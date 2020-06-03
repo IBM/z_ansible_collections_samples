@@ -213,3 +213,102 @@
     - name: Response for remove files on target in {{ tgt_tmp_dir }}/ansible
       debug:
         msg: "{{ result }}"
+
+
+    # +-------------------------------------------------------------------------
+    # | Create a directory in USS on the target, write sample JCL on target,
+    # | submit the target JCL, query for the submitted job and obtain the
+    # | job output, demonstrate creating and deleting data sets
+    # +-------------------------------------------------------------------------
+
+    - name: Create directory {{ tgt_tmp_dir }}/ansible/jcl on USS
+            target {{ system_name }}
+      file:
+        path: "{{ tgt_tmp_dir }}/ansible/jcl"
+        state: directory
+
+    - name: Write sample {{ job_name }} JCL in {{ tgt_tmp_dir }}/ansible/jcl
+            on USS
+            target {{ system_name }}
+      shell: "echo {{ lookup('file', playbook_dir + '/files/{{job_name}}.jcl') | quote }} > {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}"
+      changed_when: true
+      register: result
+
+    - name: Response for write sample {{job_name}} JCL in {{ tgt_tmp_dir }}/ansible/jcl
+            on USS target {{ system_name }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Submit {{job_name}} jcl located on target
+            in {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}
+      zos_job_submit:
+        src: "{{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}"
+        location: USS
+        wait: True
+
+    - name: Response for submit {{job_name}} jcl located on target
+            in {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Query the submitted job {{job_name}} on USS target {{ system_name }}
+      zos_job_query:
+        job_name: "{{job_name}}"
+      register: result
+
+    - name: Response for Query the submitted job {{job_name}}
+            on USS target {{ system_name }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Get {{job_name}} job output on USS target {{ system_name }}
+      zos_job_output:
+        job_name: "{{job_name}}"
+      register: result
+
+    - name: Response for Get {{job_name}} job output on USS target {{ system_name }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Remove {{job_name}} JCL and folder on USS target {{ system_name }}
+      file:
+        path: "{{ tgt_tmp_dir }}/ansible"
+        state: absent
+
+    - name: Response for remove {{job_name}} JCL and folder on
+            USS target {{ system_name }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Create a PDS data set {{ data_set_name }}
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        type: pds
+        size: 5M
+        format: fb
+        record_length: 25
+        replace: yes
+      register: result
+
+    - name: Response create a PDS data set {{ data_set_name }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Check if data set {{ data_set_name }} was created
+      command: "dls {{ data_set_name }}"
+      register: result
+      changed_when: true
+
+    - name: Response for check if data set {{ data_set_name }} was created
+      debug:
+        msg: "{{ result }}"
+
+    - name: Delete data set {{ data_set_name }}
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        state: absent
+      register: result
+
+    - name: Response for delete data set {{ data_set_name }}
+      debug:
+        msg: "{{ result }}"
