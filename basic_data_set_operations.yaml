@@ -1,0 +1,202 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates basic data set operations using modules 
+# included in the Red Hat Ansible Certified  Content for IBM Z core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory zos-collection-sample.yaml
+#
+# Notes:
+#  This sample demonstrates ways to create, delete and modify data sets using 
+#  Ansible z/OS core modules. Each module has options available on how 
+#  automation can be controlled. This sample does not demonstrate all options, 
+#  refer to documentation or ansible-doc for those options.
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+#  Data sets created for this sample will follow this pattern
+#  <USER<.SOME.DATA.SET where USER will be the user who submits the playbook.
+#  The user is identified by the Ansible variable `ansible_user`.
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `data_set_name` and `system_name`.
+#
+# Requirements:
+#   IBM z/OS core collection 1.1.0-beta1 or later
+#   ZOAU 1.0.1 or later
+#
+# Configure:
+#   tgt_tmp_dir - this is the USS directory on the target which will be written
+#                 to for this example.
+#   ctl_tmp_dir - this is the directory on the controller which will be written
+#                 to for this example.
+# Optional:
+#   data_set_name - this is the data set name that will be created during
+#                   execution of this sample.
+#   pds_name - this is the pds name that will be used during execution of this
+#              sample.
+#   system_name - this is the system name that will be used during this example,
+#                 determined by executing `uname -n` on the target.
+###############################################################################
+
+---
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  vars:
+    tgt_tmp_dir: "/tmp"
+    ctl_tmp_dir: "/tmp"
+    job_name: "HELLO"
+  environment: "{{ environment_vars }}"
+  connection: ibm.ibm_zos_core.zos_ssh
+
+  tasks:
+    # ##########################################################################
+    # Fact setting for use by this playbook
+    # ##########################################################################
+    - name: Setting fact `data_set_name` for use by this sample
+      set_fact:
+        data_set_name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        pds_name: "{{ ansible_user | upper }}.SOME.PDS.DATA.SET"
+
+    - name: Fact `data_set_name` set with value
+      debug:
+        msg: "{{ data_set_name }}"
+
+    - name: Detecting system name
+      #shell: "uname -a |awk '{print $2}'"
+      command: uname -n
+      register: result
+
+    - name: Setting fact `system_name` for use by this sample
+      set_fact:
+        system_name: "{{ result.stdout }}"
+
+    - name: Fact `system_name` set with value
+      debug:
+        msg: "{{ system_name }}"
+
+    ############################################################################
+    # Modules zos_data_set, zos_fetch
+    ############################################################################
+    # +-------------------------------------------------------------------------
+    # | 1. Create a sequential data set
+    # | 2. Create a USS file and populate it with some data
+    # | 3. Copy the USS file to the sequential data set
+    # | 4. Create a PDS and a member within the PDS
+    # | 5. Copy the sequential data set to the PDS member
+    # | 6. Create a new PDS, replacing the existing one
+    # | 7. Delete all data sets that were created during playbook execution
+    # +-------------------------------------------------------------------------
+
+    - name: Create a sequential data set
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        type: seq
+        state: present
+      register: result
+
+    - name: Response for data set creation
+      debug:
+        msg: "{{ result }}"
+      
+    - name: Create a USS file
+      file:
+        path: "{{{ tgt_tmp_dir }}/HELLO"
+        state: present
+      register: result
+
+    - name: Response for USS file creation
+      debug:
+        msg: "{{ result }}"
+
+    - name: Populate USS file
+      shell: "echo {{ lookup('file', playbook_dir + '/files/HELLO.jcl') | quote }} > {{ tgt_tmp_dir }}/HELLO"
+      changed_when: true
+      register: result
+
+    - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
+        on target {{ inventory_hostname }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Copy the USS file to the sequential data set
+      shell: 'cp {{  tgt_tmp_dir }}/HELLO "//''{{ data_set_name }}''"'
+      register: result
+
+    - name: Response for copying USS file to data set
+      debug:
+        msg: "{{ result }}"
+
+    - name: Create a PDS
+      zos_data_set:
+        name: "{{ pds_name }}"
+        type: pds
+        size: 5M
+        format: fba
+        record_length: 80
+      register: result
+
+    - name: Response for creating the PDS
+      debug:
+        msg: "{{ result }}"
+
+    - name: Create a PDS member
+      zos_data_set:
+        name: "{{ pds_name }}(HELLO)"
+        type: MEMBER
+      register: result
+
+    - name: Response for creating the PDS member
+      debug:
+        msg: "{{ result }}"
+
+    - name: Copy the sequential data set to PDS member
+      shell: 'cp "//''{{ data_set_name }}''" "//''{{ pds_name }}(HELLO)''"'
+      register: result
+
+    - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
+      debug:
+        msg: "{{ result }}"
+
+    - name: Create a new PDS
+      zos_data_set:
+        name: "{{ pds_name }}.NEW"
+        type: pds
+        size: 5M
+        format: fba
+        record_length: 80
+        replace: yes
+      register: result
+      
+    - name: Response for replacing {{ data_set_name }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Delete the data sets
+      zos_data_set:
+        batch:
+          - name: "{{ data_set_name }}"
+            state: absent
+          - name: "{{ pds_name }}"
+            state: absent
+      register: result
+
+    - name: Response for deleting the data sets
+      debug:
+        msg: "{{ result }}"
+
+    - name: Clean up {{ tgt_tmp_dir }}
+      file:
+        path: "{{ tgt_tmp_dir }}/HELLO"
+        state: absent
