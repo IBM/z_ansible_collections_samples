@@ -10,7 +10,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory zos-collection-sample.yaml
+#  ansible-playbook -i inventory data-set-operations.yaml
 #
 # Notes:
 #  This sample demonstrates ways to create, delete and modify data sets using 

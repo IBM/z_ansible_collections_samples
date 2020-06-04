@@ -12,7 +12,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory zos-collection-sample.yaml
+#  ansible-playbook -i inventory zos-operator.yaml
 #
 # Notes:
 #  This sample demonstrates various ways to perform tasks using Ansible z/OS
