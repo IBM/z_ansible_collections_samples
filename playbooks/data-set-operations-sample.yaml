@@ -104,6 +104,9 @@
         name: "{{ data_set_name }}"
         type: seq
         state: present
+        format: fb
+        record_length: 80
+        size: 5M
       register: result
 
     - name: Response for data set creation
@@ -112,8 +115,8 @@
       
     - name: Create a USS file
       file:
-        path: "{{{ tgt_tmp_dir }}/HELLO"
-        state: present
+        path: "{{ tgt_tmp_dir }}/HELLO"
+        state: touch
       register: result
 
     - name: Response for USS file creation
@@ -130,8 +133,15 @@
       debug:
         msg: "{{ result }}"
 
+    # - name: Copy the USS file to the sequential data set
+    #   shell: 'cp {{  tgt_tmp_dir }}/HELLO "//''{{ data_set_name }}''"'
+    #   register: result
+
     - name: Copy the USS file to the sequential data set
-      shell: 'cp {{  tgt_tmp_dir }}/HELLO "//''{{ data_set_name }}''"'
+      zos_copy:
+        src: "{{ tgt_tmp_dir }}/HELLO"
+        dest: "{{ data_set_name }}"
+        remote_src: yes
       register: result
 
     - name: Response for copying USS file to data set
@@ -161,25 +171,18 @@
       debug:
         msg: "{{ result }}"
 
+    # - name: Copy the sequential data set to PDS member
+    #   shell: 'cp "//''{{ data_set_name }}''" "//''{{ pds_name }}(HELLO)''"'
+    #   register: result
+
     - name: Copy the sequential data set to PDS member
-      shell: 'cp "//''{{ data_set_name }}''" "//''{{ pds_name }}(HELLO)''"'
+      zos_copy:
+        src: "{{ data_set_name }}"
+        dest: "{{ pds_name }}(HELLO)"
+        remote_src: yes
       register: result
 
     - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
-      debug:
-        msg: "{{ result }}"
-
-    - name: Create a new PDS
-      zos_data_set:
-        name: "{{ pds_name }}.NEW"
-        type: pds
-        size: 5M
-        format: fba
-        record_length: 80
-        replace: yes
-      register: result
-      
-    - name: Response for replacing {{ data_set_name }}
       debug:
         msg: "{{ result }}"
 

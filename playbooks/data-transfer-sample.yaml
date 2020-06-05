@@ -150,15 +150,15 @@
 
     - name: Add additional files to the fetched dirctory
       file:
-        path: "{{ ctl_tmp_path }}/{{ data_set_name }}/file{{ item }}"
-        state: present
+        path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
+        state: touch
       with_sequence: count=4
       delegate_to: localhost
       register: result
 
     - name: Response for populating the local directory
       debug:
-        msg: "{{ reesult }}"
+        msg: "{{ result }}"
 
     - name: Copy the updated directory back to the remote host
       zos_copy:
@@ -171,7 +171,7 @@
 
     - name: Response for copying
       debug:
-        msg: "{{ reesult }}"
+        msg: "{{ result }}"
 
     - name: Remove the data set from remote host
       zos_data_set:
@@ -181,7 +181,7 @@
 
     - name: Response for removing data set
       debug:
-        msg: "{{ reesult }}"
+        msg: "{{ result }}"
 
     - name: Remove fetched directory from control node
       file:
@@ -192,4 +192,4 @@
 
     - name: Response for removing fetched directory
       debug:
-        msg: "{{ reesult }}"
+        msg: "{{ result }}"
