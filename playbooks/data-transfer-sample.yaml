@@ -24,7 +24,7 @@
 #  permissions such as writing the the target directories or creating data sets.
 #
 #  Data sets created for this sample will follow this pattern
-#  <USER<.SOME.DATA.SET where USER will be the user who submits the playbook.
+#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
 # The user is identified by the Ansible variable `ansible_user`.
 #
 #  Additional facts for this playbook can be configured to override the defaults
