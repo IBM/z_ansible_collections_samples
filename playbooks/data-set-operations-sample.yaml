@@ -56,7 +56,6 @@
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
-    job_name: "HELLO"
   environment: "{{ environment_vars }}"
   connection: ibm.ibm_zos_core.zos_ssh
 
