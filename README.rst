@@ -362,11 +362,9 @@ To build a collection from the Git repository:
 Quickstart
 ==========
 
-After you install the collection outlined in the  `installation`_ guide, you
+After you install the collection outlined in the  `Installation`_ guide, you
 can access the collection and the ansible-doc covered in the following topics:
 
-.. _installation:
-   installation.html
 
 ibm_zos_core
 ------------
