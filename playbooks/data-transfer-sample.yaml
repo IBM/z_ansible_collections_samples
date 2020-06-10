@@ -1,0 +1,195 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to copy data to and from a z/OS system 
+# using modules included in the Red Hat Ansible Certified Content for IBM Z 
+# core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory data-transfer.yaml
+#
+# Notes:
+#  This sample demonstrates various ways to copy and fetch data sets using 
+#  Ansible z/OS core modules. Each module has options available on how 
+#  automation can be controlled. This sample does not demonstrate all options, 
+#  refer to documentation or ansible-doc for those options.
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+#  Data sets created for this sample will follow this pattern
+#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
+# The user is identified by the Ansible variable `ansible_user`.
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `data_set_name` and `system_name`.
+#
+# Requirements:
+#   IBM z/OS core collection 1.1.0-beta1 or later
+#   ZOAU 1.0.1 or later
+#
+# Configure:
+#   tgt_tmp_dir - this is the USS directory on the target which will be written
+#                 to for this example.
+#   ctl_tmp_dir - this is the directory on the controller which will be written
+#                 to for this example.
+# Optional:
+#   data_set_name - this is the data set name that will be created during
+#                   execution of this sample.
+#   system_name - this is the system name that will be used during this example,
+#                 determined by executing `uname -n` on the target.
+###############################################################################
+
+---
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  vars:
+    tgt_tmp_dir: "/tmp"
+    ctl_tmp_dir: "/tmp"
+  environment: "{{ environment_vars }}"
+  connection: ibm.ibm_zos_core.zos_ssh
+
+  tasks:
+    # ##########################################################################
+    # Fact setting for use by this playbook
+    # ##########################################################################
+    - name: Setting fact `data_set_name` for use by this sample
+      set_fact:
+        data_set_name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+
+    - name: Fact `data_set_name` set with value
+      debug:
+        msg: "{{ data_set_name }}"
+
+    - name: Detect character set for locale on target {{ inventory_hostname }}
+      command: locale -c charmap
+      register: result
+
+    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
+        target {{ inventory_hostname }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Set variable `target_charset` with target {{ inventory_hostname }}
+        charset
+      set_fact:
+        target_charset: "{{ result.stdout | default('IBM-1047') }}"
+
+    - name: Detecting system name
+      #shell: "uname -a |awk '{print $2}'"
+      command: uname -n
+      register: result
+
+    - name: Setting fact `system_name` for use by this sample
+      set_fact:
+        system_name: "{{ result.stdout }}"
+
+    - name: Fact `system_name` set with value
+      debug:
+        msg: "{{ system_name }}"
+
+
+    # ##########################################################################
+    # Modules zos_copy, zos_fetch, zos_data_set
+    # ##########################################################################
+    # ##########################################################################
+    # 1. Create a PDS on remote z/OS system
+    # 2. Copy a local file to the PDS member
+    # 3. Fetch the PDS back to the control node
+    # 4. Copy the fetched directory to a PDS, replacing the existing data set
+    # ##########################################################################
+
+    - name: Create a PDS on remote host
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        type: pds
+        format: fba
+        record_length: 80
+        size: 5M
+      register: result
+
+    - name: Response for creating the PDS
+      debug:
+        msg: "{{ result }}"
+
+    - name: Copy local file to the created PDS member
+      zos_copy:
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
+        dest: "{{ data_set_name }}(HELLO)"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+      register: result
+
+    - name: Response for copying file to PDS member
+      debug:
+        msg: "{{ result }}"
+
+    - name: Fetch the PDS back to the control node
+      zos_fetch:
+        src: "{{ data_set_name }}"
+        dest: "{{ ctl_tmp_dir }}/"
+        flat: yes
+        encoding:
+          from: "{{ target_charset }}"
+          to: ISO8859-1
+      register: result
+
+    - name: Response for fetching the PDS to control node
+      debug:
+        msg: "{{ result }}"
+
+    - name: Add additional files to the fetched dirctory
+      file:
+        path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
+        state: touch
+      with_sequence: count=4
+      delegate_to: localhost
+      register: result
+
+    - name: Response for populating the local directory
+      debug:
+        msg: "{{ result }}"
+
+    - name: Copy the updated directory back to the remote host
+      zos_copy:
+        src: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
+        dest: "{{ data_set_name }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+      register: result
+
+    - name: Response for copying
+      debug:
+        msg: "{{ result }}"
+
+    - name: Remove the data set from remote host
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        state: absent
+      register: result
+
+    - name: Response for removing data set
+      debug:
+        msg: "{{ result }}"
+
+    - name: Remove fetched directory from control node
+      file:
+        path: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
+        state: absent
+      delegate_to: localhost
+      register: result
+
+    - name: Response for removing fetched directory
+      debug:
+        msg: "{{ result }}"
