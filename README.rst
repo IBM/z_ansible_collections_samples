@@ -16,7 +16,7 @@ This repository is for managing and storing all sample playbooks related to the 
   * `Automation Hub and Private Galaxy server`_
   * `Local build`_
 
-*
+* `Sample playbooks`_
 
 * `Releases`_
 
