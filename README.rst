@@ -409,7 +409,7 @@ the correct transport method when targeting a z/OS system. The zos_ssh.py
 connection plugin is a fork of the default ssh.py plugin with the added
 functionality to check if a module is written in REXX.
 
-Since REXX scripts are required be in EBCDIC encoding to run, they must be
+Since REXX scripts are required to be in EBCDIC encoding to run, they must be
 handled differently during transfer. If the string
 ``__ANSIBLE_ENCODE_EBCDIC__`` is found in the first line of the module, the
 module is transferred to the target system using SCP. Otherwise, SFTP is used.
