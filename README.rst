@@ -9,6 +9,7 @@ This repository is for managing and storing all sample playbooks related to the 
   * `Control node`_
   * `Managed node`_
   * `Python on z/OS`_
+  * `ZOAU`_
 
 * `Installation`_
 
@@ -76,13 +77,11 @@ Managed node
      `release notes`_.
 * `z/OS OpenSSH`_
 
-.. _Python on z/OS:
-   requirements.html#id1
 .. _z/OS:
    https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2/zos-v2r2-home.html
 
 .. _IBM Z Open Automation Utilities:
-   requirements.html#id1
+   `ZOAU`_
 
 .. _z/OS OpenSSH:
    https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.e0za100/ch1openssh.htm
