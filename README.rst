@@ -16,6 +16,17 @@ This repository is for managing and storing all sample playbooks related to the 
   * `Automation Hub and Private Galaxy server`_
   * `Local build`_
 
+*
+
+* `Releases`_
+
+  * `Version 1.1.0-beta1`_
+  * `Version 1.0.0`_
+  * `Version 0.0.4`_
+  * `Version 0.0.3`_
+  * `Version 0.0.2`_
+  * `Version 0.0.1`_
+
 
 .. ...........................................................................
 .. © Copyright IBM Corporation 2020                                          .
@@ -73,7 +84,7 @@ Managed node
    https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.e0za100/ch1openssh.htm
 
 .. _release notes:
-   release_notes.html
+   `Releases`_
 
 
 Python on z/OS
@@ -335,3 +346,124 @@ To build a collection from the Git repository:
 
       .. _installing collections with Ansible Galaxy:
          https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections-with-ansible-galaxy
+
+
+Sample playbooks
+================
+
+`Data set operations <https://github.com/IBM/z_ansible_collections_samples/blob/master/playbooks/data-set-operations-sample.yaml>`_
+
+`Data transfer <https://github.com/IBM/z_ansible_collections_samples/blob/master/playbooks/data-transfer-sample.yaml>`_
+
+`Encoding <https://github.com/IBM/z_ansible_collections_samples/blob/master/playbooks/encoding-sample.yaml>`_
+
+`Job submission <https://github.com/IBM/z_ansible_collections_samples/blob/master/playbooks/job-submission-sample.yaml>`_
+
+`z/OS operator commands <https://github.com/IBM/z_ansible_collections_samples/blob/master/playbooks/zos-operator-sample.yaml>`_
+
+
+
+.. ...........................................................................
+.. © Copyright IBM Corporation 2020                                          .
+.. ...........................................................................
+
+Releases
+========
+
+Version 1.1.0-beta1
+-------------------
+
+Notes
+   * Update recommended
+   * New modules
+
+     * zos_fetch, zos_encode, zos_operator_action_query, zos_operator,
+       zos_tso_command, zos_ping
+   * New filter
+   * Improved error handling and messages
+   * Bug fixes
+   * Documentation updates
+   * New samples
+
+Availability
+  * Galaxy
+  * GitHub
+
+Reference
+  * Supported by IBM Z Open Automation Utilities: 1.0.2 or later
+
+Version 1.0.0
+-------------
+Notes
+   * Update recommended
+   * Security vulnerabilities fixed
+   * Improved test, security and injection coverage
+   * Module zos_data_set catalog support added
+   * Documentation updates
+
+Availability
+  * Automation Hub
+  * Galaxy
+  * GitHub
+
+Reference
+  * Supported by IBM Z Open Automation Utilities: 1.0.1 (PTF UI66957 or later)
+
+Version 0.0.4
+-------------
+
+Notes
+  * Update recommended
+  * Includes fixes to modules zos_job_output and zos_job_submit
+  * Improved buffer utilization
+  * Optimized JSON response
+  * Functional test cases for all modules
+  * Updated document references
+
+Availability
+  * Galaxy
+  * GitHub
+
+Reference:
+  * Supported by IBM Z Open Automation Utilities: 1.0.1 (PTF UI66957 or later)
+
+Version 0.0.3
+-------------
+Notes
+  * Update recommended
+  * Includes updates to README.md for a malformed URL and product direction
+  * Includes fixes for zos_data_set module
+
+Availability
+  * Galaxy
+  * GitHub
+
+Reference
+  * Supported by IBM Z Open Automation Utilities: 1.0.1 (PTF UI66957 or later)
+
+Version 0.0.2
+-------------
+Notes
+  * Update not required
+  * Updates to the README and included docs
+
+Availability
+  * Galaxy
+  * GitHub
+
+Reference
+  * Supported by IBM Z Open Automation Utilities: 1.0.1 (PTF UI66957 or later)
+
+Version 0.0.1
+-------------
+Notes
+  * Initial beta release of IBM Z core collection, referred to as ibm_zos_core
+    which is part of the broader offering
+    Red Hat® Ansible Certified Content for IBM Z.
+
+Availability
+  * Galaxy
+  * GitHub
+
+Reference
+  * Supported by IBM Z Open Automation Utilities: 1.0.1 (PTF UI66957 or latera
