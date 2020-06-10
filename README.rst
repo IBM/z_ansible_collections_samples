@@ -2,13 +2,27 @@ Ansible z/OS Collection Samples
 ===============================
 This repository is for managing and storing all sample playbooks related to the Red Hat Ansible Certified Content for IBM Z.
 
-.. toctree::
-   :maxdepth: 2
 
-   Installation
+
+* `Requirements`_
+
+* `Installation`_
+
+  * `Ansible Galaxy`_
+  * `Automation Hub and Private Galaxy server`_
+  * `Local build`_
+
+
 .. ...........................................................................
 .. © Copyright IBM Corporation 2020                                          .
 .. ...........................................................................
+
+Requirements
+============
+
+* IBM z/OS core collection 1.1.0-beta1 or later
+* ZOAU 1.0.1 or later
+
 
 Installation
 ============
