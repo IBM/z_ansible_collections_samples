@@ -148,7 +148,7 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Add additional files to the fetched dirctory
+    - name: Add additional files to the fetched directory
       file:
         path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
         state: touch
