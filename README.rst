@@ -1,5 +1,6 @@
+*******************************
 Ansible z/OS Collection Samples
-===============================
+*******************************
 This repository is for managing and storing all sample playbooks related to the Red Hat Ansible Certified Content for IBM Z.
 
 
@@ -495,7 +496,7 @@ Sample playbooks
 
 Blogs
 =====
-* `Job Submission on z/OS Made Easy with Ansible <https://>`_
+* `Job Submission on z/OS Made Easy with Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible>`_
 * `Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible <https://>`_
 
 .. ...........................................................................
