@@ -1,7 +1,7 @@
 *******************************
 Ansible z/OS Collection Samples
 *******************************
-This repository is for managing and storing all sample playbooks related to the Red Hat Ansible Certified Content for IBM Z.
+Documentation, sample playbooks and blogs related to the Red Hat Ansible Certified Content for IBM Z. The z/OS core collection GitHub repository can be found `here <https://github.com/ansible-collections/ibm_zos_core>`_.
 
 
 
