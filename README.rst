@@ -497,7 +497,7 @@ Sample playbooks
 Blogs
 =====
 * `Job Submission on z/OS Made Easy with Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible>`_
-* `Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible <https://>`_
+* `Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an>`_
 
 .. ...........................................................................
 .. © Copyright IBM Corporation 2020                                          .
