@@ -1,0 +1,29 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+# defaults file for unpack-restore-data-sets
+
+# a list of data sets contained in an archive you wish to restore
+data_sets_to_restore:
+  - "**"
+
+# the name to use for the data set archive
+# if not provided, module-generated name will be used
+archive_data_set: ""
+
+# the name to use for the tersed archive data set
+terse_data_set: ""
+
+# the volume where data sets restored from an archive should be placed
+# if output volume not provided system defaults will be used
+output_volume: ""
+
+# the HLQ to give to the data sets after restore
+# if one is not provided, original will be used
+new_hlq: ""
+
+# should terse and archive data sets be deleted upon successful restore?
+delete: yes
+
+# should existing data sets be overwritten during restore
+replace: yes

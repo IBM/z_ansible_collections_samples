@@ -1,0 +1,29 @@
+# Copyright (c) IBM Corporation 2020
+
+- hosts: source_system
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Dump, pack, and transfer data sets
+      include_role:
+        name: dump-pack-ftp-data-sets
+        public: yes
+
+- hosts: destination_system
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Unpack and restore data sets
+      include_role:
+        name: unpack-restore-data-sets
+      vars:
+        # target_data_set and size_in_cyls will always be defined for all hosts
+        # after dump-pack-ftp-data-sets role is executed
+        terse_data_set: "{{ hostvars.get('source').get('target_data_set') }}"
+        size_in_cyls: "{{ hostvars.get('source').get('size_in_cyls') }}"

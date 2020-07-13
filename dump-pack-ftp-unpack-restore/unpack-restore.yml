@@ -1,0 +1,12 @@
+# Copyright (c) IBM Corporation 2020
+
+- hosts: destination_system
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Unpack and restore data sets
+      include_role:
+        name: unpack-restore-data-sets

@@ -1,0 +1,7 @@
+{# # Copyright (c) IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0) #}
+{{ target_hostname }}
+{{ target_user }}
+{{ target_password }}
+bin
+PUT '{{ terse_data_set_final.get("names")[0] | upper }}' '{{ target_data_set|upper }}'
