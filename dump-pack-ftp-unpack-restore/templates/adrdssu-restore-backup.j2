@@ -1,0 +1,10 @@
+{# Copyright (c) IBM Corporation 2020 #}
+ RESTORE -
+    INDD(SOURCE) -
+{% if output_volume is defined and output_volume %}
+    OUTDY({{output_volume | upper}}) -
+{% endif %}
+    DS(INCL( -
+{% for data_set in data_sets_to_restore %}
+        {{ data_set | upper }}{{ " - " if loop.index != loop.length else ")) REPLACE" }}
+{% endfor %}

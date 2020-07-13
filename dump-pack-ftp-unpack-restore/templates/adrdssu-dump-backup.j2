@@ -1,0 +1,10 @@
+{# Copyright (c) IBM Corporation 2020 #}
+ DUMP -
+{% if input_volume is defined and input_volume %}
+    PIDY({{input_volume | upper }}) -
+{% endif %}
+    OUTDD(ARCHIVE) -
+    DS(INCL( -
+{% for data_set in data_sets_to_dump %}
+        {{ data_set | upper }}{{ " - " if loop.index != loop.length else ")) ALLEXCP" }}
+{% endfor %}

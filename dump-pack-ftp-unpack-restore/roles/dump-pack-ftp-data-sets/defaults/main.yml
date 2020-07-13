@@ -1,0 +1,35 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+# defaults file for dump-pack-ftp-data-sets
+
+# a list of data sets contained in an archive you wish to include in dump
+data_sets_to_dump:
+
+# the name to use for the data set archive
+# if not provided, module-generated name will be used
+archive_data_set: ""
+
+# the name to use for the tersed archive data set
+# if not provided, module-generated name will be used
+terse_data_set: ""
+
+# the name to give to the tersed archive after FTP transfer
+# if not provided terse_data_set value will be used
+target_data_set: ""
+
+# the volume containing the data sets to archive
+# if input volume not provided system defaults will be used
+input_volume: ""
+
+# the host name of the target host which will receive the tersed data set
+target_hostname: ""
+
+# the user name to use for connecting to the target host
+target_user: ""
+
+# the password to use for connecting to the target host
+target_password: ""
+
+# should terse and archive data sets be deleted upon successful transfer?
+delete: yes

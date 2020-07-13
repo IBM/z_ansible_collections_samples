@@ -1,0 +1,13 @@
+# Copyright (c) IBM Corporation 2020
+
+- hosts: source_system
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Dump, pack, and transfer data sets
+      include_role:
+        name: dump-pack-ftp-data-sets
+        public: yes
