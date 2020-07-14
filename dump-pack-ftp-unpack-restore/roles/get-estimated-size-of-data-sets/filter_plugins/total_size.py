@@ -71,7 +71,7 @@ def byte_to_megabyte(number_of_bytes):
 
 
 class FilterModule(object):
-    """ Jinja2 filters for use with WTOR response objects returned by zos_operator_action_query module. """
+    """ Jinja2 filters for estimating size of one or more data sets. """
 
     def filters(self):
         filters = {
