@@ -1,0 +1,24 @@
+# Copyright (c) IBM Corporation 2020
+
+# the path to the root of IBM python installation
+PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
+
+# the path to root of ZOAU installation
+ZOAU: "/usr/lpp/IBM/zoautil"
+
+# you should not need to change environment_vars
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+
+# The destination data set that the local file should be copied to.
+# It can can either a sequential data set or a PDS/PDSE member.
+dest_tmp_data_set: ""

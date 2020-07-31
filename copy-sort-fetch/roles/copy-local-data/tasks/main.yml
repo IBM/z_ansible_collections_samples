@@ -1,0 +1,61 @@
+---
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+# This role is used to copy a local file containing tabular data to a remote
+# z/OS data set.
+#
+# Flow:
+#   - Detect target system character set, to be used when converting encoding
+#     during copy task
+#   - Set 'target_charset' variable to the determined charset
+#   - Copy the local file to a z/OS sequential data set
+#   - Confirm that the file was copied by verifying existence of destination
+#     data set.
+###############################################################################
+
+###############################################################################
+# The local data set that we are going to be copying contains faculty salary 
+# data for University of Washington. The format of the data set is as follows:
+#
+#  case   id gender   deg yrdeg field startyr year   rank admin    salary 
+#     1    1      F Other    92 Other      95   95 Assist     0  6684.000
+#     2    2      M Other    91 Other      94   94 Assist     0  4743.000
+#     3    2      M Other    91 Other      94   95 Assist     0  4881.000
+#     4    4      M   PhD    96 Other      95   95 Assist     0  4231.000
+#     5    6      M   PhD    66 Other      91   91   Full     1 11182.000
+#     6    6      M   PhD    66 Other      91   92   Full     1 11507.000
+#     7    6      M   PhD    66 Other      91   93   Full     0 11840.000
+#     8    6      M   PhD    66 Other      91   94   Full     0 11840.000
+#     9    6      M   PhD    66 Other      91   95   Full     0 12184.000
+#     .    .      .   ..     .. ..         ..   ..   ..       . ... 
+###############################################################################
+
+- name: Detect character set for locale on target {{ inventory_hostname }}
+  command: locale -c charmap
+  register: target_locale
+
+- name: Set variable `target_charset` with target {{ inventory_hostname }} charset
+  set_fact:
+    target_charset: "{{ target_locale.stdout | default('IBM-1047') }}"
+
+- name: Copy local data file to remote z/OS data set
+  zos_copy:
+    src: "{{ role_path }}/files/SalaryData.txt"
+    dest: "{{ dest_tmp_data_set }}"
+    encoding:
+      from: ISO8859-1
+      to: "{{ target_charset }}"
+  register: copy_result
+
+- name: Ensure the copied data set exists on target
+  zos_find:
+    patterns:
+      - "{{ dest_tmp_data_set }}"
+  register: result
+
+- assert:
+    that:
+      - "{{ result.data_sets }} is not None and len({{ result.data_sets }}) != 0"
+      - "{{ result.datasets['name'] }} == {{ dest_tmp_data_set }}"
+    fail_msg: "The destination data set does not exist"
