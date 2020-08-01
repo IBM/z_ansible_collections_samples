@@ -123,4 +123,3 @@
           zos_data_set:
             name: "{{ dest_tmp_data_set }}"
             state: absent
-
