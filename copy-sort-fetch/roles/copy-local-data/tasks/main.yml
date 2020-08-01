@@ -31,14 +31,6 @@
 #     .    .      .   ..     .. ..         ..   ..   ..       . ... 
 ###############################################################################
 
-- name: Detect character set for locale on target {{ inventory_hostname }}
-  command: locale -c charmap
-  register: target_locale
-
-- name: Set variable `target_charset` with target {{ inventory_hostname }} charset
-  set_fact:
-    target_charset: "{{ target_locale.stdout | default('IBM-1047') }}"
-
 - name: Copy local data file to remote z/OS data set
   zos_copy:
     src: "{{ role_path }}/files/SalaryData.txt"
@@ -56,6 +48,6 @@
 
 - assert:
     that:
-      - "{{ result.data_sets }} is not None and len({{ result.data_sets }}) != 0"
-      - "{{ result.datasets['name'] }} == {{ dest_tmp_data_set }}"
+      - "{{ result.data_sets | valid_list }}"
+      - "'{{ result.data_sets[0]['name'] }}' == '{{ dest_tmp_data_set }}'"
     fail_msg: "The destination data set does not exist"

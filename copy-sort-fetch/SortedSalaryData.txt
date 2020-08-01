@@ -1,0 +1,68 @@
+    9    6      M   PhD    66 Other      91   95   Full 12184.000
+    8    6      M   PhD    66 Other      91   94   Full 11840.000
+    7    6      M   PhD    66 Other      91   93   Full 11840.000
+    6    6      M   PhD    66 Other      91   92   Full 11507.000
+    5    6      M   PhD    66 Other      91   91   Full 11182.000
+    1    1      F Other    92 Other      95   95 Assist  6684.000
+    3    2      M Other    91 Other      94   95 Assist  4881.000
+   34    9      M   PhD    82 Other      87   90  Assoc  4800.000
+    2    2      M Other    91 Other      94   94 Assist  4743.000
+   29    7      M   PhD    70 Other      71   95  Assoc  4604.000
+   33    9      M   PhD    82 Other      87   89 Assist  4393.000
+   28    7      M   PhD    70 Other      71   94  Assoc  4286.000
+   27    7      M   PhD    70 Other      71   93  Assoc  4286.000
+    4    4      M   PhD    96 Other      95   95 Assist  4231.000
+   26    7      M   PhD    70 Other      71   92  Assoc  4165.000
+   31    9      M   PhD    82 Other      87   87 Assist  4105.000
+   32    9      M   PhD    82 Other      87   88 Assist  4105.000
+   30    8      M   PhD    75 Other      95   95 Assist  4047.674
+   25    7      M   PhD    70 Other      71   91  Assoc  3991.000
+   24    7      M   PhD    70 Other      71   90  Assoc  3814.000
+   23    7      M   PhD    70 Other      71   89  Assoc  3643.000
+   22    7      M   PhD    70 Other      71   88  Assoc  3406.000
+   21    7      M   PhD    70 Other      71   87  Assoc  3217.000
+   20    7      M   PhD    70 Other      71   86  Assoc  3063.000
+   19    7      M   PhD    70 Other      71   85  Assoc  2973.000
+   18    7      M   PhD    70 Other      71   84  Assoc  2973.000
+   17    7      M   PhD    70 Other      71   83  Assoc  2784.000
+   16    7      M   PhD    70 Other      71   82  Assoc  2639.000
+   15    7      M   PhD    70 Other      71   81  Assoc  2639.000
+   14    7      M   PhD    70 Other      71   80  Assoc  2410.000
+   13    7      M   PhD    70 Other      71   79  Assoc  2237.000
+   12    7      M   PhD    70 Other      71   78 Assist  1981.000
+   11    7      M   PhD    70 Other      71   77 Assist  1851.000
+   10    7      M   PhD    70 Other      71   76 Assist  1730.000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

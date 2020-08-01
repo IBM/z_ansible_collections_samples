@@ -3,6 +3,6 @@
 source_system:
   hosts:
     source:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
+      ansible_host: ec33013a.vmec.svl.ibm.com
+      ansible_user: omvsadm
+      ansible_python_interpreter: /u/omvsadm/pyz/install/bin/python3

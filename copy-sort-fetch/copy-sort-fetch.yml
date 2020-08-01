@@ -48,20 +48,25 @@
 - hosts: source_system
   collections:
     - ibm.ibm_zos_core
+  vars_files:
+    - "host_vars/vars.yml"
   gather_facts: no
   environment: "{{ environment_vars }}"
 
   tasks:
-    - name: Copy local file containing data
-      include_role:
-        name: copy-local-data
-        public: yes
+    - block:
+      - name: Copy local file containing data
+        include_role:
+          name: copy-local-data
+          public: yes
 
-    - name: Remove the column headers so that we are left with raw data
-      zos_lineinfile:
-        src: "{{ dest_tmp_data_set }}"
-        regexp: '^ case'
-        state: absent
+      - name: Remove the column headers so that we are left with raw data
+        zos_lineinfile:
+          src: "{{ dest_tmp_data_set }}"
+          regexp: '^ case.*'
+          state: absent
+          line: ""
+          encoding: "{{ target_charset }}"
 
 ###############################################################################
 # We will be using zos_mvs_raw module to sort the data set based on salary. 
@@ -83,22 +88,39 @@
 #   /*                                           
 ###############################################################################
 
-    - name: Sort the data set based on salary descending order
-      zos_mvs_raw:
-        program_name: sort
-        dds:
-          - dd_output:
-              dd_name: sysout
-              return_content:
-                type: text
-          - dd_data_set:
-              dd_name: sortin
-              data_set_name: "{{ dest_tmp_data_set }}"
-              disposition: shr
-          - dd_data_set:
-              dd_name: sortout
-              data_set_name: "{{ dest_tmp_data_set }}"
-              disposition: old
-          - dd_input:
-              dd_name: sysin
-              content: "  SORT FIELDS=(62,9,BI,D)"
+      - name: Sort the data set based on salary in descending order
+        zos_mvs_raw:
+          program_name: sort
+          parm: "MSGPRT=CRITICAL,LIST"
+          dds:
+            - dd_output:
+                dd_name: sysout
+                return_content:
+                  type: text
+            - dd_data_set:
+                dd_name: sortin
+                data_set_name: "{{ dest_tmp_data_set }}"
+                disposition: shr
+            - dd_data_set:
+                dd_name: sortout
+                data_set_name: "{{ dest_tmp_data_set }}"
+                disposition: old
+            - dd_input:
+                dd_name: sysin
+                content: "   SORT FIELDS=(57,9,BI,D)"
+
+      - name: Fetch the sorted data set back to controller
+        zos_fetch:
+          src: "{{ dest_tmp_data_set }}"
+          dest: "{{ playbook_dir }}/SortedSalaryData.txt"
+          flat: true
+          encoding:
+            from: IBM-1047
+            to: ISO8859-1
+
+      always:
+        - name: Clean up remote data set
+          zos_data_set:
+            name: "{{ dest_tmp_data_set }}"
+            state: absent
+
