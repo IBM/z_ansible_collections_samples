@@ -19,15 +19,13 @@
 #
 #
 # Playbook flow:
-#   - Detect target system character set, to be used when converting encoding
-#     during copy task
-#   - Set 'target_charset' variable to the determined charset
-#   - Copy the local file to a z/OS sequential data set
+#   - Copy the local data file to a z/OS sequential data set
 #   - Confirm that the file was copied by verifying existence of destination
 #     data set, using zos_find module.
 #   - Remove the column headers so that it's easier to sort the data
 #   - Use the zos_mvs_raw module to sort the data set based on salary
 #   - Fetch the sorted data set back to the control node using zos_fetch module
+#   - Add the column headers back to the sorted file
 #
 # Requirements:
 #   Control Node:
@@ -50,6 +48,8 @@
     - ibm.ibm_zos_core
   vars_files:
     - "host_vars/vars.yml"
+  vars:
+    column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
   gather_facts: no
   environment: "{{ environment_vars }}"
 
@@ -59,6 +59,14 @@
         include_role:
           name: copy-local-data
           public: yes
+
+###############################################################################
+# Removing column headers is necessary due to the fact that, if the column
+# headers are present, starting byte of the first salary data point would be 
+# over 71, which is, which is greater than the maximum allowed by DFSORT. 
+# By removing the first line, we are left with raw data and the starting byte
+# of salary is 57.
+###############################################################################
 
       - name: Remove the column headers so that we are left with raw data
         zos_lineinfile:
@@ -115,8 +123,15 @@
           dest: "{{ playbook_dir }}/SortedSalaryData.txt"
           flat: true
           encoding:
-            from: IBM-1047
+            from: "{{ target_charset }}"
             to: ISO8859-1
+
+      - name: Add column headers back to the sorted file
+        lineinfile:
+          path: "{{ playbook_dir }}/SortedSalaryData.txt"
+          line: "{{ column_headers }}"
+          insertbefore: BOF
+        delegate_to: localhost
 
       always:
         - name: Clean up remote data set

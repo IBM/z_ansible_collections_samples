@@ -6,9 +6,6 @@
 # z/OS data set.
 #
 # Flow:
-#   - Detect target system character set, to be used when converting encoding
-#     during copy task
-#   - Set 'target_charset' variable to the determined charset
 #   - Copy the local file to a z/OS sequential data set
 #   - Confirm that the file was copied by verifying existence of destination
 #     data set.
