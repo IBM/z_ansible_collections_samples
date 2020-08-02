@@ -46,8 +46,6 @@
 - hosts: source_system
   collections:
     - ibm.ibm_zos_core
-  vars_files:
-    - "host_vars/vars.yml"
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
   gather_facts: no

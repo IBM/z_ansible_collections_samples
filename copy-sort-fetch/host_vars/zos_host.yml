@@ -1,12 +1,10 @@
 # Copyright (c) IBM Corporation 2020
 
 # the path to the root of IBM python installation
-# PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
-PYZ: "/u/omvsadm/pyz/install"
+PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 
 # the path to root of ZOAU installation
-# ZOAU: "/usr/lpp/IBM/zoautil"
-ZOAU: "/u/omvsadm"
+ZOAU: "/usr/lpp/IBM/zoautil"
 
 # you should not need to change environment_vars
 environment_vars:
@@ -23,7 +21,7 @@ environment_vars:
 
 # The destination data set that the local file should be copied to.
 # It can be either a sequential data set or a PDS/PDSE member.
-dest_tmp_data_set: "OMVSADM.TEST.COPY"
+dest_tmp_data_set: ""
 
 # The charset of the remote z/OS system. Default is IBM-1047
 target_charset: "IBM-1047"
