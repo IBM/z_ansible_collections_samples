@@ -12,6 +12,21 @@ control node. The following core modules are used to accomplish these set of tas
 - `zos_mvs_raw`
 - `zos_fetch`
 
+## Requirements
+
+- Control Node:
+  - Ansible 2.9 or later
+  - Python 2.7 or later
+  - OpenSSH
+  - IBM z/OS core collection 1.3.0-beta.1 or later
+
+- Managed Node:
+  - IBM Open Enterprise Python for z/OS 
+  - z/OS V2R3 or later
+  - IBM Z Open Automation Utilities (ZOAU) version 1.0.3 or later
+  - z/OS OpenSSH
+  - The z/OS shell
+
 ## Getting Started
 
 ### Update [inventory.yml](inventory.yml) with the information about your system(s)
