@@ -1,0 +1,138 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This playbook is used to demonstrate how to copy a local file, containing
+# tabular data, to a remote z/OS data set, sort the data set based on some
+# criteria and fetch the sorted data set back to the control node.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#   or
+#  ansible-playbook -i "hostaddress," <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory copy-sort-fetch.yaml
+#   or
+#  ansible-playbook -i "mysystem.to.connect.com," copy-sort-fetch.yaml
+#
+#
+# Playbook flow:
+#   - Copy the local data file to a z/OS sequential data set
+#   - Confirm that the file was copied by verifying existence of destination
+#     data set, using zos_find module.
+#   - Remove the column headers so that it's easier to sort the data
+#   - Use the zos_mvs_raw module to sort the data set based on salary
+#   - Fetch the sorted data set back to the control node using zos_fetch module
+#   - Add the column headers back to the sorted file
+#
+# Requirements:
+#   Control Node:
+#     - Ansible 2.9 or later
+#     - Python 2.7 or later
+#     - OpenSSH
+#     - IBM z/OS core collection 1.3.0-beta.1 or later
+#
+#   Managed Node:
+#     - IBM Open Enterprise Python for z/OS
+#     - z/OS V2R3 or later
+#     - IBM Z Open Automation Utilities (ZOAU) version 1.0.3 or later
+#     - z/OS OpenSSH
+#     - The z/OS shell
+#
+###############################################################################
+
+- hosts: source_system
+  collections:
+    - ibm.ibm_zos_core
+  vars:
+    column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - block:
+      - name: Copy local file containing data
+        include_role:
+          name: copy-local-data
+          public: yes
+
+###############################################################################
+# Removing column headers is necessary due to the fact that, if the column
+# headers are present, starting byte of the first salary data point would be 
+# over 71, which is, which is greater than the maximum allowed by DFSORT. 
+# By removing the first line, we are left with raw data and the starting byte
+# of salary is 57.
+###############################################################################
+
+      - name: Remove the column headers so that we are left with raw data
+        zos_lineinfile:
+          src: "{{ dest_tmp_data_set }}"
+          regexp: '^ case.*'
+          state: absent
+          line: ""
+          encoding: "{{ target_charset }}"
+
+###############################################################################
+# We will be using zos_mvs_raw module to sort the data set based on salary. 
+# The task is equivalent to executing the following JCL:
+#
+#   //ANSIBLE JOB 'SORTDS', 
+#   //  NOTIFY=OMVSADM,      
+#   //  USER=OMVSADM,        
+#   //  MSGCLASS=E,          
+#   //  MSGLEVEL=(1,1),      
+#   //  CLASS=A
+#   //*
+#   //SORT     EXEC PGM=SORT                     
+#   //SYSOUT   DD   SYSOUT=*                     
+#   //SORTIN   DD   DSN=DEST.SALARY.DATA.SET,DISP=SHR
+#   //SORTOUT  DD   DSN=DEST.SALARY.DATA.SET,DISP=OLD
+#   //SYSIN    DD   *                            
+#       SORT FIELDS=(62,9,BI,D)                  
+#   /*                                           
+###############################################################################
+
+      - name: Sort the data set based on salary in descending order
+        zos_mvs_raw:
+          program_name: sort
+          parm: "MSGPRT=CRITICAL,LIST"
+          dds:
+            - dd_output:
+                dd_name: sysout
+                return_content:
+                  type: text
+            - dd_data_set:
+                dd_name: sortin
+                data_set_name: "{{ dest_tmp_data_set }}"
+                disposition: shr
+            - dd_data_set:
+                dd_name: sortout
+                data_set_name: "{{ dest_tmp_data_set }}"
+                disposition: old
+            - dd_input:
+                dd_name: sysin
+                content: "   SORT FIELDS=(57,9,BI,D)"
+
+      - name: Fetch the sorted data set back to controller
+        zos_fetch:
+          src: "{{ dest_tmp_data_set }}"
+          dest: "{{ playbook_dir }}/SortedSalaryData.txt"
+          flat: true
+          encoding:
+            from: "{{ target_charset }}"
+            to: ISO8859-1
+
+      - name: Add column headers back to the sorted file
+        lineinfile:
+          path: "{{ playbook_dir }}/SortedSalaryData.txt"
+          line: "{{ column_headers }}"
+          insertbefore: BOF
+        delegate_to: localhost
+
+      always:
+        - name: Clean up remote data set
+          zos_data_set:
+            name: "{{ dest_tmp_data_set }}"
+            state: absent

@@ -1,0 +1,8 @@
+# Copyright (c) IBM Corporation 2020
+
+source_system:
+  hosts:
+    zos_host:
+      ansible_host: zos_target_address
+      ansible_user: zos_target_username
+      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
