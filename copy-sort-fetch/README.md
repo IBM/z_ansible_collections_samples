@@ -8,6 +8,7 @@ based on a particular criteria and the sorted data set is fetched back to the
 control node. The following core modules are used to accomplish these set of tasks:
 
 - `zos_copy`
+- `zos_find`
 - `zos_lineinfile`
 - `zos_mvs_raw`
 - `zos_fetch`

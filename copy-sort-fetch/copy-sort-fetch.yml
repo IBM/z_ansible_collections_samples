@@ -61,7 +61,7 @@
 ###############################################################################
 # Removing column headers is necessary due to the fact that, if the column
 # headers are present, starting byte of the first salary data point would be 
-# over 71, which is, which is greater than the maximum allowed by DFSORT. 
+# over 71, which is greater than the maximum allowed by DFSORT. 
 # By removing the first line, we are left with raw data and the starting byte
 # of salary is 57.
 ###############################################################################
