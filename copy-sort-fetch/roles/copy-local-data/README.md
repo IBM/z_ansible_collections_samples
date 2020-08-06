@@ -16,15 +16,8 @@ It can be an existing sequential data set. If it does not exist, it will be crea
 
 - `target_charset`: The default system character set of the target machine.
 
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
 Example Playbook
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
 ```yaml
 - hosts: source_system
@@ -50,8 +43,3 @@ Author Information
 ------------------
 
 - Asif Mahmud asif.mahmud@ibm.com, [@asifmahmud](https://github.com/asifmahmud)
-
-Copyright
--------
-
-© Copyright IBM Corporation 2020
