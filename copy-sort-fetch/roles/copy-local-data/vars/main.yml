@@ -1,2 +1,11 @@
 ---
-# vars file for copy-local-data
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+################################################################################
+# This configuration ensures variable values in the role are used in the role,
+# and will not be overridden by inventory. However, ansible-playbook
+# addhoc values used with opton `-e` will override these variable values.
+################################################################################

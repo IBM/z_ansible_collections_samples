@@ -1,4 +1,6 @@
-# Copyright (c) IBM Corporation 2020
+################################################################################
+# © Copyright IBM Corporation 2020
+################################################################################
 
 # the path to the root of IBM python installation
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
