@@ -1,5 +1,5 @@
 copy-local-data
-=========
+===============
 
 Copy a file on the control node to a sequential data set on the remote z/OS host.
 
@@ -43,3 +43,11 @@ Author Information
 ------------------
 
 - Asif Mahmud asif.mahmud@ibm.com, [@asifmahmud](https://github.com/asifmahmud)
+
+Support
+-------
+
+All IBM certified sample playbooks, roles and filters are supported as part of
+the Red Hat® Ansible Certified Content for IBM Z offering. Support for samples
+is managed through the repositories git issues:
+https://github.com/IBM/z_ansible_collections_samples/issues

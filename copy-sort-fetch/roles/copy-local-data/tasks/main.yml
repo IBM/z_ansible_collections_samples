@@ -1,6 +1,9 @@
 ---
-###############################################################################
-# Copyright (c) IBM Corporation 2020
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
 ###############################################################################
 # This role is used to copy a local file containing tabular data to a remote
 # z/OS data set.
@@ -12,10 +15,10 @@
 ###############################################################################
 
 ###############################################################################
-# The local data set that we are going to be copying contains faculty salary 
+# The local data set that we are going to be copying contains faculty salary
 # data for University of Washington. The format of the data set is as follows:
 #
-#  case   id gender   deg yrdeg field startyr year   rank admin    salary 
+#  case   id gender   deg yrdeg field startyr year   rank admin    salary
 #     1    1      F Other    92 Other      95   95 Assist     0  6684.000
 #     2    2      M Other    91 Other      94   94 Assist     0  4743.000
 #     3    2      M Other    91 Other      94   95 Assist     0  4881.000
@@ -25,7 +28,7 @@
 #     7    6      M   PhD    66 Other      91   93   Full     0 11840.000
 #     8    6      M   PhD    66 Other      91   94   Full     0 11840.000
 #     9    6      M   PhD    66 Other      91   95   Full     0 12184.000
-#     .    .      .   ..     .. ..         ..   ..   ..       . ... 
+#     .    .      .   ..     .. ..         ..   ..   ..       . ...
 ###############################################################################
 
 - name: Copy local data file to remote z/OS data set

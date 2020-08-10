@@ -1,6 +1,7 @@
-###############################################################################
-# Copyright (c) IBM Corporation 2020
-###############################################################################
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
 
 ###############################################################################
 # This playbook is used to demonstrate how to copy a local file, containing
@@ -60,8 +61,8 @@
 
 ###############################################################################
 # Removing column headers is necessary due to the fact that, if the column
-# headers are present, starting byte of the first salary data point would be 
-# over 71, which is greater than the maximum allowed by DFSORT. 
+# headers are present, starting byte of the first salary data point would be
+# over 71, which is greater than the maximum allowed by DFSORT.
 # By removing the first line, we are left with raw data and the starting byte
 # of salary is 57.
 ###############################################################################
@@ -75,23 +76,23 @@
           encoding: "{{ target_charset }}"
 
 ###############################################################################
-# We will be using zos_mvs_raw module to sort the data set based on salary. 
+# We will be using zos_mvs_raw module to sort the data set based on salary.
 # The task is equivalent to executing the following JCL:
 #
-#   //ANSIBLE JOB 'SORTDS', 
-#   //  NOTIFY=OMVSADM,      
-#   //  USER=OMVSADM,        
-#   //  MSGCLASS=E,          
-#   //  MSGLEVEL=(1,1),      
+#   //ANSIBLE JOB 'SORTDS',
+#   //  NOTIFY=OMVSADM,
+#   //  USER=OMVSADM,
+#   //  MSGCLASS=E,
+#   //  MSGLEVEL=(1,1),
 #   //  CLASS=A
 #   //*
-#   //SORT     EXEC PGM=SORT                     
-#   //SYSOUT   DD   SYSOUT=*                     
+#   //SORT     EXEC PGM=SORT
+#   //SYSOUT   DD   SYSOUT=*
 #   //SORTIN   DD   DSN=DEST.SALARY.DATA.SET,DISP=SHR
 #   //SORTOUT  DD   DSN=DEST.SALARY.DATA.SET,DISP=OLD
-#   //SYSIN    DD   *                            
-#       SORT FIELDS=(62,9,BI,D)                  
-#   /*                                           
+#   //SYSIN    DD   *
+#       SORT FIELDS=(62,9,BI,D)
+#   /*
 ###############################################################################
 
       - name: Sort the data set based on salary in descending order
