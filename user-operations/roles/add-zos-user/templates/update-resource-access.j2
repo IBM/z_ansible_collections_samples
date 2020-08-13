@@ -1,0 +1,10 @@
+{# Copyright (c) IBM Corporation 2020 #}
+PERMIT '{{ item.profile }}'
+{%- if item.id %}
+ ID('{{ item.id | upper }}')
+{%- else %}
+ ID('{{ userid | upper }}')
+{%- endif %}
+{%- if item.authority %}
+ ACCESS({{ item.authority | upper }})
+{%- endif %}

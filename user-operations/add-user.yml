@@ -1,0 +1,12 @@
+# Copyright (c) IBM Corporation 2020
+
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Add user
+      include_role:
+        name: add-zos-user
