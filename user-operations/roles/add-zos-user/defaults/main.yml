@@ -55,6 +55,11 @@ master_catalog: ""
 password: ""
 
 ##################################################################################################################
+# Specifies if a random password should be generated when no password is provided.
+##################################################################################################################
+generate_password: yes
+
+##################################################################################################################
 # Specifies the user's initial password phrase.
 # The password phrase you define is a text string of up to 100 characters and must be enclosed in single
 # quotation marks. The password phrase is always set expired, thus requiring the user to change it on initial use.
@@ -72,6 +77,11 @@ password: ""
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
 passphrase: ""
+
+##################################################################################################################
+# Specifies if a random passphrase should be generated when no passphrase is provided.
+##################################################################################################################
+generate_passphrase: yes
 
 ##################################################################################################################
 # Specifies the user's default security label, where security-label is an installation-defined

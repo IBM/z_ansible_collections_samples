@@ -7,25 +7,6 @@
     omvs_home_directory: "/u/{{ userid }}"
   when: omvs_home_directory is not defined or not omvs_home_directory
 
-- name: Get information about user's home directory
-  stat:
-    path: "{{ omvs_home_directory }}"
-  register: stat_response
-
-- name: Unmount the user's ZFS data set
-  command: unmount {{ omvs_home_directory }}
-  when: stat_response.isdir is defined and stat_response.isdir
-
-- name: Remove the user's ZFS data set
-  ibm.ibm_zos_core.zos_data_set:
-    name: "{{ omvs_zfs_data_set_name }}"
-    state: absent
-
-- name: Remove the user's omvs directory
-  file:
-    path: "{{ omvs_home_directory }}"
-    state: absent
-
 - name: Get information about the user
   ibm.ibm_zos_core.zos_tso_command:
     commands: LISTUSER ({{ userid | upper }})
@@ -63,4 +44,21 @@
       commands: "DELUSER ({{ userid | upper }})"
   when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
 
+- name: Get information about user's home directory
+  stat:
+    path: "{{ omvs_home_directory }}"
+  register: stat_response
 
+- name: Unmount the user's ZFS data set
+  command: unmount {{ omvs_home_directory }}
+  when: stat_response.stat.isdir is defined and stat_response.stat.isdir
+
+- name: Remove the user's ZFS data set
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ omvs_zfs_data_set_name }}"
+    state: absent
+
+- name: Remove the user's omvs directory
+  file:
+    path: "{{ omvs_home_directory }}"
+    state: absent

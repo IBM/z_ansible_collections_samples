@@ -62,6 +62,10 @@ Role Variables
 
   Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 
+- ### **generate_password**
+
+  Specifies if a random password should be generated when no password is provided.
+
 - ### **passphrase**
 
   Specifies the user's initial password phrase.
@@ -81,6 +85,10 @@ Role Variables
     you must use two single quotation marks together for each single quotation mark.
 
   Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
+
+- ### **generate_passphrase**
+
+  Specifies if a random passphrase should be generated when no passphrase is provided.
 
 - ### **security_label**
 
