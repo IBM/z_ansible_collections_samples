@@ -1,10 +1,10 @@
 {# Copyright (c) IBM Corporation 2020 #}
-CONNECT '{{ userid | upper }}'
+CONNECT ({{ userid | upper }})
 {%- if item.group %}
- GROUP('{{ item.group | upper }}')
+ GROUP({{ item.group | upper }})
 {%- endif %}
 {%- if item.owner %}
- OWNER('{{ item.owner | upper }}')
+ OWNER({{ item.owner | upper }})
 {%- endif %}
 {%- if item.authority %}
  AUTHORITY({{ item.authority | upper }})

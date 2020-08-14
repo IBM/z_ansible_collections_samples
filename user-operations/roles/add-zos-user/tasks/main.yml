@@ -50,6 +50,12 @@
   with_items: "{{ resources_to_permit }}"
   when: resources_to_permit is defined and resources_to_permit and resources_to_permit | length > 0
 
+- name: Add to groups
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: "{{ lookup('template', '../templates/connect-user-to-group.j2') }}"
+  with_items: "{{ groups_to_connect }}"
+  when: groups_to_connect is defined and groups_to_connect and groups_to_connect | length > 0
+
 - name: Define alias for user ID
   ibm.ibm_zos_core.zos_tso_command:
     commands: "{{ lookup('template', '../templates/define-alias.j2') }}"
