@@ -7,6 +7,6 @@
   environment: "{{ environment_vars }}"
 
   tasks:
-    - name: Add user
+    - name: Add user to z/OS system
       include_role:
         name: add-zos-user

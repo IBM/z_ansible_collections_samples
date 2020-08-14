@@ -7,6 +7,6 @@
   environment: "{{ environment_vars }}"
 
   tasks:
-    - name: Remove user
+    - name: Remove user from z/OS system
       include_role:
         name: remove-zos-user

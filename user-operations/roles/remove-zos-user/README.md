@@ -1,38 +1,85 @@
-Role Name
+remove-zos-user
 =========
 
-A brief description of the role goes here.
+Remove a user from a z/OS system.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- Ansible Collection `ibm.ibm_zos_core`
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- ### **userid**
 
-Dependencies
-------------
+  Specifies the user to be removed from RACF.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+- ### **new_owner**
+
+  Specifies a RACF-defined user or group that owns the group data set profiles now owned by the
+  user to be removed.
+
+  If you omit this operand when group data set profiles exist that require a new owner, RACF does not
+  remove the user from the group. (Group data set profiles are data set profiles whose names are qualified
+  by the group name or begin with the value supplied by an installation exit.)
+
+  The new owner of the group data set profiles must have at least USE authority in the specified group.
+
+  Do not specify a user who is being removed from the group as the new data set profile owner.
+
+- ### **user_catalog**
+
+  Specifies the user catalog entryname for which an alias is defined.
+
+- ### **omvs_home_directory**
+
+  Specifies the user's z/OS UNIX initial directory path name.
+
+  This is the current working directory for the user's process when the user enters the TSO/E.
+
+  When you define a HOME directory name to RACF, it can contain 1 - 1023 characters.
+
+  The HOME path name can consist of any characters.
+  If left blank, home directory is /u/userid.
+
+- ### **omvs_zfs_data_set_name**
+
+  Specifies the name of the data set to be used when removing ZFS data set.
+
+- ### **delete_user_data_sets**
+
+  Specifies if the user data sets should be deleted.
+
+  This job attempts to delete any data sets with the HLQ matching the user ID of the user to be removed.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+  tasks:
+    - name: Remove a user from z/OS system
+      include_role:
+        name: remove-zos-user
+```
 
 License
 -------
 
-BSD
+Copyright (c) IBM Corporation 2020 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- Blake Becker blake.becker@ibm.com, [@blakeinate](https://github.com/blakeinate)
+
+Copyright
+---------
+
+© Copyright IBM Corporation 2020

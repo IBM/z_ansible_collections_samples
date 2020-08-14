@@ -23,9 +23,14 @@
   ibm.ibm_zos_core.zos_tso_command:
     commands: "{{ lookup('template', '../templates/add-user.j2') }}"
 
-- name: Create generic profile
-  ibm.ibm_zos_core.zos_tso_command:
-    commands: "ADDSD '{{ userid | upper }}.*' UACC(NONE)"
+- block:
+    - name: Create generic profile
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "ADDSD '{{ userid | upper }}.**' UACC(NONE)"
+  rescue:
+    - name: Create generic profile, without support for enhanced generic naming
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "ADDSD '{{ userid | upper }}.*' UACC(NONE)"
 
 - name: Permit access to resources
   ibm.ibm_zos_core.zos_tso_command:
@@ -78,3 +83,16 @@
     state: directory
     owner: "{{ userid }}"
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
+
+- name: Copy files
+  ibm.ibm_zos_core.zos_copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items: "{{ files_to_copy }}"
+  when: files_to_copy is defined and files_to_copy | length > 0
+
+- name: Copy templates
+  include_tasks:
+    name: copy-template.yml
+  with_items: "{{ templates_to_copy }}"
+  when: templates_to_copy is defined and templates_to_copy | length > 0

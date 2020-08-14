@@ -50,7 +50,6 @@ master_catalog: ""
 # thus requiring the user to change the password at initial logon.
 # Note that the password syntax rules your installation defines using SETROPTS PASSWORD
 # do not apply to this password.
-# If you omit password, or enter password with no value, a random password is generated.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
 password: ""
@@ -70,11 +69,9 @@ password: ""
 #   - Must not contain more than 2 consecutive characters that are identical
 #   - If a single quotation mark is intended to be part of the password phrase,
 #     you must use two single quotation marks together for each single quotation mark.
-# If you omit passphrase, or enter a passphrase with no value, a random passphrase is generated.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
 passphrase: ""
-
 
 ##################################################################################################################
 # Specifies the user's default security label, where security-label is an installation-defined
@@ -195,7 +192,7 @@ storage_class: ""
 #               If you are creating a connection and omit AUTHORITY or enter it without a value,
 #               the default is USE.
 #               You cannot give a user a higher level of authority in the group than you have.
-#
+
 # Example:
 #   groups_to_connect:
 #     - group: "PAYROLL"
@@ -206,6 +203,7 @@ storage_class: ""
 #       authority: "CREATE"
 ##################################################################################################################
 groups_to_connect: ""
+
 ##################################################################################################################
 # A list of resources the user should be permitted to access.
 # Parameters:
@@ -228,3 +226,37 @@ groups_to_connect: ""
 #      id: ""
 ##################################################################################################################
 resources_to_permit: ""
+
+##################################################################################################################
+# A list of any templates on control node that should be evaluated and copied to the z/OS host.
+# Parameters:
+#  - src:       Specifies the absolute or relative path to the template on the Ansible control node.
+#               Relative paths are relative to the role.
+#  - dest:      Specifies the destination data set or unix path on the z/OS host.
+#               This is where the template contents are copied to after evaluation.
+
+# Example:
+#   templates_to_copy:
+#     - src: "../templates/profile.j2"
+#       dest: "/u/{{ userid }}/.profile"
+#     - src: "../templates/datatemplate.j2"
+#       dest: "{{ userid }}.private.somedata"
+##################################################################################################################
+templates_to_copy: ""
+
+##################################################################################################################
+# A list of any files on control node that should be copied to the z/OS host.
+# Parameters:
+#  - src:       Specifies the absolute or relative path to the file on the Ansible control node.
+#               Relative paths are relative to the role.
+#  - dest:      Specifies the destination data set or unix path on the z/OS host.
+#               This is where the file is copied.
+
+# Example:
+#   files_to_copy:
+#     - src: "../templates/profile.txt"
+#       dest: "/u/{{ userid }}/.profile"
+#     - src: "../templates/datafinal.txt"
+#       dest: "{{ userid }}.private.mydata"
+##################################################################################################################
+files_to_copy: ""
