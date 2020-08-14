@@ -20,6 +20,9 @@
       ibm.ibm_zos_core.zos_copy:
         src: "{{ temp.path }}"
         dest: "{{ item.dest }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
   always:
     - name: Delete tempfile
       file:

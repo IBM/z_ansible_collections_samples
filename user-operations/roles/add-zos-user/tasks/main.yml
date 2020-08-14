@@ -106,6 +106,9 @@
   ibm.ibm_zos_core.zos_copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
+    encoding:
+      from: ISO8859-1
+      to: "{{ target_charset }}"
   with_items: "{{ files_to_copy }}"
   when: files_to_copy is defined and files_to_copy | length > 0
 

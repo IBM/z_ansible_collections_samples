@@ -241,7 +241,7 @@ resources_to_permit: ""
 # A list of any templates on control node that should be evaluated and copied to the z/OS host.
 # Parameters:
 #  - src:       Specifies the absolute or relative path to the template on the Ansible control node.
-#               Relative paths are relative to the role.
+#               Relative paths are relative to playbook runners current working directory.
 #  - dest:      Specifies the destination data set or unix path on the z/OS host.
 #               This is where the template contents are copied to after evaluation.
 
@@ -258,15 +258,20 @@ templates_to_copy: ""
 # A list of any files on control node that should be copied to the z/OS host.
 # Parameters:
 #  - src:       Specifies the absolute or relative path to the file on the Ansible control node.
-#               Relative paths are relative to the role.
+#               Relative paths are relative to playbook runners current working directory.
 #  - dest:      Specifies the destination data set or unix path on the z/OS host.
 #               This is where the file is copied.
 
 # Example:
 #   files_to_copy:
-#     - src: "../templates/profile.txt"
+#     - src: "../files/profile.txt"
 #       dest: "/u/{{ userid }}/.profile"
-#     - src: "../templates/datafinal.txt"
+#     - src: "../files/datafinal.txt"
 #       dest: "{{ userid }}.private.mydata"
 ##################################################################################################################
 files_to_copy: ""
+
+##################################################################################################################
+# Specifies the character set any copied templates and files should be converted to.
+##################################################################################################################
+target_charset: "IBM-1047"

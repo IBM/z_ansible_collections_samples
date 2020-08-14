@@ -260,7 +260,7 @@ Role Variables
 
   Parameters:
 
-  - **src**: Specifies the absolute or relative path to the template on the Ansible control node. Relative paths are relative to the role.
+  - **src**: Specifies the absolute or relative path to the template on the Ansible control node. Relative paths are relative to playbook runners current working directory.
 
   - **dest**: Specifies the destination data set or unix path on the z/OS host. This is where the template contents are copied to after evaluation.
 
@@ -280,7 +280,7 @@ Role Variables
 
   Parameters:
 
-  - **src**: Specifies the absolute or relative path to the file on the Ansible control node. Relative paths are relative to the role.
+  - **src**: Specifies the absolute or relative path to the file on the Ansible control node. Relative paths are relative to playbook runners current working directory.
 
   - **dest**:      Specifies the destination data set or unix path on the z/OS host. This is where the file is copied.
 
@@ -294,6 +294,9 @@ Role Variables
         dest: "{{ userid }}.private.mydata"
   ```
 
+- ### **target_charset**
+
+  Specifies the character set any copied templates and files should be converted to.
 
 Example Playbook
 ----------------
