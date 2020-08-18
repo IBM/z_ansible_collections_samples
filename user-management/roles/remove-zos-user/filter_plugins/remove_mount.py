@@ -17,7 +17,7 @@ def remove_mount(content, omvs_zfs_data_set_name, omvs_home_directory):
     content_lines = content.split('\n')
     remove_starting_at_index = None
     for index, line in enumerate(content_lines):
-        if match(r"^\s*MOUNT\s+FILESYSTEM\(" + omvs_zfs_data_set_name.upper() + r"\)", line, MULTILINE):
+        if match(r"^\s*MOUNT\s+FILESYSTEM\(." + omvs_zfs_data_set_name.upper() + r".\)", line, MULTILINE):
             remove_starting_at_index = index
             break
     if remove_starting_at_index is not None:
