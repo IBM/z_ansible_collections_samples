@@ -84,6 +84,11 @@ passphrase: ""
 generate_passphrase: yes
 
 ##################################################################################################################
+# Specifies if a password and/or passphrase should be printed to the console upon completion of the playbook.
+##################################################################################################################
+print_pass: yes
+
+##################################################################################################################
 # Specifies the user's default security label, where security-label is an installation-defined
 # security label name that represents an association between a particular security level and
 # zero or more security categories.
@@ -144,6 +149,18 @@ omvs_zfs_data_set_name: ""
 # If left blank, defaults to 50 CYL.
 ##################################################################################################################
 omvs_zfs_data_set_size: 50
+
+##################################################################################################################
+# Specifies the data set which contains BPXPRMxx members to modify.
+##################################################################################################################
+bpxprm_data_set: "SYS1.PARMLIB"
+
+##################################################################################################################
+# Specifies the last 2 characters (xx) of the BPXPRMxx member
+# in bpxprm_data_set to which a mount command for new user's ZFS data set will be added.
+# If not specified, no persistent mount will be made for new ZFS data set.
+##################################################################################################################
+bpxprm_member: ""
 
 ##################################################################################################################
 # Specifies the user's default TSO account number when logging on through the TSO/E logon panel.

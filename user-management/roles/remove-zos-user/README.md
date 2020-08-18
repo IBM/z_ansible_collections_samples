@@ -47,6 +47,18 @@ Role Variables
 
   Specifies the name of the data set to be used when removing ZFS data set.
 
+
+- ### **bpxprm_data_set**
+
+  Specifies the data set which contains BPXPRMxx members to modify.
+
+- ### **bpxprm_member**
+
+  Specifies the last 2 characters (xx) of the BPXPRMxx member
+  in SYS1.PARMLIB to which a mount command for new user's ZFS data set will be added.
+
+  If not specified, no persistent mount will be made for new ZFS data set.
+
 - ### **delete_user_data_sets**
 
   Specifies if the user data sets should be deleted.

@@ -75,8 +75,8 @@ Role Variables
   Syntax rules for password phrases:
   - Maximum length: 100 characters
   - Minimum length:
-      - 9 characters, when the encryption algorithm is KDFAES or ICHPWX11 is present and allows the new value
-      - 14 characters, when ICHPWX11 is not present and the encryption algorithm is not KDFAES
+    - 9 characters, when the encryption algorithm is KDFAES or ICHPWX11 is present and allows the new value
+    - 14 characters, when ICHPWX11 is not present and the encryption algorithm is not KDFAES
   - Must not contain the user ID (as sequential uppercase or sequential lowercase characters)
   - Must contain at least 2 alphabetic characters (A - Z, a - z)
   - Must contain at least 2 non-alphabetic characters (numerics, punctuation, or special characters)
@@ -89,6 +89,10 @@ Role Variables
 - ### **generate_passphrase**
 
   Specifies if a random passphrase should be generated when no passphrase is provided.
+
+- ### **print_pass**
+
+  Specifies if a password and/or passphrase should be printed to the console upon completion of the playbook.
 
 - ### **security_label**
 
@@ -155,6 +159,17 @@ Role Variables
   Provided value is used for primary and secondary space.
 
   If left blank, defaults to 50 CYL.
+
+- ### **bpxprm_data_set**
+
+  Specifies the data set which contains BPXPRMxx members to modify.
+
+- ### **bpxprm_member**
+
+  Specifies the last 2 characters (xx) of the BPXPRMxx member
+  in SYS1.PARMLIB to which a mount command for new user's ZFS data set will be added.
+
+  If not specified, no persistent mount will be made for new ZFS data set.
 
 - ### **tso_account_number**
 

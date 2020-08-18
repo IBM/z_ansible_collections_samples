@@ -39,6 +39,18 @@ omvs_home_directory: ""
 omvs_zfs_data_set_name: ""
 
 ##################################################################################################################
+# Specifies the data set which contains BPXPRMxx members to modify.
+##################################################################################################################
+bpxprm_data_set: "SYS1.PARMLIB"
+
+##################################################################################################################
+# Specifies the last 2 characters (xx) of the BPXPRMxx member
+# in SYS1.PARMLIB in which a persistent ZFS mount command exists for the user to be removed.
+# If not specified, no persistent mount will be removed.
+##################################################################################################################
+bpxprm_member: ""
+
+##################################################################################################################
 # Specifies if the user data sets should be deleted.
 # This job attempts to delete any data sets with the HLQ matching the user ID of the user to be removed.
 ##################################################################################################################

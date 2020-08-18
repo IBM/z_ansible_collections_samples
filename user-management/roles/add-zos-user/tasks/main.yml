@@ -118,6 +118,71 @@
   with_items: "{{ templates_to_copy }}"
   when: templates_to_copy is defined and templates_to_copy | length > 0
 
+- name: Make mount persistent
+  block:
+    - name: Generate tempfile to hold BPXPRMxx
+      tempfile:
+        state: file
+      register: temp
+
+    - name: Generate tempfile to hold backup
+      tempfile:
+        state: file
+      register: backup
+
+    - name: Copy BPXPRMxx member to file
+      shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ temp.path }}
+
+    - name: Copy BPXPRMxx member to backup
+      shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ backup.path }}
+
+    - name: Get file contents
+      command: cat {{ temp.path }}
+      register: cat_response
+
+    - name: Insert mount into contents
+      set_fact:
+        updated_contents: "{{ cat_response.stdout | insert_mount(omvs_zfs_data_set_name, omvs_home_directory) }}"
+
+    - name: Insert updated contents back into temp file
+      ibm.ibm_zos_core.zos_copy:
+        content: "{{ updated_contents }}"
+        dest: "{{ temp.path }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+
+    - name: Copy updated BPXPRMxx member back to data set
+      shell: cp {{ temp.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
+
+    - name: Verify updated contents are valid
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "SETOMVS SYNTAXCHECK=({{ bpxprm_member | upper }})"
+      register: syntaxcheck_response
+      ignore_errors: yes
+
+    - name: Undo mount changes if bad syntaxcheck
+      shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
+      when: syntaxcheck_response.get("rc", 4) > 0
+
+    - name: Assert persistent mount did not fail
+      fail:
+        msg: "Persistent mount updated did not pass syntax check."
+      when: syntaxcheck_response.get("rc", 4) > 0
+  always:
+    - name: Remove temporary file
+      file:
+        path: "{{ temp.path }}"
+        state: absent
+      when: temp.path is defined and temp.path
+    - name: Remove backup file
+      file:
+        path: "{{ backup.path }}"
+        state: absent
+      when: backup.path is defined and backup.path
+  when: bpxprm_member is defined and bpxprm_member
+
 - name: Print password info
   debug:
     msg: "UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
+  when: print_pass is defined and print_pass
