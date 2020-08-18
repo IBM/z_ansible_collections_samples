@@ -65,6 +65,10 @@ Role Variables
 
   This job attempts to delete any data sets with the HLQ matching the user ID of the user to be removed.
 
+- ### **default_charset**
+
+  Specifies the character set any copied templates and files should be converted to.
+
 Example Playbook
 ----------------
 
