@@ -14,7 +14,7 @@ This project provides sample playbooks and roles which can be used to create and
 
 ## Getting Started
 
-### Update [inventory.yml](inventory.yml) with the information about your system(s)
+### 1. Update [inventory.yml](inventory.yml) with the information about your system(s)
 
 ```yaml
 zsystem:
@@ -25,7 +25,7 @@ zsystem:
       ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
 ```
 
-### Update the environment variables for the z/OS system in [host_vars/zhost.yml](host_vars/zhost.yml)
+### 2. Update the environment variables for the z/OS system in [host_vars/zhost.yml](host_vars/zhost.yml)
 
 ```yaml
 # the path to the root of IBM python installation
@@ -35,9 +35,9 @@ PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
 ```
 
-### Update the variables in [roles/add-zos-user/defaults/main.yml](roles/add-zos-user/defaults/main.yml) and [roles/remove-zos-user/defaults/main.yml](roles/remove-zos-user/defaults/main.yml) based on desired operations
+### 3. Update the playbook specific variables in [host_vars/zhost.yml](host_vars/zhost.yml) based on desired behavior
 
-### Run desired playbook
+### 4. Run desired playbook
 
 ```bash
 ansible-playbook -i inventory.yml <playbook-name>

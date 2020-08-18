@@ -94,6 +94,30 @@ Role Variables
 
   Specifies if a password and/or passphrase should be printed to the console upon completion of the playbook.
 
+- ### **smtp_server**
+
+  Specifies the SMTP server to use for sending email, if sending email is desired.
+
+- ### **smtp_port**
+
+  Specifies the SMTP port to use for sending email, if sending email is desired.
+
+- ### **smtp_username**
+
+  Specifies the username to use for sending email, if sending email is desired.
+
+- ### **smtp_password**
+
+  Specifies the password to use for sending email, if sending email is desired.
+
+- ### **email_to**
+
+  Specifies the email address which should receive the logon credentials for the new user.
+
+- ### **send_email**
+
+  Specifies if an email should be sent containing new user credentials.
+
 - ### **security_label**
 
   Specifies the user's default security label, where security-label is an installation-defined

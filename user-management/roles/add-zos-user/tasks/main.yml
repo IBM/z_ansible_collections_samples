@@ -186,3 +186,16 @@
   debug:
     msg: "UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
   when: print_pass is defined and print_pass
+
+- name: Send email containing login credentials to owner of new user
+  mail:
+    host: "{{ smtp_server }}"
+    port: "{{ smtp_port }}"
+    username: "{{ smtp_username }}"
+    password: "{{ smtp_password }}"
+    to: "{{ email_to }}"
+    subject: New UserID Created on {{ inventory_hostname }}
+    body: "A new UserID has been created on {{ inventory_hostname }}. UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
+    secure: always
+  when: email_to_receive_pass is defined and email_to_receive_pass
+  no_log: true
