@@ -1,0 +1,32 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+# tasks file for add-zos-user
+
+- name: Create tempfile to hold evaluated template
+  tempfile:
+    state: file
+  delegate_to: localhost
+  register: temp
+
+- block:
+    - name: Evaluate template
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ temp.path }}"
+      delegate_to: localhost
+
+    - name: Copy evaluated template to z/OS system
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ temp.path }}"
+        dest: "{{ item.dest }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+  always:
+    - name: Delete tempfile
+      file:
+        path: "{{ temp.path }}"
+        state: absent
+      delegate_to: localhost
+      when: temp.path is defined

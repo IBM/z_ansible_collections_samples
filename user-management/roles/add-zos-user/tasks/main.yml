@@ -1,0 +1,201 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+# tasks file for add-zos-user
+
+- name: Set omvs_home_directory if not set
+  set_fact:
+    omvs_home_directory: "/u/{{ userid }}"
+  when: omvs_home_directory is not defined or not omvs_home_directory
+
+- name: Verify user does not exist
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: LISTUSER ({{ userid | upper }})
+  register: listuser_response
+  failed_when: false
+
+- name: Assert desired userid is not in use
+  fail:
+    msg: "User ID {{ userid | upper }} is in use."
+  when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
+
+- name: Generate password
+  set_fact:
+    password: "{{ '' | generate_password }}"
+  when: (password is not defined or not password) and generate_password is defined and generate_password
+  no_log: true
+
+- name: Generate passphrase
+  set_fact:
+    passphrase: "{{ '' | generate_passphrase }}"
+  when: (passphrase is not defined or not passphrase) and generate_passphrase is defined and generate_passphrase
+  no_log: true
+
+- name: Add user
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: "{{ lookup('template', '../templates/add-user.j2') }}"
+
+- block:
+    - name: Create generic profile
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "ADDSD '{{ userid | upper }}.**' UACC(NONE)"
+  rescue:
+    - name: Create generic profile, without support for enhanced generic naming
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "ADDSD '{{ userid | upper }}.*' UACC(NONE)"
+
+- name: Permit access to resources
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: "{{ lookup('template', '../templates/update-resource-access.j2') }}"
+  with_items: "{{ resources_to_permit }}"
+  when: resources_to_permit is defined and resources_to_permit and resources_to_permit | length > 0
+
+- name: Add to groups
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: "{{ lookup('template', '../templates/connect-user-to-group.j2') }}"
+  with_items: "{{ groups_to_connect }}"
+  when: groups_to_connect is defined and groups_to_connect and groups_to_connect | length > 0
+
+- name: Define alias for user ID
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: "{{ lookup('template', '../templates/define-alias.j2') }}"
+
+- name: Create the users ISPPROF data set
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ userid }}.SPF.ISPPROF"
+    state: present
+    type: pds
+    space_primary: 2
+    space_secondary: 1
+    space_type: trk
+    block_size: 3120
+    record_length: 80
+
+- name: Create LDS for ZFS data set
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ omvs_zfs_data_set_name }}"
+    state: present
+    replace: yes
+    type: lds
+    space_primary: "{{ omvs_zfs_data_set_size if omvs_zfs_data_set_size else '50' }}"
+    space_secondary: "{{ omvs_zfs_data_set_size if omvs_zfs_data_set_size else '50' }}"
+    space_type: cyl
+  register: lds_create_response
+
+- name: Format LDS as ZFS
+  command: zfsadm format -aggregate {{ omvs_zfs_data_set_name }}
+
+- name: Create user's omvs directory if it does not exist
+  file:
+    path: "{{ omvs_home_directory }}"
+    state: directory
+    owner: "{{ userid }}"
+    group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
+
+- name: Mount ZFS to user directory
+  command: mount -t zfs -f {{ omvs_zfs_data_set_name | upper }} {{ omvs_home_directory }}
+
+- name: Overwrite permissions to directory if necessary
+  file:
+    path: "{{ omvs_home_directory }}"
+    state: directory
+    owner: "{{ userid }}"
+    group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
+
+- name: Copy files
+  ibm.ibm_zos_core.zos_copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    encoding:
+      from: ISO8859-1
+      to: "{{ target_charset }}"
+  with_items: "{{ files_to_copy }}"
+  when: files_to_copy is defined and files_to_copy | length > 0
+
+- name: Copy templates
+  include_tasks:
+    file: copy-template.yml
+  with_items: "{{ templates_to_copy }}"
+  when: templates_to_copy is defined and templates_to_copy | length > 0
+
+- name: Make mount persistent
+  block:
+    - name: Generate tempfile to hold BPXPRMxx
+      tempfile:
+        state: file
+      register: temp
+
+    - name: Generate tempfile to hold backup
+      tempfile:
+        state: file
+      register: backup
+
+    - name: Copy BPXPRMxx member to file
+      shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ temp.path }}
+
+    - name: Copy BPXPRMxx member to backup
+      shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ backup.path }}
+
+    - name: Get file contents
+      command: cat {{ temp.path }}
+      register: cat_response
+
+    - name: Insert mount into contents
+      set_fact:
+        updated_contents: "{{ cat_response.stdout | insert_mount(omvs_zfs_data_set_name, omvs_home_directory) }}"
+
+    - name: Insert updated contents back into temp file
+      ibm.ibm_zos_core.zos_copy:
+        content: "{{ updated_contents }}"
+        dest: "{{ temp.path }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+
+    - name: Copy updated BPXPRMxx member back to data set
+      shell: cp {{ temp.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
+
+    - name: Verify updated contents are valid
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "SETOMVS SYNTAXCHECK=({{ bpxprm_member | upper }})"
+      register: syntaxcheck_response
+      ignore_errors: yes
+
+    - name: Undo mount changes if bad syntaxcheck
+      shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
+      when: syntaxcheck_response.get("rc", 4) > 0
+
+    - name: Assert persistent mount did not fail
+      fail:
+        msg: "Persistent mount updated did not pass syntax check."
+      when: syntaxcheck_response.get("rc", 4) > 0
+  always:
+    - name: Remove temporary file
+      file:
+        path: "{{ temp.path }}"
+        state: absent
+      when: temp.path is defined and temp.path
+    - name: Remove backup file
+      file:
+        path: "{{ backup.path }}"
+        state: absent
+      when: backup.path is defined and backup.path
+  when: bpxprm_member is defined and bpxprm_member
+
+- name: Print password info
+  debug:
+    msg: "UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
+  when: print_pass is defined and print_pass
+
+- name: Send email containing login credentials to owner of new user
+  mail:
+    host: "{{ smtp_server }}"
+    port: "{{ smtp_port }}"
+    username: "{{ smtp_username }}"
+    password: "{{ smtp_password }}"
+    to: "{{ email_to }}"
+    subject: New UserID Created on {{ inventory_hostname }}
+    body: "A new UserID has been created on {{ inventory_hostname }}. UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
+    secure: always
+  when: email_to_receive_pass is defined and email_to_receive_pass
+  no_log: true
