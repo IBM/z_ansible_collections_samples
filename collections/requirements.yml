@@ -6,4 +6,5 @@
 #                https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
 ---
 collections:
-  - ibm.ibm_zos_core:1.2.0-beta.3
+  - name: ibm.ibm_zos_core
+    version: 1.2.0-beta.3
