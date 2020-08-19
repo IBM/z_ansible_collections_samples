@@ -11,7 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory job-submission.yaml
+#  ansible-playbook -i inventory submit_query_retrieve.yaml
 #
 # Notes:
 #  This sample demonstrates ways to submit, query and retrieve job output using 

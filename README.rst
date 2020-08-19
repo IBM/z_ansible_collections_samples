@@ -22,6 +22,8 @@ Documentation, sample playbooks and blogs related to the Red Hat Ansible Certifi
 
 * `Blogs`_
 
+* `How to contribute`_
+
 
 .. ...........................................................................
 .. © Copyright IBM Corporation 2020                                          .
@@ -58,17 +60,16 @@ Control node
 Managed node
 ------------
 
-* `Python on z/OS`_: 3.6 or later
-* `z/OS`_: V02.02.00 or later
+* `IBM Open Enterprise Python for z/OS`_
+* z/OS: `V2R3 <https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3/en/homepage.html>`_ or `later <https://www.ibm.com/support/knowledgecenter/SSLTBW>`_
 * `IBM Z Open Automation Utilities`_ (ZOAU)
 
    * IBM z/OS core collections are dependent on specific versions of ZOAU.
-     For information about the required version of ZOAU, review the
-     `release notes`_.
+
 * `z/OS OpenSSH`_
 
-.. _z/OS:
-   https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2/zos-v2r2-home.html
+.. _IBM Open Enterprise Python for z/OS:
+   http://www.ibm.com/products/open-enterprise-python-zos
 
 .. _IBM Z Open Automation Utilities:
    `ZOAU`_
@@ -76,34 +77,22 @@ Managed node
 .. _z/OS OpenSSH:
    https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.e0za100/ch1openssh.htm
 
-.. _release notes:
-   `Releases`_
-
 
 Python on z/OS
 --------------
-
-If the Ansible target is z/OS, you must install a Python distribution ported
-for this platform. Rocket Software is currently the preferred version for z/OS.
+If the Ansible target is z/OS, you must install **IBM Open Enterprise Python for z/OS** which is ported for the z/OS platform and required by **IBM z/OS core Collection**.
 
 **Installation**
 
-* Visit the `Rocket Software homepage`_ and create a required account in the
-  `Rocket Customer Portal`_.
-* Click Downloads on the top left portion the page.
-* Select the category z/OpenSource on the left panel.
-* Scroll and select Python.
-* Download the binaries, installation files, and the README.ZOS onto an x86
-  machine.
-* Transfer the zipped tarball (tar.gz) file to the target z/OS system and
-  extract it according to the instructions in the installation files.
-* Follow the additional setup instructions as described in the README.ZOS file.
+* Visit the `IBM Open Enterprise Python for z/OS <http://www.ibm.com/products/open-enterprise-python-zos>`_ product page for FMID, program directory, fix list, latest PTF, installation and configuration instructions.
 
-.. _Rocket Software homepage:
-   https://www.rocketsoftware.com/zos-open-source
-.. _Rocket Customer Portal:
-   https://my.rocketsoftware.com/
+* For reference, the Program IDs are:
 
+* 5655-PYT for the base product
+
+* 5655-PYS for service and support
+
+* Optionally download IBM Open Enterprise Python for z/OS, `here <https://www-01.ibm.com/marketing/iwm/platform/mrs/assets?source=swg-ibmoep>`_
 
 ZOAU
 ----
@@ -466,6 +455,13 @@ Blogs
 =====
 * `Job Submission on z/OS Made Easy with Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible>`_
 * `Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an>`_
+* `Running Batch Jobs on z/OS using Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans>`_
+
+
+How to contribute
+=================
+
+
 
 .. ...........................................................................
 .. © Copyright IBM Corporation 2020                                          .

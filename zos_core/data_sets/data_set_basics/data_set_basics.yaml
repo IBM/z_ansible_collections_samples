@@ -10,7 +10,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory data-set-operations.yaml
+#  ansible-playbook -i inventory data_set_basics.yaml
 #
 # Notes:
 #  This sample demonstrates ways to create, delete and modify data sets using 

@@ -1,7 +1,7 @@
-# Convert Encoding
+# Submit batch jobs, query and retrieve job output
 
-This sample playbook demonstrates how to perform encoding conversions on USS
-using modules included in the Red Hat Ansible Certified  Content for
+This sample playbook demonstrates how to submit batch jobs, query and retrieve job
+output using modules included in the Red Hat Ansible Certified  Content for
 IBM Z core collection.
 
 ## Getting Started
@@ -31,7 +31,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ### Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml convert_encoding.yml
+ansible-playbook -i inventory.yml submit_query_retrieve.yml
 ```
 
 # Copyright
