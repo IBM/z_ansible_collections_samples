@@ -197,5 +197,6 @@
     subject: New UserID Created on {{ inventory_hostname }}
     body: "A new UserID has been created on {{ inventory_hostname }}. UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
     secure: always
-  when: email_to_receive_pass is defined and email_to_receive_pass
+  delegate_to: localhost
+  when: send_email is defined and send_email
   no_log: true

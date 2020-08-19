@@ -36,7 +36,7 @@ omvs_home_directory: ""
 ##################################################################################################################
 # Specifies the name of the data set to be used when removing ZFS data set.
 ##################################################################################################################
-omvs_zfs_data_set_name: ""
+omvs_zfs_data_set_name: "{{ user_catalog }}.{{ userid }}"
 
 ##################################################################################################################
 # Specifies the data set which contains BPXPRMxx members to modify.
