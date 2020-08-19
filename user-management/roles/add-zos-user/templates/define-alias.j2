@@ -1,0 +1,9 @@
+{# Copyright (c) IBM Corporation 2020 #}
+DEFINE ALIAS ( NAME('{{ userid | upper }}')
+{%- if user_catalog %}
+ RELATE('{{ user_catalog | upper }}')
+{%- endif %}
+ )
+{%- if master_catalog %}
+ CATALOG('{{ master_catalog | upper }}'')
+{%- endif %}
