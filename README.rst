@@ -377,80 +377,6 @@ to refer to the collection repeatedly. For example, you can use the
             job_name: HELLO
 
 
-z/OS Connection Plugin
-----------------------
-
-Since EBCDIC encoding is used on z/OS, custom plugins are required to determine
-the correct transport method when targeting a z/OS system. The zos_ssh.py
-connection plugin is a fork of the default ssh.py plugin with the added
-functionality to check if a module is written in REXX.
-
-Since REXX scripts are required to be in EBCDIC encoding to run, they must be
-handled differently during transfer. If the string
-``__ANSIBLE_ENCODE_EBCDIC__`` is found in the first line of the module, the
-module is transferred to the target system using SCP. Otherwise, SFTP is used.
-SCP treats files as text, automatically encoding as EBCDIC at transfer time.
-SFTP treats files as binary, performing no encoding changes.
-
-**REXX Module Configuration**:
-
-* Ensure a REXX modules first line is a comment containing the case insensitive keyword ``rexx``
-* Followed by the case sensitive value ``__ANSIBLE_ENCODE_EBCDIC__``
-
-
-**Example REXX module**:
-
-.. code-block:: sh
-
-   /* rexx  __ANSIBLE_ENCODE_EBCDIC__  */
-   x = 55
-   SAY '{"SYSTEM_VERSION":"' x '"}'
-   RETURN 0
-
-
-ansible-doc
------------
-
-Modules included in this collection provide additional documentation that is
-similar to a UNIX, or UNIX-like operating system man page (manual page). This
-documentation can be accessed from the command line by using the
-``ansible-doc`` command.
-
-Here's how to use the ``ansible-doc`` command after you install the
-**IBM z/OS core collection**: ``ansible-doc ibm.ibm_zos_core.zos_data_set``
-
-.. code-block:: sh
-
-    > ZOS_DATA_SET    (/Users/user/.ansible/collections/ansible_collections/ibm/ibm_zos_core/plugins/modules/zos_data_set.py)
-
-            Create, delete and set attributes of data sets. When forcing data set replacement, contents will not be
-            preserved.
-
-    * This module is maintained by The Ansible Community
-    OPTIONS (= is mandatory):
-
-    - batch
-            Batch can be used to perform operations on multiple data sets in a single module call.
-            Each item in the list expects the same options as zos_data_set.
-            [Default: (null)]
-            type: list
-            version_added: 2.9
-
-    - data_class
-            The data class name (required for SMS-managed data sets)
-            [Default: (null)]
-            type: str
-            version_added: 2.9
-
-For more information on using the ``ansible-doc`` command, refer
-to `Ansible guide`_.
-
-.. _Ansible guide:
-   https://docs.ansible.com/ansible/latest/cli/ansible-doc.html#ansible-doc
-
-
-
-
 Blogs
 =====
 * `Job Submission on z/OS Made Easy with Ansible <https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible>`_
@@ -460,7 +386,29 @@ Blogs
 
 How to contribute
 =================
+The sample playbook repository is organized as follows:
 
+.. code-block:: sh
+
+   ├── collection_name/
+   │  ├── README.md
+   │  └── use_case/
+   │      ├── playbook_name/
+   │          ├── host_vars/
+   │              └── zos_host.yml
+   │          ├── ansible.cfg
+   │          ├── inventory
+   │          ├── playbook_name.yml
+   │          └── README.md
+   ├── LICENSE
+   ├── .gitignore
+   └── README.rst
+
+
+When contributing new sample playbooks, they must be placed under the appropriate collection and use case.
+If the playbook does not correspond to an existing use case, a new use case can be added that conforms to the
+structure outlined above.
+Each playbook should also include a README with a brief description, licensing and copyright information.
 
 
 .. ...........................................................................
