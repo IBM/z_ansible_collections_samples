@@ -254,7 +254,7 @@ The new credential type will be used to store the password for the email account
 
 ![add-email-credential](../.github/user-management-tower-setup/create-email-credential.png)
 
-## Step 7: Create Add User template
+## Step 7: Create *Add User* template
 
 Be sure to attach both the SSH key and email credentials to the *CREDENTIALS* section.
 
@@ -288,7 +288,7 @@ Ensure `print_pass: no` and `send_email: yes`. The remaining variables will need
 
 ![add-user-template](../.github/user-management-tower-setup/add-user-template.png)
 
-## Step 8: Add survey prompt for Add User template
+## Step 8: Add survey prompt for the *Add User* template
 
 ![add-user-prompt-full-name](../.github/user-management-tower-setup/adduserprompt1.png)
 
@@ -296,7 +296,7 @@ Ensure `print_pass: no` and `send_email: yes`. The remaining variables will need
 
 ![add-user-prompt-email](../.github/user-management-tower-setup/adduserprompt3.png)
 
-## Step 9: Create Remove User template
+## Step 9: Create *Remove User* template
 
 Be sure to attach the SSH key credential to the *CREDENTIALS* section.
 
@@ -306,11 +306,11 @@ You can decide whether to attach the inventory created in step 2 or prompt for a
 
 ![remove-user-template](../.github/user-management-tower-setup/remove-user-template.png)
 
-## Step 10: Add survey prompt for Remove User template
+## Step 10: Add survey prompt for the *Remove User* template
 
 ![remove-user-prompt-userid](../.github/user-management-tower-setup/remove-user-template-userid-prompt.png)
 
-## Step 11: Create Send Rejection Email template
+## Step 11: Create *Send Rejection Email* template
 
 Be sure to attach the email credential to the *CREDENTIALS* section.
 
@@ -334,7 +334,7 @@ You will need to set the following variables in the *EXTRA VARIABLES* section of
 
 ![send-rejection-email](../.github/user-management-tower-setup/send-rejection-email.png)
 
-## Step 12: Create Request a New User ID workflow template
+## Step 12: Create *Request a New User ID* workflow template
 
 You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
 
@@ -344,19 +344,35 @@ You can decide whether to attach the inventory created in step 2 or prompt for a
 
 ![workflow-visualizer](../.github/user-management-tower-setup/workflow-visualizer.png)
 
-## Step 14: Add Request Approval step to workflow template
+## Step 14: Add *Request Approval* step to workflow template
 
 ![request-approval](../.github/user-management-tower-setup/workflow-approval.png)
 
-## Step 15: Add Add User step to workflow template
+## Step 15: Add *Add User* step to workflow template
 
 ![add-user-1](../.github/user-management-tower-setup/workflow-add-user-1.png)
 ![add-user-2](../.github/user-management-tower-setup/workflow-add-user-2.png)
 
-## Step 16: Add Send Rejection Email step to workflow template
+## Step 16: Add *Send Rejection Email* step to workflow template
 
 ![send-rejection-email](../.github/user-management-tower-setup/workflow-send-rejection.png)
 
 ## Step 17: Verify workflow template looks like the following
 
 ![workflow-diagram](../.github/user-management-tower-setup/workflow-diagram.png)
+
+## Step 18: Add survey prompt for the *Request a New User ID* workflow template
+
+![workflow-survey-fullname](../.github/user-management-tower-setup/workflowprompt1.png)
+![workflow-survey-userid](../.github/user-management-tower-setup/workflowprompt2.png)
+![workflow-survey-email](../.github/user-management-tower-setup/workflowprompt3.png)
+
+## Step 19: Give desired users / teams access to inventory
+
+![give-use-permission](../.github/user-management-tower-setup/give-read-permission.png)
+
+## Step 19: Give desired users / teams access to the *Request a New User ID* workflow template
+
+Ensure you only give users access to the *Request a New User ID* workflow template and not the *Add User* and *Remove User* templates, as they do not require an approver to run individually.
+
+![give-execute-permission](../.github/user-management-tower-setup/give-execute-permission.png)
