@@ -376,3 +376,12 @@ You can decide whether to attach the inventory created in step 2 or prompt for a
 Ensure you only give users access to the *Request a New User ID* workflow template and not the *Add User* and *Remove User* templates, as they do not require an approver to run individually.
 
 ![give-execute-permission](../.github/user-management-tower-setup/give-execute-permission.png)
+
+# Copyright
+
+© Copyright IBM Corporation 2020
+
+# License
+
+Licensed under [Apache License,
+Version 2.0](https://opensource.org/licenses/Apache-2.0).
