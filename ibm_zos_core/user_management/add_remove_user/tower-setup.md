@@ -4,14 +4,14 @@
 
 Create a new project in Ansible Tower, using the Z Ansible sample repo as the SCM URL.
 
-![create-new-project](../.github/user-management-tower-setup/set-up-project.png)
+![create-new-project](images//set-up-project.png)
 
 ## Step 2: Create a new inventory
 
 Create a new inventory if you do not already have one to use for this project.
 
 
-![create-inventory](../.github/user-management-tower-setup/create-inventory.png)
+![create-inventory](images/create-inventory.png)
 
 ## Step 3: Add a new host to inventory / update existing host in inventory
 
@@ -238,21 +238,21 @@ Some variables specific to user management:
 
   Specifies the character set any copied templates and files should be converted to.
 
-![add-host-to-inventory](../.github/user-management-tower-setup/add-host-to-inventory.png)
+![add-host-to-inventory](images/add-host-to-inventory.png)
 
 ## Step 4: Add SSH key credential for host
 
-![add-ssh-key-credential](../.github/user-management-tower-setup/add-ssh-key-credential.png)
+![add-ssh-key-credential](images/add-ssh-key-credential.png)
 
 ## Step 5: Create custom credential to hold email password
 
 The new credential type will be used to store the password for the email account used to send out credential information and rejection emails.
 
-![create-custom-credential](../.github/user-management-tower-setup/email-credential-type.png)
+![create-custom-credential](images/email-credential-type.png)
 
 ## Step 6: Add email credential using custom credential type
 
-![add-email-credential](../.github/user-management-tower-setup/create-email-credential.png)
+![add-email-credential](images/create-email-credential.png)
 
 ## Step 7: Create *Add User* template
 
@@ -286,15 +286,15 @@ You will need to set the following variables in the *EXTRA VARIABLES* section of
 
 Ensure `print_pass: no` and `send_email: yes`. The remaining variables will need to be set based on your email provider and credentials.
 
-![add-user-template](../.github/user-management-tower-setup/add-user-template.png)
+![add-user-template](images/add-user-template.png)
 
 ## Step 8: Add survey prompt for the *Add User* template
 
-![add-user-prompt-full-name](../.github/user-management-tower-setup/adduserprompt1.png)
+![add-user-prompt-full-name](images/adduserprompt1.png)
 
-![add-user-prompt-userid](../.github/user-management-tower-setup/adduserprompt2.png)
+![add-user-prompt-userid](images/adduserprompt2.png)
 
-![add-user-prompt-email](../.github/user-management-tower-setup/adduserprompt3.png)
+![add-user-prompt-email](images/adduserprompt3.png)
 
 ## Step 9: Create *Remove User* template
 
@@ -304,11 +304,11 @@ This guide assumes you will use the same SSH key credential for all managed syst
 
 You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
 
-![remove-user-template](../.github/user-management-tower-setup/remove-user-template.png)
+![remove-user-template](images/remove-user-template.png)
 
 ## Step 10: Add survey prompt for the *Remove User* template
 
-![remove-user-prompt-userid](../.github/user-management-tower-setup/remove-user-template-userid-prompt.png)
+![remove-user-prompt-userid](images/remove-user-template-userid-prompt.png)
 
 ## Step 11: Create *Send Rejection Email* template
 
@@ -332,50 +332,50 @@ You will need to set the following variables in the *EXTRA VARIABLES* section of
 
   Specifies the username to use for sending email
 
-![send-rejection-email](../.github/user-management-tower-setup/send-rejection-email.png)
+![send-rejection-email](images/send-rejection-email.png)
 
 ## Step 12: Create *Request a New User ID* workflow template
 
 You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
 
-![request-new-userid](../.github/user-management-tower-setup/workflow-template-1.png)
+![request-new-userid](images/workflow-template-1.png)
 
 ## Step 13: Navigate to *WORKFLOW VISUALIZER* panel
 
-![workflow-visualizer](../.github/user-management-tower-setup/workflow-visualizer.png)
+![workflow-visualizer](images/workflow-visualizer.png)
 
 ## Step 14: Add *Request Approval* step to workflow template
 
-![request-approval](../.github/user-management-tower-setup/workflow-approval.png)
+![request-approval](images/workflow-approval.png)
 
 ## Step 15: Add *Add User* step to workflow template
 
-![add-user-1](../.github/user-management-tower-setup/workflow-add-user-1.png)
-![add-user-2](../.github/user-management-tower-setup/workflow-add-user-2.png)
+![add-user-1](images/workflow-add-user-1.png)
+![add-user-2](images/workflow-add-user-2.png)
 
 ## Step 16: Add *Send Rejection Email* step to workflow template
 
-![send-rejection-email](../.github/user-management-tower-setup/workflow-send-rejection.png)
+![send-rejection-email](images/workflow-send-rejection.png)
 
 ## Step 17: Verify workflow template looks like the following
 
-![workflow-diagram](../.github/user-management-tower-setup/workflow-diagram.png)
+![workflow-diagram](images/workflow-diagram.png)
 
 ## Step 18: Add survey prompt for the *Request a New User ID* workflow template
 
-![workflow-survey-fullname](../.github/user-management-tower-setup/workflowprompt1.png)
-![workflow-survey-userid](../.github/user-management-tower-setup/workflowprompt2.png)
-![workflow-survey-email](../.github/user-management-tower-setup/workflowprompt3.png)
+![workflow-survey-fullname](images/workflowprompt1.png)
+![workflow-survey-userid](images/workflowprompt2.png)
+![workflow-survey-email](images/workflowprompt3.png)
 
 ## Step 19: Give desired users / teams access to inventory
 
-![give-use-permission](../.github/user-management-tower-setup/give-read-permission.png)
+![give-use-permission](images/give-read-permission.png)
 
 ## Step 19: Give desired users / teams access to the *Request a New User ID* workflow template
 
 Ensure you only give users access to the *Request a New User ID* workflow template and not the *Add User* and *Remove User* templates, as they do not require an approver to run individually.
 
-![give-execute-permission](../.github/user-management-tower-setup/give-execute-permission.png)
+![give-execute-permission](images/give-execute-permission.png)
 
 # Copyright
 
