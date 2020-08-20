@@ -13,7 +13,7 @@ This project provides sample playbooks and roles which can be used to create and
 - [**add-zos-user**](roles/add-zos-user/README.md) - Holds tasks related to adding a z/OS user.
 - [**remove-zos-user**](roles/remove-zos-user/README.md) - Holds tasks related to removing a z/OS user.
 
-## Getting Started
+## Getting Started: CLI
 
 ### 1. Update [inventory.yml](inventory.yml) with the information about your system(s)
 
@@ -43,6 +43,10 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ```bash
 ansible-playbook -i inventory.yml <playbook-name>
 ```
+
+## Getting Started: Ansible Tower
+
+Please refer to the [Tower setup documentation](tower-setup.md) for a step-by-step guide for getting user management configured in Ansible Tower.
 
 # Copyright
 
