@@ -254,11 +254,13 @@ The new credential type will be used to store the password for the email account
 
 ![add-email-credential](../.github/user-management-tower-setup/create-email-credential.png)
 
-## Step 7: Create add user template
+## Step 7: Create Add User template
 
 Be sure to attach both the SSH key and email credentials to the *CREDENTIALS* section.
 
-You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, choose *PROMPT ON LAUNCH*.
+This guide assumes you will use the same SSH key credential for all managed systems. If this is not the case, select *PROMPT ON LAUNCH*.
+
+You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
 
 You will need to set the following variables in the *EXTRA VARIABLES* section of the template:
 
@@ -286,3 +288,75 @@ Ensure `print_pass: no` and `send_email: yes`. The remaining variables will need
 
 ![add-user-template](../.github/user-management-tower-setup/add-user-template.png)
 
+## Step 8: Add survey prompt for Add User template
+
+![add-user-prompt-full-name](../.github/user-management-tower-setup/adduserprompt1.png)
+
+![add-user-prompt-userid](../.github/user-management-tower-setup/adduserprompt2.png)
+
+![add-user-prompt-email](../.github/user-management-tower-setup/adduserprompt3.png)
+
+## Step 9: Create Remove User template
+
+Be sure to attach the SSH key credential to the *CREDENTIALS* section.
+
+This guide assumes you will use the same SSH key credential for all managed systems. If this is not the case, select *PROMPT ON LAUNCH*.
+
+You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
+
+![remove-user-template](../.github/user-management-tower-setup/remove-user-template.png)
+
+## Step 10: Add survey prompt for Remove User template
+
+![remove-user-prompt-userid](../.github/user-management-tower-setup/remove-user-template-userid-prompt.png)
+
+## Step 11: Create Send Rejection Email template
+
+Be sure to attach the email credential to the *CREDENTIALS* section.
+
+You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
+
+Technically, the specific host used in this step does not matter, as the *send-rejection-email.yml* playbook will always run on the control node.
+
+You will need to set the following variables in the *EXTRA VARIABLES* section of the template:
+
+- #### **smtp_server**
+
+  Specifies the SMTP server to use for sending email
+
+- #### **smtp_port**
+
+  Specifies the SMTP port to use for sending email
+
+- #### **smtp_username**
+
+  Specifies the username to use for sending email
+
+![send-rejection-email](../.github/user-management-tower-setup/send-rejection-email.png)
+
+## Step 12: Create Request a New User ID workflow template
+
+You can decide whether to attach the inventory created in step 2 or prompt for an inventory on launch. If you plan to support user creation on multiple hosts, select *PROMPT ON LAUNCH*.
+
+![request-new-userid](../.github/user-management-tower-setup/workflow-template-1.png)
+
+## Step 13: Navigate to *WORKFLOW VISUALIZER* panel
+
+![workflow-visualizer](../.github/user-management-tower-setup/workflow-visualizer.png)
+
+## Step 14: Add Request Approval step to workflow template
+
+![request-approval](../.github/user-management-tower-setup/workflow-approval.png)
+
+## Step 15: Add Add User step to workflow template
+
+![add-user-1](../.github/user-management-tower-setup/workflow-add-user-1.png)
+![add-user-2](../.github/user-management-tower-setup/workflow-add-user-2.png)
+
+## Step 16: Add Send Rejection Email step to workflow template
+
+![send-rejection-email](../.github/user-management-tower-setup/workflow-send-rejection.png)
+
+## Step 17: Verify workflow template looks like the following
+
+![workflow-diagram](../.github/user-management-tower-setup/workflow-diagram.png)
