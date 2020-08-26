@@ -1,13 +1,13 @@
 # Ansible z/OS Collection Samples
 
 This repository contains sample playbooks and blogs related to the Red Hat Ansible Certified Content for IBM Z.
-Refer to the [documentation site](https://ansible-collections.github.io/ibm_zos_core) for a detailed overview of requirements,
+Refer to the [documentation site](https://ibm.github.io/z_ansible_collections_doc/index.html) for a detailed overview of requirements,
 installation and how to get started.
 
 
 ## Index
 
-* [IBM z/OS Core](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core)
+* [z/OS Concepts](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core)
    * [Data Set Basics](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_sets/data_set_basics)
    * [Copy and Fetch Data sets](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_fetch_data_set)
    * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_sort_fetch)
@@ -20,11 +20,11 @@ installation and how to get started.
 
 ## Blogs
 
-* [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible)
+* [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/jobs/submit_query_retrieve)\]
 
-* [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans)
+* [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_sort_fetch)\]
 
-* [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an)
+* [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_fetch_data_set)\]
 
 
 
