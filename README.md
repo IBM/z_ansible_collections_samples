@@ -8,23 +8,23 @@ installation and how to get started.
 ## Index
 
 * [z/OS Concepts](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core)
-   * [Data Set Basics](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_sets/data_set_basics)
-   * [Copy and Fetch Data sets](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_fetch_data_set)
-   * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_sort_fetch)
-   * [Transfer, Dump and Unpack Data Sets](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/dump_pack_ftp_unpack_restore)
-   * [Convert Encoding](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/encoding/convert_encoding)
-   * [Submit Batch Jobs, Query and Retrieve Job Output](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/jobs/submit_query_retrieve)
-   * [Manage z/OS Users Using Ansible](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/user_management/add_remove_user)
-   * [z/OS Operator Basics](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/zos_operator/zos_operator_basics)
+   * [Data Set Basics](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/data_sets/data_set_basics)
+   * [Copy and Fetch Data sets](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/data_transfer/copy_fetch_data_set)
+   * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/data_transfer/copy_sort_fetch)
+   * [Transfer, Dump and Unpack Data Sets](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
+   * [Convert Encoding](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/encoding/convert_encoding)
+   * [Submit Batch Jobs, Query and Retrieve Job Output](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/jobs/submit_query_retrieve)
+   * [Manage z/OS Users Using Ansible](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/user_management/add_remove_user)
+   * [z/OS Operator Basics](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/zos_operator/zos_operator_basics)
 
 
 ## Blogs
 
-* [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/jobs/submit_query_retrieve)\]
+* [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/jobs/submit_query_retrieve)\]
 
-* [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_sort_fetch)\]
+* [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/data_transfer/copy_sort_fetch)\]
 
-* [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core/data_transfer/copy_fetch_data_set)\]
+* [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/zos_concepts/data_transfer/copy_fetch_data_set)\]
 
 
 
