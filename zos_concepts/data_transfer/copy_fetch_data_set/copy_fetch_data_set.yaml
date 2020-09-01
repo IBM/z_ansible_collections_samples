@@ -11,7 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory data-transfer.yaml
+#  ansible-playbook -i inventory copy_fetch_data_set.yaml
 #
 # Notes:
 #  This sample demonstrates various ways to copy and fetch data sets using 
@@ -48,7 +48,7 @@
 ###############################################################################
 
 ---
-- hosts: all
+- hosts: zos_host
   collections:
     - ibm.ibm_zos_core
   gather_facts: no

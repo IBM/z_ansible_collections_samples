@@ -11,7 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory encoding.yaml
+#  ansible-playbook -i inventory convert_encoding.yaml
 #
 # Notes:
 #  This sample demonstrates ways to submit, query and retrieve job output using 
@@ -42,7 +42,7 @@
 ###############################################################################
 
 ---
-- hosts: all
+- hosts: zos_host
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
@@ -57,7 +57,6 @@
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Detecting system name
-      #shell: "uname -a |awk '{print $2}'"
       command: uname -n
       register: result
 

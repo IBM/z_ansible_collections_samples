@@ -10,7 +10,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory data-set-operations.yaml
+#  ansible-playbook -i inventory data_set_basics.yaml
 #
 # Notes:
 #  This sample demonstrates ways to create, delete and modify data sets using 
@@ -49,7 +49,7 @@
 ###############################################################################
 
 ---
-- hosts: all
+- hosts: zos_host
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
@@ -73,7 +73,6 @@
         msg: "{{ data_set_name }}"
 
     - name: Detecting system name
-      #shell: "uname -a |awk '{print $2}'"
       command: uname -n
       register: result
 
@@ -132,10 +131,6 @@
       debug:
         msg: "{{ result }}"
 
-    # - name: Copy the USS file to the sequential data set
-    #   shell: 'cp {{  tgt_tmp_dir }}/HELLO "//''{{ data_set_name }}''"'
-    #   register: result
-
     - name: Copy the USS file to the sequential data set
       zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
@@ -169,10 +164,6 @@
     - name: Response for creating the PDS member
       debug:
         msg: "{{ result }}"
-
-    # - name: Copy the sequential data set to PDS member
-    #   shell: 'cp "//''{{ data_set_name }}''" "//''{{ pds_name }}(HELLO)''"'
-    #   register: result
 
     - name: Copy the sequential data set to PDS member
       zos_copy:
