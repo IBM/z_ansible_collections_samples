@@ -7,8 +7,6 @@ installation and how to get started.
 
 ## Index
 
-https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_sets/data_set_basics
-
 * [z/OS Concepts](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core)
    * [Data Set Basics](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_sets/data_set_basics)
    * [Copy and Fetch Data sets](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_fetch_data_set)
