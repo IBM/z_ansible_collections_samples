@@ -7,8 +7,8 @@ installation and how to get started.
 
 ## Index
 
-* [z/OS Concepts](https://github.com/IBM/z_ansible_collections_samples/ibm_zos_core)
-   * [Data Set Basics](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_sets/data_set_basics)
+* [z/OS Concepts](zos_concepts/)
+   * [Data Set Basics](zos_concepts/data_sets/data_set_basics)
    * [Copy and Fetch Data sets](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_fetch_data_set)
    * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_sort_fetch)
    * [Transfer, Dump and Unpack Data Sets](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
