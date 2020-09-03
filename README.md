@@ -8,15 +8,15 @@ installation and how to get started.
 ## Index
 
 * [z/OS Concepts](zos_concepts/)
-   * [Data Set Basics](zos_concepts/data_sets/data_set_basics)
+   * [Convert Encoding](zos_concepts/encoding/convert_encoding)
    * [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
    * [Copy Directory to PDS, Edit member and Submit Job](zos_concepts/data_sets/copy_edit_submit)
    * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)
-   * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
-   * [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
-   * [Convert Encoding](zos_concepts/encoding/convert_encoding)
-   * [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
+   * [Data Set Basics](zos_concepts/data_sets/data_set_basics)
    * [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user)
+   * [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
+   * [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
+   * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
    * [z/OS Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
 
 
