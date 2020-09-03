@@ -19,6 +19,8 @@ installation and how to get started.
    * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
    * [z/OS Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
 
+* [z/OS Administration](zos_administration/)
+   * [Set Up Host Vars by Configuring Python and ZOAU Installation](zos_administration/host_setup) 
 
 ## Blogs
 
