@@ -1,4 +1,4 @@
-# Submit batch jobs, query and retrieve job output
+# Terse Data Set and Fetch
 
 This sample demonstrates ways to create a temporary data set, terse the
 temporary data set and fetch the tersed data set back to the local machine. This

@@ -1,4 +1,4 @@
-# Submit batch jobs, query and retrieve job output
+# Copy Directory to PDS, Edit member and Submit Job
 
 This sample playbook demonstrates how to copy a directory to a PDS, edit a 
 member within the PDS and submit the PDS member containing JCL. This sample
