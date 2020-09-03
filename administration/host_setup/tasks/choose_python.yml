@@ -1,0 +1,71 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This list of tasks is used to test a discovered Python installation.
+#
+# Notes:
+#  This is a list of tasks and can not be run directly like a playbook.
+#  This list of tasks is used by the host-setup.yaml playbook during Python
+#  installation selection.
+#
+# Tasks Flow:
+#  - Build a temporary environment variable configuration.
+#  - Attempt to run the ping module.
+#  - When a Python installation is found that can run the ping module successfully,
+#    save this as our chosen Python and skip checking the remaining Python installations.
+###############################################################################
+
+- block:
+    - name: Create temporary file
+      tempfile:
+        state: file
+      register: tempfile_1
+      delegate_to: localhost
+
+    - name: Write to temporary file
+      template:
+        src: "{{ playbook_dir }}/templates/test-vars.j2"
+        dest: "{{ tempfile_1.path }}"
+      vars:
+        python_root: "{{ item.get('root') }}"
+        python_interpreter: "{{ item.get('interpreter') }}"
+      delegate_to: localhost
+
+    - name: Load variables from temp file
+      include_vars:
+        file: "{{ tempfile_1.path }}"
+
+    - name: Attempt to run ping command using newly discovered
+      ping:
+      vars:
+        ansible_python_interpreter: "{{ item.get('interpreter') }}"
+      environment: "{{ environment_vars }}"
+      register: ping_response
+      failed_when: false
+
+    - debug:
+        var: ping_response
+
+    - name: Determine if ping was successful
+      set_fact:
+        connection_success: "{{ True if ping_response.get('ping', '') == 'pong' else False }}"
+
+    - name: Set python installation
+      set_fact:
+        chosen_python: "{{ item }}"
+      when: connection_success
+
+  rescue:
+    - set_fact:
+        connection_success: False
+
+  always:
+    - name: Remove temporary file
+      file:
+        path: "{{ tempfile_1.path }}"
+        state: absent
+      delegate_to: localhost
+      when: tempfile_1 is defined
+  when: chosen_python is not defined
