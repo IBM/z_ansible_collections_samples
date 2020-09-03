@@ -27,7 +27,7 @@
 # If the user that connects to the host is different from the user submitting
 # the playbook, you can optionally instruct the playbook to user another user
 # with option '-u <username>' for example:
-# ansible-playbook -i "mysystem.to.connect.com," host-setup.yaml -u myHostUser
+# ansible-playbook -i "mysystem.to.connect.com," host_setup.yaml -u myHostUser
 #
 # Notes:
 #  This playbook will attempt to locate Ansible dependencies on a z/OS system
@@ -148,7 +148,7 @@
 
     - name: Create host_vars file
       template:
-        src: "{{ playbook_dir }}/templates/host-vars.j2"
+        src: "{{ playbook_dir }}/templates/host_vars.j2"
         dest: "{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml"
         force: yes
         backup: yes
