@@ -9,22 +9,24 @@ installation and how to get started.
 
 * [z/OS Concepts](zos_concepts/)
    * [Data Set Basics](zos_concepts/data_sets/data_set_basics)
-   * [Copy and Fetch Data sets](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_fetch_data_set)
-   * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_sort_fetch)
-   * [Transfer, Dump and Unpack Data Sets](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
-   * [Convert Encoding](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/encoding/convert_encoding)
-   * [Submit Batch Jobs, Query and Retrieve Job Output](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/jobs/submit_query_retrieve)
-   * [Manage z/OS Users Using Ansible](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/user_management/add_remove_user)
-   * [z/OS Operator Basics](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/zos_operator/zos_operator_basics)
+   * [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
+   * [Copy Directory to PDS, Edit member and Submit Job](zos_concepts/data_sets/copy_edit_submit)
+   * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)
+   * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
+   * [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
+   * [Convert Encoding](zos_concepts/encoding/convert_encoding)
+   * [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
+   * [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user)
+   * [z/OS Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
 
 
 ## Blogs
 
-* [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/jobs/submit_query_retrieve)\]
+* [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible) - \[[Sample playbook](zos_concepts/jobs/submit_query_retrieve)\]
 
-* [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_sort_fetch)\]
+* [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Sample playbook](zos_concepts/data_transfer/copy_sort_fetch)\]
 
-* [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_fetch_data_set)\]
+* [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](zos_concepts/data_transfer/copy_fetch_data_set)\]
 
 
 ## How to contribute
