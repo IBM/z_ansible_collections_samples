@@ -4,6 +4,14 @@ This repository contains sample playbooks and blogs related to the Red Hat Ansib
 Refer to the [documentation site](https://ibm.github.io/z_ansible_collections_doc/index.html) for a detailed overview of requirements,
 installation and how to get started.
 
+An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
+consists of organized instructions that define work for a managed node (host)
+to be managed with Ansible. This repository contains sample playbooks and blogs
+related to the Red Hat Ansible Certified Content for IBM Z.
+
+Refer to the documentation site for a detailed overview of requirements,
+installation and how to get started.
+
 
 ## Index
 
@@ -27,7 +35,7 @@ installation and how to get started.
 * [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/data_transfer/copy_fetch_data_set)\]
 
 
-## How to contribute
+## How sample playbooks are packaged
 
 The sample playbook repository is organized as follows:
 
@@ -44,11 +52,10 @@ The sample playbook repository is organized as follows:
     └── README
 
 
-When contributing new sample playbooks, they should be placed under the appropriate topic and use case.
-If the playbook does not correspond to an existing use case, a new use case can be added that conforms to the
+When new sample playbooks are contributed, they are placed under the appropriate topic and use case.
+If the playbook does not correspond to an existing use case, a new use case will be added that conforms to the
 structure outlined above.
-Each playbook should also include a README with a brief description, licensing and copyright information.
-
+Each playbook will also include a README with a brief description, licensing and copyright information.
 
 ## Copyright
 
