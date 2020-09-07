@@ -1,6 +1,13 @@
-################################################################################
-# Copyright (c) IBM Corporation 2020
-################################################################################
+###############################################################################
+# © Copyright IBM Corporation 2020
+# Contributed and supported by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2020-09-01
+#  - Released initial version
+###############################################################################
 
 ################################################################################
 # - The value for the property BPXK_AUTOCVT must be configured to "ON";
@@ -43,6 +50,7 @@
 #   ZOAU; for example, ``/usr/lpp/IBM/zoautil``.
 #
 ################################################################################
+
 
 # the path to the root of IBM python installation
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"

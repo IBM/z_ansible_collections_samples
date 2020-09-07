@@ -17,6 +17,10 @@ Note that this playbook requires IBM z/OS Core Collection 1.3.0-beta.1 or later
 
 ## Getting Started
 
+If you are unfamiliar with playbooks, you can review our
+[detailed configuration guide](../../../docs/share/configuration_guide.md) or
+continue with getting started below.
+
 ### Update [inventory.yml](inventory.yml) with the information about your system(s)
 
 ```yaml

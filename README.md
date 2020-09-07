@@ -77,7 +77,6 @@ be noted at the top of the playbook bellow the copyright statement. For example:
 ###############################################################################
 # © Copyright IBM Corporation 2020
 # Contributed and supported by the Ansible Content for IBM Z Team
-###############################################################################
 ```
 
 Support for samples is managed through the repositories git issues:

@@ -1,6 +1,12 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020
 # Contributed and supported by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2020-09-01
+#  - Released initial version
 ###############################################################################
 
 ###############################################################################
@@ -39,14 +45,6 @@
 # Optional:
 #   system_name - this is the system name that will be used during this example,
 #                 determined by executing `uname -n` on the target.
-###############################################################################
-
-###############################################################################
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# [1.0.0] - 2020-09-01
-#  - Released initial version
 ###############################################################################
 
 ---
