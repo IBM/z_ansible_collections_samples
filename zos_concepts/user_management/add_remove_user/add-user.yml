@@ -16,7 +16,7 @@
 #  - Released initial version
 ###############################################################################
 
-- hosts: all
+- hosts: zos_host
   collections:
     - ibm.ibm_zos_core
   gather_facts: no

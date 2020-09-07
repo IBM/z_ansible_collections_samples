@@ -26,7 +26,7 @@ zsystem:
       ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
 ```
 
-### 2. Update the environment variables for the z/OS system in [host_vars/zhost.yml](host_vars/zhost.yml)
+### 2. Update the environment variables for the z/OS system in [host_vars/zos_host.yml](host_vars/zos_host.yml)
 
 ```yaml
 # the path to the root of IBM python installation
@@ -36,7 +36,7 @@ PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
 ```
 
-### 3. Update the playbook specific variables in [host_vars/zhost.yml](host_vars/zhost.yml) based on desired behavior
+### 3. Update the playbook specific variables in [host_vars/zos_host.yml](host_vars/zos_host.yml) based on desired behavior
 
 ### 4. Run desired playbook
 

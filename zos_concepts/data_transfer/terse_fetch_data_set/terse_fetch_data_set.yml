@@ -1,0 +1,134 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to terse a data set and fetch the tersed
+# data set back to the control node.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory submit_query_retrieve.yaml
+#
+# Notes:
+#  This sample demonstrates ways to create a temporary data set, terse the
+#  temporary data set and fetch the tersed data set back to the local machine.
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+#  Data sets created for this sample will follow this pattern
+#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
+#  The user is identified by the Ansible variable `ansible_user`.
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `data_set_name` and `system_name`.
+#
+# Requirements:
+#   IBM Open Enterprise Python for z/OS 3.8.2 or later
+#   IBM Z Open Automation Utilities 1.0.3 PTF UI70141 / APAR PH26560 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  connection: ibm.ibm_zos_core.zos_ssh
+
+  tasks:
+    # ##########################################################################
+    # Modules: zos_mvs_raw, zos_fetch, zos_data_set
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create a temporary data set
+    # | - Using zos_mvs_raw, call utility to terse the temporary data set
+    # | - Using zos_fetch, fetch both the tersed archive and the data set
+    # | - Tear down by cleaning up files.
+    # +-------------------------------------------------------------------------
+    - block:
+      - name: Create a temporary data set
+        zos_data_set:
+          type: seq
+          space_primary: 5
+          space_secondary: 1
+          space_type: cyl
+          record_length: 1024
+        register: temp_data_set
+        failed_when: temp_data_set is not defined or temp_data_set.get('names', [])|length == 0
+
+    - name: Get the result of temp data set creation
+      debug:
+        var: temp_data_set
+
+    - name: "Terse data set {{ ansible_user | upper }}.SOME.DATA.SET to {{ temp_data_set.get('names')[0] }}"
+      zos_mvs_raw:
+        program_name: amaterse
+        parm: "SPACK"
+        dds:
+          - dd_data_set:
+              dd_name: sysut1
+              data_set_name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+              disposition: shr
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ temp_data_set.get('names')[0] }}"
+              disposition: new
+              replace: yes
+              type: seq
+              space_primary: 5
+              space_secondary: 1
+              space_type: cyl
+              record_length: 1024
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      register: terse_response
+
+    - name: Get the output of terse execution
+      debug:
+        var: terse_response
+
+    - name: "Fetch the tersed data set {{ temp_data_set.get('names')[0] }} to the local machine"
+      zos_fetch:
+        src: "{{ temp_data_set.get('names')[0] }}"
+        dest: "{{ playbook_dir }}/"
+        flat: true
+        is_binary: true
+      register: result
+
+    - name: Result of fetching tersed PDS to the local machine
+      debug:
+        var: result
+
+    - name: "Remove the temporary data set {{ temp_data_set.get('names')[0] }}"
+      zos_data_set:
+        name: "{{ temp_data_set.get('names')[0] }}"
+        state: absent
+      when: temp_data_set is defined and temp_data_set.names|length > 0
+
+    - name: "Fetch {{ ansible_user | upper }}.SOME.DATA.SET to local machine"
+      zos_fetch:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        dest: "{{ playbook_dir }}/"
+        flat: true
+        encoding:
+          from: IBM-1047
+          to: ISO8859-1
+      register: result
+
+    - name: "Result of fetching {{ ansible_user | upper }}.SOME.DATA.SET to local machine"
+      debug:
+        var: result
+
+    - name: "Delete data set {{ ansible_user | upper }}.SOME.DATA.SET"
+      zos_data_set:
+        name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        state: absent

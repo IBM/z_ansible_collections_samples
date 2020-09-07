@@ -1,0 +1,8 @@
+{# Copyright (c) IBM Corporation 2020 #}
+---
+zsystem:
+  hosts:
+    {{ inventory_hostname_short }}:
+      ansible_host: {{ target_host }}
+      ansible_user: {{ target_user }}
+      ansible_python_interpreter: "{{ python_interpreter }}"

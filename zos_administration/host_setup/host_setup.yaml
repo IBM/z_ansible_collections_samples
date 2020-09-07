@@ -1,0 +1,182 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# Description:
+#  This playbook is used to locate required dependencies (Python, ZOAU) and
+#  build a suitable host configuration using the discovered dependencies.
+#
+#  This playbook generates a host configuration only for Python and
+#  ZOAU version >= v1.0.3 dependencies.
+#
+#  All potential Python and ZOAU installations are output by the playbook
+#  in case the Python or ZOAU installation desired by the user is different
+#  than the one selected by this playbook.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#   or
+#  ansible-playbook -i "hostaddress," <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory host_setup.yaml
+#   or
+#  ansible-playbook -i "mysystem.to.connect.com," host_setup.yaml
+#
+# If the user that connects to the host is different from the user submitting
+# the playbook, you can optionally instruct the playbook to user another user
+# with option '-u <username>' for example:
+# ansible-playbook -i "mysystem.to.connect.com," host_setup.yaml -u myHostUser
+#
+# Notes:
+#  This playbook will attempt to locate Ansible dependencies on a z/OS system
+#  and use them to generate a valid inventory and host_vars file for the host.
+#
+#  On a native LPAR, the playbook takes about 1-5 minutes to run, or about
+#  5-15 minutes on a z/VM depending on the value of max_search_depth.
+#  Execution time may vary depending on the number of files in the
+#  Unix System Services filesystem.
+#
+#  The generated inventory and host_vars files will match the name of the host
+#  targeted by this playbook. Backups will be made if there are naming conflicts.
+#
+#  All potential Python and ZOAU installations are output by the playbook
+#  in case the Python or ZOAU installation desired by the user is different
+#  than the one selected by this playbook.
+#
+# Playbook flow:
+#  - Search the Unix System Services filesystem for Python and ZOAU binaries with
+#    execute bit set. Capture the output as list of potential dependency paths.
+#  - Filter and sort discovered python installations by "best" candidates.
+#    IBM Python is the first choice, followed by IZODA and Rocket Python in that order.
+#  - In a loop, iterating over each Python installation, build a temporary environment
+#    variable configuration and attempt to run the ping module. When a Python installation
+#    is found that can run the ping module successfully, save this as our chosen Python
+#    and skip checking the remaining Python installations.
+#  - Retrieve version information for all potential ZOAU installations.
+#  - Filter and sort discovered ZOAU installations prioritizing most recent build.
+#  - In a loop, iterating over each ZOAU installation, build a temporary environment
+#    variable configuration, including the information for the chosen Python installation,
+#    and attempt to run the zos_data_set module. When a ZOAU installation is found that can
+#    run the zos_data_set module successfully, save this as our chosen ZOAU and skip checking
+#    the remaining ZOAU installations.
+#  - Create host_vars directory in same directory as playbook if it does not already exist.
+#  - Create a new host_vars variable file for the host targeted by this playbook, backing up
+#    existing variable files if there are naming conflicts.
+#  - Create a new inventory file for the host targeted by this playbook, backing up
+#    existing inventory files if there are naming conflicts.
+#
+# Requirements:
+#   IBM z/OS core collection 1.0.3 or later
+#
+# Optional:
+#   minimum_zoau_version - this is the minumum ZOAU release version to consider
+#                 when searching for valid ZOAU installations.
+#   max_search_depth - this is the maximum directory depth to search when attempting
+#                 to locate dependency installations. A large max_search_depth has
+#                 a better chance of finding dependency installations. However,
+#                 a small max_search_depth will be much faster.
+###############################################################################
+
+- hosts: zos_host
+  gather_facts: no
+  vars:
+    # minimum_zoau_version only accepts integers and "."
+    minimum_zoau_version: 1.0.3
+    max_search_depth: 15
+
+  tasks:
+    - name: Gather potential dependency paths
+      raw: 'find / -level {{ max_search_depth }} -type f -perm -111 -name "python*" -o -type f -perm -111 -name "dtouch" 2>/dev/null || :'
+      register: dependency_paths
+
+    - set_fact:
+        potential_paths: "{{ dependency_paths|potential_paths }}"
+
+    - name: Assert potential python installs were found
+      fail:
+        msg: No potential python installs were found.
+      when: potential_paths.get('python')|length == 0
+
+    - name: Assert potential ZOAU installs were found
+      fail:
+        msg: No potential ZOAU installs were found.
+      when: potential_paths.get('zoau')|length == 0
+
+    - debug:
+        var: potential_paths
+
+    - name: Find valid python installation
+      include_tasks:
+        file: "{{ playbook_dir }}/tasks/choose_python.yml"
+      loop: "{{ potential_paths.get('python', []) }}"
+
+    - name: Assert a valid python install was found
+      fail:
+        msg: No useable python installation was found
+      when: chosen_python is not defined
+
+    - name: Get ZOAU build dates
+      raw: "{{ potential_paths | zoau_version_command_string }} 2>&1 || :"
+      register: zoau_build_dates
+
+    - debug:
+        var: zoau_build_dates
+
+    - name: Filter potential ZOAU options based on
+      set_fact:
+        filtered_zoau: "{{ potential_paths.get('zoau') | filter_zoau_installs(zoau_build_dates.get('stdout_lines'), minimum_zoau_version) }}"
+
+    - name: Find valid ZOAU install
+      include_tasks:
+        file: "{{ playbook_dir }}/tasks/choose_zoau.yml"
+      loop: "{{ filtered_zoau }}"
+      when: filtered_zoau is defined and filtered_zoau|length > 0
+
+    - name: Assert a valid ZOAU install was found
+      fail:
+        msg: No ZOAU installation found meeting requirements.
+      when: chosen_zoau is not defined
+
+
+    - name: Create host_vars directory if it does not already exist
+      file:
+        path: "{{ playbook_dir }}/host_vars"
+        state: directory
+      delegate_to: localhost
+
+    - name: Create host_vars file
+      template:
+        src: "{{ playbook_dir }}/templates/host_vars.j2"
+        dest: "{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml"
+        force: yes
+        backup: yes
+      vars:
+        python_root: "{{ chosen_python.get('root') }}"
+        python_interpreter: "{{ chosen_python.get('interpreter') }}"
+        zoau_root: "{{ chosen_zoau.get('root') }}"
+      delegate_to: localhost
+
+    - set_fact:
+        target_user: "{{ ansible_user }}"
+
+    - set_fact:
+        target_host: "{{ ansible_host }}"
+
+    - name: Create inventory file
+      template:
+        src: "{{ playbook_dir }}/templates/inventory.j2"
+        dest: "{{ playbook_dir }}/{{ inventory_hostname_short }}"
+        force: yes
+        backup: yes
+      vars:
+        python_interpreter: "{{ chosen_python.get('interpreter') }}"
+      delegate_to: localhost
+
+    - debug:
+        var: potential_paths
+
+    - debug:
+        msg: "Inventory file placed at '{{ playbook_dir }}/{{ inventory_hostname_short }}', 
+        host_vars file placed at '{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml'"

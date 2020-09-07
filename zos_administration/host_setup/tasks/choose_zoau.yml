@@ -1,0 +1,71 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This list of tasks is used to test a discovered ZOAU installation.
+#
+# Notes:
+#  This is a list of tasks and can not be run directly like a playbook.
+#  This list of tasks is used by the host-setup.yaml playbook during ZOAU
+#  installation selection.
+#
+# Tasks Flow:
+#  - Build a temporary environment variable configuration, including the information for the
+#    chosen Python installation.
+#  - Attempt to run the zos_data_set module.
+#  - When a ZOAU installation is found that can run the zos_data_set module successfully,
+#    save this as our chosen ZOAU and skip checking the remaining ZOAU installations.
+###############################################################################
+
+- block:
+    - name: Create temporary file
+      tempfile:
+        state: file
+      register: tempfile_1
+      delegate_to: localhost
+
+    - name: Write to temporary file
+      template:
+        src: "{{ playbook_dir }}/templates/test-vars.j2"
+        dest: "{{ tempfile_1.path }}"
+      vars:
+        python_root: "{{ chosen_python.get('root') }}"
+        python_interpreter: "{{ chosen_python.get('interpreter') }}"
+        zoau_root: "{{ item.get('root') }}"
+      delegate_to: localhost
+
+    - name: Load variables from temp file
+      include_vars:
+        file: "{{ tempfile_1.path }}"
+
+    - name: Attempt to run zos_data_set using chosen dependency paths
+      ibm.ibm_zos_core.zos_data_set:
+        state: present
+      vars:
+        ansible_python_interpreter: "{{ chosen_python.get('interpreter') }}"
+      environment: "{{ environment_vars }}"
+      register: zos_data_set_response
+      failed_when: false
+
+    - name: Set ZOAU installation if completed successfully
+      set_fact:
+        chosen_zoau: "{{ item }}"
+      when: zos_data_set_response is defined and zos_data_set_response.get('names', [])|length > 0
+
+  always:
+    - name: Remove temporary file
+      file:
+        path: "{{ tempfile_1.path }}"
+        state: absent
+      delegate_to: localhost
+      when: tempfile_1 is defined
+    - name: Remove temporary data set
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ zos_data_set_response.get('names')[0] }}"
+        state: absent
+      vars:
+        ansible_python_interpreter: "{{ chosen_python.get('interpreter') }}"
+      environment: "{{ environment_vars }}"
+      when: zos_data_set_response is defined and zos_data_set_response.get('names', [])|length > 0
+  when: chosen_zoau is not defined

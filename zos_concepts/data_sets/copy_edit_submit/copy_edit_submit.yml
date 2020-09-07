@@ -1,0 +1,125 @@
+###############################################################################
+# Copyright (c) IBM Corporation 2020
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to copy a directory to a PDS, edit a
+# member within the PDS and submit PDS member containing JCL.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory submit_query_retrieve.yaml
+#
+# Notes:
+#  This sample demonstrates ways to copy, edit and submit jobs using 
+#  Ansible z/OS core modules. Each module has options available on how 
+#  automation can be controlled. This sample does not demonstrate all options, 
+#  refer to documentation or ansible-doc for those options.
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+#  Data sets created for this sample will follow this pattern
+#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
+#  The user is identified by the Ansible variable `ansible_user`.
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `data_set_name` and `system_name`.
+#
+# Requirements:
+#   IBM Open Enterprise Python for z/OS 3.8.2 or later
+#   IBM Z Open Automation Utilities 1.0.3 PTF UI70141 / APAR PH26560 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  connection: ibm.ibm_zos_core.zos_ssh
+
+  tasks:
+    # ##########################################################################
+    # Modules: zos_copy, zos_lineinfile, zos_mvs_raw, zos_job_submit
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_copy, copy directory {{ playbook_dir }}/files to z/OS
+    # |   managed node into a data set, each file will be a data set member
+    # | - Using zos_copy, make a copy of member UPTIME JCL as PSA JCL
+    # | - Using zos_lineinfile, edit JCL PSA replacing the uptime command with a
+    # |   ps -A command to show all processes in USS
+    # | - Using zos_job_submit, submit both JCLs, UPTIME and PSA
+    # | - Using zos_data_set, delete the copied data set on z/OS host
+    # +-------------------------------------------------------------------------
+    - name: "Copy local directory {{ playbook_dir }}/files to {{ ansible_user | upper }}.SOME.DATA.SET"
+      zos_copy:
+        src: "{{ playbook_dir }}/files"
+        dest: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        encoding:
+          from: ISO8859-1
+          to: IBM-1047
+      register: result_copy_dir
+
+    - name: "Response for copy local directory {{ playbook_dir }}/files to {{ ansible_user | upper }}.SOME.DATA.SET."
+      debug:
+        var: result_copy_dir
+
+    - name: "Copy PDS member {{ ansible_user | upper }}.SOME.DATA.SET(UPTIME) to a new PDS member {{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+      zos_copy:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+        dest: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        remote_src: true
+
+    - name: "Edit JCL PSA job card on z/OS managed node."
+      zos_lineinfile:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        state: present
+        regexp: "//UPTIME    JOB (T043JM,JM00,1,0,0,0),'UPTIME - JRM',"
+        line: "//PSA    JOB (T043JM,JM00,1,0,0,0),'PSA - JRM',"
+
+    - name: "Edit JCL PSA step-name on z/OS managed node."
+      zos_lineinfile:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        state: present
+        regexp: "//UPTIME  EXEC PGM=BPXBATCH"
+        line: "//PSA  EXEC PGM=BPXBATCH"
+
+    - name: "Edit JCL PSA USS command on z/OS managed node."
+      zos_lineinfile:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        state: present
+        regexp: "SH uptime"
+        line: "SH ps -A"
+
+    - name: "Submit the JCL {{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+      zos_job_submit:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        location: DATA_SET
+        wait: true
+      register: result_submit_psa
+
+    - name: "Response for submitting JCL {{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+      debug:
+        var: result_submit_psa
+
+    - name: "Submit the JCL {{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+      zos_job_submit:
+        src: "{{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+        location: DATA_SET
+        wait: true
+      register: result_submit_uptime
+
+    - name: "Response for submitting JCL {{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+      debug:
+        var: result_submit_uptime
+
+    - name: "Delete data set {{ ansible_user | upper }}.SOME.DATA.SET"
+      zos_data_set:
+        name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        state: absent
