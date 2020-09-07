@@ -1,17 +1,12 @@
 # Ansible z/OS Collection Samples
 
+An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
+consists of organized instructions that define work for a managed node to be
+managed with Ansible.
+
 This repository contains sample playbooks and blogs related to the Red Hat Ansible Certified Content for IBM Z.
 Refer to the [documentation site](https://ibm.github.io/z_ansible_collections_doc/index.html) for a detailed overview of requirements,
 installation and how to get started.
-
-An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
-consists of organized instructions that define work for a managed node (host)
-to be managed with Ansible. This repository contains sample playbooks and blogs
-related to the Red Hat Ansible Certified Content for IBM Z.
-
-Refer to the documentation site for a detailed overview of requirements,
-installation and how to get started.
-
 
 ## Index
 
@@ -69,6 +64,22 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0).
 ## Support
 
 All IBM certified sample playbooks, roles and filters are supported as part of
-the Red Hat® Ansible Certified Content for IBM Z offering. Support for samples
-is managed through the repositories git issues:
+the **Red Hat® Ansible Certified Content for IBM Z** offering. The playbooks
+which are written and supported by
+**Red Hat® Ansible Certified Content for IBM Z** will
+be noted at the top of the playbook bellow the copyright statement. For example:
+
+``` {.yaml}
+###############################################################################
+# © Copyright IBM Corporation 2020
+# Contributed and supported by the Ansible Content for IBM Z Team
+###############################################################################
+```
+
+Support for samples is managed through the repositories git issues:
 https://github.com/IBM/z_ansible_collections_samples/issues
+
+Over time, approved collections may be contributed into the repository. Should
+a problem arise with one of the playbooks, you should open a Git issue and
+report the problem. The maintainers of this sample repository will engage the
+contributor in an effort to resolve the reported issue.
