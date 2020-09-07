@@ -1,7 +1,7 @@
-################################################################################
+###############################################################################
 # © Copyright IBM Corporation 2020
-# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
-################################################################################
+# Contributed and supported by the Ansible Content for IBM Z Team
+###############################################################################
 
 ###############################################################################
 # This playbook is used to demonstrate how to copy a local file, containing
@@ -29,19 +29,16 @@
 #   - Add the column headers back to the sorted file
 #
 # Requirements:
-#   Control Node:
-#     - Ansible 2.9 or later
-#     - Python 2.7 or later
-#     - OpenSSH
 #     - IBM z/OS core collection 1.3.0-beta.1 or later
 #
-#   Managed Node:
-#     - IBM Open Enterprise Python for z/OS
-#     - z/OS V2R3 or later
-#     - IBM Z Open Automation Utilities (ZOAU) version 1.0.3 or later
-#     - z/OS OpenSSH
-#     - The z/OS shell
+###############################################################################
+
+###############################################################################
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
 #
+# [1.0.0] - 2020-09-01
+#  - Released initial version
 ###############################################################################
 
 - hosts: source_system

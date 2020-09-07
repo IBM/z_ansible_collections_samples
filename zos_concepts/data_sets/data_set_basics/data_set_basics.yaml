@@ -1,9 +1,10 @@
 ###############################################################################
 # Copyright (c) IBM Corporation 2020
+# Contributed and supported by the Ansible Content for IBM Z Team
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates basic data set operations using modules 
+# This sample playbook demonstrates basic data set operations using modules
 # included in the Red Hat Ansible Certified  Content for IBM Z core collection.
 #
 # Usage:
@@ -13,9 +14,9 @@
 #  ansible-playbook -i inventory data_set_basics.yaml
 #
 # Notes:
-#  This sample demonstrates ways to create, delete and modify data sets using 
-#  Ansible z/OS core modules. Each module has options available on how 
-#  automation can be controlled. This sample does not demonstrate all options, 
+#  This sample demonstrates ways to create, delete and modify data sets using
+#  Ansible z/OS core modules. Each module has options available on how
+#  automation can be controlled. This sample does not demonstrate all options,
 #  refer to documentation or ansible-doc for those options.
 #
 #  When running this playbook, review the comments on how ths sample will
@@ -31,8 +32,7 @@
 #  `data_set_name` and `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0-beta1 or later
-#   ZOAU 1.0.1 or later
+#   IBM z/OS core collection 1.1.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -46,6 +46,14 @@
 #              sample.
 #   system_name - this is the system name that will be used during this example,
 #                 determined by executing `uname -n` on the target.
+###############################################################################
+
+###############################################################################
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2020-09-01
+#  - Released initial version
 ###############################################################################
 
 ---
