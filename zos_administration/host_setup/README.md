@@ -1,10 +1,14 @@
 # Configure Python and ZOAU Installation
 
-This playbook is used to locate required dependencies (Python, ZOAU) on the 
-remote z/OS host and build a suitable host configuration using the discovered 
+This playbook is used to locate required dependencies (Python, ZOAU) on the
+remote z/OS host and build a suitable host configuration using the discovered
 dependencies.
 
 ## Getting Started
+
+If you are unfamiliar with playbooks, you can review our
+[detailed configuration guide](../../docs/share/configuration_guide.md) or
+continue with getting started below.
 
 ### Update [inventory.yml](inventory.yml) with the information about your system(s)
 

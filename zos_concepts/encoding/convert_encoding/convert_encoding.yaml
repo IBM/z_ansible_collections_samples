@@ -1,10 +1,17 @@
 ###############################################################################
-# Copyright (c) IBM Corporation 2020
+# © Copyright IBM Corporation 2020
+# Contributed and supported by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2020-09-01
+#  - Released initial version
 ###############################################################################
 
 ###############################################################################
 # This sample playbook demonstrates how to perform encoding conversions on USS
-# using modules included in the Red Hat Ansible Certified  Content for 
+# using modules included in the Red Hat Ansible Certified  Content for
 # IBM Z core collection.
 #
 # Usage:
@@ -14,9 +21,9 @@
 #  ansible-playbook -i inventory convert_encoding.yaml
 #
 # Notes:
-#  This sample demonstrates ways to submit, query and retrieve job output using 
-#  Ansible z/OS core modules. Each module has options available on how 
-#  automation can be controlled. This sample does not demonstrate all options, 
+#  This sample demonstrates ways to submit, query and retrieve job output using
+#  Ansible z/OS core modules. Each module has options available on how
+#  automation can be controlled. This sample does not demonstrate all options,
 #  refer to documentation or ansible-doc for those options.
 #
 #  When running this playbook, review the comments on how ths sample will
@@ -28,8 +35,7 @@
 #  `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0-beta1 or later
-#   ZOAU 1.0.1 or later
+#   IBM z/OS core collection 1.1.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written

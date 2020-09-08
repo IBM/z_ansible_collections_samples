@@ -15,6 +15,10 @@ This project provides sample playbooks and roles which can be used to create and
 
 ## Getting Started: CLI
 
+If you are unfamiliar with playbooks, you can review our
+[detailed configuration guide](../../../docs/share/configuration_guide.md) or
+continue with getting started below.
+
 ### 1. Update [inventory.yml](inventory.yml) with the information about your system(s)
 
 ```yaml

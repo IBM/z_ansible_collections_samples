@@ -1,11 +1,23 @@
 ###############################################################################
-# Copyright (c) IBM Corporation 2020
+# © Copyright IBM Corporation 2020
+# Contributed and supported by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2020-09-01
+#  - Released initial version
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to execute z/OS operator commands, 
+# Requirements:
+#     - IBM z/OS core collection 1.x.x or later
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to execute z/OS operator commands,
 # retrieve command output and retrieve outstanding messages requiring operator
-# action using modules included in the Red Hat Ansible Certified Content for 
+# action using modules included in the Red Hat Ansible Certified Content for
 # IBM Z core collection.
 #
 # Usage:
@@ -25,12 +37,11 @@
 #  permissions such as writing the the target directories or creating data sets.
 #
 #  Additional facts for this playbook can be configured to override the defaults
-#  by reviewing the "Fact setting" section of this playbook, for example and 
+#  by reviewing the "Fact setting" section of this playbook, for example and
 #  `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0-beta1 or later
-#   ZOAU 1.0.1 or later
+#   IBM z/OS core collection 1.1.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written

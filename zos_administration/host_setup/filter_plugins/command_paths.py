@@ -1,5 +1,20 @@
-# Copyright (c) IBM Corporation 2020
-# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+###############################################################################
+# © Copyright IBM Corporation 2020
+# Contributed and supported by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2020-09-01
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.0.0 or later
+###############################################################################
+
+
 
 from __future__ import absolute_import, division, print_function
 
