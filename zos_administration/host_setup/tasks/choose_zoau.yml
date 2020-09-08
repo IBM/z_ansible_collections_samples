@@ -24,6 +24,8 @@
 #  - When a ZOAU installation is found that can run the zos_data_set module successfully,
 #    save this as our chosen ZOAU and skip checking the remaining ZOAU installations.
 #
+# Requirements:
+#  - IBM z/OS core collection 1.0.0 or later
 ###############################################################################
 
 
