@@ -75,7 +75,7 @@
 #    existing inventory files if there are naming conflicts.
 #
 # Requirements:
-#   IBM z/OS core collection 1.2.0 or later
+#   - IBM z/OS core collection 1.0.0 or later
 #
 # Optional:
 #   minimum_zoau_version - this is the minumum ZOAU release version to consider
