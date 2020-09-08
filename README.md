@@ -71,7 +71,7 @@ All IBM certified sample playbooks, roles and filters are supported as part of
 the **Red Hat® Ansible Certified Content for IBM Z** offering. The playbooks
 which are written and supported by
 **Red Hat® Ansible Certified Content for IBM Z** will
-be noted at the top of the playbook bellow the copyright statement. For example:
+be noted at the top of the playbook below the copyright statement. For example:
 
 ``` {.yaml}
 ###############################################################################
