@@ -36,7 +36,7 @@
 #  `data_set_name` and `system_name`.
 #
 # Requirements:
-#     - IBM z/OS core collection 1.x.x or later
+#     - IBM z/OS core collection 1.2.0 or later
 ###############################################################################
 
 ---
