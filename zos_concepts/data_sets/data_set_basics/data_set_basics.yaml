@@ -32,7 +32,7 @@
 #  `data_set_name` and `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0 or later
+#   IBM z/OS core collection 1.2.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written

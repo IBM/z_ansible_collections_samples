@@ -9,11 +9,6 @@
 #  - Released initial version
 ###############################################################################
 
-###############################################################################
-# Requirements:
-#     - IBM z/OS core collection 1.0.0 or later
-###############################################################################
-
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type

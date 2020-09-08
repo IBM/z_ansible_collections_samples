@@ -25,7 +25,7 @@
 #    save this as our chosen ZOAU and skip checking the remaining ZOAU installations.
 #
 # Requirements:
-#     - IBM z/OS core collection 1.0.0 or later
+#  - IBM z/OS core collection 1.0.0 or later
 ###############################################################################
 
 

@@ -23,8 +23,6 @@
 #  - When a Python installation is found that can run the ping module successfully,
 #    save this as our chosen Python and skip checking the remaining Python installations.
 #
-# Requirements:
-#     - IBM z/OS core collection 1.0.0 or later
 ###############################################################################
 
 - block:
