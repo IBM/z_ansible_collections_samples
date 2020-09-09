@@ -11,7 +11,7 @@ dependencies.
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../docs/share/configuration_guide.md) or
+[detailed configuration guide](../../docs/share/configuration_guide.md) or
 continue with getting started below.
 
 ### Update [inventory.yml](inventory.yml) with the information about your system(s)
