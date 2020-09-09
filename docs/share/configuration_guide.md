@@ -81,7 +81,7 @@ Behavioral inventory parameters such as `ansible_port` allow you
 to set the port for a host can be viewed in the behavioral inventory parameters
 [documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#connecting-to-hosts-behavioral-inventory-parameters).
 
-## Group Variables
+## Variables
 
 Although you can store variables in the **inventory** file, storing then in
 separate configurations such as **host_vars** or **group_vars** files may help
@@ -93,7 +93,9 @@ The value for the property **\_BPXK_AUTOCVT** must be configured to
 `ON`, for example; `_BPXK_AUTOCVT: "ON"`.
 
 The value for the property **ZOAU_HOME** is the ZOA Utilities install
-root path; for example, `ZOAU_HOME: "/usr/lpp/IBM/zoautil"`.
+root path; for example, `ZOAU_HOME: "/usr/lpp/IBM/zoautil"`.  
+**Note**, if you are using ZOAU version 1.0.1 or older, you must use property **ZOAU_ROOT**
+instead of **ZOAU_HOME**.
 
 The value for the property **PYTHONPATH** is the ZOA Utilities Python
 library path; for example, `PYTHONPATH: "/usr/lpp/IBM/zoautil/lib/"`.
@@ -123,35 +125,13 @@ _TAG_REDIR_OUT: "txt"
 The value for the property **LANG** is the name of the default locale;
 the value **C** specifies the POSIX locale. For example, `LANG: "C"`.
 
-Below depicts a complete configuration:
-
-``` {.yaml}
-environment_vars:
-  _BPXK_AUTOCVT: "ON"
-  ZOAU_HOME: "/usr/lpp/IBM/zoautil"
-  PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
-  LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."
-  PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin"
-  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
-  _TAG_REDIR_ERR: "txt"
-  _TAG_REDIR_IN: "txt"
-  _TAG_REDIR_OUT: "txt"
-  LANG: "C"
-```
-
-**Note:**  
-In ZOAU 1.0.2 and later, the property **ZOAU_ROOT** is no longer
-supported and must be replaced with the property **ZOAU_HOME**. If you
-are using ZOAU version 1.0.1 or lower, you must continue to use the
-property **ZOAU_ROOT** which is the ZOA Utilities install root path
-required for ZOAU; for example, `/usr/lpp/IBM/zoautil`.
-
-A reusable approach to storing your group variables is to create top
-level dependency variables and rely on variable expansion to substitute
-the values. This is preferred, because it tends to reduce
+Using top level dependency variables that rely on variable expansion to
+substitute values is preferred, because it tends to reduce
 misconfiguration when copying dependency paths. In this example, the top
 level dependency variables `PYZ` for Python and `ZOAU` have been added
 and used through the configuration.
+
+Below depicts a complete configuration:
 
 ``` {.yaml}
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
@@ -162,7 +142,7 @@ environment_vars:
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin"
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/sbin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
   _TAG_REDIR_ERR: "txt"
   _TAG_REDIR_IN: "txt"
@@ -170,8 +150,8 @@ environment_vars:
   LANG: "C"
 ```
 
+### Variables for Rocket Python
 
-**Note:**  
 Currently, IBM Open Enterprise Python for z/OS is the supported and
 recommended Python distribution for use on z/OS with Ansible and ZOAU.
 If Rocket Python is the only available python on the target, please
@@ -194,11 +174,21 @@ environment_vars:
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
 ```
 
-### Run the playbook
+## Run the playbook
 
 Access the sample Ansible playbook and ensure that you are within the
 playbook directory where the sample files are included
 
+It is a good practice to review the playbook samples before executing
+them. It will help you understand what requirements in terms of space,
+location, names, authority, and artifacts will be created and cleaned
+up. Although samples are always written to operate without the need for
+the user's configuration, flexibility is written into the samples
+because it is not easy to determine if a sample has access to the
+host's resources. Review the playbook notes sections for additional
+details and configuration.
+
+### Ansible command
 Use the Ansible command `ansible-playbook` to run the sample playbook.
 The command syntax is `ansible-playbook -i <inventory> <playbook>`; for
 example, `ansible-playbook -i inventory sample.yaml`.
@@ -209,16 +199,17 @@ and password each time, copy the SSH public key to the managed node
 using the `ssh-copy-id` command; for example,
 `ssh-copy-id -i ~/.ssh/mykey.pub user@<hostname>`.
 
+### Password prompt
 Alternatively, you can use the `--ask-pass` option to be prompted for
 the user\'s password each time a playbook is run; for example,
 `ansible-playbook -i inventory zos-collection-sample.yaml --ask-pass`.
 
-**Note:**  
 Using `--ask-pass` is not recommended because it will hinder
 performance. Using `--ask-pass` requires `sshpass` be installed on
 the controller. For further reference, see the
 [ask-pass documentation](https://linux.die.net/man/1/sshpass).
 
+## Debugging
 
 Optionally, you can configure the console logging verbosity during
 playbook execution. This is helpful in situations where communication is
@@ -227,12 +218,4 @@ verbosity, append more letter `v`'s; for example,
 `-v`, `-vv`, `-vvv`, or `-vvvv`. Each letter `v` increases logging
 verbosity similar to traditional logging levels INFO, WARN, ERROR, DEBUG.
 
-**Note:**  
-It is a good practice to review the playbook samples before executing
-them. It will help you understand what requirements in terms of space,
-location, names, authority, and artifacts will be created and cleaned
-up. Although samples are always written to operate without the need for
-the user's configuration, flexibility is written into the samples
-because it is not easy to determine if a sample has access to the
-host's resources. Review the playbook notes sections for additional
-details and configuration.
+
