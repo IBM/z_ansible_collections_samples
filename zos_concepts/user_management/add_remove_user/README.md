@@ -13,6 +13,16 @@ This project provides sample playbooks and roles which can be used to create and
 - [**add-zos-user**](roles/add-zos-user/README.md) - Holds tasks related to adding a z/OS user.
 - [**remove-zos-user**](roles/remove-zos-user/README.md) - Holds tasks related to removing a z/OS user.
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.2.0 or later
+
+## Getting Started
+
+If you are unfamiliar with playbooks, you can review our
+[detailed configuration guide](../../../docs/share/configuration_guide.md) or
+continue with getting started below.
+
 ## Getting Started: CLI
 
 If you are unfamiliar with playbooks, you can review our

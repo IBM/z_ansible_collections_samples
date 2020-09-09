@@ -10,11 +10,6 @@
 ###############################################################################
 
 ###############################################################################
-# Requirements:
-#     - IBM z/OS core collection 1.1.0 or later
-###############################################################################
-
-###############################################################################
 # This sample playbook demonstrates how to execute z/OS operator commands,
 # retrieve command output and retrieve outstanding messages requiring operator
 # action using modules included in the Red Hat Ansible Certified Content for

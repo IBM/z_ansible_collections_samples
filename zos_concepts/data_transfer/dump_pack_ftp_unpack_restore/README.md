@@ -14,6 +14,10 @@ This project provides sample playbooks and roles which can be used to transfer d
 - [**unpack-restore-data-sets**](roles/unpack-restore-data-sets/README.md) - Holds tasks related to unpack and restore of data sets from a terse of a data set dump.
 - [**get-estimated-size-of-data-sets**](roles/get-estimated-size-of-data-sets/README.md) - Estimates the total amount of storage space used by one or more data sets.
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.2.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our

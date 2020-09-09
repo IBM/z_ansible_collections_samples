@@ -3,6 +3,10 @@
 This sample playbook demonstrates basic use cases for manipulating data sets on z/OS
 using Red Hat Ansible Certified Content for IBM Z.
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.2.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our

@@ -7,6 +7,10 @@ uses the following modules to accomplish this use case:
 - zos_lineinfile
 - zos_job_submit
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.2.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our
