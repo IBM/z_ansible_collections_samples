@@ -8,6 +8,10 @@ sample used the following modules to accomplish this:
 - zos_fetch
 - zos_data_set
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.2.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our

@@ -15,6 +15,10 @@ control node. The following core modules are used to accomplish these set of tas
 
 Note that this playbook requires IBM z/OS Core Collection 1.3.0-beta.1 or later
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.2.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our

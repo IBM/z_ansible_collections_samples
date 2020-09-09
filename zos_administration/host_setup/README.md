@@ -4,6 +4,10 @@ This playbook is used to locate required dependencies (Python, ZOAU) on the
 remote z/OS host and build a suitable host configuration using the discovered
 dependencies.
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.0.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our

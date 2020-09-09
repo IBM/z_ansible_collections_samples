@@ -67,22 +67,14 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
 
-All IBM certified sample playbooks, roles and filters are supported as part of
-the **Red Hat® Ansible Certified Content for IBM Z** offering. The playbooks
-which are written and supported by
-**Red Hat® Ansible Certified Content for IBM Z** will
-be noted at the top of the playbook below the copyright statement. For example:
+Support for all sample playbooks, roles and filters are managed by opening
+a [Git issue](https://github.com/IBM/z_ansible_collections_samples/issues). The
+repository admins and content owners will engage users on issues reported in
+Git. In the future, samples may be community contributed, therefore it may be
+helpful to review who contributed the sample as well as the requirements.
 
 ``` {.yaml}
 ###############################################################################
 # © Copyright IBM Corporation 2020
-# Contributed and supported by the Ansible Content for IBM Z Team
+# Contributed by the Ansible Content for IBM Z Team
 ```
-
-Support for samples is managed through the repositories git issues:
-https://github.com/IBM/z_ansible_collections_samples/issues
-
-Over time, approved collections may be contributed into the repository. Should
-a problem arise with one of the playbooks, you should open a Git issue and
-report the problem. The maintainers of this sample repository will engage the
-contributor in an effort to resolve the reported issue.

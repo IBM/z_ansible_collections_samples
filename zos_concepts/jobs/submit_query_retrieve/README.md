@@ -4,6 +4,10 @@ This sample playbook demonstrates how to submit batch jobs, query and retrieve j
 output using modules included in the Red Hat Ansible Certified  Content for
 IBM Z core collection.
 
+## Ansible Collection Requirement
+
+   IBM z/OS core collection 1.1.0 or later
+
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our
