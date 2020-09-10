@@ -7,6 +7,8 @@
 #
 # 2020-09-01
 #  - Released initial version
+# 2020-09-09
+#  - Corrected bug where from_encoding and to_encoding were inverted
 ###############################################################################
 
 ###############################################################################
@@ -210,8 +212,8 @@
       zos_encode:
         src: "{{ tgt_tmp_dir }}/encode/"
         dest: "{{ tgt_tmp_dir }}/encode/"
-        from_encoding: "{{ target_charset }}"
-        to_encoding: ISO8859-1
+        from_encoding: ISO8859-1
+        to_encoding: "{{ target_charset }}"
       register: result
 
     - name: Response for encode files in {{ tgt_tmp_dir }}/encode/` from
