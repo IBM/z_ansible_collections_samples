@@ -4,42 +4,37 @@ This playbook is used to locate required dependencies (Python, ZOAU) on the
 remote z/OS host and build a suitable host configuration using the discovered
 dependencies.
 
+It is a good practice to review the playbook sample contents before executing
+them. It will help you understand the requirements in terms of space, location,
+names, authority, and the artifacts that will be created and cleaned up.
+Although samples are written to operate without the need for the user’s
+configuration, flexibility is written into the samples because it is not easy
+to determine if a sample has access to the host’s resources. Review the
+playbook notes sections for additional details and configuration.
+
 ## Ansible Collection Requirement
 
    IBM z/OS core collection 1.0.0 or later
 
 ## Getting Started
 
-If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../docs/share/configuration_guide.md) or
-continue with getting started below.
-
-### Update [inventory.yml](inventory.yml) with the information about your system(s)
-
-```yaml
-# the system where the data should be copied to
-source_system:
-  hosts:
-    zos_host:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
-```
-
-### Update the environment variables for each z/OS system in [host_vars/source.yml](host_vars/zos_host.yml)
-
-```yaml
-# the path to the root of IBM python installation
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
-
-# the path to root of ZOAU installation
-ZOAU: "/usr/lpp/IBM/zoautil"
-```
+This playbook would generate the [inventory](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md#inventory)
+as well as the [host_vars](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md#variables).
+If you are unfamiliar with playbooks, you can review
+our [detailed configuration guide](../../docs/share/configuration_guide.md)
 
 ### Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml host_setup.yaml
+ansible-playbook -i inventory.yml host_setup.yaml -u
+```
+
+If the user that connects to the host is different from the user submitting
+the playbook, you can optionally instruct the playbook to user another user
+with option '-u <username>' for example:
+
+```bash
+ansible-playbook -i "mysystem.to.connect.com," host_setup.yaml -u myHostUser
 ```
 
 # Copyright
@@ -53,7 +48,5 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
 
-All IBM certified sample playbooks, roles and filters are supported as part of
-the Red Hat® Ansible Certified Content for IBM Z offering. Support for samples
-is managed through the repositories git issues:
-https://github.com/IBM/z_ansible_collections_samples/issues
+Please refer to the [support section](../../README.md#support) for more
+details.

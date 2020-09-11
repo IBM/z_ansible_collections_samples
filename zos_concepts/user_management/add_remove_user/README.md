@@ -2,6 +2,14 @@
 
 This project provides sample playbooks and roles which can be used to create and remove users from a z/OS system.
 
+It is a good practice to review the playbook sample contents before executing
+them. It will help you understand the requirements in terms of space, location,
+names, authority, and the artifacts that will be created and cleaned up.
+Although samples are written to operate without the need for the user’s
+configuration, flexibility is written into the samples because it is not easy
+to determine if a sample has access to the host’s resources. Review the
+playbook notes sections for additional details and configuration.
+
 ## Playbook Summary
 
 - [**add-user.yml**](add-user.yml) - Handles adding a user to z/OS. Playbook includes: group configuration, granting permissions, generating passwords, creating and mounting ZFS filesystem for OMVS, transferring files and templates, creating generic profile, and creating catalog alias. Playbook is designed to be used standalone or in an Ansible Tower workflow template.
@@ -22,6 +30,14 @@ This project provides sample playbooks and roles which can be used to create and
 If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](../../../docs/share/configuration_guide.md) or
 continue with getting started below.
+
+Optionally, you can use the sample
+[host_setup](../../../zos_administration/host_setup/README.md)
+to discover and create your **inventory** and **host_vars** artifacts. It should
+be noted that when you use the **host_setup** it will generate a configuration
+for the most common dependencies, some playbooks require more customized
+configurations, in this case, you can review the sample documentation and
+add the additional required variables.
 
 ## Getting Started: CLI
 
@@ -69,4 +85,9 @@ Please refer to the [Tower setup documentation](tower-setup.md) for a step-by-st
 # License
 
 Licensed under [Apache License,
-Version 2.0](https://opensource.org/licenses/Apache-2.0).
+Version 2.0](https://opensource.org/licenses/Apache-2.0)
+
+# Support
+
+Please refer to the [support section](../../../README.md#support) for more
+details.
