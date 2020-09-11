@@ -23,7 +23,7 @@ playbook notes sections for additional details and configuration.
 
 If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](../../../docs/share/configuration_guide.md) or
-continue with getting started below.  
+continue with getting started below.
 
 Optionally, you can use the sample
 [host_setup](../../../zos_administration/host_setup/README.md)
