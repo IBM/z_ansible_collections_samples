@@ -30,7 +30,7 @@ ansible-playbook -i "mysystem.to.connect.com," host_setup.yaml
 ```
 
 If the user that connects to the host is different from the user submitting
-the playbook, you can optionally instruct the playbook to user another user
+the playbook, you can optionally instruct the playbook to use another user
 with option '-u <username>' for example:
 
 ```bash
