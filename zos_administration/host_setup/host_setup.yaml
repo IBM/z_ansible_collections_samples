@@ -7,6 +7,8 @@
 #
 # 2020-09-01
 #  - Released initial version
+# 2020-09-09
+#  - Updated doc to include --ask-pass
 ###############################################################################
 
 ###############################################################################
@@ -30,6 +32,11 @@
 #  ansible-playbook -i inventory host_setup.yaml
 #   or
 #  ansible-playbook -i "mysystem.to.connect.com," host_setup.yaml
+#
+# If you have not copied your controller's public key to the target z/OS system
+# you can use the --ask-pass option to be prompted for the user's password,
+# for example,
+# ansible-playbook -i inventory zos-collection-sample.yaml --ask-pass
 #
 # If the user that connects to the host is different from the user submitting
 # the playbook, you can optionally instruct the playbook to user another user
@@ -78,7 +85,7 @@
 #   - IBM z/OS core collection 1.0.0 or later
 #
 # Optional:
-#   minimum_zoau_version - this is the minumum ZOAU release version to consider
+#   minimum_zoau_version - this is the minimum ZOAU release version to consider
 #                 when searching for valid ZOAU installations.
 #   max_search_depth - this is the maximum directory depth to search when attempting
 #                 to locate dependency installations. A large max_search_depth has
@@ -86,7 +93,7 @@
 #                 a small max_search_depth will be much faster.
 ###############################################################################
 
-- hosts: zos_host
+- hosts: all
   gather_facts: no
   vars:
     # minimum_zoau_version only accepts integers and "."

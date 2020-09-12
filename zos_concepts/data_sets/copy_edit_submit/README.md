@@ -1,11 +1,19 @@
 # Copy Directory to PDS, Edit member and Submit Job
 
-This sample playbook demonstrates how to copy a directory to a PDS, edit a 
+This sample playbook demonstrates how to copy a directory to a PDS, edit a
 member within the PDS and submit the PDS member containing JCL. This sample
 uses the following modules to accomplish this use case:
 - zos_copy
 - zos_lineinfile
 - zos_job_submit
+
+It is a good practice to review the playbook sample contents before executing
+them. It will help you understand the requirements in terms of space, location,
+names, authority, and the artifacts that will be created and cleaned up.
+Although samples are written to operate without the need for the user’s
+configuration, flexibility is written into the samples because it is not easy
+to determine if a sample has access to the host’s resources. Review the
+playbook notes sections for additional details and configuration.
 
 ## Ansible Collection Requirement
 
@@ -16,6 +24,15 @@ uses the following modules to accomplish this use case:
 If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](../../../docs/share/configuration_guide.md) or
 continue with getting started below.
+
+Optionally, you can use the sample
+[host_setup](../../../zos_administration/host_setup/README.md)
+to discover and create your **inventory** and **host_vars** artifacts. It should
+be noted that when you use the **host_setup** it will generate a configuration
+for the most common dependencies, some playbooks require more customized
+configurations, in this case, you can review the sample documentation and
+add the additional required variables.
+
 
 ### Update [inventory.yml](inventory.yml) with the information about your system(s)
 
@@ -56,7 +73,5 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
 
-All IBM certified sample playbooks, roles and filters are supported as part of
-the Red Hat® Ansible Certified Content for IBM Z offering. Support for samples
-is managed through the repositories git issues:
-https://github.com/IBM/z_ansible_collections_samples/issues
+Please refer to the [support section](../../../README.md#support) for more
+details.
