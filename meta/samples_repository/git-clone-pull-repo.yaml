@@ -1,0 +1,141 @@
+###############################################################################
+# © Copyright IBM Corporation 2020
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2020-09-01
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Description:
+# This playbook performs a number of Git operations tailored specifically for
+# the z_ansible_collections_samples repository.
+#
+# The operations performed are:
+#  * evaluating the `repo_root_dest` directory exists and is managed by Git
+#  * updating the repository
+#  * cloning the repository
+#
+# Configure
+#   repo_root_dest - (required) the root directory to install the repository
+#   organization - (optional) Alters the repository URL if you are planning to
+#                  use this playbook to install a different apt_repository
+#   repo_name - (optional) Alters the repository to install, change this if you
+#               plan to use this playbook to install a different repository.
+#
+# Usage:
+#   ansible-playbook git-clone-pull-repo.yaml -e repo_root_dest=~/
+###############################################################################
+
+---
+  - name: "Mirror a Git repository with an Ansible playbook"
+    hosts: localhost
+    gather_facts: no
+    vars:
+      organization: IBM
+      repo_name: z_ansible_collections_samples
+      repo_root_dest: "/tmp"
+
+    tasks:
+    ############################################################################
+    # Check if the repository directory exists, if it does then we need only
+    # perform a git pull, that is if its a really a git managed repo
+    ############################################################################
+
+    - name: Checking if the directory "{{repo_root_dest}}/{{repo_name}}" exists.
+      stat:
+        path: "{{repo_root_dest}}/{{repo_name}}"
+      register: directory_exists
+
+    - name: Evaluating the directory {{repo_root_dest}}/{{repo_name}}
+      debug:
+        msg: "{% if directory_exists.stat.exists and directory_exists.stat.isdir %}
+                  Found directory {{repo_root_dest}}/{{repo_name}}, will
+                  continue to evaluate the directory.
+              {% else %}
+                  No directory {{repo_root_dest}}/{{repo_name}} was found, will
+                  continue to Git clone the repository
+                  https://github.com/{{ organization }}/{{ repo_name }}.git
+              {% endif %}"
+
+    ############################################################################
+    # If the repository directory exists, we should next evaluate the directory
+    # if in fact it is Git managed and then perform a PULL, otherwise if it does
+    # not exist we will simply Git clone the directory and complete.
+    ############################################################################
+
+    - name: Testing if directory {{repo_root_dest}}/{{repo_name}} is Git
+            managed.
+      shell: |
+        cd {{repo_root_dest}}/{{repo_name}}
+        git rev-parse --is-inside-work-tree
+      register: is_git_managed
+      ignore_errors: yes
+      when: directory_exists.stat.exists and directory_exists.stat.isdir
+
+      # ------------------------------------------------------------------------
+      # Assertion will only return 'true' when in a Git managed repo otherwise
+      # returns the STDOUT returns
+      # 'fatal: not a git repository (or any of the parent directories): .git'
+      # ------------------------------------------------------------------------
+    - name: Evaluating if directory {{repo_root_dest}}/{{repo_name}} is Git
+            managed.
+      assert:
+        that:
+          - is_git_managed.stdout_lines
+        success_msg: "Determined directory {{repo_root_dest}}/{{repo_name}} is
+                      Git managed; continuing on to perform a Git pull."
+        fail_msg: "Directory {{repo_root_dest}}/{{repo_name}} exits but is NOT
+                   Git managed or corrupt. Please consider deleting the
+                   directory {{repo_root_dest}}/{{repo_name}} and rerunning the
+                   playbook so that it can Git clone."
+      ignore_errors: no
+      when: directory_exists.stat.exists and directory_exists.stat.isdir
+
+      # ------------------------------------------------------------------------
+      # Since we have have changed directory from a prior task, we only need to
+      # to perform a Git pull IF this is a git managed repository
+      # where is_git_managed.stdout_lines is True
+      # ------------------------------------------------------------------------
+    - name: Update the existing Git managed repository {{repo_root_dest}}/{{repo_name}}
+      shell: |
+        git pull
+      register: git_pull_result
+      ignore_errors: no
+      when: is_git_managed is defined and is_git_managed.stdout is defined and is_git_managed.stdout
+
+    - name: Does the directory "{{repo_root_dest}}/{{repo_name}}" already exist?
+      debug:
+        msg: "{{ git_pull_result }}"
+
+    - name: Result of Git clone
+      debug:
+        msg: "{% if git_pull_result.changed and git_pull_result.stdout == 'Already up to date.' %}
+                  Git repository is Already up to date, no changes pulled.
+              {% else %}
+                  Git repository was updated, new content pulled.
+              {% endif %}"
+      when: is_git_managed is defined and is_git_managed.stdout is defined and is_git_managed.stdout
+
+    ############################################################################
+    # Clone the repository in the user specified `repo_root_dest` location when
+    # no locally managed repository exists.
+    ############################################################################
+    - name: "Clone the repository
+             https://github.com/{{ organization }}/{{ repo_name }}.git"
+      git:  repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
+            dest="{{repo_root_dest}}/{{repo_name}}"
+            accept_hostkey=yes
+            force=yes
+            recursive=no
+      when: not directory_exists.stat.exists
+      register: git_clone_result
+
+    - name: "Results from cloning the Git repository
+             https://github.com/{{ organization }}/{{ repo_name }}.git"
+      debug:
+        msg: "{{git_clone_result}}"
+      when: git_clone_result.changed

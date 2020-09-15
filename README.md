@@ -8,6 +8,11 @@ This repository contains sample playbooks and blogs related to the Red Hat Ansib
 Refer to the [documentation site](https://ibm.github.io/z_ansible_collections_doc/index.html) for a detailed overview of requirements,
 installation and how to get started.
 
+This repository will have frequent updates, we recommend you clone the
+repository and use the GitHub **watch** option to receive update notifications;
+this is outlined in the
+[using the samples repository](meta/samples_repository/README.md) documentation.
+
 ## Index
 
 * [z/OS Concepts](zos_concepts/)
