@@ -7,6 +7,11 @@ recommend that you fork or clone the repository locally to the ansible
 controller, this creates copies of all the playbooks allowing you to try
 them out and customize as necessary.
 
+This document requires that you have
+[Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+or [download](https://git-scm.com/downloads) the distribution of Git where you
+will clone the repository.
+
 ## Watching the GitHub repository
 The [samples repository](https://github.com/IBM/z_ansible_collections_samples/)
 is a collection of samples that will frequently have new playbooks contributed.
@@ -25,9 +30,9 @@ will have your own copy and can customize and tailor the samples to your
 specific requirements.
 
 There are a number of ways to clone a repo, command line interface, graphical
-interfaces and even playbooks. Here, will discuss command line interfaces and a
-playbook which when run will either clone or pull the latest changes from the
-repository.
+interfaces and even playbooks. In this document, we will discuss using the
+command line interface and a playbook, when run will either clone or pull the
+latest changes from the repository.
 
 ### Playbook
 
