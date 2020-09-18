@@ -26,7 +26,7 @@
 #  automation can be controlled. This sample does not demonstrate all options,
 #  refer to documentation or ansible-doc for those options.
 #
-#  When running this playbook, review the comments on how ths sample will
+#  When running this playbook, review the comments on how this sample will
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
 #
