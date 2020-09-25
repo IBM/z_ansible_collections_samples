@@ -1,0 +1,21 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+- name: cat file_name
+  command: "cat {{ file_name }}"
+  register: content
+
+- name: Load the list from the file in the git repo
+  set_fact:
+    git_list: "{{ content.stdout | list_load }}"
+
+- name: Get the delta libraries
+  set_fact:
+    apf_list_diff: "{{ git_list | list_diff(apf_list.stdout) }}"
+
+- name: Prepair a batch of entries for APF add 
+  set_fact:
+    add_list: "{{ apf_list_diff | list_format }}"

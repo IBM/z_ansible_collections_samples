@@ -1,0 +1,17 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+################################################################################
+# This configuration file can be used to define handlers that are used for
+# service management, for example if a server configutration changes you will
+# restart the server to adopt the configiguration changes.
+# Example:
+# Handle changes for file /etc/ansible/roles/apache
+# - name: Restarting Apache Server
+#   service:
+#     name: httpd
+#     state: restarted
+################################################################################

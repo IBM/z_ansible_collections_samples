@@ -1,0 +1,51 @@
+###############################################################################
+# © Copyright IBM Corporation 2020
+# Contributed by the Ansible Content for IBM Z Team
+#
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    git_addr: "git://github.com/IBM/z_ansible_collections_samples.git"
+    checkout_dir: "/git_checkout/z_ansible_collections_samples"
+    file_name: "{{ checkout_dir }}/../list.bom"
+    dsname: "APFTEST.SYS1.PARMLIB"
+    memname: "PROG00"
+    persistent_ds: 
+      persistds: "{{ dsname }}({{ memname }})"
+    pgrm:
+      - dsname: "APFTEST.PGRM001.LIB001"
+        volume: "T60313"
+      - dsname: "APFTEST.PGRM001.LIB002"
+        volume: "T60314"
+      - dsname: "APFTEST.PGRM001.LIB003"
+        volume: "T60315"
+
+  tasks:
+    - name: Create datasets
+      shell: "dtouch -tseq -V{{ item.get('volume', None) }} {{ item['dsname'] }}"
+      loop: "{{ pgrm }}"
+    - name: create persistent dataset
+      shell: "dtouch {{ dsname }}"
+    - name: git pull
+      include_role:
+        name: git-pull
+    - name: add datasets to bom file
+      shell: "echo  \"{{ item['dsname'] }} {{ item.get('volume', None) }}\" >> {{ file_name }} "
+      loop: "{{ pgrm }}"
+    - name: APF list diff
+      include_role:
+        name: apf-list
+    - name: Load the list from the file in git repo and find out the delat from current APF list
+      include_role:
+        name: list-load
+    - name: APF add diff
+      include_role:
+        name: apf-add
+    - name: APF list to be added
+      debug:
+        msg: "{{ add_list }}"
