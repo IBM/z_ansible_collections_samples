@@ -28,7 +28,7 @@ this is outlined in the
    * [z/OS Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
 
 * [z/OS Administration](zos_administration/)
-   * [Set Up Host Vars by Configuring Python and ZOAU Installation](zos_administration/host_setup) 
+   * [Set Up Host Vars by Configuring Python and ZOAU Installation](zos_administration/host_setup)
 
 ## Blogs
 
@@ -38,6 +38,7 @@ this is outlined in the
 
 * [Simplified Approach to Copying Data Between z/OS and Local Machine Using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/11/simplified-approach-to-copying-data-between-zos-an) - \[[Sample playbook](zos_concepts/data_transfer/copy_fetch_data_set)\]
 
+* [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Sample playbook](zos_concepts/user_management/add_remove_user)\]
 
 ## How sample playbooks are packaged
 
