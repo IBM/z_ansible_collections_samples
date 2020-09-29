@@ -29,13 +29,8 @@
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
 #
-#  Data sets created for this sample will follow this pattern
-#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
-#  The user is identified by the Ansible variable `ansible_user`.
-#
-#  Additional facts for this playbook can be configured to override the defaults
-#  by reviewing the "Fact setting" section of this playbook, for example,
-#  `data_set_name` and `system_name`.
+#  Data sets created for this sample will have a randomly generated name created
+#  by the ZOAU API.
 #
 # Requirements:
 #     - IBM z/OS core collection 1.2.0 or later
@@ -52,6 +47,15 @@
 
   tasks:
     # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    - set_fact:
+        tmp_data_set: "{{ tmp_ds.stdout }}"
+    # ##########################################################################
     # Modules: zos_copy, zos_lineinfile, zos_mvs_raw, zos_job_submit
     # ##########################################################################
     # +-------------------------------------------------------------------------
@@ -63,69 +67,69 @@
     # | - Using zos_job_submit, submit both JCLs, UPTIME and PSA
     # | - Using zos_data_set, delete the copied data set on z/OS host
     # +-------------------------------------------------------------------------
-    - name: "Copy local directory {{ playbook_dir }}/files to {{ ansible_user | upper }}.SOME.DATA.SET"
+    - name: "Copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}"
       zos_copy:
         src: "{{ playbook_dir }}/files"
-        dest: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        dest: "{{ tmp_data_set }}"
         encoding:
           from: ISO8859-1
           to: IBM-1047
       register: result_copy_dir
 
-    - name: "Response for copy local directory {{ playbook_dir }}/files to {{ ansible_user | upper }}.SOME.DATA.SET."
+    - name: "Response for copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}."
       debug:
         var: result_copy_dir
 
-    - name: "Copy PDS member {{ ansible_user | upper }}.SOME.DATA.SET(UPTIME) to a new PDS member {{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+    - name: "Copy PDS member {{ tmp_data_set }}(UPTIME) to a new PDS member {{ tmp_data_set }}(PSA)"
       zos_copy:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
-        dest: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        src: "{{ tmp_data_set }}(UPTIME)"
+        dest: "{{ tmp_data_set }}(PSA)"
         remote_src: true
 
     - name: "Edit JCL PSA job card on z/OS managed node."
       zos_lineinfile:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        src: "{{ tmp_data_set }}(PSA)"
         state: present
         regexp: "//UPTIME    JOB (T043JM,JM00,1,0,0,0),'UPTIME - JRM',"
         line: "//PSA    JOB (T043JM,JM00,1,0,0,0),'PSA - JRM',"
 
     - name: "Edit JCL PSA step-name on z/OS managed node."
       zos_lineinfile:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        src: "{{ tmp_data_set }}(PSA)"
         state: present
         regexp: "//UPTIME  EXEC PGM=BPXBATCH"
         line: "//PSA  EXEC PGM=BPXBATCH"
 
     - name: "Edit JCL PSA USS command on z/OS managed node."
       zos_lineinfile:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        src: "{{ tmp_data_set }}(PSA)"
         state: present
         regexp: "SH uptime"
         line: "SH ps -A"
 
-    - name: "Submit the JCL {{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+    - name: "Submit the JCL {{ tmp_data_set }}(PSA)"
       zos_job_submit:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+        src: "{{ tmp_data_set }}(PSA)"
         location: DATA_SET
         wait: true
       register: result_submit_psa
 
-    - name: "Response for submitting JCL {{ ansible_user | upper }}.SOME.DATA.SET(PSA)"
+    - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
       debug:
         var: result_submit_psa
 
-    - name: "Submit the JCL {{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+    - name: "Submit the JCL {{ tmp_data_set }}(UPTIME)"
       zos_job_submit:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+        src: "{{ tmp_data_set }}(UPTIME)"
         location: DATA_SET
         wait: true
       register: result_submit_uptime
 
-    - name: "Response for submitting JCL {{ ansible_user | upper }}.SOME.DATA.SET(UPTIME)"
+    - name: "Response for submitting JCL {{ tmp_data_set }}(UPTIME)"
       debug:
         var: result_submit_uptime
 
-    - name: "Delete data set {{ ansible_user | upper }}.SOME.DATA.SET"
+    - name: "Delete data set {{ tmp_data_set }}"
       zos_data_set:
-        name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        name: "{{ tmp_data_set }}"
         state: absent
