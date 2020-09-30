@@ -27,9 +27,8 @@
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
 #
-#  Data sets created for this sample will follow this pattern
-#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
-#  The user is identified by the Ansible variable `ansible_user`.
+#  Data sets created for this sample will have a randomly generated name created
+#  by the ZOAU API.
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
@@ -48,6 +47,16 @@
   connection: ibm.ibm_zos_core.zos_ssh
 
   tasks:
+    # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    - set_fact:
+        tmp_data_set: "{{ tmp_ds.stdout }}"
+
     # ##########################################################################
     # Modules: zos_mvs_raw, zos_fetch, zos_data_set
     # ##########################################################################
@@ -72,14 +81,14 @@
       debug:
         var: temp_data_set
 
-    - name: "Terse data set {{ ansible_user | upper }}.SOME.DATA.SET to {{ temp_data_set.get('names')[0] }}"
+    - name: "Terse data set {{ tmp_data_set }} to {{ temp_data_set.get('names')[0] }}"
       zos_mvs_raw:
         program_name: amaterse
         parm: "SPACK"
         dds:
           - dd_data_set:
               dd_name: sysut1
-              data_set_name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+              data_set_name: "{{ tmp_data_set }}"
               disposition: shr
           - dd_data_set:
               dd_name: sysut2
@@ -119,9 +128,9 @@
         state: absent
       when: temp_data_set is defined and temp_data_set.names|length > 0
 
-    - name: "Fetch {{ ansible_user | upper }}.SOME.DATA.SET to local machine"
+    - name: "Fetch {{ tmp_data_set }} to local machine"
       zos_fetch:
-        src: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        src: "{{ tmp_data_set }}"
         dest: "{{ playbook_dir }}/"
         flat: true
         encoding:
@@ -129,11 +138,11 @@
           to: ISO8859-1
       register: result
 
-    - name: "Result of fetching {{ ansible_user | upper }}.SOME.DATA.SET to local machine"
+    - name: "Result of fetching {{ tmp_data_set }} to local machine"
       debug:
         var: result
 
-    - name: "Delete data set {{ ansible_user | upper }}.SOME.DATA.SET"
+    - name: "Delete data set {{ tmp_data_set }}"
       zos_data_set:
-        name: "{{ ansible_user | upper }}.SOME.DATA.SET"
+        name: "{{ tmp_data_set }}"
         state: absent
