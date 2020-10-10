@@ -2,6 +2,6 @@
 zsystem:
   hosts:
     zos_host:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
+      ansible_host: ec33012a.vmec.svl.ibm.com
+      ansible_user: omvsadm
+      ansible_python_interpreter: "/u/oeusr01/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3.8"

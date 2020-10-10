@@ -4,4 +4,4 @@
 {{ target_user }}
 {{ target_password }}
 bin
-PUT '{{ terse_data_set_final.get("names")[0] | upper }}' '{{ target_data_set|upper }}'
+PUT '{{ backup_name.stdout | upper }}' '{{ target_data_set|upper }}'

@@ -1,24 +1,3 @@
-################################################################################
-# Configure dependency installations
-################################################################################
-PYZ: "/u/oeusr01/usr/lpp/IBM/cyp/v3r8/pyz"
-ZOAU: "/u/oeusr01/mvsutil"
-################################################################################
-# Playbook enviroment variables
-################################################################################
-
-environment_vars:
-  _BPXK_AUTOCVT: "ON"
-  ZOAU_HOME: "{{ ZOAU }}"
-  PYTHONPATH: "{{ ZOAU }}/lib"
-  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/usr/sbin:/var/bin"
-  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
-  _TAG_REDIR_ERR: "txt"
-  _TAG_REDIR_IN: "txt"
-  _TAG_REDIR_OUT: "txt"
-  LANG: "C"
-
 ##################################################################################################################
 # Specifies the user name to be associated with the new user ID.
 # You can use a maximum of 20 alphanumeric or non-alphanumeric characters.
@@ -272,10 +251,10 @@ groups_to_connect:
 #      authority: "READ"
 #      id: ""
 ##################################################################################################################
-resources_to_permit: ""
-  # - profile: "OMVSADM.*"
-  #   authority: "READ"
-  #   id: ""
+resources_to_permit:
+  - profile: "OMVSADM.*"
+    authority: "READ"
+    id: ""
 
 ##################################################################################################################
 # Specifies a RACF-defined user or group that owns the group data set profiles now owned by the
@@ -324,8 +303,8 @@ templates_to_copy:
 #     - src: "../templates/datafinal.txt"
 #       dest: "{{ userid }}.private.mydata"
 ##################################################################################################################
-files_to_copy: ""
-  # - src: "{{ playbook_dir }}/roles/add-zos-user/files/merpyderp.txt"
-  #   dest: "/u/{{ userid }}/merpyderp.txt"
-  # - src: "{{ playbook_dir }}/roles/add-zos-user/files/merpyderp.txt"
-  #   dest: "{{ userid | upper }}.TEST.ME1"
+files_to_copy:
+  - src: "{{ playbook_dir }}/roles/add-zos-user/files/merpyderp.txt"
+    dest: "/u/{{ userid }}/merpyderp.txt"
+  - src: "{{ playbook_dir }}/roles/add-zos-user/files/merpyderp.txt"
+    dest: "{{ userid | upper }}.TEST.ME1"

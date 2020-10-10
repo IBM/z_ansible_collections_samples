@@ -20,76 +20,87 @@
   when: size_in_cyls is not defined
 
 - block:
-    - name: Create data set for archive
-      ibm.ibm_zos_core.zos_data_set:
-        name: "{{ archive_data_set if archive_data_set | default(false) else omit }}"
-        replace: yes
-        type: seq
-        # space may require manual intervention in certain cases
-        space_primary: "{{ size_in_cyls.get('primary') }}"
-        space_secondary: "{{ size_in_cyls.get('secondary') }}"
-        space_type: cyl
-        record_format: u
-      register: archive_data_set_final
+  - name: "Restore all datasets from backup"
+    ibm.ibm_zos_core.zos_backup_restore:
+      operation: restore
+      backup_name: "{{ terse_data_set }}"
+      hlq: "{{ new_hlq }}"
+      space: "{{ size_in_cyls.get('primary') }}"
+      space_type: cyl
+      overwrite: yes
+    register: response
+  #   - name: Create data set for archive
+  #     ibm.ibm_zos_core.zos_data_set:
+  #       name: "{{ archive_data_set if archive_data_set | default(false) else omit }}"
+  #       replace: yes
+  #       type: seq
+  #       # space may require manual intervention in certain cases
+        # space_primary: "{{ size_in_cyls.get('primary') }}"
+        # space_secondary: "{{ size_in_cyls.get('secondary') }}"
+        # space_type: cyl
+  #       record_format: u
+  #     register: archive_data_set_final
 
-    - block:
-        - name: Unpack the data set dump
-          ibm.ibm_zos_core.zos_mvs_raw:
-            program_name: amaterse
-            parm: "UNPACK"
-            dds:
-              - dd_data_set:
-                  dd_name: sysut1
-                  data_set_name: "{{ terse_data_set }}"
-                  disposition: shr
-              - dd_data_set:
-                  dd_name: sysut2
-                  data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
-                  disposition: old
-              - dd_output:
-                  dd_name: sysprint
-                  return_content:
-                    type: text
-          register: terse_response
-          failed_when: terse_response.ret_code.code > 0
-      always:
-        - name: Get the output of terse execution
-          debug:
-            var: terse_response
-          when: terse_response is defined
+  #   - block:
+  #       - name: Unpack the data set dump
+  #         ibm.ibm_zos_core.zos_mvs_raw:
+  #           program_name: amaterse
+  #           parm: "UNPACK"
+  #           dds:
+  #             - dd_data_set:
+  #                 dd_name: sysut1
+  #                 data_set_name: "{{ terse_data_set }}"
+  #                 disposition: shr
+  #             - dd_data_set:
+  #                 dd_name: sysut2
+  #                 data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
+  #                 disposition: old
+  #             - dd_output:
+  #                 dd_name: sysprint
+  #                 return_content:
+  #                   type: text
+  #         register: terse_response
+  #         failed_when: terse_response.ret_code.code > 0
+  #     always:
+  #       - name: Get the output of terse execution
+  #         debug:
+  #           var: terse_response
+  #         when: terse_response is defined
 
-    - block:
-        - name: Load a set of data sets from an archive.
-          ibm.ibm_zos_core.zos_mvs_raw:
-            program_name: adrdssu
-            auth: yes
-            dds:
-              - dd_data_set:
-                  dd_name: source
-                  data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
-                  disposition: old
-              - dd_input:
-                  dd_name: sysin
-                  content: "{{ lookup('template', '../templates/adrdssu-restore.j2') }}"
-                  return_content:
-                    type: text
-              - dd_output:
-                  dd_name: sysprint
-                  return_content:
-                    type: text
-          register: restore_response
-          failed_when: restore_response.ret_code.code > 0
-      always:
-        - name: Get the output of restore execution
-          debug:
-            var: restore_response
-          when: restore_response is defined
+  #   - block:
+  #       - name: Load a set of data sets from an archive.
+  #         ibm.ibm_zos_core.zos_mvs_raw:
+  #           program_name: adrdssu
+  #           auth: yes
+  #           dds:
+  #             - dd_data_set:
+  #                 dd_name: source
+  #                 data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
+  #                 disposition: old
+  #             - dd_input:
+  #                 dd_name: sysin
+  #                 content: "{{ lookup('template', '../templates/adrdssu-restore.j2') }}"
+  #                 return_content:
+  #                   type: text
+  #             - dd_output:
+  #                 dd_name: sysprint
+  #                 return_content:
+  #                   type: text
+  #         register: restore_response
+  #         failed_when: restore_response.ret_code.code > 0
+  #     always:
+  #       - name: Get the output of restore execution
+  #         debug:
+  #           var: restore_response
+  #         when: restore_response is defined
   always:
-    - name: Clean up archive data set
-      ibm.ibm_zos_core.zos_data_set:
-        name: "{{ archive_data_set_final.get('names')[0] }}"
-        state: absent
-      when: delete and archive_data_set_final is defined and archive_data_set_final|length > 0
+    - debug:
+        var: response
+    # - name: Clean up archive data set
+    #   ibm.ibm_zos_core.zos_data_set:
+    #     name: "{{ archive_data_set_final.get('names')[0] }}"
+    #     state: absent
+      # when: delete and archive_data_set_final is defined and archive_data_set_final|length > 0
     - name: Clean up terse data set
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ terse_data_set }}"
