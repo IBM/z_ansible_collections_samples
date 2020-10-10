@@ -1,0 +1,7 @@
+---
+zsystem:
+  hosts:
+    tvt6031:
+      ansible_host: tvt6031.svl.ibm.com
+      ansible_user: bbecker
+      ansible_python_interpreter: "/usr/lpp/izoda/anaconda/bin/python3.6"

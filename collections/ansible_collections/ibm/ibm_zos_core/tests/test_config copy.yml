@@ -1,0 +1,40 @@
+# Copyright (c) 2019, 2020 Blake Becker <blake.becker@ibm.com>
+# Copyright (c) IBM Corporation 2020
+# LICENSE: [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0)
+
+# Copyright (c) IBM Corporation 2020
+# LICENSE: [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0)
+
+host: some.host.name
+user: myuser
+python_path: /usr/lpp/IBM/cyp/v3r8/pyz
+environment:
+  _BPXK_AUTOCVT: "ON"
+  _CEE_RUNOPTS: "'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"
+  _TAG_REDIR_ERR: txt
+  _TAG_REDIR_IN: txt
+  _TAG_REDIR_OUT: txt
+  LANG: C
+  ZOAU_ROOT: "/usr/lpp/IBM/zoautil"
+  ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+  LIBPATH: "/usr/lpp/IBM/zoautil/lib:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/lib:/usr/lib"
+  ZOAUTIL_DIR: "/usr/lpp/IBM/zoautil"
+  PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
+  PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin:/var/bin"
+  # -------------------------------------------------------------
+  # host: ec33012a.vmec.svl.ibm.com
+  # user: omvsadm
+  # python_path: /usr/lpp/izoda/v110/anaconda/bin/python3.6
+  # environment:
+  #   _BPXK_AUTOCVT: "ON"
+  #   _CEE_RUNOPTS: "'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"
+  #   _TAG_REDIR_ERR: txt
+  #   _TAG_REDIR_IN: txt
+  #   _TAG_REDIR_OUT: txt
+  #   LANG: C
+  # ZOAU_ROOT: "/usr/lpp/IBM/zoautil"
+  # ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+  # LIBPATH: "/usr/lpp/IBM/zoautil/lib:/usr/lpp/izoda/v110/anaconda/lib:/lib:/usr/lib:."
+  # ZOAUTIL_DIR: "/usr/lpp/IBM/zoautil"
+  # PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
+  # PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/izoda/v110/anaconda/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin"

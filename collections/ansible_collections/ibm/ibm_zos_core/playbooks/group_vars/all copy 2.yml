@@ -1,0 +1,10 @@
+environment_vars:
+  LIBPATH: "/usr/lpp/izoda/v110/anaconda/lib:/u/omvsadm/mvsutil/lib:/lib:/usr/lib:."
+  ZOAU_ROOT: "/u/omvsadm/mvsutil"
+  ZOAUTIL_DIR: "/u/omvsadm/mvsutil"
+  PYTHONPATH: "/usr/lpp/izoda/v110/anaconda/lib:/u/omvsadm/mvsutil/lib:/lib:/usr/lib"
+  PKG_CONFIG_PATH: "/usr/lpp/izoda/v110/anaconda/lib/pkgconfig:/usr/lpp/izoda/v110/anaconda/share/pkgconfig"
+  PYTHON_HOME: "/usr/lpp/izoda/v110/anaconda"
+  # environment variables for mvsutils/mvscmd
+  _BPXK_AUTOCVT: "ON"
+  PATH: "/u/omvsadm/mvsutil/bin:/usr/lpp/rsusr/ported/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin:/usr/lpp/izoda/v110/anaconda/bin"

@@ -1,0 +1,7 @@
+---
+zsystem:
+  hosts:
+    stlmvs1:
+      ansible_host: stlmvs1.svl.ibm.com
+      ansible_user: bbecker
+      ansible_python_interpreter: "/u/TSC390/steven/pyzv3r8/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3.8"

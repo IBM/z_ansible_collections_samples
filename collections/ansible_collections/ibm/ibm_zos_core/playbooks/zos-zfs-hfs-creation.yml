@@ -1,0 +1,75 @@
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  vars:
+    zfs_data_set: USER.PRIVATE.ZFSTEST
+    hfs_data_set: USER.PRIVATE.HFSTEST
+
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Create temporary directory to store provisioning files
+      tempfile:
+        state: directory
+      register: temp
+
+    - block:
+        - name: Create and format ZFS data set
+          zos_data_set:
+            name: "{{ zfs_data_set }}"
+            state: present
+            replace: yes
+            type: zfs
+
+        - name: Create HFS data set
+          zos_data_set:
+            name: "{{ hfs_data_set }}"
+            state: present
+            replace: yes
+            type: hfs
+
+        - name: Mount ZFS to temporary directory
+          command: "mount -t zfs -f {{ zfs_data_set }} {{ temp.path }}"
+
+        - name: Verify data set is mounted
+          command: "df {{ temp.path }}"
+          register: mountpoint
+
+        - debug:
+            var: mountpoint.stdout
+
+        - name: Unmount ZFS from temporary directory
+          command: "unmount {{ temp.path }}"
+
+        - name: Mount HFS to temporary directory
+          command: "mount -t hfs -f {{ hfs_data_set }} {{ temp.path }}"
+
+        - name: Verify data set is mounted
+          command: "df {{ temp.path }}"
+          register: mountpoint
+
+        - debug:
+            var: mountpoint.stdout
+
+        - name: Unmount HFS from temporary directory
+          command: "unmount {{ temp.path }}"
+
+      always:
+        - name: Unmount data set
+          command: "unmount {{ temp.path }}"
+          failed_when: false
+
+        - name: Remove temporary directory
+          file:
+            path: "{{ temp.path }}"
+            state: absent
+          when: temp is defined
+
+        - name: Delete data sets
+          zos_data_set:
+            batch:
+              - name: "{{ zfs_data_set }}"
+                state: absent
+              - name: "{{ hfs_data_set }}"
+                state: absent

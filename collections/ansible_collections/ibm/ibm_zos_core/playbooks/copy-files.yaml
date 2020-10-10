@@ -1,0 +1,11 @@
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  tasks:
+    - name: test
+      zos_copy:
+        src: SYS1SMS.IMSEBIZ.ACS
+        dest: SYS1SMS.IMSEBIZ.ACS2
+        remote_src: yes
