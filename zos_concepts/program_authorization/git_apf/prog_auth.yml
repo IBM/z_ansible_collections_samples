@@ -12,7 +12,7 @@
   vars:
     git_addr: "git://github.com/IBM/z_ansible_collections_samples.git"
     git_branch: "playbook/2926/zos_apf"
-    checkout_dir: "/git_checkout/z_ansible_collections_samples"
+    checkout_dir: "{{ home_dir }}/git_checkout/z_ansible_collections_samples"
     file_name: "{{ checkout_dir }}/zos_concepts/program_authorization/git_apf/roles/list-load/files/list.bom"
     persistent_ds: 
       data_set_name: "APFTEST.SYS1.PARMLIB(PROG00)"
@@ -20,10 +20,10 @@
   tasks:
     - name: Get home directory
       shell: "echo \"$HOME\" "
-      register:  home_dir
-    - name: Set checkout_dir absolute path
+      register:  result
+    - name: Set home_dir path
       set_fact:
-        checkout_dir: "{{ home_dir.stdout }}{{ checkout_dir }}"
+        home_dir: "{{ result.stdout }}"
     - name: Git clone repository
       include_role:
         name: git-pull
