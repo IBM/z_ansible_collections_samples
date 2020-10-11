@@ -11,39 +11,34 @@
   environment: "{{ environment_vars }}"
   vars:
     git_addr: "git://github.com/IBM/z_ansible_collections_samples.git"
+    git_branch: "playbook/2926/zos_apf"
     checkout_dir: "/git_checkout/z_ansible_collections_samples"
-    file_name: "{{ checkout_dir }}/../list.bom"
-    dsname: "APFTEST.SYS1.PARMLIB"
-    memname: "PROG00"
+    file_name: "{{ checkout_dir }}/zos_concepts/program_authorization/git_apf/roles/list-load/files/list.bom"
     persistent_ds: 
-      persistds: "{{ dsname }}({{ memname }})"
-    pgrm:
-      - dsname: "APFTEST.PGRM001.LIB001"
-        volume: "T60313"
-      - dsname: "APFTEST.PGRM001.LIB002"
-        volume: "T60314"
-      - dsname: "APFTEST.PGRM001.LIB003"
-        volume: "T60315"
+      data_set_name: "APFTEST.SYS1.PARMLIB(PROG00)"
 
   tasks:
-    - name: Create datasets
-      shell: "dtouch -tseq -V{{ item.get('volume', None) }} {{ item['dsname'] }}"
-      loop: "{{ pgrm }}"
-    - name: create persistent dataset
-      shell: "dtouch {{ dsname }}"
-    - name: git pull
+    - name: Get home directory
+      shell: "echo \"$HOME\" "
+      register:  home_dir
+    - name: Set checkout_dir absolute path
+      set_fact:
+        checkout_dir: "{{ home_dir.stdout }}{{ checkout_dir }}"
+    - name: Git clone repository
       include_role:
         name: git-pull
-    - name: add datasets to bom file
-      shell: "echo  \"{{ item['dsname'] }} {{ item.get('volume', None) }}\" >> {{ file_name }} "
-      loop: "{{ pgrm }}"
-    - name: APF list diff
+    - name: Get current APF list
       include_role:
         name: apf-list
-    - name: Load the list from the file in git repo and find out the delat from current APF list
+    - name: Load the list from the file in git repo and find out the delta from current APF list
       include_role:
         name: list-load
-    - name: APF add diff
+    - name: Create datasets if not exist
+      shell: "dls {{ item['library'] }}  > /dev/null 2>&1 || dtouch -tseq -V{{ item.get('volume', None) }} {{ item['library'] }}"
+      loop: "{{ add_list }}"
+    - name: Create persistent dataset if not exist
+      shell: "dls `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` > /dev/null 2>&1 || dtouch `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` }}"
+    - name: APF add delta list
       include_role:
         name: apf-add
     - name: APF list to be added

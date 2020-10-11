@@ -8,5 +8,6 @@
   git:
     repo: "{{ git_addr }}"
     dest: "{{ checkout_dir }}"
+    version: "{{ git_branch }}"
   register: result
 

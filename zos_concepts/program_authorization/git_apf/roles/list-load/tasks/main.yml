@@ -16,6 +16,11 @@
   set_fact:
     apf_list_diff: "{{ git_list | list_diff(apf_list.stdout) }}"
 
+- name: Check delta list
+  fail:
+    msg: "delta list is empty. No library will be to add!"
+  when: apf_list_diff == ''
+
 - name: Prepair a batch of entries for APF add 
   set_fact:
     add_list: "{{ apf_list_diff | list_format }}"

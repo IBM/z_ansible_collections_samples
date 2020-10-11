@@ -14,7 +14,7 @@ def list_format(apf_list_diff_str):
         ds = entry_str.split(':')[0].upper()
         vol = entry_str.split(':')[1].upper()
         entry = {}
-        entry['dsname'] = ds
+        entry['library'] = ds
         if vol == "SMS":
             entry['sms'] = True
         elif vol != "NONE":
