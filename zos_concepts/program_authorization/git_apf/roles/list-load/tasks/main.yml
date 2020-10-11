@@ -18,7 +18,7 @@
 
 - name: Check delta list
   fail:
-    msg: "delta list is empty. No library will be to add!"
+    msg: "delta list is empty. No library will be added!"
   when: apf_list_diff == ''
 
 - name: Prepair a batch of entries for APF add 
