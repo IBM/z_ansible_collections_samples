@@ -62,10 +62,3 @@ environment_vars:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
-
-# The destination data set that the local file should be copied to.
-# It can be either a sequential data set or a PDS/PDSE member.
-dest_tmp_data_set: ""
-
-# The charset of the remote z/OS system. Default is IBM-1047
-target_charset: "IBM-1047"
