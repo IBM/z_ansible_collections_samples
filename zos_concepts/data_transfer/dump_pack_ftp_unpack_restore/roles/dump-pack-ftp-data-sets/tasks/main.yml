@@ -21,8 +21,13 @@
     data_sets: "{{ data_sets_to_dump }}"
 
 - block:
+
+  - name: Get HLQ of user
+    command: hlq
+    register: hlq_name
+
   - name: get temporary data set name
-    command: mvstmp
+    command: mvstmp {{ hlq_name.stdout }}
     register: backup_name
 
   - name: "Backup"
@@ -35,80 +40,6 @@
       space_type: cyl
       overwrite: yes
     register: response
-
-    # - name: Create data set for archive
-    #   ibm.ibm_zos_core.zos_data_set:
-    #     name: "{{ archive_data_set if archive_data_set | default(false) else omit }}"
-    #     replace: yes
-    #     type: seq
-        # space_primary: "{{ size_in_cyls.get('primary') }}"
-        # space_secondary: "{{ size_in_cyls.get('secondary') }}"
-        # space_type: cyl
-    #   register: archive_data_set_final
-
-#     - block:
-#         - name: Take a set of data sets and write them to an archive.
-#           ibm.ibm_zos_core.zos_mvs_raw:
-#             program_name: adrdssu
-#             auth: yes
-#             dds:
-#               - dd_data_set:
-#                   dd_name: archive
-#                   data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
-#                   disposition: old
-#               - dd_input:
-#                   dd_name: sysin
-#                   content: "{{ lookup('template', '../templates/adrdssu-dump.j2') }}"
-#                   return_content:
-#                     type: text
-#               - dd_output:
-#                   dd_name: sysprint
-#                   return_content:
-#                     type: text
-#           register: dump_response
-#           failed_when: dump_response.ret_code.code > 0
-#       always:
-#         - name: Get the output of dump execution
-#           debug:
-#             var: dump_response
-#           when: dump_response is defined
-
-#     - name: Create data set for terse
-#       ibm.ibm_zos_core.zos_data_set:
-#         name: "{{ terse_data_set if terse_data_set | default(false) else omit }}"
-#         replace: yes
-#         type: seq
-#         space_primary: "{{ size_in_cyls.get('primary') }}"
-#         space_secondary: "{{ size_in_cyls.get('secondary') }}"
-#         space_type: cyl
-#         record_length: 1024
-#       register: terse_data_set_final
-
-#     - block:
-#         - name: Terse the data set dump
-#           ibm.ibm_zos_core.zos_mvs_raw:
-#             program_name: amaterse
-#             parm: "SPACK"
-#             dds:
-#               - dd_data_set:
-#                   dd_name: sysut1
-#                   data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
-#                   disposition: shr
-#               - dd_data_set:
-#                   dd_name: sysut2
-#                   data_set_name: "{{ terse_data_set_final.get('names')[0] }}"
-#                   disposition: old
-#               - dd_output:
-#                   dd_name: sysprint
-#                   return_content:
-#                     type: text
-#           register: terse_response
-
-#       always:
-#         - name: Get the output of terse execution
-#           debug:
-#             var: terse_response
-#           when: terse_response is defined
 
   - name: Determine name to use for target data set
     set_fact:
@@ -143,13 +74,3 @@
         name: "{{ backup_name.stdout }}"
         state: absent
       when: delete and backup_name.stdout is defined and backup_name.stdout|length > 0
-    # - name: Clean up archive data set
-    #   ibm.ibm_zos_core.zos_data_set:
-    #     name: "{{ archive_data_set_final.get('names')[0] }}"
-    #     state: absent
-    #   when: delete and archive_data_set_final is defined and archive_data_set_final|length > 0
-    # - name: Clean up terse data set
-    #   ibm.ibm_zos_core.zos_data_set:
-    #     name: "{{ terse_data_set_final.get('names')[0] }}"
-    #     state: absent
-    #   when: delete and terse_data_set_final is defined and terse_data_set_final|length > 0

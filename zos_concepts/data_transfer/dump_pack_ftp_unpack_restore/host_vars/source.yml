@@ -51,31 +51,27 @@
 #
 ################################################################################
 
-################################################################################
-# Configure dependency installations
-################################################################################
-PYZ: "/u/oeusr01/usr/lpp/IBM/cyp/v3r8/pyz"
-ZOAU: "/u/oeusr01/mvsutil"
-################################################################################
-# Playbook enviroment variables
-################################################################################
+# the path to the root of IBM python installation
+PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 
+# the path to root of ZOAU installation
+ZOAU: "/usr/lpp/IBM/zoautil"
+
+# you should not need to change environment_vars
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/usr/sbin:/var/bin"
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
   _TAG_REDIR_ERR: "txt"
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
 
-
 # a list of data sets contained in an archive you wish to include in dump
 data_sets_to_dump:
-  - user.private.test.backup
 
 # the name to use for the data set archive
 # if not provided, module-generated name will be used
@@ -94,14 +90,14 @@ target_data_set: ""
 input_volume: ""
 
 # the host name of the target host which will receive the tersed data set
-target_hostname: "ec33025a.vmec.svl.ibm.com"
+target_hostname: ""
 
 # the user name to use for connecting to the target host
-target_user: "omvsadm"
+target_user: ""
 
 # the password to use for connecting to the target host
 # can also use Ansible Vault credential
-target_password: "all1sdun"
+target_password: ""
 
 # should terse and archive data sets be deleted upon successful transfer?
 delete: yes

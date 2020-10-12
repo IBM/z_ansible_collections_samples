@@ -52,31 +52,27 @@
 ################################################################################
 
 
-################################################################################
-# Configure dependency installations
-################################################################################
-PYZ: "/u/oeusr01/usr/lpp/IBM/cyp/v3r8/pyz"
-ZOAU: "/u/oeusr01/mvsutil"
-################################################################################
-# Playbook enviroment variables
-################################################################################
+# the path to the root of IBM python installation
+PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 
+# the path to root of ZOAU installation
+ZOAU: "/usr/lpp/IBM/zoautil"
+
+# you should not need to change environment_vars
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/usr/sbin:/var/bin"
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
   _TAG_REDIR_ERR: "txt"
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
 
-
 # a list of data sets contained in an archive you wish to restore
-data_sets_to_restore:
-  - "**"
+data_sets_to_restore: ""
 
 # the name to use for the data set archive
 # if not provided, module-generated name will be used
@@ -91,7 +87,7 @@ output_volume: ""
 
 # the HLQ to give to the data sets after restore
 # if one is not provided, original will be used
-new_hlq: "restored"
+new_hlq: ""
 
 # should terse and archive data sets be deleted upon successful restore?
 delete: yes
