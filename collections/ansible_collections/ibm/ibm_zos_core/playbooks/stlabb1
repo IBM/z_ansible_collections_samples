@@ -1,6 +1,0 @@
-zsystem:
-  hosts:
-    stlabb1:
-      ansible_host: stlabb1.svl.ibm.com
-      ansible_user: bbecker
-      ansible_python_interpreter: /u/bbecker/pyz/3.8/beta4/bin/python3.8

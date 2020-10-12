@@ -1,6 +1,0 @@
-environment_vars:
-  _BPXK_AUTOCVT: ON
-  ZOAU_ROOT: "/u/oeusr01/zoau/1.0.1"
-  PYTHONPATH: "/usr/lpp/izoda/v110/anaconda/lib:/u/oeusr01/zoau/1.0.1/lib:/lib:/usr/lib"
-  LIBPATH: "/usr/lpp/izoda/v110/anaconda/lib:/u/oeusr01/zoau/1.0.1/lib:/lib:/usr/lib:."
-  PATH: "/u/oeusr01/zoau/1.0.1/bin:/usr/lpp/rsusr/ported/bin:/bin:/var/bin:/usr/lpp/izoda/v110/anaconda/bin"

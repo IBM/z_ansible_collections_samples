@@ -1,7 +1,0 @@
----
-zsystem:
-  hosts:
-    tivlp02:
-      ansible_host: tivlp02.svl.ibm.com
-      ansible_user: bbecker
-      ansible_python_interpreter: "/hsstools/python36/python-2017-04-12-py36/python36/bin/python"

@@ -1,8 +1,0 @@
-//ANSIBLE JOB 'testing',                         
-//  CLASS=H,MSGLEVEL=(1,1),REGION=0M,            
-//  MSGCLASS=H,NOTIFY=&SYSUID                    
-//COMPRESS    EXEC    PGM=IEBCOPY
-//IMSACB   DD  DSNAME=IMSTESTU.ANSI.ACBLIB1,DISP=OLD
-//SYSIN    DD *
-       COPY OUTDD=IMSACB,INDD=IMSACB
-/*

@@ -1,6 +1,0 @@
-zsystem:
-  hosts:
-    zvm:
-      ansible_host: ec33018a.vmec.svl.ibm.com
-      ansible_user: omvsadm
-      ansible_python_interpreter: /usr/lpp/izoda/v110/anaconda/bin/python3.6

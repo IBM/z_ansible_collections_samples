@@ -1,6 +1,0 @@
-zsystem:
-  hosts:
-    tvt6031:
-      ansible_host: tvt6031.svl.ibm.com
-      ansible_user: BBECKER
-      ansible_python_interpreter: /hsstools/python36/python-2017-04-12-py36/python36/bin/python

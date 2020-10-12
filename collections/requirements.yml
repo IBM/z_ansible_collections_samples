@@ -1,0 +1,10 @@
+################################################################################
+# Copyright (c) IBM Corporation 2020
+################################################################################
+# This file is required when using repository directly in AWX/Tower
+# for more info: https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#install-multiple-collections-with-a-requirements-file
+#                https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
+---
+collections:
+  - name: ibm.ibm_zos_core
+    version: 1.2.1
