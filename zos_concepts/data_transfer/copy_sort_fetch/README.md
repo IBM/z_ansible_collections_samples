@@ -52,7 +52,7 @@ source_system:
       ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
 ```
 
-### Update the environment variables for each z/OS system in [host_vars/source.yml](host_vars/zos_host.yml)
+### Update the environment variables for each z/OS system in [host_vars/zos_host.yml](host_vars/zos_host.yml)
 
 ```yaml
 # the path to the root of IBM python installation

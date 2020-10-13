@@ -43,6 +43,7 @@
 - hosts: source_system
   collections:
     - ibm.ibm_zos_core
+  connection: ibm.ibm_zos_core.zos_ssh
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
   gather_facts: no
@@ -69,7 +70,6 @@
           regexp: '^ case.*'
           state: absent
           line: ""
-          encoding: "{{ target_charset }}"
 
 ###############################################################################
 # We will be using zos_mvs_raw module to sort the data set based on salary.
@@ -117,9 +117,6 @@
           src: "{{ dest_tmp_data_set }}"
           dest: "{{ playbook_dir }}/SortedSalaryData.txt"
           flat: true
-          encoding:
-            from: "{{ target_charset }}"
-            to: ISO8859-1
 
       - name: Add column headers back to the sorted file
         lineinfile:

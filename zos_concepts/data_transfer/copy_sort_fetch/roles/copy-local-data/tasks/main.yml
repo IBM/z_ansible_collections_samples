@@ -31,17 +31,27 @@
 #     .    .      .   ..     .. ..         ..   ..   ..       . ...
 ###############################################################################
 
-- name: Copy local data file to remote z/OS data set
-  zos_copy:
+- name: Generate a temporary data set name
+  command: "mvstmp {{ ansible_user | upper }}"
+  register: tmp_ds
+
+- set_fact:
+    dest_tmp_data_set: "{{ tmp_ds.stdout }}"
+
+- name: Create the temporary data set
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ dest_tmp_data_set }}"
+    type: "SEQ"
+    record_format: "FB"
+
+- name: Copy local data file to remote z/OS temporary data set
+  ibm.ibm_zos_core.zos_copy:
     src: "{{ role_path }}/files/SalaryData.txt"
     dest: "{{ dest_tmp_data_set }}"
-    encoding:
-      from: ISO8859-1
-      to: "{{ target_charset }}"
   register: copy_result
 
 - name: Ensure the copied data set exists on target
-  zos_find:
+  ibm.ibm_zos_core.zos_find:
     patterns:
       - "{{ dest_tmp_data_set }}"
   register: result
