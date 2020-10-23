@@ -29,9 +29,8 @@
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
 #
-#  Data sets created for this sample will follow this pattern
-#  <USER>.SOME.DATA.SET where USER will be the user who submits the playbook.
-#  The user is identified by the Ansible variable `ansible_user`.
+#  Data sets created for this sample will have a randomly generated name created
+#  by the ZOAU API.
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
@@ -67,12 +66,23 @@
 
   tasks:
     # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp sequential data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds_seq
+
+    - name: Create temp sequential data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds_pds
+
+    # ##########################################################################
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Setting fact `data_set_name` for use by this sample
       set_fact:
-        data_set_name: "{{ ansible_user | upper }}.SOME.DATA.SET"
-        pds_name: "{{ ansible_user | upper }}.SOME.PDS.DATA.SET"
+        data_set_name: "{{ tmp_ds_seq.stdout }}"
+        pds_name: "{{ tmp_ds_pds.stdout }}"
 
     - name: Fact `data_set_name` set with value
       debug:
