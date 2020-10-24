@@ -21,6 +21,6 @@
     msg: "delta list is empty. No library will be added!"
   when: apf_list_diff == ''
 
-- name: Prepair a batch of entries for APF add 
+- name: Prepare a batch of entries for APF add
   set_fact:
     add_list: "{{ apf_list_diff | list_format }}"

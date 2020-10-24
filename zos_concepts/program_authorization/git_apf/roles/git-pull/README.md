@@ -11,7 +11,9 @@ Requirements
 Role Variables
 --------------
 
-- `git_addr`: The URL of the git repository to be pulled.
+- `git_repo`: The URL of the git repository to be pulled.
+
+- `git_branch`: The branch to be checked out from the git repository.
 
 - `checkout_dir`: The directory which git checks out the repository to. 
 

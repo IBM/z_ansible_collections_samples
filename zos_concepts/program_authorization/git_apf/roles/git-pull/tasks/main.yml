@@ -6,7 +6,7 @@
 
 - name: Git pull a repository
   git:
-    repo: "{{ git_addr }}"
+    repo: "{{ git_repo }}"
     dest: "{{ checkout_dir }}"
     version: "{{ git_branch }}"
   register: result
