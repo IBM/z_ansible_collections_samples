@@ -1,0 +1,11 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+- name: Get APF current list
+  ibm.ibm_zos_core.zos_apf:
+    operation: "list"
+  register: apf_list
+

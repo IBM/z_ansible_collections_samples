@@ -1,0 +1,12 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+################################################################################
+
+
+- hosts: localhost
+  remote_user: root
+  vars:
+    file_name: "{{ role_path }}/files/list.bom"
+  roles:
+    - list-load
