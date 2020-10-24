@@ -23,6 +23,7 @@ this is outlined in the
    * [Data Set Basics](zos_concepts/data_sets/data_set_basics)
    * [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user)
    * [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
+   * [Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub](zos_concepts/program_authorization/git_apf)
    * [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
    * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
    * [z/OS Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
