@@ -4,7 +4,7 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ################################################################################
 
-- name: cat file_name
+- name: Cat file_name
   command: "cat {{ file_name }}"
   register: content
 

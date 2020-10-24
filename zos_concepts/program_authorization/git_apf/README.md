@@ -1,20 +1,22 @@
-# Sync APF authorized libraries on zO/S with a configuration file cloned from GitHub source control
+# Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub
 
-This playbook clones a git repository to the desired directory on the zO/S system.
-Loads a configuration file containing a set of libraries (data sets) that are
-required to be present on the zO/S system APF authorized list. Later generates
-a list of libraries to be added to APF authorized list based on missing libraries
-from the current APF list. finally makes APF statement entries in the desired 
-data set or data set member.
+This playbook clones a Git repository to the user provided directory on the
+target z/OS system. It then loads the master configuration file containing a set
+of libraries (data sets) that are required to be present on the target z/OS
+system's APF authorized list.
+
+It then generates a list of libraries to be added to APF authorized list by
+comparing the the current APF list and the master list in GitHub. Lastly, it
+makes the APF statement entries in the user specified data set or data set
+member.
 
 ## Ansible Collection Requirement
 
-   IBM z/OS core collection 1.2.0 or later
+  [IBM z/OS core collection](https://ibm.github.io/z_ansible_collections_doc/index.html) 1.2.0 or later
 
-## zO/S Requirement Setup
+## z/OS Requirements
 
-    - `git` command 
-    - ZOAU 1.1.0 or later
+  [Git for z/OS](https://www.rocketsoftware.com/product-categories/mainframe/git-for-zos)
 
 ## Getting Started
 
