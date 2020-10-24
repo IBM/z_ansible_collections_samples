@@ -52,7 +52,7 @@ PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
 ```
 
-## Configuration file format
+### Configuration file format
 
     <library> [volume]
     ...
