@@ -1,0 +1,90 @@
+# The location of the TCPIP profile information, used to allocate ports.
+tcpip_profile: USER.PARMLIB(TCPPROF2)
+
+# The location we want to save our temporary TCPIP profile information to use for updating.
+tcpip_profile_tmp: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP(IMSPROF)'
+
+hostname: ec01105a.svl.ibm.com
+
+# Boolean used to determine if keyring should be defined.
+define_keyring: false
+
+# Boolean used to determine if security should be defined.
+define_security: false
+
+# The ID for the owner of the zCEE application.
+workflowOwner: '{{ TARGET_USERNAME }}'
+
+# Specifies the unique name for the instance of zCEE.
+softwareServiceInstanceName: ZC01
+
+# Specifies the path to the z/OS Connect EE installation directory on zFS.
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 
+
+# Define the z/OS UNIX path up to, but not including, the "bin" directory.
+java_home: /usr/lpp/java/java180/J8.0_64
+
+# Value of 'TRUE' or 'FALSE' specifying if zos connect should require authentication.
+zcon_saf_authentication: 'TRUE'
+
+# Value of 'YES' or 'NO' used to specify if zos connect should accept SSL connections.
+zcon_tls: 'NO'
+
+# Address of zos connect server keyring if needed
+zcon_server_keyring: ''
+
+# HTTP port for zCEE, may be determined at runtime.
+zcon_http_port: '1322'
+
+# HTTPS port for zCEE, may be determined at runtime.
+zcon_https_port: '1321'
+
+# The host name of the system running zCEE.
+zcon_hostname: '{{ hostname }}'
+
+# Specifies the PROCLIB holding zCEE related procedures.
+zcon_zos_proclib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB'
+
+# Specifies the path to the zCEE mount point.
+zcon_zfs_mountpoint: '/u/omvsadm/var/zosconnect'
+
+# Specifies the name of a SAF group, which is granted read, write and run authority to the z/OS Connect EE instances data directory.
+zcon_zfs_group: OMVS
+
+# Specifies the high-level qualifier for the zFS data sets that are defined during the provisioning of the z/OS Connect EE instance. 
+zcon_file_system_hlq: '{{ DFS_AUTH_LIB_HLQ1 }}'
+
+# Specifies a data class that is used to define a zFS data set for the z/OS Connect EE instance.
+zcon_zfs_dataclass: ''
+
+# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.
+zcon_admin_server: '{{ TARGET_USERNAME }}'
+
+zcon_admin_zfs: ROOT
+
+# User ID that can be used in the step to create the procedure in the PROCLIB named by the ZCON_ZOS_PROCLIB variable for the instance of z/OS Connect EE.
+zcon_admin_tso: OMVSADM
+
+# The directory to use as a temporary directory (i.e. /tmp)
+temp_dir: /tmp
+
+# Specifies the job card to use for the started task of the provisioned instance of z/OS Connect EE. When specified,
+# zcon_zos_stcjobs must also be used to indicate the data set prefix for STCJOBS.
+zcon_stc_job_card: ''
+
+# Names the data set into which the workflow can create the source JCL that defines the job level characteristics of
+# the started task for the provisioned instance of z/OS Connect EE. Used only when zcon_stc_job_card is also specified.
+# If you specify a data set of type PDSE, it enables concurrent addition of new STCJOBS to the data set. If a PDS is used
+# and multiple concurrent updates to the data set are attempted, z/OS produces a 213-30 abend code, to avoid data corruption.
+zcon_zos_stcjobs: ''
+
+# VOLUME value that is used in the creation of the zFS data sets, for example, SYSDA. 
+# If the value is specified as SMS (Storage Management Subsystem), the VOLUME parameter 
+# is omitted from the VSAM creation.
+zcon_zos_vsam_volume: '{{ DFS_DS_VOLUME1 }}'
+
+# User ID to get unauthenticated READ access to profile in APPL class.
+zcon_zos_guest_user: IBMUSER #WSGUEST
+
+# Specifies the path to the base zCEE configuration directory.
+zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

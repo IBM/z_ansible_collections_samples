@@ -1,0 +1,30 @@
+---
+# tasks file for zcee_configure_artifacts
+# - name: Encoding, copy to uss and set permissions server xml
+#   ibm.ibm_zos_core.zos_copy:
+#     src: '{{ playbook_dir }}/files/server.xml'
+#     dest: '{{ ZCEE_CONFIG_PATH }}/server.xml'
+#     encoding:  
+#         from: ISO8859-1
+#         to: "{{ target_charset }}" #IBM-1047
+#     mode: '775'
+
+# - name: Encoding, copy to uss and set permissions bootstrap properties 
+#   ibm.ibm_zos_core.zos_copy:
+#     src: '{{ playbook_dir }}/files/bootstrap.properties'
+#     dest: '{{ ZCEE_CONFIG_PATH }}/bootstrap.properties'
+#     encoding:
+#         from: ISO8859-1
+#         to: "{{ target_charset }}" #IBM-1047
+#     mode: '775'
+
+# Copy all the files that are referred in defaults/main.yml
+- name: Copy artifacts files
+  ibm.ibm_zos_core.zos_copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    encoding:
+      from: ISO8859-1
+      to: "{{ target_charset }}"
+  with_items: "{{ files_to_copy }}"
+  when: files_to_copy is defined and files_to_copy | length > 0

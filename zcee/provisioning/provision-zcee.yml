@@ -1,0 +1,82 @@
+- name: Provision zCEE
+  hosts: zsystem
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  # Include different variable files depending on environment/inventory used
+  vars_files:
+    - "{{ vars_folder_name }}/zcee.yml"
+  environment: '{{ system_environment }}'
+
+  tasks:
+    - name: Provision and configure a basic zcee instance.
+      block:
+        # check to see if zcee server is already up and running
+        - name: Check if zcee server instance exists
+          zos_operator:
+            cmd: 'D A,{{ softwareServiceInstanceName }}'
+          register: zceeInstance
+
+        - debug:
+            msg: '{{ zceeInstance}}'
+
+        - fail:
+            msg: zcee server instance exists
+          when: zceeInstance is defined and ("NOT FOUND" not in zceeInstance.content | join('') or "ADDR SPACE" in zceeInstance.content | join(''))
+
+        # Invoke a role to reserve ports
+        - include_role:
+            name: zcee_reserve_ports
+
+        # Invoke a role to create and format ZFS using z/os core module
+        - include_role:
+            name: zcee_create_format_zfs
+
+        # Invoke a role to mount a zfs filesystem
+        - include_role:
+            name: zcee_mount_zfs
+
+        # Invoke a role to zcon setup/install
+        - include_role:
+            name: zcee_zcon_setup
+
+        # Get the zOSConnectServer version and fail if the version is less than 3
+        - name: get the server version  - check server version 3 and up, fail if its less than 3
+          shell: "iconv -f ISO8859-1 -t IBM-1047 {{zcon_install_dir}}/runtime/lib/versions/zosconnect.version.properties | grep productVersion | sed -En 's/com.ibm.websphere.productVersion=([0-9]+).*/\\1/p'"
+          register: result
+        - debug:
+            msg: '{{ result }}'
+        - fail:
+            msg: need version of at least 3
+          when: result.stdout | int < 3
+
+        # Invoke a role to create a server from a template
+        - include_role:
+            name: zcee_create_server
+            tasks_from: ims_sp #default
+            # template_name: default #ims_sp #mq_sp #cics_sp
+
+        # Invoke a role to configure zcee artifacts
+        - include_role:
+            name: zcee_configure_artifacts
+
+        # Define keyring
+        - include_role:
+            name: zcee_keyring
+
+        # Define security - Basic Auth
+        - include_role:
+            name: zcee_security
+
+        - name: Set Directory Permissions,Remove read and execute access for all users to the zFS file system
+          file:
+            path:  '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
+            state: directory
+            mode: '700'
+            recurse: yes 
+
+        # Invoke a role to create a new server
+        - include_role:
+            name: zcee_start_server
+          vars:
+            server_name: '{{ softwareServiceInstanceName }}'

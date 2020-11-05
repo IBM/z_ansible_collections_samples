@@ -1,0 +1,12 @@
+---
+# tasks file for zcee_keyring
+- name: Define Keyring, Generate self signed certificate, Connect certificate to keyring and List the keyring for diagnostics 
+  ibm.ibm_zos_core.zos_tso_command: 
+    commands: 
+      - RACDCERT ADDRING(zOSConnect.{{softwareServiceInstanceName}}) ID({{zcon_admin_server}})
+      - RACDCERT ID ({{zcon_admin_server}}) GENCERT SUBJECTSDN(CN('zOSConnect.{{softwareServiceInstanceName}}') OU('zOSConnect')) WITHLABEL('zOSConnect.{{softwareServiceInstanceName}}')
+      - RACDCERT ID({{zcon_admin_server}}) CONNECT (LABEL('zOSConnect.{{softwareServiceInstanceName}}') RING(zOSConnect.{{softwareServiceInstanceName}}) DEFAULT)
+      - RACDCERT ID({{ZCON_ADMIN_SERVER}}) LISTRING(zOSConnect.{{softwareServiceInstanceName}})
+  when: 
+      - RC is defined 
+      - RC == 0
