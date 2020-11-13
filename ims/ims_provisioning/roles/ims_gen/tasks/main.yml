@@ -1,0 +1,125 @@
+---
+# tasks file for gen_srvs
+- name: DBD, PSB, and ACB Operations
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - name: Prep DBDGEN step 1
+      ims_dbd_gen:
+        src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
+        location: DATA_SET
+        member_list:
+          [
+            'DFSIVD1' : 'IVPDB1',
+            'DFSIVD1I' : 'IVPDB1I',
+            'DFSDRD1' : 'IVPDRD1',
+            'DFSIVD2' : 'IVPDB2',
+            'DFSIVD3' : 'IVPDB3',
+            'DFSIVD4' : 'IVPDB4',
+            'DFSIVD5' : 'IVPDB5',
+            DI21PART,
+            DBFSAMD1,
+            DBFSAMD2,
+            DBFSAMD3,
+            DBFSAMD4,
+            'DFSAUTDB' : 'AUTODB',
+            'DFSLAUTO' : 'AUTOLDB',
+            'DFSEMPDB' : 'EMPDB2',
+            'DFSEMLDB' : 'EMPLDB2',
+            'DFSIND11' : 'SINDEX11',
+            'DFSIND22' : 'SINDEX22',
+            'DFSIPODB' : 'IPODB'
+          ]
+        "replace": true
+        dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+        sys_lib:
+          - IMSBLD.I15RTSMM.SDFSMAC
+          - SYS1.MACLIB
+      when: dbd_gen
+
+
+
+    - name: Prep PSB step 2
+      ims_psb_gen:
+        src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
+        location: DATA_SET
+        member_list:
+          [
+            DFSIVP1,
+            DFSIVP2,
+            DFSIVP3,
+            DFSIVP31,
+            DFSIVP32,
+            DFSIVP34,
+            DFSIVP35,
+            DFSIVPD2,
+            DFSIVP4,
+            DFSIVP5,
+            DBFSAMP1,
+            DBFSAMP2,
+            DBFSAMP3,
+            DBFSAMP4,
+            DBFSAMP5,
+            DBFSAMP6,
+            DFSIVP6,
+            DFSIVP61,
+            DFSIVP62,
+            DFSIVP64,
+            DFSIVP65,
+            DFSIVP7,
+            DFSIVP9,
+            DFSIVPA,
+            DFSIVPB,
+            DFSIVPDL,
+            DFSIVPC1,
+            DFSIVPC2,
+            DFSIVPC3,
+            DFSIVPC4,
+            DFSIVPC5,
+            DFSIVPC6,
+            DFSSAM11,
+            DFSSAM12,
+            DFSSAM13,
+            DFSSAM14,
+            DFSSAM15,
+            DFSSAM16,
+            DFSSAM17,
+            DFSSAM18,
+            DFSSAM19,
+            DFSIVPD3,
+            DFSIVP8,
+            DFSIVPC,
+            DFSIVP37,
+            DFSIVP67,
+            DFSAUTAL,
+            DFSAUTEL,
+            DFSAUT11,
+            DFSIVPO1,
+            DFSIVPO2,
+          ]
+        "replace": true
+        dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+        sys_lib:
+          - IMSBLD.I15RTSMM.SDFSMAC
+          - SYS1.MACLIB
+      when: psb_gen
+
+
+    - name: Prep ACBLIB step 3
+      ims_acb_gen:
+        command_input: BUILD
+        compression: POSTCOMP
+        psb_name: ALL
+        psb_lib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+        dbd_lib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+        acb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
+        reslib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+        steplib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+      when: acb_gen

@@ -1,0 +1,5 @@
+---
+# defaults file for olc-role
+
+enable_olc: false
+active_libs: false

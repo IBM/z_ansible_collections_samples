@@ -1,0 +1,14 @@
+---
+# tasks file for install-bzip2
+
+- name: Check if bzip2 already on target
+  stat:
+    path: "{{ uss_utilities_path }}/bzip2"
+  register: bzip2_stat_result
+
+- name: Copy bzip2
+  copy: 
+    src: "../files/bzip2" 
+    dest: "{{ uss_utilities_path }}/bzip2"
+    mode: a+x
+  when: not bzip2_stat_result.stat.exists

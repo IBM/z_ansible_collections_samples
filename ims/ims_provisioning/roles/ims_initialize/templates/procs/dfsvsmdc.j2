@@ -1,0 +1,48 @@
+**********************************************************************
+*       DFSVSM00
+*
+*       Sample DFSVSM00 member of the IMS PROCLIB data set.
+*
+*       Use the DFSVSM00 member to define settings for buffer
+*       pools, trace options, DASD logging, coupling facility
+*       structures, IRLM lock timeout, and transactions in a
+*       HALDB partition.
+*
+*************** C O N D I T I O N A L   C H A N G E ******************
+*    IMPORTANT:
+*
+*    This sample assumes a DB/DC or DBCTL system.
+*    If this is a DCCTL system, then remove the following
+*    definitions in the sample below:
+*    - VSRBF (both instances)
+*    - IOBF (both instances)
+*
+*************** E N D   C O N D I T I O N A L   C H A N G E **********
+*
+*************************************************************@SCPYRT**
+*
+*    Licensed Materials - Property of IBM
+*
+*    5635-A06
+*
+*        Copyright IBM Corp. 2016      All Rights Reserved
+*
+*    US Government Users Restricted Rights - Use, duplication or
+*    disclosure restricted by GSA ADP Schedule contract with
+*    IBM Corp.
+*
+*************************************************************@ECPYRT**
+VSRBF=8192,5
+VSRBF=4096,5
+VSRBF=2048,5
+VSRBF=1024,5
+VSRBF=512,5
+IOBF=(8192,5,Y,Y)
+IOBF=(2048,5,Y,Y)
+SBONLINE,MAXSB=10
+OPTIONS,BGWRT=YES,INSERT=SKP,DUMP=YES,DUMPIO=YES
+OPTIONS,VSAMFIX=(BFR,IOB),VSAMPLS=LOCL
+OPTIONS,DL/I=OUT,LOCK=OUT,DISP=OUT,SCHD=OUT,DLOG=OUT,LATC=ON,SUBS=ON
+OPTIONS,STRG=ON
+OLDSDEF OLDS=(00,01,02,03,04,05,99),BUFNO=005,MODE=DUAL
+WADSDEF WADS=(0,1,8,9)

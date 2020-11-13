@@ -1,0 +1,10 @@
+---
+- name: Update file permissions for rexx script
+  file:
+    path: '{{ uss_file_path }}/{{ rexx_name }}'
+    mode: '0755'
+
+- name: Run REXX script
+  shell: '{{ uss_file_path }}/{{ rexx_name }} ; echo $?'
+  register: command_result
+  failed_when: (command_result.stdout_lines[-1] | int) > (max_rc | int)
