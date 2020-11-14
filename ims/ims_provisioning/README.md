@@ -28,7 +28,7 @@ This project uses roles to provide an object-oriented model to provision IMS.  E
 - [**ims_common_queue**](roles/ims_common_queue/README.md) - provides dataset definition and query or CQS 
 - [**ims_dbrc**](roles/ims_dbrc/README.md) - sets up DBRC defaults and prepares DBRC 
 - [**ims_exit**](roles/ims_exit/README.md) - prepares security and connection exit for IMS 
-- [**ims_gen](roles/ims_gen/README.md) - prepares DBDGEN, PSBGEN and ACBGEN 
+- [**ims_gen**](roles/ims_gen/README.md) - prepares DBDGEN, PSBGEN and ACBGEN 
 - [**ims_iefjobs**](roles/ims_iefjobs/README.md) - creates IEF jobs 
 - [**ims_dataset**](roles/ims_dataset/README.md) - creates and delete IMS definition data sets and libraries
 - [**ims_initialize**](roles/ims_initialize/README.md) - reserves ICON ports and send PROCLIB templates to zOS 
