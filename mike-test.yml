@@ -1,0 +1,21 @@
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    - name: Create a PDS data set
+      zos_data_set:
+        name: "test.ds.name1"
+        type: pds
+        space_primary: 5
+        space_type: M
+        record_format: fb
+        record_length: 25
+      register: result
+    - name: Delete data set
+      zos_data_set:
+        name: "test.ds.name1"
+        state: absent
