@@ -1,7 +1,7 @@
 IMS Operations Manager
 =========
 
-This role creates, starts, stops and queries IMS Operations Manager.
+Creates, starts, stops, and queries IMS Operations Manager.
 
 Requirements
 ------------

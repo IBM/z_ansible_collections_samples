@@ -1,7 +1,7 @@
 IMS Proclib operations
 =========
 
-This role creates configuration file in PROCLIB and copies PROCLIB members
+Creates a configuration file in PROCLIB and copies PROCLIB members.
 
 Requirements
 ------------
@@ -13,19 +13,19 @@ Role Variables
 --------------
 
 - ### **add**
-  When add is true, this role adds required members into PROCLIB
+  When add is true, this role adds required members into PROCLIB.
 
 - ### **copy**
-  When copy is true, this role copies members from PROCLIB to zCloud PROCLIB
+  When copy is true, this role copies members from PROCLIB to zCloud PROCLIB.
 
 - ### **copy_stage_libs**
-  When copy_stage_libs is true, this role copies staging library to active library
+  When copy_stage_libs is true, this role copies staging library to active library.
 
 - ### **delete**
-  When delete is true, this role deletes all members in zCloud PROCLIB
+  When delete is true, this role deletes all members in zCloud PROCLIB.
 
 - ### **create_sample**
-  When create_sample is true, this role creates sample JCLs in PROCLIB
+  When create_sample is true, this role creates sample JCLs in PROCLIB.
 
 
 Dependencies

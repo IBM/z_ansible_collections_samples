@@ -1,7 +1,7 @@
 Prepare User Exit Services
 =========
 
-This role prepares a user to exit IMS security and connections.
+Prepares a user to exit IMS security and connections.
 
 Requirements
 ------------

@@ -1,7 +1,7 @@
 Common Queue Services
 =========
 
-CQS role allocates CQS component and query its status.
+CQS role allocates CQS component and queries its status.
 
 Requirements
 ------------
@@ -13,7 +13,7 @@ Role Variables
 
 - ### **cqs**
 
-  Specifies to allocate or query CQS
+  Specifies whether to allocate or query CQS:
   - 'config': allocate CQS component
   - 'query': query CQS status
 

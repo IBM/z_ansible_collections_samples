@@ -1,7 +1,7 @@
 DBRC Services
 =========
 
-This role defines DBRC's default settings and prepares DBRC.
+Defines DBRC's default settings and prepares DBRC to record and manage information.
 
 Requirements
 ------------
@@ -19,7 +19,7 @@ Role Variables
 
 - ### **prep_dbrc**
 
-  When prep_dbrc = true, prepares DBRC 
+  When prep_dbrc = true, prepares DBRC
 
 
 Dependencies

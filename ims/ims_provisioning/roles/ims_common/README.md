@@ -16,13 +16,13 @@ Role Variables
 --------------
 - ### **icon**
 
-  Specifies whether to start or stop IMS Connect
+  Specifies whether to start or stop IMS Connect:
   - 'start': start IMS Connect service
   - 'stop': stop IMS Connect service
 
 - ### **ctl**
 
-  Specifies whether to start or stop IMS Control Region
+  Specifies whether to start or stop IMS Control Region:
   - 'start': start IMS Control region
   - 'stop': stop IMS Control region
 

@@ -1,7 +1,7 @@
 Gen Services
 =========
 
-This role provides DBD, PSB and ACB services
+Provides DBD, PSB, and ACB services.
 
 Requirements
 ------------

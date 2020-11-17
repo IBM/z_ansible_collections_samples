@@ -1,7 +1,7 @@
 Initialize IMS
 =========
 
-This role sends provisioning files to zOS and dynamically reserves IMS Connection ports.
+Sends provisioning files to zOS and dynamically reserves IMS Connection ports.
 
 Requirements
 ------------
