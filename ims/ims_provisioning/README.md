@@ -1,6 +1,7 @@
 # IMS Provisioning
 
-The playbooks in this project allocate all required data sets and configure them to provision IMS and related services.
+The IMS provisioning playbook samples demonstrate how to allocate the required
+data sets and configure them to provision IMS and related services.
 
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -15,7 +16,7 @@ playbook notes sections for additional details and configuration.
 
 - [**provision-ims-dbdc.yml**](provision-ims-dbdc.yml)  - handles allocating required data sets and kicking off many IMS services.
 - [**deprovision-ims-dbdc.yml**](deprovision-ims-dbdc.yml) - handles deleting data sets (created by provision-ims-dbdc.yml) and stopping all IMS services.
-- [**query-ims.yml**](query-ims.yml) - examples of how to query status of different IMS services.  These examples utilize the roles defined below.
+- [**query-ims.yml**](query-ims.yml) - provides examples of how to query status of different IMS services.  These examples utilize the roles defined below.
 
 ## Role Summary
 
