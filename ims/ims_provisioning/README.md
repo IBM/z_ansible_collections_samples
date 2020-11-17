@@ -1,6 +1,7 @@
 # IMS Provisioning
 
-The playbooks in this project allocate all required data sets and configure them to provision IMS and related services.
+The IMS provisioning playbook samples demonstrate how to allocate the required
+data sets and configure them to provision IMS and related services.
 
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -15,7 +16,7 @@ playbook notes sections for additional details and configuration.
 
 - [**provision-ims-dbdc.yml**](provision-ims-dbdc.yml)  - handles allocating required data sets and kicking off many IMS services.
 - [**deprovision-ims-dbdc.yml**](deprovision-ims-dbdc.yml) - handles deleting data sets (created by provision-ims-dbdc.yml) and stopping all IMS services.
-- [**query-ims.yml**](query-ims.yml) - examples of how to query status of different IMS services.  These examples utilize the roles defined below.
+- [**query-ims.yml**](query-ims.yml) - provides examples of how to query status of different IMS services.  These examples utilize the roles defined below.
 
 ## Role Summary
 
@@ -23,35 +24,35 @@ This project uses roles to provide an object-oriented model to provision IMS.  E
 
 - [**ims_apf**](roles/ims_apf/README.md) - adds authorization of IMS datasets to zOS
 
-- [**ims_catalog**](roles/ims_catalog/README.md) - allocates, loads and deletes IMS catalog
+- [**ims_catalog**](roles/ims_catalog/README.md) - allocates, loads, and deletes IMS catalog
 - [**ims_common**](roles/ims_common/README.md) - provides services such as start/stop IMS control regions and IMS Connection
-- [**ims_common_queue**](roles/ims_common_queue/README.md) - provides dataset definition and query or CQS 
-- [**ims_dbrc**](roles/ims_dbrc/README.md) - sets up DBRC defaults and prepares DBRC 
-- [**ims_exit**](roles/ims_exit/README.md) - prepares security and connection exit for IMS 
-- [**ims_gen**](roles/ims_gen/README.md) - prepares DBDGEN, PSBGEN and ACBGEN 
-- [**ims_iefjobs**](roles/ims_iefjobs/README.md) - creates IEF jobs 
-- [**ims_dataset**](roles/ims_dataset/README.md) - creates and delete IMS definition data sets and libraries
-- [**ims_initialize**](roles/ims_initialize/README.md) - reserves ICON ports and send PROCLIB templates to zOS 
+- [**ims_common_queue**](roles/ims_common_queue/README.md) - provides dataset definition and query or CQS
+- [**ims_dbrc**](roles/ims_dbrc/README.md) - sets up DBRC defaults and prepares DBRC
+- [**ims_exit**](roles/ims_exit/README.md) - prepares security and connection exit for IMS
+- [**ims_gen**](roles/ims_gen/README.md) - prepares DBDGEN, PSBGEN, and ACBGEN
+- [**ims_iefjobs**](roles/ims_iefjobs/README.md) - creates IEF jobs
+- [**ims_dataset**](roles/ims_dataset/README.md) - creates and deletes IMS definition data sets and libraries
+- [**ims_initialize**](roles/ims_initialize/README.md) - reserves ICON ports and sends PROCLIB templates to zOS
 - [**install-bzip2**](roles/install-bzip2/README.md) - copies and installs utility zip file on zOS
-- [**ims_online_change**](roles/ims_online_change/README.md) - create online change utility
-- [**ims_operations_manager**](roles/ims_operations_manager/README.md) - defines, starts, stops and queries operations manager
+- [**ims_online_change**](roles/ims_online_change/README.md) - enables the online change utility
+- [**ims_operations_manager**](roles/ims_operations_manager/README.md) - defines, starts, stops, and queries operations manager
 - [**ims_proclib**](roles/ims_proclib/README.md) - defines BPE configuration and copies PROCLIB
-- [**ims_racf**](roles/ims_racf/README.md) - prepare RACF for IMS
+- [**ims_racf**](roles/ims_racf/README.md) - prepares RACF security for IMS
 - [**ims_region**](roles/ims_region/README.md) - starts IMS regions
 - [**ims_resource_manager**](roles/ims_resource_manager/README.md) - defines, starts, stops and queries RM
-- [**ims_structured_call_interface**](roles/ims_structured_call_interface/README.md) - defines, starts, stops and queries SCI
+- [**ims_structured_call_interface**](roles/ims_structured_call_interface/README.md) - defines, starts, stops, and queries SCI
 - [**ims_sysdef**](roles/ims_sysdef/README.md) - prepares system definition data set
 - [**save-templates-to-datasets**](roles/save-templates-to-datasets/README.md) - copies templates from USS to zOS data sets
-- [**send-template**](roles/send-template/README.md) - sends one template file from local host to zOS
-- [**send-templates**](roles/send-templates/README.md)  - sends multiple templates in a directory from local host to zOS 
+- [**send-template**](roles/send-template/README.md) - sends a template file from the local host to zOS
+- [**send-templates**](roles/send-templates/README.md)  - sends multiple templates in a directory from local host to zOS
 - [**submit-rexx**](roles/submit-rexx/README.md) - runs a REXX script on zOS
 
 
-Inside of each role:
+Inside each role:
 
-* `./tasks` contains tasks can be performed by the role.
+* `./tasks` contains tasks that can be performed by the role.
   Sub-folder names describe the use of the contained files.
-* `./tasks/main.yml` contains the default tasks performed by the role. 
+* `./tasks/main.yml` contains the default tasks performed by the role.
 
 
 ## Ansible Collection Requirements

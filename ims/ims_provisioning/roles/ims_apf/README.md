@@ -1,7 +1,7 @@
 Authorized Program Facility Service
 =========
 
-Authorize IMS datasets to z/OS
+Authorize IMS datasets to z/OS.
 
 
 Requirements

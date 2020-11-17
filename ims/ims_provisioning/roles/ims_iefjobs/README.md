@@ -1,7 +1,7 @@
 Job Services
 =========
 
-This role creates IEF job files for IMS services: OM, RM, SC, CTL, etc ...
+Creates IEF job files for IMS services: OM, RM, SC, CTL, and other services.
 
 Requirements
 ------------

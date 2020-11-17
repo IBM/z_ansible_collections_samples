@@ -1,7 +1,7 @@
 Data Set Services
 =========
 
-This role allocates all required data sets for IMS provisioning and de-allocates them for de-provisioning.
+Allocates all required data sets for IMS provisioning and de-allocates them for de-provisioning.
 
 Requirements
 ------------

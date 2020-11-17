@@ -1,7 +1,7 @@
 Online Change Service
 =========
 
-This role enables IMS Online Change service (OLC).
+Enables IMS Online Change service (OLC).
 
 Requirements
 ------------

@@ -1,7 +1,7 @@
 submit-rexx
 =========
 
-This is a utility role used by other roles for the submission of rexx jobs that need to run in TSO/E address space.
+This role is a utility used by other roles to submit REXX jobs that need to run in the TSO/E address space.
 
 
 Requirements
@@ -12,7 +12,7 @@ Requirements
 Role Variables
 --------------
 - ### ** rexx_name **
-   The name of the REXX program to run.  This program must be previously sent over using send-template
+   The name of the REXX program to run.  This program must be previously sent over using send-template.
 
 
 Dependencies

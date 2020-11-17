@@ -16,13 +16,13 @@ Role Variables
 --------------
 - ### **icon**
 
-  Specifies to start or stop IMS Connect
+  Specifies whether to start or stop IMS Connect:
   - 'start': start IMS Connect service
   - 'stop': stop IMS Connect service
 
 - ### **ctl**
 
-  Specifies to start or stop IMS Control Region
+  Specifies whether to start or stop IMS Control Region:
   - 'start': start IMS Control region
   - 'stop': stop IMS Control region
 
@@ -42,8 +42,8 @@ Dependencies
 
 None
 
-Example Playbook: How to start IMS Connection, Control region, 
-IMS (cold) and wait for all services to be up
+Example Playbook: How to start IMS Connection, Control region,
+IMS (cold) and wait for all services to be up.
 ----------------
 
 ```yaml

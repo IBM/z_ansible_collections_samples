@@ -1,7 +1,7 @@
 Send start region REXX scripts to zOS
 =========
 
-This role sends start region REXX scripts to zOS
+Sends start region REXX scripts to zOS.
 
 Requirements
 ------------

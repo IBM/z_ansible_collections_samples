@@ -1,7 +1,7 @@
 Catalog Services
 =========
 
-This role allocates, loads and deletes all IMS catalogs.
+Allocates, loads, and deletes all IMS catalogs.
 
 Requirements
 ------------
@@ -48,7 +48,7 @@ Example Playbook: How to delete catalogs
 ```yaml
 - hosts: all
   collections:
-    - ibm.ibm_zos_core  
+    - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
   gather_facts: no
   environment: "{{ environment_vars }}"
