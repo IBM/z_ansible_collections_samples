@@ -1,7 +1,7 @@
 IMS Structured Call Interface (SCI)
 =========
 
-This role creates, starts, stops and queries IMS Structured Call Interface (SCI).
+Creates, starts, stops and queries IMS Structured Call Interface (SCI).
 
 Requirements
 ------------

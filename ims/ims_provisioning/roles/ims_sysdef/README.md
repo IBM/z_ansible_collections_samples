@@ -1,7 +1,7 @@
 System Definitions Service
 =========
 
-This role defines pre-processor macros and stage 1 & 2 data sets
+Defines pre-processor macros and stage 1 & 2 data sets.
 
 Requirements
 ------------

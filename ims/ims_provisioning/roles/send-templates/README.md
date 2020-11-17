@@ -1,7 +1,7 @@
 Send templates
 =========
 
-This role is a utility used by other roles to send entire directory of template files to z/OS system.
+This role is a utility used by other roles to send the entire directory of template files to the z/OS system.
 
 Requirements
 ------------

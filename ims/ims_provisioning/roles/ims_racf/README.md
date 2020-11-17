@@ -1,7 +1,7 @@
 RACF Preparation
 =========
 
-This role prepares RACF security for IMS
+Prepares RACF security for IMS.
 
 Requirements
 ------------
@@ -13,7 +13,7 @@ Role Variables
 --------------
 
 - ### **prep_racf**
-  When prep_racf is true, this role prepares RACF security for IMS
+  When prep_racf is true, this role prepares RACF security for IMS.
 
 
 Dependencies

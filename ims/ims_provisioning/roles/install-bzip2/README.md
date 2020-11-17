@@ -1,7 +1,7 @@
 install-bzip2
 =========
 
-This role is used to deploy _bzip2_ to a z/OS system.
+Deploys _bzip2_ to a z/OS system.
 
 Requirements
 ------------
@@ -12,7 +12,7 @@ Role Variables
 --------------
 
 - ### **  uss_utilities_path **
-   where MVSUTILS/MVSCMD and other needed tools/scripts are installed on z/OS target node
+   where MVSUTILS/MVSCMD and other needed tools/scripts are installed on z/OS target node.
 
 
 Dependencies

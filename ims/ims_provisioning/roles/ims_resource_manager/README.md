@@ -1,7 +1,7 @@
 IMS Resource Manager
 =========
 
-This role creates, starts, stops and queries IMS Resource Manager.
+Creates, starts, stops and queries IMS Resource Manager.
 
 Requirements
 ------------
