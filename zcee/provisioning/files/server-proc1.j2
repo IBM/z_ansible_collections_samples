@@ -39,7 +39,7 @@
 //* STDENV  - Initial z/OS UNIX environment for the specific
 //*           server being started
 //*
-// SET ZCONHOME='{{ zcon_install_dir }}' 
+// SET ZCONHOME='{{ zcon_install_dir }}'
 //*
 //ZCON     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
 //         PARM='PGM &ZCONHOME./bin/zosconnect run &PARMS.'
@@ -52,3 +52,5 @@ java_home={{ java_home }}
 WLP_USER_DIR={{ zcon_zfs_mountpoint }}/{{ softwareServiceInstanceName }}
 #JVM_OPTIONS=<Optional JVM parameters>
 //*
+// PEND
+//

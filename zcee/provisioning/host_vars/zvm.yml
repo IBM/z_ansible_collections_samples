@@ -1,6 +1,7 @@
-PYZ: /python/v3.8.0-ga/usr/lpp/IBM/cyp/v3r8/pyz
+PYZ: /python3/usr/lpp/IBM/cyp/v3r8/pyz #/python/3.8.3.ptf1/usr/lpp/IBM/cyp/v3r8/pyz #/python/v3.8.0-ga/usr/lpp/IBM/cyp/v3r8/pyz
+ZOAU: /zoau/v1.1.0-spr5                          #/zoau/v1.0.3-ptf2
 #ZOAU: /u/omvsadm/mvsbuilds/1032
-ZOAU: /zoau/v1.0.3-ptf2
+
 system_environment:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
