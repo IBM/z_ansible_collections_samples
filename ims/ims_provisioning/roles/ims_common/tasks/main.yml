@@ -48,30 +48,9 @@
         wait_time_s: 30
       when: icon == "start"
 
-    # Start IMS Connect, for some reason, it doesn't work
-    # - name: Start ICON
-    #   zos_operator:
-    #     cmd: 's {{ DFS_IMS_SSID }}HWS1'
-    #     verbose: true
-    #   when: icon == "start"
-
     # Stop ICON
     - name: Stop ICON
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}HWS'
         verbose: true
       when: icon == "stop"
-
-  # always:
-  #   - name: Delete the temporary submit_jcl script path
-  #     file:
-  #         path: "{{ response.script_path }}"
-  #         state: absent
-  #     when: response
-  #     ignore_errors: yes
-
-
-
-# - debug:
-#     var: response
-#     verbosity: 0

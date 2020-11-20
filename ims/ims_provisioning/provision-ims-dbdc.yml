@@ -190,14 +190,6 @@
           vars:
             rm: query
 
-      # Query CQS
-      # Note: Make sure CQS has been started before running this query
-      # - block:
-      #     - include_role:
-      #         name: ims_common_queue
-      #       vars:
-      #         cqs: query
-
       always:
         - name: Delete the temporary provision files directory
           file:

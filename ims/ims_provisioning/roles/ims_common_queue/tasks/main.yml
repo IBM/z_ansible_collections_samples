@@ -7,27 +7,6 @@
 
   block:
 
-    # AL: Replace this code w/ mvs_raw
-    # - block:
-    #   - set_fact:
-    #       eager_role_path: '{{role_path}}'
-
-    #   # Send the template over
-    #   - include_role:
-    #       name: send-template
-    #     vars:
-    #       path: '{{ eager_role_path }}/templates/DFSE304J.j2'
-    #   when: cqs == "config" and not provision
-
-    # # Define CQS
-    # - name: Define IMS subcomponent CQS
-    #   zos_job_submit:
-    #     src: '{{ uss_file_path }}/DFSE304J.j2'
-    #     location: USS
-    #     wait: true
-    #     wait_time_s: 30
-    #   when: cqs == "config"
-
     - set_fact:
         ip_config: '{{ role_path }}/templates/ip_config.txt'
         sl_config: '{{ role_path }}/templates/sl_config.txt'
