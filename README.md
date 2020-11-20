@@ -19,11 +19,11 @@ this is outlined in the
    * [Convert Encoding](zos_concepts/encoding/convert_encoding)
    * [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
    * [Copy Directory to PDS, Edit member and Submit Job](zos_concepts/data_sets/copy_edit_submit)
-   * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)
+   * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](media/copy_sort_and_fetch_data_sets_on_z_OS_using_ansible.mp4)]
    * [Data Set Basics](zos_concepts/data_sets/data_set_basics)
-   * [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user)
+   * [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user) - \[[Playback](media/managing-zos-user-with-ansible-presentation-demo.mp4)]
    * [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
-   * [Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub](zos_concepts/program_authorization/git_apf)
+   * [Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub](zos_concepts/program_authorization/git_apf) - \[[Playback](media/synchronize_APF_authorized_libraries_from_a_gitHub_configuration.mov)]
    * [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
    * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
    * [z/OS Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
@@ -41,6 +41,11 @@ this is outlined in the
 
 * [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Sample playbook](zos_concepts/user_management/add_remove_user)\]
 
+## Playbacks
+* [Copy, Sort and Fetch Data Sets on z/OS using Ansible](media/copy_sort_and_fetch_data_sets_on_z_OS_using_ansible.mp4)
+* [Manage z/OS Users Using Ansible](media/managing-zos-user-with-ansible-presentation-demo.mp4)
+* [Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub](media/synchronize_APF_authorized_libraries_from_a_gitHub_configuration.mov)
+  
 ## How sample playbooks are packaged
 
 The sample playbook repository is organized as follows:
