@@ -42,9 +42,9 @@ this is outlined in the
 * [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Sample playbook](zos_concepts/user_management/add_remove_user)\]
 
 ## Playbacks
-* [Copy, Sort and Fetch Data Sets on z/OS using Ansible](media/copy_sort_and_fetch_data_sets_on_z_OS_using_ansible.mp4)
-* [Manage z/OS Users Using Ansible](media/managing-zos-user-with-ansible-presentation-demo.mp4)
-* [Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub](media/synchronize_APF_authorized_libraries_from_a_gitHub_configuration.mov)
+* [Copy, Sort and Fetch Data Sets on z/OS using Ansible](media/copy_sort_and_fetch_data_sets_on_z_OS_using_ansible.m4v)
+* [Manage z/OS Users Using Ansible](media/managing-zos-user-with-ansible-presentation-demo.m4v)
+* [Synchronize APF authorized libraries on z/OS from a configuration file cloned from GitHub](media/synchronize_APF_authorized_libraries_from_a_gitHub_configuration.m4v)
   
 ## How sample playbooks are packaged
 
