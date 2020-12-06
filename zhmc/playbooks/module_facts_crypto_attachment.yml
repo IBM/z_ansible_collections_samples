@@ -1,0 +1,25 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    partition_name: sample-part-1
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Get facts for crypto config of partition {{ partition_name }}"
+      zhmc_crypto_attachment:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        partition_name: "{{ partition_name }}"
+        state: facts
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result

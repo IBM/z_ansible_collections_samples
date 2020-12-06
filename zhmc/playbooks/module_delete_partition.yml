@@ -1,0 +1,25 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    partition_name: sample-part-1
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure partition {{ partition_name }} does not exist"
+      zhmc_partition:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ partition_name }}"
+        state: absent
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result
