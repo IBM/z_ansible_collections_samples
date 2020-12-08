@@ -28,7 +28,7 @@
           # loop: "{{ volumes }}"
           vars:
             temp_dir: "{{ tempfile_info.path }}"
-            item: "{{ volumes[0] }}"
+            item: "{{ volumes[1] }}"
 
         - name: Combine JSON output files from volumes into CSV file
           script: "{{ playbook_dir }}/files/jsontocsv.py . datasets.csv"

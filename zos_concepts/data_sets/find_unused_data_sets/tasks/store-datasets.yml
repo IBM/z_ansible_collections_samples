@@ -1,5 +1,5 @@
 - name: Get all data sets from volumes VTOC
-  shell: echo "   LISTVTOC FORMAT,VOL={{ item.type }}={{ item.volser }}" | mvscmd --pgm=iehlist --sysin=stdin --sysprint=* --dd=SYS1.VVDS.V{{ item.volser }}
+  shell: echo "   LISTVTOC FORMAT,VOL=3390=IMSDPR" | mvscmd --pgm=iehlist --sysin=stdin --sysprint=* --dd=SYS1.VVDS.VIMSDPR
   register: dataset_list
   failed_when: false
 
@@ -10,6 +10,6 @@
     - name: Write data sets to CSV file
       copy:
         content: "{{ datasets | to_nice_json }}"
-        dest: "{{ temp_dir }}/{{ item.volser }}.json"
+        dest: "{{ temp_dir }}/IMSDPR.json"
       delegate_to: localhost
   when: dataset_list.rc == 0
