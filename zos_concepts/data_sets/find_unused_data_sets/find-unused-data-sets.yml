@@ -25,9 +25,10 @@
         - name: Get info for all data sets in volumes table of contents
           include_tasks:
             file: "{{ playbook_dir }}/tasks/store-datasets.yml"
-          loop: "{{ volumes }}"
+          # loop: "{{ volumes }}"
           vars:
             temp_dir: "{{ tempfile_info.path }}"
+            item: "{{ volumes[0] }}"
 
         - name: Combine JSON output files from volumes into CSV file
           script: "{{ playbook_dir }}/files/jsontocsv.py . datasets.csv"
@@ -48,6 +49,7 @@
               Please review the data sets to determine if any storage can be reclaimed."
             attach:
               - "{{ tempfile_info.path }}/datasets.csv"
+            secure: always
           delegate_to: localhost
       always:
         - name: Remove temporary directory
