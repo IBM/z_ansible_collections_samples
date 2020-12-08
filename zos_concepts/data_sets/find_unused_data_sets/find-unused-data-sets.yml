@@ -48,7 +48,6 @@
               Please review the data sets to determine if any storage can be reclaimed."
             attach:
               - "{{ tempfile_info.path }}/datasets.csv"
-            secure: starttls
           delegate_to: localhost
       always:
         - name: Remove temporary directory
