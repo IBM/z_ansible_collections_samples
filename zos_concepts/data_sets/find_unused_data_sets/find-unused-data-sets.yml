@@ -1,0 +1,58 @@
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    minimum_days_since_accessed: 120
+    to_email: blake.becker@ibm.com
+
+  tasks:
+    - name: get all online devices
+      command: opercmd "d u,dasd,online,,99999"
+      register: vollist
+
+    - set_fact:
+        volumes: "{{ vollist | get_volumes }}"
+
+    - name: Generate temporary directory to store data set info
+      tempfile:
+        state: directory
+      delegate_to: localhost
+      register: tempfile_info
+
+    - block:
+        - name: Get info for all data sets in volumes table of contents
+          include_tasks:
+            file: "{{ playbook_dir }}/tasks/store-datasets.yml"
+          loop: "{{ volumes }}"
+          vars:
+            temp_dir: "{{ tempfile_info.path }}"
+
+        - name: Combine JSON output files from volumes into CSV file
+          script: "{{ playbook_dir }}/files/jsontocsv.py . datasets.csv"
+          args:
+            chdir: "{{ tempfile_info.path }}"
+            executable: /usr/bin/python3
+          delegate_to: localhost
+
+        - name: notify app focals for RAP expiration
+          mail:
+            host: "{{ relay_url }}"
+            port: "{{ relay_port }}"
+            from: "{{ from_email }}"
+            to: "{{ to_email }}"
+            subject: Automated report of unused data sets for {{ inventory_hostname }}
+            body:
+              "Attached is a CSV containing data sets which have not been accessed in at least {{ minimum_days_since_accessed }} days.
+              Please review the data sets to determine if any storage can be reclaimed."
+            attach:
+              - "{{ tempfile_info.path }}/datasets.csv"
+            secure: starttls
+          delegate_to: localhost
+      always:
+        - name: Remove temporary directory
+          file:
+            path: "{{ tempfile_info.path }}"
+            state: absent
+          delegate_to: localhost
