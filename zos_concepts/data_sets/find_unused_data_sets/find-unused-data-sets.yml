@@ -36,7 +36,7 @@
             executable: /usr/bin/python3
           delegate_to: localhost
 
-        - name: notify app focals for RAP expiration
+        - name: Email CSV file containing data set information to interested party
           mail:
             host: "{{ relay_url }}"
             port: "{{ relay_port }}"

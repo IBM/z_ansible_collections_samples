@@ -1,0 +1,15 @@
+- name: Get all data sets from volumes VTOC
+  shell: echo "   LISTVTOC FORMAT,VOL={{ item.type }}={{ item.volser }}" | mvscmd --pgm=iehlist --sysin=stdin --sysprint=* --dd=SYS1.VVDS.V{{ item.volser }}
+  register: dataset_list
+  failed_when: false
+
+- block:
+    - set_fact:
+        datasets: "{{ dataset_list | get_datasets_not_used_in_x_days(minimum_days_since_accessed) }}"
+
+    - name: Write data sets to CSV file
+      copy:
+        content: "{{ datasets | to_nice_json }}"
+        dest: "{{ temp_dir }}/{{ item.volser }}.json"
+      delegate_to: localhost
+  when: dataset_list.rc == 0
