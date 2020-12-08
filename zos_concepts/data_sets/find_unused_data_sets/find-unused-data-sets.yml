@@ -25,10 +25,9 @@
         - name: Get info for all data sets in volumes table of contents
           include_tasks:
             file: "{{ playbook_dir }}/tasks/store-datasets.yml"
-          # loop: "{{ volumes }}"
+          loop: "{{ volumes }}"
           vars:
             temp_dir: "{{ tempfile_info.path }}"
-            item: "{{ volumes[1] }}"
 
         - name: Combine JSON output files from volumes into CSV file
           script: "{{ playbook_dir }}/files/jsontocsv.py . datasets.csv"
