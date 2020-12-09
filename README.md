@@ -1,10 +1,10 @@
-# Ansible z/OS Collection Samples
+# Ansible Z Playbook Samples
 
 An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
 consists of organized instructions that define work for a managed node to be
 managed with Ansible.
 
-This repository contains sample playbooks and blogs related to the Red Hat Ansible Certified Content for IBM Z.
+This repository contains sample playbooks, blogs and media related to the Red Hat Ansible Certified Content for IBM Z.
 Refer to the [documentation site](https://ibm.github.io/z_ansible_collections_doc/index.html) for a detailed overview of requirements,
 installation and how to get started.
 
@@ -13,7 +13,7 @@ repository and use the GitHub **watch** option to receive update notifications;
 this is outlined in the
 [using the samples repository](meta/samples_repository/README.md) documentation.
 
-## Index
+## Topics
 
 * [z/OS Concepts](zos_concepts/)
    * [Convert Encoding](zos_concepts/encoding/convert_encoding)
@@ -63,10 +63,12 @@ The sample playbook repository is organized as follows:
     └── README
 
 
-When new sample playbooks are contributed, they are placed under the appropriate topic and use case.
-If the playbook does not correspond to an existing use case, a new use case will be added that conforms to the
-structure outlined above.
-Each playbook will also include a README with a brief description, licensing and copyright information.
+When new playbooks are contributed, they are associated to a use case and placed
+under the appropriate topic. If the use case does not correspond to an existing
+topic, a new topic will be added, outlined above.  
+
+Each playbook will also include a README with a brief description, licensing and
+copyright information.
 
 ## Copyright
 
@@ -79,11 +81,17 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
 
-Support for all sample playbooks, roles and filters are managed by opening
-a [Git issue](https://github.com/IBM/z_ansible_collections_samples/issues). The
-repository admins and content owners will engage users on issues reported in
-Git. In the future, samples may be community contributed, therefore it may be
-helpful to review who contributed the sample as well as the requirements.
+Support for all sample playbooks, roles and filters are done so by the community
+and managed by opening a [Git issue](https://github.com/IBM/z_ansible_collections_samples/issues).
+The repository admins and content owners will engage users on issues reported in
+Git.  
+
+In the future, samples may be community contributed, therefore it may be
+helpful to review who contributed the sample as well as the requirements. You
+can view who the contributor was by looking at the playbooks commit history as
+well as notes in the playbook.  
+
+Playbooks contributed by IBM will be identified with the following header:
 
 ``` {.yaml}
 ###############################################################################
