@@ -1,0 +1,25 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    hs_adapter_name: sample-hs-1
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+  - name: "Ensure Hipersockets adapter {{ hs_adapter_name }} does not exist"
+    zhmc_adapter:
+      hmc_host: "{{ hmc_host }}"
+      hmc_auth: "{{ hmc_auth }}"
+      cpc_name: "{{ cpc_name }}"
+      name: "{{ hs_adapter_name }}"
+      state: absent
+    register: result
+
+  - name: Print the result
+    debug:
+      var: result

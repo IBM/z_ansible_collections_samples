@@ -1,0 +1,23 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  vars_files:
+    - vault.yml
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure CPC {{ cpc_name }} has the desired description"
+      zhmc_cpc:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        name: "{{ cpc_name }}"
+        state: set
+        properties:
+          description: "Changed description of CPC {{ cpc_name }}"
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result

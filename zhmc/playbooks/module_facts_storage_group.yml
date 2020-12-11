@@ -1,0 +1,27 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    partition_name: sample-part-1
+    stogroup_name: sample-sg-1
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Get facts for storage group {{ stogroup_name }}"
+      zhmc_storage_group:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ stogroup_name }}"
+        state: facts
+        expand: true
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result

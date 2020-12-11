@@ -1,0 +1,32 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    stogroup_name: sample-sg-1
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure FCP storage group {{ stogroup_name }} exists"
+      zhmc_storage_group:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ stogroup_name }}"
+        properties:
+          description: "This is storage group {{ stogroup_name }}"
+          type: fcp
+          shared: false
+          connectivity: 4
+          max-partitions: 1
+        state: present
+        expand: true
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result
