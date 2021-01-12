@@ -1,0 +1,49 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+
+# defaults file for zcee_configure_artifacts
+################################################################################
+# Specifies the path to the base zCEE configuration directory. 
+################################################################################
+zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'
+
+################################################################################
+# Specifies the path to the zCEE mount point. 
+################################################################################
+zcon_zfs_mountpoint: '/var/zosconnect'
+
+################################################################################
+# Specifies the unique name for the instance of zCEE.
+################################################################################
+softwareServiceInstanceName: ZC01
+
+################################################################################
+# When running add-user.yml, specifies a list of any files on control node that should be copied to the z/OS host.
+# Parameters:
+#  - src:       Specifies the absolute or relative path to the file on the Ansible control node.
+#               Relative paths are relative to playbook runners current working directory.
+#  - dest:      Specifies the destination data set or unix path on the z/OS host.
+#               This is where the file is copied.
+
+# Example:
+#   files_to_copy:
+#     - src: "../files/bootstrap.properties"
+#       dest: "/u/omvsadm/var/zosconnect/ZC01/servers/ZC01/bootstrap.properties"
+#     - src: "../files/server.xml"
+#       dest: "/u/omvsadm/var/zosconnect/ZC01/servers/ZC01/server.xml"
+################################################################################
+files_to_copy: 
+  - src: "{{ playbook_dir }}/files/bootstrap.properties"
+    dest: "{{ zcee_config_path }}/bootstrap.properties"
+  - src: "{{ playbook_dir }}/files/server.xml"
+    dest: "{{ zcee_config_path }}/server.xml"
+
+################################################################################
+# Specifies the character set any copied templates and files should be converted to.
+################################################################################
+target_charset: "IBM-1047"
+
+
+
+

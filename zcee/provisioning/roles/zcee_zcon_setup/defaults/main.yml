@@ -1,0 +1,12 @@
+---
+# defaults file for zcee_zcon_setup
+
+################################################################################
+# Specifies the unique name for the instance of zCEE.
+################################################################################
+softwareServiceInstanceName: ZC01
+
+################################################################################
+# Specifies the path to the z/OS Connect EE installation directory on zFS.
+################################################################################
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 #TrySample/

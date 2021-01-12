@@ -1,0 +1,150 @@
+---
+# tasks file for zcee_keyring
+
+- name: Define Security
+  ibm.ibm_zos_core.zos_tso_command: 
+    commands: 
+        # Defining STARTED task for the server
+      - RDEF STARTED {{softwareServiceInstanceName}}.* UACC(NONE) STDATA(USER({{zcon_admin_server}}) PRIVILEGED(NO) TRUSTED(NO) TRACE(YES))
+        # Setup the APPL class profile
+      - RDEFINE APPL {{softwareServiceInstanceName}} UACC(NONE)
+        #ctivating the APPL class, If not active, the domain is not restricted, which means anyone can authenticate to it
+      - SETROPTS CLASSACT(APPL)
+        #Grant the server id READ access to the profile in the APPL class
+      - PERMIT {{softwareServiceInstanceName}} CLASS(APPL) ACCESS(READ) ID({{zcon_admin_server}})
+        #Grant an unauthenticated {{ zcon_zos_guest_user }} user ID READ access to the profile in the APPL class
+      - PERMIT {{softwareServiceInstanceName}} CLASS(APPL) ACCESS(READ) ID({{ zcon_zos_guest_user }})
+        #Configure a security domain for server auth
+      - RDEFINE SERVER BBG.SECPFX.{{softwareServiceInstanceName}} UACC(NONE)
+        #Grant the servers id READ access to the security domain for the server
+      - PERMIT BBG.SECPFX.{{softwareServiceInstanceName}} CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        #Grant the server access to the angel process - Define the class for the angel process
+      - RDEFINE SERVER bbg.angel UACC(NONE)
+        #Grant the server access to the angel process - Permitting the server access to the angel process
+      - PERMIT bbg.angel CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        #Grant the server access to use the z/OS Authorized services - Create a SERVER profile for the authorized module BBGZSAFM
+      - RDEFINE SERVER bbg.authmod.bbgzsafm UACC(NONE)
+        #Grant the server access to use the z/OS Authorized services - Permit the servers id READ access to the authorized module BBGZSAFM
+      - PERMIT bbg.authmod.bbgzsafm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create a profile for the SAF authorized user registry services and SAF authorization services
+      - RDEFINE SERVER bbg.authmod.bbgzsafm.safcred UACC(NONE)
+        # Permit the servers id READ access to the SAF authorized user registry services and SAF authorization services
+      - PERMIT bbg.authmod.bbgzsafm.safcred CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create a profile for the SVCDUMP services
+      - RDEFINE  SERVER bbg.authmod.bbgzsafm.zosdump UACC(NONE)
+        # Permit the servers id READ access to the SVCDUMP services
+      - PERMIT bbg.authmod.bbgzsafm.zosdump CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create profiles for the optimized local adapter authorized service
+      - RDEFINE  SERVER bbg.authmod.bbgzsafm.localcom UACC(NONE)
+      - RDEFINE  SERVER bbg.authmod.bbgzsafm.wola UACC(NONE)
+        # Permit the servers id READ access to the optimized local adapter authorized service
+      - PERMIT bbg.authmod.bbgzsafm.localcom CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+      - PERMIT bbg.authmod.bbgzsafm.wola CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create a SERVER profile for the authorized module BBGZSCFM
+      - RDEFINE SERVER bbg.authmod.bbgzscfm UACC(NONE)
+        # Permit the servers id READ access to the authorized module BBGZSCFM
+      - PERMIT bbg.authmod.bbgzscfm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create profiles for the optimized local adapter authorized client service
+      - RDEFINE  SERVER bbg.authmod.bbgzscfm.wola UACC(NONE)
+        # Permit the servers id READ access to the optimized local adapter authorized client service
+      - PERMIT bbg.authmod.bbgzscfm.wola CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create a profile for WLM services
+      - RDEFINE  SERVER bbg.authmod.bbgzsafm.zoswlm UACC(NONE)
+        # Permit the servers id READ access to the WLM services
+      - PERMIT bbg.authmod.bbgzsafm.zoswlm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create a profile for the TXRRS services
+      - RDEFINE  SERVER bbg.authmod.bbgzsafm.txrrs UACC(NONE)
+        # Permit the servers id READ access to the TXRRS services
+      - PERMIT bbg.authmod.bbgzsafm.txrrs CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Create a profile for the IFAUSAGE services (PRODMGR)
+      - RDEFINE  SERVER bbg.authmod.bbgzsafm.prodmgr UACC(NONE)
+        # Permit the servers id READ access to the IFAUSAGE services (PRODMGR)
+      - PERMIT bbg.authmod.bbgzsafm.prodmgr CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+        # Setup user authorization to access the z/OS Connect application by
+        # assigning users the zosConnectAccess role
+        # Defining the z/OS Connect access role class
+      - RDEFINE EJBROLE BBGZDFLT.zos.connect.access.roles.zosConnectAccess UACC(NONE)
+        # Permitting the provisioning userid to the z/OS Connect access role class
+      - PERMIT BBGZDFLT.zos.connect.access.roles.zosConnectAccess CLASS(EJBROLE) ID({{workflowOwner}}) ACCESS(READ)
+  register: response
+  failed_when: response.output | map(attribute='rc') | max > 4
+
+# - name: Define Security
+#   ibm.ibm_zos_core.zos_tso_command: 
+#     commands: 
+#         # Defining STARTED task for the server
+#       - RDEF STARTED {{softwareServiceInstanceName}}.* UACC(NONE) STDATA(USER({{zcon_admin_server}}) PRIVILEGED(NO) TRUSTED(NO) TRACE(YES))
+#         # Setup the APPL class profile
+#       - RDEFINE APPL {{softwareServiceInstanceName}} UACC(NONE)
+#         #ctivating the APPL class, If not active, the domain is not restricted, which means anyone can authenticate to it
+#       - SETROPTS CLASSACT(APPL)
+#         #Grant the server id READ access to the profile in the APPL class
+#       - PERMIT {{softwareServiceInstanceName}} CLASS(APPL) ACCESS(READ) ID({{zcon_admin_server}})
+#         #Grant an unauthenticated {{ zcon_zos_guest_user }} user ID READ access to the profile in the APPL class
+#       - PERMIT {{softwareServiceInstanceName}} CLASS(APPL) ACCESS(READ) ID({{ zcon_zos_guest_user }})
+#         #Configure a security domain for server auth
+#       - RDEFINE SERVER BBG.SECPFX.{{softwareServiceInstanceName}} UACC(NONE)
+#         #Grant the servers id READ access to the security domain for the server
+#       - PERMIT BBG.SECPFX.{{softwareServiceInstanceName}} CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         #Grant the server access to the angel process - Define the class for the angel process
+#       - RDEFINE SERVER bbg.angel UACC(NONE)
+#         #Grant the server access to the angel process - Permitting the server access to the angel process
+#       - PERMIT bbg.angel CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         #Grant the server access to use the z/OS Authorized services - Create a SERVER profile for the authorized module BBGZSAFM
+#       - RDEFINE SERVER bbg.authmod.bbgzsafm UACC(NONE)
+#         #Grant the server access to use the z/OS Authorized services - Permit the servers id READ access to the authorized module BBGZSAFM
+#       - PERMIT bbg.authmod.bbgzsafm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create a profile for the SAF authorized user registry services and SAF authorization services
+#       - RDEFINE SERVER bbg.authmod.bbgzsafm.safcred UACC(NONE)
+#         # Permit the servers id READ access to the SAF authorized user registry services and SAF authorization services
+#       - PERMIT bbg.authmod.bbgzsafm.safcred CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create a profile for the SVCDUMP services
+#       - RDEFINE  SERVER bbg.authmod.bbgzsafm.zosdump UACC(NONE)
+#         # Permit the servers id READ access to the SVCDUMP services
+#       - PERMIT bbg.authmod.bbgzsafm.zosdump CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create profiles for the optimized local adapter authorized service
+#       - RDEFINE  SERVER bbg.authmod.bbgzsafm.localcom UACC(NONE)
+#       - RDEFINE  SERVER bbg.authmod.bbgzsafm.wola UACC(NONE)
+#         # Permit the servers id READ access to the optimized local adapter authorized service
+#       - PERMIT bbg.authmod.bbgzsafm.localcom CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#       - PERMIT bbg.authmod.bbgzsafm.wola CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create a SERVER profile for the authorized module BBGZSCFM
+#       - RDEFINE SERVER bbg.authmod.bbgzscfm UACC(NONE)
+#         # Permit the servers id READ access to the authorized module BBGZSCFM
+#       - PERMIT bbg.authmod.bbgzscfm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create profiles for the optimized local adapter authorized client service
+#       - RDEFINE  SERVER bbg.authmod.bbgzscfm.wola UACC(NONE)
+#         # Permit the servers id READ access to the optimized local adapter authorized client service
+#       - PERMIT bbg.authmod.bbgzscfm.wola CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create a profile for WLM services
+#       - RDEFINE  SERVER bbg.authmod.bbgzsafm.zoswlm UACC(NONE)
+#         # Permit the servers id READ access to the WLM services
+#       - PERMIT bbg.authmod.bbgzsafm.zoswlm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create a profile for the TXRRS services
+#       - RDEFINE  SERVER bbg.authmod.bbgzsafm.txrrs UACC(NONE)
+#         # Permit the servers id READ access to the TXRRS services
+#       - PERMIT bbg.authmod.bbgzsafm.txrrs CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Create a profile for the IFAUSAGE services (PRODMGR)
+#       - RDEFINE  SERVER bbg.authmod.bbgzsafm.prodmgr UACC(NONE)
+#         # Permit the servers id READ access to the IFAUSAGE services (PRODMGR)
+#       - PERMIT bbg.authmod.bbgzsafm.prodmgr CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
+#         # Setup user authorization to access the z/OS Connect application by
+#         # assigning users the zosConnectAccess role
+#         # Defining the z/OS Connect access role class
+#       - RDEFINE EJBROLE BBGZDFLT.zos.connect.access.roles.zosConnectAccess UACC(NONE)
+#         # Permitting the provisioning userid to the z/OS Connect access role class
+#       - PERMIT BBGZDFLT.zos.connect.access.roles.zosConnectAccess CLASS(EJBROLE) ID({{workflowOwner}}) ACCESS(READ)
+#     register: response
+#     failed_when: response.output | map(attribute='rc') | max > 4
+#   when:
+#       - RC is defined
+#       - RC == 0
+
+- name: Refresh
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - SETROPTS RACLIST(FACILITY) REFRESH
+      - SETROPTS RACLIST(APPL) REFRESH
+      - SETROPTS RACLIST(EJBROLE) REFRESH
+      - SETROPTS RACLIST(SERVER) GENERIC(SERVER) REFRESH
+      - SETROPTS RACLIST(STARTED) REFRESH

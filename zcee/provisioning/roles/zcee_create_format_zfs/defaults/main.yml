@@ -1,0 +1,40 @@
+---
+# defaults file for zcee_create_format_zfs
+
+################################################################################
+# Specifies the unique name for the instance of zCEE.
+################################################################################
+softwareServiceInstanceName: ZC01
+
+################################################################################
+# Specifies the path to the z/OS Connect EE installation directory on zFS.
+################################################################################
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 
+
+################################################################################
+# Specifies the path to the zCEE mount point. 
+################################################################################
+zcon_zfs_mountpoint: '/var/zosconnect'
+
+################################################################################
+# Specifies the high-level qualifier for the zFS data sets that are defined during the provisioning of the z/OS Connect EE instance. 
+################################################################################
+zcon_file_system_hlq: '{{ DFS_AUTH_LIB_HLQ1 }}'
+
+################################################################################
+# VOLUME value that is used in the creation of the zFS data sets, for example, SYSDA. 
+# If the value is specified as SMS (Storage Management Subsystem), the VOLUME parameter 
+# is omitted from the VSAM creation.
+################################################################################
+zcon_zos_vsam_volume: DIPTI1
+
+################################################################################
+# Specifies a data class that is used to define a zFS data set for the z/OS Connect EE instance.
+################################################################################
+zcon_zfs_dataclass: '' 
+
+################################################################################
+# Specifies the path to the base zCEE configuration directory. 
+################################################################################
+zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'
+

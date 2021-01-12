@@ -1,0 +1,16 @@
+{% set jobcard = '//{0} '.format(softwareServiceInstanceName) %}
+{% set stc = zcon_stc_job_card %}
+{% for parm in stc.split(',') %}
+{% set temp = '//{0} {1},'.format(softwareServiceInstanceName, parm) %}
+{% if temp | length > 70 %}
+{{ jobcard }}
+{% set temp = '//  {0},'.format(parm) %}
+{% endif %}
+{% set jobcard = temp %}
+{% endfor %}
+{{ jobcard.rsplit(',', 1)[0] }}
+//*
+//* Set proc order and then execute z/OS Connect EE
+//*
+//PROCLIB JCLLIB ORDER={{ zcon_zos_proclib }}
+//ZCON    EXEC {{softwareServiceInstanceName}}

@@ -1,0 +1,45 @@
+- name: Deprovision zCEE
+  hosts: zsystem
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - "{{ vars_folder_name }}/zcee.yml"
+  environment: '{{ system_environment }}'
+  # TODO: add removal of reserved ports
+  tasks:
+    - name: Deprovision zCEE instance 
+      block:
+        - name: Stop zCEE server job
+          zos_operator: 
+            cmd: 'CANCEL ST{{ softwareServiceInstanceName }}'
+        - name: Stop zCEE server from USS 
+          shell: ./zosconnect stop {{softwareServiceInstanceName}}
+          args:
+            chdir: '{{ zcon_install_dir }}/bin'
+          environment:
+            WLP_USER_DIR: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
+          ignore_errors: yes
+          register: response
+          when: "'Server ZC01 is not running' is not in response.msg"
+        - debug:
+            msg: "{{ response.msg }}" 
+        - name: Delete dataset member from PROCLIB
+          ibm.ibm_zos_core.zos_data_set:
+            name: '{{zcon_zos_proclib}}({{softwareServiceInstanceName}})'
+            state: absent
+            type: MEMBER 
+        - name: Delete from private PROCLIB
+          ibm.ibm_zos_core.zos_data_set:
+            name: '{{user_private_proclib}}({{softwareServiceInstanceName}})'
+            state: absent
+            type: MEMBER
+        - name: Unmount VSAM dataset 
+          shell: /usr/sbin/unmount '{{ zcon_install_dir }}/wlp/etc'
+        - name: Delete VSAM LDS
+          ibm.ibm_zos_core.zos_data_set:
+            name: '{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}'
+            state: absent
+            volume: "{{ zcon_zos_vsam_volume }}"
+            
