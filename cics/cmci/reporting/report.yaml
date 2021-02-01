@@ -1,0 +1,113 @@
+# Copyright (c) IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+###############################################################################
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-01-31
+#  - Released initial version
+###############################################################################
+# This sample playbook demonstrates basic usage of the cmci_get module
+# included in the ibm.ibm_zos_cics collection
+#
+# Usage:
+#  ansible-playbook report.yaml
+#
+# Notes:
+#  This sample playbook demonstrates how to use the cmci_get module from the
+#  ibm.ibm_zos_cics collection to retrieve operational data from running CICS
+#  regions. This example, retrieves information corresponding to the CICSRGN
+#  resource table, but can be adapted to retrieve information about any of the
+#  resource tables supported by CPSM. The retrieved information is written to a
+#  csv file, suitable for opening as a spreadsheet.  This sample additionally
+#  shows how to automate installation of pre-requisites for the CMCI modules.
+#
+# Requirements:
+#   IBM z/OS CICS collection 1.0.0 or later
+###############################################################################
+---
+- name:  CICS CMCI Report
+
+  collections:
+      - ibm.ibm_zos_cics
+
+  hosts: 'localhost'
+  gather_facts: 'false'
+
+  vars_prompt:
+    - name: cmci_host
+      prompt: Target CMCI hostname
+      private: no
+    - name: cmci_port
+      prompt: Target CMCI port
+      private: no
+    - name: scheme
+      prompt: CMCI scheme
+      private: no
+      default: 'https'
+    - name: context
+      prompt: Target CPSM context
+      private: no
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
+
+  vars:
+    attributes:
+      - eyu_cicsname
+      - release
+      - jobid
+      - totltasks
+
+  tasks:
+    ############################################################################
+    # Install module dependencies
+    ############################################################################
+    - name: Make sure CMCI module dependencies are installed
+      pip:
+        name:
+          - requests
+          - xmltodict
+
+    ############################################################################
+    # Get information about CICS regions from the supplied context, using CMCI
+    ############################################################################
+    - name: Get information about CICS regions
+      cmci_get:
+        context: '{{ context }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSRegion'
+      register: result
+
+    ############################################################################
+    # Print the response from CMCI to the log - useful to see attribute names!
+    ############################################################################
+#    - debug:
+#        msg: '{{ result }}'
+
+    ############################################################################
+    # Use an inline template to extract the selected attributes to a report var
+    ############################################################################
+    - name: Create CSV report from template
+      set_fact:
+        csv: |
+          {{ attributes | join(',') }}
+          {% for record in result.records %}
+          {% for attribute in attributes %}
+          {{ record[attribute] }}{% if not loop.last %},{% endif %}
+          {% endfor %}
+
+          {% endfor %}
+
+    ############################################################################
+    # Write the report to a file
+    ############################################################################
+    - name: Write the report to a file
+      copy: content="{{ csv }}" dest=report.csv
