@@ -1,7 +1,7 @@
 # Retrieving operational data from running CICS regions
 
 This sample playbook demonstrates how to use the `cmci_get` module from the `ibm_zos_cics` collection
-to retrieve operational data from running CICS regions.  This example retrieves information corresponding to the
+to retrieve operational data from running CICS regions. This example retrieves information corresponding to the
 `CICSRGN` resource table, but can be adapted to retrieve information about any of the resource tables supported by
 CICSPlex SM. The retrieved information is written to a csv file, which you can open as a spreadsheet. This sample
 additionally shows how to automate installation of pre-requisites for the `cmci_*` modules.
@@ -55,15 +55,15 @@ report.
 
 - Try editing `report.yaml` to change the attributes included in the report.
   
-  You may want to uncomment the debug task, to see the full response from CICSPlex SM, which includes all the attribute
-  names applicable to the target resource.
+  You may want to uncomment the debug task to see the full response from CICSPlex SM, which includes all the attribute
+  names applicable to the target resource. In this example, the returned attributes will correspond to what's listed in the [CICSRGN resource table](https://www.ibm.com/support/knowledgecenter/en/SSGMCP_5.6.0/reference-cpsm-restables/cpsm-restables/CICSRGNtab.html). 
   
 - Try adding a `filter` argument to the `cmci_get` task, to restrict the report to a subset of your CICS regions. For
   information on how to set a filter for the `cmci_get` task, see [the IBM z/OS CICS modules documentation](http://todo).
   
 - Try supplying a different resource for the `type` argument of the `cmci_get` task, to request attributes for a different type of resource. You can find
   available CMCI resource names at
-  [CMCI resource names](https://www.ibm.com/support/knowledgecenter/SSGMCP_5.6.0/reference-system-programming/cmci/clientapi_resources.html)
+  [CMCI resource names](https://www.ibm.com/support/knowledgecenter/SSGMCP_5.6.0/reference-system-programming/cmci/clientapi_resources.html).
 
 # Copyright
 
