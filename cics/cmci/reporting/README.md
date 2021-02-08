@@ -1,10 +1,12 @@
 # Retrieving operational data from running CICS regions
 
-This sample playbook demonstrates how to use the `cmci_get` module from the `ibm_zos_cics` collection
-to retrieve operational data from running CICS regions. This example retrieves information corresponding to the
-`CICSRGN` resource table, but can be adapted to retrieve information about any of the resource tables supported by
-CICSPlex SM. The retrieved information is written to a csv file, which you can open as a spreadsheet. This sample
-additionally shows how to automate installation of pre-requisites for the `cmci_*` modules.
+This sample playbook demonstrates how to use the `cmci_get` module from the
+`ibm_zos_cics` collection to retrieve operational data from running CICS
+regions. This example retrieves information corresponding to the `CICSRGN`
+resource table, but can be adapted to retrieve information about any of the
+resource tables supported by CICSPlex SM. The retrieved information is written
+to a csv file, which you can open as a spreadsheet. This sample additionally
+shows how to automate installation of pre-requisites for the `cmci_*` modules.
 
 ## Requirements
    - Python 2.7+
@@ -13,19 +15,23 @@ additionally shows how to automate installation of pre-requisites for the `cmci_
    
 ## Getting Started
 
-will need to have set up the CMCI REST API in your CICS environment. You can enable the CMCI REST API in either
-CICSplex SM environments, or in independent CICS regions.
-The `cmci_*` modules use the *CMCI REST API* to interact with your CICS environment. To use the `cmci_*` modules you
+You will need to have set up the CMCI REST API in your CICS environment. You
+can enable the CMCI REST API in either CICSPlex SM environments, or in
+independent CICS regions. The `cmci_*` modules use the *CMCI REST API* to
+interact with your CICS environment. To use the `cmci_*` modules you
+will need to have set up the CMCI REST API in your CICS environment. You can
+enable the CMCI REST API in either CICSplex SM environments, or in independent
+CICS regions.
 
-[the documentation](https://ibm.github.io/z_ansible_collections_doc/installation/installation.html).
 For detailed installation instructions please consult
+[the documentation](https://ibm.github.io/z_ansible_collections_doc/installation/installation.html).
 
-```
-ansible-galaxy collection install ibm.ibm_zos_cics
+You can install the IBM z/OS CICS collection from Ansible Galaxy by using the
+`ansible-galaxy` CLI, which is supplied with your Ansible installation:
+
 ```bash
-
-with your Ansible installation:
-You can install the IBM z/OS CICS collection from Ansible Galaxy by using the `ansible-galaxy` CLI, which is supplied
+ansible-galaxy collection install ibm.ibm_zos_cics
+```
 
 For more information about the CMCI REST API, see the
 [CMCI overview in the CICS TS documentation](https://www.ibm.com/support/knowledgecenter/SSGMCP_5.6.0/fundamentals/cpsm/cpsm-cmci-overview.html).
@@ -42,11 +48,11 @@ node.  The playbook demonstrates how you can ensure the pre-requisites are insta
 the `cmci_get` module is executed.  More information about the `cmci_*` module pre-requisites can be found in the
 [documentation](todo)
 
-## Run [report.yaml](report.yaml)
+## Run [report.yml](report.yml)
 
 You can run the playbook without modification:
 ```bash
-ansible-playbook report.yaml
+ansible-playbook report.yml
 ````
 
 The playbook will prompt for required parameters. After parameters have been supplied, the playbook will install the
@@ -60,7 +66,7 @@ report.
 - To avoid being prompted for parameters, you can try supplying the input parameters on the command line directly:
 
   ```bash
-  ansible-playbook -e "context=MYCTXT cmci_host=example.com" report.yaml
+  ansible-playbook -e "context=MYCTXT cmci_host=example.com" report.yml
   ```
   
   Parameters specified in this way won't be prompted for.  Have a look at the `vars_prompt` section of the playbook to
@@ -71,7 +77,7 @@ report.
   command line argument. For information about how to set variables, see
   [the Ansible documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html).
 
-- Try editing `report.yaml` to change the attributes included in the report.
+- Try editing `report.yml` to change the attributes included in the report.
   
   You may want to uncomment the debug task to see the full response from CICSPlex SM, which includes all the attribute
   names applicable to the target resource. In this example, the returned attributes will correspond to what's listed in the [CICSRGN resource table](https://www.ibm.com/support/knowledgecenter/en/SSGMCP_5.6.0/reference-cpsm-restables/cpsm-restables/CICSRGNtab.html). 
