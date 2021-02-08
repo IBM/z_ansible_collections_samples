@@ -2,25 +2,28 @@
 
 This sample playbook demonstrates how to use the `cmci_get` module from the
 `ibm_zos_cics` collection to retrieve operational data from running CICS
-regions. This example retrieves information corresponding to the `CICSRGN`
+regions.
+
+This example retrieves information corresponding to the `CICSRGN`
 resource table, but can be adapted to retrieve information about any of the
 resource tables supported by CICSPlex SM. The retrieved information is written
-to a csv file, which you can open as a spreadsheet. This sample additionally
-shows how to automate installation of pre-requisites for the `cmci_*` modules.
+to a CSV file, which you can open as a spreadsheet.
+
+This sample additionally shows how to automate installation of pre-requisites
+for the `cmci_*` modules.
 
 ## Requirements
    - Python 2.7+
    - Ansible 2.9+
-   - IBM z/OS CICS Ansible collection 1.0.0+
    
 ## Getting Started
 
 You will need to have set up the CMCI REST API in your CICS environment. You
 can enable the CMCI REST API in either CICSPlex SM environments, or in
-independent CICS regions. The `cmci_*` modules use the *CMCI REST API* to
+stand-alone CICS regions. The `cmci_*` modules use the *CMCI REST API* to
 interact with your CICS environment. To use the `cmci_*` modules you
 will need to have set up the CMCI REST API in your CICS environment. You can
-enable the CMCI REST API in either CICSplex SM environments, or in independent
+enable the CMCI REST API in either CICSplex SM environments, or in stand-alone
 CICS regions.
 
 For detailed installation instructions please consult
@@ -46,7 +49,7 @@ The `cmci_*` modules have pre-requisites that need to be installed into the Pyth
 executes.  In this case, the `cmci_get` module will be executed on `localhost`, i.e. the Ansible control
 node.  The playbook demonstrates how you can ensure the pre-requisites are installed (wherever the module runs) before
 the `cmci_get` module is executed.  More information about the `cmci_*` module pre-requisites can be found in the
-[documentation](todo)
+[documentation](todo).
 
 ## Run [report.yml](report.yml)
 
@@ -55,11 +58,11 @@ You can run the playbook without modification:
 ansible-playbook report.yml
 ````
 
-The playbook will prompt for required parameters. After parameters have been supplied, the playbook will install the
-CMCI module dependencies to the python environment. A CMCI GET request will be made to regions in the supplied CICSPlex SM
-context, and a file `report.csv` will be written to the current directory with a report on a subset of attributes for
-each region. You should be able to open this file in a text editor, or as a spreadsheet to look at the results of the
-report.
+The playbook will prompt for required parameters. After parameters have been supplied, the playbook installs the
+CMCI module dependencies to the python environment. The playbook makes a CMCI GET request to regions in the supplied
+CICSPlex SM context, and writes the file `report.csv` to the current directory with a report on a subset of
+attributes for each region. You can open this file in a text editor, or as a spreadsheet to look at
+the results of the report.
 
 ## What next?
 
