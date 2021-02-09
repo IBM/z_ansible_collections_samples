@@ -1,15 +1,18 @@
 # Using the CICS and z/OS collections to deploy a program to a CICS region
 
 This sample playbook demonstrates how to use the `zos_copy` module from the `ibm_zos_core` collection in
-conjunction with the `cmci_action` module from the `ibm_zos_cics` collection.  This sample shows how to use
-these modules to deploy a load module from a build output dataset, to a CICS load library, and `NEWCOPY` the
-`PROGRAM` in CICS.  This sample additionally shows how to automate installation of pre-requisites for the `cmci_*`
-modules.
+conjunction with the `cmci_action` module from the `ibm_zos_cics` collection.
 
-## Ansible Collection Requirement
+This sample shows how to use these modules to deploy a load module from a build output dataset to a CICS
+load library, and `NEWCOPY` the `PROGRAM` in CICS.
 
-IBM z/OS Core 1.2.0 or later
-IBM z/OS CICS 1.0.0 or later
+This sample additionally shows how to automate installation of pre-requisites for the `cmci_*` modules.
+
+## Requirements
+   - Python 2.7+
+   - Ansible 2.9+
+   - IBM z/OS CICS Ansible collection 1.0.0+
+   - IBM z/OS Core Ansible collection 1.2.0+
 
 ## Getting Started
 If you are unfamiliar with playbooks, you can review our
@@ -80,10 +83,10 @@ cmci_user:
 cmci_password:
 ```
 
-### Run desired playbook
+### Run [deploy_program.yml](deploy_program.yml)
 
 ```bash
-ansible-playbook -i inventory.yml deploy.yml
+ansible-playbook -i inventory.yml deploy_program.yml
 ```
 
 # Copyright
