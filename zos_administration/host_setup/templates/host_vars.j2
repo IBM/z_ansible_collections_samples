@@ -15,7 +15,13 @@ ZOAU: "{{ zoau_root }}"
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
+{% endraw %}
+{% if not is_110 %}
+{% raw %}
   PYTHONPATH: "{{ ZOAU }}/lib"
+{% endraw %}
+{% endif %}
+{% raw %}
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/usr/sbin:/var/bin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"

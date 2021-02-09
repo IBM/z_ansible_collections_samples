@@ -36,6 +36,9 @@
       register: tempfile_1
       delegate_to: localhost
 
+    - debug:
+        var: item
+
     - name: Write to temporary file
       template:
         src: "{{ playbook_dir }}/templates/test-vars.j2"
@@ -44,6 +47,7 @@
         python_root: "{{ chosen_python.get('root') }}"
         python_interpreter: "{{ chosen_python.get('interpreter') }}"
         zoau_root: "{{ item.get('root') }}"
+        is_110: "{{ True if '1.1.0' in item.get('build') else False }}"
       delegate_to: localhost
 
     - name: Load variables from temp file

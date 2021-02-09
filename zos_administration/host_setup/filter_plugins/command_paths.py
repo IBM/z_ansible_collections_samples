@@ -120,14 +120,22 @@ def filter_zoau_installs(zoau_installs, build_info, minimum_zoau_version):
     """
     for index, zoau_install in enumerate(zoau_installs):
         zoau_install["build"] = build_info[index]
-    zoau_installs.sort(key=lambda x: x.get("build"), reverse=True)
+    for zoau_install in zoau_installs:
+        zoau_install["build"] = _get_version_from_build_string(zoau_install.get("build", ""))
+    zoau_installs.sort(key=lambda x: _version_to_tuple(x.get("build")), reverse=True)
     min_version = _version_to_tuple(minimum_zoau_version)
     valid_installs = []
     for zoau_install in zoau_installs:
         if min_version <= _version_to_tuple(
-            _get_version_from_build_string(zoau_install.get("build", ""))
+            zoau_install.get("build")
         ):
             valid_installs.append(zoau_install)
+            # account for the fact 1.1.0 may or may not require pip install depending on PTF
+            if "1.1.0" in zoau_install.get("build", ""):
+                backup_install = zoau_install.copy()
+                # set build to none so we do not treat it like a pip 1.1.0 install when testing
+                backup_install["build"] = ""
+                valid_installs.append(backup_install)
     return valid_installs
 
 
