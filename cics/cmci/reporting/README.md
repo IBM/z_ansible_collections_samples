@@ -21,10 +21,7 @@ for the `cmci_*` modules.
 You will need to have set up the CMCI REST API in your CICS environment. You
 can enable the CMCI REST API in either CICSPlex SM environments, or in
 stand-alone CICS regions. The `cmci_*` modules use the *CMCI REST API* to
-interact with your CICS environment. To use the `cmci_*` modules you
-will need to have set up the CMCI REST API in your CICS environment. You can
-enable the CMCI REST API in either CICSplex SM environments, or in stand-alone
-CICS regions.
+interact with your CICS environment.
 
 For detailed installation instructions please consult
 [the documentation](https://ibm.github.io/z_ansible_collections_doc/installation/installation.html).
