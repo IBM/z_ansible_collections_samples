@@ -56,7 +56,7 @@ module will be executed on `localhost`, i.e. the Ansible control node.
 The playbook demonstrates how you can ensure the pre-requisites are installed
 (wherever the module runs) before the `cmci_get` module is executed.  More
 information about the `cmci_*` module pre-requisites can be found in the
-[documentation](todo).
+[documentation](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_cics/docs/source/requirements_managed.html).
 
 ## Run [override_failure.yml](override_failure.yml)
 
