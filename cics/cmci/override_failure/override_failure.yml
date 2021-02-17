@@ -1,0 +1,95 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+###############################################################################
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-01-31
+#  - Released initial version
+###############################################################################
+# This sample playbook demonstrates how to override the default failure
+# behaviour of the cmci modules
+#
+# Usage:
+#  ansible-playbook override_failure.yml
+#
+# Notes:
+#  This sample playbook demonstrates how to override the default failure
+#  criteria of the CMCI modules.  In this sample, the `cmci_get` module from
+#  the `ibm_zos_cics` collection is used to retrieve a `PROGRAM` from a
+#  specified CICS region.  In the event that the module fails because the
+#  program doesn't exist, this failure is ignored, and any subsequent tasks
+#  are allowed to proceed. Failures resulting from other conditions will still
+#  cause the playbook to fail.  Try running this sample with the name of a
+#  `PROGRAM` that does exist, and one that doesn't, to see how the
+#  `failed_when` criteria prevents module failure.
+#
+#  This sample additionally shows how to automate installation of
+#  pre-requisites for the `cmci_*` modules.
+#
+# Requirements:
+#   IBM z/OS CICS collection 1.0.0 or later
+###############################################################################
+---
+- name:  CICS CMCI Report
+
+  collections:
+      - ibm.ibm_zos_cics
+
+  hosts: 'localhost'
+  gather_facts: 'false'
+
+  vars_prompt:
+    - name: cmci_host
+      prompt: Target CMCI hostname
+      private: no
+    - name: cmci_port
+      prompt: Target CMCI port
+      private: no
+    - name: scheme
+      prompt: CMCI scheme
+      private: no
+      default: 'https'
+    - name: context
+      prompt: Target CICSPlex SM context
+      private: no
+    - name: scope
+      prompt: Target CICSPlex SM scope
+      private: no
+    - name: program
+      prompt: Target PROGRAM name
+      private: no
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
+
+  tasks:
+    - name: Make sure CMCI module dependencies are installed
+      pip:
+        name:
+          - requests
+          - xmltodict
+
+    - name: Get a PROGRAM, and ignore a failures caused by it not existing
+      ibm.ibm_zos_cics.cmci_get:
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSProgram'
+        resources:
+          filter:
+            program: '{{ program }}'
+      register: result
+      failed_when: >
+        'cpsm_response' not in result or result.cpsm_response not in ['OK', 'NODATA']
+
+    - name: Show CMCI respose
+      debug:
+        msg: '{{ result }}'
