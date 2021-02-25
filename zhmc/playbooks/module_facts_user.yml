@@ -1,0 +1,25 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    user_name: "{{ hmc_auth.userid }}"  # Adjust to any other user
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Get facts for HMC user {{ user_name }}"
+      zhmc_user:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        name: "{{ user_name }}"
+        state: facts
+        expand: true
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result

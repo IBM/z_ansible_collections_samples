@@ -1,0 +1,13 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+- name: Git pull a repository
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ checkout_dir }}"
+    version: "{{ git_branch }}"
+  register: result
+

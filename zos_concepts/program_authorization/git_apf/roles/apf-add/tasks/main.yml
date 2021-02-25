@@ -1,0 +1,11 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+- name: Add to APF list
+  ibm.ibm_zos_core.zos_apf:
+    batch: "{{ add_list }}"
+    force_dynamic: True
+    persistent: "{{ persistent_ds }}"

@@ -1,0 +1,13 @@
+---
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+################################################################################
+# This configuration file can be used to define default values for variables
+# used in the role. Defining variables in main.yml cetralizes management of
+# defaul role variables and values which can vary for each user.
+# For more on defining role variables see:
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-in-included-files-and-roles
+################################################################################

@@ -1,0 +1,17 @@
+---
+# defaults file for git_clone_private_repo
+
+# Github secret key that can be found on localhost to access github repository
+secret_key: ~/path/to/secret/key
+
+# This should always be overridden by higher prescedence variable
+TARGET_USERNAME: user001
+
+# Git repository to be cloned. Must be SSH (not Https)
+GIT_REPO: git@github.com:MyCompany/my-zcee-app.git
+
+# Specify the branch in your repository
+GIT_BRANCH: api-deploy-branch
+
+# Directory where the repository will be cloned
+CLONE_DEST: "~/dest/to/my-zcee-app"

@@ -1,0 +1,59 @@
+---
+# vars for api_deploy
+
+# ************************************
+#   Variables for generating archives
+# ************************************
+
+# Home Location of z/OS Connect EE vcenter_folder
+ZOS_CONNECT_HOME: /usr/lpp/zosconnect/v3r0
+
+# Location of zCEE Build toolkit
+ZCEE_BUILD_TOOLKIT_PATH: '{{ uss_utilities_path }}'
+
+# Name of your project. Will be used for other variable names and generating archives.
+PROJECT_NAME: my-zcee-app
+
+# Full path to the root project directory
+BASE_PROJECT_DIR: '/u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}'
+
+# Full path to archive directory used to store generated archive files.
+ARCHIVE_PATH: '{{ uss_file_path }}/archives'
+
+# Path to root service directory that will be used to scan for service properties files.
+SERVICE_ROOT_DIR: '{{ BASE_PROJECT_DIR }}/zCEE/'
+
+# Project directory specified to create API Archive file.
+API_PROJ_DIR: '{{ BASE_PROJECT_DIR }}/zCEE/MyAPI'
+
+# API Archive file name.
+API_ARCHIVE_FILE: '{{ ARCHIVE_PATH }}/myapi.aar'
+
+# Provided sample properties file used to generate API Requester Archive file (does not need to be changed to test generating ARA).
+ARA_PROP_FILE: '{{ BASE_PROJECT_DIR }}/zcon-sample-apirequester/source/config/claims.properties'
+
+# API Requester Archive file name (does not need to be changed to test generating ARA).
+ARA_ARCHIVE_FILE: '{{ ARCHIVE_PATH }}/claims.ara'
+
+
+# ************************************
+#   Variables for zCEE deployment
+# ************************************
+
+# Server name used to access the z/OS Connect EE REST API
+ZCEE_SERVER: http://myzceeserver.com
+
+# Port specified to access the z/OS Connect EE REST API
+ZCEE_PORT: zcee_port
+
+# Username used to access the z/OS Connect EE REST API
+USERNAME: Fred
+
+# Password used to access the z/OS Connect EE REST API
+PASSWORD: fredpwd
+
+# Location to deploy SAR files created from your project.
+SERVICE_DEPLOY_PATH: '/var/zosconnect/ZC01/servers/ZC01/resources/zosconnect/services'
+
+# Location to deploy AAR files created from your project.
+API_DEPLOY_PATH: '/var/zosconnect/ZC01/servers/ZC01/resources/zosconnect/apis'

@@ -1,0 +1,26 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  vars_files:
+    - vault.yml
+  vars:
+    adapter_name: sample-hs-1  # Adjust to an existing adapter in your CPC
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure adapter {{ adapter_name }} has the desired description"
+      zhmc_adapter:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ adapter_name }}"
+        state: set
+        properties:
+          description: "Changed description of adapter {{ adapter_name }}"
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result

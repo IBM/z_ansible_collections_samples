@@ -5,17 +5,22 @@ Although each sample includes default configurations, it also provides
 a playbook [host-setup](https://github.com/ansible-collections/ibm_zos_core/blob/dev/playbooks/host-setup.yaml)
 that attempts to locate Ansible dependencies on a z/OS system and
 use them to generate a valid **inventory** and **host_vars** configuration.
-While the playbook executes, it will print out all the dependencies it finds
+While the playbook executes, it prints out all the dependencies it finds, 
 should you be interested in overriding the generated configurations with other
 dependencies.
+
+.. note::
+
+Ensure that you configure your playbook with the necessary `environment: "{{ environment_vars }}"` to
+allow the variables to be available to the playbooks runtime. A complete example configuration is presented in the
+[Variables section](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md#variables).
 
 ## Ansible Config
 
 The Ansible configuration file **ansible.cfg** can override almost all
-`ansible-playbook` configurations. Included is a sample **ansible.cfg**
-that can supplement `ansible-playbook` with a little modification.
-
-The only required configuration is in **ansible.cfg** `pipelining = True`.
+`ansible-playbook` configurations. The configuration file includes a sample **ansible.cfg**
+that can supplement `ansible-playbook` with a little modification. The only required
+configuration is present in **ansible.cfg** `pipelining = True`.
 Setting the `pipelining = True` overrides the default behavior which is to
 transfer Ansible modules to the target in binary via SFTP.
 
@@ -50,9 +55,9 @@ using a list or group of lists known as an
 [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html).
 Once the inventory is defined, you can use
 [patterns](https://docs.ansible.com/ansible/latest/user_guide/intro_patterns.html#intro-patterns)
-to select the hosts or groups that you want Ansible to run against.
+to select the hosts or groups that you want Ansible to run on.
 
-Included in the sample is **inventory** that can be used to manage your nodes
+The sample includes **inventory** that can be used to manage your nodes
 with a little modification. This inventory file should be included when running
 the sample playbook.
 
@@ -83,11 +88,12 @@ to set the port for a host can be viewed in the behavioral inventory parameters
 
 ## Variables
 
-Although you can store variables in the **inventory** file, storing then in
-separate configurations such as **host_vars** or **group_vars** files may help
-you organize your variable values. Included with the sample is a **host_vars**
-file that with little effort can be easily customized; below the variables
-are explained.
+Although you can store variables in the **inventory** file, storing them in
+separate configurations such as **host_vars** or **group_vars** files help
+you organize your variable values. 
+
+The sample includes a **host_vars** file that can be easily customized;
+the relevant variables are explained below:
 
 The value for the property **\_BPXK_AUTOCVT** must be configured to
 `ON`, for example; `_BPXK_AUTOCVT: "ON"`.
@@ -131,7 +137,7 @@ misconfiguration when copying dependency paths. In this example, the top
 level dependency variables `PYZ` for Python and `ZOAU` have been added
 and used through the configuration.
 
-Below depicts a complete configuration:
+A complete configuration is depicted below:
 
 ``` {.yaml}
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
@@ -154,7 +160,7 @@ environment_vars:
 
 Currently, IBM Open Enterprise Python for z/OS is the supported and
 recommended Python distribution for use on z/OS with Ansible and ZOAU.
-If Rocket Python is the only available python on the target, please
+If Rocket Python is the only available Python library on the target, please
 review the suggested environment variables below for use with Rocket
 Python.
 
@@ -180,8 +186,8 @@ Access the sample Ansible playbook and ensure that you are within the
 playbook directory where the sample files are included
 
 It is a good practice to review the playbook samples before executing
-them. It will help you understand what requirements in terms of space,
-location, names, authority, and artifacts will be created and cleaned
+them. It will help you understand the requirements in terms of space,
+location, names, authority, and the artifacts will be created and cleaned
 up. Although samples are always written to operate without the need for
 the user's configuration, flexibility is written into the samples
 because it is not easy to determine if a sample has access to the

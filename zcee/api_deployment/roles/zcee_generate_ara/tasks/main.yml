@@ -1,0 +1,8 @@
+---
+# tasks file for zcee_generate_ara
+- name: Generate artifacts for API requester
+  shell: |
+    PATH=$PATH:$JAVA_HOME/bin
+    {{ ZCEE_BUILD_TOOLKIT_PATH }}/bin/zconbt.zos --properties={{ properties_file }} --file={{ archive_file_name }}
+  args:
+    chdir: "{{ BASE_PROJECT_DIR }}"

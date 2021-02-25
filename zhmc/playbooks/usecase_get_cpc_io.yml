@@ -1,0 +1,60 @@
+---
+# Sample playbook: Get I/O configuration for a single CPC
+
+- hosts: localhost
+  vars_files:
+    - vault.yml
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Get facts for CPC {{ cpc_name }}"
+      zhmc_cpc:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        name: "{{ cpc_name }}"
+        state: facts
+      register: cpc_out
+
+    #- debug:
+    #    var: cpc_out
+
+    - name: "Get facts for all adapters of CPC {{ cpc_name }}"
+      zhmc_adapter:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ ad.name }}"
+        state: facts
+      with_items: "{{ cpc_out.cpc.adapters|sort(attribute='name') }}"
+      loop_control:
+        loop_var: ad
+        label: "{{ ad.name }}"
+      register: adapters_out
+
+    #- debug:
+    #    var: adapters_out
+
+    - name: "Get facts for all partitions of CPC {{ cpc_name }}"
+      zhmc_partition:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ part.name }}"
+        state: facts
+        expand_storage_groups: true
+        expand_crypto_adapters: true
+      with_items: "{{ cpc_out.cpc.partitions|sort(attribute='name') }}"
+      loop_control:
+        loop_var: part
+        label: "{{ part.name }}"
+      register: partitions_out
+
+    #- debug:
+    #    var: partitions_out
+
+    - name: "Using Jinja2 template to create output file: playbooks/cpc_io_{{ cpc_name }}.md"
+      template:
+        src: usecase_get_cpc_io.md.j2
+        dest: "cpc_io_{{ cpc_name }}.md"
+        mode: '0755'

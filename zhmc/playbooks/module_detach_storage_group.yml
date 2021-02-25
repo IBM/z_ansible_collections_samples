@@ -1,0 +1,27 @@
+---
+# Sample module-level playbook of the IBM Z HMC Collection
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vault.yml
+  vars:
+    partition_name: sample-part-1
+    stogroup_name: sample-sg-1
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure storage group {{ stogroup_name }} is detached from partition {{ partition_name }}"
+      zhmc_storage_group_attachment:
+        hmc_host: "{{ hmc_host }}"
+        hmc_auth: "{{ hmc_auth }}"
+        cpc_name: "{{ cpc_name }}"
+        storage_group_name: "{{ stogroup_name }}"
+        partition_name: "{{ partition_name }}"
+        state: detached
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result

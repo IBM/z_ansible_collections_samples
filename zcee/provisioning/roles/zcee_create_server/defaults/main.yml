@@ -1,0 +1,22 @@
+---
+# defaults file for zcee_create_server
+
+################################################################################
+# Specifies the path to the z/OS Connect EE installation directory on zFS.
+################################################################################
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 #TryS
+
+################################################################################
+# Specifies the path to the zCEE mount point. 
+################################################################################ample/
+zcon_zfs_mountpoint: '/var/zosconnect'
+
+################################################################################
+# Specifies the unique name for the instance of zCEE.
+################################################################################
+softwareServiceInstanceName: ZC01
+
+################################################################################
+# Specifies the path to the base zCEE configuration directory. 
+################################################################################
+zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

@@ -1,0 +1,49 @@
+---
+# tasks file for default template that provides a starting point for z/OS Connect EE servers.
+- name: Create server - default
+  command: '{{zcon_install_dir}}/bin/zosconnect create {{softwareServiceInstanceName}} --template=zosconnect:default'
+
+- name: Create dirs
+  file:
+    path: mkdir {{ zcee_config_path }}/resources
+    state: directory 
+
+- name: Create folder structure - /resources/zosconnect
+  file:
+    path: mkdir {{ zcee_config_path }}/resources/zosconnect
+    state: directory
+
+- name: Create folder structure - /resources/zosconnect/apis
+  file:
+    path: mkdir {{ zcee_config_path }}/resources/zosconnect/apis
+    state: directory
+    mode: '700'  
+
+- name: Create folder structure - /resources/zosconnect/services
+  file:
+    path: mkdir {{ zcee_config_path }}/resources/zosconnect/services
+    state: directory
+    mode: '700'
+
+- name: Create folder structure - /.tmp_server/server_di
+  file:
+    path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/.tmp_server/server_dir'
+    state: directory
+    mode: '700'
+
+- name: Create dirs 
+  file:
+    path: '{{ zcee_config_path }}/resources/imsmobile-config/connections'
+    state: directory
+    mode: '700'
+- name: Create folder structure - /resources/imsmobile-config/interactions
+  file:
+    path: '{{ zcee_config_path }}/resources/imsmobile-config/interactions'
+    state: directory
+    mode: '700'
+- name: Create folder structure - /resources/imsmobile-config/services
+  file:
+    path: '{{ zcee_config_path }}/resources/imsmobile-config/services'
+    state: directory
+    mode: '700'
+

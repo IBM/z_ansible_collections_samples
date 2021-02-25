@@ -1,0 +1,60 @@
+{#
+ # This Jinja2 template file generates a markdown file with the I/O config of a CPC.
+ #
+ # Input variables:
+ #   cpc_out: Object that is the output of the zhmc_cpc module with state=facts
+ #   adapters_out: List of objects that are the output of the
+ #     zhmc_adapter module with state=facts
+ #   partitions_out: List of objects that are the output of the
+ #     zhmc_partition module with state=facts
+ #}
+{% set cpc_obj = cpc_out.cpc %}
+{% set cpc_name = cpc_obj.name %}
+# I/O configuration of CPC {{ cpc_name }}
+
+## Basic CPC information
+
+| Name | Description          | Model    | Mode | IFLs | Mem [GiB] |
+|:---- |:-------------------- |:-------- |:---- |:---- |:--------- |
+{{ '| %-4s | %-20s | %-4s-%-3s | %-4s | %-4s | %-9s |'
+   | format(cpc_name, cpc_obj.description, cpc_obj['machine-type'], cpc_obj['machine-model'], cpc_obj['iml-mode'], cpc_obj['processor-count-ifl'], (cpc_obj['storage-customer']/1024)|int) }}
+
+## Adapters of the CPC
+
+| PCHID | Name                 | Description          | Card Type                  |
+|:----- |:-------------------- |:-------------------- |:-------------------------- |
+{% for ad_item in adapters_out.results|sort(attribute='adapter.adapter-id') %}
+{% set ad_obj = ad_item.adapter %}
+{{ '| %-5s | %-20s | %-20s | %-26s |'
+   | format(ad_obj['adapter-id'], ad_obj.name, ad_obj.description, ad_obj['detected-card-type']) }}
+{% endfor %}
+
+## Partitions of the CPC
+
+| Name                 | Description          | Network Adapters               | Storage Adapters               | Crypto Adapters                |
+|:-------------------- |:-------------------- |:------------------------------ |:------------------------------ |:------------------------------ |
+{% for part_item in partitions_out.results|sort(attribute='partition.name') %}
+{% set part_obj = part_item.partition %}
+{% set net_ad_list = [] %}
+{% for nic_obj in part_obj.nics %}
+{% set dummy = net_ad_list.append(nic_obj['adapter-id']) %}
+{% endfor %}
+{% set net_ad_list = net_ad_list|sort|unique %}
+{% set sto_ad_list = [] %}
+{% for sg_obj in part_obj['storage-groups'] %}
+{% for cap_item in sg_obj['candidate-adapter-ports'] %}
+{% set ad_obj = cap_item['parent-adapter'] %}
+{% set dummy = sto_ad_list.append(ad_obj['adapter-id']) %}
+{% endfor %}
+{% endfor %}
+{% set sto_ad_list = sto_ad_list|sort|unique %}
+{% set cryp_ad_list = [] %}
+{% if part_obj['crypto-configuration'] %}
+{% for cryp_ad_item in part_obj['crypto-configuration']['crypto-adapters'] %}
+{% set dummy = cryp_ad_list.append(cryp_ad_item['adapter-id']) %}
+{% endfor %}
+{% set cryp_ad_list = cryp_ad_list|sort|unique %}
+{% endif %}
+{{ '| %-20s | %-20s | %-30s | %-30s | %-30s |'
+   | format(part_obj.name, part_obj.description, net_ad_list|join(', '), sto_ad_list|join(', '), cryp_ad_list|join(', ')) }}
+{% endfor %}

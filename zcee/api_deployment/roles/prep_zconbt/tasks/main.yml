@@ -1,0 +1,52 @@
+---
+# tasks file for prep_zconbt
+
+- name: Prep zconbt
+  block:
+
+    # * Need this because Ansible lazily interprets role_path
+    # * Results in wrong paths being sent when passing vars that use role_path var
+    - set_fact:
+        eager_role_path: '{{role_path}}'
+
+    # Install z/OS Connect Build Toolkit if not already installed on Target Host
+    - include_role:
+        name: install_zconbt
+      vars:
+        install_path: '{{ ZCEE_BUILD_TOOLKIT_PATH }}'
+        utility_path: '{{ uss_utilities_path }}'
+
+    # Set up environment for the "zcee_generate_*" roles
+    # This process includes creating directories for
+    # the archive files and properly encoding project's files.
+    - name: Copy and extract bank sample files
+      block:
+
+        # Create proper directories in preparation for zcee_generate_* roles
+        - file:
+            path: '{{ ARCHIVE_PATH }}'
+            state: absent
+
+        - file:
+            path: '{{ ARCHIVE_PATH }}'
+            state: directory
+
+        - copy:
+            src: '{{ eager_role_path }}/files/ara_demo.tar'
+            dest: '{{ BASE_PROJECT_DIR }}/ara_demo.tar'
+
+        # Migrate and untar demo project directory to target host
+        - shell: tar -Co . -xf ara_demo.tar ; rm ara_demo.tar
+          args:
+            chdir: '{{ BASE_PROJECT_DIR }}'
+
+        # Encode project directory in prepartion for zcee_generate_* roles
+        - name: Encode all template files
+          shell: "for filename in $(find . -type f); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done"
+          args:
+            chdir: '{{ BASE_PROJECT_DIR }}'
+
+        - name: Change encoding from IBM-1047 to UTF-8
+          shell: "for filename in $(find . -type f); do; iconv -f IBM-1047 -t ISO8859-1 ${filename} > ${filename}1; chtag -tc ISO8859-1 ${filename}1; mv ${filename}1 ${filename}; done"
+          args:
+            chdir: "{{ BASE_PROJECT_DIR }}"

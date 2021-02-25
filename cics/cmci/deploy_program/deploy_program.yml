@@ -1,0 +1,49 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name:  CICS Program Deploy
+
+  collections:
+    - ibm.ibm_zos_cics
+    - ibm.ibm_zos_core
+
+  hosts: 'all'
+  gather_facts: 'false'
+
+  tasks:
+    ############################################################################
+    # Copy load module to load library
+    ############################################################################
+    - name: Copy PDS member from build to load library
+      environment: "{{ environment_vars }}"
+      zos_copy:
+        src: "{{ build_ds }}({{ program }})"
+        dest: "{{ load_lib }}({{ program }})"
+        remote_src: true
+
+    ############################################################################
+    # Install cmci_action module dependencies
+    ############################################################################
+    - name: Make sure CMCI module dependencies are installed
+      delegate_to: localhost
+      pip:
+        name:
+          - requests
+          - xmltodict
+
+    ############################################################################
+    # Install module dependencies
+    ############################################################################
+    - name: NEWCOPY PROGRAM in CICS
+      delegate_to: localhost
+      cmci_action:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        scheme: '{{ scheme }}'
+        action_name: NEWCOPY
+        type: CICSProgram
+        resources:
+          filter:
+            program: '{{ program }}'

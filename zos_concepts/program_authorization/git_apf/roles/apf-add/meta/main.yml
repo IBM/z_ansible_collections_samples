@@ -1,0 +1,17 @@
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+galaxy_info:
+  author: "Behnam (@balkajbaf)"
+  description: "Add libraries to APF dynamic list and make parmlib APF statement entries via Ansible zos_apf"
+  company: IBM
+  license: "Apache License, Version 2.0"
+  min_ansible_version: 2.9
+  galaxy_tags:
+    - z
+    - zos
+    - z_os
+    - ibm_zos_core
+    - zos_apf

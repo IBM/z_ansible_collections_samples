@@ -170,6 +170,7 @@
         python_root: "{{ chosen_python.get('root') }}"
         python_interpreter: "{{ chosen_python.get('interpreter') }}"
         zoau_root: "{{ chosen_zoau.get('root') }}"
+        is_110: "{{ True if '1.1.0' in chosen_zoau.get('build') else False }}"
       delegate_to: localhost
 
     - set_fact:
@@ -192,5 +193,5 @@
         var: potential_paths
 
     - debug:
-        msg: "Inventory file placed at '{{ playbook_dir }}/{{ inventory_hostname_short }}', 
+        msg: "Inventory file placed at '{{ playbook_dir }}/{{ inventory_hostname_short }}',
         host_vars file placed at '{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml'"

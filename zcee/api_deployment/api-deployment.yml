@@ -1,0 +1,75 @@
+- name: API Deployment
+  hosts: source_system
+  gather_facts: false
+  vars_files:
+    - "{{ vars_folder_name }}/api_deploy.yml"
+  environment: '{{ system_environment }}'
+
+  tasks:
+    - name: API deployment roles
+      block:
+
+        # Copies source code from remote repository onto target host.
+        - include_role:
+            name: git_clone_private_repo
+
+        # Prepares target host environment to preform the following zcee_generate_* roles.
+        - include_role:
+            name: prep_zconbt
+
+        # Loops through project directory to locate all properties files in order to generate multiple service archives.
+        - name: Get list of service project directory
+          find:
+            paths: ["{{ SERVICE_ROOT_DIR }}"]
+            patterns: '*.properties'
+            recurse: yes
+          register: service_file_list
+
+        # Uses the service archive list in the previous step to generate multiple service archives.
+        - include_role:
+            name: zcee_generate_sar
+          vars:
+            project_directory: "{{ item.path | dirname }}"
+            archive_file_name: "{{ ARCHIVE_PATH }}/{{ item.path | dirname | basename }}.sar"
+          with_items:
+            - "{{ service_file_list.files }}"
+
+        # Generate the API archive file
+        - include_role:
+            name: zcee_generate_aar
+          vars:
+            project_directory: "{{ API_PROJ_DIR }}"
+            archive_file_name: "{{ API_ARCHIVE_FILE }}"
+
+        # Generate the API Requester Archive
+        - include_role:
+            name: zcee_generate_ara
+          vars:
+            properties_file: "{{ ARA_PROP_FILE }}"
+            archive_file_name: "{{ ARA_ARCHIVE_FILE }}"
+
+        # Begin the process of deploying the archives by placing them into the drop-in folder.
+        - name: Copy over archive files to proper folders
+          shell: |
+            cp {{ ARCHIVE_PATH }}/*.sar {{ SERVICE_DEPLOY_PATH }}
+            cp {{ ARCHIVE_PATH }}/*.aar {{ API_DEPLOY_PATH }}
+            chmod 777 {{ SERVICE_DEPLOY_PATH }}/*
+            chmod 777 {{ API_DEPLOY_PATH }}/*
+
+        # Make an HTTP request to the z/OS Connect EE Server instance to retrieve all available APIs.
+        - name: Get available APIs
+          uri:
+            url: "{{ ZCEE_SERVER }}:{{ ZCEE_PORT }}/zosConnect/apis/"
+            validate_certs: no
+            user: "{{ USERNAME }}"
+            password: "{{ PASSWORD }}"
+            force_basic_auth: true
+            method: GET
+            status_code: 200
+          register: api_response
+
+        # Verify the API was successfully deployed.
+        - name: Verify response
+          fail:
+            msg: The API did not successfully deploy
+          when: api_response.json.apis[0].name != 'myapiname'  # Replace 'myapiname' with the name of your API
