@@ -1,0 +1,37 @@
+###############################################################################
+# © Copyright IBM Corporation 2020
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2020-09-01
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.2.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # - name: Copy SSH Key
+    #   command: 'ssh-copy-id -i ~/.ssh/id_rsa.pub omvsadm@ec01129a.vmec.svl.ibm.com'
+
+    - name: Set up zoau100 file path
+      zos_job_submit:
+        src: IMSTESTL.ZOAU100.SMPE.JOBS(BGY4ZFS)
+        location: DATA_SET
+        wait: true
+    - name: Set up zoau100 install directory
+      zos_job_submit:
+        src: IMSTESTL.ZOAU100.SMPE.JOBS(BGY5MKD)
+        location: DATA_SET
+        wait: true
+
