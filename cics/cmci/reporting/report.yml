@@ -71,6 +71,7 @@
         name:
           - requests
           - xmltodict
+          - typing;python_version<"3.5"
 
     ############################################################################
     # Get information about CICS regions from the supplied context, using CMCI

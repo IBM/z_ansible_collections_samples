@@ -72,6 +72,7 @@
         name:
           - requests
           - xmltodict
+          - typing;python_version<"3.5"
 
     - name: Get a PROGRAM, and ignore a failures caused by it not existing
       ibm.ibm_zos_cics.cmci_get:
