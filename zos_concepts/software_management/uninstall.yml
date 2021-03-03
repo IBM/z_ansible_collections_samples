@@ -48,7 +48,7 @@
             - dd_input:
                 dd_name: "SMPCNTL"
                 content:
-                 - 'SET  BOUNDARY(TGT) .'
+                 - 'SET  BOUNDARY({{ target_zone }}) .'
                  - 'RESTORE S({{ ptfs[0] }})'
                  - 'CHECK'
                  - 'COMPRESS(ALL).'
@@ -71,7 +71,7 @@
             - dd_input:
                 dd_name: "SMPCNTL"
                 content:
-                 - 'SET  BOUNDARY(TGT) .'
+                 - 'SET  BOUNDARY({{ target_zone }}) .'
                  - 'RESTORE S({{ ptfs[0] }})'
                  - 'COMPRESS(ALL).'
         when: restore_check_result.ret_code.code <= 4
