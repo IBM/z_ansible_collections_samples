@@ -9,11 +9,12 @@ While the playbook executes, it prints out all the dependencies it finds,
 should you be interested in overriding the generated configurations with other
 dependencies.
 
-.. note::
+```
 
 Ensure that you configure your playbook with the necessary `environment: "{{ environment_vars }}"` to
 allow the variables to be available to the playbooks runtime. A complete example configuration is presented in the
 [Variables section](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md#variables).
+```
 
 ## Ansible Config
 
