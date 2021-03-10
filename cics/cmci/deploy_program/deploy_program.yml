@@ -30,6 +30,7 @@
         name:
           - requests
           - xmltodict
+          - typing;python_version<"3.5"
 
     ############################################################################
     # Install module dependencies
