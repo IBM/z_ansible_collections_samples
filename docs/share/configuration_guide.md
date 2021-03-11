@@ -185,7 +185,7 @@ environment_vars:
 
 Currently, only ``z/OS® shell`` is supported. Using ``ansible_shell_executable``
 to change the default shell is discouraged. For more information,
-see `Ansible documentation`_.
+see [Ansible documentation](https://docs.ansible.com/ansible/2.7/user_guide/intro_inventory.html).
 
 Shells such as ``bash`` are **not supported** because they handle the reading
 and writing of untagged files differently. ``bash`` added enhanced ASCII support
