@@ -181,6 +181,28 @@ environment_vars:
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
 ```
 
+### Variables for Bash shell
+
+Currently, only ``z/OS® shell`` is supported. Using ``ansible_shell_executable``
+to change the default shell is discouraged. For more information,
+see [Ansible documentation](https://docs.ansible.com/ansible/2.7/user_guide/intro_inventory.html).
+
+Shells such as ``bash`` are **not supported** because they handle the reading
+and writing of untagged files differently. ``bash`` added enhanced ASCII support
+in version 4.3 and thus differs from 4.2. If ``bash`` shell is the only shell
+available, you must control how the new and existing files are tagged and
+encoded. This can be controlled by setting both, "_ENCODE_FILE_NEW" and
+"_ENCODE_FILE_EXISTING".
+
+For example,
+``` {.sh}
+_ENCODE_FILE_NEW: "IBM-1047"
+_ENCODE_FILE_EXISTING: "IBM-1047"
+```
+
+Please review the README.ZOS guide included with the ported ``bash`` shell for
+further configurations.
+
 ## Run the playbook
 
 Access the sample Ansible playbook and ensure that you are within the
