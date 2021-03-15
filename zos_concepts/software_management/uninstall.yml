@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: ['UI70435']
+    ptfs: 'UI70435'
     global_csi: 'IMSTESTL.ZOAU100.CSI'
     storage_class: 'DB2SMS10'
     target_zone: 'TGT'
@@ -32,7 +32,7 @@
 
   tasks:
       # RESTORE CHECK a SYSMOD
-      - name: "RESTORE CHECK SYSMOD {{ ptfs[0]}} "
+      - name: "RESTORE CHECK SYSMOD {{ ptfs }} "
         zos_mvs_raw:
           pgm: GIMSMP
           auth: "yes"
@@ -49,13 +49,13 @@
                 dd_name: "SMPCNTL"
                 content:
                  - 'SET  BOUNDARY({{ target_zone }}) .'
-                 - 'RESTORE S({{ ptfs[0] }})'
+                 - 'RESTORE S({{ ptfs }})'
                  - 'CHECK'
                  - 'COMPRESS(ALL).'
         register: restore_check_result
 
       # RESTORE a SYSMOD
-      - name: "RESTORE SYSMOD {{ ptfs[0]}} "
+      - name: "RESTORE SYSMOD {{ ptfs}} "
         zos_mvs_raw:
           pgm: GIMSMP
           auth: "yes"
@@ -72,13 +72,13 @@
                 dd_name: "SMPCNTL"
                 content:
                  - 'SET  BOUNDARY({{ target_zone }}) .'
-                 - 'RESTORE S({{ ptfs[0] }})'
+                 - 'RESTORE S({{ ptfs }})'
                  - 'COMPRESS(ALL).'
         when: restore_check_result.ret_code.code <= 4
         register: restore_result
 
       # REJECT a SYSMOD
-      - name: "REJECT SYSMOD {{ ptfs[0] }}"
+      - name: "REJECT SYSMOD {{ ptfs }}"
         zos_mvs_raw:
           pgm: GIMSMP
           auth: "yes"
@@ -94,5 +94,5 @@
             - dd_input:
                 dd_name: "SMPCNTL"
                 content: " SET  BOUNDARY(GLOBAL) .
-                          \nREJECT S({{ ptfs[0] }}) ."
+                          \nREJECT S({{ ptfs }}) ."
         when: reject_sysmod and restore_result.ret_code.code <= 4

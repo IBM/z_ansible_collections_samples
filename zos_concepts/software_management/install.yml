@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: ["UI70435"]
+    ptfs: "UI70435"
     global_csi: "IMSTESTL.ZOAU100.CSI"
     smpe_hlq: "IMSTESTL.ZOAU100"
     storage_class: "DB2SMS10"
@@ -68,7 +68,7 @@
     #           content:
     #             - 'SET  BOUNDARY(GLOBAL) .'
     #             - 'RECEIVE SELECT('
-    #             - '    {{ ptfs[0] }}'
+    #             - '    {{ ptfs }}'
     #             - ') SYSMODS LIST .'
     #   when: package_location == ''
     #   register: receive_result
@@ -198,7 +198,7 @@
               dd_name: "SMPCNTL"
               content: " SET BOUNDARY({{target_zone}}) .
                 \nAPPLY SELECT(
-                \n{{ptfs[0]}}
+                \n{{ptfs}}
                 \n)
                 \nCHECK
                 \nBYPASS(HOLDSYS,HOLDERROR)
@@ -225,7 +225,7 @@
               dd_name: "SMPCNTL"
               content: " SET BOUNDARY({{target_zone}}) .
                 \nAPPLY SELECT(
-                \n{{ptfs[0]}}
+                \n{{ptfs}}
                 \n)
                 \nBYPASS(HOLDSYS,HOLDERROR)
                 \nCOMPRESS(ALL) ."
