@@ -56,8 +56,8 @@ Inside each role:
 
 
 ## Ansible Collection Requirements
-* IBM z/OS core collection 1.2.0 or later
-* IBM z/OS IMS collection 1.x.x
+* IBM z/OS core collection 1.2.1
+* IBM z/OS IMS collection 1.1.0
 
 ## Getting Started
 
@@ -86,7 +86,7 @@ For more information on python configuration requirements on z/OS, refer to [Ans
      * ansible_user: the username used to login with SSH.
      * ansible_python_interpreter: the path on the target to the python interpreter.
    * An example is below, where `zsystem` will be the name used to reference our target:
-  
+
     ```yaml
     zsystem:
     hosts:
