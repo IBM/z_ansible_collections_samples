@@ -1,0 +1,12 @@
+---
+# vars file for remove-zos-user
+smp_logs:
+  - smplog
+  - smploga
+smp_lts:
+  - smplts
+smp_pds:
+  - smpmts
+  - smppts
+  - smpscds
+  - smpsts

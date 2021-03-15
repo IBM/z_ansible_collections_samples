@@ -1,0 +1,80 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2021
+################################################################################
+
+################################################################################
+# - The value for the property BPXK_AUTOCVT must be configured to "ON";
+#   for example: _BPXK_AUTOCVT: "ON"
+# - The value for the property ZOAU_HOME is the ZOA Utilities install root path;
+#   for example: ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+# - The value for the property PYTHONPATH is the ZOA Utilities Python library path;
+#   for example: PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
+# - The value for the property LIBPATH is both the path to the Python libraries on
+#   the target and the ZOA Utilities Python library path separated by
+#   semi-colons; for example:
+#   LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."
+# - The value for the property PATH is the ZOA utilities BIN path and Python
+#   interpreter path, for example:
+#   PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin"
+# - The value for the property _CEE_RUNOPTS is the invocation Language
+#   Environment® runtime options for programs and used by Python. For example,
+#   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+# - The value for the properties __TAG_REDIR_ERR, _TAG_REDIR_IN, _TAG_REDIR_OUT
+#   are txt and used by the shell; for example:
+#      _TAG_REDIR_ERR: "txt"
+#      _TAG_REDIR_IN: "txt"
+#      _TAG_REDIR_OUT: "txt"
+# - The value for the property LANG is the name of the default locale; value
+#   C specifies the POSIX locale; for example: ``LANG: "C"``.
+# - The bash shell is unsupported. If that is the only shell available, you must
+#   control how new and existing files are tagged and encoded. An
+#   example of what is needed in addition to the files environment variables
+#   are "_ENCODE_FILE_NEW" and "_ENCODE_FILE_EXISTING"; for example,
+#      _ENCODE_FILE_NEW: "IBM-1047"
+#      _ENCODE_FILE_EXISTING: "IBM-1047"
+#   Please review the README.ZOS guide included with the ported ``bash`` shell
+#   for further configurations.
+#
+# Note:
+#   In ZOAU 1.0.2 and later, the property ZOAU_ROOT is no longer supported
+#   and must be replaced with the property ZOAU_HOME. If you are using ZOAU
+#   version 1.0.1 or lower, you must continue to use the property
+#   ZOAU_ROOT which is the ZOA Utilities install root path required for
+#   ZOAU; for example, ``/usr/lpp/IBM/zoautil``.
+#
+################################################################################
+
+################################################################################
+# the path to the root of IBM python installation
+################################################################################
+PYZ: "/var/hamb380/usr/lpp/IBM/cyp/v3r8/pyz"
+################################################################################
+# the path to root of ZOAU installation
+################################################################################
+ZOAU: "/var/zoau/1.1.0"
+
+################################################################################
+# The environment variables that should be set on z/OS host when running playbook.
+# You should not need to change environment_vars
+################################################################################
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  ZOAU_ROOT: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/usr/sbin:/var/bin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+################################################################################
+# SMPE specific variables
+################################################################################
+smpe_hlq: 'ANDYN.ZOAU100'
+storage_class: 'DB2SMS10'
+target_zone: 'TGT'
+dist_zone: 'DLIB'
+smpe_root: '/u/andyn/var/zoau100'

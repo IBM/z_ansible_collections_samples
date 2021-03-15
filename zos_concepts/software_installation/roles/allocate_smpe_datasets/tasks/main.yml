@@ -1,0 +1,15 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+# tasks file for allocate_smpe_datasets
+- name: ALLOCATING SMPE DATASETS
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ smpe_hlq}}.{{item}}"
+    type: seq
+    record_format: vb
+    record_length: 3200
+    space_primary: 3200
+    key_length: 24
+    key_offset: 0
+    state: present
+  with_items: "{{ smp_logs }}"

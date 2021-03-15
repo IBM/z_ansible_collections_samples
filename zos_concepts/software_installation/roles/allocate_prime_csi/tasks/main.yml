@@ -1,0 +1,14 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks for allocate_prime_csi
+
+# ALLOCATE KSDS FOR CSI
+- name: ALLOCATING KSDS FOR CSI
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ smpe_hlq}}.CSI"
+    type: KSDS
+    key_length: 24
+    key_offset: 0
+    state: present
+  notify: prime csi
