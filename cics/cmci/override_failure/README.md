@@ -87,6 +87,10 @@ payload to determine whether the module has failed. By specifying that
 `cpsm_response` codes of both `OK` and `NODATA` are OK, the playbook ignores
 failures due to finding no programs.
 
+## What next?
+
+- Look at the [other samples](../..) to find examples of what else you can do with the CICS collection.
+
 # Support
 
 Please refer to the [support section](../../../README.md#support) for more

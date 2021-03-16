@@ -89,6 +89,8 @@ the results of the report.
   available CMCI resource names at
   [CMCI resource names](https://www.ibm.com/support/knowledgecenter/SSGMCP_5.6.0/reference-system-programming/cmci/clientapi_resources.html).
 
+- Look at the [other samples](../..) to find examples of what else you can do with the CICS collection.
+
 # Copyright
 
 © Copyright IBM Corporation 2021

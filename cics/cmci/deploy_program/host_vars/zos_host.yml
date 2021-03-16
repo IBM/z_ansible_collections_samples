@@ -40,7 +40,7 @@ scope: MYRGN
 # Name of the target program
 program: PRG1
 
-# Name of the dataset containing the build output load module
+# Name of the data set containing the build output load module
 build_ds: BLD.OUTPUT
 
 # Name of the destination load library for the load module

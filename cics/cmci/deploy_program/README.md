@@ -3,8 +3,8 @@
 This sample playbook demonstrates how to use the `zos_copy` module from the `ibm_zos_core` collection in
 conjunction with the `cmci_action` module from the `ibm_zos_cics` collection.
 
-This sample shows how to use these modules to deploy a load module from a build output dataset to a CICS
-load library, and `NEWCOPY` the `PROGRAM` in CICS.
+This sample shows how to use these modules to deploy a load module from a build output data set to a CICS
+library, and `NEWCOPY` the `PROGRAM` in CICS.
 
 This sample additionally shows how to automate installation of pre-requisites for the `cmci_*` modules.
 
@@ -70,7 +70,7 @@ scope: MYRGN
 # Name of the target program
 program: PRG1
 
-# Name of the dataset containing the build output load module
+# Name of the data set containing the build output load module
 build_ds: BLD.OUTPUT
 
 # Name of the destination load library for the load module
@@ -89,6 +89,10 @@ cmci_password:
 ansible-playbook -i inventory.yml deploy_program.yml
 ```
 
+## What next?
+
+- Look at the [other samples](../..) to find examples of what else you can do with the CICS collection.
+
 # Copyright
 
 © Copyright IBM Corporation 2021
@@ -102,3 +106,5 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 Please refer to the [support section](../../../README.md#support) for more
 details.
+
+#
