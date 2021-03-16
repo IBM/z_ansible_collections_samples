@@ -1,4 +1,4 @@
-# Customising when a CMCI module should fail
+# Customizing when a CMCI module should fail
 
 This sample playbook demonstrates how to override the default failure criteria
 of the CMCI modules.

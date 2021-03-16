@@ -18,7 +18,7 @@ This repository provides a number of samples that show how to use the CICS colle
 
     This sample uses the z/OS core collection in concert with the CICS collection, within the one playbook.
 
-1. [Customising when a CMCI module should fail](cmci/override_failure)
+1. [Customizing when a CMCI module should fail](cmci/override_failure)
 
     The `override_failure` sample shows how to override the default error when searching for a program that doesn't exist in CICS.
 

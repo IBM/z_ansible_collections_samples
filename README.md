@@ -31,6 +31,11 @@ this is outlined in the
 * [z/OS Administration](zos_administration/)
    * [Set Up Host Vars by Configuring Python and ZOAU Installation](zos_administration/host_setup)
 
+* [CICS samples](cics/)
+   * [Retrieve operational data from running CICS regions](cics/cmci/reporting/)
+   * [Deploy a program to a CICS region](cics/cmci/deploy_program/)
+   * [Customize when a CMCI module should fail](cics/cmci/override_failure/)
+
 ## Blogs
 
 * [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/06/10/job-submission-on-zos-made-easy-with-ansible) - \[[Sample playbook](zos_concepts/jobs/submit_query_retrieve)\]
