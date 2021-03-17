@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ###############################################################################
 # © Copyright IBM Corporation 2020
 # Contributed and supported by the Ansible Content for IBM Z Team
