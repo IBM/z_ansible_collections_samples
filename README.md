@@ -113,15 +113,8 @@ and managed by opening a
 The repository admins and content owners will engage users on issues reported
 a Git issue.
 
-In the future, samples may be community contributed, therefore it may be
-helpful to review who contributed the sample as well as the requirements. You
+Playbooks may be contributed by IBM as well as teh community, therefore it may
+be helpful to review who contributed the sample as well as the requirements. You
 can view who the contributor was by looking at the playbooks commit history as
 well as notes in the playbook.
 
-Playbooks contributed by IBM will be identified with the following header:
-
-``` {.yaml}
-###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
-```
