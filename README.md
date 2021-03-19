@@ -81,17 +81,17 @@ required, a default configurations will be included.
 
 The playbooks in the repository is organized as follows:
 
-   ├── topic/
-   │  └── use_case/
-   │      └── playbook_name/
-   │          ├── host_vars/
-   │              └── zos_host.yml
-   │          ├── ansible.cfg
-   │          ├── inventory
-   │          ├── playbook_name.yml
-   │          └── README
-   ├── LICENSE
-   └── README
+    ├── topic/
+    │  └── use_case/
+    │      └── playbook_name/
+    │          ├── host_vars/
+    │              └── zos_host.yml
+    │          ├── ansible.cfg
+    │          ├── inventory
+    │          ├── playbook_name.yml
+    │          └── README
+    ├── LICENSE
+    └── README
 
 ## Copyright
 © Copyright IBM Corporation 2020
