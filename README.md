@@ -1,10 +1,16 @@
 # Ansible Z Playbook Repository
 
-This repository provides playbooks that can be tailored to automate commonly
-performed Z tasks as well as links to blogs and other related media. The
-playbooks in this repository are written using the collections that come with
-Red Hat® Ansible® Certified Content for IBM Z®, for a detailed overview refer to
-the [documentation](https://ibm.github.io/z_ansible_collections_doc/index.html).
+This repository provides playbooks that can be tailored to automate often
+repeated Z tasks, links to blogs and other related media. The playbooks in this
+repository are written using the collections from
+**Red Hat® Ansible® Certified Content for IBM Z®** offering, for a detailed
+overview refer to the
+[documentation](https://ibm.github.io/z_ansible_collections_doc/index.html).
+
+The collections can be found on
+[Ansible Galaxy](https://galaxy.ansible.com/search?deprecated=false&keywords=ibm_z&order_by=-relevance&page=1)
+and [Automation Hub](https://www.ansible.com/products/automation-hub),
+for additional content review our [community](ibm.biz/BdfsTR).
 
 An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
 consists of organized instructions that define work for a managed node to be
