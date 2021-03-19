@@ -3,7 +3,7 @@
 This repository provides playbooks that can be tailored to automate commonly
 performed Z tasks as well as links to blogs and other related media. The
 playbooks in this repository are written using the collections that come with
-Red Hat Ansible Certified Content for IBM Z, for a detailed overview refer to
+Red Hat® Ansible® Certified Content for IBM Z®, for a detailed overview refer to
 the [documentation](https://ibm.github.io/z_ansible_collections_doc/index.html).
 
 An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
@@ -18,7 +18,7 @@ to receive ongoing updates about specific activity on GitHub.
 ## Playbooks
 
 Playbooks are organized by topics that align to tasks and use cases that are
-commonly performed and in need of automation.
+often repeated and in need of automation.
 
 ### Z Topics
 * [Z Systems Administration](z_systems_administration)
@@ -28,7 +28,7 @@ commonly performed and in need of automation.
 * [Z Systems Automation](z_systems_automation)
   * [System Automation](z_systems_automation/sysauto/)
 
-### z/OS Topics
+### z/OS® Topics
 * [z/OS Administration](zos_administration/)
    * [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
 * [z/OS Concepts](zos_concepts/)
@@ -63,10 +63,10 @@ which one to read first, well here is a list of some of our recent blogs.
 * [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Playbook](zos_concepts/user_management/add_remove_user)\]
 
 ## Playbacks
-Want to experience z Automation without rolling up your sleeves? Did you just
-poor a fresh cup of coffee and want to learn more about automating Z with
-Ansible? Have a look at some of our playbooks using our own playbooks available
-to you to use.
+Want to experience Z automation without rolling up your sleeves? Did you just
+pour a fresh cup of coffee and want to learn more about automating Z with
+Ansible? Have a look at some of our playbacks using our own playbooks available
+in this repository.
 
 * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)
 * [Manage z/OS Users Using Ansible](https://mediacenter.ibm.com/media/Managing+z+OS+Users+with+Ansible+/1_bnud4enw)
@@ -75,9 +75,9 @@ to you to use.
 ## How playbooks are organized in this repository
 
 All playbooks in this repository can run independently from any other playbook.
-Each playbook in this repository includes a README with a brief description,
+Each playbook in this repository includes a README, with a brief description,
 licensing and instructions on how to configure the playbook. If configuration is
-required, a default configurations will be included.
+required, a default configuration will be included with the playbook.
 
 The playbooks in the repository is organized as follows:
 
