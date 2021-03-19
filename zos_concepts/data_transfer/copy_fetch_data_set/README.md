@@ -55,7 +55,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ### Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml copy_fetch_data_set.yml
+ansible-playbook -i inventory.yml copy_fetch_data_set.yaml
 ```
 
 # Copyright

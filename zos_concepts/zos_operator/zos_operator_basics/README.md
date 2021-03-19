@@ -56,7 +56,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ### Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml zos_operator_basics.yml
+ansible-playbook -i inventory.yml zos_operator_basics.yaml
 ```
 
 # Copyright

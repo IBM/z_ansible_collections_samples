@@ -54,7 +54,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ### Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml data_set_basics.yml
+ansible-playbook -i inventory.yml data_set_basics.yaml
 ```
 
 # Copyright
