@@ -1,22 +1,20 @@
 # Ansible Z Playbook Repository
 
 This repository provides playbooks that can be tailored to automate often
-repeated Z tasks, links to blogs and other related media. The playbooks in this
+repeated Z tasks, links to blogs, and other related media. An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
+consists of organized instructions that define work for a managed node to be
+automated with Ansible. The playbooks in this
 repository are written using the collections from
-**Red Hat® Ansible® Certified Content for IBM Z®** offering, for a detailed
-overview refer to the
+**Red Hat® Ansible® Certified Content for IBM Z®** offering. For a detailed
+overview of the playbooks, refer to the
 [documentation](https://ibm.github.io/z_ansible_collections_doc/index.html).
 
 The collections can be found on
 [Ansible Galaxy](https://galaxy.ansible.com/search?deprecated=false&keywords=ibm_z&order_by=-relevance&page=1)
-and [Automation Hub](https://www.ansible.com/products/automation-hub),
-for additional content review our [community](ibm.biz/BdfsTR).
+and [Automation Hub](https://www.ansible.com/products/automation-hub).
+For additional content, review our [community page](ibm.biz/BdfsTR).
 
-An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
-consists of organized instructions that define work for a managed node to be
-automated with Ansible.
-
-This repository will have frequent updates, we recommend you clone the
+This repository is frequently updated to refresh content. We recommend that you clone the
 the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
@@ -58,10 +56,10 @@ often repeated and in need of automation.
    * [ZCEE](zos_subsystems/zcee)
 
 ## Blogs
-Don't have time to explore a collection, particular module or playbook? Sit
-back, relax and take a few minutes to read some of our
+Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings 
+from our
 [blogs](https://community.ibm.com/community/user/ibmz-and-linuxone/groups/topic-home/blog-entries?communitykey=ce54fe94-0145-4832-a0ef-4ea81d6062cc&tab=blog-entries). Don't know
-which one to read first, well here is a list of some of our recent blogs.
+which one to read first? Well, here is a list of some of our recent blogs:
 
 * [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Playbook](zos_concepts/jobs/submit_query_retrieve)\]
 * [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Playbook](zos_concepts/data_transfer/copy_sort_fetch)\]
@@ -69,9 +67,8 @@ which one to read first, well here is a list of some of our recent blogs.
 * [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Playbook](zos_concepts/user_management/add_remove_user)\]
 
 ## Playbacks
-Want to experience Z automation without rolling up your sleeves? Did you just
-pour a fresh cup of coffee and want to learn more about automating Z with
-Ansible? Have a look at some of our playbacks using our own playbooks available
+Want to experience Z automation with Ansible without rolling up your sleeves?
+Take a look at some of our playbacks using our own playbooks available
 in this repository.
 
 * [Copy, Sort and Fetch Data Sets on z/OS using Ansible](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)
@@ -81,7 +78,7 @@ in this repository.
 ## How playbooks are organized in this repository
 
 All playbooks in this repository can run independently from any other playbook.
-Each playbook in this repository includes a README, with a brief description,
+Each playbook in this repository includes a README with a brief description,
 licensing and instructions on how to configure the playbook. If configuration is
 required, a default configuration will be included with the playbook.
 
@@ -100,21 +97,21 @@ The playbooks in the repository is organized as follows:
     └── README
 
 ## Copyright
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2020, 2021
 
 ## License
 Licensed under
 [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
-Support for all playbooks, roles and filters are done so by the community
-and managed by opening a
+Support for all playbooks, roles, and filters are provided by the community
+and all issues are tracked through a
 [Git issue](https://github.com/IBM/z_ansible_collections_samples/issues).
-The repository admins and content owners will engage users on issues reported
-a Git issue.
+The repository admins and content owners will engage directly with users on issues reported on the
+Git issue.
 
-Playbooks may be contributed by IBM as well as teh community, therefore it may
-be helpful to review who contributed the sample as well as the requirements. You
+Playbooks are contributed both by IBM as well as the broader Ansible community including IBM partners and the Z community. 
+Therefore, it may be helpful to review who contributed a sample as well as its requirements. You
 can view who the contributor was by looking at the playbooks commit history as
 well as notes in the playbook.
 
