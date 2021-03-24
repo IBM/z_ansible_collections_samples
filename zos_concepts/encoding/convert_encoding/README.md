@@ -55,7 +55,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ### Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml convert_encoding.yml
+ansible-playbook -i inventory.yml convert_encoding.yaml
 ```
 
 # Copyright
