@@ -95,4 +95,4 @@
                 dd_name: "SMPCNTL"
                 content: " SET  BOUNDARY(GLOBAL) .
                           \nREJECT S({{ ptfs }}) ."
-        when: reject_sysmod is true and restore_result.ret_code.code <= 4
+        when: reject_sysmod and restore_result.ret_code.code <= 4
