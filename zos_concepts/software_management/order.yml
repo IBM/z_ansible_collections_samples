@@ -14,7 +14,7 @@
 #     - IBM z/OS core collection 1.2.0 or later
 ###############################################################################
 
-- hosts: zos_host
+- hosts: ec01129a
   collections:
     - ibm.ibm_zos_core
   gather_facts: no

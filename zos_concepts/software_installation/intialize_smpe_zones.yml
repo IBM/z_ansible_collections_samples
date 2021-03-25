@@ -21,4 +21,4 @@
   environment: "{{ environment_vars }}"
 
   roles:
-    - allocate_prime_csi
+    - initialize_smpe_zones

@@ -1,0 +1,28 @@
+---
+# Copyright (c) IBM Corporation 2020
+
+# defaults file for initialize_smpe_zones
+output_ddname:
+  - SMPOUT
+  - SMPRPT
+  - SMPLIST
+  - SYSPRINT
+  - SMPSNAP
+
+sysut:
+  - SYSUT1
+  - SYSUT2
+  - SYSUT3
+  - SYSUT3
+
+smp_logs:
+  - smplog
+  - smploga
+
+smp_pds:
+  - smplts
+  - smpmts
+  - smppts
+  - smpscds
+  - smpsts
+

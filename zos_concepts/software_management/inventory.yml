@@ -1,10 +1,15 @@
 ---
 zsystem:
   hosts:
-    zos_host:
-      # ansible_host: zos_target_address
-      # ansible_user: zos_target_username
-      # ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
+    dummy:
+      ansible_host: zos_target_address
+      ansible_user: zos_target_username
+      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
+    tivlp02:
+      ansible_host: tivlp02.svl.ibm.com
+      ansible_user: andyn
+      ansible_python_interpreter: "/var/hamb380/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3.8"
+    ec01129a:
       ansible_host: ec01129a.vmec.svl.ibm.com
       ansible_user: omvsadm
       ansible_python_interpreter: "/usr/lpp/cyp/v3r8/pyz/bin/python3.8"

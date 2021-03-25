@@ -1,7 +1,7 @@
 # Copyright (c) IBM Corporation 2020
 
 galaxy_info:
-  author: Blake Becker
+  author: Andrew Nguyen
   description: Ansible z/OS Core Developer
   company: IBM
   license: "Apache License, Version 2.0"
