@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: ["UI70435"]
+    ptfs: "UI70435"
     global_csi: "IMSTESTL.ZOAU100.CSI"
     smpe_hlq: "IMSTESTL.ZOAU100"
     storage_class: "DB2SMS10"
@@ -68,7 +68,7 @@
     #           content:
     #             - 'SET  BOUNDARY(GLOBAL) .'
     #             - 'RECEIVE SELECT('
-    #             - '    {{ ptfs[0] }}'
+    #             - '    {{ ptfs }}'
     #             - ') SYSMODS LIST .'
     #   when: package_location == ''
     #   register: receive_result
@@ -180,7 +180,7 @@
       register: receive_result
 
     # APPLY CHECK
-    - name: "Perform APPLY CHECK for {{ ptfs[0] }}"
+    - name: "Perform APPLY CHECK for {{ ptfs }}"
       zos_mvs_raw:
         pgm: GIMSMP
         auth: "yes"
@@ -207,7 +207,7 @@
       register: apply_check_result
 
     # APPLY
-    - name: "Perform APPLY for {{ ptfs[0] }}"
+    - name: "Perform APPLY for {{ ptfs }}"
       zos_mvs_raw:
         pgm: GIMSMP
         auth: "yes"

@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: ['UI70435']
+    ptfs: 'UI70435'
     global_csi: 'IMSTESTL.ZOAU100.CSI'
     # storage_class: 'DB2SMS10'
     # target_zone: 'TGT'
@@ -66,7 +66,7 @@
                 content:
                   - 'SET  BOUNDARY(GLOBAL) .'
                   - 'RECEIVE ORDER('
-                  - '           CONTENT(PTFS({{ ptfs[0] }}))'
+                  - '           CONTENT(PTFS({{ ptfs }}))'
                   - '           ORDERSERVER(SERVINFO)'
                   - '           CLIENT(CLNTINFO)'
                   - '              )'
@@ -100,6 +100,6 @@
                 dd_name: "SMPCNTL"
                 content:
                  - 'SET  BOUNDARY(GLOBAL) .'
-                 - 'LIST SYSMOD({{ ptfs[0] }}) HOLDDATA .'
+                 - 'LIST SYSMOD({{ ptfs }}) HOLDDATA .'
 
         when: order_result.ret_code.code <= 4
