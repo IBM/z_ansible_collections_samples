@@ -1,7 +1,7 @@
-add-zos-user
+query_csi
 =========
 
-Add a new user to a z/OS system.
+Query CSI data
 
 Requirements
 ------------

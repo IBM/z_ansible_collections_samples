@@ -1,7 +1,7 @@
 ---
 # Copyright (c) IBM Corporation 2021
 
-# tasks file for apply_ptf
+# tasks file for add_certificate
 
 ###########################################################################
 # ISSUE ALL RACF COMMANDS NEEDED TO ADD CERTIFICATE TO SMP/E RECEIVE ORDER

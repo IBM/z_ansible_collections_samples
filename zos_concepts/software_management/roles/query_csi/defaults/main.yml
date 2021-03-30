@@ -1,6 +1,6 @@
 ---
 # Copyright (c) IBM Corporation 2021
 
-# defaults file for aplly_ptf
+# defaults file for query_csi
 # zone: TGT
 zone: GLOBAL

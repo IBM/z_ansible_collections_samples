@@ -1,7 +1,7 @@
-add-zos-user
+reject_ptf
 =========
 
-Add a new user to a z/OS system.
+REJECT a PTF from the Global zone.
 
 Requirements
 ------------

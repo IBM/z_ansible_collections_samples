@@ -21,6 +21,5 @@
   environment: "{{ environment_vars }}"
   vars:
 
-
   roles:
     - role: accept_ptf

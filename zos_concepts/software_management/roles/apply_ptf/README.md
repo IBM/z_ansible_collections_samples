@@ -1,7 +1,7 @@
-add-zos-user
+aplly_ptf
 =========
 
-Add a new user to a z/OS system.
+APPLY a PTF
 
 Requirements
 ------------
