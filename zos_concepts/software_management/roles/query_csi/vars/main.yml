@@ -1,5 +1,5 @@
 ---
 # vars file for query_csi
-ptfs: 'UI70435'
-list_operands: 'SYSMOD({{ ptfs }}) HOLDDATA .'
+ptf: 'UI70435'
+list_operands: 'SYSMOD({{ ptf }}) HOLDDATA .'
 global_csi: 'IMSTESTL.ZOAU100.CSI'

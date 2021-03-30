@@ -1,6 +1,6 @@
 ---
 # vars file for order_ptf
-ptfs: 'UI70435'
+ptf: 'UI70435'
 global_csi: 'IMSTESTL.ZOAU100.CSI'
 smpe_root: '/var/zoau100'
 server_info:

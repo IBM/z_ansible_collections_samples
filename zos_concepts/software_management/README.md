@@ -1,4 +1,4 @@
-# Apply PTFs using Using Ansible
+# Apply ptf using Using Ansible
 
 This project provides sample playbooks and roles which can be used to perform SMPE operations.
 

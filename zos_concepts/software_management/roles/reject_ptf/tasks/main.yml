@@ -4,7 +4,7 @@
 # tasks file for reject_ptf
 
 # REJECT CHECK a SYSMOD
-- name: "REJECT CHECK SYSMOD {{ ptfs }}"
+- name: "REJECT CHECK SYSMOD {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -21,11 +21,11 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
-                    \nREJECT CHECK S({{ ptfs }})."
+                    \nREJECT CHECK S({{ ptf }})."
   register: reject_check_result
 
 # REJECT a SYSMOD
-- name: "REJECT SYSMOD {{ ptfs }}"
+- name: "REJECT SYSMOD {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -42,6 +42,6 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
-                    \nREJECT S({{ ptfs }})."
+                    \nREJECT S({{ ptf }})."
   tags: reject sysmod
   when: reject_check_result.ret_code.code <= 4

@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: 'UI70435'
+    ptf: 'UI70435'
     global_csi: 'IMSTESTL.ZOAU100.CSI'
     # storage_class: 'DB2SMS10'
     # target_zone: 'TGT'
@@ -46,7 +46,7 @@
 
   tasks:
       # Order PTF from IBM
-      - name: "ORDER PTF {{ptfs}} from IBM server"
+      - name: "ORDER PTF {{ptf}} from IBM server"
         zos_mvs_raw:
           pgm: GIMSMP
           auth: "yes"
@@ -68,7 +68,7 @@
                 content:
                   - 'SET  BOUNDARY(GLOBAL) .'
                   - 'RECEIVE ORDER('
-                  - '           CONTENT(PTFS({{ ptfs }}))'
+                  - '           CONTENT(ptf({{ ptf }}))'
                   - '           ORDERSERVER(SERVINFO)'
                   - '           CLIENT(CLNTINFO)'
                   - '              )'
@@ -103,6 +103,6 @@
                 dd_name: "SMPCNTL"
                 content:
                  - 'SET  BOUNDARY(GLOBAL) .'
-                 - 'LIST SYSMOD({{ ptfs }}) HOLDDATA .'
+                 - 'LIST SYSMOD({{ ptf }}) HOLDDATA .'
 
         when: order_result.ret_code.code <= 4

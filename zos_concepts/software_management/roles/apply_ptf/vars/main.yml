@@ -1,6 +1,6 @@
 ---
 # vars file for apply_ptf
-ptfs: 'UI70435'
+ptf: 'UI70435'
 global_csi: 'IMSTESTL.ZOAU100.CSI'
 smpe_root: '/var/zoau100'
 package_location: "" # smpnts or pending_order or ibm_server or '' if already in GLOBAL zone

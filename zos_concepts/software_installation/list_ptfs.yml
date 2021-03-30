@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: 'UI70435'
+    ptf: 'UI70435'
     global_csi: 'IMSTESTL.ZOAU100.CSI'
     storage_class: 'DB2SMS10'
     target_zone: 'TGT'
@@ -53,4 +53,4 @@
                 dd_name: "SMPCNTL"
                 content:
                  - 'SET  BOUNDARY(GLOBAL) .'
-                 - 'LIST SYSMOD({{ ptfs }}) HOLDDATA .'
+                 - 'LIST SYSMOD({{ ptf }}) HOLDDATA .'

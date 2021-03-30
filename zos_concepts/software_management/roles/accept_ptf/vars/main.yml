@@ -1,4 +1,4 @@
 ---
 # vars file for accept_ptf
-ptfs: 'UI70435'
+ptf: 'UI70435'
 global_csi: 'IMSTESTL.ZOAU100.CSI'

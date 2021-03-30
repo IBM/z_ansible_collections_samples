@@ -20,7 +20,7 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    ptfs: "UI70435"
+    ptf: "UI70435"
     global_csi: "IMSTESTL.ZOAU100.CSI"
     smpe_hlq: "IMSTESTL.ZOAU100"
     storage_class: "DB2SMS10"
@@ -48,7 +48,7 @@
 
   tasks:
     # RECEIVE PTF from SMPPTS dataset
-    # - name: "RECEIVE PTF {{ptfs}} from SMPPTS dataset into CSI Global Zone"
+    # - name: "RECEIVE PTF {{ptf}} from SMPPTS dataset into CSI Global Zone"
     #   zos_mvs_raw:
     #     pgm: GIMSMP
     #     auth: "yes"
@@ -68,7 +68,7 @@
     #           content:
     #             - 'SET  BOUNDARY(GLOBAL) .'
     #             - 'RECEIVE SELECT('
-    #             - '    {{ ptfs }}'
+    #             - '    {{ ptf }}'
     #             - ') SYSMODS LIST .'
     #   when: package_location == ''
     #   register: receive_result
@@ -186,7 +186,7 @@
       register: receive_result
 
     # APPLY CHECK
-    - name: "Perform APPLY CHECK for {{ ptfs }}"
+    - name: "Perform APPLY CHECK for {{ ptf }}"
       zos_mvs_raw:
         pgm: GIMSMP
         auth: "yes"
@@ -205,7 +205,7 @@
               dd_name: "SMPCNTL"
               content: " SET BOUNDARY({{target_zone}}) .
                 \nAPPLY SELECT(
-                \n{{ptfs}}
+                \n{{ptf}}
                 \n)
                 \nCHECK
                 \nBYPASS(HOLDSYS,HOLDERROR)
@@ -214,7 +214,7 @@
       register: apply_check_result
 
     # APPLY
-    - name: "Perform APPLY for {{ ptfs }}"
+    - name: "Perform APPLY for {{ ptf }}"
       zos_mvs_raw:
         pgm: GIMSMP
         auth: "yes"
@@ -233,7 +233,7 @@
               dd_name: "SMPCNTL"
               content: " SET BOUNDARY({{target_zone}}) .
                 \nAPPLY SELECT(
-                \n{{ptfs}}
+                \n{{ptf}}
                 \n)
                 \nBYPASS(HOLDSYS,HOLDERROR)
                 \nCOMPRESS(ALL) ."

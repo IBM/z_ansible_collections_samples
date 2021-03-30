@@ -4,7 +4,7 @@
 # tasks file for accept_ptf
 
 # ACCEPT CHECK
-- name: "Perform ACCEPT CHECK for {{ ptfs }}"
+- name: "Perform ACCEPT CHECK for {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -23,7 +23,7 @@
           dd_name: "SMPCNTL"
           content: " SET BOUNDARY({{dist_zone}}) .
             \nACCEPT SELECT(
-            \n{{ptfs}}
+            \n{{ptf}}
             \n)
             \nCHECK
             \n REDO COMPRESS(ALL). "
@@ -31,7 +31,7 @@
   register: accept_check_result
 
 # ACCEPT
-- name: "Perform ACCEPT for {{ ptfs }}"
+- name: "Perform ACCEPT for {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -50,7 +50,7 @@
           dd_name: "SMPCNTL"
           content: " SET BOUNDARY({{dist_zone}}) .
             \nACCEPT SELECT(
-            \n{{ptfs}}
+            \n{{ptf}}
             \n)
             \n REDO COMPRESS(ALL). "
 

@@ -23,7 +23,7 @@
   roles:
     - role: query_csi
       zone: GLOBAL
-      list_operands: 'SYSMOD({{ ptfs }}) HOLDDATA .'
+      list_operands: 'SYSMOD({{ ptf }}) HOLDDATA .'
       # zone: TGT
-      # list_operands: 'SYSMOD({{ ptfs }}) .'
+      # list_operands: 'SYSMOD({{ ptf }}) .'
 

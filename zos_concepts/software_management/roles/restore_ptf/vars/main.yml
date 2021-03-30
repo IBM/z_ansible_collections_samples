@@ -1,5 +1,5 @@
 ---
 # vars file for restore_ptf
-ptfs: 'UI70435'
+ptf: 'UI70435'
 global_csi: 'IMSTESTL.ZOAU100.CSI'
 reject_sysmod: true    # reject sysmod after RESTORE

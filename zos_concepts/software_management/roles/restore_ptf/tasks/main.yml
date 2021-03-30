@@ -4,7 +4,7 @@
 # tasks file for restore_ptf
 
 # RESTORE CHECK a SYSMOD
-- name: "RESTORE CHECK SYSMOD {{ ptfs }} "
+- name: "RESTORE CHECK SYSMOD {{ ptf }} "
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -22,13 +22,13 @@
           dd_name: "SMPCNTL"
           content:
             - 'SET  BOUNDARY({{ target_zone }}) .'
-            - 'RESTORE S({{ ptfs }})'
+            - 'RESTORE S({{ ptf }})'
             - 'CHECK'
             - 'COMPRESS(ALL).'
   register: restore_check_result
 
 # RESTORE a SYSMOD
-- name: "RESTORE SYSMOD {{ ptfs }} "
+- name: "RESTORE SYSMOD {{ ptf }} "
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -46,13 +46,13 @@
           dd_name: "SMPCNTL"
           content:
             - 'SET  BOUNDARY({{ target_zone }}) .'
-            - 'RESTORE S({{ ptfs }})'
+            - 'RESTORE S({{ ptf }})'
             - 'COMPRESS(ALL).'
   when: restore_check_result.ret_code.code <= 4
   register: restore_result
 
 # REJECT a SYSMOD
-- name: "REJECT SYSMOD {{ ptfs }}"
+- name: "REJECT SYSMOD {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -69,6 +69,6 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY(GLOBAL) .
-                    \nREJECT S({{ ptfs }}) ."
+                    \nREJECT S({{ ptf }}) ."
   tags: reject sysmod
   when: reject_sysmod and restore_result.ret_code.code <= 4

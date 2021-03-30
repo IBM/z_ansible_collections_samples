@@ -113,7 +113,7 @@
   register: receive_result
 
 # APPLY CHECK
-- name: "Perform APPLY CHECK for {{ ptfs }}"
+- name: "Perform APPLY CHECK for {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -132,7 +132,7 @@
           dd_name: "SMPCNTL"
           content: " SET BOUNDARY({{target_zone}}) .
             \nAPPLY SELECT(
-            \n{{ptfs}}
+            \n{{ptf}}
             \n)
             \nCHECK
             \nBYPASS(HOLDSYS,HOLDERROR)
@@ -141,7 +141,7 @@
   register: apply_check_result
 
 # APPLY
-- name: "Perform APPLY for {{ ptfs }}"
+- name: "Perform APPLY for {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
@@ -160,7 +160,7 @@
           dd_name: "SMPCNTL"
           content: " SET BOUNDARY({{target_zone}}) .
             \nAPPLY SELECT(
-            \n{{ptfs}}
+            \n{{ptf}}
             \n)
             \nBYPASS(HOLDSYS,HOLDERROR)
             \nCOMPRESS(ALL) ."
