@@ -1,0 +1,57 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks file for apply_ptf
+
+###########################################################################
+# ISSUE ALL RACF COMMANDS NEEDED TO ADD CERTIFICATE TO SMP/E RECEIVE ORDER
+# NOTE: USER CERTIFICATE AND CA CERTIFICATE ALREADY IN Z/OS DATA SETS
+###########################################################################
+- name: Define, permit and activate FACILITY class
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: ikjeft01
+    auth: yes
+    parm: "REGIONS=0K"
+    dds:
+      - dd_output:
+          dd_name: sysprint
+          return_content:
+            type: text
+      - dd_output:
+          dd_name: systsprt
+          return_content:
+            type: text
+      - dd_output:
+          dd_name: sysdump
+          return_content:
+            type: text
+      - dd_input:
+          dd_name: systsin
+          content:
+              - RDEFINE FACILITY IRR.DIGTCERT.ADD      UACC(NONE)
+              - RDEFINE FACILITY IRR.DIGTCERT.ADDRING  UACC(NONE)
+              - RDEFINE FACILITY IRR.DIGTCERT.ALTER    UACC(NONE)
+              - RDEFINE FACILITY IRR.DIGTCERT.CONNECT  UACC(NONE)
+              - RDEFINE FACILITY IRR.DIGTCERT.LIST     UACC(NONE)
+              - RDEFINE FACILITY IRR.DIGTCERT.LISTRING UACC(NONE)
+              - PERMIT IRR.DIGTCERT.ADD      CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(READ)
+              - PERMIT IRR.DIGTCERT.ADDRING  CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(READ)
+              - PERMIT IRR.DIGTCERT.ALTER    CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(READ)
+              - PERMIT IRR.DIGTCERT.CONNECT  CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(UPDATE)
+              - PERMIT IRR.DIGTCERT.LIST     CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(READ)
+              - PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(READ)
+              - RACDCERT ID({{ ansible_user }}) ADDRING(SMPERING)
+              - RACDCERT ID({{ ansible_user }}) LISTRING(SMPERING)
+              - RACDCERT ID({{ ansible_user }}) ADD('IMSTESTL.ZOAU100.SMPE.USER.CERT') +
+              - WITHLABEL('SMPE Client Certificate') PASSWORD('smpeansible') TRUST
+              - RACDCERT CERTAUTH ADD('IMSTESTL.ZOAU100.SMPE.CA.CERT') +
+              - WITHLABEL('DigiCert Global Root CA') TRUST
+              - RACDCERT ID({{ ansible_user }}) CONNECT(LABEL('SMPE Client Certificate') +
+              - RING(SMPERING) USAGE(CERTAUTH) )
+              - RACDCERT ID({{ ansible_user }}) +
+              - CONNECT( CERTAUTH LABEL('DigiCert Global Root CA') +
+              - RING(SMPERING) USAGE(CERTAUTH) )
+              - RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root CA'))
+              - RACDCERT ID({{ ansible_user }}) LIST(LABEL('SMPE Client Certificate'))
+              - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+              - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH

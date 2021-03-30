@@ -1,5 +1,0 @@
-{# Copyright (c) IBM Corporation 2020 #}
-REMOVE ({{ userid | upper }}) GROUP({{ item }})
-{%- if new_owner %}
- OWNER({{ new_owner |upper }})
-{%- endif %}

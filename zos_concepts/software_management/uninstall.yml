@@ -5,13 +5,13 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-02-01
+# 2021-04-30
 #  - Released initial version
 ###############################################################################
 
 ###############################################################################
 # Requirements:
-#     - IBM z/OS core collection 1.2.0 or later
+#     - IBM z/OS core collection 1.3.0 or later
 ###############################################################################
 
 - hosts: ec01129a
@@ -19,80 +19,7 @@
     - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{ environment_vars }}"
-  vars:
-    ptfs: 'UI70435'
-    global_csi: 'IMSTESTL.ZOAU100.CSI'
-    storage_class: 'DB2SMS10'
-    target_zone: 'TGT'
-    dist_zone: 'DLIB'
-    smpe_root: '/var/zoau100'
-    reject_sysmod: true    # reject sysmod after RESTORE
-    are_ptfs_applied: false
-    receive_successful: false
 
-  tasks:
-      # RESTORE CHECK a SYSMOD
-      - name: "RESTORE CHECK SYSMOD {{ ptfs }} "
-        zos_mvs_raw:
-          pgm: GIMSMP
-          auth: "yes"
-          dds:
-            - dd_data_set:
-                dd_name: "SMPCSI"
-                data_set_name: "{{ global_csi }}"
-
-            - dd_output:
-                dd_name: "SMPOUT"
-                return_content:
-                    type: text
-            - dd_input:
-                dd_name: "SMPCNTL"
-                content:
-                 - 'SET  BOUNDARY({{ target_zone }}) .'
-                 - 'RESTORE S({{ ptfs }})'
-                 - 'CHECK'
-                 - 'COMPRESS(ALL).'
-        register: restore_check_result
-
-      # RESTORE a SYSMOD
-      - name: "RESTORE SYSMOD {{ ptfs }} "
-        zos_mvs_raw:
-          pgm: GIMSMP
-          auth: "yes"
-          dds:
-            - dd_data_set:
-                dd_name: "SMPCSI"
-                data_set_name: "{{ global_csi }}"
-
-            - dd_output:
-                dd_name: "SMPOUT"
-                return_content:
-                    type: text
-            - dd_input:
-                dd_name: "SMPCNTL"
-                content:
-                 - 'SET  BOUNDARY({{ target_zone }}) .'
-                 - 'RESTORE S({{ ptfs }})'
-                 - 'COMPRESS(ALL).'
-        when: restore_check_result.ret_code.code <= 4
-        register: restore_result
-
-      # REJECT a SYSMOD
-      - name: "REJECT SYSMOD {{ ptfs }}"
-        zos_mvs_raw:
-          pgm: GIMSMP
-          auth: "yes"
-          dds:
-            - dd_data_set:
-                dd_name: "SMPCSI"
-                data_set_name: "{{ global_csi }}"
-
-            - dd_output:
-                dd_name: "SMPOUT"
-                return_content:
-                    type: text
-            - dd_input:
-                dd_name: "SMPCNTL"
-                content: " SET  BOUNDARY(GLOBAL) .
-                          \nREJECT S({{ ptfs }}) ."
-        when: reject_sysmod and restore_result.ret_code.code <= 4
+  roles:
+    - role: restore_ptf
+      reject_sysmod: false

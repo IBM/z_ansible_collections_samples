@@ -1,0 +1,6 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# defaults file for aplly_ptf
+# zone: TGT
+zone: GLOBAL

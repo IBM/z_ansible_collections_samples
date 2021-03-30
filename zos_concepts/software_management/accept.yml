@@ -19,8 +19,8 @@
     - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{ environment_vars }}"
+  vars:
+
 
   roles:
-    - role: apply_ptf
-
-
+    - role: accept_ptf

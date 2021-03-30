@@ -48,7 +48,7 @@
 
   tasks:
     # RECEIVE PTF from SMPPTS dataset
-    # - name: "RECEIVE PTF {{ptfs[0]}} from SMPPTS dataset into CSI Global Zone"
+    # - name: "RECEIVE PTF {{ptfs}} from SMPPTS dataset into CSI Global Zone"
     #   zos_mvs_raw:
     #     pgm: GIMSMP
     #     auth: "yes"
@@ -82,6 +82,8 @@
           - dd_data_set:
               dd_name: "SMPCSI"
               data_set_name: "{{ global_csi }}"
+              disposition: old
+
           - dd_output:
               dd_name: "SMPOUT"
               return_content:
@@ -110,6 +112,8 @@
           - dd_data_set:
               dd_name: "SMPCSI"
               data_set_name: "{{ global_csi }}"
+              disposition: old
+
           - dd_output:
               dd_name: "SMPOUT"
               return_content:
@@ -148,6 +152,8 @@
           - dd_data_set:
               dd_name: "SMPCSI"
               data_set_name: "{{ global_csi }}"
+              disposition: old
+
           - dd_output:
               dd_name: "SMPOUT"
               return_content:
@@ -188,6 +194,7 @@
           - dd_data_set:
               dd_name: "SMPCSI"
               data_set_name: "{{ global_csi }}"
+              disposition: old
 
           - dd_output:
               dd_name: "SMPOUT"
@@ -198,7 +205,7 @@
               dd_name: "SMPCNTL"
               content: " SET BOUNDARY({{target_zone}}) .
                 \nAPPLY SELECT(
-                \n{{ptfs[0]}}
+                \n{{ptfs}}
                 \n)
                 \nCHECK
                 \nBYPASS(HOLDSYS,HOLDERROR)
@@ -215,6 +222,7 @@
           - dd_data_set:
               dd_name: "SMPCSI"
               data_set_name: "{{ global_csi }}"
+              disposition: old
 
           - dd_output:
               dd_name: "SMPOUT"
@@ -225,7 +233,7 @@
               dd_name: "SMPCNTL"
               content: " SET BOUNDARY({{target_zone}}) .
                 \nAPPLY SELECT(
-                \n{{ptfs[0]}}
+                \n{{ptfs}}
                 \n)
                 \nBYPASS(HOLDSYS,HOLDERROR)
                 \nCOMPRESS(ALL) ."

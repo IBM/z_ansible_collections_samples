@@ -1,0 +1,17 @@
+---
+# vars file for order_ptf
+ptfs: 'UI70435'
+global_csi: 'IMSTESTL.ZOAU100.CSI'
+smpe_root: '/var/zoau100'
+server_info:
+  - '<ORDERSERVER'
+  - '  url="https://eccgw01.boulder.ibm.com/services/projects/ecc/ws"'
+  - '  keyring="SMPERING"'
+  - '  certificate="SMPE Client Certificate">'
+  - '</ORDERSERVER>'
+client_info:
+  - '<CLIENT'
+  - '  downloadmethod="https"'
+  - '  javahome="/usr/lpp/java/java180/J8.0_64"'
+  - '  classpath="/usr/lpp/smp/classes">'
+  - '</CLIENT>'

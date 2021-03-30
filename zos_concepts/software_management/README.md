@@ -1,6 +1,6 @@
-# Manage z/OS Users Using Ansible
+# Apply PTFs using Using Ansible
 
-This project provides sample playbooks and roles which can be used to create and remove users from a z/OS system.
+This project provides sample playbooks and roles which can be used to perform SMPE operations.
 
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -23,7 +23,7 @@ playbook notes sections for additional details and configuration.
 
 ## Ansible Collection Requirement
 
-   IBM z/OS core collection 1.2.0 or later
+   IBM z/OS core collection 1.3.0 or later
 
 ## Getting Started
 
@@ -80,7 +80,7 @@ Please refer to the [Tower setup documentation](tower-setup.md) for a step-by-st
 
 # Copyright
 
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2021
 
 # License
 

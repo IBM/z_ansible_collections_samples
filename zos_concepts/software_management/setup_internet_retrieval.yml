@@ -21,6 +21,5 @@
   environment: "{{ environment_vars }}"
 
   roles:
-    - role: apply_ptf
-
+    - add_certificate
 

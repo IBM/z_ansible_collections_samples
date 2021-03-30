@@ -46,7 +46,7 @@
 
   tasks:
       # Order PTF from IBM
-      - name: "ORDER PTF {{ptfs[0]}} from IBM server"
+      - name: "ORDER PTF {{ptfs}} from IBM server"
         zos_mvs_raw:
           pgm: GIMSMP
           auth: "yes"
@@ -54,6 +54,8 @@
             - dd_data_set:
                 dd_name: "SMPCSI"
                 data_set_name: "{{ global_csi }}"
+                disposition: old
+
             - dd_output:
                 dd_name: "SMPOUT"
                 return_content:
@@ -87,6 +89,7 @@
             - dd_data_set:
                 dd_name: "SMPCSI"
                 data_set_name: "{{ global_csi }}"
+                disposition: old
 
             - dd_output:
                 dd_name: "SMPOUT"

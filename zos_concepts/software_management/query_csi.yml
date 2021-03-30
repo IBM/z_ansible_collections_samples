@@ -21,6 +21,9 @@
   environment: "{{ environment_vars }}"
 
   roles:
-    - role: apply_ptf
-
+    - role: query_csi
+      # zone: GLOBAL
+      # list_operands: 'SYSMOD({{ ptfs }}) HOLDDATA .'
+      zone: TGT
+      list_operands: 'SYSMOD({{ ptfs }}) .'
 

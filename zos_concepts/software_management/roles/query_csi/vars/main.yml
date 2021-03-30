@@ -1,0 +1,5 @@
+---
+# vars file for restore_ptf
+ptfs: 'UI70435'
+list_operands: 'SYSMOD({{ ptfs }}) HOLDDATA .'
+global_csi: 'IMSTESTL.ZOAU100.CSI'

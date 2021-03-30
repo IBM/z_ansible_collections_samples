@@ -1,0 +1,57 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks file for accept_ptf
+
+# ACCEPT CHECK
+- name: "Perform ACCEPT CHECK for {{ ptfs }}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+            type: text
+
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content: " SET BOUNDARY({{dist_zone}}) .
+            \nACCEPT SELECT(
+            \n{{ptfs}}
+            \n)
+            \nCHECK
+            \n REDO COMPRESS(ALL). "
+
+  register: accept_check_result
+
+# ACCEPT
+- name: "Perform ACCEPT for {{ ptfs }}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+            type: text
+
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content: " SET BOUNDARY({{dist_zone}}) .
+            \nACCEPT SELECT(
+            \n{{ptfs}}
+            \n)
+            \n REDO COMPRESS(ALL). "
+
+  when: accept_check_result.ret_code.code <= 4

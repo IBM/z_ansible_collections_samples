@@ -40,6 +40,7 @@
             - dd_data_set:
                 dd_name: "SMPCSI"
                 data_set_name: "{{ global_csi }}"
+                disposition: old
 
             - dd_output:
                 dd_name: "SMPOUT"
@@ -63,6 +64,7 @@
             - dd_data_set:
                 dd_name: "SMPCSI"
                 data_set_name: "{{ global_csi }}"
+                disposition: old
 
             - dd_output:
                 dd_name: "SMPOUT"
@@ -86,6 +88,7 @@
             - dd_data_set:
                 dd_name: "SMPCSI"
                 data_set_name: "{{ global_csi }}"
+                disposition: old
 
             - dd_output:
                 dd_name: "SMPOUT"

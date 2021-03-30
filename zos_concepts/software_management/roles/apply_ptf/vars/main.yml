@@ -1,0 +1,20 @@
+---
+# vars file for apply_ptf
+ptfs: 'UI70435'
+global_csi: 'IMSTESTL.ZOAU100.CSI'
+smpe_root: '/var/zoau100'
+package_location: "" # smpnts or pending_order or ibm_server or '' if already in GLOBAL zone
+order_number: "ORD00002"
+server_info:
+  - "<SERVER"
+  - 'host="deliverycb-bld.dhe.ibm.com"'
+  - 'user="S4n98585"'
+  - 'pw="a724c585154011r"'
+  - ">"
+  - "<PACKAGE"
+  - 'file="2021020107251/PROD/GIMPAF.XML"'
+  - 'hash="1F804B036296255018175B60EF16428A6AB4AFED"'
+  - 'id="U02256470"'
+  - ">"
+  - "</PACKAGE>"
+  - "</SERVER>"
