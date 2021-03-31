@@ -12,14 +12,23 @@ playbook notes sections for additional details and configuration.
 
 ## Playbook Summary
 
-- [**add-user.yml**](add-user.yml) - Handles adding a user to z/OS. Playbook includes: group configuration, granting permissions, generating passwords, creating and mounting ZFS filesystem for OMVS, transferring files and templates, creating generic profile, and creating catalog alias. Playbook is designed to be used standalone or in an Ansible Tower workflow template.
-- [**remove-user.yml**](remove-user.yml) - Handles removal of a user from z/OS. Playbook includes removal of all configuration performed in **add-user.yml**. Playbook is designed to be used standalone or in an Ansible Tower workflow template.
-- [**send-rejection-email.yml**](send-rejection-email.yml) - Handles sending rejection email in the event a user's request for a new UserID is rejected. Playbook is designed to be used in an Ansible Tower workflow template.
+- [**setup_internet_retrieval.yml**](setup_internet_retrieval.yml) - Set up IBM Internet Service Retrieval by adding digital certificates to RACF database.
+- [**order.yml**](order.yml) - Handles order a PTF from IBM and receive it into the Global zone using IBM Internet Service Retrieval.
+- [**install.yml**](install.yml) - Handles APPLY process for a PTF.
+- [**uninstall.yml**](uninstall.yml) - Handles RESTORE process for a PTF.
+- [**accept.yml**](accept.yml) - Handles ACCEPT process for a PTF.
+- [**reject.yml**](reject.yml) - Handles REJECT process for a PTF.
+- [**query_csi.yml**](query_csi.yml) - Query CSI data.
 
 ## Role Summary
 
-- [**add-zos-user**](roles/add-zos-user/README.md) - Holds tasks related to adding a z/OS user.
-- [**remove-zos-user**](roles/remove-zos-user/README.md) - Holds tasks related to removing a z/OS user.
+- [**add_certificate**](roles/add_certificate/README.md) - Holds tasks related to adding certificates to RACF.
+- [**order_ptf**](roles/order_ptf/README.md) - Holds tasks related to order a PTF from IBM.
+- [**apply_ptf**](roles/apply_ptf/README.md) - Holds tasks related to APPLY a PTF.
+- [**restore_ptf**](roles/restore_ptf/README.md) - Holds tasks related to RESTORE a PTF.
+- [**reject_ptf**](roles/reject_ptf/README.md) - Holds tasks related to REJECT a PTF.
+- [**accept_ptf**](roles/accept_ptf/README.md) - Holds tasks related to ACCEPT a PTF.
+- [**query_csi**](roles/query_csi/README.md) - Holds tasks related to QUERY data from CSI.
 
 ## Ansible Collection Requirement
 
@@ -73,10 +82,6 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ```bash
 ansible-playbook -i inventory.yml <playbook-name>
 ```
-
-## Getting Started: Ansible Tower
-
-Please refer to the [Tower setup documentation](tower-setup.md) for a step-by-step guide for getting user management configured in Ansible Tower.
 
 # Copyright
 

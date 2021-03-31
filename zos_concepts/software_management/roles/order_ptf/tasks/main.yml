@@ -25,7 +25,7 @@
           content:
             - 'SET  BOUNDARY(GLOBAL) .'
             - 'RECEIVE ORDER('
-            - '           CONTENT(ptf({{ ptf }}))'
+            - '           CONTENT(PTFS({{ ptf }}))'
             - '           ORDERSERVER(SERVINFO)'
             - '           CLIENT(CLNTINFO)'
             - '              )'

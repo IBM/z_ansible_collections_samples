@@ -42,9 +42,9 @@
               - PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID({{ ansible_user }}) ACCESS(READ)
               - RACDCERT ID({{ ansible_user }}) ADDRING(SMPERING)
               - RACDCERT ID({{ ansible_user }}) LISTRING(SMPERING)
-              - RACDCERT ID({{ ansible_user }}) ADD('IMSTESTL.ZOAU100.SMPE.USER.CERT') +
+              - RACDCERT ID({{ ansible_user }}) ADD('{{user_certificate_dataset}}') +
               - WITHLABEL('SMPE Client Certificate') PASSWORD('smpeansible') TRUST
-              - RACDCERT CERTAUTH ADD('IMSTESTL.ZOAU100.SMPE.CA.CERT') +
+              - RACDCERT CERTAUTH ADD('{{ ca_certificate_dataset }}'') +
               - WITHLABEL('DigiCert Global Root CA') TRUST
               - RACDCERT ID({{ ansible_user }}) CONNECT(LABEL('SMPE Client Certificate') +
               - RING(SMPERING) USAGE(CERTAUTH) )

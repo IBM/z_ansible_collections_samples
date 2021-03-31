@@ -1,2 +1,4 @@
 ---
 # vars file for add_certificate
+user_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.USER.CERT'
+ca_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.CA.CERT'
