@@ -62,7 +62,7 @@
                     - RACDCERT ID(OMVSADM) ADDRING(SMPERING)
                     - RACDCERT ID(OMVSADM) LISTRING(SMPERING)
                     - RACDCERT ID(OMVSADM) ADD('IMSTESTL.ZOAU100.SMPE.USER.CERT') +
-                    - WITHLABEL('SMPE Client Certificate') PASSWORD('smpeansible') TRUST
+                    - WITHLABEL('SMPE Client Certificate') PASSWORD('{{user_cert_pwd}}') TRUST
                     - RACDCERT CERTAUTH ADD('IMSTESTL.ZOAU100.SMPE.CA.CERT') +
                     - WITHLABEL('DigiCert Global Root CA') TRUST
                     - RACDCERT ID(OMVSADM) CONNECT(LABEL('SMPE Client Certificate') +
