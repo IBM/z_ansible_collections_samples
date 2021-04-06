@@ -1,0 +1,56 @@
+---
+# Common services for provision-ims-dbdc
+- name: Provision IMS
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    # Start IMS control region if start_ctl is true
+    - name: Start IMS control region
+      zos_operator:
+        cmd: 's {{ DFS_IMS_SSID }}CTL'
+        verbose: true
+      when: ctl == "start"
+
+    # Stop IMS control region
+    - name: Stop IMS control region
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}CTL'
+        verbose: true
+      when: ctl == "stop"
+
+
+    - name: Wait for IMS ready
+      include_role:
+        name: submit-rexx
+        public: yes
+      vars:
+        rexx_name: 'WaitJob.j2'
+        max_rc: 0
+      ignore_errors: true
+      when: wait_for_job
+
+    - name: IMS cold start
+      ims_command:
+        command:  NRE CHECKPOINT 0 FMT ALL
+        plex:  '{{ DFS_IMSPlex }}'
+        route: '{{ DFS_IMS_SSID }}'
+      when: cold_start
+
+
+    - name: ICON start
+      zos_job_submit:
+        src: IMSTESTL.IMS1.JOBS(IMS1HWS1)
+        location: DATA_SET
+        wait: true
+        wait_time_s: 30
+      when: icon == "start"
+
+    # Stop ICON
+    - name: Stop ICON
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}HWS'
+        verbose: true
+      when: icon == "stop"

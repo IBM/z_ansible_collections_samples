@@ -1,0 +1,202 @@
+- name: Provision IMS DB/DC
+  hosts: zsystem
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - "{{ vars_folder_name }}/ims-dbdc.yml"
+  environment: '{{ system_environment }}'
+
+  tasks:
+    - name: Create temporary directory to store provisioning files
+      tempfile:
+        state: directory
+      register: provision_tmp_dir
+      tags:
+       - always
+
+    - block:
+
+        - include_role:
+            name: install-bzip2
+
+        - include_role:
+            name: ims_dataset
+          vars:
+            work_dataset: allocate
+            sysdef_datasets: allocate
+            runtime_datasets: allocate
+
+        - include_role:
+            name: ims_initialize
+          vars:
+            DYNAMICALLY_RESERVE_PORTS: false
+            send_procs: true
+            DFS_INIT_JAVA_CONF: false
+
+        - include_role:
+            name: ims_proclib
+          vars:
+            create_sample: true
+
+        - include_role:
+            name: ims_sysdef
+          vars:
+            preprocess: true
+            stage1: true
+            stage2: true
+
+        - include_role:
+            name: ims_racf
+          vars:
+            prep_racf: true
+
+        - include_role:
+            name: ims_apf
+          vars:
+            auth_datasets: true
+
+        - include_role:
+            name: ims_dataset
+          vars:
+            system_datasets: allocate
+
+        - include_role:
+            name: ims_catalog
+          vars:
+            catalog: allocate
+
+        - include_role:
+            name: ims_dbrc
+          vars:
+            prep_dbrc: true
+
+        - include_role:
+            name: ims_proclib
+          vars:
+            add: true
+            bpeconfg: true
+
+        # Call SCI config to copy & config SCI
+        - include_role:
+            name: ims_structured_call_interface
+          vars:
+            sci: config
+
+        # Call OM config to copy & config OM
+        - include_role:
+            name: ims_operations_manager
+          vars:
+            om: config
+
+        # Call RM config to copy & config RM
+        - include_role:
+            name: ims_resource_manager
+          vars:
+            rm: config
+
+        # Call CQS to config
+        - include_role:
+            name: ims_common_queue
+          vars:
+            cqs: config
+
+        - include_role:
+            name: ims_iefjobs
+          vars:
+            iefjobs: create
+
+        - include_role:
+            name: ims_proclib
+          vars:
+            copy: true
+            copy_to_jobs: true
+            copy_stage_libs: true
+
+        - include_role:
+            name: ims_exit
+          vars:
+            prep_exits: true
+
+
+        # Run DBD, PSB, and ACB gen
+        - include_role:
+            name: ims_gen
+          vars:
+            dbd_gen: true
+            psb_gen: true
+            acb_gen: true
+
+        - include_role:
+            name: ims_online_change
+          vars:
+            enable_olc: true
+            active_libs: true
+
+        - include_role:
+            name: ims_dbrc
+          vars:
+            dbrc_defaults: true
+
+        - include_role:
+            name: ims_catalog
+          vars:
+            catalog: 'load'
+
+        - include_role:
+            name: ims_region
+
+
+        # Start SCI
+        - include_role:
+            name: ims_structured_call_interface
+          vars:
+            sci: start
+
+        # Start OM
+        - include_role:
+            name: ims_operations_manager
+          vars:
+            om: start
+
+        # Start RM
+        - include_role:
+            name: ims_resource_manager
+          vars:
+            rm: start
+
+        - include_role:
+            name: ims_common
+          vars:
+            icon: start
+            ctl: start
+            wait_for_job: true
+            cold_start: true
+
+        # Query OM
+        - include_role:
+            name: ims_operations_manager
+          vars:
+            om: query
+
+        # Query SCI
+        - include_role:
+            name: ims_structured_call_interface
+          vars:
+            sci: query
+
+        # Query RM
+        - include_role:
+            name: ims_resource_manager
+          vars:
+            rm: query
+
+      always:
+        - name: Delete the temporary provision files directory
+          file:
+            path: "{{ provision_tmp_dir.path }}"
+            state: absent
+      # tags:
+      #  - always
+      vars:
+        uss_file_path: '{{ provision_tmp_dir.path }}'
+

@@ -1,0 +1,27 @@
+**********************************************************************
+* GLOBAL STRUCTURE DEFINITION PROCLIB MEMBER                         *
+**********************************************************************
+*-------------------------------------------------*
+* DEFINITION FOR IMS MESSAGE QUEUE STRUCTURES     *
+*-------------------------------------------------*
+STRUCTURE (
+  STRNAME=QMSGIMS01,
+  OVFLWSTR=QMSGIMS01OFLW,
+  SRDSDSN1={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSGQ.SRDS1,
+  SRDSDSN2={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSGQ.SRDS2,
+  LOGNAME=SYSLOG.MSGQ01.LOG 
+  OBJAVGSZ=1024)
+
+*-------------------------------------------------*
+* DEFINITION FOR IMS EMH QUEUE STRUCTURES         *
+*-------------------------------------------------*  
+STRUCTURE (
+  STRNAME=QEMHIMS01,
+  OVFLWSTR=QEMHIMS01OFLW,
+  SRDSDSN1={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EMHQ.SRDS1,
+  SRDSDSN2={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EMHQ.SRDS2,
+  LOGNAME=SYSLOG.EMHQ01.LOG 
+  OBJAVGSZ=1024)
+*--------------------------------------------------------------------*
+* END OF MEMBER CQSSG000                                             *
+*--------------------------------------------------------------------*
