@@ -1,0 +1,67 @@
+//******************************************************************
+//*  DFSJBP Procedure
+//*
+//*  This procedure starts a Java non-message driven dependent
+//*  region that resembles a non-message-driven BMP region.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//*  The default name of the callable services library data set
+//*  is SYS1.CSSLIB.
+//*  If your installation overrides this default value
+//*  in the CSSLIB parameter of the sysgen IMSGEN macro,
+//*  then you should set the CSSLIB parameter of this procedure.
+//*
+//*  The default name of the System C Runtime library data set
+//*  is CEE.SCEERUN.
+//*  If your installation overrides this default value
+//*  in the SCEERUN parameter of the sysgen IMSGEN macro,
+//*  then you should set the SCEERUN parameter of this procedure.
+//*
+//***********************************************************@SCPYRT**
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//***********************************************************@ECPYRT**
+//*
+//       PROC MBR=TEMPNAME,PSB=,JVMOPMAS=,OUT=,
+//            OPT=N,SPIE=0,TEST=0,DIRCA=000,
+//            STIMER=,CKPTID=,PARDLI=,
+//            CPUTIME=,NBA=,OBA=,IMSID={{ DFS_IMS_SSID }},AGN=,
+//            PREINIT=,RGN=52K,SOUT=A,
+//            SYS2=,ALTID=,APARM=,ENVIRON=,
+//            LOCKMAX=,PRLD=,SSM=
+//*,
+//            CSSLIB='{{ zCloud_CSSLIB }}',
+//            SCEERUN='{{ zCloud_LERuntime }}'
+//*
+//*
+//JBPRGN EXEC PGM=DFSRRC00,REGION=&RGN,
+//            PARM=(JBP,&MBR,&PSB,&JVMOPMAS,&OUT,
+//            &OPT&SPIE&TEST&DIRCA,
+//            &STIMER,&CKPTID,&PARDLI,&CPUTIME,
+//            &NBA,&OBA,&IMSID,&AGN,
+//            &PREINIT,&ALTID,
+//            '&APARM',&ENVIRON,
+//            &LOCKMAX,&PRLD,&SSM)
+//*
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSJLIB,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PGMLIB,DISP=SHR
+//         DD DSN=&SCEERUN.,DISP=SHR
+//         DD DSN=&CSSLIB.,DISP=SHR
+//PROCLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB,DISP=SHR
+//SYSUDUMP DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,RECFM=VBA,BLKSIZE=3129),
+//         SPACE=(125,(2500,100),RLSE,,ROUND)

@@ -1,0 +1,11 @@
+{{ JOB_CARD }}
+{%- if 'REG=' not in JOB_CARD and 'REGION=' not in JOB_CARD %}
+,
+//  REGION=0M
+{% endif %}
+//STARTCTL       EXEC PGM=ISFAFD
+//ISFOUT DD SYSOUT=*
+//ISFIN  DD *
+LOG
+/S {{ DFS_IMS_SSID }}CTL
+/*

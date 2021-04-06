@@ -1,0 +1,9 @@
+zsystem:
+  hosts:
+    zvm:
+      ansible_host: ec00000a.vmec.svl.ibm.com
+      ansible_user: user1
+      ansible_python_interpreter: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+
+
+
