@@ -1,9 +1,0 @@
-*--------------------------------------------------------------------*
-* CONFIGURATION FILE FOR BPE WITH CQS, OM, RM, SCI - BPECONFG        *
-*--------------------------------------------------------------------*
-LANG=ENU     /* (ENU = U.S. ENGLISH)       */
-TRCLEV=(*,LOW,BPE)    /* DEFAULT ALL TRACES TO LOW  */
-TRCLEV=(*,LOW,OM)     /* DEFAULT OM TRACES TO LOW   */
-*--------------------------------------------------------------------*
-* END OF MEMBER BPECONFG                                             *
-*--------------------------------------------------------------------*

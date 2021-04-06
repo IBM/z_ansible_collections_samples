@@ -1,5 +1,0 @@
----
-# defaults file for dbrc_srvs
-
-dbrc_defaults: false
-prep_dbrc: false
