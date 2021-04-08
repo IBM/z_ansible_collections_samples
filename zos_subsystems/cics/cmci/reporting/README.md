@@ -40,7 +40,7 @@ Because this playbook only uses the CMCI REST API, it can be run on the control 
 configure an inventory. Generally you'll be able to use this trick with any of the CMCI modules. In this example, we
 run the `cmci_get` module on `localhost`, i.e. the Ansible control node, by setting the target host to localhost.
 Running the CMCI modules on the control node can be a good idea, because you don't have to deal with the complexity of
-an unneessary SSH connection, and you don't have to install the modules' dependencies on the remote host.
+an unnecessary SSH connection, and you don't have to install the modules' dependencies on the remote host.
 
 The `cmci_*` modules have pre-requisites that need to be installed into the Python environment in which the module
 executes.  In this case, the `cmci_get` module will be executed on `localhost`, i.e. the Ansible control

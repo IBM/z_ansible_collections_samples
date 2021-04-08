@@ -24,6 +24,10 @@ This repository provides a number of samples that show how to use the CICS colle
 
     The tasks provided by the CICS collection have automatic awareness of failure criteria, such as HTTP errors or actions being applied but zero resources matching the criteria. However, sometimes you want to override that behaviour and carry on despite a failure, as this sample shows.
 
+1. [Resource lifecycle and CSD](cmci/resource_lifecycle_and_csd)
+
+    The `resource_lifecycle_and_csd` sample shows how to perform full CICS resource lifecycle with the CMCI modules, creating and installing a definition from CSD.
+
 ---
 
 These CICS samples are just some of the samples available for the Red Hat Ansible Certified Content for IBM Z. You can find samples covering other aspects at the [root of the repository](https://github.com/IBM/z_ansible_collections_samples).
