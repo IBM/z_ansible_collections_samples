@@ -56,7 +56,7 @@ often repeated and in need of automation.
      * [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
    * [ZCEE](zos_subsystems/zcee)
      * [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
-     * [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/provisioning)
+     * [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/api_deployment)
      
 
 ## Blogs
