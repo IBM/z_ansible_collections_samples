@@ -37,23 +37,23 @@
   gather_facts: 'false'
 
   vars_prompt:
-    - name: cmci_host
-      prompt: Target CMCI hostname
-      private: no
-    - name: cmci_port
-      prompt: Target CMCI port
-      private: no
-    - name: scheme
-      prompt: CMCI scheme
-      private: no
-      default: 'https'
-    - name: context
-      prompt: Target CPSM context
-      private: no
-    - name: cmci_user
-      prompt: CMCI user name (leave blank for unauthenticated)
-    - name: cmci_password
-      prompt: CMCI password (leave blank for unauthenticated)
+   - name: cmci_host
+     prompt: Target CMCI hostname
+     private: no
+   - name: cmci_port
+     prompt: Target CMCI port
+     private: no
+   - name: scheme
+     prompt: CMCI scheme
+     private: no
+     default: 'https'
+   - name: context
+     prompt: Target CPSM context
+     private: no
+   - name: cmci_user
+     prompt: CMCI user name (leave blank for unauthenticated)
+   - name: cmci_password
+     prompt: CMCI password (leave blank for unauthenticated)
 
   vars:
     attributes:
@@ -90,8 +90,8 @@
     ############################################################################
     # Print the response from CMCI to the log - useful to see attribute names!
     ############################################################################
-#    - debug:
-#        msg: '{{ result }}'
+    #    - debug:
+    #        msg: '{{ result }}'
 
     ############################################################################
     # Use an inline template to extract the selected attributes to a report var

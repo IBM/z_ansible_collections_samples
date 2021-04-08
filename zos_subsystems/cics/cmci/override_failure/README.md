@@ -47,7 +47,7 @@ able to use this trick with any of the CMCI modules. In this example, we run
 the `cmci_get` module on `localhost`, i.e. the Ansible control node, by setting
 the target host to localhost. Running the CMCI modules on the control node can
 be a good idea, because you don't have to deal with the complexity of an
-unneessary SSH connection, and you don't have to install the modules'
+unnecessary SSH connection, and you don't have to install the modules'
 dependencies on the remote host.
 
 The `cmci_*` modules have pre-requisites that need to be installed into the
