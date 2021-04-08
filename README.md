@@ -53,7 +53,11 @@ often repeated and in need of automation.
      * [Deploy a program to a CICS region](zos_subsystems/cics/cmci/deploy_program)
      * [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
    * [IMS](zos_subsystems/ims)
+     * [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
    * [ZCEE](zos_subsystems/zcee)
+     * [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
+     * [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/provisioning)
+     
 
 ## Blogs
 Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings 
