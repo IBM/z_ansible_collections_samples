@@ -1,0 +1,48 @@
+//******************************************************************
+//*  IMSBATCH Procedure
+//*
+//*  This procedure executes an IMS online batch message
+//*  processing address space.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//***********************************************************@SCPYRT**
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//***********************************************************@ECPYRT**
+//*
+//       PROC MBR=TEMPNAME,PSB=,IN=,OUT=,
+//            OPT=N,SPIE=0,TEST=0,DIRCA=000,
+//            PRLD=,STIMER=,CKPTID=,PARDLI=,
+//            CPUTIME=,NBA=,OBA=,IMSID={{ DFS_IMS_SSID }},AGN=,
+//            SSM=,PREINIT=,RGN=52K,SOUT=A,
+//            SYS2=,ALTID=,APARM=,LOCKMAX=,
+//            ENVIRON=,JVMOPMAS=
+//*
+//*
+//G      EXEC PGM=DFSRRC00,REGION=&RGN,
+//            PARM=(BMP,&MBR,&PSB,&IN,&OUT,
+//            &OPT&SPIE&TEST&DIRCA,&PRLD,
+//            &STIMER,&CKPTID,&PARDLI,&CPUTIME,
+//            &NBA,&OBA,&IMSID,&AGN,&SSM,
+//            &PREINIT,&ALTID,
+//            '&APARM',&LOCKMAX,
+//            &ENVIRON,&JVMOPMAS)
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PGMLIB,DISP=SHR
+//PROCLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB,DISP=SHR
+//SYSUDUMP DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,RECFM=VBA,BLKSIZE=3129),
+//         SPACE=(125,(2500,100),RLSE,,ROUND)

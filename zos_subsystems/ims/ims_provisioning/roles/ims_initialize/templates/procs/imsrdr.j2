@@ -1,0 +1,39 @@
+//*********************************************************************
+//*  IMSRDR Procedure
+//*
+//*  The IMSRDR procedure is used to read an IMSMSG job into
+//*  the operating system job stream from direct access
+//*  storage devices (DASDs).
+//*
+//*  If the installation specifies the PRDR= parameter in
+//*  the DFSPBxxx proclib member or JCL overrides,
+//*  then you should rename this procedure from IMSRDR.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  Licensed Materials - Property of IBM                             *
+//*                                                                   *
+//*  5635-A06                                                         *
+//*                                                                   *
+//*      Copyright IBM Corp. 1974,2016 All Rights Reserved            *
+//*                                                                   *
+//*  US Government Users Restricted Rights - Use, duplication or      *
+//*  disclosure restricted by GSA ADP Schedule contract with          *
+//*  IBM Corp.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//         PROC MBR=IMSMSG,CLASS=A,SYS2=
+//*
+//IEFPROC  EXEC PGM=IEBEDIT
+//SYSPRINT DD DUMMY
+//SYSUT1   DD DDNAME=IEFRDER
+//SYSUT2   DD SYSOUT=(&CLASS,INTRDR),DCB=BLKSIZE=80
+//SYSIN    DD DUMMY
+//IEFRDER  DD DISP=SHR,
+//         DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.JOBS(&MBR)

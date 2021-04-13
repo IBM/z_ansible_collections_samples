@@ -1,0 +1,6 @@
+---
+# Default vars for ims dataset services
+work_dataset: ""
+sysdef_datasets: ""
+runtime_datasets: ""
+system_datasets: ""

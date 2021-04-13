@@ -1,0 +1,209 @@
+# (c) Copyright IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+###############################################################################
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-08
+#  - Released initial version
+###############################################################################
+# This sample playbook demonstrates how to use the cmci modules to control the
+# full lifecycle of a CICS resource.
+#
+# Usage:
+#  ansible-playbook csd_install.yml
+#
+# Notes:
+#  CMCI's access to CSD is through a named CICS region, so in addition to
+#  supplying the CMCI connection details as parameters, you will also need to
+#  supply a context and scope which identifies a CICS region that's using the
+#  appropriate CSD.  You'll also be prompted for the name of a CSD group to use
+#  temporarily.  The created definition will be deleted at the end of the
+#  sample.  The sample will create a PROGRAM defintion in the named CSD group,
+#  update the definition, install it into the target CICS region, disable the
+#  program, discard the program, and delete the definition, leaving the system
+#  in the same state as it started.
+#
+#  Also of note, install is an asynchronous action in CMCI.  This playbook also
+#  demonstrates how to use Ansible to wait until the install has completed
+#  successfully before proceeding.
+#
+#  This sample additionally shows how to automate installation of
+#  pre-requisites for the `cmci_*` modules.
+#
+# Requirements:
+#   IBM z/OS CICS collection 1.0.0 or later
+###############################################################################
+---
+- name:  CSD Install
+
+  collections:
+      - ibm.ibm_zos_cics
+
+  hosts: 'localhost'
+  gather_facts: 'false'
+
+  vars_prompt:
+   - name: cmci_host
+     prompt: Target CMCI hostname
+     private: no
+   - name: cmci_port
+     prompt: Target CMCI port
+     private: no
+   - name: scheme
+     prompt: CMCI scheme
+     private: no
+     default: 'https'
+   - name: cmci_user
+     prompt: CMCI user name (leave blank for unauthenticated)
+   - name: cmci_password
+     prompt: CMCI password (leave blank for unauthenticated)
+   - name: context
+     prompt: Target CPSM context
+     private: no
+   - name: scope
+     prompt: Target CPSM scope
+     private: no
+   - name: csdgroup
+     prompt: Target CSD group to create the definition in
+     private: no
+
+  vars:
+    program: 'HELOWRLD'
+
+  tasks:
+    ############################################################################
+    # Install module dependencies
+    ############################################################################
+    - name: Make sure CMCI module dependencies are installed
+      pip:
+        name:
+          - requests
+          - xmltodict
+          - typing;python_version<"3.5"
+
+    - name: 'HTTP Create progdef'
+      delegate_to: 'localhost'
+      cmci_create:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSDefinitionProgram'
+        attributes:
+          name: '{{ program }}'
+          csdgroup: '{{ csdgroup }}'
+        create_parameters:
+          - name: 'CSD'
+
+    - name: 'HTTP Update progdef'
+      delegate_to: 'localhost'
+      ibm.ibm_zos_cics.cmci_update:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSDefinitionProgram'
+        attributes:
+          description: 'foo'
+        resources:
+          filter:
+            NAME: '{{ program }}'
+          get_parameters:
+            - name: 'CSDGROUP'
+              value: '{{ csdgroup }}'
+
+    - name: 'HTTP Install program'
+      delegate_to: 'localhost'
+      ibm.ibm_zos_cics.cmci_action:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSDefinitionProgram'
+        action_name: 'CSDINSTALL'
+        resources:
+          filter:
+            NAME: '{{ program }}'
+          get_parameters:
+            - name: 'CSDGROUP'
+              value: '{{ csdgroup }}'
+
+    - name: 'HTTP Check program was installed'
+      delegate_to: 'localhost'
+      ibm.ibm_zos_cics.cmci_get:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSProgram'
+        resources:
+          filter:
+            PROGRAM: '{{ program }}'
+      retries: 3  # May take a while to install, so give it a chance!
+      until: result is not failed
+      register: result
+
+    - name: 'HTTP Disable program'
+      delegate_to: 'localhost'
+      ibm.ibm_zos_cics.cmci_update:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSProgram'
+        attributes:
+          status: 'disabled'
+        resources:
+          filter:
+            PROGRAM: '{{ program }}'
+
+    - name: 'HTTP Delete program'
+      delegate_to: 'localhost'
+      ibm.ibm_zos_cics.cmci_delete:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSProgram'
+        resources:
+          filter:
+            PROGRAM: '{{ program }}'
+
+    - name: 'HTTP Delete progdef'
+      delegate_to: 'localhost'
+      ibm.ibm_zos_cics.cmci_delete:
+        context: '{{ context }}'
+        scope: '{{ scope }}'
+        cmci_host: '{{ cmci_host }}'
+        cmci_port: '{{ cmci_port | int }}'
+        cmci_user: '{{ cmci_user | default(omit) }}'
+        cmci_password: '{{ cmci_password | default(omit) }}'
+        scheme: '{{ scheme }}'
+        type: 'CICSDefinitionProgram'
+        resources:
+          filter:
+            NAME: '{{ program }}'
+          get_parameters:
+            - name: 'CSDGROUP'
+              value: '{{ csdgroup }}'

@@ -1,0 +1,108 @@
+**********************************************************************
+*       DFSPBIMS
+*
+*       Sample DFSPBIMS member of the IMS PROCLIB data set.
+*
+*       Use the DFSPBIMS member to specify execution parameters
+*       for the DB/DC control region.
+*
+*************************************************************@SCPYRT**
+*
+*    Licensed Materials - Property of IBM
+*
+*    5635-A06
+*
+*        Copyright IBM Corp. 2016      All Rights Reserved
+*
+*    US Government Users Restricted Rights - Use, duplication or
+*    disclosure restricted by GSA ADP Schedule contract with
+*    IBM Corp.
+*
+*************************************************************@ECPYRT**
+ALOT=60,
+AOIP=,
+AOIS=,
+APPC=,
+APPLID1={{ IST_VTAM_IMSAPPLID }},
+APPLID2=,
+APPLID3=,
+ARC={{ARC}},
+ARMRST=N,
+ASOT=60,
+AUTO=N,
+BSIZ=04096,
+CIOP=2000,
+CMDMCS=Y,
+{# CPLOG=500000, #}
+CRC={{ DFS_IMS_CRC }},
+CSAPSB=12,
+DBBF=0,
+DBFX=01150,
+DBRCNM={{ DFS_IMS_SSID }}DRC,
+DBWP=024,
+DFSDF=000,
+DLINM={{ DFS_IMS_SSID }}DLI,
+DLIPSB=700,
+DMB=200,
+DSCT=I,
+EMHB=,
+EMHL=256,
+EPCB=0012,
+ETO=Y,
+EXVR=Y,
+FBP=00048,
+FESTIM=,
+FIX=DC,
+FMTO=D,
+FP=Y,
+FPWP=,
+FRE=00030,
+GRNAME={{ DFS_IMSXCFGroup }},
+HIOP=,
+HSBID=,
+HSBMBR=,
+IMSGROUP={{ DFS_IMS_SSID }},
+IMSID={{ DFS_IMS_SSID }},
+IRLM=N,
+IRLMNM={{ DXR_IRLM_SSID }},
+ISIS=A,
+LGNR=10,
+LSO=S,
+LUMC=,
+LUMP=,
+MAXPST=
+MSDB=C,
+NLXB=,
+OTHR=005,
+OTMA=Y,
+OTMASE=N,
+PIINCR=,
+PIMAX=,
+PRDR={{ DFS_IMS_SSID }}RDR,
+PRLD=DC,
+PSB=0048,
+PSBW=024,
+PST=5,
+QBUF=0005,
+QTL=050,
+QTU=075,
+RCF=A,
+RECA=50,
+RECASZ=4096,
+RDS=4096,
+RES=Y,
+RRS={{ DFS_useRRS }},
+SAV=005,
+SGN=Z,
+SOD=,
+SPM=,
+SRCH=0,
+SSM={{ DFS_IMS_SSID }}SSM,
+SUF=I,
+TRN=Y,
+UHASH=,
+USERVAR=,
+VAUT=1,
+VSPEC=DC,
+WADS=D,
+WKAP=048

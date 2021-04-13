@@ -1,0 +1,2 @@
+LANG=ENU          /* (ENU = U.S. ENGLISH)       */
+TRCLEV=(*,LOW,RM)    /* DEFAULT RM TRACES TO LOW   */
