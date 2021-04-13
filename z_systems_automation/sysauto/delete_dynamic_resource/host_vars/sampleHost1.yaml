@@ -1,0 +1,6 @@
+# Copyright (c) IBM Corporation 2020
+
+# host name, port and protocol of the sampleHost1 REST Server
+sa_service_hostname: your.host.name
+sa_service_port: port_number
+sa_service_protocol: https
