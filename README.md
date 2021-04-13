@@ -29,8 +29,6 @@ often repeated and in need of automation.
   * [zHMC](z_systems_administration/zhmc)
     * [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
     * [zHMC Concepts](z_systems_administration/zhmc/docs/module_playbooks.md)
-* [Z Systems Automation](z_systems_automation)
-  * [System Automation](z_systems_automation/sysauto/)
 
 ### z/OS® Topics
 * [z/OS Administration](zos_administration/)
@@ -54,6 +52,9 @@ often repeated and in need of automation.
      * [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
    * [IMS](zos_subsystems/ims)
    * [ZCEE](zos_subsystems/zcee)
+* [z/OS Automated Operations]   
+   * [IBM Z System Automation](z_system_automation)
+     * Managing Dynamic Resources](z_system_automation/dynamic_resources/)
 
 ## Blogs
 Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings 
