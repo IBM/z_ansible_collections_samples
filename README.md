@@ -52,7 +52,7 @@ often repeated and in need of automation.
      * [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
    * [IMS](zos_subsystems/ims)
    * [ZCEE](zos_subsystems/zcee)
-* [z/OS Automated Operations]   
+* z/OS Automated Operations   
    * [IBM Z System Automation](z_system_automation)
      * Managing Dynamic Resources](z_system_automation/dynamic_resources/)
 
