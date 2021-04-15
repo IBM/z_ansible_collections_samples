@@ -21,5 +21,9 @@
   environment: "{{ environment_vars }}"
 
   roles:
-    - add_certificate
+    - role: add_certificate
+      user_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.USER.CERT'
+      ca_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.CA.CERT'
+      user_cert_pwd: 'smpeansible'
+
 
