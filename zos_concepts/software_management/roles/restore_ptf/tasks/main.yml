@@ -71,4 +71,4 @@
           content: " SET  BOUNDARY(GLOBAL) .
                     \nREJECT S({{ ptf }}) ."
   tags: reject sysmod
-  when: reject_sysmod and restore_result.ret_code.code <= 4
+  when: reject_sysmod | bool and restore_result.ret_code.code <= 4

@@ -22,8 +22,15 @@
 
   roles:
     - role: query_csi
-      # zone: GLOBAL
-      # list_operands: 'SYSMOD({{ ptf }}) HOLDDATA .'
-      zone: TGT
-      list_operands: 'SYSMOD({{ ptf }}) .'
+      ptf: 'UI70435'
+      global_csi: 'IMSTESTL.ZOAU100.CSI'
+      zone: GLOBAL
+      list_operands: 'SYSMOD({{ ptf }}) HOLDDATA .'
+      # ptf: 'UI70435'
+      # global_csi: 'IMSTESTL.ZOAU100.CSI'
+      # zone: TGT
+      # list_operands: 'SYSMOD({{ ptf }}) .'
+      # ptf: 'UI74491'
+      # zone: TGT
+      # list_operands: 'SYSMOD({{ ptf }}) .'
 
