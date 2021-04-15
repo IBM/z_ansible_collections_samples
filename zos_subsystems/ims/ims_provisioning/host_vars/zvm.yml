@@ -1,0 +1,168 @@
+PYZ: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+ZOAU: /zoau/v1.0.3-ptf2
+system_environment:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  # PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin"
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+  STEPLIB: IMSBLD.I15RTSMM.COMRESL1
+
+# vars_folder_name is the name of the folder at the root of the project
+# which contains variable files to be imported by various playbooks
+# this is done to separate variable values when they may be different between environments
+# for example:
+#  vars_files:
+#    - "{{ vars_folder_name }}/ims-dbdc.yml"
+vars_folder_name: vars_zvm
+
+# ---------------------------------------------------------------------------- #
+#                               TCPIP information                              #
+# ---------------------------------------------------------------------------- #
+# TCPIP information, including default ports and port reservation behavior
+# Desired port information for IMS 15
+# if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
+DYNAMICALLY_RESERVE_PORTS: no
+# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
+# to reserve the port numbers provided below. If any are in use the playbook will fail
+# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
+# port within the default range of the Ansible zport module
+RESERVE_SPECIFIC_PORT: yes
+
+DFS_PORTID: 9978
+DFS_SSLPORTID: 9979
+
+# HTTP port for IMS Connect
+DFS_REGION_TCPIPPORT: 9977
+# HTTPS Port for IMS Connect
+DFS_REGION_SSLTCPIPPORT: 9966
+# location of system tcpip profile
+TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
+# A dataset is needed to store a TCPIP profile containing
+# changes to the default for dynamic port reservation
+# TCPIP_PROFILE_TMP is the name of the temporary dataset
+# or dataset member to store the profile changes
+TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP(imsprof)'
+# ---------------------------------------------------------------------------- #
+
+
+# The z/OS username to use for job submission
+TARGET_USERNAME: omvsadm
+
+# JOB_CARD will be the default job card inserted for dynamically generated JCL
+# ensure MSGCLASS and CLASS are correct for desired environment
+JOB_CARD: |-
+  //ANSIBLE JOB 'testing',
+  //  NOTIFY={{ TARGET_USERNAME | upper }},
+  //  USER={{ TARGET_USERNAME | upper }},
+  //  MSGCLASS=E,
+  //  MSGLEVEL=(1,1),
+  //  CLASS=A
+
+
+# Where to install MVSUTILS/MVSCMD and other needed tools/scripts
+uss_utilities_path: /u/{{ TARGET_USERNAME }}
+
+# Where generated JCL files should be saved on target
+# this is a defalult value that should be overwritten
+# with a temporary directory for easier cleanup at the
+# end of a playbook
+uss_file_path: /u/{{ TARGET_USERNAME }}
+
+# The API key to use for artifactory repositories
+api_key: ''
+
+# The user ID to use for IMS related provisioning steps
+DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
+
+# The SSID for the IMS to be provisioned
+DFS_IMS_SSID: IMS1
+
+# ---------------------------------------------------------------------------- #
+# The first HLQ to be used to store IMS related datasets
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# specific datasets
+DFS_AUTH_LIB_HLQ1: IMSTESTL
+# The second HLQ to be used to store IMS related datasets
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# specific datasets
+DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}'
+# ---------------------------------------------------------------------------- #
+# The first HLQ for system datasets that will be used
+# by IMS during provisioning. These should exist prior to
+# running playbooks
+DFS_AUTH_LIB_SYSHLQ1: IMSBLD
+# The second HLQ for system datasets that will be used
+# by IMS during provisioning. These should exist prior to
+# running playbooks
+DFS_AUTH_LIB_SYSHLQ2: I15RTSMM
+# ---------------------------------------------------------------------------- #
+# The fully qualified dataset name for the JOBS PDS
+# this will hold jobs for starting and stoppng IMS resources
+DFS_JOBLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
+
+# The fully qualified dataset name for the IMS RESLIB
+DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+
+# The fully qualified dataset name for the IMS PROCLIB
+DFS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+
+
+# ---------------------------------------------------------------------------- #
+#  AL:  Common Services related settings                                       #
+# ---------------------------------------------------------------------------- #
+OM_CONFIG: false
+
+# ---------------------------------------------------------------------------- #
+#                            storage related settings                           #
+# ---------------------------------------------------------------------------- #
+
+# Are the volumes we want to use managed by the storage management subsystem (SMS)?
+DFS_SMS_ENVIRONMENT: false
+
+# ------------------- Storage Management Subsystem settings ------------------ #
+# -------------------------- used when SMS is in use ------------------------- #
+
+# If the volumes are managed by SMS, what SMS storage class should be used?
+DFS_SMS_CLASS: CLASS2
+# If the volumes are managed by SMS, what SMS management class should be used?
+DFS_SMS_MCLASS: NONE
+
+# -------------------------- volume related settings ------------------------- #
+# ------------------------ for when SMS is not in use ------------------------ #
+
+# first volume to use to store IMS datasets
+DFS_DS_VOLUME1: USRV01
+# DFS_DS_VOLUME1: JERRYL
+# second volume to use to store IMS datasets
+DFS_DS_VOLUME2: USRV01
+# DFS_DS_VOLUME2: JERRYL
+
+# ---------------------------------------------------------------------------- #
+
+# IMSPlex name
+DFS_IMSPlex: PLEX1
+
+# The language environment runtime dataset to use
+zCloud_LERuntime: CEE.SCEERUN
+
+zCloud_MACLIB: SYS1.MACLIB
+
+# Dataset containing zos CSS library
+zCloud_CSSLIB: SYS1.CSSLIB
+
+# ---------------------------------------------------------------------------- #
+#                             Java related settings                            #
+# ---------------------------------------------------------------------------- #
+
+# The location to create and reference the profile that has environment settings and JVM options.
+JAVA_CONF_PATH: /u/dfsjvmpr.props
+
+# Working directory for the IMS Java region (JMP)
+DFS_workingdir: /u/{{ TARGET_USERNAME }}

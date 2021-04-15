@@ -1,0 +1,66 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+################################################################################
+# - The value for the property BPXK_AUTOCVT must be configured to "ON";
+#   for example: _BPXK_AUTOCVT: "ON"
+# - The value for the property ZOAU_HOME is the ZOA Utilities install root path;
+#   for example: ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+#
+# Note:
+#   In ZOAU 1.0.2 and later, the property ZOAU_ROOT is no longer supported
+#   and must be replaced with the property ZOAU_HOME. If you are using ZOAU
+#   version 1.0.1 or lower, you must continue to use the property
+#   ZOAU_ROOT which is the ZOA Utilities install root path required for
+#   ZOAU; for example, ``/usr/lpp/IBM/zoautil``.
+#
+################################################################################
+
+# the path to the root of IBM python installation
+PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
+
+# the path to root of ZOAU installation
+ZOAU: "/usr/lpp/IBM/zoautil"
+
+# Target CMCI hostname
+cmci_host: example.com
+
+# Target CMCI port
+cmci_port: 12345
+
+# CMCI scheme (http or https)
+scheme: https
+
+# Target CICSplex SM context
+context: MYPLEX
+
+# Target CICSplex SM scope (probably the target region name)
+scope: MYRGN
+
+# Name of the target program
+program: PRG1
+
+# Name of the data set containing the build output load module
+build_ds: BLD.OUTPUT
+
+# Name of the destination load library for the load module
+load_lib: CICS.LLIB
+
+# CMCI user name (leave blank for unauthenticated)
+cmci_user:
+
+# CMCI password (leave blank for unauthenticated)
+cmci_password:
+
+# you should not need to change environment_vars
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"

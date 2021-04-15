@@ -7,7 +7,9 @@
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ zoau_root }}"
+{% if not is_110 %}
   PYTHONPATH: "{{ zoau_root }}/lib"
+{% endif %}
   LIBPATH: "{{ zoau_root }}/lib:{{ python_root }}/lib:/lib:/usr/lib:."
   PATH: "{{ zoau_root }}/bin:{{ python_root }}/bin:/bin:/usr/sbin:/var/bin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
