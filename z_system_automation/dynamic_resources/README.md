@@ -18,7 +18,7 @@ names, authority, and the artifacts that will be created and cleaned up.
 ## Getting Started
 
 You can use the sample [inventory](inventory.yaml), [hosts file](host_vars/zos_host.yaml), and [vars file](vars/vars.yaml)
-to discover and create your system specific **inventory**, **host_vars**, and **vars** artifacts.
+to create your system specific **inventory**, **host_vars**, and **vars** configuration.
 
 ### 1. [inventory.yml](inventory.yml) simply points to the host vars file named zos_host.yaml
 

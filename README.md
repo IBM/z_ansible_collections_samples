@@ -54,7 +54,7 @@ often repeated and in need of automation.
    * [ZCEE](zos_subsystems/zcee)
 * z/OS Automated Operations   
    * [IBM Z System Automation](z_system_automation)
-     * Managing Dynamic Resources](z_system_automation/dynamic_resources/)
+     * [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
 
 ## Blogs
 Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings 
