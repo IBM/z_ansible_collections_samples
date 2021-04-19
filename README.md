@@ -57,7 +57,8 @@ often repeated and in need of automation.
    * [ZCEE](zos_subsystems/zcee)
      * [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
      * [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/api_deployment)
-     
+* z/OS Software Installation
+   * [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 
 ## Blogs
 Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings 
