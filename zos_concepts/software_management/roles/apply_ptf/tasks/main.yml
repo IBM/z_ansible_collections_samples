@@ -1,0 +1,98 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks file for apply_ptf
+
+# Download pending order
+- name: "RECEIVE PTF using a pending order into CSI Global Zone"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+            type: text
+      - dd_unix:
+          dd_name: "SMPNTS"
+          path: "{{smpe_root}}/smpnts/"
+
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content:
+            - " SET  BOUNDARY(GLOBAL) ."
+            - "RECEIVE SYSMODS HOLDDATA"
+            - "ORDER("
+            - "PENDING({{order_number}})"
+            - "CLIENT(CLNTINFO)"
+            - ")."
+      - dd_input:
+          dd_name: "CLNTINFO"
+          content:
+            - "<CLIENT"
+            - 'downloadmethod="https"'
+            - 'downloadkeyring="javatruststore"'
+            - 'javahome="/usr/lpp/java/java180/J8.0_64"'
+            - ">"
+            - "</CLIENT>"
+  when: package_location == 'pending_order'
+  register: receive_result
+
+# APPLY CHECK
+- name: "Perform APPLY CHECK for {{ ptf }}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+            type: text
+
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content: " SET BOUNDARY({{target_zone}}) .
+            \nAPPLY SELECT(
+            \n{{ptf}}
+            \n)
+            \nCHECK
+            \nBYPASS(HOLDSYS,HOLDERROR)
+            \nCOMPRESS(ALL) ."
+  when: receive_result is skipped or receive_result.ret_code.code <=4
+  register: apply_check_result
+
+# APPLY
+- name: "Perform APPLY for {{ ptf }}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+            type: text
+
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content: " SET BOUNDARY({{target_zone}}) .
+            \nAPPLY SELECT(
+            \n{{ptf}}
+            \n)
+            \nBYPASS(HOLDSYS,HOLDERROR)
+            \nCOMPRESS(ALL) ."
+
+  when: apply_check_result.ret_code.code <= 4

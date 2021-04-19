@@ -1,0 +1,6 @@
+---
+# vars file for query_csi
+ptf: 'UI70435'
+global_csi: 'IMSTESTL.ZOAU100.CSI'
+zone: GLOBAL
+list_operands: 'SYSMOD({{ ptf }}) HOLDDATA .'

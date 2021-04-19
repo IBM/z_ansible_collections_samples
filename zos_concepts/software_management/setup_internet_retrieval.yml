@@ -1,0 +1,29 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  roles:
+    - role: add_certificate
+      user_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.USER.CERT'
+      ca_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.CA.CERT'
+      user_cert_pwd: 'smpeansible'
+
+

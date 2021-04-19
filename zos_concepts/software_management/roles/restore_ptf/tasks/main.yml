@@ -1,0 +1,74 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks file for restore_ptf
+
+# RESTORE CHECK a SYSMOD
+- name: "RESTORE CHECK SYSMOD {{ ptf }} "
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+              type: text
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content:
+            - 'SET  BOUNDARY({{ target_zone }}) .'
+            - 'RESTORE S({{ ptf }})'
+            - 'CHECK'
+            - 'COMPRESS(ALL).'
+  register: restore_check_result
+
+# RESTORE a SYSMOD
+- name: "RESTORE SYSMOD {{ ptf }} "
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+              type: text
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content:
+            - 'SET  BOUNDARY({{ target_zone }}) .'
+            - 'RESTORE S({{ ptf }})'
+            - 'COMPRESS(ALL).'
+  when: restore_check_result.ret_code.code <= 4
+  register: restore_result
+
+# REJECT a SYSMOD
+- name: "REJECT SYSMOD {{ ptf }}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+          disposition: old
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+              type: text
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content: " SET  BOUNDARY(GLOBAL) .
+                    \nREJECT S({{ ptf }}) ."
+  tags: reject sysmod
+  when: reject_sysmod | bool and restore_result.ret_code.code <= 4

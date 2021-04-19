@@ -1,0 +1,5 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# defaults file for accept_ptf
+dist_zone: DLIB
