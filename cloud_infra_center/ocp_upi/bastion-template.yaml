@@ -1,0 +1,31 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+cluster_nodes:
+  bootstrap:
+    bootstrap:
+      ip: '172.26.103.230'
+  masters:
+    master-0:
+      ip: '172.26.103.231'
+      etcd: etcd-0
+    master-1:
+      ip: '172.26.103.232'
+      etcd: etcd-1
+    master-2:
+      ip: '172.26.103.233'
+      etcd: etcd-2
+  infra:
+    worker-0:
+      ip: '172.26.103.234'
+    worker-1:
+      ip: '172.26.103.235'
+    worker-2:
+      ip: '172.26.103.236'
+        

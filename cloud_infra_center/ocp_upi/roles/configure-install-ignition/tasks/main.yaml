@@ -1,0 +1,45 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-install-ignition
+
+- name: Create Install Ignition Configs
+  command:
+    cmd: ./openshift-install create ignition-configs
+
+- name: Export Infra ID
+  script: tools/infra-id.sh
+  register: infra_id
+
+- name: Edit Bootstrap Ignition
+  script: tools/ignition-modify.py
+  args:
+    executable: python3
+
+- name: Upload Boostrap Ignition
+  command:
+    cmd: openstack image create --disk-format=raw --container-format=bare --file bootstrap.ign "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
+
+- name: Get Image Url
+  script: tools/get-image-path.sh "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
+  register: image_url
+  
+- name: Get Glance Token
+  command:
+    cmd: openstack token issue -c id -f value
+  register: glance_token
+  
+- name: Generate Bootstrap Ignition Shim
+  script: tools/generate-bootstrap-ignitionshim.py {{ image_url.stdout_lines[0] }} {{ glance_token.stdout }} {{ infra_id.stdout_lines[0] }}
+  args:
+    executable: python3
+
+- name: Generate Master Ignition
+  script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }}

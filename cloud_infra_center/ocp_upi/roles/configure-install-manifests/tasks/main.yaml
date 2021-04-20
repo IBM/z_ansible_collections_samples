@@ -1,0 +1,25 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-install-manifests
+
+- name: Create Install Manifests
+  command:
+    cmd: ./openshift-install create manifests
+
+- name: Remove Machine and MachineSet
+  shell:
+    cmd: rm -f openshift/99_openshift-cluster-api_master-machines-*.yaml openshift/99_openshift-cluster-api_worker-machineset-*.yaml
+
+- name: Make Control-plane Nodes Unschedulable
+  script: tools/make-control-plane-unschedulable.py
+  args:
+    executable: python3
+

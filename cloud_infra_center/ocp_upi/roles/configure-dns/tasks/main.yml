@@ -1,0 +1,77 @@
+# =================================================================
+# Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==================================================================
+
+---
+# tasks file for configure-dns
+- include_vars: bastion-template.yaml
+
+- name: install bind-chroot for dns 
+  yum:
+    name: bind-chroot
+    state: latest
+    
+- name: create /var/named directory
+  file:
+    path: /var/named
+    state: directory
+
+- name: create dns subnet definition
+  template:
+    src: var/named/cluster_domain_name.zone.j2
+    dest: /var/named/{{ cluster_domain_name }}.zone
+  notify:
+   - restart dns
+
+- name: unmanage resolve.conf in NetworkManager
+  lineinfile:
+    line: dns=none
+    dest: /etc/NetworkManager/NetworkManager.conf
+    insertafter: "\\[main\\].*"
+    regexp: "^dns=.*"
+
+- name: use local dns in resolv.conf
+  blockinfile:
+    dest: /etc/resolv.conf
+    insertbefore: BOF
+    block: |
+      search {{ cluster_domain_name }}
+      nameserver {{ bastion_private_ip_address }} 
+
+- name: create dns subnet zone for bastion
+  template:
+    src: var/named/bastion.in-addr.arpa.zone.j2
+    dest: /var/named/{{ bastion_subnet_prefix_reverse }}.in-addr.arpa.zone
+  notify:
+   - restart dns
+ 
+- name: create /etc/named.conf
+  template:
+    src: etc/named.conf.j2
+    dest: /etc/named.conf
+  notify:
+   - restart dns
+
+- name: add dns to firewall
+  firewalld:
+    permanent: true
+    service: dns
+    state: enabled
+    zone: "{{ item }}"
+  with_items:
+    - internal
+    - public
+  notify:
+  - restart firewalld

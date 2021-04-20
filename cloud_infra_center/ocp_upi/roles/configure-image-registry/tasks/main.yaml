@@ -1,0 +1,39 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+# The Image Registry Operator is not initially available for platforms that do not provide default storage. 
+# We set the image registry to an empty directory for non-production clusters.
+
+- name: 'Check the image registry service status'
+  shell:
+    cmd: "./oc --kubeconfig auth/kubeconfig get service -n openshift-image-registry | grep image-registry | wc -l"
+  register: service_status
+
+- name: 'Set the image registry storage to an empty directory'
+  command:
+    cmd: "./oc --kubeconfig auth/kubeconfig patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}'"
+  when:
+  - service_status.stdout == "2"
+
+- name: 'Set the image registry to managed to enable building and pushing of images'
+  command:
+    cmd: "./oc --kubeconfig auth/kubeconfig patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}'"
+  when:
+  - service_status.stdout == "2"
+
+- name: 'Expose the image registry'
+  command:
+    cmd: "./oc --kubeconfig auth/kubeconfig patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"defaultRoute\":true}}'"
