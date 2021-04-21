@@ -71,3 +71,4 @@
       vars:
         instance_action_name: "{{ action }}"
         instance_info_json_path: "{{ instance_info_file }}"
+        input_vars: '<optional-fill-me-input-vars>'
