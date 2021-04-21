@@ -1,0 +1,18 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2021-04-21
+#  - Released initial version
+###############################################################################
+
+# directory path that the provisioning role uses to capture various information (in JSON format) about the provisioned instance.
+instance_record_dir: "/tmp" 
+
+# total retry attempts allowed before the task exits with failure, waiting on the instance action to complete
+api_polling_retry_count: 50
+
+# interval time (in seconds) for each polling request
+api_polling_interval_seconds: 10

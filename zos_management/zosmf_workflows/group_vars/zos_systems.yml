@@ -1,0 +1,37 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2021-04-21
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Notes:
+#   - This is an easy example to use username and password for authenticating
+#     with z/OSMF server. `zmf_user` and `zmf_password` will be prompted to
+#     input when running the sample playbooks. Actually, client-certificate
+#     authorization is recommended. You can use `zmf_crt` and `zmf_key` to
+#     specify the client-certificate authorization. If both methods are
+#     specified, the system attempts to use client-certificate authentication.
+###############################################################################
+
+# hostname of the z/OSMF server
+zmf_host: zosmf_host_name
+
+# port number of the z/OSMF server
+zmf_port: zosmf_port_number
+
+# user name to be used for authenticating with the z/OSMF server
+# zmf_user: zosmf_user_name
+
+# password to be used for authenticating with the z/OSMF server
+# zmf_password: zosmf_password
+
+# location of the PEM-formatted certificate chain file to be used for HTTPS client authentication with z/OSMF server
+# zmf_crt: zosmf_client_certificate
+
+# location of the PEM-formatted file with your private key to be used for HTTPS client authentication with z/OSMF server
+# zmf_key: zosmf_client_certificate_key

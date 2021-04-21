@@ -1,0 +1,9 @@
+################################################################################
+# © Copyright IBM Corporation 2021
+################################################################################
+
+# group of the target z/OS systems
+zos_systems:
+  hosts:
+    workflow_host1:
+    workflow_host2:

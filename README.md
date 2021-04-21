@@ -47,6 +47,10 @@ often repeated and in need of automation.
    * [Synchronize APF authorized libraries from a configuration cloned from GitHub](zos_concepts/program_authorization/git_apf) - \[[Playback](https://mediacenter.ibm.com/media/Using+Ansible+to+synchronize+z+OS+APF+libraries+from+a+GitHub+configuration+file/1_e6qsiwmg)]
    * [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
    * [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
+* Integrating Existing Automation
+   * [Invoking z/OSMF Workflows](zos_management/zosmf_workflows)
+* z/OS Provisioning
+   * [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
 * [z/OS Subsystems](zos_subsystems)
    * [CICS](zos_subsystems/cics)
      * [Retrieve operational data from running CICS regions](zos_subsystems/cics/cmci/reporting)

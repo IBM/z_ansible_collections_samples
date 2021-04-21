@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- © Copyright IBM Corporation 2021                                                 -->
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:noNamespaceSchemaLocation="./workflow_v1.xsd">
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+	 This sample demonstrates the use of automation steps in a workflow.
+
+         When a workflow is started automatically, the Workflows task locates 
+         the auto-enabled steps with one of the following statuses: 
+         ready, in-progress, or failed. These steps are considered to be 
+         automation ready. The Workflows task will attempt to run these 
+         steps in automation on z/OS.
+
+	 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+-->
+
+<workflowInfo>
+	<parallelSteps>false</parallelSteps>
+	<workflowID>WorkflowAutomationSample</workflowID>
+	<workflowDescription>Sample that demonstrates the use of automation steps in a workflow.</workflowDescription>
+	<workflowVersion>1.0</workflowVersion>
+	<vendor>IBM</vendor>
+	<Configuration>
+		<productID>ABC123</productID>
+		<productName>Product ABC</productName>
+		<productVersion>Version 1</productVersion>
+ 	</Configuration>
+</workflowInfo>
+
+<!-- Declare a set of variables -->
+<variable name="st_user">
+	<label>user ID</label>
+	<abstract>User ID for a started task.</abstract>
+	<description>The user ID under which the started task will run.</description>
+	<category>Started</category>
+	<string>
+		<validationType>USERID</validationType>
+		<default>MYSTUSER</default>
+	</string>
+</variable>
+
+<!-- This step contains substeps. The substeps will be performed automatically.  -->
+<step name="rootStep">
+	<title>Root Step</title>
+	<description>This is a top-level step.</description>
+	<step name="subStep1">
+		<title>Second-level step 1</title>
+		<description>This is a second-level step 1.</description>
+		<variableValue name="st_user" required="true"/>
+		<instructions>This is a simple JCL job that submits empty JCL.</instructions>
+		<weight>2</weight>
+		<skills>Basic JCL</skills>
+		<autoEnable>true</autoEnable>
+		<template> 
+			<inlineTemplate substitution="false">//IZUWFJO1 JOB
+//STEP1       EXEC  PGM=IEFBR14
+//SYSEXEC    DD    DUMMY
+//* PRINT DD SYSOUT=A
+/*
+			</inlineTemplate>
+			<submitAs>JCL</submitAs>
+		</template>
+	</step>
+	<step name="subStep2">
+		<title>Second-level step 2</title>
+		<description>This is a second-level step 2.</description>
+		<instructions>This is a simple JCL job that submits empty JCL.</instructions>
+		<weight>2</weight>
+		<skills>Basic JCL</skills>
+		<autoEnable>true</autoEnable>
+		<template> 
+			<inlineTemplate substitution="false">//IZUWFJO2 JOB
+//STEP1       EXEC  PGM=IEFBR14
+//SYSEXEC    DD    DUMMY
+//* PRINT DD SYSOUT=A
+/*
+			</inlineTemplate>
+			<submitAs>JCL</submitAs>
+		</template>
+	</step>
+	<step name="subStep3">
+		<title>Second-level step 3</title>
+		<description>This is a second-level step 3.</description>
+		<instructions>This is a basic automated step.</instructions>
+		<weight>1</weight>
+		<autoEnable>true</autoEnable>
+	</step>
+</step>
+
+<!-- This step demonstrates the use of a step attribute ("stepState") in the conditional expression of a conditional step. -->
+<step name="attrConditionStep">
+	<title>Step Attribute Conditional Step</title>
+	<description>In this conditional step, the step state is used as the condition.</description>
+	<condition>
+		<expression><![CDATA[ ${subStep3.stepState} == "Complete" ]]></expression>
+		<description>This step state will change to "skipped" state when:<br/>
+			- The step state of step "subStep3" equals "Complete".
+		</description>
+		<!-- Target step state(skipped) is specified in this conditional step -->
+		<targetState>Skipped</targetState>
+	</condition>
+	<instructions>When you complete step "subStep3", the step will be marked as skipped.</instructions>
+	<weight>2</weight>
+	<skills>Basic JCL</skills>
+	<autoEnable>true</autoEnable>
+	<template> 
+			<inlineTemplate substitution="false">//IZUWFJO3 JOB
+//STEP1       EXEC  PGM=IEFBR14
+//SYSEXEC    DD    DUMMY
+//* PRINT DD SYSOUT=A
+/*
+			</inlineTemplate>
+			<submitAs>JCL</submitAs>
+		</template>
+</step>
+
+</workflow>
