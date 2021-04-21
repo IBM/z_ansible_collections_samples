@@ -9,12 +9,14 @@ library, and `NEWCOPY` the `PROGRAM` in CICS.
 This sample additionally shows how to automate installation of pre-requisites for the `cmci_*` modules.
 
 ## Requirements
-   - Python 2.7+
-   - Ansible 2.9+
-   - IBM z/OS CICS Ansible collection 1.0.0+
-   - IBM z/OS Core Ansible collection 1.2.0+
+
+- Python 2.7+
+- Ansible 2.9+
+- IBM z/OS CICS Ansible collection 1.0.0+
+- IBM z/OS Core Ansible collection 1.2.0+
 
 ## Getting Started
+
 If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](../../../docs/share/configuration_guide.md) or
 continue with getting started below.
@@ -27,7 +29,7 @@ for the most common dependencies, some playbooks require more customized
 configurations, in this case, you can review the sample documentation and
 add the additional required variables.
 
-###  Update [inventory.yml](inventory.yml) with the information about your system(s)
+### Update [inventory.yml](inventory.yml) with the information about your system(s)
 
 ```yaml
 # the target z/OS system
@@ -93,18 +95,14 @@ ansible-playbook -i inventory.yml deploy_program.yml
 
 - Look at the [other samples](../..) to find examples of what else you can do with the CICS collection.
 
-# Copyright
+# Support
 
-© Copyright IBM Corporation 2021
+Please refer to the [support section](../../../../README.md/#support) for more details.
 
 # License
 
-Licensed under [Apache License,
-Version 2.0](https://opensource.org/licenses/Apache-2.0).
+Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
-# Support
+# Copyright
 
-Please refer to the [support section](../../../README.md#support) for more
-details.
-
-#
+© Copyright IBM Corporation 2021.

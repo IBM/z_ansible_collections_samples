@@ -3,14 +3,14 @@
 CMCI's access to CSD is through a named CICS region, so in addition to
 supplying the CMCI connection details as parameters, you will also need to
 supply a context and scope which identifies a CICS region that's using the
-appropriate CSD.  You'll also be prompted for the name of a CSD group to use
-temporarily.  The created definition will be deleted at the end of the
-sample.  The sample will create a `PROGDEF` in the named CSD group,
+appropriate CSD. You'll also be prompted for the name of a CSD group to use
+temporarily. The created definition will be deleted at the end of the
+sample. The sample will create a `PROGDEF` in the named CSD group,
 update the definition, install it into the target CICS region, disable the
 `PROGRAM`, discard the `PROGRAM`, and delete `PROGDEF`, leaving the system
 in the same state as it started.
 
-Also of note, install is an asynchronous action in CMCI.  This playbook also
+Also of note, install is an asynchronous action in CMCI. This playbook also
 demonstrates how to use Ansible to wait until the install has completed
 successfully before proceeding.
 
@@ -18,10 +18,12 @@ This sample additionally shows how to automate installation of
 pre-requisites for the `cmci_*` modules.
 
 ## Requirements
-   - Python 2.7+
-   - Ansible 2.9+
+
+- Python 2.7+
+- Ansible 2.9+
 
 ## Getting Started
+
 You will need to have set up the CMCI REST API in your CICS environment. You
 can enable the CMCI REST API in either CICSPlex SM environments, or in
 stand-alone CICS regions. The `cmci_*` modules use the *CMCI REST API* to
@@ -41,7 +43,7 @@ ansible-galaxy collection install ibm.ibm_zos_cics
 ```
 
 For more information about the CMCI REST API, see the
-[CMCI overview in the CICS TS documentation](https://www.ibm.com/support/knowledgecenter/SSGMCP_5.6.0/fundamentals/cpsm/cpsm-cmci-overview.html).
+[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/5.6?topic=environment-cics-management-client-interface-cmci).
 
 Because this playbook only uses the CMCI REST API, it can be run on the control
 node directly, without having to configure an inventory. Generally you'll be
@@ -53,16 +55,17 @@ unnecessary SSH connection, and you don't have to install the modules'
 dependencies on the remote host.
 
 The `cmci_*` modules have pre-requisites that need to be installed into the
-Python environment in which the module executes.  In this case, the `cmci_*`
+Python environment in which the module executes. In this case, the `cmci_*`
 modules will be executed on `localhost`, i.e. the Ansible control node.
 The playbook demonstrates how you can ensure the pre-requisites are installed
-(wherever the module runs) before the `cmci_*` modules are executed.  More
+(wherever the module runs) before the `cmci_*` modules are executed. More
 information about the `cmci_*` module pre-requisites can be found in the
 [documentation](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_cics/docs/source/requirements_managed.html).
 
 ## Run [resource_lifecycle_and_csd.yml](resource_lifecycle_and_csd.yml)
 
 You can run the playbook without modification:
+
 ```bash
 ansible-playbook resource_lifecycle_and_csd.yml
 ````
@@ -71,7 +74,7 @@ ansible-playbook resource_lifecycle_and_csd.yml
 
 The playbook shows which parameters you need to set to create definitions in CSD,
 update definitions in CSD, install definitions from CSD and delete definitions
-from CSD.  Of note is that when creating you must specify that you'd like to
+from CSD. Of note is that when creating you must specify that you'd like to
 create the definition in CSD in addition to supplying a scope:
 
 ```yaml
@@ -101,9 +104,16 @@ ibm.ibm_zos_cics.cmci_action:
 ```
 
 You can cross-reference this with the documentation for the
-[`PROGDEF` resource table](https://www.ibm.com/docs/en/cics-ts/5.6?topic=tables-progdef-resource-table)
+[`PROGDEF` resource table](https://www.ibm.com/docs/en/cics-ts/5.6?topic=tables-progdef-resource-table).
 
 # Support
 
-Please refer to the [support section](../../../README.md#support) for more
-details.
+Please refer to the [support section](../../../../README.md/#support) for more details.
+
+# License
+
+Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
+
+# Copyright
+
+© Copyright IBM Corporation 2021.
