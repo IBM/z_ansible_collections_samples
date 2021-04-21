@@ -85,7 +85,7 @@ the results of the report.
   names applicable to the target resource. In this example, the returned attributes will correspond to what's listed in the [CICSRGN resource table](https://www.ibm.com/docs/en/cics-ts/5.6?topic=tables-cicsrgn-resource-table). 
   
 - Try adding a `filter` argument to the `cmci_get` task, to restrict the report to a subset of your CICS regions. For
-  information on how to set a filter for the `cmci_get` task, see [the IBM z/OS CICS modules documentation](http://todo).
+  information on how to set a filter for the `cmci_get` task, see [the IBM z/OS CICS modules documentation](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_cics/docs/source/modules/cmci_get.html).
   
 - Try supplying a different resource for the `type` argument of the `cmci_get` task, to request attributes for a different type of resource. You can find
   available CMCI resource names at
