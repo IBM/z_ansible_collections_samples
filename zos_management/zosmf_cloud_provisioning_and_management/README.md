@@ -113,7 +113,7 @@ z/OSMF server.
 
 Although you can store variables in the **inventory** file, storing them in
 separate configurations such as **host_vars** or **group_vars** files help
-you organize your variable values.
+you organize your variable values. **host_vars** file name must match the host name used in the **inventory** and playbook.
 
 The sample includes a **host_vars** file
 [**cpm_host1.yml**](host_vars/cpm_host1.yml) that can be easily customized.
@@ -126,7 +126,7 @@ api_polling_interval_seconds: 10
 
 - **instance_record_dir**: The value of this property identifies the directory
 path that the provisioning role uses to capture various information
-(in JSON format) about the provisioned instance.
+(in JSON format) about the provisioned instance. 
 
 - **api_polling_retry_count**: The value of this property identifies the total
 retry attempts allowed before the task exits with failure, waiting on the

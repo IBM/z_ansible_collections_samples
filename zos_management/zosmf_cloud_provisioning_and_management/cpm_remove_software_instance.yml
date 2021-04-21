@@ -31,7 +31,7 @@
 
 ---
 - name: remove a deprovisioned software service instance
-  hosts: zos_systems
+  hosts: cpm_host1
   gather_facts: no
   collections:
     - ibm.ibm_zosmf
@@ -42,6 +42,9 @@
     - name: zmf_password
       prompt: "Enter your z/OSMF"
       private: yes
+    - name: instance_info_file
+      prompt: "Enter instance info file full path"
+      private: no
   tasks:
     # ##########################################################################
     # Role: zmf_cpm_remove_software_instance
@@ -52,4 +55,4 @@
     - include_role:
         name: zmf_cpm_remove_software_instance
       vars:
-        instance_info_json_path: "<full-instance-json-file-path>"
+        instance_info_json_path: "{{ instance_info_file }}"

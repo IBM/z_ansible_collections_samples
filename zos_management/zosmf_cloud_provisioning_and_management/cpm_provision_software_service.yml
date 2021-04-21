@@ -51,7 +51,7 @@
 
 ---
 - name: provision a z/OS software service
-  hosts: zos_systems
+  hosts: cpm_host1
   gather_facts: no
   collections:
     - ibm.ibm_zosmf
@@ -72,8 +72,8 @@
     - include_role:
         name: zmf_cpm_provision_software_service
       vars:
-        cpm_template_name: "<fill-me-template-name>"
-        domain_name: "<domain-name>"
-        tenant_name: "<tenant-name>"
-        systems_nicknames: "<system-name>"
-        input_vars: "<input-vars>"
+        cpm_template_name: '<fill-me-template-name>'
+        domain_name: '<fill-me-domain-name>'
+        tenant_name: '<optional-fill-me-tenant-name>'
+        systems_nicknames: '<optional-fill-me-system-name>'
+        input_vars: '<optional-fill-me-input-vars>'
