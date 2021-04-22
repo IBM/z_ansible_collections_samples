@@ -113,7 +113,8 @@ z/OSMF server.
 
 Although you can store variables in the **inventory** file, storing them in
 separate configurations such as **host_vars** or **group_vars** files help
-you organize your variable values. **host_vars** file name must match the host name used in the **inventory** and playbook.
+you organize your variable values. **host_vars** file name must match the host
+name used in the **inventory** file and sample playbooks.
 
 The sample includes a **host_vars** file
 [**cpm_host1.yml**](host_vars/cpm_host1.yml) that can be easily customized.
@@ -122,11 +123,13 @@ The sample includes a **host_vars** file
 instance_record_dir: "/tmp"
 api_polling_retry_count: 50
 api_polling_interval_seconds: 10
+# zmf_user: zosmf_user_name
+# zmf_password: zosmf_password
 ```
 
 - **instance_record_dir**: The value of this property identifies the directory
 path that the provisioning role uses to capture various information
-(in JSON format) about the provisioned instance. 
+(in JSON format) about the provisioned instance.
 
 - **api_polling_retry_count**: The value of this property identifies the total
 retry attempts allowed before the task exits with failure, waiting on the
@@ -134,6 +137,17 @@ instance action to complete.
 
 - **api_polling_interval_seconds**: The value of this property identifies the
 interval time (in seconds) for each polling request.
+
+- **zmf_user**: The value of this property identifies the username to be used
+for authenticating with z/OSMF server.
+
+- **zmf_password**: The value of this property identifies the password to be
+used for authenticating with z/OSMF server.
+
+**`Notes:`**
+
+- **zmf_user** and **zmf_password** will be prompted to input when running the
+sample playbooks.
 
 ### Run the Playbook
 

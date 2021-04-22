@@ -90,7 +90,8 @@ is configured in **z/OSMF Systems** plugin.
 
 Although you can store variables in the **inventory** file, storing them in
 separate configurations such as **host_vars** or **group_vars** files help
-you organize your variable values.
+you organize your variable values. **host_vars** file name must match the host
+name used in the **inventory** file and sample playbooks.
 
 The sample includes a **group_vars** file
 [**zos_systems.yml**](group_vars/zos_systems.yml) that can be easily

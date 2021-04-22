@@ -33,10 +33,10 @@
 #                       (CP&M).
 #   domain_name       - the cloud domain name that is associated with the
 #                       template.
-#   tenant_name       - CP&M tenant name that is associated with `zmf_user` who
-#                       is provisioning the template.
 #
 # Optional:
+#   tenant_name       - CP&M tenant name that is associated with `zmf_user` who
+#                       is provisioning the template.
 #   systems_nicknames - the nickname of system on which the software instance
 #                       will be provisioned. If this variable is not specified
 #                       provisioning is performed on the system where z/OSMF is
