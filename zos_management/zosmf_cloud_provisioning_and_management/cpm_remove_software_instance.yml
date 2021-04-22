@@ -40,7 +40,7 @@
       prompt: "Enter your z/OSMF username"
       private: no
     - name: zmf_password
-      prompt: "Enter your z/OSMF"
+      prompt: "Enter your z/OSMF password"
       private: yes
     - name: instance_info_file
       prompt: "Enter instance info file full path"
