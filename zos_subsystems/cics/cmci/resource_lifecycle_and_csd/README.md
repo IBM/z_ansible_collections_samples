@@ -1,4 +1,4 @@
-# Customising when a CMCI module should fail
+# Resource lifecycle and CSD
 
 CMCI's access to CSD is through a named CICS region, so in addition to
 supplying the CMCI connection details as parameters, you will also need to
