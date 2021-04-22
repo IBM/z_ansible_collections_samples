@@ -25,6 +25,7 @@ Playbooks are organized by topics that align to tasks and use cases that are
 often repeated and in need of automation.
 
 ### Z Topics
+
 * [Z Systems Administration](z_systems_administration)
   * [zHMC](z_systems_administration/zhmc)
     * [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
@@ -33,6 +34,7 @@ often repeated and in need of automation.
   * [System Automation](z_systems_automation/sysauto/)
 
 ### z/OS® Topics
+
 * [z/OS Administration](zos_administration/)
    * [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
 * [z/OS Concepts](zos_concepts/)
@@ -52,6 +54,7 @@ often repeated and in need of automation.
      * [Retrieve operational data from running CICS regions](zos_subsystems/cics/cmci/reporting)
      * [Deploy a program to a CICS region](zos_subsystems/cics/cmci/deploy_program)
      * [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
+     * [Resource lifecycle and CSD](zos_subsystems/cics/cmci/resource_lifecycle_and_csd)
    * [IMS](zos_subsystems/ims)
      * [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
    * [ZCEE](zos_subsystems/zcee)
@@ -61,7 +64,8 @@ often repeated and in need of automation.
    * [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 
 ## Blogs
-Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings 
+
+Don't have time to explore a collection, particular module or a playbook? Learn all about the offerings
 from our
 [blogs](https://community.ibm.com/community/user/ibmz-and-linuxone/groups/topic-home/blog-entries?communitykey=ce54fe94-0145-4832-a0ef-4ea81d6062cc&tab=blog-entries). Don't know
 which one to read first? Well, here is a list of some of our recent blogs:
@@ -72,6 +76,7 @@ which one to read first? Well, here is a list of some of our recent blogs:
 * [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Playbook](zos_concepts/user_management/add_remove_user)\]
 
 ## Playbacks
+
 Want to experience Z automation with Ansible without rolling up your sleeves?
 Take a look at some of our playbacks using our own playbooks available
 in this repository.
@@ -102,21 +107,23 @@ The playbooks in the repository is organized as follows:
     └── README
 
 ## Copyright
+
 © Copyright IBM Corporation 2020, 2021
 
 ## License
+
 Licensed under
 [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
+
 Support for all playbooks, roles, and filters are provided by the community
 and all issues are tracked through a
 [Git issue](https://github.com/IBM/z_ansible_collections_samples/issues).
 The repository admins and content owners will engage directly with users on issues reported on the
 Git issue.
 
-Playbooks are contributed both by IBM as well as the broader Ansible community including IBM partners and the Z community. 
+Playbooks are contributed both by IBM as well as the broader Ansible community including IBM partners and the Z community.
 Therefore, it may be helpful to review who contributed a sample as well as its requirements. You
 can view who the contributor was by looking at the playbooks commit history as
 well as notes in the playbook.
-
