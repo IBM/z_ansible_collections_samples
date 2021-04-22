@@ -17,3 +17,9 @@ api_polling_retry_count: 50
 
 # interval time (in seconds) for each polling request
 api_polling_interval_seconds: 10
+
+# user name to be used for authenticating with the z/OSMF server
+# zmf_user: zosmf_user_name
+
+# password to be used for authenticating with the z/OSMF server
+# zmf_password: zosmf_password
