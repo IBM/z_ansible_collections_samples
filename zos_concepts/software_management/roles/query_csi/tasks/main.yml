@@ -1,0 +1,28 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks file for query_csi
+
+# LIST HOLDDATA
+- name: "LIST {{ list_operands }} FROM ZONE {{ zone }}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: GIMSMP
+    auth: "yes"
+    dds:
+      - dd_data_set:
+          dd_name: "SMPCSI"
+          data_set_name: "{{ global_csi }}"
+
+      - dd_output:
+          dd_name: "SMPOUT"
+          return_content:
+              type: text
+      - dd_output:
+          dd_name: "SMPLIST"
+          return_content:
+              type: text
+      - dd_input:
+          dd_name: "SMPCNTL"
+          content:
+            - 'SET  BOUNDARY({{ zone }}) .'
+            - 'LIST {{ list_operands }}'
