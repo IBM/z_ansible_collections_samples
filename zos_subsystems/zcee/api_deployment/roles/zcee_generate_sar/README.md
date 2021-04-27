@@ -1,7 +1,7 @@
 zcee_generate_sar
 =========
 
-This role generates the API Archive file when provided with the project directory and archive file name.
+This role generates the Service Archive file when provided with the project directory and archive file name.
 
 Requirements
 ------------
@@ -30,7 +30,7 @@ Example Playbook
         name: zcee_generate_sar
       vars:
         project_directory: path/to/root/project/directory
-        archive_file_name: archives/api_archive.aar
+        archive_file_name: archives/service_archive.sar
 ```
 
 License
