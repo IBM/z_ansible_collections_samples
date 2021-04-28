@@ -34,7 +34,7 @@ often repeated and in need of automation.
    * [IBM Z System Automation](z_system_automation)
      * [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
 	
-	### z/OS® Topics
+### z/OS® Topics
 
 * [z/OS Administration](zos_administration/)
    * [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
