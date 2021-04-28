@@ -30,10 +30,11 @@ often repeated and in need of automation.
   * [zHMC](z_systems_administration/zhmc)
     * [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
     * [zHMC Concepts](z_systems_administration/zhmc/docs/module_playbooks.md)
-* [Z Systems Automation](z_systems_automation)
-  * [System Automation](z_systems_automation/sysauto/)
-
-### z/OS® Topics
+* z/OS Automated Operations   
+   * [IBM Z System Automation](z_system_automation)
+     * [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
+	
+	### z/OS® Topics
 
 * [z/OS Administration](zos_administration/)
    * [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
@@ -62,6 +63,7 @@ often repeated and in need of automation.
      * [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/api_deployment)
 * z/OS Software Installation
    * [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
+
 
 ## Blogs
 

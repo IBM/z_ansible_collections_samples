@@ -1,0 +1,8 @@
+# Copyright (c) IBM Corporation 2020,2021
+
+# this group is used in the sample playbooks
+# If the hostname is changed here, please create an appropriate "host_name".yaml file under host_vars and specify host specific variables
+# as shown in example zos_host.yaml
+sample:
+  hosts:
+    zos_host:

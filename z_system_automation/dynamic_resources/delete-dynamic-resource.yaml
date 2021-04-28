@@ -1,0 +1,27 @@
+---
+# Copyright (c) IBM Corporation 2020, 2021 
+
+# This sample playbook demonstrates how to use the role sa_delete_dynamic_resource.
+# Example:
+# ansible-playbook -i inventory.yaml delete-dynamic-resource.yaml
+- name: find, stop, and delete an SA resource
+  hosts: zos_host
+  gather_facts: no
+  collections:
+    - ibm.ibm_zos_sysauto
+  vars_files:
+    - ./vars/vars.yaml
+  vars_prompt:
+    - name: username
+      prompt: "Enter your username"
+      default: "{{ lookup('env', 'username_value') }}"
+      private: no
+
+    - name: password
+      prompt: "Enter your password"
+      default: "{{ lookup('env', 'password_value') }}"
+      private: yes    
+  tasks:
+    - include_role:
+        name: sa_delete_dynamic_resource
+...
