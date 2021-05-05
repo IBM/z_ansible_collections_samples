@@ -23,7 +23,7 @@ and WebSphere Liberty on the target z/OS systems using z/OS middleware/software
 template published inthe z/OSMF software services catalog and role
 `zmf_cpm_provision_software_service` provided with IBM z/OSMF collection.
 
-This playbook creates a local record file of instance information, which is
+   This playbook creates a local record file of instance information, which is
 returned in JSON format and is used as the input to other playbooks
 [cpm_manage_software_instance.yml](cpm_manage_software_instance.yml) and
 [cpm_remove_software_instance.yml](cpm_remove_software_instance.yml).
