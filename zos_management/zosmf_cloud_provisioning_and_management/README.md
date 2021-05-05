@@ -1,9 +1,10 @@
 # z/OSMF Cloud Provisioning and Management
 
 This project provides sample playbooks which are used to demonstrate how to
-provision and manage z/OS middlewares/softwares, such as CICS, Db2, IMS, and
-WebSphere Liberty, on the target z/OS systems using roles provided by IBM
-z/OSMF collection included in the Red Hat Ansible Certified Content for IBM Z.
+provision and manage z/OS middlewares/softwares, such as CICS, Db2, MQ, z/OS Connect,
+and WebSphere Liberty, on the target z/OS systems using z/OS middleware/software 
+templates published in the z/OSMF Software Services Catalog and roles provided by 
+IBM z/OSMF collection included in the Red Hat Ansible Certified Content for IBM Z.
 
 It is a good practice to review the playbook sample contents before executing
 them.
@@ -17,8 +18,11 @@ Review the playbook notes sections for additional details and configuration.
 ## Playbook Summary
 
 - [**cpm_provision_software_service.yml**](cpm_provision_software_service.yml) -
-Provision a z/OS software service on the target z/OS systems using role
-`zmf_cpm_provision_software_service`.
+Provision a z/OS middleware/software such as ICS, Db2, MQ, z/OS Connect,
+and WebSphere Liberty on the target z/OS systems using z/OS middleware/software 
+template published inthe z/OSMF software services catalog and role
+`zmf_cpm_provision_software_service` provided with IBM z/OSMF collection.
+
 This playbook creates a local record file of instance information, which is
 returned in JSON format and is used as the input to other playbooks
 [cpm_manage_software_instance.yml](cpm_manage_software_instance.yml) and
