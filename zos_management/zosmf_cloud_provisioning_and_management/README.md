@@ -1,14 +1,14 @@
 # z/OSMF Cloud Provisioning and Management
 
-This project provides sample playbooks which are used to demonstrate how to
-provision and manage z/OS middlewares/softwares, such as CICS, Db2, MQ, z/OS Connect,
-and WebSphere Liberty, on the target z/OS systems using z/OS middleware/software 
-templates published in the z/OSMF Software Services Catalog and roles provided by 
-IBM z/OSMF collection included in the Red Hat Ansible Certified Content for IBM Z.
+This project provides sample playbooks which demonstrate how to provision
+and manage z/OS middlewares/softwares, such as CICS, Db2, MQ, z/OS Connect,
+and WebSphere Liberty, on the target z/OS systems using templates published
+in the `z/OSMF software services catalog`. These playbooks leverage roles 
+provided by IBM z/OSMF collection included in the Red Hat Ansible 
+Certified Content for IBM Z to provision and manage z/OS middleware/software.
 
 It is a good practice to review the playbook sample contents before executing
-them.
-It will help you understand the requirements in terms of space, location,
+them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
 Although samples are written to operate without the need for the user’s
 configuration, flexibility is written into the samples because it is not easy
