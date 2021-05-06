@@ -1,0 +1,79 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2021-04-21
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to provision a z/OS software service on
+# the target z/OS systems using role `zmf_cpm_provision_software_service`
+# provided by IBM z/OSMF collection included in the Red Hat Ansible Certified
+# Content for IBM Z.
+#
+# This playbook creates a local record file of instance information, which is
+# returned in JSON format and is used as the input to other playbooks
+# `cpm_manage_software_instance.yml` and `cpm_remove_software_instance.yml`.
+#
+# Usage:
+#   ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#   ansible-playbook -i inventory.yml cpm_provision_software_service.yml
+#
+# Requirements:
+#   IBM z/OSMF collection 1.0.0 or later
+#
+# Configure:
+#   cpm_template_name - the template name for the software service to be
+#                       provisioned with Cloud Provisioning and Management
+#                       (CP&M).
+#   domain_name       - the cloud domain name that is associated with the
+#                       template.
+#
+# Optional:
+#   tenant_name       - CP&M tenant name that is associated with `zmf_user` who
+#                       is provisioning the template.
+#   systems_nicknames - the nickname of system on which the software instance
+#                       will be provisioned. If this variable is not specified
+#                       provisioning is performed on the system where z/OSMF is
+#                       currently running.
+#   input_vars        - the input variable names and values for the software
+#                       service to be provisioned. This variable is required if
+#                       software service expects specific inputs from user.
+#                       This is a dictionary variable and needs to be in
+#                       following format:
+#                       `[{ "name":"VAR1","value":"VAR1_VALUE"},{..},...]`
+###############################################################################
+
+---
+- name: provision a z/OS software service
+  hosts: cpm_host1
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+  vars_prompt:
+    - name: zmf_user
+      prompt: "Enter your z/OSMF username"
+      private: no
+    - name: zmf_password
+      prompt: "Enter your z/OSMF password"
+      private: yes
+  tasks:
+    # ##########################################################################
+    # Role: zmf_cpm_provision_software_service
+    # ##########################################################################
+    # ##########################################################################
+    # Provision a z/OS software service
+    # ##########################################################################
+    - include_role:
+        name: zmf_cpm_provision_software_service
+      vars:
+        cpm_template_name: '<fill-me-template-name>'
+        domain_name: '<fill-me-domain-name>'
+        tenant_name: '<optional-fill-me-tenant-name>'
+        systems_nicknames: '<optional-fill-me-system-name>'
+        input_vars: '<optional-fill-me-input-vars>'
