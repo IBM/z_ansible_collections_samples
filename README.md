@@ -56,9 +56,9 @@ often repeated and in need of automation.
 - Provisioning
   - [IMS](zos_subsystems/ims)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
-  - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
+  - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
 - Application & Service Deployment
   - [ZCEE](zos_subsystems/zcee)
     - [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/api_deployment)
