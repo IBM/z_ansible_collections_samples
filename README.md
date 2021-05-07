@@ -54,9 +54,9 @@ often repeated and in need of automation.
   - [System Automation](z_system_automation)
     - [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
 - Provisioning
-  - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
   - [IMS](zos_subsystems/ims)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
+  - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
 - Application & Service Deployment
