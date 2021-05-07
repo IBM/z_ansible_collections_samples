@@ -26,49 +26,49 @@ often repeated and in need of automation.
 
 ### Z Topics
 
-- [Systems Administration](z_systems_administration)
+- Systems Administration
   - [zHMC](z_systems_administration/zhmc)
     - [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
     - [zHMC Concepts](z_systems_administration/zhmc/docs/module_playbooks.md)
 
 ### z/OS® Topics
 
-- [Administration](zos_administration/)
+- Administration
   - [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
   - [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user) - \[[Playback](https://mediacenter.ibm.com/media/Managing+z+OS+Users+with+Ansible+/1_bnud4enw)]
   - [Synchronize APF authorized libraries from a configuration cloned from GitHub](zos_concepts/program_authorization/git_apf) - \[[Playback](https://mediacenter.ibm.com/media/Using+Ansible+to+synchronize+z+OS+APF+libraries+from+a+GitHub+configuration+file/1_e6qsiwmg)]
-- [Basic Operations](basic_operations)
+- Basic Operations
   - [Data Set Basics](zos_concepts/data_sets/data_set_basics)
   - [Copy Directory to PDS, Edit member and Submit Job](zos_concepts/data_sets/copy_edit_submit)
   - [Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
   - [Convert Encoding](zos_concepts/encoding/convert_encoding)
-- [Concepts](zos_concepts/)
+- Concepts
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
-- [Integrating Existing Automation](integrating_existing_automation)
+- Integrating Existing Automation
   - [Job Control Language](job_control_language) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
   - [z/OSMF Workflows](zos_management/zosmf_workflows)
   - [System Automation](z_system_automation)
     - [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
-- [Provisioning](provisioning)
+- Provisioning
   - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
   - [IMS](zos_subsystems/ims)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
-- [Application & Service Deployment](application_service_deployment)
+- Application & Service Deployment
   - [ZCEE](zos_subsystems/zcee)
     - [Generate and deploy z/OS Connect EE API, service, and API requester artifacts](zos_subsystems/zcee/api_deployment)
-- [Subsystems](zos_subsystems)
+- Subsystems
   - [CICS](zos_subsystems/cics)
     - [Retrieve operational data from running CICS regions](zos_subsystems/cics/cmci/reporting)
     - [Deploy a program to a CICS region](zos_subsystems/cics/cmci/deploy_program)
     - [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
-    - [Resource lifecycle and CSD](zos_subsystems/cics/cmci/resource_lifecycle_and_csd)
-- [Software Installation](software_installation)
+    - [Resource life cycle and CSD](zos_subsystems/cics/cmci/resource_lifecycle_and_csd)
+- Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 
 ## Blogs
