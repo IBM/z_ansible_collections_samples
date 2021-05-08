@@ -1,0 +1,60 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    cert_label: 'ANDYSSL'
+    owner_id: 'OMVSADM'
+
+  tasks:
+    - include_role:
+        name: issue_racf_cmd
+      vars:
+        system_name: 'EC01129A'
+        task_description: 'Clean up certs and keyring'
+        command:
+            - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
+            - RACDCERT LIST(LABEL('{{cert_label}}')) ID({{ owner_id}})
+            - RACDCERT DELRING(WEBSSL) ID({{ owner_id}})
+            - RACDCERT LISTRING(WEBSSL) ID({{ owner_id}})
+            - RACDCERT ADDRING(WEBSSL) ID({{owner_id}})
+            - RACDCERT LISTRING(WEBSSL) ID({{ owner_id}})
+
+    - include_role:
+        name: issue_racf_cmd
+      vars:
+        system_name: 'EC01129A'
+        task_description: 'Create new certs and connect to keyring'
+        command:
+            - RACDCERT GENCERT ID({{owner_id}}) SUBJECTSDN(CN('www.TEST.com') +
+            - OU('ANSIBLE CORE') C('US')) WITHLABEL('{{cert_label}}') +
+            - NOTAFTER(DATE(2021-05-28))
+            - RACDCERT ID({{owner_id}}) CONNECT(LABEL('{{cert_label}}') +
+            - RING(WEBSSL) DEFAULT)
+            - RACDCERT LISTRING(WEBSSL)
+            - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
+
+    - include_role:
+        name: issue_operator_cmd
+      vars:
+        task_description: 'Run Health Check'
+        command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+
+

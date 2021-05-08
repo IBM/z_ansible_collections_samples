@@ -1,0 +1,41 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - command: "date '+%b%d%y'"
+      register: result
+
+    - debug: msg="{{result.stdout}}"
+
+    - name: Back up current cert
+      include_role:
+        name: issue_racf_cmd
+      vars:
+        system_name: 'EC01129A'
+        task_description: 'Export current certificate'
+        today: "{{result.stdout}}"
+        command:
+            - RACDCERT EXPORT(LABEL('WEB SERVER CERT')) +
+            - DSN('{{ ansible_user }}.CERT.B64.BACKUP.{{today}}')
+            - RACDCERT CHECKCERT('{{ ansible_user }}.CERT.B64.BACKUP.{{today}}')
+
+

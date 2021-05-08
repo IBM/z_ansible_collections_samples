@@ -1,0 +1,17 @@
+---
+# Copyright (c) IBM Corporation 2021
+
+# tasks file for print_hc_buffer
+###########################################################################
+# skeleton for HZSPRNT
+###########################################################################
+- name: "{{task_description}}"
+  ibm.ibm_zos_core.zos_mvs_raw:
+    pgm: HZSPRNT
+    auth: yes
+    parm: "REGION=0M,PARM={{parm_string}}"
+    dds:
+      - dd_output:
+          dd_name: SYSOUT
+          return_content:
+            type: text
