@@ -1,0 +1,6 @@
+---
+# vars file for issue_racf_cmd
+command: ''
+system_name: 'EC01129A'
+task_description: 'issue RACF commands'
+today: ''

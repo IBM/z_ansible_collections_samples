@@ -1,0 +1,82 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    cert_found: false
+
+  tasks:
+    # - command: "date '+%b%d%y'"
+    #   register: result
+
+    # - debug: msg="{{result.stdout}}"
+
+    - name: Get expiring certs
+      zos_job_submit:
+        src: USER.PRIVATE.PROCLIB(HZSPRINT)
+        location: DATA_SET
+        # wait: false
+        # wait_time_s: 10
+      register: job_output
+
+    # - set_fact:
+    #   cert_found: item.content is search("WEB SERVER CERT2")
+
+    # - name: Get sysout
+    #   debug:
+    #     msg="{{item.key.ddname}}"
+    #     # msg="{{job_output.jobs.0.ddnames}}"
+    #   with_dict: "{{ job_output.jobs.0.ddnames }}"
+    #   # when: item.value.ddname == 'SYSOUT'
+
+    # - name: Get sysout
+    #   debug:
+    #     msg="{{item.1}}"
+    #   with_subelements:
+    #     - "{{ job_output.jobs }}"
+    #     - ddnames
+    #   # when: '"WEB SERVER CERT" in item.1.ddname'
+    #   when: item.1.ddname == 'JESJCL'
+    #   register: result
+
+    - name: search for {{cert_label}}
+      # debug: msg="{{job_output}}"
+      # debug:
+      #   msg: "{{item.content}}"
+      set_fact:
+        cert_found: true
+      # debug: msg="{{job_output.jobs.0.ddnames}}"
+      with_items: "{{job_output.jobs.0.ddnames}}"
+      # when: '"SYSOUT" in item.content'
+      when: item.content is search("{{cert_label}}")
+      # when: '"WEB SERVER CERT" in item.content'
+      # when: item.ddname == 'SYSOUT' and '"WEB SERVER CERT" in item.content'
+
+    - debug:
+        msg: "{{cert_found}}"
+
+    # - name: Get expiring certs
+    #   include_role:
+    #     name: print_hc_buffer
+    #   vars:
+    #     system_name: 'EC01129A'
+    #     # parm_string: "('CHECK(*,*)','EXCEPTIONS')"
+    #     parm_string: "('CHECK(IBMRACF,RACF_CERTIFICATE_EXPIRATION)','EXCEPTIONS')"
+

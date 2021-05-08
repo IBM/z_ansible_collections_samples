@@ -1,0 +1,37 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  roles:
+    - role: issue_racf_cmd
+      system_name: 'EC01129A'
+      command:
+        - RDEFINE XFACILIT HZS.{{system_name}}.*.*.MESSAGES UACC(NONE)
+        - PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
+        - ID({{ansible_user}}) ACCESS(READ)
+        - RDEFINE XFACILIT HZS.{{system_name}}.*.*.RUN UACC(NONE)
+        - PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
+        - ID({{ansible_user}}) ACCESS(UPDATE)
+        - RDEFINE XFACILIT HZS.{{system_name}}.*.*.QUERY UACC(NONE)
+        - PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
+        - ID({{ansible_user}}) ACCESS(READ)
+        - SETROPTS CLASSACT(XFACILIT)
+        - SETROPTS RACLIST(XFACILIT) REFRESH

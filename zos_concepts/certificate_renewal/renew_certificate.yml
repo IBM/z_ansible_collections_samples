@@ -1,0 +1,40 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  roles:
+    - role: issue_racf_cmd
+      system_name: 'EC01129A'
+      task_description: 'Generate new cert to replace old cert'
+
+      # new ssl cert signed with local CA
+      command:
+        - RACDCERT GENREQ (LABEL('WEB SERVER CERT')) ID({{ansible_user}}) +
+        - DSN('{{ ansible_user }}.CERT.REQUEST')
+        - RACDCERT ID({{ansible_user}}) GENCERT('{{ ansible_user }}.CERT.REQUEST') +
+        - SIGNWITH(CERTAUTH LABEL('TEST CA CERT'))
+
+      # new ssl cert and self-sign
+      # command:
+      #   - RACDCERT GENREQ (LABEL('WEB SERVER CERT')) ID({{ansible_user}}) +
+      #   - DSN('{{ ansible_user }}.CERT.REQUEST')
+      #   - RACDCERT ID({{ansible_user}}) GENCERT('{{ ansible_user }}.CERT.REQUEST') +
+      #   - SIGNWITH(LABEL('WEB SERVER CERT'))

@@ -1,0 +1,4 @@
+---
+# vars file for add_certificate
+command: ''
+task_description: 'issue operator command'

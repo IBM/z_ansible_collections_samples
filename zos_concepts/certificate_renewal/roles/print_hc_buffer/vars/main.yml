@@ -1,0 +1,5 @@
+---
+# vars file for issue_racf_cmd
+parm_string: ''
+system_name: 'EC01129A'
+task_description: 'Print HC buffer for {{ parm_string }}'

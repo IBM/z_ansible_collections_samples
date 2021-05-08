@@ -1,0 +1,58 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-04-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  tasks:
+  - name: using zos_tso_command
+    zos_tso_command:
+      commands:
+        - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) +
+        - SUBJECTSDN(CN('TN3270 CA') OU('ANSIBLE CORE') C('US')) WITHLABEL('TN3270 CA CERT')
+
+  # RACDCERT GENCERT CERTAUTH +
+  #   KEYUSAGE(CERTSIGN) +
+  #   SUBJECTSDN(CN('TN3270 CA') +
+  #   OU('ANSIBLE CORE') C('US')) +
+  #   WITHLABEL('TN3270 CA CERT')
+  # roles:
+  #   - role: issue_racf_cmd
+  #     system_name: 'EC01129A'
+  #     task_description: 'Create new CA cert and add it to a keyring and check it'
+  #     command:
+  #         - >
+  #           RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('TN3270 CA') -
+  #             OU('ANSIBLE CORE') C('US')) WITHLABEL('TN3270 CA CERT')
+          # - RACDCERT ID(OMVSKERN) CONNECT(CERTAUTH LABEL('TN3270 CA CERT') +
+          # - RING(SharedRing1))
+          # - RACDCERT SITE GENCERT ID(OMVSKERN) +
+          # - SUBJECTSDN(CN('ec01129a.vmec.svl.ibm.com') +
+          # - OU('ANSIBLE CORE') C('US')) WITHLABEL('SITE CERT')  +
+          # - SIGNWITH(CERTAUTH LABEL('TN3270 CA CERT')) +
+          # - NOTAFTER(DATE(2021-05-28))
+          # - RACDCERT LISTCHAIN (LABEL('SITE CERT')) ID(OMVSKERN)
+          # - RACDCERT CONNECT(LABEL('SITE CERT') +
+          # - RING(SharedRing1) DEFAULT USAGE(PERSONAL))
+          # - RACDCERT LISTRING(SharedRing1)
+          # - RACDCERT EXPORT(LABEL('TN3270 CA CERT')) CERTAUTH +
+          # - DSN('{{ ansible_user }}.CA.CERT.B64')
+          # - RACDCERT CHECKCERT('{{ ansible_user }}.CA.CERT.B64')
+
+
