@@ -43,7 +43,7 @@ of this method of installation.
 
 The file `inventory.yaml` contains the variables most likely to need customisation.
 
-For a successful IBM® Cloud Infrastructure Center UPI installation it is required:
+For a successful IBM® Cloud Infrastructure Center UPI installation (3 woker nodes) it is required:
 
 Security Groups: 3
 Security Group Rules: 60
@@ -157,7 +157,6 @@ Supported version: 4.7 .
 
 Config the `vm_type` as "kvm" and `disk_type` as "" in inventory.yaml
 
-
 ### Prepare configuration and ignition files before installation
 
 The ansible playbooks has automated origin complex UPI mannul process, such as correcting configuration, creating manifests, creating ignition files and uploading ignition files to glance. 
@@ -253,11 +252,22 @@ $ tree
 
 ## The step to use this ansible playbooks
 
-1. Configure IBM® Cloud Infrastructure Center environment variable
+Configure IBM® Cloud Infrastructure Center environment variable
 
 ```sh
 $ source /opt/ibm/icic/icicrc <user> <password>
 ```
+
+### Check requirements for enviroment before installation
+
+You can run below command to check whether your enviroment meet the minimum requirements:
+
+```
+$ ansible-playbook -i inventory.yaml configure-pre-check.yaml
+```
+
+### Prepare configuration and ignition files
+
 Before OpenShift installation, some special configuration should be modified, such as configure machine network, generate and upload igntions.
 
 ```sh
@@ -286,7 +296,7 @@ If you want to use an existing netowrk instead of creating a new network, you ca
 network name and subnet UUID, for example:
 
 ```
-ansible-playbook -i inventory.yaml configure-network.yaml -e os_network="openshift-knjws-network" -e os_subnet="26715757-6e9c-4434-af2f-65de972078f0"
+$ ansible-playbook -i inventory.yaml configure-network.yaml -e os_network="openshift-knjws-network" -e os_subnet="26715757-6e9c-4434-af2f-65de972078f0"
 ```
 
 ### Configure bastion
