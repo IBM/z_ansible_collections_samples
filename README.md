@@ -68,6 +68,10 @@ often repeated and in need of automation.
     - [Deploy a program to a CICS region](zos_subsystems/cics/cmci/deploy_program)
     - [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
     - [Resource life cycle and CSD](zos_subsystems/cics/cmci/resource_lifecycle_and_csd)
+- Subsystems
+  - [MQ](zos_subsystems/mq)
+    - [Interacting with local queues](zos_subsystems/mq/mqsc/qlocal)
+	- [Backing up an application structure](zos_subsystems/mq/mqsc/cfstruct)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 
