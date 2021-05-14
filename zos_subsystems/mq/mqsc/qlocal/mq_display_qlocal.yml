@@ -1,0 +1,26 @@
+# (c) Copyright IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: Display a queue
+  hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  
+  tasks:
+    - name: Issue display command
+      zos_operator:
+        cmd: "{{ mq_cpf }} DIS QLOCAL( {{ mq_queue_name }} )"
+        verbose: false
+      register: display_output
+
+    - name: Output response from display command
+      debug:
+        msg: "{{ display_output.content }}"
+
+    - name: Check the display worked
+      fail:
+        msg: Display of queue failed
+      when: (display_output.content is not search("CSQ9022I")) or
+            (display_output.content is search("CSQM297I"))
