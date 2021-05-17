@@ -57,6 +57,7 @@
     userdata: "{{ lookup('file', 'worker.ign') | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.1 }}"
+    meta: "{{ cluster_id_tag }}"
   with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
 
 - name: 'Approve worker nodes csr'

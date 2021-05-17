@@ -48,3 +48,4 @@
     auto_ip: no
     nics:
     - port-name: "{{ os_port_bootstrap }}"
+    meta: "{{ cluster_id_tag }}"
