@@ -95,7 +95,7 @@ This playbook will use the following operations:
 * Cancellation of a workflow
 * Deletion of a workflow
 
-**Note:** to learn more about z/OSMF workflow services, visit the [knowledge center](https://www.ibm.com/docs/en/zos/2.4.0?topic=services-zosmf-workflow)
+**Note:** to learn more about z/OSMF workflow services, visit [IBM Docs](https://www.ibm.com/docs/en/zos/2.4.0?topic=services-zosmf-workflow)
 
 <br>
 
