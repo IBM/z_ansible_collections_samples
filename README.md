@@ -53,6 +53,7 @@ often repeated and in need of automation.
   - [z/OSMF Workflows](zos_management/zosmf_workflows)
   - [System Automation](z_system_automation)
     - [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
+  - [Invoking REST APIs using the URI module](zos_concepts/rest_apis)
 - Provisioning
   - [IMS](zos_subsystems/ims)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
