@@ -20,25 +20,29 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    cert_label: 'ANDYSITE' # must be 8 char or less
-    cert_type: 'SITE'  # USER or SITE or CERTAUTH
-    sign_type: 'CERTAUTH' #USER or CERTAUTH
-    sign_label: 'ANDYCA'
-    owner_id: 'OMVSKERN'
+    # cert_label: 'ANDYSITE' # must be 8 char or less
+    # cert_type: 'SITE'  # USER or SITE or CERTAUTH
+    # sign_type: 'CERTAUTH' #USER or CERTAUTH
+    # sign_label: 'ANDYCA'
+    # owner_id: 'OMVSKERN'
 
-    # cert_label: 'ANDYSSL' # must be 8 char or less
-    # cert_type: 'USER'  # USER or SITE or CERTAUTH
-    # sign_type: 'USER' #USER or CERTAUTH
-    # sign_label: 'ANDYSSL'
-    # owner_id: 'OMVSADM'
+    cert_label: 'ANDYSSL' # must be 8 char or less
+    cert_type: 'USER'  # USER or SITE or CERTAUTH
+    sign_type: 'USER' # USER or CERTAUTH
+    sign_label: 'ANDYSSL'
+    owner_id: 'OMVSADM'
 
     cert_found: false
     today: ''
 
   tasks:
     - set_fact:
-        cert_type: ''
+        cert_type: ' '
+        sign_type: ' '
       when: cert_type == 'USER'
+
+    - debug:
+        msg: 'cert_type is {{ cert_type }}'
 
     - name: Create temporary directory to store bank files
       tempfile:
