@@ -29,8 +29,14 @@ Example Playbook
   environment: "{{ environment_vars }}"
   vars:
 
-  roles:
-    - role: add_certificate
+  tasks:
+  - include_role:
+      name: issue_racf_cmd
+    vars:
+      task_description: 'Create a new keyring'
+      command:
+          - RACDCERT ADDRING(SharedRing1) ID({{owner_id}})
+          - RACDCERT LISTRING(SharedRing1) ID({{owner_id}})
 ```
 
 License

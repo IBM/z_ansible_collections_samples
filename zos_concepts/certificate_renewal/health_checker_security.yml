@@ -5,7 +5,7 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-04-30
+# 2021-06-30
 #  - Released initial version
 ###############################################################################
 
@@ -24,55 +24,39 @@
 
   tasks:
     - block:
-          - include_role:
-              name: issue_operator_cmd
-            vars:
-              task_description: 'Start Health Check'
-              command: "S HZSPROC"
+      - include_role:
+          name: issue_operator_cmd
+        vars:
+          task_description: 'Start Health Check'
+          command: "S HZSPROC"
 
-          - include_role:
-              name: issue_racf_cmd
-            vars:
-              # system_name: 'EC01129A'
-              task_description: 'Set up profiles'
-              command:
-                - RDEFINE XFACILIT HZS.{{system_name}}.*.*.MESSAGES UACC(NONE)
-                - RDEFINE XFACILIT HZS.{{system_name}}.*.*.RUN UACC(NONE)
-                - RDEFINE XFACILIT HZS.{{system_name}}.*.*.QUERY UACC(NONE)
+      - include_role:
+          name: issue_racf_cmd
+        vars:
+          task_description: 'Set up profiles'
+          command:
+            - RDEFINE XFACILIT HZS.{{system_name}}.*.*.MESSAGES UACC(NONE)
+            - RDEFINE XFACILIT HZS.{{system_name}}.*.*.RUN UACC(NONE)
+            - RDEFINE XFACILIT HZS.{{system_name}}.*.*.QUERY UACC(NONE)
 
-          - include_role:
-              name: issue_racf_cmd
-            vars:
-              # system_name: 'EC01129A'
-              user_id: 'OMVSADM OMVSKERN'
-              task_description: 'Permit access to {{ user_id }}'
-              command:
-                - PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
-                - ID({{ user_id }}) ACCESS(READ)
-                - PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
-                - ID({{ user_id }}) ACCESS(UPDATE)
-                - PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
-                - ID({{ user_id }}) ACCESS(READ)
+      - include_role:
+          name: issue_racf_cmd
+        vars:
+          user_id: 'OMVSADM OMVSKERN'
+          task_description: 'Permit access to {{ user_id }}'
+          command:
+            - PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
+            - ID({{ user_id }}) ACCESS(READ)
+            - PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
+            - ID({{ user_id }}) ACCESS(UPDATE)
+            - PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
+            - ID({{ user_id }}) ACCESS(READ)
 
-          # - include_role:
-          #     name: issue_racf_cmd
-          #   vars:
-          #     system_name: 'EC01129A'
-          #     user_id: 'OMVSKERN'
-          #     task_description: 'Permit access to {{ user_id }} '
-          #     command:
-          #       - PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
-          #       - ID({{ user_id }}) ACCESS(READ)
-          #       - PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
-          #       - ID({{ user_id }}) ACCESS(UPDATE)
-          #       - PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
-          #       - ID({{ user_id }}) ACCESS(READ)
-
-          - include_role:
-              name: issue_racf_cmd
-            vars:
-              task_description: 'Activate and refresh RACF profile '
-              command:
-                - SETROPTS CLASSACT(XFACILIT)
-                - SETROPTS RACLIST(XFACILIT) REFRESH
+      - include_role:
+          name: issue_racf_cmd
+        vars:
+          task_description: 'Activate and refresh RACF profile '
+          command:
+            - SETROPTS CLASSACT(XFACILIT)
+            - SETROPTS RACLIST(XFACILIT) REFRESH
 
