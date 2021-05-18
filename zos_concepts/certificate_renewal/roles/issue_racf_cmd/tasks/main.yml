@@ -4,7 +4,7 @@
 # tasks file for issue_racf_cmd
 
 ###########################################################################
-# ISSUE ALL RACF COMMANDS
+# ISSUE RACF COMMANDS
 ###########################################################################
 - name: "{{task_description}}"
   ibm.ibm_zos_core.zos_mvs_raw:

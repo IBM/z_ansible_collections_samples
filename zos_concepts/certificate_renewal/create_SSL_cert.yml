@@ -5,7 +5,7 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-04-30
+# 2021-06-30
 #  - Released initial version
 ###############################################################################
 
@@ -27,7 +27,6 @@
     - include_role:
         name: issue_racf_cmd
       vars:
-        # system_name: 'EC01129A'
         task_description: 'Clean up certs and keyring'
         command:
             - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
@@ -40,7 +39,6 @@
     - include_role:
         name: issue_racf_cmd
       vars:
-        # system_name: 'EC01129A'
         task_description: 'Create new certs and connect to keyring'
         command:
             - RACDCERT GENCERT ID({{owner_id}}) SUBJECTSDN(CN('www.TEST.com') +
