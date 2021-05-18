@@ -21,6 +21,7 @@
   environment: "{{ environment_vars }}"
   vars:
     system_name: 'EC01129A'
+    user_id: 'OMVSADM OMVSKERN'
 
   tasks:
     - block:
@@ -42,7 +43,6 @@
       - include_role:
           name: issue_racf_cmd
         vars:
-          user_id: 'OMVSADM OMVSKERN'
           task_description: 'Permit access to {{ user_id }}'
           command:
             - PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
