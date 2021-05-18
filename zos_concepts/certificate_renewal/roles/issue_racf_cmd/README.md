@@ -1,7 +1,7 @@
-add_certificate
+issue_racf_cmd
 =========
 
-Add a digital certificate to a key ring and activate it
+Issue RACF commands
 
 Requirements
 ------------
@@ -11,9 +11,12 @@ Requirements
 Role Variables
 --------------
 
-- ### **ansible_user**
+- ### **command**
 
-  Specifies the userID that owns the Key Ring
+  Specifies the RACF command(s) to be issued
+- ### **task_description**
+
+  Specifies a description related to the command to be issued
 
 Example Playbook
 ----------------

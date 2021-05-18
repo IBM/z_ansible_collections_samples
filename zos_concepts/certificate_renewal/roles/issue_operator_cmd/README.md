@@ -11,9 +11,13 @@ Requirements
 Role Variables
 --------------
 
-- ### **ansible_user**
+- ### **command**
 
-  Specifies the userID that owns the Key Ring
+  Specifies operator command to be issued
+- ### **task_description**
+
+  Specifies a description related to the command to be issued
+
 
 Example Playbook
 ----------------
@@ -26,8 +30,11 @@ Example Playbook
   environment: "{{ environment_vars }}"
   vars:
 
-  roles:
-    - role: add_certificate
+  - include_role:
+      name: isssue_operator_cmd
+    vars:
+      command: 'd a,l'
+      task_description: 'Display active users'
 ```
 
 License
