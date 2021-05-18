@@ -1,4 +1,4 @@
 ---
-# vars file for add_certificate
+# vars file for issue_operator_cmd
 command: ''
 task_description: 'issue operator command'

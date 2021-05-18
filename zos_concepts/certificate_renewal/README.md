@@ -1,6 +1,6 @@
 # Apply ptf using Using Ansible
 
-This project provides sample playbooks and roles which can be used to perform SMPE operations.
+This project provides sample playbooks and roles which can be used to perform certificate renewal using RACF.
 
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -12,23 +12,17 @@ playbook notes sections for additional details and configuration.
 
 ## Playbook Summary
 
-- [**setup_internet_retrieval.yml**](setup_internet_retrieval.yml) - Set up IBM Internet Service Retrieval by adding digital certificates to RACF database.
-- [**order.yml**](order.yml) - Handles order a PTF from IBM and receive it into the Global zone using IBM Internet Service Retrieval.
-- [**install.yml**](install.yml) - Handles APPLY process for a PTF.
-- [**uninstall.yml**](uninstall.yml) - Handles RESTORE process for a PTF.
-- [**accept.yml**](accept.yml) - Handles ACCEPT process for a PTF.
-- [**reject.yml**](reject.yml) - Handles REJECT process for a PTF.
-- [**query_csi.yml**](query_csi.yml) - Query CSI data.
+- [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions
+- [**create_SSL_cert.yml**](create_SSL_cert.yml) - Create a sample SSL certificate
+- [**create_TN3270.cert.yml**](create_TN3270_cert.yml) - Create a sample SITE certificate
+- [**search_and_renew.yml**](search_and_renew.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report
 
 ## Role Summary
 
-- [**add_certificate**](roles/add_certificate/README.md) - Holds tasks related to adding certificates to RACF.
-- [**order_ptf**](roles/order_ptf/README.md) - Holds tasks related to order a PTF from IBM.
-- [**apply_ptf**](roles/apply_ptf/README.md) - Holds tasks related to APPLY a PTF.
-- [**restore_ptf**](roles/restore_ptf/README.md) - Holds tasks related to RESTORE a PTF.
-- [**reject_ptf**](roles/reject_ptf/README.md) - Holds tasks related to REJECT a PTF.
-- [**accept_ptf**](roles/accept_ptf/README.md) - Holds tasks related to ACCEPT a PTF.
-- [**query_csi**](roles/query_csi/README.md) - Holds tasks related to QUERY data from CSI.
+- [**issue_operator_cmd**](roles/issue_operator_cmd/README.md) - Issue an operator command
+- [**issue_racf_cmd**](roles/issue_racf_cmd/README.md) - Isuue RACF command(s)
+- [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
+- [**send-template**](roles/send-template/README.md) - send template to a zOS host
 
 ## Ansible Collection Requirement
 

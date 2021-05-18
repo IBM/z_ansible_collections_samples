@@ -20,74 +20,98 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    # cert_label: 'ANDYSITE' # must be 8 char or less
-    # cert_type: 'SITE'  # blank or SITE or CERTAUTH
-    # sign_type: 'CERTAUTH' #blank or CERTAUTH
-    # sign_label: 'ANDYCA'
-    # owner_id: 'OMVSKERN'
-    cert_label: 'ANDYSSL' # must be 8 char or less
-    cert_type: ''  # blank or SITE or CERTAUTH
-    sign_type: '' #blank or CERTAUTH
-    sign_label: 'ANDYSSL'
-    owner_id: 'OMVSADM'
+    cert_label: 'ANDYSITE' # must be 8 char or less
+    cert_type: 'SITE'  # blank or SITE or CERTAUTH
+    sign_type: 'CERTAUTH' #blank or CERTAUTH
+    sign_label: 'ANDYCA'
+    owner_id: 'OMVSKERN'
+
+    # cert_label: 'ANDYSSL' # must be 8 char or less
+    # cert_type: ''  # blank or SITE or CERTAUTH
+    # sign_type: '' #blank or CERTAUTH
+    # sign_label: 'ANDYSSL'
+    # owner_id: 'OMVSADM'
+
     cert_found: false
+    today: ''
 
   tasks:
+    - name: Create temporary directory to store bank files
+      tempfile:
+        state: directory
+      register: playbook_tmp_dir
 
-    - include_role:
-        name: issue_operator_cmd
+    - block:
+          - include_role:
+              name: issue_operator_cmd
+            vars:
+              task_description: 'Run Health Checker'
+              command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+
+          # - name: Get expiring certs report
+          #   zos_job_submit:
+          #     src: USER.PRIVATE.PROCLIB(HZSPRINT)
+          #     location: DATA_SET
+          #     wait: true
+          #   register: hc_job_output
+
+          - include_role:
+              name: print_hc_buffer
+            vars:
+              hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+          - name: search for {{cert_label}} in report
+            set_fact:
+              cert_found: true
+            with_items: "{{hc_job_output.jobs.0.ddnames}}"
+            when: item.content is search("{{cert_label}}")
+
+          - debug: msg="{{cert_label}} expiring - {{cert_found}}"
+
+          - command: "date '+%b%d%y'"
+            register: date_result
+            when: cert_found
+
+          - set_fact:
+              today: "{{ date_result.stdout }}"
+
+          - include_role:
+              name: issue_racf_cmd
+            vars:
+              # system_name: 'EC01129A'
+              task_description: 'Back up current certificate'
+              # today: "{{date_result.stdout}}"
+              command:
+                  - RACDCERT EXPORT(LABEL('{{cert_label}}')) ID({{owner_id}}) +
+                  - DSN('{{ owner_id }}.CERT.{{cert_label}}.BACKUP.{{today}}')
+                  - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{cert_label}}.BACKUP.{{today}}') ID({{owner_id}})
+            when: cert_found
+
+          - include_role:
+              name: issue_racf_cmd
+            vars:
+              # system_name: 'EC01129A'
+              # today: "{{date_result.stdout}}"
+              task_description: 'Generate new cert request'
+              command:
+                - RACDCERT {{cert_type}} GENREQ (LABEL('{{cert_label}}')) +
+                - ID({{owner_id}}) +
+                - DSN('{{ owner_id }}.{{cert_label}}.REQUEST.{{today}}')
+                - RACDCERT {{cert_type}} ID({{owner_id}}) +
+                - GENCERT('{{ owner_id }}.{{cert_label}}.REQUEST.{{today}}') +
+                - SIGNWITH({{sign_type}} LABEL('{{sign_label}}'))
+            when: cert_found
+
+          - include_role:
+              name: issue_operator_cmd
+            vars:
+              task_description: 'Run Health Check'
+              command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+
+      always:
+        - name: Delete the temporary directory
+          file:
+            path: "{{ playbook_tmp_dir.path }}"
+            state: absent
       vars:
-        task_description: 'Run Health Checker'
-        command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
-
-    - name: Get expiring certs report
-      zos_job_submit:
-        src: USER.PRIVATE.PROCLIB(HZSPRINT)
-        location: DATA_SET
-        wait: true
-      register: job_output
-
-    - name: search for {{cert_label}} in report
-      set_fact:
-        cert_found: true
-      with_items: "{{job_output.jobs.0.ddnames}}"
-      when: item.content is search("{{cert_label}}")
-
-    - debug: msg="{{cert_label}} expiring - {{cert_found}}"
-
-    - command: "date '+%b%d%y'"
-      register: date_result
-      when: cert_found
-
-    - include_role:
-        name: issue_racf_cmd
-      vars:
-        system_name: 'EC01129A'
-        task_description: 'Back up current certificate'
-        today: "{{date_result.stdout}}"
-        command:
-            - RACDCERT EXPORT(LABEL('{{cert_label}}')) ID({{owner_id}}) +
-            - DSN('{{ owner_id }}.CERT.{{cert_label}}.BACKUP.{{today}}')
-            - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{cert_label}}.BACKUP.{{today}}') ID({{owner_id}})
-      when: cert_found
-
-    - include_role:
-        name: issue_racf_cmd
-      vars:
-        system_name: 'EC01129A'
-        today: "{{date_result.stdout}}"
-        task_description: 'Generate new cert request'
-        command:
-          - RACDCERT {{cert_type}} GENREQ (LABEL('{{cert_label}}')) +
-          - ID({{owner_id}}) +
-          - DSN('{{ owner_id }}.{{cert_label}}.REQUEST.{{today}}')
-          - RACDCERT {{cert_type}} ID({{owner_id}}) +
-          - GENCERT('{{ owner_id }}.{{cert_label}}.REQUEST.{{today}}') +
-          - SIGNWITH({{sign_type}} LABEL('{{sign_label}}'))
-      when: cert_found
-
-    - include_role:
-        name: issue_operator_cmd
-      vars:
-        task_description: 'Run Health Check'
-        command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+        uss_file_path: '{{ playbook_tmp_dir.path }}'

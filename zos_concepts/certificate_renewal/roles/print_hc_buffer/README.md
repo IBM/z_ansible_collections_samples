@@ -1,7 +1,7 @@
-add_certificate
+print_hc_buffer
 =========
 
-Add a digital certificate to a key ring and activate it
+Extract Health Checker data
 
 Requirements
 ------------
@@ -11,9 +11,9 @@ Requirements
 Role Variables
 --------------
 
-- ### **ansible_user**
+- ### **hc_check**
 
-  Specifies the userID that owns the Key Ring
+  Specifies the Health Checker check to print the data for
 
 Example Playbook
 ----------------
@@ -26,8 +26,10 @@ Example Playbook
   environment: "{{ environment_vars }}"
   vars:
 
-  roles:
-    - role: add_certificate
+  - include_role:
+      name: print_hc_buffer
+    vars:
+      hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 ```
 
 License
