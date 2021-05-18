@@ -21,8 +21,8 @@
   environment: "{{ environment_vars }}"
   vars:
     owner_id: 'OMVSKERN'
-    ca_cert_label: 'ANDYCA'
-    site_cert_label: 'ANDYSITE'
+    sign_label: 'ANDYCA'
+    cert_label: 'ANDYSITE'
 
   tasks:
   - include_role:
@@ -30,8 +30,8 @@
     vars:
       task_description: 'Create a new keyring'
       command:
-          - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{site_cert_label}}'))
-          - RACDCERT CERTAUTH DELETE(LABEL('{{ca_cert_label}}'))
+          - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
+          - RACDCERT CERTAUTH DELETE(LABEL('{{sign_label}}'))
           - RACDCERT DELRING(SharedRing1) ID({{owner_id}})
           - RACDCERT ADDRING(SharedRing1) ID({{owner_id}})
           - RACDCERT LISTRING(SharedRing1) ID({{owner_id}})
@@ -43,20 +43,20 @@
       command:
         - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) +
         - SUBJECTSDN(CN('TN3270 CA') OU('ANSIBLE CORE') +
-        - C('US')) WITHLABEL('{{ca_cert_label}}')
+        - C('US')) WITHLABEL('{{sign_label}}')
         - RACDCERT ID({{owner_id}}) +
-        - CONNECT(CERTAUTH LABEL('{{ca_cert_label}}') +
+        - CONNECT(CERTAUTH LABEL('{{sign_label}}') +
         - RING(SharedRing1))
         - RACDCERT SITE GENCERT ID({{owner_id}}) +
         - SUBJECTSDN(CN('ec01129a.vmec.svl.ibm.com') +
         - OU('ANSIBLE CORE') C('US')) +
-        - WITHLABEL('{{site_cert_label}}')  +
-        - SIGNWITH(CERTAUTH LABEL('{{ca_cert_label}}')) +
+        - WITHLABEL('{{cert_label}}')  +
+        - SIGNWITH(CERTAUTH LABEL('{{sign_label}}')) +
         - NOTAFTER(DATE(2021-05-28))
-        - RACDCERT LISTCHAIN (LABEL('{{site_cert_label}}')) +
+        - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) +
         - ID({{owner_id}})
         - RACDCERT ID({{owner_id}}) +
-        - CONNECT(LABEL('{{site_cert_label}}') +
+        - CONNECT(LABEL('{{cert_label}}') +
         - RING(SharedRing1) DEFAULT USAGE(PERSONAL))
         - RACDCERT LISTRING(SharedRing1) ID({{owner_id}})
 
