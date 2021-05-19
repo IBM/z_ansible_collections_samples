@@ -42,6 +42,7 @@ often repeated and in need of automation.
   - [Copy Directory to PDS, Edit member and Submit Job](zos_concepts/data_sets/copy_edit_submit)
   - [Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
   - [Convert Encoding](zos_concepts/encoding/convert_encoding)
+  - [Job Submit Response Parsing and Constructs](zos_basics/constructs)
 - Concepts
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
