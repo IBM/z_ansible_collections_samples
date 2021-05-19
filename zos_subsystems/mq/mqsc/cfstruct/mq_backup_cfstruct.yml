@@ -1,0 +1,78 @@
+# (c) Copyright IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: Backup a coupling facility structure used by MQ
+  hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+
+  # MQ coupling facility backups are asynchronous, so even though the backup command can succeed the backup
+  # itself can fail. This playbook attempts to detect a failed backup by getting the current backup time (BKUPTIME) for 
+  # the structure before performing the backup and comparing it to the backup time after the command has been run.
+  # Because of the asynchrounous nature of the backup the playbook pauses to allow time for the backup  to occur.
+
+  tasks:
+    - name: Issue display command before backup
+      zos_operator:
+        cmd: "{{ mq_cpf }} DIS CFSTATUS( {{ mq_structure_name }} ) TYPE(BACKUP)"
+        verbose: false
+      register: display_output_before
+
+    - name: Output response from display command
+      debug:
+        msg: "{{ display_output_before.content }}"
+
+    - name: Check the display worked
+      fail:
+        msg: Display of cfstatus failed
+      when: display_output_before.content is not search("CSQ9022I")
+
+    - name: Get backup time before
+      set_fact:
+         backup_time_before: "{{ display_output_before.content  | map('trim') | select('match','BKUPTIME') }}"
+
+    - name: Issue the backup
+      zos_operator:
+        cmd: "{{ mq_cpf }} BACKUP CFSTRUCT( {{ mq_structure_name }} )"
+        verbose: false
+      register: backup_output
+
+    - name: If backup failed output readable failure information
+      debug:
+        msg: "{{ backup_output.content }}"
+      when: backup_output.content is not search("CSQ9022I")
+
+    - name: Check the backup started OK
+      fail:
+        msg: Backup failed to start 
+      when: backup_output.content is not search("CSQ9022I")
+
+    - name: Pause while backup occurs
+      pause: 
+        seconds: "{{ mq_pause_time }}"
+
+    - name: Issue display command after backup
+      zos_operator:
+        cmd: "{{ mq_cpf }} DIS CFSTATUS( {{ mq_structure_name }} ) TYPE(BACKUP)"
+        verbose: false
+      register: display_output_after
+
+    - name: Output response from display command
+      debug:
+        msg: "{{ display_output_after.content }}"
+
+    - name: Check the display worked
+      fail:
+        msg: Display of cfstatus failed
+      when: display_output_after.content is not search("CSQ9022I")
+
+    - name: Get backup time after
+      set_fact:
+         backup_time_after: "{{ display_output_after.content  | map('trim') | select('match','BKUPTIME') }}"
+
+    - name: Check that backup_time_after is different to backup_time_before
+      fail: 
+        msg: "Backup time hasn't changed. Backup time from before backup: {{ backup_time_before }}, backup time after backup: {{ backup_time_after }}"
+      when:  backup_time_after ==  backup_time_before
