@@ -1,4 +1,4 @@
-# Copy Directory to PDS, Edit member and Submit Job
+# Job Submit Response Parsing and Constructs
 
 This sample focuses on processing the result of a z/OS® job submission response
 using a number of Ansible® constructs such as `when`, `with_sequence`, `loop`,
@@ -63,7 +63,7 @@ PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
 ```
 
-### Run desired playbook with the supported Ansible `--tags``
+### Run desired playbook with the supported Ansible --tags
 
 ```bash
 Usage:
