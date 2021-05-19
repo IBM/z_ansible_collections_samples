@@ -70,7 +70,7 @@ Usage:
  ansible-playbook -i <inventory> <playbook> --tags "....."
 ```
 
-```bash
+```
   1) Run in development mode using JSON cached input
         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_json"
   2) Run in development mode using YAML cached input
