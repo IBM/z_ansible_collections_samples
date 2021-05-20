@@ -1,0 +1,79 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- hosts: localhost
+  gather_facts: no
+
+  tasks:
+  - name: 'Import common yaml'
+    import_tasks: common.yaml
+
+  - name: 'Export Infra ID'
+    shell:
+      cmd: "jq -r .infraID metadata.json"
+    register: infra_id
+
+  - name: 'Generate random string for the Compute ports and store them in a json file'
+    script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} 1
+    args:
+      executable: python3
+
+  - name: 'Read compute nodes names'
+    set_fact:
+      compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
+
+  - name: 'Create the Compute ports'
+    os_port:
+      name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      network: "{{ os_network }}"
+      security_groups:
+      - "{{ os_sg_worker }}"
+      fixed_ips:
+      - subnet: "{{ os_subnet }}"
+        ip_address: "{{ ip }}"
+    register: ports
+    when:
+    - auto_allocated_ip == false
+
+  - name: 'Create the Compute ports'
+    os_port:
+      name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      network: "{{ os_network }}"
+      security_groups:
+      - "{{ os_sg_worker }}"
+    register: ports
+    when:
+    - auto_allocated_ip == true
+
+  - name: 'Set Compute ports tag'
+    command:
+      cmd: "openstack port set --tag {{ [cluster_id_tag] }} {{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+
+  - name: 'Create the Compute servers'
+    os_server:
+      name: "{{ os_compute_server_name }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      image: "{{ os_image_rhcos }}"
+      flavor: "{{ os_flavor_worker }}"
+      auto_ip: no
+      timeout: 2400
+      userdata: "{{ lookup('file', 'worker.ign') | string }}"
+      nics:
+      - port-name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+
+  - name: 'Approve worker nodes csr'
+    script: tools/wait-nodes-csrs.py {{ os_compute_server_name }}-{{ compute_nodes_json.compute_node_names[-1] }}
+    args:
+      executable: python3

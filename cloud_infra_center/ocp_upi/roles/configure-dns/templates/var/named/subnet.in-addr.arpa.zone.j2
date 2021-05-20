@@ -1,0 +1,25 @@
+{% set bootstrap = cluster_nodes['bootstrap'] %}
+{% set masters = cluster_nodes['masters'] %}
+{% set infra = cluster_nodes['infra'] %}
+$TTL 900
+
+@ IN SOA bastion.{{ cluster_domain_name }} hostmaster.{{ cluster_domain_name }}. (
+    2019062001 1D 1H 1W 3H
+  )      
+  IN NS bastion.{{ cluster_domain_name }}.
+
+{% for item in masters.keys() %}
+{{ masters[item].ip.split('.')[3] }} IN PTR {{ item }}.{{ cluster_domain_name }}.
+{% endfor %}
+
+{% if infra is defined %}
+{% for item in infra.keys() %}
+{{ infra[item].ip.split('.')[3] }} IN PTR {{ item }}.{{ cluster_domain_name }}.
+{% endfor %}
+{% endif %}
+
+{% for item in bootstrap.keys() %}
+{{ bootstrap[item].ip.split('.')[3] }} IN PTR {{ item }}.{{ cluster_domain_name }}.
+{% endfor %}
+
+

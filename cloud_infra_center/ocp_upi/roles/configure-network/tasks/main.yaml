@@ -1,0 +1,169 @@
+# =================================================================
+# Copyright 2021 https://github.com/openshift/installer
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =================================================================
+
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+#
+# Change Summary: 
+# - Add port creation
+# - Delete unnecessary Ansible tasks
+# - Use random strings to name compute ports
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- name: 'Import common yaml'
+  import_tasks: common.yaml
+
+- name: 'Create the cluster network'
+  os_network:
+    name: "{{ os_network }}"
+
+- name: 'Set the cluster network tag'
+  command:
+    cmd: "openstack network set --tag {{ cluster_id_tag }} {{ os_network }}"
+
+- name: 'Create a subnet'
+  os_subnet:
+    name: "{{ os_subnet }}"
+    network_name: "{{ os_network }}"
+    cidr: "{{ os_subnet_range }}"
+    dns_nameservers: "{{ os_dns_domain }}"
+    allocation_pool_start: "{{ os_subnet_range | next_nth_usable(10) }}"
+    allocation_pool_end: "{{ os_subnet_range | ipaddr('last_usable') }}"
+  when:
+  - allocation_pool_start is not defined
+  - allocation_pool_end is not defined 
+
+- name: 'Create a subnet'
+  os_subnet:
+    name: "{{ os_subnet }}"
+    network_name: "{{ os_network }}"
+    cidr: "{{ os_subnet_range }}"
+    dns_nameservers: "{{ os_dns_domain }}"
+    allocation_pool_start: "{{ allocation_pool_start }}"
+    allocation_pool_end: "{{ allocation_pool_end }}"
+  when:
+  - allocation_pool_start is defined
+  - allocation_pool_end is defined 
+
+- name: 'Set the cluster subnet tag'
+  command:
+    cmd: "openstack subnet set --tag {{ cluster_id_tag }} {{ os_subnet }}"
+
+- name: 'Export Infra ID'
+  shell:
+    cmd: "jq -r .infraID metadata.json"
+  register: infra_id
+
+- name: 'Generate random string for the Compute ports and store them in a json file'
+  script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
+  args:
+    executable: python3
+
+- name: 'Read compute nodes names'
+  set_fact:
+    compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
+
+- name: 'Create the bootstrap server port'
+  os_port:
+    name: "{{ os_port_bootstrap }}"
+    network: "{{ os_network }}"
+    security_groups:
+    - "{{ os_sg_master }}"
+    fixed_ips:
+    - subnet: "{{ os_subnet }}"
+      ip_address: "{{ os_bootstrap_ip }}"
+  when:
+  - auto_allocated_ip == false
+
+- name: 'Create the Control Plane ports'
+  os_port:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    network: "{{ os_network }}"
+    security_groups:
+    - "{{ os_sg_master }}"
+    fixed_ips:
+    - subnet: "{{ os_subnet }}"
+      ip_address: "{{ os_master_ip[item.0] }}"
+  with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+  when:
+  - auto_allocated_ip == false
+
+- name: 'Create the Compute ports'
+  os_port:
+    name: "{{ os_port_worker }}-{{ item.1 }}"
+    network: "{{ os_network }}"
+    security_groups:
+    - "{{ os_sg_worker }}"
+    fixed_ips:
+    - subnet: "{{ os_subnet }}"
+      ip_address: "{{ os_infra_ip[item.0]}}"
+  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  when:
+  - auto_allocated_ip == false
+
+- name: 'Create the bootstrap server port'
+  os_port:
+    name: "{{ os_port_bootstrap }}"
+    network: "{{ os_network }}"
+    security_groups:
+    - "{{ os_sg_master }}"
+  when:
+  - auto_allocated_ip == true
+
+- name: 'Create the Control Plane ports'
+  os_port:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    network: "{{ os_network }}"
+    security_groups:
+    - "{{ os_sg_master }}"
+  with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+  when:
+  - auto_allocated_ip == true
+
+- name: 'Create the Compute ports'
+  os_port:
+    name: "{{ os_port_worker }}-{{ item.1 }}"
+    network: "{{ os_network }}"
+    security_groups:
+    - "{{ os_sg_worker }}"
+  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  when:
+  - auto_allocated_ip == true
+    
+- name: 'Set bootstrap port tag'
+  command:
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_bootstrap }}"
+
+- name: 'Set Control Plane ports tag'
+  command:
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
+  with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+
+- name: 'Set Compute ports tag'
+  command:
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ item.1 }}"
+  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"

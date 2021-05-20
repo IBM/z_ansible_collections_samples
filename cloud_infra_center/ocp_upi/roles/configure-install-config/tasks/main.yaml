@@ -1,0 +1,21 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-install-config
+
+- name: Configure Machine Network in Install Configuration
+  script: tools/config-machine-network.py {{ os_subnet_range }}
+  args:
+    executable: python3
+
+- name: Empty Compute Pools
+  script: tools/empty-compute-node.py
+  args:
+    executable: python3
