@@ -1,8 +1,14 @@
 # Job Submit Response Parsing and Constructs
 
 This sample focuses on processing the result of a z/OS® job submission response
-using a number of Ansible® constructs such as `when`, `with_sequence`, `loop`,
-`set_fact`, `debug`, `tags`, etc, all available as part of the Ansible engine.
+using a number of Ansible® constructs such as
+[when](https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html#conditionals),
+[with_sequence](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#loops),
+[loop](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#loops),
+[set_fact](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/set_fact_module.html),
+[debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html),
+[tags](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html),
+etc, all available as part of the Ansible engine.
 
 Because this sample is aimed at helping users become familiar with the various
 Ansible constructs, it includes a response from a submitted job in both JSON
@@ -25,6 +31,7 @@ playbook notes sections for additional details and configuration.
   - [IBM® z/OS® core collection 1.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
   - [Ansible® 2.10 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   - [jmespath](https://pypi.org/project/jmespath/)
+    - `pip install jmespath`
 
 ## Getting Started
 
@@ -87,7 +94,7 @@ Usage:
 
 # Copyright
 
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2021
 
 # License
 
