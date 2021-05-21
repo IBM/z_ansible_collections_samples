@@ -27,7 +27,7 @@ often repeated and in need of automation.
 ### Z Topics
 - Infrastructure Provisioning
     - [IBM Cloud Infrastructure Center](z_infra_provisioning/cloud_infra_center)
-      - [Installing Red Hat OpenShift Container Platform](z_infra_provisioning/cloud_infra_center/ocp_upi)
+      - [Installing Red Hat OpenShift Container Platform](z_infra_provisioning/cloud_infra_center/ocp_upi/README.md)
 - Systems Administration
   - [zHMC](z_systems_administration/zhmc)
     - [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
