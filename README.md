@@ -25,7 +25,9 @@ Playbooks are organized by topics that align to tasks and use cases that are
 often repeated and in need of automation.
 
 ### Z Topics
-
+- Infrastructure Provisioning
+    - [IBM Cloud Infrastructure Center](z_infra_provisioning/cloud_infra_center)
+      - [Installing Red Hat OpenShift Container Platform](z_infra_provisioning/cloud_infra_center/ocp_upi)
 - Systems Administration
   - [zHMC](z_systems_administration/zhmc)
     - [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
