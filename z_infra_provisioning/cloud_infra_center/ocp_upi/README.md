@@ -1,6 +1,6 @@
 # IBM® Cloud Infrastructure Center
 
-IBM® Cloud Infrastructure Center is an advanced infrastructure management offering, including on-premises cloud deployments of IBM z/VM®-based and KVM based Linux® virtual machines on the IBM Z® and IBM LinuxONE platforms.
+IBM® Cloud Infrastructure Center is an advanced infrastructure management product, providing on-premises cloud deployments of IBM z/VM®-based and KVM based Linux® virtual machines on the IBM Z® and IBM LinuxONE platforms.
 
 More details: https://www.ibm.com/docs/en/cic/1.1.3
 
@@ -8,7 +8,7 @@ More details: https://www.ibm.com/docs/en/cic/1.1.3
 
 The purposes of this playbook:
 
-1. Use IBM® Cloud Infrastructure Center to install Red Hat® OpenShift® Container Platform with user-provisioned infrastructure (UPI)
+1. Use IBM® Cloud Infrastructure Center to install Red Hat® OpenShift® Container Platform via user-provisioned infrastructure (UPI)
 
 2. Enhance the existing UPI process, such as 
 
@@ -26,9 +26,9 @@ The purposes of this playbook:
 
   3. Requirements pre-check before installation
 
-**Note**: This playbook support version of IBM® Cloud Infrastructure Center now is only 1.1.3 . And support version of OpenShift Container Platform is 4.6, 4.7 for z/VM and 4.7 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.3 and RH OpenShift Container Platform version 4.6 and, 4.7 for z/VM and version 4.7 for KVM.
 
-# Installing OpenShift on IBM® Cloud Infrastructure Center with user-provisioned infrastructure (UPI)
+# Installing OpenShift on IBM® Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
 The User-Provisioned Infrastructure (UPI) process installs OpenShift in stages, providing opportunities for modifications or integrating with existing infrastructure.
 
