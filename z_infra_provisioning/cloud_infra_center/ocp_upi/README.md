@@ -12,13 +12,19 @@ The purposes of this playbook:
 
 2. Enhance the existing UPI process, such as 
 
-  - RHCOS images can be automatically downloaded and uploaded.
+- Rhcos images can be automatically downloaded and uploaded.
 
-  - Nodes’ IPs can be allocated instead of being fixed.
+- Nodes’ IPs can be allocated instead of be fixed.
 
-  - Worker nodes’ CSR can be automatically approved.
+- Worker nodes’ CSR can be automatically approved.
 
-  - Additional scripts are provided: 1) add or remove a new OpenShift compute node 2) Configure image registry.
+- Additional scripts are provided: 
+
+  1. Add or remove a new OpenShift compute node 
+
+  2. Configure image registry. 
+
+  3. Requirements pre-check before installation
 
 **Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.3 and RH OpenShift Container Platform version 4.6 and, 4.7 for z/VM and version 4.7 for KVM.
 
@@ -43,7 +49,7 @@ of this method of installation.
 
 The file `inventory.yaml` contains the variables most likely to need customisation.
 
-For a successful IBM® Cloud Infrastructure Center UPI installation (3 woker nodes) it is required:
+For a successful IBM® Cloud Infrastructure Center UPI installation (3 worker nodes) it is required:
 
 Security Groups: 3
 Security Group Rules: 60
