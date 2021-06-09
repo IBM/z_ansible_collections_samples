@@ -63,7 +63,7 @@ all:
       # 3 is the minimum number for a fully-functional cluster.
       os_compute_nodes_number: 3
 
-    # Bastion DNS and HAProxy settings (Only for fixed IP address)
+    # Bastion DNS and HAProxy settings
     bastion:
       ansible_ssh_host: 172.26.103.100
       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
@@ -75,7 +75,9 @@ all:
       bastion_private_ip_address: 172.26.103.100
       gateway_ip: 172.26.0.1
       bastion_subnet_prefix_reverse: 103.26.172
-      cluster_subnet_prefix: 172.26.103
+      # The queries from IPs in `cluster_subnet_range` will be allowed, 
+      # we suggest setting `cluster_subnet_range` the same as localhost's `os_subnet_range`
+      cluster_subnet_range: 172.26.0.0/16
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
   
   vars:

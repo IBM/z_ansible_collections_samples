@@ -1,4 +1,4 @@
-acl internal_nets { {{ cluster_subnet_prefix }}.0/24; };
+acl internal_nets { {{ cluster_subnet_range }}; };
 
 options {
 	listen-on port 53 { 127.0.0.1; {{ bastion_private_ip_address}};};
