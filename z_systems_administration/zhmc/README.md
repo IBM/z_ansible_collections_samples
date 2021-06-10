@@ -6,11 +6,11 @@ provides sample playbooks.
 ## Downloading the sample playbooks
 
 Follow the instructions in
-[using the samples repository](../meta/samples_repository/README.md)
+[using the samples repository](../../meta/samples_repository/README.md)
 to clone this Git repository to your local system.
 
 The sample playbooks for the IBM Z HMC Collection are located in the
-directory ``zhmc/playbooks`` of the cloned repository.
+directory ``z_systems_administration/zhmc/playbooks`` of the cloned repository.
 
 ## Creating a vault file
 
