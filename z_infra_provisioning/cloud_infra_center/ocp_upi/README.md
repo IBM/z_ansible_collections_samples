@@ -429,8 +429,6 @@ The playbook places the Control Plane in a Server Group with "soft anti-affinity
 
 The master nodes should load the initial Ignition and then keep waiting until the bootstrap node stands up the Machine Config Server which will provide the rest of the configuration.
 
-***Note***: This playbook may give the warning of `UserWarning: You are specifying a cacert for the cloud envvars:RegionOne but also to ignore the host verification`. You can monitor this issue [#72](https://github.com/IBM/z_ansible_collections_samples/issues/72) to get latest status.
-
 ### Wait for the Control Plane to Complete
 
 When that happens, the masters will start running their own pods, run etcd and join the "bootstrap" cluster. Eventually, they will form a fully operational control plane.
