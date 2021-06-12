@@ -51,7 +51,7 @@ often repeated and in need of automation.
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
 - Integrating Existing Automation
-  - [Job Control Language](job_control_language) (JCL)
+  - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
   - [z/OSMF Workflows](zos_management/zosmf_workflows)
   - [System Automation](z_system_automation)
