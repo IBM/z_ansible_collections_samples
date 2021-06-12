@@ -1,8 +1,8 @@
 ---
 # Sample module-level playbook of the IBM Z HMC Collection
 
-- hosts: localhost
-  connection: local
+- hosts:
+    - my_hmc_list
   vars_files:
     - vault.yml
   vars:
@@ -13,9 +13,10 @@
   tasks:
 
     - name: "Ensure storage volume {{ stovolume_name }} exists in storage group {{ stogroup_name }}"
+      delegate_to: localhost
       zhmc_storage_volume:
-        hmc_host: "{{ hmc_host }}"
-        hmc_auth: "{{ hmc_auth }}"
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         cpc_name: "{{ cpc_name }}"
         storage_group_name: "{{ stogroup_name }}"
         name: "{{ stovolume_name }}"
