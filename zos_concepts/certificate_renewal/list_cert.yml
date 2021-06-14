@@ -34,7 +34,7 @@
   - include_role:
       name: issue_racf_cmd
     vars:
-      task_description: 'Deleting cert {{cert_label}}'
+      task_description: 'Displaying cert {{cert_label}}'
       command:
           - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
     when: cert_type == 'USER'
@@ -42,7 +42,7 @@
   - include_role:
       name: issue_racf_cmd
     vars:
-      task_description: 'Deleting cert {{cert_label}}'
+      task_description: 'Displaying cert {{cert_label}}'
       command:
           - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
     when: cert_type == 'CERTAUTH'
@@ -50,7 +50,7 @@
   - include_role:
       name: issue_racf_cmd
     vars:
-      task_description: 'Deleting cert {{cert_label}}'
+      task_description: 'Displaying cert {{cert_label}}'
       command:
           - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
     when: cert_type == 'SITE'
