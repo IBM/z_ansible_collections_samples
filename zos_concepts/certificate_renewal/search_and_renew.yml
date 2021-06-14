@@ -20,19 +20,19 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    # cert_label: 'ANDY SITE' # must be 8 char or less
-    # cert_type: 'SITE'  # USER or SITE or CERTAUTH
-    # sign_with: 'CERTAUTH' # blank or CERTAUTH
-    # sign_label: 'ANDY CA'
-    # owner_id: 'OMVSKERN'
-    # keyring_name: 'SharedRing1'
-
-    cert_label: 'ANDY SSL' # must be 8 char or less
-    cert_type: 'USER'  # USER or SITE or CERTAUTH
+    cert_label: 'ANDY SITE' # must be 8 char or less
+    cert_type: 'SITE'  # USER or SITE or CERTAUTH
     sign_with: 'CERTAUTH' # blank or CERTAUTH
     sign_label: 'ANDY CA'
-    owner_id: 'OMVSADM'
-    keyring_name: 'WEBSSL'
+    owner_id: 'OMVSKERN'
+    keyring_name: 'SharedRing1'
+
+    # cert_label: 'ANDY SSL' # must be 8 char or less
+    # cert_type: 'USER'  # USER or SITE or CERTAUTH
+    # sign_with: 'CERTAUTH' # blank or CERTAUTH
+    # sign_label: 'ANDY CA'
+    # owner_id: 'OMVSADM'
+    # keyring_name: 'WEBSSL'
 
     cert_found: false
     today: ''
@@ -77,12 +77,25 @@
             task_description: 'Back up current certificate'
             command:
               - >
+                  RACDCERT EXPORT(LABEL('{{cert_label}}')) +
+                      DSN('{{ owner_id }}.CERT.{{cert_type}}.BACKUP.{{today}}')
+              - >
+                  RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{cert_type}}.BACKUP.{{today}}')
+          when: cert_found and not cert_type == 'USER'
+
+        - include_role:
+
+            name: issue_racf_cmd
+          vars:
+            task_description: 'Back up current certificate'
+            command:
+              - >
                   RACDCERT EXPORT(LABEL('{{cert_label}}')) ID({{owner_id}}) +
                       DSN('{{ owner_id }}.CERT.{{cert_type}}.BACKUP.{{today}}')
               - >
                   RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{cert_type}}.BACKUP.{{today}}') +
                       ID({{owner_id}})
-          when: cert_found
+          when: cert_found and cert_type == 'USER'
 
         - include_role:
             name: issue_racf_cmd

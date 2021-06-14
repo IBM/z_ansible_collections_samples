@@ -20,12 +20,12 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    # owner_id: 'OMVSADM'
-    # cert_type: 'USER'
-    # cert_label: 'ANDY SSL'
+    owner_id: 'OMVSADM'
+    cert_type: 'USER'
+    cert_label: 'ANDY SSL'
 
-    cert_type: 'CERTAUTH'
-    cert_label: 'ANDY CA'
+    # cert_type: 'CERTAUTH'
+    # cert_label: 'ANDY CA'
 
     # cert_type: 'SITE'
     # cert_label: 'ANDY SITE'
