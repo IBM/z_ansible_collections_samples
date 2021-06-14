@@ -45,12 +45,15 @@
         vars:
           task_description: 'Permit access to {{ user_id }}'
           command:
-            - PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
-            - ID({{ user_id }}) ACCESS(READ)
-            - PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
-            - ID({{ user_id }}) ACCESS(UPDATE)
-            - PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
-            - ID({{ user_id }}) ACCESS(READ)
+            - >
+                PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
+                  ID({{ user_id }}) ACCESS(READ)
+            - >
+                PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
+                  ID({{ user_id }}) ACCESS(UPDATE)
+            - >
+                PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
+                  ID({{ user_id }}) ACCESS(READ)
 
       - include_role:
           name: issue_racf_cmd
