@@ -21,14 +21,14 @@
   environment: "{{ environment_vars }}"
   vars:
     # cert_label: 'ANDY SITE' # must be 8 char or less
-    # cert_type: 'SITE'  # PERSONAL or SITE or CERTAUTH
+    # cert_type: 'SITE'  # USER or SITE or CERTAUTH
     # sign_with: 'CERTAUTH' # blank or CERTAUTH
     # sign_label: 'ANDY CA'
     # owner_id: 'OMVSKERN'
     # keyring_name: 'SharedRing1'
 
     cert_label: 'ANDY SSL' # must be 8 char or less
-    cert_type: 'PERSONAL'  # PERSONAL or SITE or CERTAUTH
+    cert_type: 'USER'  # USER or SITE or CERTAUTH
     sign_with: 'CERTAUTH' # blank or CERTAUTH
     sign_label: 'ANDY CA'
     owner_id: 'OMVSADM'
@@ -99,7 +99,7 @@
                     DSN('{{ owner_id }}.CSR.{{cert_type}}.{{today}}')
               - >
                   RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
-          when: cert_found and not cert_type == 'PERSONAL'
+          when: cert_found and not cert_type == 'USER'
 
         - include_role:
             name: issue_racf_cmd
@@ -117,7 +117,7 @@
                     DSN('{{ owner_id }}.CSR.{{cert_type}}.{{today}}')
               - >
                   RACDCERT ID({{owner_id}}) DELETE(LABEL('{{ cert_label }}'))
-          when: cert_found and cert_type == 'PERSONAL'
+          when: cert_found and cert_type == 'USER'
 
         - include_role:
             name: issue_racf_cmd
@@ -134,8 +134,8 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and not sign_label == ' ' and not cert_type == 'PERSONAL'
+                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+          when: cert_found and not sign_label == ' ' and not cert_type == 'USER'
 
         - include_role:
             name: issue_racf_cmd
@@ -152,8 +152,8 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and not sign_label == ' ' and cert_type == 'PERSONAL'
+                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+          when: cert_found and not sign_label == ' ' and cert_type == 'USER'
 
         - include_role:
             name: issue_racf_cmd
@@ -170,8 +170,8 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and sign_label == ' ' and not cert_type == 'PERSONAL'
+                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+          when: cert_found and sign_label == ' ' and not cert_type == 'USER'
 
         - include_role:
             name: issue_racf_cmd
@@ -188,8 +188,8 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and sign_label == ' ' and cert_type == 'PERSONAL'
+                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+          when: cert_found and sign_label == ' ' and cert_type == 'USER'
 
         - include_role:
             name: issue_operator_cmd
