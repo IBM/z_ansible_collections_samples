@@ -21,7 +21,7 @@
   environment: "{{ environment_vars }}"
   vars:
     # owner_id: 'OMVSADM'
-    # cert_type: 'PERSONAL'
+    # cert_type: 'USER'
     # cert_label: 'ANDY SSL'
 
     cert_type: 'CERTAUTH'
@@ -40,7 +40,7 @@
       command:
           - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
           - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
-    when: cert_type == 'PERSONAL'
+    when: cert_type == 'USER'
 
   - include_role:
       name: issue_racf_cmd

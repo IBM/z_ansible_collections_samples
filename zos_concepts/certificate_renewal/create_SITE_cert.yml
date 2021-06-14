@@ -59,7 +59,7 @@
         - >
             RACDCERT ID({{owner_id}}) +
                CONNECT(SITE LABEL('{{cert_label}}') +
-               RING({{keyring}}) DEFAULT USAGE(PERSONAL))
+               RING({{keyring}}) DEFAULT USAGE(USER))
         - >
             RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
     when: not expiry_date == ''
@@ -82,7 +82,7 @@
         - >
             RACDCERT ID({{owner_id}}) +
                CONNECT(SITE LABEL('{{cert_label}}') +
-               RING({{keyring}}) DEFAULT USAGE(PERSONAL))
+               RING({{keyring}}) DEFAULT USAGE(USER))
         - >
             RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
     when: expiry_date == ''
