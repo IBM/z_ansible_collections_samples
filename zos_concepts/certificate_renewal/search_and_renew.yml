@@ -147,7 +147,7 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and not sign_label == ' ' and not cert_type == 'USER'
 
         - include_role:
@@ -165,7 +165,7 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and not sign_label == ' ' and cert_type == 'USER'
 
         - include_role:
@@ -183,7 +183,7 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and sign_label == ' ' and not cert_type == 'USER'
 
         - include_role:
@@ -201,7 +201,7 @@
               - >
                   RACDCERT ID({{owner_id}}) +
                      CONNECT(LABEL('{{cert_label}}') +
-                     RING({{keyring_name}}) DEFAULT USAGE(USER))
+                     RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and sign_label == ' ' and cert_type == 'USER'
 
         - include_role:
