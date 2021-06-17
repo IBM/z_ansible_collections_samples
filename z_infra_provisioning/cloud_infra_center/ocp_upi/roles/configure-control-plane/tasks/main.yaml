@@ -84,3 +84,5 @@
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }}"
   with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+  environment: 
+    PYTHONWARNINGS: 'ignore::UserWarning'
