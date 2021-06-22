@@ -107,13 +107,13 @@ Provision a Red Hat machine based on the following specifications, or using exis
 
 **Requirements:**
 
-* Python
-* Ansible
-* jq
+* Python >= 3.6.8
+* Ansible >= 2.11.1
+* jq >= 1.5
 * Python modules required in the playbooks. Namely:
-  * openstackclient
-  * openstacksdk
-  * netaddr
+  * openstackclient >= 5.2.0
+  * openstacksdk >= 0.57.0
+  * netaddr >= 0.8.0
 
 **Verify the installation:**
 ```sh
