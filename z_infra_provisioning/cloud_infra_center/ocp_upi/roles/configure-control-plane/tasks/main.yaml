@@ -69,7 +69,7 @@
 - name: 'Create the Control Plane servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "{{ os_image_rhcos }}"
+    image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     timeout: 2400

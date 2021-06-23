@@ -50,7 +50,6 @@ all:
       # allocation_pool_end: '172.26.0.10'
       os_flavor_master: 'medium'
       os_flavor_worker: 'large'
-      os_image_rhcos: 'rhcos'
 
       # Name of the SDN.
       os_networking_type: 'OpenshiftSDN'

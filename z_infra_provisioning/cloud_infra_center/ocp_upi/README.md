@@ -73,9 +73,6 @@ Depending on the type of image registry backend an additional 100 GB volume.
 - The `openshift-install` binary
 - A subnet range for the Nova servers / OpenShift Nodes, that does not conflict with your existing network, and 
   - inventory: `os_subnet_range`
-- The RHCOS image to use, the default value is "rhcos"
-  - the default value is "rhcos" 
-  - inventory: `os_image_rhcos`
 - A DNS zone you can configure
   - it must be the resolver for the base domain, for the installer and for the end-user machines
   - it will host two records: for API and apps access
