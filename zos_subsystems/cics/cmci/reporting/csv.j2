@@ -1,7 +1,7 @@
 {{ attributes | join(',') }}
 {% for record in result.records %}
 {% for attribute in attributes %}
-{{ record[attribute] }}{% if not loop.last %},{% endif %}
+"{{ record[attribute] }}"{% if not loop.last %},{% endif %}
 {% endfor %}
 {% if not loop.last %}{{ "\n" }}{% endif %}
 {% endfor %}
