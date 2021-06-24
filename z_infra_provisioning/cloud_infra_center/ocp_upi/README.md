@@ -76,6 +76,10 @@ Depending on the type of image registry backend an additional 100 GB volume.
 - The RHCOS image to use, the default value is "rhcos"
   - the default value is "rhcos" 
   - inventory: `os_image_rhcos`
+- The availability zone in which to create the server
+  - inventory: `availability_zone`
+  - the default value is '', which means to use the default availability zone
+  - to select the host where instances are launched: `availability_zone: 'ZONE:HOST:NODE'`, HOST and NODE are optional parameters, so you can use the `availability_zone 'ZONE::NODE'`, `availability_zone: 'ZONE:HOST'` or `availability_zone: 'ZONE'`
 - A DNS zone you can configure
   - it must be the resolver for the base domain, for the installer and for the end-user machines
   - it will host two records: for API and apps access
