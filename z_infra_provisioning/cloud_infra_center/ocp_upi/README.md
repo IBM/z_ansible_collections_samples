@@ -220,7 +220,7 @@ The ansible playbooks has automated origin complex UPI mannul process, such as c
 
 ### Config HAproxy and DNS on a bastion node (default)
 
-User can choose to use your own bastion node to deploy cluster. If there aren't DNS server and Haproxy on bastion node, highly recommend installing them by ansible playbook [Configure Bastion](#configure-bastion), or you have an external DNS server which is managed in other DNS provider, if so, you need to add openshift recorder in your DNS server and HAProxy manually, please see the following [example](#sample-dns-zone-database) to add it.
+User can choose to use your own bastion node to deploy cluster. If there aren't DNS server and Haproxy on bastion node, highly recommend installing them by ansible playbook [Configure Bastion](#configure-bastion), or you have an external DNS server which is managed in other DNS provider, if so, you need to add openshift recorder in your DNS server and Load Balancer manually, please see the following [example](#sample-dns-zone-database) to add it.
 
 #### Sample DNS zone database
 ```
@@ -439,7 +439,7 @@ The playbook creates one Security group for the Control Plane and one for the Co
 ```sh
 $ ansible-playbook -i inventory.yaml configure-network.yaml
 ```
-The playbook use an existing network to deploy OCP, so it will overwrite DNS nameserver of this network card, please attention other application will not be interrupted.
+The playbook use an existing network to deploy OCP, so it will overwrite DNS nameserver of this network.
 
 ### Configure bastion
 

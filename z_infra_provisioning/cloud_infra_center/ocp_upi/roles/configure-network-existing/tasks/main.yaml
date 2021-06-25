@@ -47,13 +47,26 @@
     msg: "use_existing_network_subnet is not defined!"
   failed_when: use_existing_network_subnet is not defined
 
-- name: 'Update subnet {{ use_existing_network_subnet }} DNS name server'
-  command:
-    cmd: "openstack subnet set --dns-nameserver {{ vars.os_dns_domain }} {{ use_existing_network_subnet }}"
+- name: 'Update subnet {{ use_existing_network_subnet }}'
+  os_subnet:
+    name: "{{ use_existing_network_subnet }}"
+    network_name: "{{ use_existing_network_name }}"
+    cidr: "{{ os_subnet_range }}"
+    dns_nameservers: "{{ os_dns_domain }}"
+    allocation_pool_start: "{{ os_subnet_range | next_nth_usable(10) }}"
+    allocation_pool_end: "{{ os_subnet_range | ipaddr('last_usable') }}"
+  when:
+  - allocation_pool_start is not defined
+  - allocation_pool_end is not defined 
 
-- name: 'Update subnet {{ use_existing_network_subnet }} allocation pools'
-  command:
-    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ use_existing_network_subnet }}"
+- name: 'Update subnet {{ use_existing_network_subnet }}'
+  os_subnet:
+    name: "{{ use_existing_network_subnet }}"
+    network_name: "{{ use_existing_network_name }}"
+    cidr: "{{ os_subnet_range }}"
+    dns_nameservers: "{{ os_dns_domain }}"
+    allocation_pool_start: "{{ allocation_pool_start }}"
+    allocation_pool_end: "{{ allocation_pool_end }}"
   when:
   - allocation_pool_start is defined
   - allocation_pool_end is defined 
