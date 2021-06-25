@@ -46,6 +46,7 @@
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: 3600
     auto_ip: no
+    availability_zone: "{{ availability_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }}"

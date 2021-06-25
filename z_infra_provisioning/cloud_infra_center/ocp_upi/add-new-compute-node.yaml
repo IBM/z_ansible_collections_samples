@@ -70,6 +70,7 @@
       auto_ip: no
       timeout: 2400
       userdata: "{{ lookup('file', 'worker.ign') | string }}"
+      availability_zone: "{{ availability_zone }}"
       nics:
       - port-name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
 

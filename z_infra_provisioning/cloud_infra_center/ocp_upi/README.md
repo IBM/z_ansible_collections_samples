@@ -73,6 +73,10 @@ Depending on the type of image registry backend an additional 100 GB volume.
 - The `openshift-install` binary
 - A subnet range for the Nova servers / OpenShift Nodes, that does not conflict with your existing network, and 
   - inventory: `os_subnet_range`
+- The availability zone in which to create the server
+  - inventory: `availability_zone`
+  - the default value is '', which means to use the default availability zone
+  - to select the host where instances are launched: `availability_zone: 'ZONE:HOST:NODE'`, HOST and NODE are optional parameters, so you can use the `availability_zone 'ZONE::NODE'`, `availability_zone: 'ZONE:HOST'` or `availability_zone: 'ZONE'`
 - A DNS zone you can configure
   - it must be the resolver for the base domain, for the installer and for the end-user machines
   - it will host two records: for API and apps access
@@ -104,13 +108,13 @@ Provision a Red Hat machine based on the following specifications, or using exis
 
 **Requirements:**
 
-* Python
-* Ansible
-* jq
+* Python >= 3.6.8
+* Ansible >= 2.11.1
+* jq >= 1.5
 * Python modules required in the playbooks. Namely:
-  * openstackclient
-  * openstacksdk
-  * netaddr
+  * openstackclient >= 5.2.0
+  * openstacksdk >= 0.57.0
+  * netaddr >= 0.8.0
 
 **Verify the installation:**
 ```sh
@@ -425,8 +429,6 @@ Our control plane will consist of three nodes. The servers will be passed the `m
 The playbook places the Control Plane in a Server Group with "soft anti-affinity" policy.
 
 The master nodes should load the initial Ignition and then keep waiting until the bootstrap node stands up the Machine Config Server which will provide the rest of the configuration.
-
-***Note***: This playbook may give the warning of `UserWarning: You are specifying a cacert for the cloud envvars:RegionOne but also to ignore the host verification`. You can monitor this issue [#72](https://github.com/IBM/z_ansible_collections_samples/issues/72) to get latest status.
 
 ### Wait for the Control Plane to Complete
 
