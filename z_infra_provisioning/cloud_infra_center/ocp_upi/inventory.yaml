@@ -34,6 +34,11 @@ all:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
 
+      # To succeed deploy OCP, we will overwrite DNS nameserver on existing network
+      # Please be careful other application will not be interrupted.
+      use_existing_network_name: 'flat01'
+      use_existing_network_subnet: 'a2134ea5-7c7c-4515-8cbe-71fd41686935'  #f9921330-0cc0-419a-a055-d202f1fb11d9
+
       # User-provided values
       vm_type: 'zvm'
       disk_type: 'dasd'

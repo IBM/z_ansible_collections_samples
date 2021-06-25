@@ -8,7 +8,7 @@
 # =================================================================
 
 ---
-- name: Configure network
+- name: Configure existing network
   hosts: localhost
   roles:
-  - configure-network
+  - configure-network-existing
