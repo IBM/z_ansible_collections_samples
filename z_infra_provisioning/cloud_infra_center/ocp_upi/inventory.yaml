@@ -35,10 +35,14 @@ all:
       ansible_python_interpreter: "{{ansible_playbook_python}}"
 
       # User-provided values
-      vm_type: 'zvm'
+      vm_type: 'kvm'
       disk_type: 'dasd'
       openshift_version: '4.7'
-      openshift_minor_version: '0'
+      openshift_minor_version: '7'
+
+      # Support to use existing network
+      use_existing_network_name: 'flat01'
+      use_existing_network_subnet: 'a2134ea5-7c7c-4515-8cbe-71fd41686935'  #f9921330-0cc0-419a-a055-d202f1fb11d9
 
       # The auto_allocated_ip default value is true, then IPs will be allocated from subnet range. 
       # If you need specify IP addresses, set auto_allocated_ip to false.
@@ -48,9 +52,8 @@ all:
       # The allocation pool can be configured by allocation_pool_start and allocation_pool_end
       # allocation_pool_start: '172.26.0.2'
       # allocation_pool_end: '172.26.0.10'
-      os_flavor_master: 'medium'
-      os_flavor_worker: 'large'
-      os_image_rhcos: 'rhcos'
+      os_flavor_master: 'ocp'
+      os_flavor_worker: 'ocp'
 
       # Name of the SDN.
       os_networking_type: 'OpenshiftSDN'
@@ -65,23 +68,20 @@ all:
 
     # Bastion DNS and HAProxy settings
     bastion:
-      ansible_ssh_host: 172.26.103.100
-      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
-
       # Configure the IP address of your private subnet
       # These default values will work by default
       # with the default configuration defined in
       # tony-hypervisor-setup
-      bastion_private_ip_address: 172.26.103.100
+      bastion_private_ip_address: 172.26.105.35
       gateway_ip: 172.26.0.1
-      bastion_subnet_prefix_reverse: 103.26.172
+      bastion_subnet_prefix_reverse: 105.26.172
       # The queries from IPs in `cluster_subnet_range` will be allowed, 
       # we suggest setting `cluster_subnet_range` the same as localhost's `os_subnet_range`
       cluster_subnet_range: 172.26.0.0/16
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
   
   vars:
-    os_dns_domain: "172.26.103.100"
+    os_dns_domain: "172.26.105.35"
     cluster_domain_name: "openshift.example.com"
     
     # If you need specify IP addresses (the auto_allocated_ip value is false), fill below lists.

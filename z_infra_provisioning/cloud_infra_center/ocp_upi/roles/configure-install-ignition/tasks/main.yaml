@@ -19,7 +19,7 @@
   register: infra_id
 
 - name: Edit Bootstrap Ignition
-  script: tools/ignition-modify.py
+  script: tools/ignition-modify.py 
   args:
     executable: python3
 
@@ -42,4 +42,5 @@
     executable: python3
 
 - name: Generate Master Ignition
-  script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }}
+  script: tools/generate-master-ignition.py {{ infra_id.stdout_lines[0] }} 
+
