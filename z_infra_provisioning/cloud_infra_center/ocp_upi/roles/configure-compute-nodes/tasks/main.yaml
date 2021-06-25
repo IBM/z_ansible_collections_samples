@@ -50,7 +50,7 @@
 - name: 'Create the Compute servers'
   os_server:
     name: "{{ os_compute_server_name }}-{{ item.1 }}"
-    image: "{{ os_image_rhcos }}"
+    image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ availability_zone }}"

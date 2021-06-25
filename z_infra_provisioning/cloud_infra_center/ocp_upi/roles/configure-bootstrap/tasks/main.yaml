@@ -41,7 +41,7 @@
 - name: 'Create the bootstrap server'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "{{ os_image_rhcos }}"
+    image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: 3600
