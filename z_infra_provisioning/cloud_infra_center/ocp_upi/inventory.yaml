@@ -82,11 +82,16 @@ all:
       # we suggest setting `cluster_subnet_range` the same as localhost's `os_subnet_range`
       cluster_subnet_range: 172.26.0.0/16
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
+     
+      # Specify a valid IP address for nameserver where requests should be forwarded for resolution.
+      # It can be specified as your upstream nameserver. 
+      # If you don't need it, set its value the same as bastion's IP.
+      dns_forwarder: 172.26.103.100 
   
   vars:
     os_dns_domain: "172.26.103.100"
     cluster_domain_name: "openshift.example.com"
-    
+   
     # If you need specify IP addresses (the auto_allocated_ip value is false), fill below lists.
     # os_bootstrap_ip: '172.26.103.230'
     # os_master_ip: ['172.26.103.231', '172.26.103.232', '172.26.103.233']
