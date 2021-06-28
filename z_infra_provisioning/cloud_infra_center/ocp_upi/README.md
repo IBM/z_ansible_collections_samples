@@ -397,6 +397,8 @@ $ ansible-playbook -i inventory.yaml configure-haproxy.yaml
 
 The nodes' hostnames and IP addresses will be read from nodes' port and configured in bastion node's DNS and Haproxy.
 
+At this stage, if you want to add another cluster's DNS and HAProxy configuration on the same bastion node, you need to add the second configuration manually. Because above steps will cover the older configuration. You can refer to [configure another cluster's DNS and HAProxy on the same bastion node](docs/multi-cluster-bastion.md)
+
 ### OpenShift Bootstrap
 
 ```sh
