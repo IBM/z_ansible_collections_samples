@@ -19,6 +19,8 @@ the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
 
+**Want to contribute playbooks to this repository?** We are accepting contributions of ansible playbooks from community memebers. These playbooks should relate to IBM Z, and should either leverage the Red Hat Ansible Certified Content for IBM Z collections, or highlight additional capabilities and use-cases for Z automation. Check out the contribution guidelines for more information. 
+
 ## Playbooks
 
 Playbooks are organized by topics that align to tasks and use cases that are
