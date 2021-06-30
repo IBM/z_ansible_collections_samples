@@ -13,7 +13,7 @@ options {
 
 	recursion yes;
 	allow-recursion { localhost; internal_nets; };
-	forwarders { {{ os_dns_domain}}; };
+	forwarders { {{ dns_forwarder }}; };
 
 	dnssec-enable yes;
 	dnssec-validation no;
