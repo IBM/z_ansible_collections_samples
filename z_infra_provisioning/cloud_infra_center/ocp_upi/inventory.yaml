@@ -34,6 +34,10 @@ all:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
 
+      # To succeed deploy OCP, it will overwrite DNS nameserver of this network.
+      use_existing_network_name: 'flat01'
+      use_existing_network_subnet: 'a2134ea5-7c7c-4515-8cbe-71fd41686935' 
+
       # User-provided values
       vm_type: 'zvm'
       disk_type: 'dasd'
@@ -84,6 +88,7 @@ all:
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
   
   vars:
+    # If you want to use your external DNS server, set os_dns_domain to use it.
     os_dns_domain: "172.26.103.100"
     cluster_domain_name: "openshift.example.com"
     

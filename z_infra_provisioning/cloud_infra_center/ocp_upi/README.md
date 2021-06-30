@@ -220,7 +220,7 @@ The ansible playbooks has automated origin complex UPI mannul process, such as c
 
 ### Config HAproxy and DNS on a bastion node (default)
 
-User can choose to use your own bastion node to deploy cluster. If there aren't DNS server and Haproxy on bastion node, highly recommend installing them by ansible playbook [Configure Bastion](#configure-bastion), or you have an external DNS server which is managed in other DNS provider, if so, you need to add openshift recorder in your DNS server manually, please see the following [example](#sample-dns-zone-database) to add it.
+User can choose to use your own bastion node to deploy cluster. If there aren't DNS server and Haproxy on bastion node, highly recommend installing them by ansible playbook [Configure Bastion](#configure-bastion), or you have an external DNS server which is managed in other DNS provider, if so, you need to add openshift recorder in your DNS server and Load Balancer manually, please see the following [example](#sample-dns-zone-database) to add it.
 
 #### Sample DNS zone database
 ```
@@ -246,7 +246,73 @@ master-2              IN A 172.26.103.233
 worker-62c41              IN A 172.26.103.234
 worker-a7c60              IN A 172.26.103.235
 worker-c94d1              IN A 172.26.103.236
+
+etcd-0              IN A 172.26.103.231
+etcd-1              IN A 172.26.103.232
+etcd-2              IN A 172.26.103.233
+
+_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.openshift.example.com.
+                      IN SRV 0 10 2380 etcd-1.openshift.example.com.
+                      IN SRV 0 10 2380 etcd-2.openshift.example.com.
 ```
+
+#### Sample HAProxy 
+```
+frontend ocp4-kubernetes-api-server
+   mode tcp
+   option tcplog
+   bind api.openshift.example.com:6443
+   bind api-int.openshift.example.com:6443
+   default_backend ocp4-kubernetes-api-server
+
+frontend ocp4-machine-config-server
+   mode tcp
+   option tcplog
+   bind api.openshift.example.com:22623
+   bind api-int.openshift.example.com:22623
+   default_backend ocp4-machine-config-server
+
+frontend ocp4-router-http
+   mode tcp
+   option tcplog
+   bind apps.openshift.example.com:80
+   default_backend ocp4-router-http
+
+frontend ocp4-router-https
+   mode tcp
+   option tcplog
+   bind apps.openshift.example.com:443
+   default_backend ocp4-router-https
+
+backend ocp4-kubernetes-api-server
+   mode tcp
+   balance source
+   server bootstrap bootstrap.openshift.example.com:6443 check
+   server master-0 master-0.openshift.example.com:6443 check
+   server master-1 master-1.openshift.example.com:6443 check
+   server master-2 master-2.openshift.example.com:6443 check
+
+backend ocp4-machine-config-server
+   mode tcp
+   balance source
+   server bootstrap bootstrap.openshift.example.com:22623 check
+   server master-0 master-0.openshift.example.com:22623 check
+   server master-1 master-1.openshift.example.com:22623 check
+   server master-2 master-2.openshift.example.com:22623 check
+
+backend ocp4-router-http
+   mode tcp
+         server worker-62c41 worker-62c41.openshift.example.com:80 check
+         server worker-a7c60 worker-a7c60.openshift.example.com:80 check
+         server worker-c94d1 worker-c94d1.openshift.example.com:80 check
+
+backend ocp4-router-https
+   mode tcp
+         server worker-62c41 worker-62c41.openshift.example.com:443 check
+         server worker-a7c60 worker-a7c60.openshift.example.com:443 check
+         server worker-c94d1 worker-c94d1.openshift.example.com:443 check
+```
+
 #### Verify DNS record
 
 You can use the nslookup <hostname> command to verify name resolution. 
@@ -282,6 +348,7 @@ Update bastion node info, dns domain and OCP nodes IP addresses in `inventory.ya
     os_dns_domain: "172.26.103.100"
     cluster_domain_name: "openshift.example.com"
 ```
+
 
 ### Modify other user-provided values in inventory.yaml
 
@@ -372,20 +439,7 @@ The playbook creates one Security group for the Control Plane and one for the Co
 ```sh
 $ ansible-playbook -i inventory.yaml configure-network.yaml
 ```
-
-The playbook creates a default VLAN network and a subnet. The subnet obeys `os_subnet_range`. By default, if the `os_subnet_range` is '172.26.0.0/16', the allocation pools will be '172.26.0.10-172.26.255.254'. The allocation pool can be configured by `allocation_pool_start` and `allocation_pool_end`. Finally, the playbook creates the nodes' ports. 
-
-***Note***: If your Bastion node was not VLAN network type, the bootstrap node should be connected confused with bastion node. Please use of existing network.
-
-
-**Use existing network**
-
-If you want to use an existing netowrk instead of creating a new network, you can specify the 
-network name and subnet UUID, for example:
-
-```
-$ ansible-playbook -i inventory.yaml configure-network.yaml -e os_network="<Network_name>" -e os_subnet="<Network_subnet>"
-```
+The playbook use an existing network to deploy OCP, so it will overwrite DNS nameserver of this network.
 
 ### Configure bastion
 
