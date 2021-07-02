@@ -60,16 +60,4 @@
   - name: 'Remove the cluster router'
     os_router:
       name: "{{ os_router }}"
-      state: absent
-
-  - name: 'List cluster networks'
-    command:
-      cmd: "openstack network list --tags {{ cluster_id_tag }} -f value -c Name"
-    register: networks
-
-  - name: 'Remove the cluster networks'
-    os_network:
-      name: "{{ item.1}}"
-      state: absent
-    with_indexed_items: "{{ networks.stdout_lines }}"
-    
+      state: absent  
