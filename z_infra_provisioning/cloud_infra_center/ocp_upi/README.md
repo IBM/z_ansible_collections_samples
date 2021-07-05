@@ -104,17 +104,19 @@ You can use any ICIC nodes or any RHEL8 machine to run ansible scripts to deploy
 ## Provision a Red Hat machine
 Provision a Red Hat machine based on the following specifications, or using existing ICIC compute nodes, the minimum system requirements: `1 vCPU, 2GB memory, 30GB Disk`.
 
+**Note:** The operating system which this Ansible script runs on successfully is s390x.
+
 ## Install required packages
 
 **Requirements:**
 
-* Python >= 3.6.8
-* Ansible >= 2.11.1
-* jq >= 1.5
+* Python3
+* Ansible
+* jq
 * Python modules required in the playbooks. Namely:
-  * openstackclient >= 5.2.0
+  * openstackclient 
   * openstacksdk >= 0.57.0
-  * netaddr >= 0.8.0
+  * netaddr
 
 **Verify the installation:**
 ```sh
