@@ -87,3 +87,31 @@
   with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
+  when:
+  - disk_type == "dasd"
+
+  - name: 'Create the Control Plane servers with boot volume'
+  os_server:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    image: "rhcos"
+    flavor: "{{ os_flavor_master }}"
+    auto_ip: no
+    availability_zone: "{{ availability_zone }}"
+    timeout: 2400
+    # The ignition filename will be concatenated with the Control Plane node
+    # name and its 0-indexed serial number.
+    # In this case, the first node will look for this filename:
+    #    "{{ infraID }}-master-0-ignition.json"
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
+    nics:
+    - port-name: "{{ os_port_master }}-{{ item.0 }}"
+    scheduler_hints:
+      group: "{{ server_group_id }}"
+    meta: "{{ cluster_id_tag }}"
+    boot_from_volume: True
+    terminate_volume: True
+  with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+  environment: 
+    PYTHONWARNINGS: 'ignore::UserWarning'
+  when:
+  - disk_type == "scsi"

@@ -60,6 +60,26 @@
     - port-name: "{{ os_port_worker }}-{{ item.1 }}"
     meta: "{{ cluster_id_tag }}"
   with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  when:
+  - disk_type == "dasd"
+
+- name: 'Create the Compute servers with boot volume'
+  os_server:
+    name: "{{ os_compute_server_name }}-{{ item.1 }}"
+    image: "rhcos"
+    flavor: "{{ os_flavor_worker }}"
+    auto_ip: no
+    availability_zone: "{{ availability_zone }}"
+    timeout: 2400
+    userdata: "{{ lookup('file', 'worker.ign') | string }}"
+    nics:
+    - port-name: "{{ os_port_worker }}-{{ item.1 }}"
+    meta: "{{ cluster_id_tag }}"
+    boot_from_volume: True
+    terminate_volume: True
+  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  when:
+  - disk_type == "scsi"
 
 - name: 'Approve worker nodes csr'
   script: tools/wait-nodes-csrs.py {{ os_compute_server_name }}-{{ item.1 }}
