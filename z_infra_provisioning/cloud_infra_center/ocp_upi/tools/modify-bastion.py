@@ -52,13 +52,14 @@ def get_nodes_ips(infra_id, node_role):
     nodes_dict = {}
     for node in nodes:
         name = node.split(" ")[0]
+        name = name.replace(infra_id, "")
         n = name.split("-")
-        if len(n) < 4:
+        if len(n) <= 1:
             break
-        if len(n) == 5:
-            name = n[2] + "-" +n[4]
+        elif node_role == "bootstrap":
+            name = n[1]
         else:
-            name = n[2]
+            name = n[1] + "-" + n[3]
         ip = node.split(" ")[1]
         ip = ip.split("'")[1]
         if node_role == "master":
