@@ -90,7 +90,7 @@
   when:
   - disk_type == "dasd"
 
-  - name: 'Create the Control Plane servers with boot volume'
+- name: 'Create the Control Plane servers with boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
