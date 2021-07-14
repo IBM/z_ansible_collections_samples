@@ -183,7 +183,7 @@ All the configuration files, logs and installation state are kept in a single di
 ```sh
 $ git clone https://github.com/IBM/z_ansible_collections_samples.git
 $ cp -r z_ansible_collections_samples/z_infra_provisioning/cloud_infra_center/ocp_upi ocp_upi
-$ cd ocp-upi
+$ cd ocp_upi
 ```
 
 ## Prepare the configuration before installation
