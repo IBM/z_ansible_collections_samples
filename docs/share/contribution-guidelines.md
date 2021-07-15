@@ -250,6 +250,75 @@ practices, we will discuss them below briefly. You may find it helpful to review
 [The Inside Playbook](https://www.ansible.com/blog/ansible-best-practices-essentials)
 essentials and best practices.
 
+Consider:
+- Always name your tasks and plays, it reads easier when users are watching the
+  output of a playbook
+  ```
+  - hosts: production
+    name: Copy and fetch data from z/OS
+    tasks:
+      - name: Copy /etc/profile from Unix System Services
+        ibm.ibm_zos_core.zos_fetch:
+        .....
+  ```
+- Use well defined and easily readable variable names
+  ```
+  lpar_etc_profile: /etc/profile
+  ```
+- Avoid `key=value` shorthand where content is placed on one line
+  `state=present src=/etc/profile dest=/tmp force=true`
+  instead:
+  ```
+  state=present
+  src=/etc/profile
+  dest=/tmp force=true
+  ```
+- Always look to use modules before resorting to commands executing in
+  `shell`, `raw`, `command`
+- If your playbook has many debug statements consider using the `verbosity`
+  parameter
+  ```
+  - debug:
+   msg: "This message always appears on the console."
+
+  - debug:
+   msg: "This message only appears on the console with ansible-playbook -vv+"
+   verbosity: 2
+  ```
+- Enforcing desired state
+  - What it means is that a playbook can run more than once (two times in a row)
+    and the second time it will not break anything. You can you use many of the
+    Ansible constructs such as
+    [conditionals](https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html#conditionals)
+    to achieve this desired state.
+
+    For example, consider the below command will always execute regardless of state:
+    ```
+    - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
+      system {{ system_name }}
+      zos_operator:
+        cmd: "DUMP COMM=('test dump')"
+    ```
+    where as in this snippet we are checking for a specific boolean with the
+    `when` operator before continuing.
+    ```
+    - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
+      system {{ system_name }}
+      zos_operator:
+        cmd: "DUMP COMM=('test dump')"
+      register: result_zos_operator
+      when: bool_zos_operator_action_continue
+    ```
+- Fully qualified collection names
+  - Since Ansible 2.10, many collections have been moved to collections into
+    Galaxy. To ensure future portability its is best to use the fully qualified
+    name for the module.
+    For example prior to Ansible 2.10 you could reference the command module
+    with syntax `command: ls -la` where now its recommended you do so as
+    `ansible.builtin.command: ls -la`. For the index of all modules and fully
+    qualified names, review the
+    [documentation](https://docs.ansible.com/ansible/latest/collections/index_module.html)
+
 #### Linting
 At this time, linting is not required by this community but in the near future
 as the repository begins to mature, you can expect bots or a pipeline to be in
