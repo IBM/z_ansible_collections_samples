@@ -4,10 +4,11 @@ This document captures the general guidelines for contributing to the
 **Ansible® for IBM Z® Playbooks repository**. All playbooks contributed to this
 repository are required to follow these guidelines.
 
-Quick links
-[Developer Certificate of Origin](#developer-certificate-of-origin)
-[Community Guidelines](#community-guidelines)
-[Playbook Development Guidelines](#playbook-development-guidelines)
+**Quick links**
+[Developer Certificate of Origin](#developer-certificate-of-origin)  
+[Community Guidelines](#community-guidelines)  
+[Playbook Development Guidelines](#playbook-development-guidelines)  
+[Obtaining the Source Code](obtaining-the-source-code)  
 
 ## Developer Certificate of Origin
 The **Ansible for IBM Z playbook repository** requires the use of the
