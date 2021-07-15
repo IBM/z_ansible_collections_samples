@@ -8,7 +8,7 @@ repository are required to follow these guidelines.
 [Developer Certificate of Origin](#developer-certificate-of-origin)  
 [Community Guidelines](#community-guidelines)  
 [Playbook Development Guidelines](#playbook-development-guidelines)  
-[Obtaining the Source Code](obtaining-the-source-code)  
+[Obtaining the Source Code](#obtaining-the-source-code)  
 
 ## Developer Certificate of Origin
 The **Ansible for IBM Z playbook repository** requires the use of the
