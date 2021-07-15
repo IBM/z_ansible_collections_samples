@@ -20,8 +20,14 @@ the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
 
-## Contribute
-Want to contribute playbooks to this repository? We are accepting contributions of ansible playbooks from community memebers. These playbooks should relate to IBM Z, and should either leverage the Red Hat Ansible Certified Content for IBM Z collections, or highlight additional capabilities and use-cases for Z automation. Check out the [contribution guidelines](https://github.com/IBM/z_ansible_collections_samples/blob/dan-external-contributions/docs/share/contribution-guidelines.md) for more information. 
+## Contribute Ansible Playbooks
+
+We are accepting Ansible playbooks from the community. These playbooks
+should relate to **IBM Z**, and should either leverage the
+**Red Hat Ansible Certified Content for IBM Z** collections, or highlight
+additional capabilities and use-cases for **Z automation**. Check out the
+[contribution guidelines](docs/share/contribution-guidelines.md) for more
+information.
 
 ## Playbooks
 
