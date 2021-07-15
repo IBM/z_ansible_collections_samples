@@ -86,7 +86,7 @@ often repeated and in need of automation.
 
 Don't have time to explore a collection, particular module or a playbook?  
 Learn all about the offerings from our [blogs](https://community.ibm.com/community/user/ibmz-and-linuxone/groups/topic-home/blog-entries?communitykey=ce54fe94-0145-4832-a0ef-4ea81d6062cc&tab=blog-entries).  
-Don't know which one to read first? Well, here is a list of some of our recent blogs:  
+Don't know which one to read first? Well, here is a list of some of our recent blogs:   
 
 - [Job Submission on z/OS Made Easy with Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Playbook](zos_concepts/jobs/submit_query_retrieve)\]
 - [Running Batch Jobs on z/OS using Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/asif-mahmud1/2020/08/04/how-to-run-batch-jobs-on-zos-without-jcl-using-ans) - \[[Playbook](zos_concepts/data_transfer/copy_sort_fetch)\]
