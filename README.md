@@ -1,7 +1,9 @@
 # Ansible Z Playbook Repository
 
 This repository provides playbooks that can be tailored to automate often
-repeated Z tasks, links to blogs, and other related media. An [Ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
+repeated IBM Z tasks, links to blogs, and other related media.
+
+An [Ansible® playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro)
 consists of organized instructions that define work for a managed node to be
 automated with Ansible. The playbooks in this
 repository are written using the collections from
@@ -19,8 +21,14 @@ the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
 
-## Contribute
-Want to contribute playbooks to this repository? We are accepting contributions of ansible playbooks from community memebers. These playbooks should relate to IBM Z, and should either leverage the Red Hat Ansible Certified Content for IBM Z collections, or highlight additional capabilities and use-cases for Z automation. Check out the [contribution guidelines](https://github.com/IBM/z_ansible_collections_samples/blob/dan-external-contributions/docs/share/contribution-guidelines.md) for more information. 
+## Contribute Ansible Playbooks
+
+We are accepting Ansible playbooks from the community. These playbooks
+should relate to **IBM Z**, and should either leverage the
+**Red Hat Ansible Certified Content for IBM Z** collections, or highlight
+additional capabilities and use-cases for **Z automation**. Check out the
+[contribution guidelines](docs/share/contribution-guidelines.md) for more
+information.
 
 ## Playbooks
 
