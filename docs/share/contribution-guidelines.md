@@ -4,6 +4,11 @@ This document captures the general guidelines for contributing to the
 **Ansible® for IBM Z® Playbooks repository**. All playbooks contributed to this
 repository are required to follow these guidelines.
 
+Quick links
+[Developer Certificate of Origin](#developer-certificate-of-origin)
+[Community Guidelines](#community-guidelines)
+[Playbook Development Guidelines](#playbook-development-guidelines)
+
 ## Developer Certificate of Origin
 The **Ansible for IBM Z playbook repository** requires the use of the
 [Developer’s Certificate of Origin 1.1 (DCO)](https://developercertificate.orgx`)
@@ -150,7 +155,7 @@ follow up that may aid you in developing Ansible playbooks.
 - [Writing tasks, plays, and playbooks](https://docs.ansible.com/ansible/latest/user_guide/index.html#writing-tasks-plays-and-playbooks)
 - [Complete Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/index.html#user-guide)
 
-#### Roles
+### Roles
 If in your playbook you begin to notice your it is becoming overly
 complex and difficult to maintain, think about introducing a role. Playbooks
 invoke roles instead of tasks such that you can still group tasks together then
@@ -309,3 +314,39 @@ to all other playbook READMEs. They should try to contain the following topics:
     Please refer to the [support section](../../../README.md#support) for more
     details.
     ```
+
+## Obtaining the Source Code
+Obtaining the source to contribute is best done by forking the repository. A
+fork is a copy of a repository that allows you to freely make changes without
+impacting the original project.
+
+There are [many guides](https://docs.github.com/en/get-started/quickstart/fork-a-repo)
+available that discuss the GitHub forking workflow model. Although it can seem
+intimidating, once you learn it, it's always the same and can be applied
+everywhere.
+
+To summarize the flow:
+- Fork the repository
+  - This is done through GitHub by logging into your account and clicking the
+    Fork button
+- Locally clone your newly forked repository replacing your GIT_ID
+  - `git clone git@github.com:GIT_ID/z_ansible_collections_samples.git`
+- Track the original repository as a remote of the fork
+  - `git remote add --track master upstream git@github.com:IBM/z_ansible_collections_samples.git`
+  - `git fetch upstream`
+- Crete a new branch for your changes
+  - `git checkout -b new-playbook upstream/master`
+- Make your changes to your playbook, add files, etc
+- Add your changes
+  - `git add .`
+- Commit and sign off on your changes
+  - `git commit -s -m "Contributing my first playbook"`
+- Push your changes
+  - `git push -u origin new-playbook`
+- Submit your pull request
+  - Now your are ready to submit the playbook project for approval. Go to the
+    [Pull requests tab](https://github.com/IBM/z_ansible_collections_samples/pulls)
+    and you should see an automatic suggestion from GitHub
+    asking you to create a pull request from your new branch. Essentially this
+    pull request will link your changes and this repository together so the
+    changes can be accepted and pulled into the repository.
