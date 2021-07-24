@@ -38,11 +38,11 @@
   - name: 'Create the Compute ports'
     os_port:
       name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
-      network: "{{ os_network }}"
+      network: "{{ use_existing_network_name }}"
       security_groups:
       - "{{ os_sg_worker }}"
       fixed_ips:
-      - subnet: "{{ os_subnet }}"
+      - subnet: "{{ use_existing_network_subnet }}"
         ip_address: "{{ ip }}"
     register: ports
     when:
@@ -51,7 +51,7 @@
   - name: 'Create the Compute ports'
     os_port:
       name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
-      network: "{{ os_network }}"
+      network: "{{ use_existing_network_name }}"
       security_groups:
       - "{{ os_sg_worker }}"
     register: ports
