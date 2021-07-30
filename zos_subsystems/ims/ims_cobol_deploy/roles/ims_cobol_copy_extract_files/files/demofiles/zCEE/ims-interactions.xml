@@ -1,0 +1,19 @@
+<server>
+<!-- Change the values for the following attributes.
+	1. id: Specify the ID for this interaction properties profile. This is the value to specify in the
+		z/OS Connect EE API toolkit as the interaction properties profile name when configuring the service properties.
+	2. commitMode: Specify the commit mode. A value of 0 means commit-then-send (CM0); 1 means send-then-commit (CM1).
+	3. imsConnectTimeout: Specify the time in milliseconds for the IMS service provider to wait for a reply after sending a message to IMS Connect.
+		The default is 30000, which means to wait 30 seconds.
+	4. imsDatastoreName: Specify the name of the IMS data store (IMS Connect).
+	5. interactionTimeout: Specify the time in milliseconds for the transaction to be processed by IMS.
+		- Valid values are -1, 0, or between 1 and 3600000 (one hour), inclusively.
+		- A value of 0 means the timeout value is determined by IMS Connect.
+		- A value of -1 means to wait indefinitely.
+	6. syncLevel: Specify the sync level. A value of 0 means None; 1 means Confirm. commitMode 0 (CM0, Commit-then-send) is invalid with sync level 0 (None).
+	7. imsConnectCodepage: Specify the code page to use for character string conversion with IMS Connect
+	8. ltermOverrideName: Optional. Specify a LTERM name to override the value in the LTERM field of the IMS application program's I/O PCB.
+	9. comment: Optional. Enter comments about this interaction properties profile.-->
+<imsmobile_interaction comment="" commitMode="1" id="Interaction1" imsConnectCodepage="Cp1047" imsConnectTimeout="30000" 
+imsDatastoreName="IMSO" interactionTimeout="-1" ltermOverrideName="" syncLevel="0"/>
+</server>

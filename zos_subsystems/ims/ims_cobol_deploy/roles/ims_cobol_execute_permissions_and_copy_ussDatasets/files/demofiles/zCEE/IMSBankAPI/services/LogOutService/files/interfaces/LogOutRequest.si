@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" transactionCode="" messageName="LogOutRequest" direction="0" serviceType="IMS">
+    <message id="1" name="LogOutRequest">
+        <segment id="1" name="Segment 1" originalName="Segment 1">
+            <field name="INPUT_AREA" originalName="INPUT_AREA" included="Y" path="INPUT_AREA">
+                <startPos>1</startPos>
+                <bytes>21</bytes>
+                <maxBytes>21</maxBytes>
+                <marshaller alignment="NATURAL"/>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL_IN" originalName="LL_IN" included="N" path="INPUT_AREA.LL_IN">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ_IN" originalName="ZZ_IN" included="N" path="INPUT_AREA.ZZ_IN">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="TRAN_CODE" originalName="TRAN_CODE" included="N" defaultValue="IBLOGOUT" isHex="false" path="INPUT_AREA.TRAN_CODE" codepageConversion="Y">
+                    <startPos>5</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <remarks></remarks>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="customerNumber" originalName="IN_CUSTID" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customerNumber" codepageConversion="Y">
+                    <startPos>13</startPos>
+                    <bytes>9</bytes>
+                    <maxBytes>9</maxBytes>
+                    <remarks></remarks>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

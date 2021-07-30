@@ -1,0 +1,5 @@
+collections:
+  - name: ibm.ibm_zos_core
+    source: https://galaxy.ansible.com
+  - name: ibm.ibm_zos_ims
+    source: https://galaxy.ansible.com

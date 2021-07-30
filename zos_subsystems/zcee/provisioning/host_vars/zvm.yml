@@ -85,7 +85,7 @@ api_key: ''
 DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
 
 # The SSID for the IMS to be provisioned
-DFS_IMS_SSID: IMS1
+DFS_IMS_SSID: IMS2
 
 # ---------------------------------------------------------------------------- #
 # The first HLQ to be used to store IMS related datasets

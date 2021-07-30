@@ -1,0 +1,10 @@
+{{ JOB_CARD }}
+//***************************************************************
+//* DISPLAY MODIFY      
+//SPOC      EXEC PGM=CSLUSPOC,                                 
+//  PARM=('IMSPlex={{DFS_IMSPLEX}},ROUTE={{ROUTE}},WAIT=30')                  
+//STEPLIB   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{DFS_AUTH_LIB_HLQ2 }}.SDFSRESL               
+//SYSPRINT  DD SYSOUT=*                                        
+//SYSIN     DD *                                               
+    /DISPLAY MODIFY
+/*                                                

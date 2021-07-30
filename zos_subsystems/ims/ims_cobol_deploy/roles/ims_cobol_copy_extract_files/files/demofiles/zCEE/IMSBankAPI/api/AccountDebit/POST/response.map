@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><mappingRoot xmlns="http://www.ibm.com/2008/ccl/Mapping" domainID="com.ibm.msl.mapping.xml" domainIDExtension="zosconnect" jsonWrapped="false" targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/POST" version="8.0.5.0" xmlns:map="http://www.ibm.com/zosConnect/2.0/mapping/POST">
+    <inlinedXMLSchema targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST" xmlns:tns="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST">
+  <xsd:element name="OUTPUT_AREA" type="tns:OUTPUT_AREA"/>
+  <xsd:complexType name="OUTPUT_AREA">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="message">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="43"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>]]></inlinedXMLSchema>
+    <inlinedXMLSchema targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/HTTP/output/POST"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/HTTP/output/POST" xmlns:body="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST" xmlns:tns="http://www.ibm.com/zosConnect/2.0/mapping/HTTP/output/POST">
+
+      <xsd:import namespace="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST" schemaLocation="../schema_0.xsd"/>
+
+      <xsd:element name="HTTPResponse" type="tns:HTTPResponseType"/>
+
+      <xsd:complexType name="HTTPResponseType">
+        <xsd:sequence>
+          <xsd:element name="Headers" type="tns:HeadersType"/>
+          <xsd:element name="Body" type="tns:BodyType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="HeadersType">
+        <xsd:sequence>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="BodyType">
+        <xsd:sequence>
+          <xsd:element ref="body:OUTPUT_AREA"/>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>]]></inlinedXMLSchema>
+    <input inlinedXMLSchema="true" path="../schema_0.xsd" targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST" var="rootInput"/>
+    <output inlinedXMLSchema="true" path="../schema_1.xsd" targetNamespace="http://www.ibm.com/zosConnect/2.0/mapping/HTTP/output/POST" var="rootOutput"/>
+    <namespaces>
+        <namespace kind="supplement" prefix="in" uri="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST"/>
+        <namespace kind="supplement" prefix="out" uri="http://www.ibm.com/zosConnect/2.0/mapping/HTTP/output/POST"/>
+    </namespaces>
+    <mappingDeclaration name="POST.AccountDebit">
+        <input namespace="http://www.ibm.com/zosConnect/2.0/mapping/JSON/input/POST" path="$rootInput/OUTPUT_AREA"/>
+        <output namespace="http://www.ibm.com/zosConnect/2.0/mapping/HTTP/output/POST" path="$rootOutput/HTTPResponse"/>
+        <passthrough>
+            <input path="."/>
+            <output path="Body/OUTPUT_AREA"/>
+            <updates/>
+        </passthrough>
+    </mappingDeclaration>
+</mappingRoot>

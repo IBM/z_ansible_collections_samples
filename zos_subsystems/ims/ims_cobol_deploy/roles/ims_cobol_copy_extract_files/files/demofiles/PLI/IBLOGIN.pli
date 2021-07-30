@@ -1,0 +1,338 @@
+*PROCESS SYSTEM(IMS);
+  /*------------------------------------------------------------*
+  * Procedure: IBLOGIN
+  * Description: PL/I pgm for IMS Bank App Demo _ Rewrite
+  * the IBLOGIN.cbl.
+  *------------------------------------------------------------*/
+
+
+  IBLOGIN: PROCEDURE(IOPCB_PTR, DBPCB_PTR) OPTIONS(MAIN);
+
+  DCL PLITDLI ENTRY EXTERNAL;
+  DCL IOPCB_PTR POINTER;
+  DCL DBPCB_PTR POINTER;
+
+  /*------------------------------------------------------------*
+  * CONSTANTS
+  * ERROR MESSAGES & MESSAGE PROCESSING
+  *------------------------------------------------------------*/
+  DCL  LOGINSUCCESSFUL  CHAR(16)   INIT('LOGIN SUCCESSFUL');
+  DCL  CUSTLOGGEDIN     CHAR(26)   INIT('CUSTOMER ALREADY LOGGED IN');
+  DCL  PASSWORDINVALID  CHAR(16)   INIT('PASSWORD INVALID');
+  DCL  NOCUSTOMER       CHAR(23)   INIT('CUSTOMER DOES NOT EXIST');
+  DCL  LOGGEDIN         CHAR(1)    INIT('1');
+  DCL  LOGGEDOUT        CHAR(1)    INIT('0');
+
+  DCL  TERM_IO             FIXED BIN(31)     INIT(0);
+  DCL  MESSAGE_EXIST       CHAR(2)           INIT('CF');
+  DCL  NO_MORE_MESSAGE     CHAR(2)           INIT('QC');
+
+
+  /*---------------------------------------------------------*
+  * DATABASE CALL CODES
+  *----------------------------------------------------------*/
+  DCL  GU     CHAR(4)    INIT('GU  ');
+  DCL  GN     CHAR(4)    INIT('GN  ');
+  DCL  GHU    CHAR(4)    INIT('GHU ');
+  DCL  GHN    CHAR(4)    INIT('GHN ');
+  DCL  ISRT   CHAR(4)    INIT('ISRT');
+  DCL  REPL   CHAR(4)    INIT('REPL');
+
+
+ /*---------------------------------------------------------*
+  * IMS STATUS CODES
+  *---------------------------------------------------------*/
+  DCL  GE     CHAR(2)    INIT('GE');
+  DCL  GB     CHAR(2)    INIT('GB');
+
+
+
+ /*---------------------------------------------------------*
+  * ERROR STATUS CODE AREA
+  *---------------------------------------------------------*/
+
+  DCL
+   1 BAD_STATUS,
+    5 SC_MSG  CHAR(30)  INIT('BAD STATUS CODE WAS RECEIVED: '),
+    5 SC      CHAR(2);
+
+
+ /*------------------------------------------------------------*
+  * CUSTOMER SEGMENT AREA
+  *------------------------------------------------------------*/
+
+  DCL 01 CUST_SEG,
+    5 CUSTID_SEG      FIXED BIN(31),
+    5 LASTNAME_SEG    CHAR(50),
+    5 FIRSTNAME_SEG   CHAR(50),
+    5 ADDRESS_SEG     CHAR(80),
+    5 CITY_SEG        CHAR(25),
+    5 STATE_SEG       CHAR(2),
+    5 ZIPCODE_SEG     CHAR(15),
+    5 PHONE_SEG       CHAR(12),
+    5 STATUS_SEG      CHAR(1),
+    5 PASSWD_SEG      CHAR(16),
+    5 CUSTTYPE_SEG    CHAR(1),
+    5 LASTLOGIN_SEG,
+        10 YEAR_TS        CHAR(4),
+        10 YEAR_MONTH     CHAR(1)    INIT('_'),
+        10 MONTH_TS       CHAR(2),
+        10 MONT_DAY       CHAR(1)    INIT('_'),
+        10 DAY_TS         CHAR(2),
+        10 DAY_HOUR       CHAR(1)    INIT(' '),
+        10 HOUR_TS        CHAR(2),
+        10 HOUR_MINUTE    CHAR(1)    INIT(':'),
+        10 MINUTE_TS      CHAR(2),
+        10 MINUTE_SECOND  CHAR(1)    INIT(':'),
+        10 SECOND_TS      CHAR(2),
+        10 MINUTE_MILISEC CHAR(1)    INIT(':'),
+        10 MILLISEC_TS    CHAR(2),
+        10 FILLER         CHAR(1)    INIT('0');
+
+ /*-------------------------------------------------------------*
+  *INPUT/OUTPUT MESSAGE AREA
+  *IBLOGIN 16918    password
+  *-------------------------------------------------------------*/
+
+ DCL
+   1 INPUT_AREA,
+    5 LL_IN       FIXED BIN(15),
+    5 ZZ_IN       FIXED BIN(15),
+    5 TRAN_CODE   CHAR(9),
+    5 IN_CUSTID   CHAR(10),
+    5 IN_PASSWD   CHAR(16);
+
+ DCL
+   1 OUTPUT_AREA,
+    5 LL_OUT      FIXED BIN(31)  INIT(38),
+    5 ZZ_OUT      FIXED BIN(15) INIT(0),
+    5 MSG_OUT     CHAR(32);
+
+ /*---------------------------------------------------------------*
+ * SEGMENT SEARCH ARGUMENTS
+ * CUSTOMER_SSA1 IS USED TO FIND INFO FROM THE CUSTOMER RECORD
+ * SELECT ... WHERE sa.customer.custid = ?
+ * ALSO USED TO MARK CUSTOMER TABLE THAT USER IS LOGGED IN
+ *----------------------------------------------------------------*/
+
+ DCL
+   1 CUSTOMER_SSA1  STATIC UNALIGNED,
+    5 SEG_NAME        CHAR(8)          INIT('CUSTOMER'),
+    5 SEG_QUAL        CHAR(1)          INIT('('),
+    5 SEG_KEY_NAME    CHAR(8)          INIT('CUSTID  '),
+    5 SEG_OPR         CHAR(2)          INIT('EQ'),
+    5 CUSTID          FIXED BIN(31)    INIT(0),
+    5 SEG_END_CHAR    CHAR(1)          INIT(')'),
+    5 FILLER          CHAR(1)          INIT(' ');
+
+ DCL CUSTID_NUM      PIC'(9)9' BASED(ADDR(IN_CUSTID));
+
+ /*---------------------------------------------------------------*
+ * CLOCK STRUCTURE
+ *----------------------------------------------------------------*/
+ DCL
+  1 TIMESTAMP,
+    5 YEAR_TS        CHAR(4),
+    5 YEAR_MONTH     CHAR(1)    INIT('_'),
+    5 MONTH_TS       CHAR(2),
+    5 MONT_DAY       CHAR(1)    INIT('_'),
+    5 DAY_TS         CHAR(2),
+    5 DAY_HOUR       CHAR(1)    INIT(' '),
+    5 HOUR_TS        CHAR(2),
+    5 HOUR_MINUTE    CHAR(1)    INIT(':'),
+    5 MINUTE_TS      CHAR(2),
+    5 MINUTE_SECOND  CHAR(1)    INIT(':'),
+    5 SECOND_TS      CHAR(2),
+    5 MINUTE_MILISEC CHAR(1)    INIT(':'),
+    5 MILLISEC_TS    CHAR(2),
+    5 FILLER         CHAR(1)    INIT('0');
+
+
+ /*-------------------------------------------------------------*
+ * I/O PCB
+ *--------------------------------------------------------------*/
+
+ DCL
+  1 LTERMPCB       BASED (IOPCB_PTR),
+    5 LOGTTERM     CHAR(8),
+    5 *            CHAR(2),
+    5 TPSTAT       CHAR(2),
+    5 IODATE       CHAR(4),
+    5 IOTIME       CHAR(4),
+    5 *            CHAR(2),
+    5 SEQNUM       CHAR(2),
+    5 MOD          CHAR(8);
+
+ /*-------------------------------------------------------------*
+ * DATABASE PCB
+ *--------------------------------------------------------------*/
+
+  DCL
+    1 DBPCB         BASED (DBPCB_PTR),
+      5 DBDNAME     CHAR(8),
+      5 SEGLEVEL    CHAR(2),
+      5 DBSTAT      CHAR(2),
+      5 PROCOPTS    CHAR(4),
+      5 FILLER      FIXED BIN(31),
+      5 SEGNAMFB    CHAR(8),
+      5 LENKEY      FIXED BIN(31),
+      5 SENSSSEGS   FIXED BIN(31),
+      5 KEYFB       CHAR(20);
+
+  DCL ONE FIXED BINARY (31,0) INITIAL(1);
+  DCL TWO FIXED BINARY (31,0) INITIAL(2);
+  DCL THREE FIXED BINARY (31,0) INITIAL(3);
+  DCL FOUR FIXED BINARY (31,0) INITIAL(4);
+
+ /*--------------------------------------------------------------*
+ * MAIN PART OF PL/I BATCH PROGRAM
+ *--------------------------------------------------------------*/
+
+ PUT SKIP LIST ('IBLOGIN START ....');
+
+ /* TERM_IO LOOP */
+ TERM_IO = 0;
+ INPUT_AREA = 0;
+ PUT SKIP LIST ('LTERMPCB_PTR =', IOPCB_PTR);
+ PUT SKIP LIST ('LTERMPCB =', LTERMPCB);
+ PUT SKIP LIST ('INPUT_AREA =', INPUT_AREA);
+  DO UNTIL (TERM_IO = 1);
+    PUT SKIP LIST ('GET INPUT MESSAGE FROM QUEUE ....');
+    CALL PLITDLI (THREE, GU, LTERMPCB, INPUT_AREA);
+    PUT SKIP LIST ('TPSTAT = ', TPSTAT);
+    IF (TPSTAT = '  ' | TPSTAT = MESSAGE_EXIST) THEN DO;
+      PUT SKIP LIST ('HAVE AN INPUT MESSAGE FROM QUEUE ....');
+      CALL LOGIN;
+      CALL INSERT_IO;
+    END;
+    ELSE DO;
+      IF (TPSTAT = NO_MORE_MESSAGE) THEN DO;
+        PUT SKIP LIST ('NO MORE INPUT MESSAGE FROM QUEUE ....');
+        TERM_IO = 1;
+      END;
+      ELSE DO;
+        PUT SKIP LIST('GU FROM IOPCB FAILED WITH STATUS CODE: ');
+        PUT SKIP LIST(TPSTAT);
+      END;
+    END;
+  END;
+
+ /* PROCEDURE LOGIN */
+ LOGIN: PROCEDURE;
+  PUT SKIP LIST ('LOGIN PROCEDURE ENTERED ....');
+  PUT SKIP LIST('HELLO ANDY');
+
+  OUTPUT_AREA = 0;
+  CUSTID_NUM = IN_CUSTID;
+  PUT SKIP LIST ('CUSTID_NUM = ');
+  PUT LIST (CUSTID_NUM);
+
+  PUT SKIP LIST ('LL_IN = ');
+  PUT LIST (LL_IN);
+  PUT SKIP LIST ('ZZ_IN = ');
+  PUT LIST (ZZ_IN);
+  PUT SKIP LIST ('TRAN_CODE = ');
+  PUT LIST (TRAN_CODE);
+  PUT SKIP LIST ('IN_CUSTID = ');
+  PUT LIST (IN_CUSTID);
+  PUT SKIP LIST ('IN_PASSWD = ');
+  PUT LIST (IN_PASSWD);
+
+  CUSTID = CUSTID_NUM;
+  PUT SKIP LIST ('CUSTID     = ');
+  PUT LIST (CUSTID);
+  PUT SKIP LIST ('CALL IMS TO GET CUSTOMER SEGMENT ....');
+  PUT SKIP LIST ('FOUR =', FOUR);
+  PUT SKIP LIST ('GHU =', GHU);
+  PUT SKIP LIST ('DBPCB_PTR =', DBPCB_PTR);
+  PUT SKIP LIST ('DBPCB =', DBPCB);
+  PUT SKIP LIST ('DBNAME =', DBPCB.DBDNAME);
+  PUT SKIP LIST ('SSA =', CUSTOMER_SSA1);
+
+  CALL PLITDLI (FOUR, GHU, DBPCB_PTR, CUST_SEG, CUSTOMER_SSA1);
+  IF (DBSTAT ^= ' ') THEN DO;
+    IF (DBSTAT = GB | DBSTAT = GE) THEN DO;
+      MSG_OUT = NOCUSTOMER;
+      PUT SKIP LIST ('NO CUSTOMER: ');
+      PUT LIST (DBSTAT);
+    END;
+    ELSE DO;
+      SC = DBSTAT;
+      MSG_OUT = SC_MSG;
+      PUT SKIP LIST ('Bad status code:');
+      PUT LIST (SC);
+      END;
+  END;
+  ELSE DO;
+  /* CHECK FOR PASSWORD MATCH */
+    PUT SKIP LIST ('GOT CUSTOMER SEG, CHECKING FOR PASSWORD ....');
+
+    IF (PASSWD_SEG ^= IN_PASSWD) THEN DO;
+      MSG_OUT = PASSWORDINVALID;
+      PUT SKIP LIST ('Bad password');
+    END;
+    ELSE DO;
+      /* CHECK IF ALREADY LOGGED IN */
+      IF (STATUS_SEG = LOGGEDIN) THEN DO;
+        MSG_OUT = CUSTLOGGEDIN;
+        PUT SKIP LIST('Customer already logged in');
+      END;
+      ELSE DO;
+        PUT SKIP LIST ('GETTING TIMESTAMP ....');
+
+     /* UPDATE LAST LOGIN VALUE WITH STCK */
+        DCL MY_DATE CHAR(17);
+        MY_DATE = DATETIME();
+        PUT SKIP LIST ('MY_DATE = ', MY_DATE);
+        TIMESTAMP.YEAR_TS = SUBSTR(MY_DATE,1,4);
+        TIMESTAMP.MONTH_TS = SUBSTR(MY_DATE,5,2);
+        TIMESTAMP.DAY_TS = SUBSTR(MY_DATE,7,2);
+        TIMESTAMP.HOUR_TS = SUBSTR(MY_DATE,9,2);
+        TIMESTAMP.MINUTE_TS = SUBSTR(MY_DATE,11,2);
+        TIMESTAMP.SECOND_TS = SUBSTR(MY_DATE,13,2);
+        TIMESTAMP.MILLISEC_TS = SUBSTR(MY_DATE,15,2);
+        LASTLOGIN_SEG = TIMESTAMP;
+        STATUS_SEG = LOGGEDIN;
+        PUT SKIP LIST ('CALL REPLACE TIMESTAMP = ', LASTLOGIN_SEG);
+
+        CALL PLITDLI(THREE, REPL, DBPCB, CUST_SEG);
+        IF (DBSTAT ^= ' ') THEN DO;
+          SC = DBSTAT;
+          MSG_OUT = SC_MSG;
+          PUT SKIP LIST('Bad status code: ');
+          PUT SKIP LIST(SC);
+        END;
+        ELSE DO;
+           MSG_OUT = LOGINSUCCESSFUL;
+        END;
+      END;
+    END;
+  END;
+
+ RETURN;
+
+ END LOGIN;
+
+ /* PROCEDURE INSERT_IO : INSERT FOR IOPCB REQUEST HANDLER */
+ INSERT_IO: PROCEDURE;
+  PUT SKIP LIST ('INSERT_IO ENTERED ....');
+
+  LL_OUT = SIZE(OUTPUT_AREA)-2;
+  ZZ_OUT = 0;
+  PUT SKIP LIST ('LTERMPCB_PTR =', IOPCB_PTR);
+  PUT SKIP LIST ('LTERMPCB =', LTERMPCB);
+  PUT SKIP LIST ('INSERT OUTPUT MSG TO QUEUE = ', OUTPUT_AREA);
+
+  CALL PLITDLI (THREE, ISRT,LTERMPCB,OUTPUT_AREA);
+  IF TPSTAT ^= ' ' THEN DO;
+   PUT SKIP LIST ('INSERT TO IOPCB FAILED WITH STATUS CODE: ');
+   PUT SKIP LIST(TPSTAT);
+  END;
+
+ RETURN;
+
+ END INSERT_IO;
+
+ RETURN;
+
+ END IBLOGIN;

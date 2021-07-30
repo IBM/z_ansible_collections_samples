@@ -1,0 +1,29 @@
+---
+# tasks file for ims_cobol_load_tsta
+
+- name: Create temporary directory for load tsta
+  tempfile:
+    state: directory
+  register: temp_file_path
+  delegate_to: localhost
+- name: Interpret templates
+  block:
+    - set_fact:
+        eager_role_path: '{{role_path}}'
+    - name: Compile templates and put results in temporary directory
+      template:
+        src: "{{ eager_role_path }}/templates/LOADTSTA.j2"
+        dest: "{{ temp_file_path.path }}/LOADTSTA.j2"
+        output_encoding: "ASCII"
+      delegate_to: localhost
+    - name: Submit load accounts job
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ temp_file_path.path }}/LOADTSTA.j2"
+        location: LOCAL
+        wait: true
+        encoding:
+          from: ISO8859-1
+          to: IBM-037
+      register: output
+    - debug:
+        msg: "{{ output.jobs[0].job_id }}"

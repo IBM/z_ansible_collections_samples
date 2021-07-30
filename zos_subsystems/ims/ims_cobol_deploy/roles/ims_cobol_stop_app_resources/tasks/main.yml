@@ -1,0 +1,24 @@
+---
+# tasks file for ims_cobol_stop_app_resources
+- name: Delete resources
+  ibm.ibm_zos_ims.ims_command:
+    batch:
+      -
+        command: UPDATE TRAN NAME(IBACSUM) STOP(Q,SCHD)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: UPDATE PGM NAME(IB*) STOP(SCHD)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: DEL TRAN NAME(IBACSUM)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: DEL PGM NAME(IBACSUM)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+
+  register: response
+  ignore_errors: yes

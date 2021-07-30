@@ -1,0 +1,14 @@
+{
+  "type" : "object",
+  "properties" : {
+    "OUTPUT_AREA" : {
+      "type" : "object",
+      "properties" : {
+        "message" : {
+          "maxLength" : 43,
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

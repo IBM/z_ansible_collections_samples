@@ -1,0 +1,14 @@
+{
+  "type" : "object",
+  "properties" : {
+    "INPUT_AREA" : {
+      "type" : "object",
+      "properties" : {
+        "accountNumber" : {
+          "maxLength" : 18,
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

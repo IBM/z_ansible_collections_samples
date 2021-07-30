@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" transactionCode="" messageName="UpdateCustInfoRequest" direction="0" serviceType="IMS">
+    <message id="1" name="UpdateCustInfoRequest">
+        <segment id="1" name="Segment 1" originalName="Segment 1">
+            <field name="INPUT_AREA" originalName="INPUT_AREA" included="Y" path="INPUT_AREA">
+                <startPos>1</startPos>
+                <bytes>250</bytes>
+                <maxBytes>250</maxBytes>
+                <marshaller alignment="NATURAL"/>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL_IN" originalName="LL_IN" included="N" path="INPUT_AREA.LL_IN">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ_IN" originalName="ZZ_IN" included="N" path="INPUT_AREA.ZZ_IN">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="TRAN_CODE" originalName="TRAN_CODE" included="N" defaultValue="IBSCUDAT" isHex="false" path="INPUT_AREA.TRAN_CODE" codepageConversion="Y">
+                    <startPos>5</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <remarks></remarks>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="customer" originalName="CUSTOMER_IN" included="Y" path="INPUT_AREA.customer" codepageConversion="N">
+                    <startPos>13</startPos>
+                    <bytes>238</bytes>
+                    <maxBytes>238</maxBytes>
+                    <remarks></remarks>
+                    <marshaller alignment="NATURAL"/>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="customerNumber" originalName="CUSTID_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.customerNumber" codepageConversion="Y">
+                        <startPos>13</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <remarks></remarks>
+                        <marshaller isNativeInteger="Y" alignment="NATURAL"/>
+                        <applicationDatatype datatype="INT"/>
+                    </field>
+                    <field name="lastName" originalName="LASTNAME_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.lastName" codepageConversion="Y">
+                        <startPos>17</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="firstName" originalName="FIRSTNAME_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.firstName" codepageConversion="Y">
+                        <startPos>67</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="address" originalName="ADDRESS_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.address" codepageConversion="Y">
+                        <startPos>117</startPos>
+                        <bytes>80</bytes>
+                        <maxBytes>80</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="city" originalName="CITY_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.city" codepageConversion="Y">
+                        <startPos>197</startPos>
+                        <bytes>25</bytes>
+                        <maxBytes>25</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="state" originalName="STATE_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.state" codepageConversion="Y">
+                        <startPos>222</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="zipCode" originalName="ZIPCODE_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.zipCode" codepageConversion="Y">
+                        <startPos>224</startPos>
+                        <bytes>15</bytes>
+                        <maxBytes>15</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="phone" originalName="PHONE_IN" included="Y" defaultValue="" isHex="false" path="INPUT_AREA.customer.phone" codepageConversion="Y">
+                        <startPos>239</startPos>
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>
