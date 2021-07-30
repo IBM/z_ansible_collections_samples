@@ -1,0 +1,82 @@
+- name: Provisioning/Deployment of IMS COBOL Application
+  hosts: zsystem
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+  gather_facts: false
+  vars_files:
+    - "{{ vars_folder_name }}/ims_cobol.yml"
+  environment: '{{ system_environment }}'
+
+  tasks:
+    - name: IMS COBOL App Provision
+      block:
+
+        # Copy and extract the sample COBOL files
+        - include_role:
+            name: ims_cobol_copy_extract_files
+
+        # # Create Application Datasets
+        - include_role:
+            name: ims_cobol_create_app_datasets
+
+        # Execute permissions to copy data and copy it to uss datasets and
+        # copy the DBD's and PSB's to the datasets
+        - include_role:
+            name: ims_cobol_execute_permissions_and_copy_ussDatasets
+
+        # DBDGEN, PSBGEN, ACBGEN
+        - include_role:
+            name: ims_cobol_run_gens
+          vars:
+            dbd_gen: true
+            psb_gen: true
+            acb_gen: true
+
+        - include_role:
+            name: ims_cobol_check_acblib
+
+        - include_role:
+            name: ims_cobol_copy_acblib_to_inactive_acb
+
+        # Compile and link Cobol and load programs
+        - include_role:
+            name: ims_cobol_compile_link_cobol
+
+        # Create dynamic allocation
+        - include_role:
+            name: ims_cobol_create_dynamic_alloc
+
+        # Load data
+        - include_role:
+            name: ims_cobol_load_accounts
+
+        - include_role:
+            name: ims_cobol_load_customer_accounts
+
+        - include_role:
+            name: ims_cobol_load_customer_data
+
+        - include_role:
+            name: ims_cobol_load_history
+
+        - include_role:
+            name: ims_cobol_load_tsta
+
+        # Register Db to Recons
+        - include_role:
+            name: ims_cobol_register_db_to_recons
+
+        # Create and start IMS databases
+        - include_role:
+            name: ims_cobol_define_ims_databases
+
+        # Create and start IMS application resources - Pgms, Trans
+        - include_role:
+            name: ims_cobol_define_app_resources
+
+        # Define and start the MPP Region
+        - include_role:
+            name: ims_cobol_define_mpp_region
+          vars:
+            mpp: true
