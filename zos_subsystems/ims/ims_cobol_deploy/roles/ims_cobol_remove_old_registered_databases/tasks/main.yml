@@ -1,0 +1,112 @@
+---
+# tasks file for ims_cobol_remove_old_registered_databases
+# DELOLDRECON.j2
+- name: Remove old registered databases
+  ibm.ibm_zos_ims.ims_dbrc:
+    command:
+      - DELETE.DBDS  DBD(CUSTOMER) DDN(CUSTOMER)
+      - DELETE.DB    DBD(CUSTOMER)
+      - DELETE.DBDS  DBD(ACCOUNT) DDN(ACCOUNT)
+      - DELETE.DB    DBD(ACCOUNT)
+      - DELETE.DBDS  DBD(CUSTACCS) DDN(CUSTACCS)
+      - DELETE.DB    DBD(CUSTACCS)
+      - DELETE.DBDS DBD(HISTORY) DDN(HISTORY)
+      - DELETE.DB DBD(HISTORY)
+      - DELETE.DBDS DBD(TSTAT) DDN(TSTAT)
+      - DELETE.DB DBD(TSTAT)"
+    steplib:
+      - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+    dbd_lib: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB"
+    recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1"
+    recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2"
+    recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
+  register: response
+  failed_when: response.rc > 12
+
+- name: Delete existing data sets
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}"
+    state: absent
+  loop: "{{datasets}}"
+
+- name: Delete existing input load data sets
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}.INPUT"
+    state: absent
+  loop: "{{loads}}"
+
+- name: Delete existing load db datasets  
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}.DB"
+    state: absent
+  loop: "{{loads}}"
+
+- name: Delete dbds from ACBLIB
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{dbds}}"
+
+- name: Delete dbds from ACBLIBA
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{dbds}}"
+
+- name: Delete dbds from ACBLIBB
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{dbds}}"
+
+- name: Delete dbds from DBDLIB
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{dbds}}"
+
+- name: Delete psbs from ACBLIB
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{psbs}}"
+
+- name: Delete psbs from ACBLIBA
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{psbs}}"
+
+- name: Delete psbs from ACBLIBB
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{psbs}}"
+
+- name: Delete psbs from PSBLIB
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{psbs}}"
+
+- name: Delete existing data sets
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB({{ item.name | upper }})"
+    state: absent
+    type: MEMBER
+  loop: "{{loads}}"
+  
+# - name: Delete existing data sets
+#   ibm.ibm_zos_core.zos_data_set:
+#     name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PLIINCL.*"
+#     state: absent
+#     type: MEMBER
+  # call ims_command to stop and delete all the DB's

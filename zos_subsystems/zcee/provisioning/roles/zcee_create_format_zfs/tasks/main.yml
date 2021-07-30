@@ -8,7 +8,7 @@
   when: 
     - zcon_zfs_dataclass is defined 
     - zcon_zfs_dataclass != '' 
- 
+
 - name: Create an LDS
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}"

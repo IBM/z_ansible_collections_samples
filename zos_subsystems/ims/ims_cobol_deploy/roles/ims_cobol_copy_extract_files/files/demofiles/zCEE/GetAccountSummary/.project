@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>GetAccountSummary</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.ibm.zosconnect.service.ui.projectbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.ibm.zosconnect.ui.projects.ServiceProjectNature</nature>
+		<nature>com.ibm.zosconnect.ui.projects.ImsServiceProjectNature</nature>
+	</natures>
+</projectDescription>

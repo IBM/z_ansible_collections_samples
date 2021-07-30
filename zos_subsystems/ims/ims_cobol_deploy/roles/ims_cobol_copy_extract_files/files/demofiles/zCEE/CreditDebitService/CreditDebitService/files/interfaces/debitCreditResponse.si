@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" transactionCode="" messageName="debitCreditOutput" direction="0" serviceType="IMS">
+    <message id="1" name="debitCreditOutput">
+        <segment id="1" name="Segment 1" originalName="Segment 1">
+            <field name="OUTPUT_AREA" originalName="OUTPUT_AREA" included="Y" path="OUTPUT_AREA">
+                <startPos>1</startPos>
+                <bytes>150</bytes>
+                <maxBytes>0</maxBytes>
+                <marshaller alignment="NATURAL"/>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL_OUT" originalName="LL_OUT" included="N" path="OUTPUT_AREA.LL_OUT">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ_OUT" originalName="ZZ_OUT" included="N" path="OUTPUT_AREA.ZZ_OUT">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="message" originalName="MSG_OUT" included="Y" defaultValue="" isHex="false" path="OUTPUT_AREA.message" codepageConversion="Y">
+                    <startPos>5</startPos>
+                    <bytes>43</bytes>
+                    <maxBytes>43</maxBytes>
+                    <remarks></remarks>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="BAL" originalName="BAL" included="N" path="OUTPUT_AREA.BAL" redefines="MSG_OUT">
+                    <startPos>5</startPos>
+                    <bytes>43</bytes>
+                    <maxBytes>43</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="BALANCE_ZONED1" originalName="BALANCE_ZONED1" included="N" path="OUTPUT_AREA.BAL.BALANCE_ZONED1">
+                        <startPos>5</startPos>
+                        <bytes>16</bytes>
+                        <maxBytes>16</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="FILL_0" originalName="FILL_0" included="N" path="OUTPUT_AREA.BAL.FILL_0">
+                        <startPos>21</startPos>
+                        <bytes>27</bytes>
+                        <maxBytes>27</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+                <field name="TOTAL_ACCS" originalName="TOTAL_ACCS" included="N" path="OUTPUT_AREA.TOTAL_ACCS" dependedOn="true">
+                    <startPos>48</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="1" scale="0"/>
+                </field>
+                <field name="accountSummary" originalName="ACCOUNT_SUMMARY" included="N" path="OUTPUT_AREA.accountSummary" dependsOn="TOTAL_ACCS" dependsOnPath="OUTPUT_AREA.TOTAL_ACCS" minOccurs="1" maxOccurs="6" codepageConversion="N">
+                    <startPos>49</startPos>
+                    <bytes>102</bytes>
+                    <maxBytes>0</maxBytes>
+                    <remarks></remarks>
+                    <marshaller alignment="NATURAL"/>
+                    <applicationDatatype datatype="ARRAY"/>
+                    <field name="balance" originalName="BALANCE_AS" included="N" defaultValue="" isHex="false" path="OUTPUT_AREA.accountSummary.balance" codepageConversion="Y">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <remarks></remarks>
+                        <marshaller isSigned="Y">
+                            <typeConverter>PACKEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="15" scale="2"/>
+                    </field>
+                    <field name="accountType" originalName="ACCTYPE_AS" included="N" defaultValue="" isHex="false" path="OUTPUT_AREA.accountSummary.accountType" codepageConversion="Y">
+                        <bytes>1</bytes>
+                        <maxBytes>1</maxBytes>
+                        <remarks></remarks>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="accountNumber" originalName="ACCID_AS" included="N" defaultValue="" isHex="false" path="OUTPUT_AREA.accountSummary.accountNumber" codepageConversion="Y">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <remarks></remarks>
+                        <marshaller isNativeInteger="Y" alignment="NATURAL"/>
+                        <applicationDatatype datatype="LONG"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

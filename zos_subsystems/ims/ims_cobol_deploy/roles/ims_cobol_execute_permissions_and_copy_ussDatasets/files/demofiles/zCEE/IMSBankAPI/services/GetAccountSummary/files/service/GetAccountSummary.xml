@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<service xmlns:ns2="http://www.ibm.com/ims/Transaction">
+    <shallow>true</shallow>
+    <serviceName>GetAccountSummary</serviceName>
+    <serviceType>ims-rest</serviceType>
+    <resourceType>TRAN</resourceType>
+    <status>1</status>
+    <conversionType>3</conversionType>
+    <dataProtocol>0</dataProtocol>
+    <serviceInputInterface>
+        <metadataName>GetAcctSumRequest.si</metadataName>
+        <serviceInterface>
+            <interface>
+                <segment segmentName="Segment 1">
+                    <interfaceField included="Y" fieldName="INPUT_AREA">
+                        <field included="N" fieldName="LL_IN"/>
+                        <field included="N" fieldName="ZZ_IN"/>
+                        <field included="N" fieldName="TRAN_CODE" defaultValue="IBACSUM" isHex="false"/>
+                        <field included="Y" fieldName="customerNumber" isHex="false"/>
+                    </interfaceField>
+                </segment>
+            </interface>
+        </serviceInterface>
+        <version>0</version>
+    </serviceInputInterface>
+    <serviceOutputInterface>
+        <metadataName>GetAcctSumResponse.si</metadataName>
+        <serviceInterface>
+            <interface>
+                <segment segmentName="Segment 1">
+                    <interfaceField included="Y" fieldName="OUTPUT_AREA">
+                        <field included="N" fieldName="LL_OUT"/>
+                        <field included="N" fieldName="ZZ_OUT"/>
+                        <field included="Y" fieldName="message" isHex="false"/>
+                        <field included="N" fieldName="TOTAL_ACCS"/>
+                        <field included="Y" fieldName="accountSummary">
+                            <field included="Y" fieldName="balance" isHex="false"/>
+                            <field included="Y" fieldName="accountType" isHex="false"/>
+                            <field included="Y" fieldName="accountNumber" isHex="false"/>
+                        </field>
+                    </interfaceField>
+                </segment>
+            </interface>
+        </serviceInterface>
+        <version>0</version>
+    </serviceOutputInterface>
+    <totalExecCount>0</totalExecCount>
+    <failedCount>0</failedCount>
+    <trancodeOverride>IBACSUM</trancodeOverride>
+    <trimOutputLeadingWhitespace>false</trimOutputLeadingWhitespace>
+    <trimOutputTrailingWhitespace>true</trimOutputTrailingWhitespace>
+    <escapeOutputControlCharacters>false</escapeOutputControlCharacters>
+    <initializeInputFields>false</initializeInputFields>
+    <omitOutputFieldsByValue>false</omitOutputFieldsByValue>
+    <omitOutputFieldsByValueByte>0x00</omitOutputFieldsByValueByte>
+    <omitOutputEmptyTags>false</omitOutputEmptyTags>
+    <enforceMinArrayOccurrence>false</enforceMinArrayOccurrence>
+    <enforceMinArrayOccurrenceResponse>false</enforceMinArrayOccurrenceResponse>
+</service>

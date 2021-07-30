@@ -1,0 +1,4 @@
+---
+# defaults file for ims_cobol_define_ims_databases
+
+ROUTE: '{{ DFS_IMS_SSID }}'

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" transactionCode="" messageName="LogInResponse" direction="0" serviceType="IMS">
+    <message id="1" name="LogInResponse">
+        <segment id="1" name="Segment 1" originalName="Segment 1">
+            <field name="OUTPUT_AREA" originalName="OUTPUT_AREA" included="Y" path="OUTPUT_AREA">
+                <startPos>1</startPos>
+                <bytes>36</bytes>
+                <maxBytes>36</maxBytes>
+                <marshaller alignment="NATURAL"/>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL_OUT" originalName="LL_OUT" included="N" path="OUTPUT_AREA.LL_OUT">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ_OUT" originalName="ZZ_OUT" included="N" path="OUTPUT_AREA.ZZ_OUT">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="message" originalName="MSG_OUT" included="Y" defaultValue="" isHex="false" path="OUTPUT_AREA.message" codepageConversion="Y">
+                    <startPos>5</startPos>
+                    <bytes>32</bytes>
+                    <maxBytes>32</maxBytes>
+                    <remarks></remarks>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

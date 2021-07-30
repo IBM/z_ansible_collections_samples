@@ -1,0 +1,48 @@
+<server>
+<!--	Important: Change only the values for the following attributes.
+	 1. id: Specify a unique ID for this connection profile. This is the connection profile value to enter in the z/OS Connect EE API toolkit when you configure the service properties.
+	 2. connectionFactoryRef: Set this value to the ID of the connectionFactory element.
+	 3. comment: Optionally, enter a comment for this connection.
+-->
+<!--
+<imsmobile_imsConnection comment="" connectionFactoryRef="Connection1_CF" id="Connection1"/>
+-->
+<imsmobile_imsConnection comments="IMS Gateway Connection" configSchemaVersion="3" connectionFactoryRef="ICON_RACF_N_CF" 
+connectionTimeout="30000" connectionType="IMSCONNECT" id="IMS1" idleTimeout="20000" modifiedBy="omvsadm" 
+modifyTime="2019-01-25 17:37:44.396" passwordExists="true" traceAppend="false" traceLevel="0" usesTrace="false"/>
+
+<!--	Change the values for the following attributes.
+	 1. id: Specify an ID for the connectionFactory as referenced from the connectionFactoryRef attribute in the imsmobile_imsConnection element above.
+	 2. hostName: Specify the host name or IP address of the data store server (IMS Connect).
+	 3. portName: Specify the port number that is used to connect to IMS Connect.
+	 4. If RACF security is turned on in IMS Connect:
+				a. Set the value for containerAuthDataRef to the ID of the authData element.
+				b. Configure the authData element below.
+			If RACF security is turned off in IMS Connect:
+				a. Delete the containerAuthDataRef attribute.
+				b. Remove or comment out the authData element below.
+-->
+<!-- 
+<connectionFactory containerAuthDataRef="Connection1_Auth" id="Connection1_CF">
+	<properties.gmoa hostName="localhost" portNumber="9999"/>
+</connectionFactory>
+
+<connectionFactory containerAuthDataRef="ICON_RACF_N_Auth" id="ICON_RACF_N_CF">
+	<properties.gmoa hostName="tivlp02.svl.ibm.com" portNumber="9999"/>
+</connectionFactory>
+-->
+
+<connectionFactory id="ICON_RACF_N_CF" connectionManagerRef="connManager1">
+	<properties.gmoa hostName="tivlp02.svl.ibm.com" portNumber="9999"/>
+</connectionFactory>
+
+<connectionManager minPoolSize="2" maxPoolSize="3" id="connManager1"/>
+
+<!--	If security is turned on in IMS Connect, specify the values for the following attributes in the authData element.
+	 1. id: Specify an ID for this authData element as referenced from the containerAuthDataRef attribute in the connectionFactory element above.
+	 2. user: Specify the user name to use to connect to IMS Connect.
+	 3. password: Specify the encrypted password for the specified user. Use a tool such as securityUtility in Liberty to encrypt plain text.
+	If security is turned off in IMS Connect, remove or comment out the authData element below.
+-->
+<authData id="Connection1_Auth" password="encryptedPassword1" user="userName1"/>
+</server>
