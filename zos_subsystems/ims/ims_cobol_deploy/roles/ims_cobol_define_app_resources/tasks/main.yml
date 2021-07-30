@@ -1,0 +1,45 @@
+---
+# tasks file for ims_cobol_define_app_resources
+# Create and start IMS Resources
+
+- name: Create PGM IBACSUM
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE PGM NAME(IBACSUM) SET( BMPTYPE(N) DOPT(N) FP(N) GPSB(N) RESIDENT(Y) SCHDTYPE(PARALLEL) TRANSTAT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Create PGM IBLOAD
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE PGM NAME(IBLOAD) SET( BMPTYPE(N) DOPT(N) FP(N) GPSB(N) RESIDENT(Y) SCHDTYPE(PARALLEL) TRANSTAT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Start PGM IBACSUM
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE PGM NAME(IBACSUM) START(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+
+- name: Start PGM IBLOAD
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE PGM NAME(IBLOAD) START(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+
+- name: Create TRAN IBACSUM
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE TRAN NAME(IBACSUM) SET(PGM(IBACSUM) WFI(N) PARLIM(0) PLCT(65535) CLASS(5) EDITUC(N))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Start TRAN IBACSUM
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE TRAN NAME(IBACSUM) START(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"

@@ -1,0 +1,35 @@
+{{ JOB_CARD }}                          
+//*******************************************************************
+//*  COPY DATA FROM ACBLIB TO ACBLIB/A
+//*******************************************************************
+{% for item in acblib %}
+//*
+//STEP{{ loop.index }} EXEC PGM=IEBCOPY
+//SYSPRINT DD SYSOUT=A
+//SYSUT1 DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB({{ item.name }}),DISP=SHR
+//SYSUT2 DD DSN={{ INACTIVE_ACBLIB }}({{ item.name }}),DISP=SHR
+//SYSIN DD DUMMY
+//*
+{% endfor %}
+//*
+//*******************************************************************
+//*  MODIFY PREPARE
+//*******************************************************************  
+//SPOC1      EXEC PGM=CSLUSPOC,                                 
+//  PARM=('IMSPLEX={{  DFS_IMSPlex }},ROUTE={{  ROUTE }},WAIT=30')                  
+//STEPLIB   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL               
+//SYSPRINT  DD SYSOUT=*                                        
+//SYSIN     DD *                                               
+    /MODIFY PREPARE ACBLIB
+/*                      
+//*******************************************************************
+//*  MODIFY COMMIT
+//*******************************************************************  
+//***************************************************************    
+//SPOC2      EXEC PGM=CSLUSPOC,                                 
+//  PARM=('IMSPLEX={{  DFS_IMSPlex }},ROUTE={{  ROUTE }},WAIT=30')                  
+//STEPLIB   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL               
+//SYSPRINT  DD SYSOUT=*                                        
+//SYSIN     DD *                                               
+    /MODIFY COMMIT
+/*

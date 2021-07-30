@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<zosConnectApi xmlns="http://www.ibm.com/zosConnect/2.0/zosConnectApi" id="imsbankapi2">
+    <apiSpec title="imsbankapi2" basePath="/imsbank/api/d" description="" version="1.0.0">
+        <path relativePath="/GetBalance">
+            <method type="POST" zosConnectServiceRef="GetBalance" httpXformFile="api/GetBalance/POST/mapping.xml" operationId="postGetBalance"/>
+            <method type="GET" httpXformFile="api/GetBalance/GET/mapping.xml"/>
+            <method type="PUT" httpXformFile="api/GetBalance/PUT/mapping.xml"/>
+            <method type="DELETE" httpXformFile="api/GetBalance/DELETE/mapping.xml"/>
+        </path>
+        <apiDoc docType="SWAGGER">api-docs/swagger.json</apiDoc>
+    </apiSpec>
+</zosConnectApi>

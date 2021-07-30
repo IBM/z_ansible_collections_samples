@@ -1,0 +1,641 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "APIs to access the IMS Bank services",
+    "version" : "1.0.0",
+    "title" : "imsbankapi"
+  },
+  "host" : "localhost:8080",
+  "basePath" : "/imsbank/api",
+  "schemes" : [ "https", "http" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/AccountCredit" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postCreditDebitService",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postCreditDebitService_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postCreditDebitService_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postCreditDebitService_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/AccountDebit" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postCreditDebitService1",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postCreditDebitService1_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postCreditDebitService1_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postCreditDebitService1_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/GetAccountHistory" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postGetAccountHistory",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postGetAccountHistory_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postGetAccountHistory_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postGetAccountHistory_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/GetAccountSummary" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postGetAccountSummary",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postGetAccountSummary_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postGetAccountSummary_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postGetAccountSummary_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/GetBalance" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postGetBalance",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postGetBalance_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postGetBalance_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postGetBalance_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/GetCustomerInfo" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postGetCustomerInfo",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postGetCustomerInfo_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postGetCustomerInfo_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postGetCustomerInfo_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/LogIn" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postLogInService",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "postLogInService_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postLogInService_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postLogInService_response_200"
+            }
+          }
+        }
+      }
+    },
+    "/UpdateCustomerInfo" : {
+      "post" : {
+        "tags" : [ "imsbankapi" ],
+        "operationId" : "postUpdateCustomerInfo",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "postUpdateCustomerInfo_request",
+          "description" : "request body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/postUpdateCustomerInfo_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/postUpdateCustomerInfo_response_200"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "postGetCustomerInfo_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            }
+          }
+        }
+      }
+    },
+    "postGetCustomerInfo_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 32
+            },
+            "firstName" : {
+              "type" : "string",
+              "maxLength" : 50
+            },
+            "lastName" : {
+              "type" : "string",
+              "maxLength" : 50
+            },
+            "address" : {
+              "type" : "string",
+              "maxLength" : 80
+            },
+            "city" : {
+              "type" : "string",
+              "maxLength" : 25
+            },
+            "state" : {
+              "type" : "string",
+              "maxLength" : 2
+            },
+            "zipCode" : {
+              "type" : "string",
+              "maxLength" : 15
+            },
+            "phone" : {
+              "type" : "string",
+              "maxLength" : 12
+            },
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            }
+          }
+        }
+      }
+    },
+    "postGetBalance_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            }
+          }
+        }
+      }
+    },
+    "postGetBalance_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 32
+            },
+            "accountSummary" : {
+              "type" : "array",
+              "items" : {
+                "type" : "object",
+                "properties" : {
+                  "balance" : {
+                    "type" : "number",
+                    "format" : "decimal",
+                    "minimum" : -9999999999999.99,
+                    "maximum" : 9999999999999.99
+                  },
+                  "accountType" : {
+                    "type" : "string",
+                    "maxLength" : 1
+                  },
+                  "accountNumber" : {
+                    "type" : "integer",
+                    "minimum" : -9223372036854775808,
+                    "maximum" : 9223372036854775807
+                  }
+                }
+              },
+              "maxItems" : 6,
+              "minItems" : 1
+            }
+          }
+        }
+      }
+    },
+    "postGetAccountHistory_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "accountNumber" : {
+              "type" : "string",
+              "maxLength" : 18
+            }
+          }
+        }
+      }
+    },
+    "postGetAccountHistory_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 32
+            },
+            "TX_DETAIL" : {
+              "type" : "array",
+              "items" : {
+                "type" : "object",
+                "properties" : {
+                  "TXID" : {
+                    "type" : "integer",
+                    "minimum" : -9223372036854775808,
+                    "maximum" : 9223372036854775807
+                  },
+                  "TIMESTMP" : {
+                    "type" : "string",
+                    "maxLength" : 23
+                  },
+                  "TRANSTYP" : {
+                    "type" : "string",
+                    "maxLength" : 1
+                  },
+                  "AMOUNT" : {
+                    "type" : "string",
+                    "maxLength" : 18
+                  },
+                  "REFTXID" : {
+                    "type" : "integer",
+                    "minimum" : -9223372036854775808,
+                    "maximum" : 9223372036854775807
+                  },
+                  "ACCID" : {
+                    "type" : "integer",
+                    "minimum" : -9223372036854775808,
+                    "maximum" : 9223372036854775807
+                  }
+                }
+              },
+              "maxItems" : 50,
+              "minItems" : 1
+            }
+          }
+        }
+      }
+    },
+    "postCreditDebitService_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "accountNumber" : {
+              "type" : "string",
+              "maxLength" : 18
+            },
+            "amount" : {
+              "type" : "string",
+              "maxLength" : 16
+            },
+            "trxtype" : {
+              "type" : "string",
+              "maxLength" : 1
+            },
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            }
+          }
+        }
+      }
+    },
+    "postCreditDebitService_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 43
+            }
+          }
+        }
+      }
+    },
+    "postCreditDebitService1_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "accountNumber" : {
+              "type" : "string",
+              "maxLength" : 18
+            },
+            "amount" : {
+              "type" : "string",
+              "maxLength" : 16
+            },
+            "trxtype" : {
+              "type" : "string",
+              "maxLength" : 1
+            },
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            }
+          }
+        }
+      }
+    },
+    "postCreditDebitService1_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 43
+            }
+          }
+        }
+      }
+    },
+    "postGetAccountSummary_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            }
+          }
+        }
+      }
+    },
+    "postGetAccountSummary_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 32
+            },
+            "accountSummary" : {
+              "type" : "array",
+              "items" : {
+                "type" : "object",
+                "properties" : {
+                  "balance" : {
+                    "type" : "number",
+                    "format" : "decimal",
+                    "minimum" : -9999999999999.99,
+                    "maximum" : 9999999999999.99
+                  },
+                  "accountType" : {
+                    "type" : "string",
+                    "maxLength" : 1
+                  },
+                  "accountNumber" : {
+                    "type" : "integer",
+                    "minimum" : -9223372036854775808,
+                    "maximum" : 9223372036854775807
+                  }
+                }
+              },
+              "maxItems" : 6,
+              "minItems" : 1
+            }
+          }
+        }
+      }
+    },
+    "postUpdateCustomerInfo_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "customer" : {
+              "type" : "object",
+              "properties" : {
+                "customerNumber" : {
+                  "type" : "integer",
+                  "minimum" : -2147483648,
+                  "maximum" : 2147483647
+                },
+                "lastName" : {
+                  "type" : "string",
+                  "maxLength" : 50
+                },
+                "firstName" : {
+                  "type" : "string",
+                  "maxLength" : 50
+                },
+                "address" : {
+                  "type" : "string",
+                  "maxLength" : 80
+                },
+                "city" : {
+                  "type" : "string",
+                  "maxLength" : 25
+                },
+                "state" : {
+                  "type" : "string",
+                  "maxLength" : 2
+                },
+                "zipCode" : {
+                  "type" : "string",
+                  "maxLength" : 15
+                },
+                "phone" : {
+                  "type" : "string",
+                  "maxLength" : 12
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "postUpdateCustomerInfo_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 32
+            }
+          }
+        }
+      }
+    },
+    "postLogInService_request" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "customerNumber" : {
+              "type" : "string",
+              "maxLength" : 9
+            },
+            "password" : {
+              "type" : "string",
+              "maxLength" : 16
+            }
+          }
+        }
+      }
+    },
+    "postLogInService_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT_AREA" : {
+          "type" : "object",
+          "properties" : {
+            "message" : {
+              "type" : "string",
+              "maxLength" : 32
+            }
+          }
+        }
+      }
+    }
+  }
+}

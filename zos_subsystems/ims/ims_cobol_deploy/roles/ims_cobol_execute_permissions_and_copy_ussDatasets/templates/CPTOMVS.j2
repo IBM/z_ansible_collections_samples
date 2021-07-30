@@ -1,0 +1,32 @@
+#!/hsstools/bash-4.3/bin/bash
+#set -e
+rm /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/JCL/DFS*
+rm /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/JCL/IMSOMPR2
+rm /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/JCL/IMSOMPR3
+
+{% for file in uss_datasets %}
+for entry in `ls /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/{{ file.name }}`; do
+name=$(echo "$entry" | cut -f 1 -d '.')
+
+{% if file.name == "COBOL" %}
+cp /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/{{ file.name }}/$entry "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMSRC($name)'"
+
+{% elif file.name == "PLI" %}
+cp /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/{{ file.name }}/$entry "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PLISRC($name)'"
+
+{% elif file.name == "LoadData" %}
+file_extension="${entry##*.}"
+file_exists=`tsocmd "LISTCAT ENTRIES('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.$name.INPUT')"`
+
+if [[ "$file_extension" = "data" &&  $file_exists == *"IN-CAT"* ]]; then
+cp /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/{{ file.name }}/$entry "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.$name.INPUT'"
+fi
+
+{% else %}
+cp /u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}/{{ file.name }}/$entry "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ file.name }}($name)'"
+
+{% endif %}
+
+done
+
+{% endfor %}

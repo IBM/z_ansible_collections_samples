@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ZosConnectServiceMapping xmlns:ns2="http://www.ibm.com/zosConnect/2.0/zosConnectServiceMapping" mappingSpecVersion="1.0">
+    <mappingContext basePath="/imsbank/api" relativePath="/LogIn" method="GET" defaultResponseCode="200"/>
+    <responseMessages code="200" description="OK"/>
+</ns2:ZosConnectServiceMapping>

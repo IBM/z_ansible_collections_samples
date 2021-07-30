@@ -1,0 +1,69 @@
+{{ JOB_CARD }}
+{%- if 'REG=' not in JOB_CARD and 'REGION=' not in JOB_CARD %}
+,
+//  REGION=0M
+{% endif %}
+//*
+//*JOBPARM PROCLIB=PROC99
+//*
+//* SKELETON: DFSIXS19
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR MPP # - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//MYLIBS JCLLIB ORDER=({{DFS_PROCLIB}})
+//MPP{{ REGION_NUM|string }}     EXEC PROC={{DFSMPR_NAME}},TIME=(1440),
+//         NBA=0,
+//         OBA=0,
+//         SOUT='*',              SYSOUT CLASS
+//         CL1={{ DFS_tranclass1 }},               TRANSACTION CLASS 1
+//         CL2={{ DFS_tranclass2 }},               TRANSACTION CLASS 2
+//         CL3={{ DFS_tranclass3 }},               TRANSACTION CLASS 3
+//         CL4={{ DFS_tranclass4 }},               TRANSACTION CLASS 4
+//         TLIM=10,               MPR TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC,            PROCLIB DFSINTXX MEMBER
+//         PWFI={{'Y' if USE_PSEUDO_WFI else 'N'}}{{ ',' if WITH_DB2 else ''}}
+{% if WITH_DB2 %}
+//         SSM={{ DB2_SSM }},
+//         ENVIRON=DFSJVMEV,
+//         JVMOPMAS=DFSJVMMS
+{% endif %}
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSCTL   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSSBPRM)
+//DFSSTAT  DD SYSOUT=*
+//* REXX EXEC SOURCE LOCATION
+//SYSEXEC  DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSEXEC
+//* REXX INPUT LOCATION WHEN STACK IS EMPTY
+//SYSTSIN  DD *
+/*
+//* REXX OUTPUT LOCATION
+//SYSTSPRT DD SYSOUT=*
+//* COBOL OUTPUT LOCATION
+//SYSOUT   DD SYSOUT=*
+//* COBOL ABEND OUTPUT LOCATION
+//SYSABOUT DD SYSOUT=*
+//*
+ZZ

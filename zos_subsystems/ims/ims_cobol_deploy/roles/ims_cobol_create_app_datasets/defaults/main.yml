@@ -1,0 +1,96 @@
+---
+# defaults file for ims_cobol_create_app_datasets
+
+# Vars for datasets needed to be created/deleted
+datasets:
+ - name: DBD
+   type: library
+   primary_size: 2
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 80
+   block_size: 32720
+   dir_blocks: 10
+ - name: PSB
+   type: library
+   primary_size: 2
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 80
+   block_size: 32720 
+   dir_blocks: 10
+ - name: JCL
+   type: pds
+   primary_size: 5
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 80
+   block_size: 32720
+   dir_blocks: 10
+# - name: PGMLIB
+#   type: pdse
+#   size: 6
+#   record_format: u
+#   logical_record_length: 0
+ - name: PGMSRC
+   type: library
+   primary_size: 2
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 80
+   block_size: 32720
+   dir_blocks: 10
+ - name: PLIINCL
+   type: library
+   primary_size: 2
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 80
+   block_size: 32720
+   dir_blocks: 10
+ - name: PLISRC
+   type: library
+   primary_size: 2
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 80
+   block_size: 32720
+   dir_blocks: 10
+
+# Vars file for create-load-input
+loads:
+ - name: ACCOUNT
+   type: basic
+   primary_size: 3
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 200
+   block_size: 27800
+ - name: CUSTACCS
+   type: basic
+   primary_size: 3
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 200
+   block_size: 27800
+ - name: CUSTOMER
+   type: basic
+   primary_size: 3
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 200
+   block_size: 27800
+ - name: HISTORY
+   type: basic
+   primary_size: 3
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 200
+   block_size: 27800
+ - name: TSTAT
+   type: basic
+   primary_size: 3
+   secondary_size: 1
+   record_format: fb
+   logical_record_length: 200
+   block_size: 27800

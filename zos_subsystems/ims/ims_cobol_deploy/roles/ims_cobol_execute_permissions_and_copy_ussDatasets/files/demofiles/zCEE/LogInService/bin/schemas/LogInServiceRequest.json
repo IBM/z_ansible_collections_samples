@@ -1,0 +1,18 @@
+{
+  "type" : "object",
+  "properties" : {
+    "INPUT_AREA" : {
+      "type" : "object",
+      "properties" : {
+        "customerNumber" : {
+          "maxLength" : 9,
+          "type" : "string"
+        },
+        "password" : {
+          "maxLength" : 16,
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

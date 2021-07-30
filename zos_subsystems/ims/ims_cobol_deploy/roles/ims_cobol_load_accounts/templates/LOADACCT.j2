@@ -1,0 +1,72 @@
+{{ JOB_CARD }}
+{%- if 'REG=' not in JOB_CARD and 'REGION=' not in JOB_CARD %}
+,
+//  REGION=0M
+{% endif %}
+{#//*******************************************************************
+//*  SCRATCH ACCOUNT DB DATASET
+//*******************************************************************
+//SCRATCH  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACCOUNT.DB -
+         NONVSAM SCRATCH
+  SET MAXCC=0
+//*#}
+//*******************************************************************
+//*  ALLOCATE ACCOUNT DB DATASET
+//*******************************************************************
+//ALLOC   EXEC PGM=IEFBR14
+//SYSPRINT  DD SYSOUT=*
+//A1        DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACCOUNT.DB,
+{% if DFS_SMS_ENVIRONMENT %}
+//            STORCLAS={{ DFS_SMS_CLASS }},
+{% else %}
+//            VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(5,1)),UNIT=SYSDA,DISP=(,CATLG),
+//             DCB=(RECFM=F,LRECL=8192,BLKSIZE=8192)
+/*
+//*******************************************************************
+//*  PREREORG (ACCOUNT)
+//*******************************************************************
+//PREREORG EXEC PGM=DFSRRC00,
+//        PARM='ULU,DFSURPR0,,,,,,,,,,,,N,N',REGION=1M
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1}}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//DFSRESLB DD DSN={{ DFS_AUTH_LIB_HLQ1}}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//IMS      DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+//DFSURCDS DD DSN=&&CDS,UNIT=SYSDA,DISP=(,PASS),
+//            SPACE=(TRK,1),DCB=BLKSIZE=1600
+//SYSPRINT DD SYSOUT=A
+//SYSUDUMP DD SYSOUT=A
+//SYSIN    DD *
+DBIL=ACCOUNT
+/*
+//*******************************************************************
+//*  LOAD DB (ACCOUNT)
+//*******************************************************************
+//LOADSTEP EXEC PGM=DFSRRC00,
+//        PARM='DLI,LOADACCT,IBLOAD,,,,,,,,,,,N,N',REGION=0M
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1}}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//DFSRESLB DD DSN={{ DFS_AUTH_LIB_HLQ1}}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//IMS      DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+//PRINTDD  DD SYSOUT=A,DCB=BLKSIZE=1200
+//ACCTIN   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACCOUNT.INPUT
+//SYSABEND DD SYSOUT=A
+//SYSPRINT DD SYSOUT=A
+//DFSURCDS DD DSN=&&CDS,DISP=(OLD,PASS)
+//DFSVSAMP DD *
+IOBF=(2048,20000,Y,Y,OA2K)
+IOBF=(2048,20000,Y,Y,OB2K)
+IOBF=(2048,20000,Y,Y,OC2K)
+IOBF=(2048,20000,Y,Y,OD2K)
+IOBF=(4096,4000,Y,Y,O04K)
+IOBF=(8192,20000,Y,Y,O08K)
+IOBF=(12288,20000,Y,Y,O12K)
+//IEFRDER  DD DUMMY
+//ACCOUNT  DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACCOUNT.DB
+//PUNCHDD  DD SYSOUT=B
+//*
