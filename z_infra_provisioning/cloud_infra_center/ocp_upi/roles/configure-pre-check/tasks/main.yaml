@@ -75,7 +75,7 @@
     executable: python3
 
 - name: Get security group
-  shell: neutron quota-show -c security_group -f value
+  shell: openstack quota show -f json | grep "secgroups" | awk -F ':' '{print$2}' | tr -d ','
   register:
     security_group
 
@@ -85,7 +85,7 @@
   failed_when: "security_group.stdout_lines[0]|int < 3"
 
 - name: Get security group rule
-  shell: neutron quota-show -c security_group_rule -f value
+  shell: openstack quota show -f json | grep "secgroup-rules" | awk -F ':' '{print$2}' | tr -d ','
   register:
     security_group_rule
   
