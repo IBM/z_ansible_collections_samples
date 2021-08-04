@@ -32,6 +32,8 @@
   template:
     src: var/named/cluster_domain_name.zone.j2
     dest: /var/named/{{ cluster_domain_name }}.zone
+    owner: named
+    group: named
   notify:
    - restart dns
 
@@ -54,6 +56,8 @@
   template:
     src: var/named/bastion.in-addr.arpa.zone.j2
     dest: /var/named/{{ bastion_subnet_prefix_reverse }}.in-addr.arpa.zone
+    owner: named
+    group: named
   notify:
    - restart dns
  
