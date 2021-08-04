@@ -92,7 +92,7 @@ Depending on the type of image registry backend an additional 100 GB volume.
 
 ## Getting Started
 
-You can use any ICIC nodes or any RHEL8 machine to run ansible scripts to deploy OCP UPI, it's recommended to using RHEL8 machine, following these steps to start it:
+You can use any ICIC compute nodes or any RHEL8 machine to run ansible scripts to deploy OCP UPI, it's recommended to using RHEL8 machine, following these steps to start it:
 * [Provision a Red Hat machine](#provision-a-red-hat-machine)
 * [Install required packages](#install-required-packages)
 * [Generate an SSH private key and add it to the CIC control node](#generate-an-ssh-private-key-and-add-it-to-the-cic-control-node)
@@ -111,12 +111,63 @@ Provision a Red Hat machine based on the following specifications, or using exis
 **Requirements:**
 
 * Python3
-* Ansible
+* Ansible >=2.8
 * jq
+* wget
+* git
+* firewalld
 * Python modules required in the playbooks. Namely:
   * openstackclient 
   * openstacksdk >= 0.57.0
   * netaddr
+
+**Install:**
+
+Use the following command to register the system, then automatically associate any available subscription matching that system:
+```sh
+sudo subscription-manager register --username <username> --password <password> --auto-attach
+```
+After registration, use the following command to enable ansible repository, or use newer version. 
+Note: Our scenario has been tested for Ansible 2.8.18 on RHEL OS version 8.2 and 8.3. 
+```sh
+sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
+```
+Install the packages from the repository in the system:
+```sh
+sudo yum install python3 ansible jq wget git firewalld -y
+```
+Upgrade the pip package and dnf:
+```sh
+sudo -H pip3 install --upgrade pip
+sudo dnf update -y
+```
+Install the required package through dnf:
+```sh
+sudo dnf install redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
+```
+Then create the requirements file and use pip3 to install the python modules:
+Note: The requirements.txt are tested for python-openstackclient =5.5.0 on RHEL OS version 8.2 and 8.3.
+```sh
+cat <<'EOF' >> requirements.txt 
+# The order of packages is significant, because pip processes them in the order
+# of appearance. Changing the order has an impact on the overall integration
+# process, which may cause wedges in the gate later.
+pbr!=2.1.0,>=2.0.0 # Apache-2.0
+
+cliff>=3.5.0 # Apache-2.0
+iso8601>=0.1.11 # MIT
+openstacksdk>=0.57.0 # Apache-2.0
+osc-lib>=2.3.0 # Apache-2.0
+oslo.i18n>=3.15.3 # Apache-2.0
+oslo.utils>=3.33.0 # Apache-2.0
+python-keystoneclient>=3.22.0 # Apache-2.0
+python-novaclient>=17.0.0 # Apache-2.0
+python-cinderclient>=3.3.0 # Apache-2.0
+stevedore>=2.0.1 # Apache-2.0
+EOF
+
+sudo pip3 install -r requirements.txt python-openstackclient --ignore-installed
+``` 
 
 **Verify the installation:**
 ```sh
@@ -146,7 +197,7 @@ $ ssh-copy-id root@<Bastion-Node>
 
 1. Copy the `icicrc` file to your user's home directory.
 ```sh
-$ scp -r root@<CIC-control-node-ip>:/opt/ibm/icic/icicrc opt/ibm/icic/icicrc
+$ scp -r root@<CIC-control-node-ip>:/opt/ibm/icic/icicrc /opt/ibm/icic/icicrc
 ```
 
 2. Copy the `icic.crt` file to your certs directory
@@ -320,10 +371,10 @@ backend ocp4-router-https
 You can use the nslookup <hostname> command to verify name resolution. 
 ```
 $ nslookup master-0.openshift.example.com
-Server:		172.26.100.8
-Address:	172.26.100.8#53
+Server:   172.26.100.8
+Address:  172.26.100.8#53
 
-Name:	master-0.openshift.example.com
+Name: master-0.openshift.example.com
 Address: 172.26.103.231
 ```
 
@@ -519,8 +570,8 @@ You can use the `oc` or `kubectl` commands to talk to the OpenShift API. The adm
 
 ```sh
 $ export KUBECONFIG="$PWD/auth/kubeconfig"
-$ oc get nodes
-$ oc get pods -A
+$ ./oc get nodes
+$ ./oc get pods -A
 ```
 
 **NOTE**: Only the API will be up at this point. The OpenShift UI will run on the compute nodes.
@@ -605,11 +656,11 @@ You can add a new compute node after installation, and specify the hostname inde
 
 ```sh
 $ ansible-playbook -i inventory.yaml  \
-	down-bootstrap.yaml      \
-	down-control-plane.yaml  \
-	down-compute-nodes.yaml  \
-	down-network.yaml        \
-	down-security-groups.yaml
+  down-bootstrap.yaml      \
+  down-control-plane.yaml  \
+  down-compute-nodes.yaml  \
+  down-network.yaml        \
+  down-security-groups.yaml
 ```
 
 Then, remove the `api` and `*.apps` DNS records.
