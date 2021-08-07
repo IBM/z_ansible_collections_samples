@@ -143,13 +143,13 @@ Licensed under
 
 ## Support
 
-Support for all playbooks, roles, and filters are provided by the community
-and all issues are tracked through a
-[Git issue](https://github.com/IBM/z_ansible_collections_samples/issues).
-The repository admins and content owners will engage directly with users on issues reported on the
-Git issue.
+This project is supported by the community though
+[Git issues](https://github.com/IBM/z_ansible_collections_samples/issues).
 
-Playbooks are contributed both by IBM as well as the broader Ansible community including IBM partners and the Z community.
-Therefore, it may be helpful to review who contributed a sample as well as its requirements. You
-can view who the contributor was by looking at the playbooks commit history as
-well as notes in the playbook.
+The repository admins and content owners will engage directly with users on
+issues reported.
+
+Playbooks are contributed by IBM and the broader Ansible Z community. Therefore,
+it may be helpful to review who contributed a playbook as well as its
+requirements before opening a Git issue. You can view who the contributor was by
+looking at the playbooks commit history as well as notes in the playbook.
