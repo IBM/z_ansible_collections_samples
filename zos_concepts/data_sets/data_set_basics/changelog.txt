@@ -1,0 +1,32 @@
+###############################################################################
+# Changelog:
+#   All notable changes to this project will be documented in this file.
+#
+# Types of changes:
+#   [Added for new features.]
+################################################################################
+
+# Changelog
+    All notable changes to this project will be documented in this file.
+    Types of changes:
+        - Added: new features are added
+        - Changed: changes in existing functionality
+        - Deprecated: features being removed in the future
+        - Removed: features removed no longer available
+        - Fixed: bug fixes
+        - Security: vulnerabilities fixed
+
+## [2020-09-01]
+### Added
+- Released initial version
+
+## [2021-08-06]
+### Added
+- Site playbook for consistency with playbook design
+- Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
+- Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
+### Fixed
+- Fixed the error "EDC5003I Truncation of a record occurred during an I/O operation" that appears in data_set_basics.yaml
+- Renamed `inventory.yml` to `inventory`
+### Removed
+- Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
