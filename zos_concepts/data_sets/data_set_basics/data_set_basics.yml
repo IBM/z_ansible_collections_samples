@@ -1,13 +1,6 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
+# © Copyright IBM Corporation 2020, 2021
 #
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
-###############################################################################
 
 ###############################################################################
 # This sample playbook demonstrates basic data set operations using modules
@@ -17,7 +10,8 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory data_set_basics.yaml
+#  ansible-playbook -i inventory data_set_basics.yml
+#  ansible-playbook -i inventory data_set_basics.yml -v
 #
 # Notes:
 #  This sample demonstrates ways to create, delete and modify data sets using
@@ -61,8 +55,9 @@
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
+    PYZ: "{{ hostvars.zos_host.pyz }}"
+    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
-  connection: ibm.ibm_zos_core.zos_ssh
 
   tasks:
     # ##########################################################################
@@ -118,15 +113,17 @@
         name: "{{ data_set_name }}"
         type: seq
         state: present
+        replace: true
         format: fb
-        record_length: 80
+        record_length: 100
         size: 5M
+        volume: dimato
       register: result
 
     - name: Response for data set creation
       debug:
         msg: "{{ result }}"
-      
+
     - name: Create a USS file
       file:
         path: "{{ tgt_tmp_dir }}/HELLO"
@@ -137,9 +134,15 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Populate USS file
-      shell: "echo {{ lookup('file', playbook_dir + '/files/HELLO.jcl') | quote }} > {{ tgt_tmp_dir }}/HELLO"
-      changed_when: true
+    # - name: Populate USS file
+    #   shell: "echo {{ lookup('file', playbook_dir + '/files/HELLO.jcl') | quote }} > {{ tgt_tmp_dir }}/HELLO"
+    #   changed_when: true
+    #   register: result
+
+    - zos_copy:
+        src: /Users/ddimatos/git/github/z_ansible_collections_samples/zos_concepts/data_sets/data_set_basics/files/HELLO.jcl
+        dest: "/tmp/HELLO"
+       #remote_src: yes
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
@@ -164,7 +167,7 @@
         type: pds
         size: 5M
         format: fba
-        record_length: 80
+        record_length: 100
       register: result
 
     - name: Response for creating the PDS

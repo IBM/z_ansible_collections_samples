@@ -1,0 +1,15 @@
+# Only one `requires_ansible_` is supported
+
+# Playbook requires a version specific version or range, can be more than one
+requires_ansible_version:
+    - "2.9"
+    - "2.11"
+
+requires_collection:
+    - ibm_zos_core:
+        name: "ibm_zos_core"
+        version: "1.4.0-beta.1"
+    - ibm_zos_ims:
+        name: "ibm_zos_ims"
+        version: "999.0.0"
+
