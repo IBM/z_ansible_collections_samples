@@ -54,7 +54,7 @@
   - name: Display if the Ansible the engine version for this playbook requirement succeded or failed
     ansible.builtin.debug:
         msg: "{{result_ansible_check.msg}}"
-    when: result_ansible_check
+    when: result_ansible_check is defined and (result_ansible_check | bool)
 
   - name: Display if the Ansible collection version for this playbook requirement succeded or failed
     debug:
