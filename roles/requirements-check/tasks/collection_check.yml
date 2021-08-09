@@ -11,7 +11,7 @@
 
 ---
 - name: Extracting Ansible enviroment variable COLLECTIONS_PATHS from localhost
-  ansible.builtin.shell:
+  shell:
     cmd: ansible-config dump|grep -i COLLECTIONS_PATHS|awk -F" = " '{print $2}'
   register: ansible_collections_paths
 
@@ -19,7 +19,7 @@
   ansible.builtin.debug:
     var: ansible_collections_paths
     verbosity: 1
-  when: ansible_collections_paths
+  when: ansible_collections_paths is defined and (ansible_collections_paths | bool)
 
 - name: Set fact `collection_paths` with Ansible COLLECTIONS_PATHS
   set_fact:
@@ -36,7 +36,7 @@
   ansible.builtin.debug:
     var: collection_paths_status
     verbosity: 1
-  when: collection_paths_status
+  when: collection_paths_status is defined and (collection_paths_status | bool)
 
 - name: Populate temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
   set_fact:
@@ -48,7 +48,7 @@
   ansible.builtin.debug:
     var: temp_collection_paths_dict
     verbosity: 1
-  when: temp_collection_paths_dict
+  when: temp_collection_paths_dict is defined and (temp_collection_paths_dict | bool)
 
 - name: Combine dictionary `temp_collection_paths_dict` with `requires_collection` dictionary
   set_fact:
@@ -59,7 +59,7 @@
   ansible.builtin.debug:
     var: requires_collection
     verbosity: 1
-  when: requires_collection
+  when: requires_collection is defined and (requires_collection | bool)
 
 - name: Create `_collection_status_dict` dictionary with all collection stats
   set_fact:
@@ -79,7 +79,7 @@
   ansible.builtin.debug:
     var: _collection_status_dict
     verbosity: 1
-  when: _collection_status_dict
+  when: _collection_status_dict is defined and (_collection_status_dict | bool)
 
 - name: Invoke Ansible version filter to update _collection_status_dict with additional facts
   ansible_version:
@@ -90,13 +90,13 @@
   ansible.builtin.debug:
     var: result_ansible_version_filter
     verbosity: 1
-  when: result_ansible_version_filter
+  when: result_ansible_version_filter is defined and (result_ansible_version_filter | bool)
 
 - name: DEBUG(-v) Display dictionary `_collection_status_dict` after Ansible filter is applied
   ansible.builtin.debug:
     var: _collection_status_dict
     verbosity: 1
-  when: _collection_status_dict
+  when: _collection_status_dict is defined and (_collection_status_dict | bool)
 
 - name: Ansible collection version check in progress
   assert:
