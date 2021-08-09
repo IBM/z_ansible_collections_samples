@@ -134,11 +134,6 @@
       debug:
         msg: "{{ result }}"
 
-    # - name: Populate USS file
-    #   shell: "echo {{ lookup('file', playbook_dir + '/files/HELLO.jcl') | quote }} > {{ tgt_tmp_dir }}/HELLO"
-    #   changed_when: true
-    #   register: result
-
     - zos_copy:
         src: /Users/ddimatos/git/github/z_ansible_collections_samples/zos_concepts/data_sets/data_set_basics/files/HELLO.jcl
         dest: "/tmp/HELLO"
