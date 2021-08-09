@@ -12,7 +12,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory copy_edit_submit.yml
+#  ansible-playbook -i inventory.yml copy_edit_submit.yml
 #
 # Notes:
 #  This sample demonstrates ways to copy, edit and submit jobs using
