@@ -5,11 +5,10 @@
 ###############################################################################
 # This playbook (`site.yml`) is the master playbook for this project. Based on
 # the playbooks requirments, `site.yml` playbook will evalute the requirements
-# and report when the minimum requirements are not configured.
+# and report when the minimum requirements are not configured and fail playbook
+# execution.
 #
-# It then invokes the playbook written that uses the
-# Red Hat Ansible Certified Content for IBM Z.
-# perform a number of requirement checks
+# Upon successful dependency analyais, the z/OS playbook will be executed.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -31,7 +30,5 @@
     include_role:
       name: requirements-check
 
-- hosts: zos_host
-
-- name: Partially tearing down to be save to avoid undesirable commits
-  import_playbook: data_set_basics.yaml
+- name: Executing the z/OS Ansible playbook
+  import_playbook: data_set_basics.yml

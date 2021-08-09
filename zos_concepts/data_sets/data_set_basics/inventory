@@ -1,5 +1,5 @@
 ################################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2021
 ################################################################################
 
 ################################################################################
@@ -24,12 +24,3 @@ source_system:
       pyz: path_to_python_installation_on_zos_target
       ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
       zoau: path_to_zoau_installation_on_zos_target
-
-# source_system:
-#   hosts:
-#     zos_host:
-#       zoau: "/u/oeusr01/zoau/1.1.1"
-#       pyz: "/u/oeusr01/python/pyz_3_8_2/usr/lpp/IBM/cyp/v3r8/pyz"
-#       ansible_host: ec33017a.vmec.svl.ibm.com
-#       ansible_user: omvsadm
-#       ansible_python_interpreter: "{{pyz}}/bin/python3.8"
