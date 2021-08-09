@@ -39,17 +39,17 @@
 #  ansible-playbook -i <inventory> <playbook> --tags "....."
 #
 #   1) Run in development mode using JSON cached input
-#         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_json"
+#         ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_json"
 #   2) Run in development mode using YAML cached input
-#         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml"
+#         ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml"
 #   3) Run in development mode using JSON cached input with verbose
-#         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_json,mode_verbose"
+#         ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_json,mode_verbose"
 #   4) Run in development mode using YAML cached input with verbose
-#         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml,mode_verbose"
+#         ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml,mode_verbose"
 #   5) Run in production mode on z/OS target
-#         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_production"
+#         ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_production"
 #   6) Run in production mode on z/OS target with verbose
-#         ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_production,mode_verbose"
+#         ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_production,mode_verbose"
 #
 # Requirements:
 #   1) IBM® z/OS® core collection 1.0.0 or later
