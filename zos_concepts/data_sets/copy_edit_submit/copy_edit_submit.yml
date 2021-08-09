@@ -1,12 +1,7 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2021
 # Contributed by the Ansible Content for IBM Z Team
 #
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
 ###############################################################################
 
 ###############################################################################
@@ -17,7 +12,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory submit_query_retrieve.yaml
+#  ansible-playbook -i inventory copy_edit_submit.yml
 #
 # Notes:
 #  This sample demonstrates ways to copy, edit and submit jobs using
@@ -42,8 +37,10 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
+  vars:
+    PYZ: "{{ hostvars.zos_host.pyz }}"
+    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
-  connection: ibm.ibm_zos_core.zos_ssh
 
   tasks:
     # ##########################################################################
