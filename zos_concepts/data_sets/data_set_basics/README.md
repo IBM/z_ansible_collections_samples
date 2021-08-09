@@ -49,14 +49,9 @@ source_system:
 
 ### Run desired playbook
 
-This project has includes a `site.yml` playbook that serves as the master playbook
+This project has included a `site.yml` playbook that serves as the master playbook
 that provides additional prerequisite checks then it invokes the `data_set_basics.yml`
-playbook. You can skip the prerequisite check and run the `data_set_basics.yml` with
-command:
-
-```bash
-ansible-playbook -i inventory data_set_basics.yml
-```
+playbook.
 
 If you want to run the master playbook `site.yml` it will check that your environment
 has the correct version of Ansible as well as the collection needed to execute
@@ -64,6 +59,13 @@ correctly. To run the master playbook, use command:
 
 ```bash
 ansible-playbook -i inventory site.yml
+```
+
+You can skip the prerequisite check and run the `data_set_basics.yml` with
+command:
+
+```bash
+ansible-playbook -i inventory data_set_basics.yml
 ```
 
 # Copyright
