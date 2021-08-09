@@ -53,11 +53,11 @@
 #
 # Requirements:
 #   1) IBM® z/OS® core collection 1.0.0 or later
-#   2) Ansible 2.10 or later
+#   2) Ansible 2.11 or later
 #   3) jmespath (`pip install jmespath`)
 #
 # Notes:
-#   * If you do not run with Ansible 2.10 or later, you will encounter an
+#   * If you do not run with Ansible 2.11 or later, you will encounter an
 #     error similar to this:
 #       "Invalid data passed to 'loop', it requires a list, got this
 #        instead: {{ submit_job_list | community.general.json_query('ddnames[*].ddname') }}.
@@ -82,6 +82,8 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
+    PYZ: "{{ hostvars.zos_host.pyz }}"
+    ZOAU: "{{ hostvars.zos_host.zoau }}"
     ############################################################################
     # YAML representation of the zos_job_submit response used for development to
     # simulate a job submission used to expedite development. Allows for
@@ -526,7 +528,7 @@
     # Traverse the submitted job to extract ddname and stepname by using
     # the Ansible construct  `loop` and `json_query`
     # Requirements:
-    #  * Ansible 2.10 or later
+    #  * Ansible 2.11 or later
     #  * jmespath be installed where the playbook is run
     #    * `pip install jmespath`
     ############################################################################
@@ -549,7 +551,7 @@
     # Traverse the submitted job to extract ddname and stepname by using
     # the Ansible construct  `with_items` and `json_query`
     # Requirements:
-    #  * Ansible 2.10 or later
+    #  * Ansible 2.11 or later
     #  * jmespath be installed where the playbook is run
     #    * `pip install jmespath`
     ############################################################################
