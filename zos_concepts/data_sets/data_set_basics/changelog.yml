@@ -39,8 +39,8 @@ releases:
                 - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
                 - Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
             fixed:
-                - Fixed the error "EDC5003I Truncation of a record occurred during an I/O operation" that appears in data_set_basics.yaml
-                - Renamed `inventory.yml` to `inventory`
+                - Fixed the error "EDC5003I Truncation of a record occurred during an I/O operation" that appears in data_set_basics.yml
+                - Renamed `data_set_basics.yaml` to `data_set_basics.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
 

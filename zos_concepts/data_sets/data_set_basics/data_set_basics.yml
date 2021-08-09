@@ -11,7 +11,7 @@
 #
 # Example:
 #  ansible-playbook -i inventory data_set_basics.yml
-#  ansible-playbook -i inventory data_set_basics.yml -v
+#  ansible-playbook -i inventory.yml data_set_basics.yml -v
 #
 # Notes:
 #  This sample demonstrates ways to create, delete and modify data sets using
