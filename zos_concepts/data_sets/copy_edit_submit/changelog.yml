@@ -39,7 +39,6 @@ releases:
                 - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
                 - Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
             fixed:
-                - Renamed `inventory.yml` to `inventory`
                 - Renamed `copy_edit_submit.yaml` to `copy_edit_submit.yml` to standardize all playbooks with the same extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
