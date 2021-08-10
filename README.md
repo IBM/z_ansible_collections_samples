@@ -14,7 +14,7 @@ overview of the playbooks, refer to the
 The collections can be found on
 [Ansible Galaxy](https://galaxy.ansible.com/search?deprecated=false&keywords=ibm_z&order_by=-relevance&page=1)
 and [Automation Hub](https://www.ansible.com/products/automation-hub).
-For additional content, review our [community page](ibm.biz/BdfsTR).
+For additional content, review our [community page](http://ibm.biz/BdfsTR).
 
 This repository is frequently updated to refresh content. We recommend that you clone the
 the repository and configure your GitHub
