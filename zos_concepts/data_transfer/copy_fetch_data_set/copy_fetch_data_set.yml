@@ -19,17 +19,6 @@
 #  automation can be controlled. This sample does not demonstrate all options,
 #  refer to documentation or ansible-doc for those options.
 #
-#  When running this playbook, review the comments on how this sample will
-#  interact with your target, ensure you have the required authority and
-#  permissions such as writing the the target directories or creating data sets.
-#
-#  Data sets created for this sample will have a randomly generated name created
-#  by the ZOAU API.
-#
-#  Additional facts for this playbook can be configured to override the defaults
-#  by reviewing the "Fact setting" section of this playbook, for example,
-#  `data_set_name` and `system_name`.
-#
 # Requirements:
 #   IBM z/OS core collection 1.2.0 or later
 #
