@@ -1,13 +1,9 @@
 # Copy, Sort and Fetch Data Sets on z/OS using Ansible
-This project provides sample playbooks and roles which is used to demonstrate
-how to use many of the common core Ansible modules included in Red Hat Ansible
-Certified Content for IBM Z.
-
-This playbook copies a local file containing tabular data to a sequential
-data set on the remote z/OS system usingRed Hat Ansible Certified Content for
-IBM Z. This data set is then sorted based on a particular criteria and the
-sorted data set is fetched back to the control node. The following core modules
-are used to accomplish these set of tasks:
+This playbook demonstrates how to copy a local file containing tabular
+data to a sequential data set on the remote z/OS system using Red Hat Ansible
+Certified Content for IBM Z. This data set is then sorted based on a particular
+criteria and the sorted data set is fetched back to the control node. The
+following core modules are used to accomplish these set of tasks:
 
 This playbook uses:
   - collection:
