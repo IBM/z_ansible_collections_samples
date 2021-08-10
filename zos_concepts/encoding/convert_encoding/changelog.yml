@@ -1,0 +1,53 @@
+################################################################################
+# Copyright (c) IBM Corporation 2021
+#
+# All notable changes to this project will be documented in this file. Following
+# releases is a decimal based date since playbooks have no version in this
+# repository.
+#
+# releases:
+#     2020.05.19:
+#         date: 2020-05-19
+#         changes:
+#             added:
+#                 - new features are added
+#             deprecated:
+#                 - features being removed in the future
+#             fixed:
+#                 - bug fixes
+#             minor:
+#                 - changes in existing functionality
+#             removed:
+#                 - features removed no longer available
+#             security:
+#                 - vulnerabilities fixed
+#             summary:
+#                 - summary of changes or link to Git issue, pull request
+################################################################################
+
+releases:
+    2020.09.01:
+        date: 2020-09-01
+        changes:
+            added:
+                - Released initial version
+    2020.09.09:
+        date: 2020-09-01
+        changes:
+            fixed:
+                - Corrected bug where from_encoding and to_encoding were inverted
+    2021.08.06:
+        date: 2021-08-06
+        changes:
+            added:
+                - Site playbook for consistency with playbook design
+                - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
+                - Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
+            fixed:
+                - Renamed `convert_encoding.yaml` to `convert_encoding.yml` with a `yml` extenstion to follow standardize on the extension
+            removed:
+                - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+
+
+
+

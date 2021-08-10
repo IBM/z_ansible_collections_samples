@@ -1,14 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
-#
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
-# 2020-09-09
-#  - Corrected bug where from_encoding and to_encoding were inverted
+# © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
 ###############################################################################
@@ -20,13 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory convert_encoding.yaml
-#
-# Notes:
-#  This sample demonstrates ways to submit, query and retrieve job output using
-#  Ansible z/OS core modules. Each module has options available on how
-#  automation can be controlled. This sample does not demonstrate all options,
-#  refer to documentation or ansible-doc for those options.
+#  ansible-playbook -i inventory.yml convert_encoding.yml
 #
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
@@ -57,8 +42,9 @@
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
+    PYZ: "{{ hostvars.zos_host.pyz }}"
+    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
-  connection: ibm.ibm_zos_core.zos_ssh
 
   tasks:
     # ##########################################################################
@@ -83,8 +69,8 @@
     # | Create shell script on target, encode with the targets charset, execute
     # | script if mode == 755, else fail
     # +-------------------------------------------------------------------------
-    - name: Create shell script {{ tgt_tmp_dir }}/date.sh on
-        target {{ inventory_hostname }}
+    - name: Create shell script {{ tgt_tmp_dir }}/date.sh
+        on target {{ inventory_hostname }}
       copy:
         dest: "{{ tgt_tmp_dir }}/date.sh"
         content: |
