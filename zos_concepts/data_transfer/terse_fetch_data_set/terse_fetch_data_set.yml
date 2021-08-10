@@ -1,12 +1,7 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2021
 # Contributed by the Ansible Content for IBM Z Team
 #
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
 ###############################################################################
 
 ###############################################################################
@@ -17,7 +12,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory submit_query_retrieve.yaml
+#  ansible-playbook -i inventory.yml terse_fetch_data_set.yml
 #
 # Notes:
 #  This sample demonstrates ways to create a temporary data set, terse the
@@ -26,13 +21,6 @@
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
-#
-#  Data sets created for this sample will have a randomly generated name created
-#  by the ZOAU API.
-#
-#  Additional facts for this playbook can be configured to override the defaults
-#  by reviewing the "Fact setting" section of this playbook, for example,
-#  `data_set_name` and `system_name`.
 #
 # Requirements:
 #     - IBM z/OS core collection 1.2.0 or later
@@ -43,19 +31,33 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
+  vars:
+    PYZ: "{{ hostvars.zos_host.pyz }}"
+    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
-  connection: ibm.ibm_zos_core.zos_ssh
+
 
   tasks:
     # ##########################################################################
     # Generate a temporary data set name
     # ##########################################################################
-    - name: Create temp data set name
-      command: "mvstmp {{ ansible_user | upper }}"
-      register: tmp_ds
+    - block:
+      - name: Create a temporary data set
+        zos_data_set:
+          type: seq
+          space_primary: 5
+          space_secondary: 1
+          space_type: cyl
+          record_length: 1024
+        register: tmp_ds
+        failed_when: tmp_ds is not defined or tmp_ds.get('names', [])|length == 0
+
+    - name: Get the result of temp data set creation
+      debug:
+        var: tmp_ds
 
     - set_fact:
-        tmp_data_set: "{{ tmp_ds.stdout }}"
+        tmp_data_set: "{{ tmp_ds.get('names')[0] }}"
 
     # ##########################################################################
     # Modules: zos_mvs_raw, zos_fetch, zos_data_set
