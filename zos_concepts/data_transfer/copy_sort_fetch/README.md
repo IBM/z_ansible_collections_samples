@@ -76,7 +76,6 @@ ansible-playbook -i inventory copy-sort-fetch.yml
 All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
-
 # Copyright
 © Copyright IBM Corporation 2020
 
