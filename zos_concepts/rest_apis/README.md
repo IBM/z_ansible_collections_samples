@@ -3,23 +3,22 @@ This sample playbook demonstrates basic use cases for invoking a REST API servic
 particularly the z/OSMF REST API services.
 
 
-It is a good practice to review the playbook sample contents before executing
+It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
-Although samples are written to operate without the need for the user’s
-configuration, flexibility is written into the samples because it is not easy
-to determine if a sample has access to the host’s resources. Review the
-playbook notes sections for additional details and configuration.
-
 
 ## Prerequisites
 
 * Access to the [z/OSMF REST API](https://www.ibm.com/docs/en/zos/2.4.0?topic=guide-using-zosmf-rest-services)
 
+## Playbook Requirements
+This playbook requires:
 
-## Ansible Collection Requirement
+- [IBM® z/OS® core collection 1.2.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+- [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-* IBM z/OS core collection 1.2.0 or later
+Note, only the playbook requirements are listed in this document, please review
+the collections documentation for additional requirements.
 
 ## Playbook Summary
 
@@ -31,34 +30,24 @@ If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md) or
 continue with getting started below.
 
-Optionally, you can use the sample
-[host_setup](https://github.com/IBM/z_ansible_collections_samples/blob/master/zos_administration/host_setup/README.md)
-to discover and create your **inventory** and **host_vars** artifacts. It should
-be noted that when you use the **host_setup** it will generate a configuration
-for the most common dependencies, some playbooks require more customized
-configurations, in this case, you can review the sample documentation and
-add the additional required variables.
-
-### Update [inventories/zos_host](inventories/zos_host) with the information about your system(s)
+### Update the included [inventory](inventory) with the information about your system's.
+Description of the properties used in this configuration:
+* Property `ansible_host` is the z/OS managed node (target), e.g, `ansible_host: "zvm1.vmec.svl.ibm.com"`
+* Property `ansible_user` is the z/OS managed user to connect and run as over SSH,  e.g, `ansible_user: "zosadm"`
+* Property `pyz` is the python installation home path on the z/OS managed node (target), e.g, `pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"`
+* Property `ansible_python_interpreter` is the z/OS managed node (target) Python binary installation path,
+  e.g, `ansible_python_interpreter: "{{pyz}}/bin/python3.8"`
+* Property `zoau` is the ZOAU installation home on the z/OS managed node (target), e.g, `zoau: "/usr/lpp/IBM/zoautil"`
 
 ```yaml
-# the system where the data should be copied to
 source_system:
   hosts:
     zos_host:
       ansible_host: zos_target_address
       ansible_user: zos_target_username
+      pyz: path_to_python_installation_on_zos_target
       ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
-```
-
-### Update the environment variables for each z/OS system in [host_vars/zos_host.yml](host_vars/zos_host.yml)
-
-```yaml
-# the path to the root of IBM python installation
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
-
-# the path to root of ZOAU installation
-ZOAU: "/usr/lpp/IBM/zoautil"
+      zoau: path_to_zoau_installation_on_zos_target
 ```
 
 ### Update the playbook's [group_vars](group_vars/all.yml) with the corresponding values
@@ -144,29 +133,50 @@ ZOSMF_PASS: !vault |
   6332316134666538300a393833663835343134393466343265356337633637346631653761653230
   6365
 ```
-### Run desired playbook
 
-If `ansible-vault` was used to encrypt any sensitive information, run the following command.  
-**Note:** This command will prompt you for the password used to encrypt the sensitive data.
+### Run the playbook
+This project has included a `site.yml` playbook that serves as the master playbook
+that provides additional prerequisite checks then it invokes the `uri-sample.yml`
+playbook.
+
+If you want to run the master playbook `site.yml` it will check that your environment
+has the correct version of Ansible as well as the collection needed to execute
+correctly. To run the master playbook, use command:
+
 ```bash
-ansible-playbook -i inventories/zos_host --ask-vault-pass uri-sample.yml
+ansible-playbook -i inventories/zos_host site.yml
 ```
 
-Otherwise, run the following command.
+You can skip the prerequisite check and run the `uri-sample.yml` with
+command:
+
 ```bash
 ansible-playbook -i inventories/zos_host uri-sample.yml
 ```
 
-# Copyright
+If `ansible-vault` was used to encrypt any sensitive information, add the
+following to your command: `--ask-vault-pass`. **Note:** This will prompt you
+for the password used to encrypt the sensitive data. e.g,, run the following command:
 
+```bash
+ansible-playbook -i inventories/zos_host --ask-vault-pass uri-sample.yml
+```
+
+```bash
+ansible-playbook -i inventories/zos_host --ask-vault-pass site.yml
+```
+
+# Changelog
+All changes are maintained chronologically by date found in the
+[changelog](changelog.yml).
+
+# Copyright
 © Copyright IBM Corporation 2021
 
 # License
-
 Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
-
 Please refer to the [support section](https://github.com/IBM/z_ansible_collections_samples/blob/master/README.md#support) for more
 details.
