@@ -33,6 +33,4 @@
 - name: Executing the z/OS Ansible playbook `add-user.yml`
   import_playbook: add-user.yml
 
-- name: Executing the z/OS Ansible playbook `remove-user.yml`
-  import_playbook: remove-user.yml
 
