@@ -51,7 +51,7 @@ source_system:
 
 ### Run the playbook
 This project has included a `site.yml` playbook that serves as the master playbook
-that provides additional prerequisite checks then it invokes the `data_set_basics.yml`
+that provides additional prerequisite checks then it invokes the `copy_fetch_data_set.yml`
 playbook.
 
 If you want to run the master playbook `site.yml` it will check that your environment
@@ -62,7 +62,7 @@ correctly. To run the master playbook, use command:
 ansible-playbook -i inventory site.yml
 ```
 
-You can skip the prerequisite check and run the `data_set_basics.yml` with
+You can skip the prerequisite check and run the `copy_fetch_data_set.yml` with
 command:
 
 ```bash
