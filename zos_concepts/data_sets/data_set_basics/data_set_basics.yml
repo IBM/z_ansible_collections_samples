@@ -1,7 +1,5 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020, 2021
-#
-
 ###############################################################################
 # This sample playbook demonstrates basic data set operations using modules
 # included in the Red Hat Ansible Certified  Content for IBM Z core collection.
@@ -12,19 +10,6 @@
 # Example:
 #  ansible-playbook -i inventory data_set_basics.yml
 #  ansible-playbook -i inventory.yml data_set_basics.yml -v
-#
-# Notes:
-#  This sample demonstrates ways to create, delete and modify data sets using
-#  Ansible z/OS core modules. Each module has options available on how
-#  automation can be controlled. This sample does not demonstrate all options,
-#  refer to documentation or ansible-doc for those options.
-#
-#  When running this playbook, review the comments on how ths sample will
-#  interact with your target, ensure you have the required authority and
-#  permissions such as writing the the target directories or creating data sets.
-#
-#  Data sets created for this sample will have a randomly generated name created
-#  by the ZOAU API.
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
