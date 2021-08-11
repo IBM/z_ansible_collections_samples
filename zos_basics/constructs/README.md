@@ -37,7 +37,7 @@ If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](../../../docs/share/configuration_guide.md) or
 continue with getting started below.
 
-### Update the included [inventory](inventory) with the information about your system(s)
+### Update the included [inventory.yml](inventory.yml) with the information about your system(s)
 Description of the properties used in this configuration:
 * Property `ansible_host` is the z/OS managed node (target), e.g, `ansible_host: "zvm1.vmec.svl.ibm.com"`
 * Property `ansible_user` is the z/OS managed user to connect and run as over SSH,  e.g, `ansible_user: "zosadm"`
@@ -67,14 +67,14 @@ has the correct version of Ansible as well as the collection needed to execute
 correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory site.yml
+ansible-playbook -i inventory.yml site.yml
 ```
 
 You can skip the prerequisite check and run the `zos_job_submit_ansible_constructs.yml` with
 command:
 
 ```bash
-ansible-playbook -i inventory zos_job_submit_ansible_constructs.yml
+ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yml
 ```
 
 Additional ways to run this playbook using --tags listed below control how the
@@ -87,17 +87,17 @@ Usage:
 
 ```
   1) Run in development mode using JSON cached input
-        ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_json"
+        ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_json"
   2) Run in development mode using YAML cached input
-        ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml"
+        ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml"
   3) Run in development mode using JSON cached input with verbose
-        ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_json,mode_verbose"
+        ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_json,mode_verbose"
   4) Run in development mode using YAML cached input with verbose
-        ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml,mode_verbose"
+        ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_development_yaml,mode_verbose"
   5) Run in production mode on z/OS target
-        ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_production"
+        ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_production"
   6) Run in production mode on z/OS target with verbose
-        ansible-playbook -i inventory zos_job_submit_ansible_constructs.yaml --tags "mode_production,mode_verbose"
+        ansible-playbook -i inventory.yml zos_job_submit_ansible_constructs.yaml --tags "mode_production,mode_verbose"
 ```
 
 # Changelog
