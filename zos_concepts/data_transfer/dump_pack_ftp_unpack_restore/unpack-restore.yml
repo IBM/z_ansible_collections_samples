@@ -1,12 +1,5 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
-#
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
 ###############################################################################
 
 ###############################################################################
@@ -18,6 +11,9 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
+  vars:
+    PYZ: "{{ hostvars.destination.pyz }}"
+    ZOAU: "{{ hostvars.destination.zoau }}"
   environment: "{{ environment_vars }}"
 
   tasks:

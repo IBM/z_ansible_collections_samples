@@ -1,63 +1,43 @@
-###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed and supported by the Ansible Content for IBM Z Team
-#
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# [1.0.0] - 2020-09-01
-#  - Released initial version
-###############################################################################
-
 ################################################################################
-# - The value for the property BPXK_AUTOCVT must be configured to "ON";
-#   for example: _BPXK_AUTOCVT: "ON"
-# - The value for the property ZOAU_HOME is the ZOA Utilities install root path;
-#   for example: ZOAU_HOME: "/usr/lpp/IBM/zoautil"
-# - The value for the property PYTHONPATH is the ZOA Utilities Python library path;
-#   for example: PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
-# - The value for the property LIBPATH is both the path to the Python libraries on
-#   the target and the ZOA Utilities Python library path separated by
-#   semi-colons; for example:
-#   LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."
-# - The value for the property PATH is the ZOA utilities BIN path and Python
-#   interpreter path, for example:
-#   PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin"
-# - The value for the property _CEE_RUNOPTS is the invocation Language
-#   Environment® runtime options for programs and used by Python. For example,
-#   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
-# - The value for the properties __TAG_REDIR_ERR, _TAG_REDIR_IN, _TAG_REDIR_OUT
-#   are txt and used by the shell; for example:
-#      _TAG_REDIR_ERR: "txt"
-#      _TAG_REDIR_IN: "txt"
-#      _TAG_REDIR_OUT: "txt"
-# - The value for the property LANG is the name of the default locale; value
-#   C specifies the POSIX locale; for example: ``LANG: "C"``.
-# - The bash shell is unsupported. If that is the only shell available, you must
-#   control how new and existing files are tagged and encoded. An
-#   example of what is needed in addition to the files environment variables
-#   are "_ENCODE_FILE_NEW" and "_ENCODE_FILE_EXISTING"; for example,
-#      _ENCODE_FILE_NEW: "IBM-1047"
-#      _ENCODE_FILE_EXISTING: "IBM-1047"
-#   Please review the README.ZOS guide included with the ported ``bash`` shell
-#   for further configurations.
-#
-# Note:
-#   In ZOAU 1.0.2 and later, the property ZOAU_ROOT is no longer supported
-#   and must be replaced with the property ZOAU_HOME. If you are using ZOAU
-#   version 1.0.1 or lower, you must continue to use the property
-#   ZOAU_ROOT which is the ZOA Utilities install root path required for
-#   ZOAU; for example, ``/usr/lpp/IBM/zoautil``.
-#
+# Variables used and needing confirugation for this playbook
 ################################################################################
 
-# the path to the root of IBM python installation
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
+# A list of data sets contained in an archive you wish to include in dump
+data_sets_to_dump:
 
-# the path to root of ZOAU installation
-ZOAU: "/usr/lpp/IBM/zoautil"
+# The name to use for the data set archive,
+# if not provided, module-generated name will be used
+archive_data_set: ""
 
-# you should not need to change environment_vars
+# The name to use for the tersed archive data set,
+# if not provided, module-generated name will be used
+terse_data_set: ""
+
+# The name to give to the tersed archive after FTP transfer,
+# if not provided terse_data_set value will be used
+target_data_set: ""
+
+# The volume containing the data sets to archive,
+# if input volume not provided system defaults will be used
+input_volume: ""
+
+# The host name of the target host which will receive the tersed data set
+target_hostname: ""
+
+# The user name to use for connecting to the target host
+target_user: ""
+
+# The password to use for connecting to the target host,
+# can also use Ansible Vault credential
+target_password: ""
+
+# Indicates if terse and archive data sets should be deleted upon successful transfer?
+delete: yes
+
+################################################################################
+# Enviroment variables for all z/OS managed nodes (target) that do not need
+# further configuration.
+################################################################################
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
@@ -70,34 +50,41 @@ environment_vars:
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
 
-# a list of data sets contained in an archive you wish to include in dump
-data_sets_to_dump:
-
-# the name to use for the data set archive
-# if not provided, module-generated name will be used
-archive_data_set: ""
-
-# the name to use for the tersed archive data set
-# if not provided, module-generated name will be used
-terse_data_set: ""
-
-# the name to give to the tersed archive after FTP transfer
-# if not provided terse_data_set value will be used
-target_data_set: ""
-
-# the volume containing the data sets to archive
-# if input volume not provided system defaults will be used
-input_volume: ""
-
-# the host name of the target host which will receive the tersed data set
-target_hostname: ""
-
-# the user name to use for connecting to the target host
-target_user: ""
-
-# the password to use for connecting to the target host
-# can also use Ansible Vault credential
-target_password: ""
-
-# should terse and archive data sets be deleted upon successful transfer?
-delete: yes
+################################################################################
+# Description of the environment variables used in this configuration.
+################################################################################
+# - Property BPXK_AUTOCVT must be configured to "ON"; e.g., _BPXK_AUTOCVT: "ON"
+# - Property ZOAU_HOME is the ZOA Utilities install root path; e.g., ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+# - Property PYTHONPATH is the ZOA Utilities Python library path; e.g., PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
+# - Property LIBPATH is both the path to the Python libraries on the target
+#   and the ZOA Utilities Python library path separated by semi-colons; e.g.,
+#   LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."
+# - Property PATH is the ZOA utilities BIN path and Python interpreter path, e.g.,
+#   PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin"
+# - Property _CEE_RUNOPTS is the invocation Language Environment® runtime
+#   options for programs and used by Python. e.g.,
+#   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+# - Properties __TAG_REDIR_ERR, _TAG_REDIR_IN, _TAG_REDIR_OUT are txt and used
+#   by the shell; e.g.,
+#      _TAG_REDIR_ERR: "txt"
+#      _TAG_REDIR_IN: "txt"
+#      _TAG_REDIR_OUT: "txt"
+# - Property LANG is the name of the default locale; value
+#   C specifies the POSIX locale; for example: ``LANG: "C"``.
+#
+# Note:
+# - The bash shell is unsupported. If that is the only shell available, you must
+#   control how new and existing files are tagged and encoded. An
+#   example of what is needed in addition to the files environment variables
+#   are "_ENCODE_FILE_NEW" and "_ENCODE_FILE_EXISTING"; e.g.,
+#      _ENCODE_FILE_NEW: "IBM-1047"
+#      _ENCODE_FILE_EXISTING: "IBM-1047"
+#   Please review the README.ZOS guide included with the ported ``bash`` shell
+#   for further configurations.
+# - In ZOAU 1.0.2 and later, the property ZOAU_ROOT is no longer supported
+#   and must be replaced with the property ZOAU_HOME. If you are using ZOAU
+#   version 1.0.1 or lower, you must continue to use the property
+#   ZOAU_ROOT which is the ZOA Utilities install root path required for
+#   ZOAU; e.g., ``/usr/lpp/IBM/zoautil``.
+#
+################################################################################
