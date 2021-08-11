@@ -65,22 +65,20 @@ source_system:
 ### Run desired playbook
 This project has included a `site.yml` playbook that serves as the master playbook
 that provides additional prerequisite checks then it invokes the  `add-user.yml`
-or `remove-user.yml` playbook.
+playbook.
 
 If you want to run the master playbook `site.yml` it will check that your environment
 has the correct version of Ansible as well as the collection needed to execute
 correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory site.yml
+ansible-playbook -i inventory.yml site.yml
 ```
 
-You can skip the prerequisite check and run the `add-user.yml`  or
-`remove-user.yml` with command:
+You can skip the prerequisite check and run the `add-user.yml` with command:
 
 ```bash
 ansible-playbook -i inventory add-user.yml
-ansible-playbook -i inventory remove-user.yml
 ```
 
 ## Getting Started: Ansible Tower
