@@ -1,7 +1,26 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates basic use cases for invoking a REST API
+# service, particularly the z/OSMF REST API services.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories/zos_host uri-sample.yml
+#
+###############################################################################
+---
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
+  vars:
+    PYZ: "{{ hostvars.zos_host.pyz }}"
+    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment:
     "{{ environment_vars }}"
 

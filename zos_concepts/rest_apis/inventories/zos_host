@@ -1,6 +1,26 @@
+################################################################################
+# © Copyright IBM Corporation 2021
+################################################################################
+
+################################################################################
+# Description of the properties used in this configuration:
+# - Property `ansible_host` is the z/OS managed node (target),
+#    e.g, ansible_host: "zvm1.vmec.svl.ibm.com"
+# - Property `ansible_user` is the z/OS managed user to connect and run as over SSH,
+#    e.g, ansible_user: "zosadm"
+# - Property `pyz` is the python installation home path on the z/OS managed node (target),
+#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+# - property `ansible_python_interpreter` is the z/OS managed node (target) Python
+#    binary installation path, e.g, ansible_python_interpreter: "{{pyz}}/bin/python3.8"
+# - Property `zoau` is the ZOAU installation home on the z/OS managed node (target),
+#    e.g, zoau: "/usr/lpp/IBM/zoautil"
+################################################################################
+
 source_system:
   hosts:
     zos_host:
       ansible_host: zos_target_address
       ansible_user: zos_target_username
+      pyz: path_to_python_installation_on_zos_target
       ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
+      zoau: path_to_zoau_installation_on_zos_target
