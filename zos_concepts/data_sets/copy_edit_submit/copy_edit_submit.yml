@@ -1,7 +1,5 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020, 2021
-# Contributed by the Ansible Content for IBM Z Team
-#
 ###############################################################################
 
 ###############################################################################
@@ -14,18 +12,9 @@
 # Example:
 #  ansible-playbook -i inventory.yml copy_edit_submit.yml
 #
-# Notes:
-#  This sample demonstrates ways to copy, edit and submit jobs using
-#  Ansible z/OS core modules. Each module has options available on how
-#  automation can be controlled. This sample does not demonstrate all options,
-#  refer to documentation or ansible-doc for those options.
-#
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
-#
-#  Data sets created for this sample will have a randomly generated name created
-#  by the ZOAU API.
 #
 # Requirements:
 #     - IBM z/OS core collection 1.2.0 or later

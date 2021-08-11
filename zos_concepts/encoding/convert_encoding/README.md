@@ -49,7 +49,7 @@ source_system:
 
 ### Run the playbook
 This project has included a `site.yml` playbook that serves as the master playbook
-that provides additional prerequisite checks then it invokes the `data_set_basics.yml`
+that provides additional prerequisite checks then it invokes the `convert_encoding.yml`
 playbook.
 
 If you want to run the master playbook `site.yml` it will check that your environment
