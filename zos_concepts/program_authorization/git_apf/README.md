@@ -40,7 +40,7 @@ If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](../../../docs/share/configuration_guide.md) or
 continue with getting started below.
 
-### Update the included [inventory](inventory) with the information about your system's.
+### Update the included [inventory.yml](inventory.yml) with the information about your system's.
 Description of the properties used in this configuration:
 * Property `ansible_host` is the z/OS managed node (target), e.g, `ansible_host: "zvm1.vmec.svl.ibm.com"`
 * Property `ansible_user` is the z/OS managed user to connect and run as over SSH,  e.g, `ansible_user: "zosadm"`
@@ -81,14 +81,14 @@ has the correct version of Ansible as well as the collection needed to execute
 correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory site.yml
+ansible-playbook -i inventory.yml site.yml
 ```
 
 You can skip the prerequisite check and run the `prog_auth.yml` with
 command:
 
 ```bash
-ansible-playbook -i inventory copy-sort-prog_auth.yml
+ansible-playbook -i inventory.yml prog_auth.yml
 ```
 
 # Changelog
