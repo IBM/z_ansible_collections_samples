@@ -84,14 +84,17 @@ has the correct version of Ansible as well as the collection needed to execute
 correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory site.yml
+ansible-playbook -i inventory.yml site.yml
 ```
 
-You can skip the prerequisite check and run the `transfer-data-sets.yml` with
+You can skip the prerequisite check and run the `transfer-data-sets.yml`,
+`dump-pack-ftp.yml` or `unpack-restore.yml` with
 command:
 
 ```bash
 ansible-playbook -i inventory.yml transfer-data-sets.yml
+ansible-playbook -i inventory.yml dump-pack-ftp.yml
+ansible-playbook -i inventory.yml unpack-restore.yml
 ```
 
 # Changelog
