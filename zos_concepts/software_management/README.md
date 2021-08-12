@@ -47,22 +47,35 @@ This playbook requires:
 - Update the playbook specific variables found in each playbook and review the
   role README files.
 
-### 4. Run the playbook
+##Run the playbook
+
+
+
+This project has included a `site.yml` playbook that serves as the master playbook
+that provides additional prerequisite checks.
+
+If you want to run the master playbook `site.yml` it will check that your environment
+has the correct version of Ansible as well as the collection needed to execute
+correctly. To run the master playbook, use command:
+
+```bash
+ansible-playbook -i inventories site.yml
+```
+
+You can skip the prerequisite check and run the appropriate playbook with
+command:
 
 ```bash
 ansible-playbook -i inventories <playbook-name>
 ```
 
 # Copyright
-
 © Copyright IBM Corporation 2021
 
 # License
-
 Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 # Support
-
 Please refer to the [support section](../../../README.md#support) for more
 details.
