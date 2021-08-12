@@ -14,8 +14,8 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory site.yml
-#  ansible-playbook -i inventory site.yml -v
+#  ansible-playbook -i inventories site.yml
+#  ansible-playbook -i inventories site.yml -v
 ###############################################################################
 
 
