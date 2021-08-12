@@ -1,0 +1,47 @@
+################################################################################
+# Copyright (c) IBM Corporation 2021
+################################################################################
+
+################################################################################
+# Variables used and needing confirugation for this playbook
+################################################################################
+
+# A list of data sets contained in an archive you wish to restore
+data_sets_to_restore:
+  - "**"
+
+# The name to use for the data set archive, if not provided, module-generated
+# name will be used
+archive_data_set: ""
+
+# The name to use for the tersed archive data set
+terse_data_set: ""
+
+# The volume where data sets restored from an archive should be placed,
+# if output volume not provided system defaults will be used
+output_volume: ""
+
+# The HLQ to give to the data sets after the restore, if one is not provided,
+# original will be used
+new_hlq: ""
+
+# Indicates if terse and archive data sets should be deleted upon successful
+# restore?
+delete: yes
+
+# Indicates if existing data sets should be overwritten during restore
+replace: yes
+
+# The python installation home path on the z/OS managed node (target),
+# e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+PYZ: "path_to_python_installation_on_zos_target"
+
+# The ZOAU installation home on the z/OS managed node (target),
+# e.g, zoau: "/usr/lpp/IBM/zoautil"
+ZOAU: "path_to_zoau_installation_on_zos_target"
+
+# The z/OS managed node (target) Python binary installation path,
+# e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+# NOTE: This needs not configuration because it uses variable substituion to
+# correctly set the variable`ansible_python_interpreter`
+ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"

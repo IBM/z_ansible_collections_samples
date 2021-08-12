@@ -10,7 +10,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory.yml copy_edit_submit.yml
+#  ansible-playbook -i inventories copy_edit_submit.yml
 #
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
@@ -26,9 +26,6 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
-  vars:
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
 
   tasks:

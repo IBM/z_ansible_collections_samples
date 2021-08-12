@@ -29,9 +29,6 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
-  vars:
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
 
 

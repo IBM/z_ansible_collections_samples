@@ -32,49 +32,17 @@ This playbook requires:
 - [IBM® z/OS® core collection 1.2.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-Note, only the playbook requirements are listed in this document, please review
-the collections documentation for additional requirements.
+## Configuration
+- Configure the included [inventory.yml](inventories/inventory.yml) with the
+  information from the managed z/OS host.
+  - Review [inventory documentation](../../../docs/share/zos_core/configure_inventory.md)
+- Configure the included **host_vars** files [source.yml](inventories/host_vars/source.yml)
+  and [destination.yml](inventories/host_vars/destination.yml) with the
+  information from your z/OS system.
+  - Review [host_vars documentation](../../../docs/share/zos_core/configure_host_vars.md)
+    and any additional noted variables in the configuration.
 
-## Getting Started
-If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../docs/share/configuration_guide.md) or
-continue with getting started below.
-
-### Update the variables in [host_vars/source.yml](host_vars/source.yml) and
-[host_vars/destination.yml](host_vars/destination.yml) based on desired operations
-
-### Update the included [inventory.yml](inventory.yml) with the information about your system's.
-Description of the properties used in this configuration:
-* Property `ansible_host` is the z/OS managed node (target), e.g, `ansible_host: "zvm1.vmec.svl.ibm.com"`
-* Property `ansible_user` is the z/OS managed user to connect and run as over SSH,  e.g, `ansible_user: "zosadm"`
-* Property `pyz` is the python installation home path on the z/OS managed node (target), e.g, `pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"`
-* Property `ansible_python_interpreter` is the z/OS managed node (target) Python binary installation path,
-  e.g, `ansible_python_interpreter: "{{pyz}}/bin/python3.8"`
-* Property `zoau` is the ZOAU installation home on the z/OS managed node (target), e.g, `zoau: "/usr/lpp/IBM/zoautil"`
-
-```yaml
-# The system which initially holds the data sets
-source_system:
-  hosts:
-    source:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      pyz: path_to_python_installation_on_zos_target
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
-      zoau: path_to_zoau_installation_on_zos_target
-
-# The system which should receive a copy of the data sets on source_system
-destination_system:
-  hosts:
-    destination:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      pyz: path_to_python_installation_on_zos_target
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
-      zoau: path_to_zoau_installation_on_zos_target
-```
-
-### Run the playbook
+## Run the playbook
 This project has included a `site.yml` playbook that serves as the master playbook
 that provides additional prerequisite checks then it invokes the `transfer-data-sets.yml`
 playbook.
@@ -84,7 +52,7 @@ has the correct version of Ansible as well as the collection needed to execute
 correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory.yml site.yml
+ansible-playbook -i inventories site.yml
 ```
 
 You can skip the prerequisite check and run the `transfer-data-sets.yml`,
@@ -92,9 +60,9 @@ You can skip the prerequisite check and run the `transfer-data-sets.yml`,
 command:
 
 ```bash
-ansible-playbook -i inventory.yml transfer-data-sets.yml
-ansible-playbook -i inventory.yml dump-pack-ftp.yml
-ansible-playbook -i inventory.yml unpack-restore.yml
+ansible-playbook -i inventories transfer-data-sets.yml
+ansible-playbook -i inventories dump-pack-ftp.yml
+ansible-playbook -i inventories unpack-restore.yml
 ```
 
 # Changelog
