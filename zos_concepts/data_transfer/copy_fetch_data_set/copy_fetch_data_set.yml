@@ -11,7 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory.yml copy_fetch_data_set.yml
+#  ansible-playbook -i inventories copy_fetch_data_set.yml
 #
 # Notes:
 #  This sample demonstrates various ways to copy and fetch data sets using
@@ -42,8 +42,6 @@
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
 
   tasks:

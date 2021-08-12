@@ -43,6 +43,7 @@ releases:
                 - Site playbook for consistency with playbook design
                 - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
                 - Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
+                - Updated host_vars, group_vars and inventory
             fixed:
                 - Renamed `copy-sort-fetch.yaml` to `copy-sort-fetch.yml` with a `yml` extenstion to follow standardize on the extension
             removed:

@@ -8,8 +8,8 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory data_set_basics.yml
-#  ansible-playbook -i inventory.yml data_set_basics.yml -v
+#  ansible-playbook -i inventories data_set_basics.yml
+#  ansible-playbook -i inventories data_set_basics.yml -v
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
@@ -40,8 +40,6 @@
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
 
   tasks:
