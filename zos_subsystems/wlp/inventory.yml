@@ -1,0 +1,12 @@
+################################################################################
+# © Copyright IBM Corporation 2020
+################################################################################
+---
+source_system:
+  hosts:
+    zos_host:
+      ansible_host: ec33016A.vmec.svl.ibm.com
+      ansible_user: omvsadm
+      #ansible_python_interpreter: /python/3.8.3.ptf1/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+      ansible_python_interpreter: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+

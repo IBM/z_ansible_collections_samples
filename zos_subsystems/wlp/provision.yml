@@ -1,0 +1,69 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{environment_vars}}"
+  connection: ibm.ibm_zos_core.zos_ssh
+
+  tasks: 
+    - name: Provision, configure, and start Liberty server instance
+      block: 
+      #Checks to see if the server under given name exists
+      - name: Check if server instance exists
+        stat: 
+          path: "{{environment_vars.WLP_USER_DIR}}/servers/{{server_instance_name}}"
+        register: instance
+      
+      - fail: 
+          msg: Liberty server instance exists
+        when: instance.stat.exists == true
+
+      #invoke role to create zFS 
+      - include_role:
+          name: create_zFS 
+
+      #invoke role to mount a zFS 
+      - include_role:
+          name: mount_zFS
+
+      #invoke role to create a new server instance
+      - include_role: 
+          name: create_server
+      
+      #role used to transfer custom configuration files; runs based on boolean value of CUSTOMIZE variable 
+      - include_role: 
+          name: configure_server
+        when: CUSTOMIZE | bool 
+
+      #invoke role to enable starting the server as a STARTED task 
+      - include_role: 
+          name: started_server 
+
+      #role used to create started profiles for angel process and enable access to authorized z/OS services; runs based on boolean value of SECURITY variable
+      - include_role: 
+          name: security
+        when: SECURITY | bool
+        
+      #Start the angel process 
+      - name: Start angel process 
+        zos_operator:
+          cmd: "START {{ANGEL_PROC}}" 
+        tags: start_angel #if tags are used while running the playbook, it has precendence over the when conditional
+        when: SECURITY | bool #assumes if you enable authorized services, you would want to start the angel process
+
+      #Start and stop server process as STARTED tasks 
+      #If you start the server with a STARTED task, must also stop the server with a STARTED task
+      - name: Start server process 
+        zos_operator:
+          cmd: "START {{SERVER_PROC}}" 
+        tags: start
+          
+      # #Start the server -- USS shell example -- if you start the server in the shell, must also stop the server in the shell
+      # - name: Start the newly created WLP server #z/os operator task 
+      #   shell: '{{liberty_bin_path}}/server start {{server_instance_name}}'
+      #   tags: start 
+
+  
+      
+

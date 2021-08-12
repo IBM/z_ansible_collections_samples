@@ -1,0 +1,52 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{environment_vars}}"
+  connection: ibm.ibm_zos_core.zos_ssh
+
+  tasks: 
+  
+    - name: Stop the server 
+      zos_operator:
+        cmd: "STOP {{SERVER_PROC}}" 
+      tags: stop
+
+    # #Stop the server -- USS shell example -- if you start the server in the shell, must also stop the server in the shell
+    # - name: Stop the server
+    #   shell: '{{liberty_bin_path}}/server stop {{server_instance_name}}'
+    #   tags: stop 
+    
+    #Stop the angel process
+    - name: Stop angel 
+      zos_operator: 
+        cmd: "STOP {{ANGEL_PROC}}"
+      tags: stop_angel #if tags are used while running the playbook, it has precedence over the when conditional
+      when: SECURITY | bool #assumes if you enable authorized services, you would want to stop the angel process 
+
+    #Remove server instance by deleting directory 
+    - name: Delete the server directory
+      shell: 'rm -rf {{liberty_server_path}}'
+
+    - name: unmount zFS file 
+      shell: "/usr/sbin/unmount {{environment_vars.WLP_USER_DIR}}"
+
+    - name: delete zFS file
+      ibm.ibm_zos_core.zos_data_set: 
+        name: "{{data_set_name}}" 
+        state: absent
+
+    #Remove JCL Procedures
+    - name: Remove JCL server procedure from an existing procedure library
+      zos_data_set:
+        name: "{{PROC_LIB}}({{SERVER_PROC}})"
+        state: absent
+        type: MEMBER
+
+    - name: Remove JCL angel procedure from an existing procedure library
+      zos_data_set:
+        name: "{{PROC_LIB}}({{ANGEL_PROC}})"
+        state: absent
+        type: MEMBER
+
