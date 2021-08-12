@@ -17,7 +17,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory.yml copy-sort-fetch.yml
+#  ansible-playbook -i inventories copy-sort-fetch.yml
 #
 # Requirements:
 #     - IBM z/OS core collection 1.2.0 or later
@@ -58,8 +58,6 @@
     file_name: "{{ checkout_dir }}/zos_concepts/program_authorization/git_apf/roles/list-load/files/list.bom"
     persistent_ds:
       data_set_name: "APFTEST.SYS1.PARMLIB(PROG00)"
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
 
   tasks:

@@ -11,7 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory.yml copy-sort-fetch.yml
+#  ansible-playbook -i inventories copy-sort-fetch.yml
 #
 # Playbook flow:
 #   - Copy the local data file to a z/OS sequential data set
@@ -33,8 +33,6 @@
     - ibm.ibm_zos_core
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   gather_facts: no
   environment: "{{ environment_vars }}"
 

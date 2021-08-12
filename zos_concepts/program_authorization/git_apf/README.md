@@ -32,33 +32,14 @@ This playbook requires:
 - [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Git for z/OS](https://www.rocketsoftware.com/product-categories/mainframe/git-for-zos)
 
-Note, only the playbook requirements are listed in this document, please review
-the collections documentation for additional requirements.
-
-## Getting Started
-If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../docs/share/configuration_guide.md) or
-continue with getting started below.
-
-### Update the included [inventory.yml](inventory.yml) with the information about your system's.
-Description of the properties used in this configuration:
-* Property `ansible_host` is the z/OS managed node (target), e.g, `ansible_host: "zvm1.vmec.svl.ibm.com"`
-* Property `ansible_user` is the z/OS managed user to connect and run as over SSH,  e.g, `ansible_user: "zosadm"`
-* Property `pyz` is the python installation home path on the z/OS managed node (target), e.g, `pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"`
-* Property `ansible_python_interpreter` is the z/OS managed node (target) Python binary installation path,
-  e.g, `ansible_python_interpreter: "{{pyz}}/bin/python3.8"`
-* Property `zoau` is the ZOAU installation home on the z/OS managed node (target), e.g, `zoau: "/usr/lpp/IBM/zoautil"`
-
-```yaml
-source_system:
-  hosts:
-    zos_host:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      pyz: path_to_python_installation_on_zos_target
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
-      zoau: path_to_zoau_installation_on_zos_target
-```
+## Configuration
+- Configure the included [inventory.yml](inventories/inventory.yml) with the
+  information from the managed z/OS host.
+  - Review [inventory documentation](../../../docs/share/zos_core/configure_inventory.md)
+- Configure the included **host_vars** [zos_host.yml](inventories/host_vars/zos_host.yml)
+  with the information from your z/OS system.
+  - Review [host_vars documentation](../../../docs/share/zos_core/configure_host_vars.md)
+    and any additional noted variables in the configuration.
 
 ### Configuration file format
 
@@ -71,7 +52,7 @@ APFTEST.PGRM001.LIB002 T60314
 APFTEST.PGRM001.LIB003 T60315
 ```
 
-### Run the playbook
+## Run the playbook
 This project has included a `site.yml` playbook that serves as the master playbook
 that provides additional prerequisite checks then it invokes the `prog_auth.yml`
 playbook.
@@ -81,14 +62,14 @@ has the correct version of Ansible as well as the collection needed to execute
 correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory.yml site.yml
+ansible-playbook -i inventories site.yml
 ```
 
 You can skip the prerequisite check and run the `prog_auth.yml` with
 command:
 
 ```bash
-ansible-playbook -i inventory.yml prog_auth.yml
+ansible-playbook -i inventories prog_auth.yml
 ```
 
 # Changelog

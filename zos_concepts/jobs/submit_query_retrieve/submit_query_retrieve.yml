@@ -11,7 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory.yml submit_query_retrieve.yaml
+#  ansible-playbook -i inventories submit_query_retrieve.yaml
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
@@ -43,8 +43,6 @@
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
     job_name: "HELLO"
-    PYZ: "{{ hostvars.zos_host.pyz }}"
-    ZOAU: "{{ hostvars.zos_host.zoau }}"
   environment: "{{ environment_vars }}"
 
   tasks:
