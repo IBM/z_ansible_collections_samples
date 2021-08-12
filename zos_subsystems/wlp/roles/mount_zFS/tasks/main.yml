@@ -1,0 +1,13 @@
+---
+# tasks file for roles/mount_zFS
+
+  - name: Query information about the main mountpoint
+    shell: df "{{environment_vars.WLP_USER_DIR}}"
+    register: mountpoint 
+
+  - name: mount
+    command: '/usr/sbin/mount -t zfs -f "{{data_set_name}}" {{environment_vars.WLP_USER_DIR}}'
+    register: result
+    failed_when: result.rc > 0 and "A problem was found with the mount point specified" not in result.stderr
+
+  

@@ -1,0 +1,11 @@
+---
+# defaults file for security
+
+#boolean value variables to define if z/OS authorized services will be enabled
+SAFCRED: yes
+ZOSWLM: yes
+TXRSS: yes
+ZOSDUMP: yes
+LOCAL_ADAPTER: no
+PRODMGR: no 
+ZOSAIO: no

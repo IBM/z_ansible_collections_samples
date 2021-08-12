@@ -1,0 +1,7 @@
+---
+# tasks file for roles/create_server
+
+  - name: Create server with variables 
+    shell: "{{liberty_bin_path}}/server create {{server_instance_name}}" 
+    
+ 
