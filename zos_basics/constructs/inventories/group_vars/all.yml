@@ -39,20 +39,4 @@ environment_vars:
 #      _TAG_REDIR_OUT: "txt"
 # - Property LANG is the name of the default locale; value
 #   C specifies the POSIX locale; for example: ``LANG: "C"``.
-#
-# Note:
-# - The bash shell is unsupported. If that is the only shell available, you must
-#   control how new and existing files are tagged and encoded. An
-#   example of what is needed in addition to the files environment variables
-#   are "_ENCODE_FILE_NEW" and "_ENCODE_FILE_EXISTING"; e.g.,
-#      _ENCODE_FILE_NEW: "IBM-1047"
-#      _ENCODE_FILE_EXISTING: "IBM-1047"
-#   Please review the README.ZOS guide included with the ported ``bash`` shell
-#   for further configurations.
-# - In ZOAU 1.0.2 and later, the property ZOAU_ROOT is no longer supported
-#   and must be replaced with the property ZOAU_HOME. If you are using ZOAU
-#   version 1.0.1 or lower, you must continue to use the property
-#   ZOAU_ROOT which is the ZOA Utilities install root path required for
-#   ZOAU; e.g., ``/usr/lpp/IBM/zoautil``.
-#
 ################################################################################
