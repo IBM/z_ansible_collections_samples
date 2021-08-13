@@ -14,8 +14,8 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory site.yml
-#  ansible-playbook -i inventory site.yml -v
+#  ansible-playbook -i inventories site.yml
+#  ansible-playbook -i inventories site.yml -v
 ###############################################################################
 
 
@@ -24,7 +24,7 @@
 
   tasks:
   - name: Parse the registry for collection entries
-    include_vars: runtime-requirements.txt
+    include_vars: runtime-requirements.yml
 
   - name: Display the registered collections and properites in `registry.yml`.
     include_role:
