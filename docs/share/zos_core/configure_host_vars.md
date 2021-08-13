@@ -27,4 +27,4 @@ ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
 configured to use variable expansion based on the `PYZ` environment variable.
 
 If you are unfamiliar with playbook configuration practices and would like to
-learn more, you can review our[detailed configuration guide](../../../docs/share/configuration_guide.md).
+learn more, you can review our[detailed configuration guide](configuration_guide.md).
