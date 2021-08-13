@@ -1,5 +1,4 @@
 # Ansible Z Playbook Repository
-
 This repository provides playbooks that can be tailored to automate often
 repeated IBM Z tasks, links to blogs, and other related media.
 
@@ -22,7 +21,6 @@ the repository and configure your GitHub
 to receive ongoing updates about specific activity on GitHub.
 
 ## Contribute Ansible Playbooks
-
 We are accepting Ansible playbooks from the community. These playbooks
 should relate to **IBM Z**, and should either leverage the
 **Red Hat Ansible Certified Content for IBM Z** collections, or highlight
@@ -31,7 +29,6 @@ additional capabilities and use-cases for **Z automation**. Check out the
 information.
 
 ## Playbooks
-
 Playbooks are organized by topics that align to tasks and use cases that are
 often repeated and in need of automation.
 
@@ -45,7 +42,6 @@ often repeated and in need of automation.
     - [zHMC Concepts](z_systems_administration/zhmc/docs/module_playbooks.md)
 
 ### z/OS® Topics
-
 - Administration
   - [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
   - [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user) - \[[Playback](https://mediacenter.ibm.com/media/Managing+z+OS+Users+with+Ansible+/1_bnud4enw)]
@@ -91,7 +87,6 @@ often repeated and in need of automation.
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 
 ## Blogs
-
 Don't have time to explore a collection, particular module or a playbook?  
 Learn all about the offerings from our [blogs](https://community.ibm.com/community/user/ibmz-and-linuxone/groups/topic-home/blog-entries?communitykey=ce54fe94-0145-4832-a0ef-4ea81d6062cc&tab=blog-entries).  
 Don't know which one to read first? Well, here is a list of some of our recent blogs:   
@@ -102,7 +97,6 @@ Don't know which one to read first? Well, here is a list of some of our recent b
 - [z/OS User Management With Ansible](https://community.ibm.com/community/user/ibmz-and-linuxone/blogs/blake-becker1/2020/09/03/zos-user-management-with-ansible) - \[[Playbook](zos_concepts/user_management/add_remove_user)\]
 
 ## Playbacks
-
 Want to experience Z automation with Ansible without rolling up your sleeves?
 Take a look at some of our playbacks using our own playbooks available
 in this repository.
@@ -112,37 +106,22 @@ in this repository.
 - [Synchronize APF authorized libraries from a configuration cloned from GitHub](https://mediacenter.ibm.com/media/Using+Ansible+to+synchronize+z+OS+APF+libraries+from+a+GitHub+configuration+file/1_e6qsiwmg)
 
 ## How playbooks are organized in this repository
-
 All playbooks in this repository can run independently from any other playbook.
 Each playbook in this repository includes a README with a brief description,
 licensing and instructions on how to configure the playbook. If configuration is
 required, a default configuration will be included with the playbook.
 
-The playbooks in the repository is organized as follows:
-
-    ├── topic/
-    │  └── use_case/
-    │      └── playbook_name/
-    │          ├── host_vars/
-    │              └── zos_host.yml
-    │          ├── ansible.cfg
-    │          ├── inventory
-    │          ├── playbook_name.yml
-    │          └── README
-    ├── LICENSE
-    └── README
+For further reading on how playbook projects are organized in this repository,
+review the following [documentation](docs/share/contribution-guidelines#playbook-structure).
 
 ## Copyright
-
 © Copyright IBM Corporation 2020, 2021
 
 ## License
-
 Licensed under
 [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
-
 This project is supported by the community though
 [Git issues](https://github.com/IBM/z_ansible_collections_samples/issues).
 
