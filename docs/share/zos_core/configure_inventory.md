@@ -20,4 +20,4 @@ source_system:
 ```
 
 If you are unfamiliar with playbook configuration practices and would like to
-learn more, you can review our[detailed configuration guide](../../../docs/share/configuration_guide.md).
+learn more, you can review our[detailed configuration guide](configuration_guide.md).
