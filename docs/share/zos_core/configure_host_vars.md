@@ -6,12 +6,12 @@ established.
 
 ## Description of the environment variables used in this configuration
 * Environment variable `PYZ` is the Python home installation path on the
-  z/OS managed node (target), e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+  z/OS managed node (target), e.g, `pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"`
 * Environment variable `ZOAU` is the ZOAU installation home on the z/OS managed
-  node (target), e.g, zoau: "/usr/lpp/IBM/zoautil"
+  node (target), e.g, `zoau: "/usr/lpp/IBM/zoautil"`
 * Environment variable `ansible_python_interpreter` is the Python binary
   installation path on the z/OS managed node (target),
-  e.g, ansible_python_interpreter: "{{pyz}}/bin/python3.8"
+  e.g, `ansible_python_interpreter: "{{pyz}}/bin/python3.8"`
 
 Configure `PYZ` and `ZOAU` in the included **group_vars** configuration.
 
