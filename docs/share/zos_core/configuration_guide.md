@@ -71,7 +71,7 @@ The value for the property **ansible_host** is the z/OS managed user to
 connect and run as over SSH; for example, `ansible_user: zosadm`.
 
 Behavioral inventory parameters such as `ansible_port` allow you
-to set the port for a host can be viewed in the behavioral inventory parameters
+to set the port for a host and can be viewed in the behavioral inventory parameters
 [documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#connecting-to-hosts-behavioral-inventory-parameters).
 
 
