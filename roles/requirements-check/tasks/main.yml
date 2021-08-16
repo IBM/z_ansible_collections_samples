@@ -4,7 +4,7 @@
 
 ################################################################################
 # requirement-check role that reads the local file runtime-requirements.txt to
-# determine the if the controllers installed Ansbiel version on the controller
+# determine the if the controllers installed Ansible version on the controller
 # is a match to the version identified in runtime-requirements.txt
 #
 # Note: The perferred way to have implemented this role would have been done
