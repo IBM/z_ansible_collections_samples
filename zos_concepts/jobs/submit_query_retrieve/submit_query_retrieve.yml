@@ -1,12 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
-#
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
+# © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
 ###############################################################################
@@ -18,20 +11,7 @@
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory submit_query_retrieve.yaml
-#
-# Notes:
-#  This sample demonstrates ways to submit, query and retrieve job output using
-#  Ansible z/OS core modules. Each module has options available on how
-#  automation can be controlled. This sample does not demonstrate all options,
-#  refer to documentation or ansible-doc for those options.
-#
-#  When running this playbook, review the comments on how ths sample will
-#  interact with your target, ensure you have the required authority and
-#  permissions such as writing the the target directories or creating data sets.
-#
-#  Data sets created for this sample will have a randomly generated name created
-#  by the ZOAU API.
+#  ansible-playbook -i inventories submit_query_retrieve.yaml
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
@@ -64,7 +44,6 @@
     ctl_tmp_dir: "/tmp"
     job_name: "HELLO"
   environment: "{{ environment_vars }}"
-  connection: ibm.ibm_zos_core.zos_ssh
 
   tasks:
     # ##########################################################################

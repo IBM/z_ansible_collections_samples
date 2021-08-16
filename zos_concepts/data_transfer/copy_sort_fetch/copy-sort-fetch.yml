@@ -1,12 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
-#
-# Changelog
-#  All notable changes to this sample will be documented in this playbook
-#
-# 2020-09-01
-#  - Released initial version
+# © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
 ###############################################################################
@@ -16,14 +9,9 @@
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
-#   or
-#  ansible-playbook -i "hostaddress," <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory copy-sort-fetch.yaml
-#   or
-#  ansible-playbook -i "mysystem.to.connect.com," copy-sort-fetch.yaml
-#
+#  ansible-playbook -i inventories copy-sort-fetch.yml
 #
 # Playbook flow:
 #   - Copy the local data file to a z/OS sequential data set
@@ -43,7 +31,6 @@
 - hosts: source_system
   collections:
     - ibm.ibm_zos_core
-  connection: ibm.ibm_zos_core.zos_ssh
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
   gather_facts: no
