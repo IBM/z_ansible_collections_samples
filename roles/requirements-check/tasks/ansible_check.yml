@@ -25,7 +25,7 @@
     register: result
     ignore_errors: true
 
-  - name: DEBUG(-v) Display Ansbile version check
+  - name: DEBUG(-v) Display Ansible version check
     ansible.builtin.debug:
       var: result
       verbosity: 1
