@@ -7,7 +7,7 @@ consists of organized instructions that define work for a managed node to be
 automated with Ansible. The playbooks in this
 repository are written using the collections from
 **Red Hat® Ansible® Certified Content for IBM Z®** offering. For a detailed
-overview of the playbooks, refer to the
+overview of the collections, refer to the
 [documentation](https://ibm.github.io/z_ansible_collections_doc/index.html).
 
 The collections can be found on
