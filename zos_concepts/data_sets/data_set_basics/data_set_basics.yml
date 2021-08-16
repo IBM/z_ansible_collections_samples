@@ -118,7 +118,7 @@
         msg: "{{ result }}"
 
     - zos_copy:
-        src: /Users/ddimatos/git/github/z_ansible_collections_samples/zos_concepts/data_sets/data_set_basics/files/HELLO.jcl
+        src: files/HELLO.jcl
         dest: "/tmp/HELLO"
        #remote_src: yes
       register: result
