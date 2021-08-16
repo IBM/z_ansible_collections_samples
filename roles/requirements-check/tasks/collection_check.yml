@@ -15,7 +15,7 @@
     cmd: ansible-config dump|grep -i COLLECTIONS_PATHS|awk -F" = " '{print $2}'
   register: ansible_collections_paths
 
-- name: DEBUG(-v) Display Ansbile COLLECTIONS_PATHS environment variable
+- name: DEBUG(-v) Display Ansible COLLECTIONS_PATHS environment variable
   ansible.builtin.debug:
     var: ansible_collections_paths
     verbosity: 1
