@@ -294,7 +294,7 @@ finally, append the contents from `cat ~/.ssh/id_rsa.pub` to `~/.ssh/authorized_
 ### Password prompt
 Alternatively, you can use the `--ask-pass` option to be prompted for
 the user\'s password each time a playbook is run; for example,
-`ansible-playbook -i inventory zos-collection-sample.yaml --ask-pass`.
+`ansible-playbook -i <inventory> <playbook>.yml --ask-pass`.
 
 Using `--ask-pass` is not recommended because it will hinder
 performance. Using `--ask-pass` requires `sshpass` be installed on
