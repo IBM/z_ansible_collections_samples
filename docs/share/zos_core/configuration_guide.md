@@ -168,7 +168,7 @@ will only look for `group_vars/` and `host_vars/` in the inventory directory.
 
 `host_vars/` provides organization such that they are unique to a the z/OS
 managed node. The playbook projects include a `*.yml` usually named
-`zos_host.yaml` that is located in the `host_vars/` directory. These variables
+`zos_host.yml` that is located in the `host_vars/` directory. These variables
 are used in combination with the variables defined in `group_vars/all.yml` such
 complete the configuration.
 
