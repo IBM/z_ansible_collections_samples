@@ -1,0 +1,35 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-06-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    # owner_id: 'OMVSKERN'
+    # ring_name: 'SharedRing1'
+
+    owner_id: 'OMVSADM'
+    ring_name: 'WEBSSL'
+
+  tasks:
+  - include_role:
+      name: issue_racf_cmd
+    vars:
+      task_description: 'Deleting keyring {{ring_name}}'
+      command:
+          - RACDCERT ID({{ owner_id}}) DELRING({{ring_name}})
