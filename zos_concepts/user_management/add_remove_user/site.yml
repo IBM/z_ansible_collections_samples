@@ -8,7 +8,7 @@
 # and report when the minimum requirements are not configured and fail playbook
 # execution.
 #
-# Upon successful dependency analyais, the z/OS playbook will be executed.
+# Upon successful dependency analysis, the z/OS playbook will be executed.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
