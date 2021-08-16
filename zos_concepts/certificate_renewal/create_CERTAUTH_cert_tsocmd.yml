@@ -1,0 +1,68 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2021-06-30
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# Requirements:
+#     - IBM z/OS core collection 1.3.0 or later
+###############################################################################
+
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: 'OMVSKERN'
+    cert_label: 'ANDY CA'
+    cn: '{{cert_label}}'
+    ou: 'ANSIBLE CORE'
+    country: 'US'
+    keyring: 'SharedRing1'
+    expiry_date: ''
+    # expiry_date: '2022-12-31'
+    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+  tasks:
+  - block:
+    - include_role:
+        name: issue_tso_cmd
+      vars:
+        task_description: 'Create a new keyring'
+            # - RACDCERT CERTAUTH DELETE(LABEL('{{cert_label}}'))
+        command:
+            - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
+            - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
+    ignore_errors: True
+
+  - include_role:
+      name: issue_tso_cmd
+    vars:
+      task_description: 'Create new CA cert and connect to keyring'
+      command:
+        - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}') NOTAFTER(DATE({{expiry_date}}))
+        - RACDCERT ID({{owner_id}}) CONNECT(CERTAUTH LABEL('{{cert_label}}') RING({{keyring}}))
+    when: not expiry_date == ''
+
+  - include_role:
+      name: issue_tso_cmd
+    vars:
+      task_description: 'Create new CA cert and connect to keyring'
+      command:
+        - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}')
+        - RACDCERT ID({{owner_id}}) CONNECT(CERTAUTH LABEL('{{cert_label}}') RING({{keyring}}))
+    when: expiry_date == ''
+
+  - include_role:
+      name: issue_operator_cmd
+    vars:
+      task_description: 'Run Health Checker'
+      command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+

@@ -7,8 +7,11 @@
 # the path to the root of IBM python installation
 ################################################################################
 PYZ: "/usr/lpp/cyp/v3r8/pyz"
+# PYZ: "/python3/usr/lpp/IBM/cyp/v3r8/pyz"
 ################################################################################
 # the path to root of ZOAU installation
 ################################################################################
 ZOAU: "/var/zoau110"
+# ZOAU: "/zoau/v1.1.0-ga"
+# ZOAU: "/zoau/v1.1.1"
 
