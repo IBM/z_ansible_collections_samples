@@ -32,7 +32,7 @@
   with_items: "{{ collection_paths }}"
   # ignore_errors: True (Should we?)
 
-- name: DEBUG(-v) Display Ansbile COLLECTIONS_PATHS existance and status
+- name: DEBUG(-v) Display Ansible COLLECTIONS_PATHS existance and status
   ansible.builtin.debug:
     var: collection_paths_status
     verbosity: 1
