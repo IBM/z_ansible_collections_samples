@@ -251,7 +251,7 @@ permissions such as writing the the target directories or creating data sets.
 ### Ansible command
 Use the Ansible command `ansible-playbook` to run the sample playbook.
 The command syntax is `ansible-playbook -i <inventory> <playbook>`; for
-example, `ansible-playbook -i inventories sample.yaml`.
+example, `ansible-playbook -i inventories sample.yml`.
 
 This command assumes that the controller's public SSH key has been
 shared with the managed node. If you want to avoid entering a username
