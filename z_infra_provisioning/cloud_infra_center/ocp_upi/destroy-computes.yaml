@@ -1,0 +1,74 @@
+# =================================================================
+# Copyright 2021 https://github.com/openshift/installer
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =================================================================
+
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+#
+# Change Summary: 
+# - Delete unnecessary Ansible tasks
+# - Read compute nodes names from json
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- hosts: localhost
+  gather_facts: no
+
+  tasks:
+  - name: 'Import common yaml'
+    import_tasks: common.yaml
+
+  - name: 'Export Infra ID'
+    shell:
+      cmd: "jq -r .infraID metadata.json"
+    register: infra_id
+  
+  - name: 'Find compute nodes names'
+    find:
+      paths: .
+      patterns: ".compute-nodes.*"
+    register: find_compute
+
+  - name: 'Read compute nodes names'
+    set_fact:
+      compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
+    when: "{{ find_compute['files'] }}"
+
+  - name: 'Remove the Compute servers'
+    os_server:
+      name: "{{ os_compute_server_name }}-{{ item.1 }}"
+      state: absent
+    with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+    when: "{{ find_compute['files'] }}"
+
+  - name: 'Remove the Compute servers from CIC'
+    shell: |
+       openstack server list -c Name -f value | grep worker
+    register: computes
+
+  - name: 'Remove the computes node'
+    shell:
+      cmd: "openstack server delete {{ item.1 }}"
+    with_indexed_items: "{{ computes.stdout_lines }}"

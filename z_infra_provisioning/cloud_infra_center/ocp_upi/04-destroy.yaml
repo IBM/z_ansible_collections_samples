@@ -14,15 +14,9 @@
 # limitations under the License.
 # =================================================================
 
-- hosts: localhost
-  gather_facts: no
-
-  tasks:
-  - name: 'Import common yaml'
-    import_tasks: common.yaml
-
-  - name: 'Remove the bootstrap server'
-    os_server:
-      name: "{{ os_bootstrap_server_name }}"
-      state: absent
-      delete_fip: yes
+---
+- import_playbook: destroy-controls.yaml
+- import_playbook: destroy-computes.yaml 
+- import_playbook: destroy-network.yaml
+- import_playbook: destroy-security-groups.yaml
+- import_playbook: destroy-images-files.yaml
