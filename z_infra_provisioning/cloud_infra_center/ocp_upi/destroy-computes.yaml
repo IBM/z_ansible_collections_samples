@@ -63,10 +63,11 @@
     with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
     when: "{{ find_compute['files'] }}"
 
-  - name: 'Remove the Compute servers from CIC'
+  - name: 'Get Compute servers from ICIC command line'
     shell: |
        openstack server list -c Name -f value | grep worker
     register: computes
+    ignore_errors: true
 
   - name: 'Remove the computes node'
     shell:
