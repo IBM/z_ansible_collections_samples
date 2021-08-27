@@ -251,9 +251,9 @@ Update your settings based on the samples. The following propeties are **require
 | `os_dns_domain` | \<external DNS ip addr\> or \<bastion ip addr\>|If you want to use your external or existing DNS server set `os_dns_domain` to use it, others set bastion machine ip address|
 | `cluster_domain_name` |openshift.example.com|The cluster name and base domain that used in DNS forwarding| 
 
-Others are **optional**, you don't have to update value or enable them if you don't need it.
+Others are **optional**, you can enable them and update value if you need more specified settings.
 
-> **Please note**: If you want to use a bastion server, you have to set correct value for bastion proprties.
+> **Please note**: If you want to use a bastion server, you need to set correct value for bastion proprties.
 
 | Property| <div style="width:220px">Default</div> | Description                           |
 | --------------------------------------- | ------------------------------------- |:-----|

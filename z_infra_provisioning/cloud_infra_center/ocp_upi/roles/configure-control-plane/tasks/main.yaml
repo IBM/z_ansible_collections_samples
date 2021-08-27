@@ -84,7 +84,7 @@
     scheduler_hints:
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }}"
-  with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
@@ -110,7 +110,7 @@
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
     terminate_volume: True
-  with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
