@@ -118,7 +118,7 @@
         msg: "{{ result }}"
 
     - zos_copy:
-        src: files/HELLO.jcl
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "/tmp/HELLO"
        #remote_src: yes
       register: result
