@@ -1,6 +1,33 @@
-## Configure another cluster's DNS and HAProxy on the same bastion node
+## Configure another cluster's DNS and HAProxy
 
-After the bastion was configured by our Ansible scripts, named and HAProxy were installed. If you want to use the same node as another cluster's bation node, you need to add the second configuration manually.
+If you want to use your external DNS and Load Balancer or existing DNS and HAProxy to access OpenShift Platform Cluster, you need to add the below configuration manually. 
+
+You can refer to the generated configuration about IPs and hostnames under your Ansible directory named `cluster-template.yaml`.
+
+```sh
+[root@xxx ocp_upi]# cat cluster-template.yaml
+cluster_nodes:
+  bootstrap:
+    bootstrap:
+      ip: 172.26.105.210
+  infra:
+    worker-2e582:
+      ip: 172.26.105.208
+    worker-5e74f:
+      ip: 172.26.105.209
+    worker-dd190:
+      ip: 172.26.105.211
+  masters:
+    master-0:
+      etcd: etcd-0
+      ip: 172.26.105.200
+    master-1:
+      etcd: etcd-1
+      ip: 172.26.105.207
+    master-2:
+      etcd: etcd-2
+      ip: 172.26.105.202
+```
 
 ### named
 
@@ -30,6 +57,7 @@ master-2              IN A 172.26.105.202
 
 worker-2e582              IN A 172.26.105.208
 worker-5e74f              IN A 172.26.105.209
+worker-dd190              IN A 172.26.105.211
 
 etcd-0              IN A 172.26.105.200
 etcd-1              IN A 172.26.105.207
@@ -207,11 +235,14 @@ backend ocp4-router-http-second
    mode tcp
          server worker-2e582 worker-2e582.openshift.second.com:80 check
          server worker-5e74f worker-5e74f.openshift.second.com:80 check
+         server worker-dd190 worker-dd190.openshift.second.com:80 check
+         
 
 backend ocp4-router-https-seconds
    mode tcp
          server worker-2e582 worker-2e582.openshift.second.com:443 check
          server worker-5e74f worker-5e74f.openshift.second.com:443 check
+         server worker-dd190 worker-dd190.openshift.second.com:443 check
 ```
 
 **Note**: The second cluster's frontend and backend names can not be the same as first cluster ones.
