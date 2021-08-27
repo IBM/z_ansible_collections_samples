@@ -50,7 +50,7 @@ Please be aware of the [Known Issues](https://github.com/openshift/installer/blo
 of this method of installation.
 
 # Workflow
-![ocp_upi_ansible](https://media.github.ibm.com/user/95263/files/44cafe00-0743-11ec-98da-799a14c8ce9e)
+![ocp_upi_ansible](https://media.github.ibm.com/user/95263/files/d9902480-0760-11ec-942a-b544da47ad24)
 
 This is the overall workflow running Ansible playbook, mainly has the following steps:
 - [Prepare](#prepare)
