@@ -51,9 +51,9 @@ zone "{{ cluster_domain_name }}" {
 };
 
 
-zone "{{ bastion_subnet_prefix_reverse }}.in-addr.arpa" {
+zone "bastion_subnet_prefix_reverse.in-addr.arpa" {
         type master;
-        file "{{ bastion_subnet_prefix_reverse }}.in-addr.arpa.zone";
+        file "bastion_subnet_prefix_reverse.in-addr.arpa.zone";
         allow-query { any; };
         allow-transfer { none; };
         allow-update { none; };
