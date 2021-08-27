@@ -58,11 +58,6 @@
   shell: openstack catalog show -f json cinder | jq -r '.endpoints[] | "\(.url)"' | head -n 1
   register: storage_provider_url
 
-- name: Check icic resource requirements
-  script: tools/check-icic-resources.py {{ nova_url.stdout_lines[0] }} {{ storage_provider_url.stdout_lines[0] }} {{ icic_token.stdout_lines[0] }} {{ os_compute_nodes_number }}
-  args:
-    executable: python3
-
 - name: Get security group
   shell: openstack quota show -f json | grep "secgroups" | awk -F ':' '{print$2}' | tr -d ','
   register:
