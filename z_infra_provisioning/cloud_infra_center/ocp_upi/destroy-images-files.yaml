@@ -63,12 +63,6 @@
     file:
       path: auth/
       state: absent
-
-  - name: Remove the cluster-template.yaml file
-    file:
-      path: "{{ item }}"
-      state: absent
-    with_items:  cluster-template.yaml
   
   - name: 'Remove the file of Compute server names'
     file:
