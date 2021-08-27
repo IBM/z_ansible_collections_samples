@@ -12,11 +12,7 @@
 
 - name: Check DNS server connection
   shell: ping -c 1 -w 2 {{ os_dns_domain }}
-
-- name: Check if the install-config.yaml file exists
-  stat:
-    path: install-config.yaml
-
+  
 - name: Gather the package facts
   package_facts:
     manager: auto
