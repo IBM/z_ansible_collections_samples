@@ -10,6 +10,28 @@
 ---
 # tasks file for configure-install-config
 
+- name: Create install-config.yaml
+  template:
+    src:  templates/install-config-yaml.j2
+    dest: "install-config.yaml"
+
+- name: Split the cluster domain name
+  set_fact: 
+    clustername: "{{ cluster_domain_name.split('.')[0] }}"
+    basedomain_one: "{{ cluster_domain_name.split('.')[1] }}"
+    basedomain_two: "{{ cluster_domain_name.split('.')[2] }}"
+
+- name: Append basedomain to one string
+  set_fact:
+    basedomain: "{{ basedomain_one }}.{{ basedomain_two }}"
+
+- name: Update cluster domain name in install-config.yaml
+  shell: 
+    cmd: |
+      sed -i "s/cluster_basedomain/{{ basedomain }}/g" install-config.yaml
+      sed -i "s/cluster_name/{{ clustername }}/g" install-config.yaml
+      cp -r install-config.yaml .install-config.yaml
+
 - name: Configure Machine Network in Install Configuration
   script: tools/config-machine-network.py {{ os_subnet_range }}
   args:
