@@ -22,7 +22,7 @@ def get_worker_status():
     else:
         return status.split('\n')[0:-1]
 
-for i in range(0, 60):
+for i in range(0, 30):
     # wait up to 10 minutes to approve csrs util worker nodes' status get ready
     worker_status = get_worker_status()
     if (not worker_status) or worker_status[0] != "Ready":

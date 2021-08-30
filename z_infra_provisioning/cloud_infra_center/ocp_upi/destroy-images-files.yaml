@@ -14,19 +14,6 @@
 # limitations under the License.
 # =================================================================
 
-# =================================================================
-# Licensed Materials - Property of IBM
-#
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
-#
-# US Government Users Restricted Rights - Use, duplication or
-# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
-# =================================================================
-#
-# Change Summary: 
-# - Delete unnecessary Ansible tasks
-# - Read compute nodes names from json
-
 # Required Python packages:
 #
 # ansible
@@ -40,22 +27,49 @@
   - name: 'Import common yaml'
     import_tasks: common.yaml
 
-  - name: 'Export Infra ID'
+  - name: 'List rhcos and bootstrap ignition image'
+    command:
+      cmd: "openstack image list --tag {{ cluster_id_tag }} -f value -c ID"
+    register: images
+
+  - name: 'Remove the rhcos image'
     shell:
-      cmd: "jq -r .infraID metadata.json"
-    register: infra_id
+      cmd: "openstack image delete {{ item.1 }}"
+    with_indexed_items: "{{ images.stdout_lines }}"
 
-  - name: 'Read compute nodes names'
-    set_fact:
-      compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
+  - find:
+      paths: .
+      patterns: "*.json"
+      excludes: 
+      - "metadata.json"
+    register: find_results
 
-  - name: 'Remove the Compute servers'
-    os_server:
-      name: "{{ os_compute_server_name }}-{{ item.1 }}"
+  - file:
+      path: "{{ item['path'] }}"
       state: absent
-    with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+    with_items: "{{ find_results['files'] }}"
+
+  - find:
+      paths: .
+      patterns: "*.ign"
+    register: find_results_ign
+
+  - file:
+      path: "{{ item['path'] }}"
+      state: absent
+    with_items: "{{ find_results_ign['files'] }}"
+    
+  - name: Remove the auth directory
+    file:
+      path: auth/
+      state: absent
   
   - name: 'Remove the file of Compute server names'
     file:
       state: absent
       path: .compute-nodes-{{ infra_id.stdout_lines[0] }}.json
+    
+  - name: 'Remove the downloaded RHCOS image file'
+    file:
+      state: absent
+      path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz

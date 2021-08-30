@@ -3,26 +3,26 @@
 {% set infra = cluster_nodes['infra'] %}
 $TTL 900
 
-@ IN SOA bastion.{{ cluster_domain_name }} hostmaster.{{ cluster_domain_name }}. (
+@ IN SOA bastion.{{ cluster_name }}.{{ base_domain }} hostmaster.{{ cluster_name }}.{{ base_domain }}. (
     2019062001 1D 1H 1W 3H
   )      
-  IN NS bastion.{{ cluster_domain_name }}.
+  IN NS bastion.{{ cluster_name }}.{{ base_domain }}.
 
 
-{{ bastion_private_ip_address.split('.')[3] }} IN PTR bastion.{{ cluster_domain_name }}.
+{{ bastion_private_ip_address.split('.')[3] }} IN PTR bastion.{{ cluster_name }}.{{ base_domain }}.
 
 {% for item in masters.keys() %}
-{{ masters[item].ip.split('.')[3] }} IN PTR {{ cluster_domain_name }}-{{ item }}.
+{{ masters[item].ip.split('.')[3] }} IN PTR {{ cluster_name }}.{{ base_domain }}-{{ item }}.
 {% endfor %}
 
 {% if infra is defined %}
 {% for item in infra.keys() %}
-{{ infra[item].ip.split('.')[3] }} IN PTR {{ cluster_domain_name }}-{{ item }}.
+{{ infra[item].ip.split('.')[3] }} IN PTR {{ cluster_name }}.{{ base_domain }}-{{ item }}.
 {% endfor %}
 {% endif %}
 
 {% for item in bootstrap.keys() %}
-{{ bootstrap[item].ip.split('.')[3] }} IN PTR {{ cluster_domain_name }}-{{ item }}.
+{{ bootstrap[item].ip.split('.')[3] }} IN PTR {{ cluster_name }}.{{ base_domain }}-{{ item }}.
 {% endfor %}
 
 

@@ -12,12 +12,12 @@ import yaml
 import os
 
 """
-This script will get current cluster nodes IP addresses from Ports, and then rewrite them into bastion-template.yaml. 
-So that you can use bastion-template.yaml to configure DNS and HAProxy on bastion node.
+This script will get current cluster nodes IP addresses from Ports, and then rewrite them into cluster-template.yaml. 
+So that you can use cluster-template.yaml to configure DNS and HAProxy on bastion node.
 """
 
 def get_bastion_template():
-    with open("bastion-template.yaml", "r") as f:
+    with open("cluster-template.yaml", "r") as f:
         cont = yaml.load(f)
     return cont
 
@@ -80,6 +80,6 @@ bastion_dict["cluster_nodes"]["masters"] = master
 worker = get_nodes_ips(infra_id, "worker")
 bastion_dict["cluster_nodes"]["infra"] = worker
 
-with open("bastion-template.yaml", "w") as b:
+with open("cluster-template.yaml", "w") as b:
     result = yaml.dump(bastion_dict)
     b.write(result)
