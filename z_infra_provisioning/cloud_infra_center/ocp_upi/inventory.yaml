@@ -33,72 +33,41 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
+      
+      use_network_name: '<network-name-from-icic>'
+      use_network_subnet: '<subnet-id-from-network-name-in-icic>'
 
-      # To succeed deploy OCP, it will overwrite DNS nameserver of this network.
-      use_existing_network_name: 'flat01'
-      use_existing_network_subnet: 'a2134ea5-7c7c-4515-8cbe-71fd41686935' 
-
-      # User-provided values
-      vm_type: 'zvm'
-      disk_type: 'dasd'
+      vm_type: 'kvm' # kvm or zvm
+      disk_type: 'dasd' # dasd or scsi
       openshift_version: '4.7'
-      openshift_minor_version: '0'
-
-      # The auto_allocated_ip default value is true, then IPs will be allocated from subnet range. 
-      # If you need specify IP addresses, set auto_allocated_ip to false.
+      openshift_minor_version: '7'
+      
       auto_allocated_ip: true 
-      os_subnet_range: '172.26.0.0/16'
-      # By default, if the os_subnet_range is '172.26.0.0/16', the allocation pools will be 172.26.0.10-172.26.255.254
-      # The allocation pool can be configured by allocation_pool_start and allocation_pool_end
-      # allocation_pool_start: '172.26.0.2'
-      # allocation_pool_end: '172.26.0.10'
+      os_subnet_range: "<subnet-range>"
+      #allocation_pool_start: '<ip range start>'
+      #allocation_pool_end: '<ip range end>'
       os_flavor_master: 'medium'
-      os_flavor_worker: 'large'
+      os_flavor_worker: 'medium' 
 
-      # Name of the SDN.
-      os_networking_type: 'OpenshiftSDN'
-
-      # The availability zone in which to create the server. 
-      # The default value is '', which means to use the default availability zone.
       availability_zone: ''
 
-      # Number of provisioned Control Plane nodes
-      # 3 is the minimum number for a fully-functional cluster.
-      os_cp_nodes_number: 3
+      os_control_nodes_number: 3
 
-      # Number of provisioned Compute nodes.
-      # 3 is the minimum number for a fully-functional cluster.
       os_compute_nodes_number: 3
+      #os_bootstrap_ip: '<bootstrap ip addr>'
+      #os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
+      #os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
 
-    # Bastion DNS and HAProxy settings
     bastion:
-      ansible_ssh_host: 172.26.103.100
+      ansible_ssh_host: "<linux-server-ip-addr>"
       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
-
-      # Configure the IP address of your private subnet
-      # These default values will work by default
-      # with the default configuration defined in
-      # tony-hypervisor-setup
-      bastion_private_ip_address: 172.26.103.100
-      gateway_ip: 172.26.0.1
-      bastion_subnet_prefix_reverse: 103.26.172
-      # The queries from IPs in `cluster_subnet_range` will be allowed, 
-      # we suggest setting `cluster_subnet_range` the same as localhost's `os_subnet_range`
-      cluster_subnet_range: 172.26.0.0/16
+      bastion_private_ip_address: "<bastion-ip-addr>"
+      cluster_subnet_range: "<cluster-subnet-range>"
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
-     
-      # Specify a valid IP address for nameserver where requests should be forwarded for resolution.
-      # It can be specified as your upstream nameserver. 
-      # If you don't need it, set its value the same as bastion's IP.
-      dns_forwarder: 172.26.103.100 
-  
+      dns_forwarder: '<upstream-dns-ip-addr>'
+
   vars:
-    # If you want to use your external DNS server, set os_dns_domain to use it.
-    os_dns_domain: "172.26.103.100"
+    os_dns_domain: "<external-dns-ip-addr>"
     cluster_domain_name: "openshift.example.com"
-   
-    # If you need specify IP addresses (the auto_allocated_ip value is false), fill below lists.
-    # os_bootstrap_ip: '172.26.103.230'
-    # os_master_ip: ['172.26.103.231', '172.26.103.232', '172.26.103.233']
-    # os_infra_ip: ['172.26.103.234', '172.26.103.235', '172.26.103.236']
-    
+    pullsecret: '<pull-secret>'
+    sshkey: '<ssh-key>'

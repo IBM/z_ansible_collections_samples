@@ -80,9 +80,3 @@
   with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
   when:
   - disk_type == "scsi"
-
-- name: 'Approve worker nodes csr'
-  script: tools/wait-nodes-csrs.py {{ os_compute_server_name }}-{{ item.1 }}
-  args:
-    executable: python3
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"

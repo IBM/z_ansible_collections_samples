@@ -14,15 +14,35 @@
 # limitations under the License.
 # =================================================================
 
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
 - hosts: localhost
   gather_facts: no
 
   tasks:
-  - name: 'Import common yaml'
-    import_tasks: common.yaml
+  - name: Wait-for bootstrap-complete
+    command: "./openshift-install wait-for bootstrap-complete"
+    async: 3600
+    poll: 0
+    register: bootstrap_complete_sleeper
 
-  - name: 'Remove the bootstrap server'
-    os_server:
-      name: "{{ os_bootstrap_server_name }}"
-      state: absent
-      delete_fip: yes
+  - name: 'Waiting for bootstrap-complete'
+    async_status:
+      jid: "{{ bootstrap_complete_sleeper.ansible_job_id }}"
+    register: job_result
+    until: job_result.finished
+    retries: 1200
+    delay: 30
+
+  - name: oc get nodes
+    command: ./oc get nodes
+    environment:
+      KUBECONFIG: "./auth/kubeconfig"
+    retries: 30
+    delay: 10
+    register: result
+    until: result is not failed

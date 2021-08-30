@@ -1,0 +1,31 @@
+apiVersion: v1
+baseDomain: cluster_basedomain
+compute:
+- architecture: s390x
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: {{ os_compute_nodes_number }}
+controlPlane:
+  architecture: s390x
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: {{ os_control_nodes_number }}
+metadata:
+  creationTimestamp: null
+  name: cluster_name
+networking:
+  clusterNetworks:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  none: {}
+publish: External
+pullSecret: '{{ pullsecret }}'
+sshKey: '{{ sshkey }}'
