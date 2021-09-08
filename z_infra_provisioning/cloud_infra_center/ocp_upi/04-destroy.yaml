@@ -1,5 +1,5 @@
 # =================================================================
-# Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
+# Copyright 2021 https://github.com/openshift/installer
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# =================================================================.
-
 # =================================================================
-# Licensed Materials - Property of IBM
-#
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
-#
-# US Government Users Restricted Rights - Use, duplication or
-# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
-# =================================================================
-#
-# Change Summary: 
-# - Add more playbooks
 
 ---
-- import_playbook: configure-installer-and-image.yaml
-- import_playbook: configure-install-config.yaml
-- import_playbook: configure-install-manifests.yaml
-- import_playbook: configure-install-ignition.yaml
+- import_playbook: destroy-controls.yaml
+- import_playbook: destroy-computes.yaml 
+- import_playbook: destroy-network.yaml
+- import_playbook: destroy-security-groups.yaml
+- import_playbook: destroy-images-files.yaml

@@ -42,18 +42,18 @@ zone "." IN {
 include "/etc/named.rfc1912.zones";
 include "/etc/named.root.key";
 
-zone "{{ cluster_domain_name }}" {
+zone "{{ cluster_name }}.{{ base_domain }}" {
 	type master;
-	file "{{ cluster_domain_name }}.zone";
+	file "{{ cluster_name }}.{{ base_domain }}.zone";
 	allow-query { any; };
 	allow-transfer { none; };
 	allow-update { none; };
 };
 
 
-zone "{{ bastion_subnet_prefix_reverse }}.in-addr.arpa" {
+zone "bastion_subnet_prefix_reverse.in-addr.arpa" {
         type master;
-        file "{{ bastion_subnet_prefix_reverse }}.in-addr.arpa.zone";
+        file "bastion_subnet_prefix_reverse.in-addr.arpa.zone";
         allow-query { any; };
         allow-transfer { none; };
         allow-update { none; };

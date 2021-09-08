@@ -26,12 +26,18 @@
   tasks:
   - name: 'Import common yaml'
     import_tasks: common.yaml
+  
+  - name: 'Remove the bootstrap server'
+    os_server:
+      name: "{{ os_bootstrap_server_name }}"
+      state: absent
+      delete_fip: yes
 
   - name: 'Remove the Control Plane servers'
     os_server:
       name: "{{ item.1 }}-{{ item.0 }}"
       state: absent
-    with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+    with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
 
   - name: 'List the Server groups'
     command:

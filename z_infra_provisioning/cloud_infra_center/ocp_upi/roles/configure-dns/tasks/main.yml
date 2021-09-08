@@ -16,19 +16,23 @@
 
 ---
 # tasks file for configure-dns
-- include_vars: bastion-template.yaml
+- include_vars: cluster-template.yaml
 
-- name: install bind-chroot for dns 
+- name: Install bind-chroot for dns 
   yum:
     name: bind-chroot
     state: latest
     
-- name: create /var/named directory
+- name: Create /var/named directory
   file:
     path: /var/named
     state: directory
 
-- name: create dns subnet definition
+- name: Combine cluster name and base domain
+  set_fact: 
+    cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
+
+- name: Create dns subnet definition
   template:
     src: var/named/cluster_domain_name.zone.j2
     dest: /var/named/{{ cluster_domain_name }}.zone
@@ -37,14 +41,14 @@
   notify:
    - restart dns
 
-- name: unmanage resolve.conf in NetworkManager
+- name: Unmanage resolve.conf in NetworkManager
   lineinfile:
     line: dns=none
     dest: /etc/NetworkManager/NetworkManager.conf
     insertafter: "\\[main\\].*"
     regexp: "^dns=.*"
 
-- name: use local dns in resolv.conf
+- name: Use local dns in resolv.conf
   blockinfile:
     dest: /etc/resolv.conf
     insertbefore: BOF
@@ -52,23 +56,33 @@
       search {{ cluster_domain_name }}
       nameserver {{ bastion_private_ip_address }} 
 
-- name: create dns subnet zone for bastion
+- name: Reverse the order of the decimals in the specified bastion subnet
+  set_fact: 
+    bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
+  
+- name: Create dns subnet zone for bastion
   template:
     src: var/named/bastion.in-addr.arpa.zone.j2
-    dest: /var/named/{{ bastion_subnet_prefix_reverse }}.in-addr.arpa.zone
+    dest: /var/named/{{ bastion_reverse }}.in-addr.arpa.zone
     owner: named
     group: named
   notify:
    - restart dns
  
-- name: create /etc/named.conf
+- name: Create /etc/named.conf
   template:
     src: etc/named.conf.j2
     dest: /etc/named.conf
   notify:
    - restart dns
 
-- name: add dns to firewall
+- name: Replace bastion_subnet_prefix_reverse
+  shell: 
+    cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
+  notify:
+   - restart dns
+
+- name: Add dns to firewall
   firewalld:
     permanent: true
     service: dns

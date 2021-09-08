@@ -88,11 +88,11 @@ if minimum_resources["mem"] > usage["mem"]["reserved"]:
     msgs += "%s resources doesn't meet the minimum requirements, "\
             "current reserved: %s MB, minimum required: %s MB\n"\
             % ("Memory", usage["mem"]["reserved"], minimum_resources["mem"])
-if minimum_resources["disk"] > usage["disk"]["reserved"] and minimum_resources["disk"] > usage["capacity"]["reserved"]:
-    msgs += "%s resources doesn't meet the minimum requirements, "\
-            "current disk reserved: %s GB, storage provider capacity reserved: %s GB, "\
-            "minimum disk required: %s GB"\
-            % ("Storage", usage["disk"]["reserved"], usage["capacity"]["reserved"], minimum_resources["disk"])
+#if minimum_resources["disk"] > usage["disk"]["reserved"] and minimum_resources["disk"] > usage["capacity"]["reserved"]:
+#   msgs += "%s resources doesn't meet the minimum requirements, "\
+#          "current disk reserved: %s GB, storage provider capacity reserved: %s GB, "\
+#          "minimum disk required: %s GB"\
+#         % ("Storage", usage["disk"]["reserved"], usage["capacity"]["reserved"], minimum_resources["disk"])
 if len(msgs) > 0:
     sys.exit(msgs)
 
