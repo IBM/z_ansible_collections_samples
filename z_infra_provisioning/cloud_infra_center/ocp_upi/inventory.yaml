@@ -49,7 +49,7 @@ all:
       os_flavor_master: 'medium'
       os_flavor_worker: 'medium' 
 
-      availability_zone: ''
+      create_server_zone: ''
 
       os_control_nodes_number: 3
 
