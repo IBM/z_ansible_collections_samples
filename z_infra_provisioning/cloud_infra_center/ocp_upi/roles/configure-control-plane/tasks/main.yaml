@@ -72,7 +72,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
-    availability_zone: "{{ availability_zone }}"
+    availability_zone: "{{ create_server_zone }}"
     timeout: 2400
     # The ignition filename will be concatenated with the Control Plane node
     # name and its 0-indexed serial number.
@@ -96,7 +96,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
-    availability_zone: "{{ availability_zone }}"
+    availability_zone: "{{ create_server_zone }}"
     timeout: 2400
     # The ignition filename will be concatenated with the Control Plane node
     # name and its 0-indexed serial number.

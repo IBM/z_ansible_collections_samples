@@ -75,7 +75,7 @@ After above steps, you will get one ready OpenShift Container Platform on ICIC i
       - Disk with at least 20GiB
 - **(Optional)** Bastion server, the machine that used to configure DNS and Load Balancer for OpenShift installation
     - If you use existing DNS and HAProxy server for OpenShift installation, the bastion server **is not** required.
-    - If you need the Ansible playbook to help configure DNS and Haproxy server for you, you need to create one linux server as the bastion server. You can alos use the same linux server that runs Ansible.
+    - If you need the Ansible playbook to help configure DNS and Haproxy server for you, you need to create one linux server as the bastion server. You can also use the same linux server that runs Ansible.
 
 ### 2. Install packages on linux server
 
@@ -239,14 +239,14 @@ Update your settings based on the samples. The following propeties are **require
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, supported: `dasd` or `scsi` | |
 | `openshift_version` |4.7| The product version of OpenShift Container Platform, such as `4.6` or `4.7` or `4.8`| |
-| `openshift_minor_version` |7| The minor version of Openshift Platfrom cluster, such as `7` or `13` | 
+| `openshift_minor_version` |7| The minor version of Openshift Container Platform, such as `7` or `13` | 
 | `auto_allocated_ip` |true| 'true' or 'false', if false, IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_subnet_range` |\<subnet-range\> | If the os_subnet_range is `172.26.0.0/16`, the allocation pools will be `172.26.0.10-172.26.255.254` | |
 | `os_flavor_master` | medium| `openstack flavor list` | |
 | `os_flavor_worker` | medium| `openstack flavor list` | |
 | `os_control_nodes_number` |3| Number of provisioned Control Plane nodes| |
 | `os_compute_nodes_number` |3| Number of provisioned Compute nodes| |
-| `availability_zone` |''| The availability zone in which to create the server, default value is '', which means to use the default availability zone.|
+| `create_server_zone` |''| The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. Default value is '', which means to use the default availability zone. [ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`]|
 | `pullsecret` | \<pull-secret\> |  Get from [cloud.redhat.com](https://console.redhat.com/openshift/install/ibmz/user-provisioned)|
 | `sshkey` | \<ssh-key\>| The SSH public key for the core user in RHEL CoreOS |
 | `os_dns_domain` | \<external DNS ip addr\> or \<bastion ip addr\>|If you want to use your external or existing DNS server set `os_dns_domain` to use it, others set bastion machine ip address|
