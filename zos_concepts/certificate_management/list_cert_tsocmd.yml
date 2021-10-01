@@ -5,7 +5,7 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-06-30
+# 2021-09-30
 #  - Released initial version
 ###############################################################################
 
@@ -20,19 +20,19 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'OMVSADM'
-    cert_type: 'USER'
-    cert_label: 'ANDY SSL'
+    # owner_id: 'OMVSADM'
+    # cert_type: 'USER'
+    # cert_label: 'ANDY SSL'
 
     # cert_type: 'CERTAUTH'
     # cert_label: 'ANDY CA'
 
-    # cert_type: 'SITE'
-    # cert_label: 'ANDY SITE'
+    cert_type: 'SITE'
+    cert_label: 'ANDY SITE'
 
   tasks:
   - include_role:
-      name: issue_racf_cmd
+      name: issue_tso_cmd
     vars:
       task_description: 'Displaying cert {{cert_label}}'
       command:
@@ -40,17 +40,15 @@
     when: cert_type == 'USER'
 
   - include_role:
-      name: issue_racf_cmd
+      name: issue_tso_cmd
     vars:
       task_description: 'Displaying cert {{cert_label}}'
       command:
-          - >
-            RACDCERT CERTAUTH +
-              LIST(LABEL('{{cert_label}}'))
+          - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
     when: cert_type == 'CERTAUTH'
 
   - include_role:
-      name: issue_racf_cmd
+      name: issue_tso_cmd
     vars:
       task_description: 'Displaying cert {{cert_label}}'
       command:

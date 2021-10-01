@@ -5,7 +5,7 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-06-30
+# 2021-09-30
 #  - Released initial version
 ###############################################################################
 
@@ -35,10 +35,6 @@
         name: issue_racf_cmd
       vars:
         task_description: 'Clean up certs and keyring'
-            # - >
-            #   RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
-            # - >
-            #   RACDCERT LIST(LABEL('{{cert_label}}')) ID({{ owner_id}})
         command:
             - >
               RACDCERT ADDRING({{keyring}}) ID({{owner_id}})

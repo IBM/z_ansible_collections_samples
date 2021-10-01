@@ -5,7 +5,7 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-06-30
+# 2021-09-30
 #  - Released initial version
 ###############################################################################
 
@@ -26,7 +26,7 @@
     cn: 'www.{{cert_label}}.com'
     ou: '{{cert_label}}'
     country: 'US'
-    expiry_date: '2021-09-28'
+    expiry_date: '2021-12-28'
     keyring: 'WEBSSL'
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
@@ -36,8 +36,6 @@
           name: issue_tso_cmd
         vars:
           task_description: 'Clean up certs and keyring'
-              # - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
-              # - RACDCERT LIST(LABEL('{{cert_label}}')) ID({{ owner_id}})
           command:
               - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
               - RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
