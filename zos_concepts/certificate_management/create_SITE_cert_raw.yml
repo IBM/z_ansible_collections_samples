@@ -5,7 +5,7 @@
 # Changelog
 #  All notable changes to this sample will be documented in this playbook
 #
-# 2021-06-30
+# 2021-09-30
 #  - Released initial version
 ###############################################################################
 
@@ -35,7 +35,6 @@
       name: issue_racf_cmd
     vars:
       task_description: 'Create a new keyring'
-          # - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
       command:
           - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
           - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
@@ -44,8 +43,6 @@
       name: issue_racf_cmd
     vars:
       task_description: 'Create new SITE cert and connect to keyring'
-            # RACDCERT SITE GENCERT ID({{owner_id}}) +
-              #  ID({{owner_id}})
       command:
         - >
             RACDCERT SITE GENCERT +
@@ -68,8 +65,6 @@
       name: issue_racf_cmd
     vars:
       task_description: 'Create new SITE cert and connect to keyring'
-            # RACDCERT SITE GENCERT ID({{owner_id}}) +
-              #  ID({{owner_id}})
       command:
         - >
             RACDCERT SITE GENCERT +
@@ -87,17 +82,17 @@
             RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
     when: expiry_date == ''
 
-  # - include_role:
-  #     name: issue_operator_cmd
-  #   vars:
-  #     task_description: 'Stop TN3270 server'
-  #     command: 'p TN3270'
+  - include_role:
+      name: issue_operator_cmd
+    vars:
+      task_description: 'Stop TN3270 server'
+      command: 'p TN3270'
 
-  # - include_role:
-  #     name: issue_operator_cmd
-  #   vars:
-  #     task_description: 'Start TN3270 server'
-  #     command: 's TN3270'
+  - include_role:
+      name: issue_operator_cmd
+    vars:
+      task_description: 'Start TN3270 server'
+      command: 's TN3270'
 
   - include_role:
       name: issue_operator_cmd

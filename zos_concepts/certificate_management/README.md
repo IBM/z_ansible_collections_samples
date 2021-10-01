@@ -13,14 +13,26 @@ playbook notes sections for additional details and configuration.
 ## Playbook Summary
 
 - [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions
-- [**create_SSL_cert.yml**](create_SSL_cert.yml) - Create a sample SSL certificate
-- [**create_TN3270.cert.yml**](create_TN3270_cert.yml) - Create a sample SITE certificate
-- [**search_and_renew.yml**](search_and_renew.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report
+- [**create_CERTAUTH_cert_raw.yml**](create_CERTAUTH_cert_raw.yml) - Create a CERTAUTH certificate using zos_mvs_raw module
+- [**create_CERTAUTH_cert_tsocmd.yml**](create_CERTAUTH_cert_tsocmd.yml) - Create a CERTAUTH certificate using zos_tso_command module
+- [**create_SITE_cert_raw.yml**](create_SITE_cert_raw.yml) - Create a SITE certificate using zos_mvs_raw module
+- [**create_SITE_cert_tsocmd.yml**](create_SITE_cert_tsocmd.yml) - Create a SITE certificate using zos_tso_command module
+- [**create_USER_cert_raw.yml**](create_USER_cert_raw.yml) - Create a USER certificate using zos_mvs_raw module
+- [**create_USER_cert_tsocmd.yml**](create_USER_cert_tsocmd.yml) - Create a USER certificate using zos_tso_command module
+- [**delete_cert_raw.yml**](delete_cert_raw.yml) - Delete a certificate using zos_mvs_raw module
+- [**delete_cert_tsocmd.yml**](delete_cert_tsocmd.yml) - Delete a certificate using zos_tso_command module
+- [**delete_keyring_raw.yml**](delete_keyring_raw.yml) - Delete a keyring using zos_mvs_raw module
+- [**delete_keyring_tsocmd.yml**](delete_keyring_tsocmd.yml) - Delete a keyring using zos_tso_command module
+- [**list_cert_raw.yml**](list_cert_raw.yml) - Display a certificate's details using zos_mvs_raw module
+- [**list_cert_tsocmd.yml**](list_cert_tsocmd.yml) - Display a certificate details using zos_tso_command module
+- [**search_and_renew_raw.yml**](search_and_renew_raw.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report using zos_mvs_raw module
+- [**search_and_renew_tsocmd.yml**](search_and_renew_tsocmd.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report using zos_tso_command module
 
 ## Role Summary
 
 - [**issue_operator_cmd**](roles/issue_operator_cmd/README.md) - Issue an operator command
 - [**issue_racf_cmd**](roles/issue_racf_cmd/README.md) - Isuue RACF command(s)
+- [**issue_tso_cmd**](roles/issue_operator_cmd/README.md) - Issue TSO command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
 - [**send-template**](roles/send-template/README.md) - send template to a zOS host
 
