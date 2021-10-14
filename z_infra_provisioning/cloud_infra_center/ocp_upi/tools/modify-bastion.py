@@ -17,9 +17,12 @@ So that you can use cluster-template.yaml to configure DNS and HAProxy on bastio
 """
 
 def get_bastion_template():
-    with open("cluster-template.yaml", "r") as f:
-        cont = yaml.load(f)
-    return cont
+    with open("cluster-template.yaml", "r") as stream:
+        try:
+            count = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+    return count
 
 def get_infra_id():
     cmd = "jq -r .infraID metadata.json"
