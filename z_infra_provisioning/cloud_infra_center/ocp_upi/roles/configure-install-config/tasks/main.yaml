@@ -14,18 +14,18 @@
   template:
     src:  templates/install-config-yaml.j2
     dest: "install-config.yaml"
-    
+
+- name: Configure Machine Network in Install Configuration
+  script: tools/config-machine-network.py {{ os_subnet_range }}
+  args:
+    executable: python3
+     
 - name: Update cluster domain name in install-config.yaml
   shell: 
     cmd: |
       sed -i "s/cluster_basedomain/{{ base_domain }}/g" install-config.yaml
       sed -i "s/cluster_name/{{ cluster_name }}/g" install-config.yaml
       cp -r install-config.yaml .install-config.yaml
-
-- name: Configure Machine Network in Install Configuration
-  script: tools/config-machine-network.py {{ os_subnet_range }}
-  args:
-    executable: python3
 
 - name: Empty Compute Pools
   script: tools/empty-compute-node.py
