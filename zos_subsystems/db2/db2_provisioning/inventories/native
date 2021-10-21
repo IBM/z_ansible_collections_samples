@@ -1,0 +1,6 @@
+zsystem:
+  hosts:
+    native:
+      ansible_host: tivlp02.svl.ibm.com
+      ansible_user: ansuser
+      ansible_python_interpreter: /var/hamb380/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3.8

@@ -1,0 +1,19 @@
+---
+# tasks file for db2_get_team_id
+
+- name: Retrieve team id
+  uri:
+    url: "{{ base_url }}/teams/{{team_name}}/"
+    validate_certs: no
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    status_code: 200
+  register: team_response
+
+- name: Register the team id and environment id
+  set_fact:
+    TEAM_ID: "{{team_response.json.id}}"
+    ENV_ID: "{{team_response.json.environments[0].environmentId}}"
