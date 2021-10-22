@@ -1,6 +1,6 @@
 # Db2 Ansible playbooks
 
-The following Db2 Ansible playbooks demonstrate how to prompt registered instantiable applications<sup>[1](#footnote1)</sup>, Db2 subsystems and create new instances of an application by exploiting IBM Db2 DevOps Experience for z/OS (DOE) APIs.
+The following Db2 Ansible playbooks demonstrate how to prompt registered instantiable applications[^1], Db2 subsystems and create new instances of an application by exploiting IBM Db2 DevOps Experience for z/OS (DOE) APIs.
 
 ## Db2 DevOps Experience
 
@@ -38,9 +38,6 @@ For more information: [Integrating Db2 for z/OS database changes into a CI/CD pi
 ## Released Version
 * Version 1.0 - Release Notes: (Released mm dd, 2021)
 
-### Note:
-<sup>[1](#footnote1)</sup> An application in DOE is a set of objects, such as tablespaces, tables, and indexes that are grouped to be managed and provisioned as a single unit for the use of an application program or a set of application programs. 
-
 # Copyright
 
 © Copyright IBM Corporation 2021
@@ -54,3 +51,6 @@ Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 Please refer to the [support section](https://github.com/IBM/z_ansible_collections_samples/blob/master/README.md#support) for more
 details.
+
+### Note:
+[^1]: An application in DOE is a set of objects, such as tablespaces, tables, and indexes that are grouped to be managed and provisioned as a single unit for the use of an application program or a set of application programs. 
