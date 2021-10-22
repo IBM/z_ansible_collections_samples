@@ -1,6 +1,6 @@
-# Ansible Db2 playbooks
+# Db2 Ansible playbooks
 
-The Ansible Db2 playbooks demonstrate how to prompt registered instantiable applications<sup>[1](#footnote1)</sup>, Db2 subsystems and create new instances of an application by exploiting IBM Db2 DevOps Experience for z/OS (DOE) APIs.
+The following Db2 Ansible playbooks demonstrate how to prompt registered instantiable applications<sup>[1](#footnote1)</sup>, Db2 subsystems and create new instances of an application by exploiting IBM Db2 DevOps Experience for z/OS (DOE) APIs.
 
 ## Db2 DevOps Experience
 
