@@ -3,7 +3,7 @@
 
 - name: Authenticate User
   uri:
-    url: "https://tivlp02.svl.ibm.com:12024/ws/security/login"
+    url: "zos_target_address:12024/ws/security/login"
     validate_certs: no
     user: "{{ username }}"
     password: "{{ password }}"

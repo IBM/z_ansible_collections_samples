@@ -60,8 +60,8 @@ For more information on Python configuration requirements on z/OS, refer to [Ans
   zsystem:
       hosts:
         native:
-          ansible_host: tivlp00.svl.ibm.com
-          ansible_user: ansuser
+          ansible_host: zos_target_address
+          ansible_user: zos_target_username
           ansible_python_interpreter: /var/hamb380/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3.8
   ```
 

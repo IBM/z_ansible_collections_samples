@@ -1,7 +1,7 @@
 
 # Hostname of the system on which Db2 for z/OS DevOps Experience is running.
 # Server name used to access the DOE rest apis
-doe_server: https://tivlp02.svl.ibm.com
+doe_server: zos_target_address
 
 # Port number of Db2 DevOps Experience Server. Default: 12023
 doe_server_port: 12024
