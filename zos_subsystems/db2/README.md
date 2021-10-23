@@ -34,8 +34,7 @@ For more information: [Integrating Db2 for z/OS database changes into a CI/CD pi
 * IBM Unified Management Server for V1.1.0.4 or later
 * IBM Db2 DevOps Experience for z/OS V1.2.0.1 or later
 * Ansible 2.9 or later
-
-# Changelog
+## Changelog
 All changes are maintained chronologically by date found in the changelog.yml associated with each sample. 
 
 # Copyright
