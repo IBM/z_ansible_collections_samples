@@ -35,8 +35,8 @@ For more information: [Integrating Db2 for z/OS database changes into a CI/CD pi
 * IBM Db2 DevOps Experience for z/OS V1.2.0.1 or later
 * Ansible 2.9 or later
 
-## Released Version
-* Version 1.0 - Release Notes: (Released mm dd, 2021)
+# Changelog
+All changes are maintained chronologically by date found in the changelog.yml associated with each sample. 
 
 # Copyright
 
