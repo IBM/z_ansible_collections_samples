@@ -34,7 +34,7 @@ In addition, the Db2 schema provisioning sample playbook can be applied after yo
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md) or
+[detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/zos_core/configuration_guide.md) or
 continue with getting started below.
 
 ### Getting Started: CLI
