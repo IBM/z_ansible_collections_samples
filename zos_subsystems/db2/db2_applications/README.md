@@ -34,14 +34,6 @@ If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/configuration_guide.md) or
 continue with getting started below.
 
-Optionally, you can use the sample
-[host_setup](https://github.com/IBM/z_ansible_collections_samples/blob/master/zos_administration/host_setup/README.md)
-to discover and create your **inventory** and **host_vars** artifacts. Please
-note that when you use **host_setup**, it generates a configuration
-for the most common dependencies. Some playbooks require more customized
-configurations; in this case, you can review the sample documentation and
-add the additional required variables.
-
 ### Getting Started: CLI
 
 A few settings may need to be changed to ensure compatibility with your z/OS target.
