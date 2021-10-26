@@ -243,7 +243,7 @@ Update your settings based on the samples. The following propeties are **require
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
 | `openshift_version` |4.7| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
 | `openshift_minor_version` |7| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
-| `auto_allocated_ip` |true| 'true' or 'false', if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
+| `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_subnet_range` |\<subnet-range\> | If the os_subnet_range is `172.26.0.0/16`, <br>the allocation pools will be `172.26.0.10-172.26.255.254` | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB | |
 | `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB  | |
