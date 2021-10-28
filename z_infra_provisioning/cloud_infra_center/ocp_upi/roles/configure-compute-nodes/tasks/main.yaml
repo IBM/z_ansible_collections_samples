@@ -53,7 +53,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
-    availability_zone: "{{ availability_zone }}"
+    availability_zone: "{{ create_server_zone }}"
     timeout: 2400
     userdata: "{{ lookup('file', 'worker.ign') | string }}"
     nics:
@@ -69,7 +69,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
-    availability_zone: "{{ availability_zone }}"
+    availability_zone: "{{ create_server_zone }}"
     timeout: 2400
     userdata: "{{ lookup('file', 'worker.ign') | string }}"
     nics:
