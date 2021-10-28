@@ -27,8 +27,8 @@ For more information: [Integrating Db2 for z/OS database changes into a CI/CD pi
 ## Playbooks Summary
 * [**Provision**](db2_provisioning/db2-schema-provision.yml) - Provision a Db2 schema instance of an application
 * [**Deprovision**](db2_provisioning/db2-schema-deprovision.yml) - Deprovision a Db2 schema instance of an application
-* [**Discovery of Db2 applications**](db2_applications/db2-get-applications.yml) - Prompt all registered "applications" that can be instantiated
-* [**Discovery of Db2 system information**](db2_discovery/db2-discovery.yml) - Prompt the information on all registered Db2 systems
+* [**Discovery of Db2 applications**](db2_applications/db2-discover-applications.yml) - Prompt all registered "applications" that can be instantiated
+* [**Discovery of Db2 system information**](db2_discovery/db2-discover-subsystems.yml) - Prompt the information on all registered Db2 systems
 
 ## Requirements:
 * IBM Unified Management Server for V1.1.0.4 or later
