@@ -1,0 +1,20 @@
+- name: DB2 Subsystem Discovery
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - "vars/db2_discover_subsystems.yml"
+
+  tasks:
+    - name: Discover DB2 Subsystems
+      block:
+
+        # Authenticate user
+        - include_role:
+            name: db2_login
+
+        # Get the application id
+        - include_role:
+            name: db2_put_infra_discovery
+
+        - include_role:
+            name: db2_post_graphql_discovery
