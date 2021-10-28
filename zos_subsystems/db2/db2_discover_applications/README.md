@@ -15,7 +15,7 @@ It is a good practice to review the playbook sample contents before executing th
 
 ## Playbook Summary
 
-- [**db2-get-applications.yml**](db2-get-applications.yml) - Handles retrieving the registered applications for a Db2 system.
+- [**db2-discover-applications.yml**](db2-discover-applications.yml) - Handles retrieving the registered applications for a Db2 system.
 
 ## Role Summary
 
@@ -41,14 +41,14 @@ A few settings may need to be changed to ensure compatibility with your z/OS tar
 For more information on Python configuration requirements on z/OS, refer to [Ansible FAQ: Running on z/OS](https://docs.ansible.com/ansible/latest/reference_appendices/faq.html).
 
 
-Update the playbook-specific variables in [vars/db2_applications.yml](vars/db2_applications.yml), based on the behavior that you want.
+Update the playbook-specific variables in [vars/db2_discover_applications.yml](vars/db2_discover_applications.yml), based on the behavior that you want.
 
 
 ## Run the playbook
 
 1. To run the DB2 application discovery playbook, type the following command from the root of this repository:
 
-  `ansible-playbook db2-applications.yml`
+  `ansible-playbook db2-discover-applications.yml`
 
 ### Note: 
 <sup>[1](#footnote1)</sup> An application is a set of objects, such as tablespaces, tables, and indexes that are grouped to be managed and provisioned as a single unit for the use of an application program or a set of application programs. Application objects are logical, which means that they are only references to the objects. When users provision instances of an application, the referenced objects are copied to create the instances.
