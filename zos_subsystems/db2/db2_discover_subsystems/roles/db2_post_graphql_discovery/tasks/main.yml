@@ -1,0 +1,16 @@
+---
+# tasks file for db2_post_graphql_discovery
+
+- name: Graphql Discovery
+  uri:
+    url: "{{ doe_server }}:{{ doe_server_port }}/ws/model/graphql/"
+    validate_certs: no
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    body: 'query { Db2Subsystem (isActive:"ACTIVE") { label id mod systemName isActive release domainName sysplexName location listenerPort name version groupName messages securePort runlib sdsnexit sdsnload bsdsNames}}'
+    body_format: json
+    status_code: 200
+  register: discovery_data

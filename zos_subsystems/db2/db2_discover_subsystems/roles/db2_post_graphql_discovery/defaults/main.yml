@@ -1,0 +1,22 @@
+---
+# defaults file for db2_post_graphql_discovery
+
+# Hostname of the system on which Db2 for z/OS DevOps Experience is running.
+# Server name used to access the DOE rest apis
+doe_server: zos_target_address
+
+# Port number of Db2 DevOps Experience Server. Default: 12024
+doe_server_port: 12024
+
+# Base url used to access DOE REST API
+base_url: "{{ doe_server }}:{{ doe_server_port }}/ws/policy"
+
+# Username used to access the DOE REST API
+username: DOEDEV1
+
+# Password used to access the DOE REST API
+password: DOEPW
+
+# The name for the newly provisioned instance.
+# The name cannot contain the symbols for less-than (&lt;) , greater-than (&gt;) , or ampersand (&amp;) . Db2 DevOps Experience validates this name to ensure that it is unique across all of the existing instances.
+inst_name: ansibleInst

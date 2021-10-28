@@ -1,0 +1,18 @@
+---
+# tasks file for db2_get_subsystem_id
+
+- name: Retrieve subsystem info
+  uri:
+    url: "{{ base_url }}/subsystems/db2/"
+    validate_certs: no
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    status_code: 200
+  register: subsystem_response
+
+- name: Register the subsystem id
+  set_fact:
+    SUBSYSTEM_ID: "{{ subsystem_response.json.subsystems[0].id }}"

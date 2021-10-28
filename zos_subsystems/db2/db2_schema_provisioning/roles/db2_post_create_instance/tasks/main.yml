@@ -1,0 +1,55 @@
+---
+# tasks file for db2_post_create_instance
+
+- block:
+    - name: Create an instance of the application with data
+      uri:
+        url: "{{ base_url }}/instances/"
+        validate_certs: no
+        user: "{{ username }}"
+        password: "{{ password }}"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ACCESS_TOKEN}}"
+        body:
+          applicationIds:  "[\"{{APP_ID}}\"]"
+          db2:
+            subsystemIds:  "[\"{{SUBSYSTEM_ID}}\"]"
+          teamId: "{{TEAM_ID}}"
+          environmentId: "{{ENV_ID}}"
+          dataSeed: "master"
+          name: "{{inst_name}}"
+        body_format: json
+        status_code: 201
+      register: inst_resp_data
+
+    - name: Register instance id
+      set_fact:
+        INSTANCE_ID: "{{inst_resp_data.json.id}}"
+  when: with_data
+
+- block:
+  - name: Create an instance of the application with no data
+    uri:
+      url: "{{ base_url }}/instances/"
+      validate_certs: no
+      user: "{{ username }}"
+      password: "{{ password }}"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ACCESS_TOKEN}}"
+      body:
+        applicationIds:  "[\"{{APP_ID}}\"]"
+        db2:
+          subsystemIds:  "[\"{{SUBSYSTEM_ID}}\"]"
+        teamId: "{{TEAM_ID}}"
+        environmentId: "{{ENV_ID}}"
+        name: "{{inst_name}}"
+      body_format: json
+      status_code: 201
+    register: instance_response
+
+  - name: Register the instance id
+    set_fact:
+      INSTANCE_ID: "{{instance_response.json.id}}"
+  when: not with_data
