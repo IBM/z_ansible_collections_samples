@@ -79,10 +79,13 @@ often repeated and in need of automation.
     - [Deploy a program to a CICS region](zos_subsystems/cics/cmci/deploy_program)
     - [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
     - [Resource life cycle and CSD](zos_subsystems/cics/cmci/resource_lifecycle_and_csd)
-- Subsystems
   - [MQ](zos_subsystems/mq)
     - [Interacting with local queues](zos_subsystems/mq/mqsc/qlocal)
 	- [Backing up an application structure](zos_subsystems/mq/mqsc/cfstruct)
+  - [Db2](zos_subsystems/db2)
+    - [Provision a Db2 schema instance](zos_subsystems/db2/db2_schema_provisioning)
+    - [Discover registered Db2 applications](zos_subsystems/db2/db2_discover_applications)
+    - [Discover registered Db2 subsystems](zos_subsystems/db2/db2_discover_subsystems)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 
