@@ -25,10 +25,10 @@ of the z/OS system where you installed DOE and <*port*> is the port number that 
 For more information: [Integrating Db2 for z/OS database changes into a CI/CD pipeline](https://www.redbooks.ibm.com/Redbooks.nsf/RedpieceAbstracts/redp5646.html?Open)
 
 ## Playbooks Summary
-* [**Provision**](db2_provisioning/db2-schema-provision.yml) - Provision a Db2 schema instance of an application
-* [**Deprovision**](db2_provisioning/db2-schema-deprovision.yml) - Deprovision a Db2 schema instance of an application
-* [**Discovery of Db2 applications**](db2_applications/db2-discover-applications.yml) - Prompt all registered "applications" that can be instantiated
-* [**Discovery of Db2 system information**](db2_discovery/db2-discover-subsystems.yml) - Prompt the information on all registered Db2 systems
+* [**Provision**](db2_schema_provisioning) - Provision a Db2 schema instance of an application
+* [**Deprovision**](db2_schema_provisioning) - Deprovision a Db2 schema instance of an application
+* [**Discovery of Db2 applications**](db2_discover_applications) - Prompt all registered "applications" that can be instantiated
+* [**Discovery of Db2 system information**](db2_discover_subsystems) - Prompt the information on all registered Db2 systems
 
 ## Requirements:
 * IBM Unified Management Server for V1.1.0.4 or later
