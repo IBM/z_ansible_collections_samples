@@ -34,18 +34,9 @@ In addition, the Db2 schema provisioning sample playbook can be applied after yo
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/zos_core/configuration_guide.md) or
-continue with getting started below.
-
-### Getting Started: CLI
-
-A few settings may need to be changed to ensure compatibility with your z/OS target.
-
-For more information on Python configuration requirements on z/OS, refer to [Ansible FAQ: Running on z/OS](https://docs.ansible.com/ansible/latest/reference_appendices/faq.html).
-
+[detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/zos_core/configuration_guide.md).
 
 Update the playbook-specific variables in [vars/db2_schema.yml](vars/db2_schema.yml), based on the behavior that you want.
-
 
 ### Run the playbook
 
