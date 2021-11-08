@@ -91,6 +91,11 @@
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
+- name: 'Generate random string for the Compute ports and store them in a json file'
+  script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
+  args:
+    executable: python3
+
 - name: 'Create the bootstrap server port'
   os_port:
     name: "{{ os_port_bootstrap }}"
@@ -118,14 +123,14 @@
 
 - name: 'Create the Compute ports'
   os_port:
-    name: "{{ os_port_worker }}-{{ item.1 }}"
+    name: "{{ item.1  }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_worker }}"
     fixed_ips:
     - subnet: "{{ os_subnet }}"
       ip_address: "{{ os_infra_ip[item.0]}}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  with_indexed_items:  "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
   - auto_allocated_ip == false
 
@@ -151,11 +156,11 @@
 
 - name: 'Create the Compute ports'
   os_port:
-    name: "{{ os_port_worker }}-{{ item.1 }}"
+    name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_worker }}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
   - auto_allocated_ip == true
     
@@ -170,5 +175,5 @@
 
 - name: 'Set Compute ports tag'
   command:
-    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ item.1 }}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
+  with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"

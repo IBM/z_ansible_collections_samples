@@ -10,4 +10,5 @@
 ---
 - import_playbook: configure-bootstrap.yaml
 - import_playbook: configure-control-plane.yaml
+- import_playbook: approve.yaml
 - import_playbook: wait-for-bootstrap-complete.yaml

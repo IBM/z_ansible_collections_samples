@@ -12,10 +12,10 @@ import time
 import os
 import sys
 
-domain_name = sys.argv[1]
+work_name = sys.argv[1]
 
 def get_worker_status():
-    cmd = "./oc get nodes --kubeconfig auth/kubeconfig | grep %s | awk '{print $2}'" % domain_name
+    cmd = "./oc get nodes --kubeconfig auth/kubeconfig | grep %s | awk '{print $2}'" % work_name
     status = os.popen(cmd).read()
     if not status:
         return None
@@ -31,4 +31,3 @@ for i in range(0, 30):
         time.sleep(10)
     else:
         break
-        

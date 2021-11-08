@@ -51,16 +51,11 @@
       patterns: ".compute-nodes.*"
     register: find_compute
 
-  - name: 'Read compute nodes names'
-    set_fact:
-      compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
-    when: "{{ find_compute['files'] }}"
-
   - name: 'Remove the Compute servers'
     os_server:
       name: "{{ os_compute_server_name }}-{{ item.1 }}"
       state: absent
-    with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+    with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
     when: "{{ find_compute['files'] }}"
 
   - name: 'Get Compute servers from ICIC command line'

@@ -26,18 +26,19 @@
       cmd: "jq -r .infraID metadata.json"
     register: infra_id
 
-  - name: 'Generate random string for the Compute ports and store them in a json file'
-    script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} 1
-    args:
-      executable: python3
+  - name: 'Get the created worker nodes name and store them in a file'
+    shell: "./oc get nodes --kubeconfig auth/kubeconfig --no-headers | awk '{print$1}' | grep -w worker | awk -F '-' '{print$4}' | sort -r | head -n1"
+    register: latest_worker_index
 
-  - name: 'Read compute nodes names'
-    set_fact:
-      compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
+  - name: 'Increment worker node index'
+    set_fact: new_worker_index={{ latest_worker_index | int + 1 }}
+
+  - name: 'Generate worker node json file'
+    script: tools/generate-new-worker-ignition.sh {{ os_compute_server_name }}-{{ new_worker_index }}
 
   - name: 'Create the Compute ports'
     os_port:
-      name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      name: "{{ os_port_worker }}-{{ new_worker_index }}"
       network: "{{ use_network_name }}"
       security_groups:
       - "{{ os_sg_worker }}"
@@ -50,7 +51,7 @@
 
   - name: 'Create the Compute ports'
     os_port:
-      name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      name: "{{ os_port_worker }}-{{ new_worker_index }}"
       network: "{{ use_network_name }}"
       security_groups:
       - "{{ os_sg_worker }}"
@@ -60,39 +61,37 @@
 
   - name: 'Set Compute ports tag'
     command:
-      cmd: "openstack port set --tag {{ [cluster_id_tag] }} {{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      cmd: "openstack port set --tag {{ [cluster_id_tag] }} {{ os_port_worker }}-{{ new_worker_index }}"
 
   - name: 'Create the Compute servers'
     os_server:
-      name: "{{ os_compute_server_name }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
       image: "rhcos"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: 2400
-      userdata: "{{ lookup('file', 'worker.ign') | string }}"
+      userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
       availability_zone: "{{ create_server_zone }}"
       nics:
-      - port-name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
     when:
     - disk_type == "dasd"
 
   - name: 'Create the Compute servers with boot volume'
     os_server:
-      name: "{{ os_compute_server_name }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
       image: "rhcos"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: 2400
-      userdata: "{{ lookup('file', 'worker.ign') | string }}"
+      userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
       availability_zone: "{{ create_server_zone }}"
       nics:
-      - port-name: "{{ os_port_worker }}-{{ compute_nodes_json.compute_node_names[-1] }}"
+      - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
       boot_from_volume: True
       terminate_volume: True
     when:
     - disk_type == "scsi"
 
-  - name: 'Approve worker nodes csr'
-    script: tools/wait-nodes-csrs.py {{ os_compute_server_name }}-{{ compute_nodes_json.compute_node_names[-1] }}
-    args:
-      executable: python3
+  - name: 'Approve node csr'
+    import_tasks: approve.yaml

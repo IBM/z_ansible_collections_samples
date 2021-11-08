@@ -53,7 +53,7 @@
     timeout: 2400
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.1 }}"
+    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }}"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
@@ -69,15 +69,10 @@
     timeout: 2400
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.1 }}"
+    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
     terminate_volume: True
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "scsi"
-
-- name: 'Approve worker nodes csr'
-  script: tools/wait-nodes-csrs.py {{ cluster_name }}.{{ base_domain }}
-  args:
-    executable: python3

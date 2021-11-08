@@ -8,12 +8,11 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 
-master_start=0
 infra_id=$1
-master_end=$2
+master_end=$(($2 - 1))
 
-for index in ($master_start..$master_end); do
-    MASTER_HOSTNAME="$infra_idinfra_id-master-$index\n"
+for index in $( seq 0 $master_end); do
+    MASTER_HOSTNAME="$infra_id-master-$index\n"
     python -c "import base64, json, sys
 ignition = json.load(sys.stdin)
 storage = ignition.get('storage', {})
