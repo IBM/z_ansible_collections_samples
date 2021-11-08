@@ -43,46 +43,41 @@
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
-- name: 'Read compute nodes names'
-  set_fact:
-    compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
-
 - name: 'Create the Compute servers'
   os_server:
-    name: "{{ os_compute_server_name }}-{{ item.1 }}"
+    name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     timeout: 2400
-    userdata: "{{ lookup('file', 'worker.ign') | string }}"
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.1 }}"
     meta: "{{ cluster_id_tag }}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "dasd"
 
 - name: 'Create the Compute servers with boot volume'
   os_server:
-    name: "{{ os_compute_server_name }}-{{ item.1 }}"
+    name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     timeout: 2400
-    userdata: "{{ lookup('file', 'worker.ign') | string }}"
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.1 }}"
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
     terminate_volume: True
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "scsi"
 
 - name: 'Approve worker nodes csr'
-  script: tools/wait-nodes-csrs.py {{ os_compute_server_name }}-{{ item.1 }}
+  script: tools/wait-nodes-csrs.py {{ cluster_name }}.{{ base_domain }}
   args:
     executable: python3
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
