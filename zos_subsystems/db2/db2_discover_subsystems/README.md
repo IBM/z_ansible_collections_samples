@@ -1,6 +1,6 @@
 # Ansible Discovery of Db2 subsystem
 
-This project provides the required sample playbook and roles to discover the Db2 subsystem information and prompt the information on all registered Db2 subsystems.
+This project provides the required sample playbook and roles to discover the Db2 subsystem information and prompt the information of all defined Db2 subsystems in the sysplex.
 
 The execution of this playbook will return information for each registered Db2 subsystem under DOE, such as:
 - groupName
