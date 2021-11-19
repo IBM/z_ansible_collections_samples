@@ -13,4 +13,5 @@
   roles:
   - configure-compute-nodes
 
+- import_playbook: approve.yaml
 - import_playbook: wait-for-install-complete.yaml

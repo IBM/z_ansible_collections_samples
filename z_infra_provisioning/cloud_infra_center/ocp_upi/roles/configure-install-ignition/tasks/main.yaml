@@ -45,4 +45,7 @@
     executable: python3
 
 - name: Generate Master Ignition
-  script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }}
+  script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_control_nodes_number }}
+
+- name: Generate Worker Ignition
+  script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
