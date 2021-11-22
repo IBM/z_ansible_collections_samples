@@ -73,3 +73,13 @@
     file:
       state: absent
       path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
+
+  - name: 'Remove the hidden openshift install state json files'
+    file:
+      state: absent
+      path: .openshift_install_state.json
+  
+  - name: 'Remove the hidden openshift_install.log files'
+    file:
+      state: absent
+      path: .openshift_install.log
