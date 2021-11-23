@@ -75,25 +75,24 @@ backend ocp4-machine-config-server
 
 backend ocp4-router-http
    mode tcp
-{% if infra is defined %}
+{% if infra is defined and infra|length > 0 %}
    {% for item in infra.keys() %}
       server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:80 check
    {% endfor %}
 {% else %}
-    {% for item in masters.keys() %}
-      server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:80 check
+   {% for item in masters.keys() %}
+      server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:22623 check
    {% endfor %}
 {% endif %}
 
 backend ocp4-router-https
    mode tcp
-{% if infra is defined %}
+{% if infra is defined and infra|length > 0 %}
    {% for item in infra.keys() %}
       server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:443 check
    {% endfor %}
 {% else %}
-    {% for item in masters.keys() %}
-      server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:443 check
+   {% for item in masters.keys() %}
+   server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:22623 check
    {% endfor %}
 {% endif %}
-

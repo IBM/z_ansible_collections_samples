@@ -273,6 +273,9 @@ Others are **optional**, you can enable them and update value if you need more s
 | `os_bootstrap_ip` | \<bootstrap ip addr\> |'x.x.x.x, <br>**required** when `auto_allocated_ip` is false
 | `os_master_ip` | \<master ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
 | `os_infra_ip` |\<infra ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
+| `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting
+| `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, <br>**required** when `use_proxy` is true
+| `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, <br>**required** when `use_proxy` is true
 
 
 ## Creation of the cluster
