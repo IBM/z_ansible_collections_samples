@@ -42,8 +42,8 @@ all:
       openshift_version: '4.7'
       openshift_minor_version: '7'
       
-      auto_allocated_ip: true 
-      os_subnet_range: "<subnet-range>"
+      auto_allocated_ip: true  # true or false
+      os_subnet_range: '<subnet-range>'
       #allocation_pool_start: '<ip range start>'
       #allocation_pool_end: '<ip range end>'
       os_flavor_master: 'medium'
@@ -57,18 +57,23 @@ all:
       #os_bootstrap_ip: '<bootstrap ip addr>'
       #os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
       #os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
+      
+      use_proxy: false # true or false
+      #http_proxy: '<http-proxy>'
+      #https_proxy: '<https-proxy>'
+      #no_proxy: '<no-proxy>'
 
     bastion:
-      ansible_ssh_host: "<linux-server-ip-addr>"
-      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
-      bastion_private_ip_address: "<bastion-ip-addr>"
-      cluster_subnet_range: "<cluster-subnet-range>"
+      ansible_ssh_host: '<linux-server-ip-addr>'
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+      bastion_private_ip_address: '<bastion-ip-addr>'
+      cluster_subnet_range: '<cluster-subnet-range>'
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
       dns_forwarder: '<upstream-dns-ip-addr>'
 
   vars:
-    os_dns_domain: "<external-dns-ip-addr>"
-    cluster_name: "<cluster-name>"
-    base_domain: "<cluster-base-domain>"
+    os_dns_domain: '<external-dns-ip-addr>'
+    cluster_name: '<cluster-name>'
+    base_domain: '<cluster-base-domain>'
     pullsecret: '<pull-secret>'
     sshkey: '<ssh-key>'
