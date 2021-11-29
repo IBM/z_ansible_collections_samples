@@ -42,7 +42,7 @@
   os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "rhcos"
-    flavor: "{{ os_flavor_master }}"
+    flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: 3600
     auto_ip: no
@@ -57,7 +57,7 @@
   os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "rhcos"
-    flavor: "{{ os_flavor_master }}"
+    flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: 3600
     auto_ip: no

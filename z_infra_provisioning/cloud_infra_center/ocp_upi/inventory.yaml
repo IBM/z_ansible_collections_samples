@@ -46,6 +46,7 @@ all:
       os_subnet_range: '<subnet-range>'
       #allocation_pool_start: '<ip range start>'
       #allocation_pool_end: '<ip range end>'
+      os_flavor_bootstrap: 'medium'
       os_flavor_master: 'medium'
       os_flavor_worker: 'medium' 
 
