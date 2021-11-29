@@ -48,6 +48,10 @@
     insertafter: "\\[main\\].*"
     regexp: "^dns=.*"
 
+- name: Check if DNS is already defined
+  shell: grep -c "^{{ cluster_domain_name }}" /etc/resolv.conf || true
+  register: check
+
 - name: Use local dns in resolv.conf
   blockinfile:
     dest: /etc/resolv.conf
@@ -55,6 +59,7 @@
     block: |
       search {{ cluster_domain_name }}
       nameserver {{ bastion_private_ip_address }} 
+  when: check.stdout == "0"
 
 - name: Reverse the order of the decimals in the specified bastion subnet
   set_fact: 

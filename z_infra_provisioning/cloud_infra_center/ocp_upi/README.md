@@ -77,10 +77,10 @@ After you performed the previous steps successfully, you get one ready OpenShift
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
 - **(Optional)** A Bastion server, a machine that is used to configure DNS and Load Balancer for the Red Hat OpenShift installation
-    - If you use both existing DNS and HAProxy server for the Red Hat OpenShift installation, the bastion server **is not** required.
-    - If you have external or existing DNS server, but no existing HAProxy server for the Red Hat Openshift installation, please set `os_dns_domain` property, and use a separate YAML `configure-haproxy` to only configure the HAProxy in bastion server.
-    - If you have external or existing HAProxy, but no existing DNS server for the Red Hat Openshift installation, you can use a separate YAML `configure-dns` to configure the DNS server in bastion server.
-    - If you don't have any existing DNS server or HAProxy for the Red Hat Openshift installation, our Ansible playbook will help configure DNS and HAProxy server, you need to create one Linux server as the bastion server. You can also use the same Linux server that runs Ansible.
+    - If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, the bastion server **is not** required.
+    - If you have external or existing DNS server, but no Load Balancer for the Red Hat Openshift installation, please set `os_dns_domain` property, and then use a separate YAML `configure-haproxy` to configure the HAProxy in bastion server.
+    - If you have existing Load Balancer, but no DNS server for the Red Hat Openshift installation, you can use a separate YAML `configure-dns` to configure the DNS server in bastion server.
+    - If you don't have any existing DNS server or Load Balancer for the Red Hat Openshift installation, you need to create one Linux server as the bastion server and run playbook to configure DNS server and Load Balancer. You can also use the same Linux server that runs Ansible.
 
 ### 2. Installation of packages on a Linux server
 
@@ -258,7 +258,7 @@ Update your settings based on the samples. The following propeties are **require
 | `cluster_name` | \<cluster-name\> |The name of the cluster, such as `openshift`.| 
 | `base_domain` | \<cluster-base-domain\> |The base domain of the cluster, the base domain is used to create routes to your OpenShift Container Platform cluster components, such as `example.com`| 
 
-If you need the Ansible playbook to help configure DNS or HAProxy server on bastion server, you need to configure correct bastion properties.
+If you need the Ansible playbook to help configure DNS server or HAProxy server on bastion server, you need to configure correct bastion properties.
 | Property| <div style="width:220px">Default</div> | Description                           |
 | --------------------------------------- | ------------------------------------- |:-----|
 | `ansible_ssh_host` | \<linux server ip addr\> | 'x.x.x.x'<br> **required** when use bastion server, give the IP address of bastion server.
@@ -275,7 +275,10 @@ Others are **optional**, you can enable them and update value if you need more s
 | `os_bootstrap_ip` | \<bootstrap ip addr\> |'x.x.x.x, <br>**required** when `auto_allocated_ip` is false
 | `os_master_ip` | \<master ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
 | `os_infra_ip` |\<infra ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
-
+| `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting
+| `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
+| `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
+| `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
 
 ## Creation of the cluster
 
@@ -289,14 +292,14 @@ ansible-playbook -i inventory.yaml 01-preparation.yaml
 
 **Note**: This step is optional.
 
-> Skip this step if you want to use your external or existing DNS and HAProxy, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
+> Skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
 
-> If you use your external or existing DNS server, but no HAProxy, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS server part, and use this playbook to configure HAProxy in your bastion server.
+> If you use your external or existing DNS server, but no Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS server part, and use this playbook to configure HAProxy in your bastion server.
 ```sh
 ansible-playbook -i inventory.yaml configure-haproxy.yaml
 ```
 
-> If you don't have any existing DNS server or HAProxy, please use this playbook to configure DNS server and HAProxy in your bastion server. 
+> If you don't have any existing DNS server or Load Balancer, please use this playbook to configure DNS server and HAProxy in your bastion server. 
 ```sh
 ansible-playbook -i inventory.yaml bastion.yaml
 ```
