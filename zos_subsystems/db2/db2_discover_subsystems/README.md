@@ -42,6 +42,11 @@ If you are unfamiliar with playbooks, you can review our
 
 Update the playbook-specific variables in [vars/db2_discover_subsystems.yml](vars/db2_discover_subsystems.yml), based on the behavior that you want.
 
+1. zos_target_address - Hostname of the system on which Db2 for z/OS DevOps Experience is running. 
+2. valid_port_number - Port number of Db2 DevOps Experience Server.
+3. valid_username - Username used to access the DOE REST API.
+4. valid_password - Password used to access the DOE REST API.
+
 ## Run the playbook
 
 1. To run the DB2 discovery playbook, type the following command from the root of this repository:
