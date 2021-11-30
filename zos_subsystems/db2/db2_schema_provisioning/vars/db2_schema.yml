@@ -16,16 +16,17 @@ username: valid_username
 password: valid_password
 
 # The name for the application that the instance is provisioned from.
-# Db2 DevOps Experience validates this name to ensure that it exists.
-app_name: ANS_GenApp
+# Db2 DevOps Experience validates this name to ensure that it exists. Eg.ANS_GenApp
+app_name: valid_app_name
 
 # The  name for the team which the instance is provisioned under.
-# Db2 DevOps Experience validates this name to ensure that it exists.
-team_name: ANSTEAM
+# Db2 DevOps Experience validates this name to ensure that it exists. Eg.ANSTEAM
+team_name: valid_team_name
 
 # The name for the newly provisioned instance.
-# The name cannot contain the symbols for less-than (&lt;) , greater-than (&gt;) , or ampersand (&amp;) . Db2 DevOps Experience validates this name to ensure that it is unique across all of the existing instances.
-inst_name: ansibleInst
+# The name cannot contain the symbols for less-than (&lt;) , greater-than (&gt;) , or ampersand (&amp;).
+# Db2 DevOps Experience validates this name to ensure that it is unique across all of the existing instances. Eg.ansibleInst
+inst_name: valid_inst_name
 
 # Parameter that gives option to user to provision the app instance with or without data
 with_data: yes
