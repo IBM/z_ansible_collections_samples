@@ -7,14 +7,14 @@ zos_target_address: https://tivlp02.svl.ibm.com
 # Server name used to access the DOE rest apis
 doe_server: zos_target_address
 
-# Port number of Db2 DevOps Experience Server. Default: 12024
-doe_server_port: 12024
+# Port number of Db2 DevOps Experience Server. Default: 12023
+doe_server_port: valid_port_number
 
 # Base url used to access DOE REST API
 base_url: "{{ doe_server }}:{{ doe_server_port }}"
 
 # Username used to access the DOE REST API
-username: DOEDEV3
+username: valid_username
 
 # Password used to access the DOE REST API
-password: DOEPW
+password: valid_password
