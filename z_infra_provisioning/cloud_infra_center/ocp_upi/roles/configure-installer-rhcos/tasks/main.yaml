@@ -13,6 +13,13 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
+- name: Check if kvm is scsi disk
+  fail:
+    msg: "kvm does not support scsi disk type"
+  failed_when: 
+  - vm_type == "kvm"
+  - disk_type == "scsi"
+  
 - name: Download RHCOS Image
   become: yes
   get_url:

@@ -27,7 +27,7 @@
     register: infra_id
 
   - name: 'Get the created worker nodes name and store them in a file'
-    shell: "./oc get nodes --kubeconfig auth/kubeconfig --no-headers | awk '{print$1}' | grep -w worker | awk -F '-' '{print$4}' | sort -r | head -n1"
+    shell: "./oc get nodes --kubeconfig auth/kubeconfig --no-headers | awk '{print$1}' | grep -w worker | grep -Po '.(?=.{0}$)' | sort -r | head -n1"
     register: latest_worker_index
 
   - name: 'Increment worker node index'
