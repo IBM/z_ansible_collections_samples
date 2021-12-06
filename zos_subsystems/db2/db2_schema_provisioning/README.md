@@ -37,13 +37,6 @@ If you are unfamiliar with playbooks, you can review our
 [detailed configuration guide](https://github.com/IBM/z_ansible_collections_samples/blob/master/docs/share/zos_core/configuration_guide.md).
 
 Update the playbook-specific variables in [vars/db2_schema.yml](vars/db2_schema.yml), based on the behavior that you want.
-1. zos_target_address - Hostname of the system on which Db2 for z/OS DevOps Experience is running. 
-2. valid_port_number - Port number of Db2 DevOps Experience Server.
-3. valid_username - Username used to access the DOE REST API.
-4. valid_password - Password used to access the DOE REST API.
-5. valid_app_name - The name for the application that the instance is provisioned from. Db2 DevOps Experience validates this name to ensure that it exists.
-6. valid_team_name - The  name for the team which the instance is provisioned under. Db2 DevOps Experience validates this name to ensure that it exists.
-7. valid_inst_name - The name for the newly provisioned instance. The name cannot contain the symbols for less-than (&lt;) , greater-than (&gt;) , or ampersand (&amp;). Db2 DevOps Experience validates this name to ensure that it is unique across all of the existing instances.
 
 1. zos_target_address - Hostname of the system on which Db2 for z/OS DevOps Experience is running. Server name used to access the DOE rest apis.
 2. valid_port_number - Port number of Db2 DevOps Experience Server.
