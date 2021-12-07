@@ -14,7 +14,7 @@ Role Variables
 | Variable           | Definition                                                                             |
 |--------------------|----------------------------------------------------------------------------------------|
 | doe_server    | Server name used to access the DOE REST APIs|
-| doe_server_port            | Port number of the Db2 DevOps Experience Server. Default: 12024|
+| doe_server_port            | Port number of the Db2 DevOps Experience Server. Default: 12023|
 | base_url       |  Base URL used to access the DOE REST APIs|
 | username              | Username used to access the DOE REST APIs|
 | password              | Password used to access the DOE REST APIs|

@@ -5,17 +5,17 @@
 # Server name used to access the DOE rest apis
 doe_server: zos_target_address
 
-# Port number of Db2 DevOps Experience Server. Default: 12024
-doe_server_port: 12024
+# Port number of Db2 DevOps Experience Server. Default: 12023
+doe_server_port: valid_port_number
 
 # Base url used to access DOE REST API
 base_url: "{{ doe_server }}:{{ doe_server_port }}/ws/policy"
 
 # Username used to access the DOE REST API
-username: DOEDEV1
+username: valid_username
 
 # Password used to access the DOE REST API
-password: DOEPW
+password: valid_password
 
 # The name for the newly provisioned instance.
 # The name cannot contain the symbols for less-than (&lt;) , greater-than (&gt;) , or ampersand (&amp;) . Db2 DevOps Experience validates this name to ensure that it is unique across all of the existing instances.
