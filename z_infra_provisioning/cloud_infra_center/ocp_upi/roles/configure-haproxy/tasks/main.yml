@@ -60,7 +60,6 @@
   notify:
   - restart firewalld
 
-
 - name: Allow https traffic
   firewalld:
     service: https
@@ -115,4 +114,36 @@
   notify:
   - restart firewalld
 
+- name: Restart haproxy
+  service: name=haproxy state=restarted
 
+- name: Restart firewalld
+  service: name=firewalld state=restarted
+
+- name: Check if haproxy is running
+  service:
+    name: haproxy
+    state: started
+
+- name: Check if firewalld is running
+  service:
+    name: firewalld
+    state: started
+
+# - name: Report status of haproxy
+#   fail:
+#     msg: |
+#       Service haproxy is not running.
+#       Output of `systemctl status haproxy`:
+#       {{ service_haproxy_status.stdout }}
+#       {{ service_haproxy_status.stderr }}
+#   when: services_state.ansible_facts.services['haproxy.service'].state != 'started'  
+
+# - name: Report status of firewalld
+#   fail:
+#     msg: |
+#       Service firewalld is not running.
+#       Output of `systemctl status firewalld`:
+#       {{ service_firewalld_status.stdout }}
+#       {{ service_firewalld_status.stderr }}
+#   when: services_state.ansible_facts.services['firewalld.service'].state != 'started'  

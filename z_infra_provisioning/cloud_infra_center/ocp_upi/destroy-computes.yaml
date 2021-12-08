@@ -44,19 +44,12 @@
     shell:
       cmd: "jq -r .infraID metadata.json"
     register: infra_id
-  
-  - name: 'Find compute nodes names'
-    find:
-      paths: .
-      patterns: ".compute-nodes.*"
-    register: find_compute
 
   - name: 'Remove the Compute servers'
     os_server:
-      name: "{{ os_compute_server_name }}-{{ item.1 }}"
+      name: "{{ item.1 }}-{{ item.0 }}"
       state: absent
-    with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
-    when: "{{ find_compute['files'] }}"
+    with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
 
   - name: 'Get Compute servers from ICIC command line'
     shell: |
@@ -64,7 +57,7 @@
     register: computes
     ignore_errors: true
 
-  - name: 'Remove the computes node'
+  - name: 'Remove all computes node'
     shell:
       cmd: "openstack server delete {{ item.1 }}"
     with_indexed_items: "{{ computes.stdout_lines }}"
