@@ -65,7 +65,7 @@
 
   - name: 'Set Compute ports tag'
     command:
-      cmd: "openstack port set --tag {{ [cluster_id_tag] }} {{ os_port_worker }}-{{ new_worker_index }}"
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ new_worker_index }}"
 
   - name: 'Create the Compute servers'
     os_server:
