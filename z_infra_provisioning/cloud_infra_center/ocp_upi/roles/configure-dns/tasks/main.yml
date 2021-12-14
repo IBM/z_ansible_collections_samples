@@ -32,6 +32,10 @@
   set_fact: 
     cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
 
+- name: Get the subnet range from localhost
+  set_fact:
+    subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
+
 - name: Create dns subnet definition
   template:
     src: var/named/cluster_domain_name.zone.j2
@@ -81,7 +85,13 @@
   notify:
    - restart dns
 
-- name: Replace bastion_subnet_prefix_reverse
+- name: Update cluster_subnet_range
+  shell: 
+    cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
+  notify:
+   - restart dns
+
+- name: Update bastion_subnet_prefix_reverse
   shell: 
     cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
   notify:

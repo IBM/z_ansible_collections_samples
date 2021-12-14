@@ -43,7 +43,6 @@ all:
       openshift_minor_version: '7'
       
       auto_allocated_ip: true  # true or false
-      os_subnet_range: '<subnet-range>'
       #allocation_pool_start: '<ip range start>'
       #allocation_pool_end: '<ip range end>'
       os_flavor_bootstrap: 'medium'
@@ -51,10 +50,9 @@ all:
       os_flavor_worker: 'medium' 
 
       create_server_zone: ''
-
       os_control_nodes_number: 3
-
       os_compute_nodes_number: 3
+
       #os_bootstrap_ip: '<bootstrap ip addr>'
       #os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
       #os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
@@ -64,11 +62,12 @@ all:
       #https_proxy: '<https-proxy>'
       #no_proxy: '<no-proxy>'
 
+      approve_nodes_csr: 10 # minute
+
     bastion:
       ansible_ssh_host: '<linux-server-ip-addr>'
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
       bastion_private_ip_address: '<bastion-ip-addr>'
-      cluster_subnet_range: '<cluster-subnet-range>'
       bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
       dns_forwarder: '<upstream-dns-ip-addr>'
 

@@ -23,6 +23,11 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
+- name: 'Get the subnet range'
+  command:
+    cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
+  register: sunbet_range
+
 - name: 'Create the master security group'
   os_security_group:
     name: "{{ os_sg_master }}"
@@ -48,7 +53,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 22623
     port_range_max: 22623
 
@@ -62,7 +67,7 @@
 - name: 'Create master-sg rule "DNS (TCP)"'
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     protocol: tcp
     port_range_min: 53
     port_range_max: 53
@@ -70,7 +75,7 @@
 - name: 'Create master-sg rule "DNS (UDP)"'
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     protocol: udp
     port_range_min: 53
     port_range_max: 53
@@ -78,7 +83,7 @@
 - name: 'Create master-sg rule "mDNS"'
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     protocol: udp
     port_range_min: 5353
     port_range_max: 5353
@@ -94,7 +99,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 4789
     port_range_max: 4789
 
@@ -102,7 +107,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 6081
     port_range_max: 6081
 
@@ -110,7 +115,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 6641
     port_range_max: 6642
 
@@ -118,7 +123,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 9000
     port_range_max: 9999
 
@@ -126,7 +131,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 9000
     port_range_max: 9999
 
@@ -134,7 +139,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 10259
     port_range_max: 10259
 
@@ -142,7 +147,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 10257
     port_range_max: 10257
 
@@ -150,7 +155,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 10250
     port_range_max: 10250
 
@@ -158,7 +163,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 2379
     port_range_max: 2380
 
@@ -166,7 +171,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 30000
     port_range_max: 32767
 
@@ -174,7 +179,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 30000
     port_range_max: 32767
 
@@ -182,7 +187,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_master }}"
     protocol: '112'
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
 
 
 - name: 'Create worker-sg rule "ICMP"'
@@ -201,7 +206,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 5353
     port_range_max: 5353
 
@@ -223,7 +228,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 1936
     port_range_max: 1936
 
@@ -231,7 +236,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 4789
     port_range_max: 4789
 
@@ -239,7 +244,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 6081
     port_range_max: 6081
 
@@ -247,7 +252,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 9000
     port_range_max: 9999
 
@@ -255,7 +260,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 9000
     port_range_max: 9999
 
@@ -263,7 +268,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 10250
     port_range_max: 10250
 
@@ -271,7 +276,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: tcp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 30000
     port_range_max: 32767
 
@@ -279,7 +284,7 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: udp
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
     port_range_min: 30000
     port_range_max: 32767
 
@@ -287,4 +292,4 @@
   os_security_group_rule:
     security_group: "{{ os_sg_worker }}"
     protocol: '112'
-    remote_ip_prefix: "{{ os_subnet_range }}"
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"

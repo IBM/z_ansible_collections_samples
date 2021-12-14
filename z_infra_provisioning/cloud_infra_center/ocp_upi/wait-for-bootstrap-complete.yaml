@@ -37,3 +37,11 @@
     until: job_result.finished
     retries: 120
     delay: 30
+  
+  - name: Check bootstrap log
+    shell: 'cat .openshift_install.log  | grep -A7 "bootstrapping to complete"'
+    register: bootstrap_log
+
+  - name: Show bootstrapping log
+    debug:
+      var:  bootstrap_log.stdout_lines
