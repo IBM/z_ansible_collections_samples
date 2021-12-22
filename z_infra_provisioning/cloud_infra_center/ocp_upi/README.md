@@ -10,6 +10,10 @@ Before you get started with Ansible, familiarize yourself with the basics of Red
 
 # About this playbook
 
+> The current version of this playbook: [version](./version)
+
+> The instruction of [checkout to specific version](./checkout-to-version.md#Checkout-to-specific-version)
+
 The playbook contains the following topics:
 
 1. How to use the IBM Cloud Infrastructure Center to install Red Hat OpenShift Container Platform via user-provisioned infrastructure (UPI)
