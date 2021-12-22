@@ -27,8 +27,5 @@
 # - Change Ansible playbook name
 
 ---
-- name: configure dns on bastion
-  hosts: bastion
-  serial: 2
-  roles:
-  - configure-dns
+- import_playbook: modify-dns.yaml
+- import_playbook: modify-haproxy.yaml

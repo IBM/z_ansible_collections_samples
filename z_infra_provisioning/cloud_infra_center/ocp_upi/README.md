@@ -247,7 +247,6 @@ Update your settings based on the samples. The following propeties are **require
 | `openshift_version` |4.7| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
 | `openshift_minor_version` |7| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
-| `os_subnet_range` |\<subnet-range\> | If the os_subnet_range is `172.26.0.0/16`, <br>the allocation pools will be `172.26.0.10-172.26.255.254` | |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB  | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB | |
 | `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB  | |
@@ -265,7 +264,6 @@ If you need the Ansible playbook to help configure DNS server or HAProxy server 
 | --------------------------------------- | ------------------------------------- |:-----|
 | `ansible_ssh_host` | \<linux server ip addr\> | 'x.x.x.x'<br> **required** when use bastion server, give the IP address of bastion server.
 | `bastion_private_ip_address` | \<bastion ip addr\>      |IP address of your bastion node<br>**required** when use bastion server, give the IP address of bastion server.
-| `cluster_subnet_range` |\<cluster subnet range\>       |The queries from IPs in `cluster_subnet_range` will be allowed, we suggest setting the same as `os_subnet_range`  <br>**required** when use bastion server
 | `dns_forwarder` | \<upstream DNS ip addr\> |For nameserver where requests should be forwarded for resolution.<br>**required** when use bastion server
 
 Others are **optional**, you can enable them and update value if you need more specified settings.
@@ -281,6 +279,7 @@ Others are **optional**, you can enable them and update value if you need more s
 | `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
+| `approve_nodes_csr` |10| Default is 10 minutes that used to wait for approving node csrs
 
 ## Creation of the cluster
 
@@ -333,13 +332,27 @@ After above steps, you will get one ready OpenShift Container Platform on the IB
 ## Day2 Operation
 
 ### Add a new compute node
-If you want to add new compute node as allocated IP:
+Use this playbook to add new compute node as allocated IP:
 ```sh
 ansible-playbook -i inventory.yaml add-new-compute-node.yaml 
 ```
-If you want to add new compute node as fixed IP:
+Use this playbook to add new compute node as fixed IP:
 ```sh
 ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.xs
+```
+**Please notice:**
+The new compute node should be updated corresponding DNS and Load Balancer. If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, you may skip this part.
+* If you use our `bastion.yaml` playbook to configure the DNS server and Load Balancer, you can use this playbook to update those two directly.
+```sh
+ansible-playbook -i inventory.yaml modify-bastion.yaml
+```
+* If you use our `configure-haproxy.yaml` playbook to configure the Load Balancer, you can use this playbook to update HAProxy too.
+```sh
+ansible-playbook -i inventory.yaml modify-haproxy.yaml
+```
+* If you use our `configure-dns.yaml` playbook to configure the DNS server, you can use this playbook to update DNS too.
+```sh
+ansible-playbook -i inventory.yaml modify-dns.yaml
 ```
 
 ## Uninstall Red Hat OpenShift Container Platform

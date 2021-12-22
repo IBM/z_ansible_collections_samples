@@ -32,6 +32,10 @@
 
   - name: 'Increment worker node index'
     set_fact: new_worker_index={{ latest_worker_index.stdout|int + 1 }}
+  
+  - name: Get existing node count
+    shell: "cat .new_ocp_node.yml | grep total_count | awk -F '=' '{print $2}'"
+    register: existing_node_count
 
   # - name: get new worker index
   #   debug:
@@ -96,5 +100,20 @@
       terminate_volume: True
     when:
     - disk_type == "scsi"
+  
+  - name: Get new node IP
+    environment:
+      KUBECONFIG: "./auth/kubeconfig"
+    shell: |
+      openstack server show {{ os_compute_server_name }}-{{ new_worker_index }} -c addresses -f value | awk -F = '{print$2}'
+    register: new_worker_ip
+
+  - name: 'Save new worker info into yaml'
+    shell: |
+      rm -rf .new_ocp_node.yml
+      echo total_count={{ existing_node_count.stdout | int + 1 }} >> .new_ocp_node.yml
+      echo cluster_domain_name={{ cluster_name }}.{{ base_domain }} >> .new_ocp_node.yml
+      echo new_worker_index={{ new_worker_index }} >> .new_ocp_node.yml
+      echo new_worker_ip={{ new_worker_ip.stdout }} >> .new_ocp_node.yml
 
 - import_playbook: approve.yaml

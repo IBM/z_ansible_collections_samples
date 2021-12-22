@@ -47,11 +47,10 @@
     retries: 120
     delay: 30
 
-  - name: Check kubeadmin-password
-    slurp:
-      src: "./auth/kubeadmin-password"
-    register: kubeadmin_password
+  - name: Check openshift web-console and kubeadmin-password
+    shell: 'cat .openshift_install.log  | grep -A10 "Install complete"'
+    register: webconsole
 
-  - name: Show kubeadmin-password
+  - name: Show openshift web-console and kubeadmin-password
     debug:
-      msg: "{{ kubeadmin_password.content | b64decode }}"
+      var:  webconsole.stdout_lines

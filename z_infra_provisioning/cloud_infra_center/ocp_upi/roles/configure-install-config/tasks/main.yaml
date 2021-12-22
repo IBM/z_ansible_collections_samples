@@ -15,13 +15,18 @@
     state: absent
     path: install-config.yaml
 
+- name: 'Get the subnet range'
+  command:
+    cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
+  register: sunbet_range
+
 - name: Create install-config.yaml
   template:
     src:  templates/install-config-yaml.j2
     dest: "install-config.yaml"
 
 - name: Configure Machine Network in Install Configuration
-  script: tools/config-machine-network.py {{ os_subnet_range }}
+  script: tools/config-machine-network.py {{ sunbet_range.stdout_lines[0] }}
   args:
     executable: python3
 

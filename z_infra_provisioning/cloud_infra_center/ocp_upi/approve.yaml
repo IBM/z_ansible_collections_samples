@@ -74,3 +74,32 @@
   # - name: viewing fifth csr approved
   #   debug:
   #     msg: "{{csr_approved_4.stdout_lines}}"
+
+  - name: Get ready nodes count from OCP cluster
+    environment:
+      KUBECONFIG: "./auth/kubeconfig"
+    shell: |
+      ./oc get nodes --no-headers=true | grep worker | wc -l
+    register: existing_node_count
+
+  - name: Get total node count from yaml file
+    shell: "cat .new_ocp_node.yml | grep total_count | awk -F '=' '{print $2}'"
+    register: total_node_count
+
+  - name: Waiting more than {{ approve_nodes_csr }} minutes within poor performance node
+    script: tools/wait-nodes-csrs.py {{ total_node_count.stdout }} {{ approve_nodes_csr }}
+    args:
+      executable: python3
+    when: existing_node_count.stdout != total_node_count.stdout
+
+  - name: Second get ready nodes count from OCP cluster
+    environment:
+      KUBECONFIG: "./auth/kubeconfig"
+    shell: |
+      ./oc get nodes --no-headers=true | grep worker | wc -l
+    register: second_node_count
+
+  - name: Failed task after approving all pending CSR within {{ approve_nodes_csr }} minutes
+    fail:
+      msg: "Please increase default approving CSR minutes by approve_nodes_csr, or approving all pending CSR manually via: oc get csr | grep -i pend | awk ‘{print $1}’ | xargs oc adm certificate approve"
+    failed_when: second_node_count.stdout != total_node_count.stdout
