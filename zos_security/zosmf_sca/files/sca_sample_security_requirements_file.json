@@ -1,0 +1,7 @@
+{   
+    "resourceItems": [{
+        "ResourceProfile" : "IZUP01SF.ZOSMF.CONFIGURATION.SECURITY_ASSISTANT",
+        "ResourceClass" : "ZMFAPLA",
+        "LevelOfAccessRequired" : "READ"
+    }]
+}

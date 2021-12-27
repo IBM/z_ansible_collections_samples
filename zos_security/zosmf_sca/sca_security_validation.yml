@@ -1,0 +1,20 @@
+- hosts: zos_systems 
+  connection: local
+  collections:
+    - ibm.ibm_zosmf
+  gather_facts: false
+  tasks:
+  - zmf_authenticate:
+        zmf_host: "{{ zmf_host }}"
+        zmf_port: "{{ zmf_port }}"
+        zmf_user: "{{ zmf_user }}"
+        zmf_password: "{{ zmf_password }}"
+    register: result_auth
+  - name: Run security validation and expect all requirements are satisified
+    zmf_sca:
+        zmf_credential: "{{ result_auth }}"
+        location: "{{location}}" # The security requirement file location: local or remote
+        path_of_security_requirements: "{{path}}" # Path of the security requirement file
+        target_userid: "{{target_userid}}" # Targete user /group id to be validated
+    register: result
+  - debug: var=result
