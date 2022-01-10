@@ -1,8 +1,8 @@
 # z/OSMF Security Configuration Assistant
 
 This project provides sample playbooks which demonstrate how to validate
-security requirements on the target z/OS systems. These playbooks leverage module
-`zmf_sca` provided by IBM z/OSMF collection included in the Red Hat Ansible
+security requirements on the target z/OS systems by leveraging z/OSMF Security Configuration Assistant (SCA). 
+These playbooks leverage module `zmf_sca` provided by IBM z/OSMF collection included in the Red Hat Ansible
 Certified Content for IBM Z.
 
 It is a good practice to review the playbook sample contents before executing
@@ -17,12 +17,13 @@ Review the playbook notes sections for additional details and configuration.
 
 - [**sca_security_validation.yml**](sca_security_validation.yml) -
 Performing security validation using module `zmf_sca` provided with IBM z/OSMF collection.
-The playbook will succeed if all requirements are satisified, otherwise it will fail and
-return those unsatisified requirements.
+The playbook will succeed if all requirements in the json format of SCA security descriptor file
+are satisified, otherwise it will fail and return those unsatisified requirements. 
+The json format of SCA security descriptor file is flexible and can be used to describe security requirements based on your need. For an example of SCA secruity descriptor file, please refer to [**here**](https://github.com/IBM/IBM-Z-zOS/tree/main/zOSMF/Zosmf-SCA).
 
 - [**sca_security_audit.yml**](sca_security_audit.yml) -
 Performing security audit using module `zmf_sca` provided with IBM z/OSMF collection.
-The playbook will succeed if no access to any items, otherwise it will fail and
+The playbook will succeed if no access to any items described by the SCA security descriptor file, otherwise it will fail and
 return those unqualified items.
 
 
@@ -31,6 +32,9 @@ return those unqualified items.
 IBM z/OSMF collection 1.1.0 or later
 
 ## Getting Started
+### Make sure z/OSMF SCA plugin is configured properly
+The zmf_sca module depends on z/OSMF SCA plugin with APAR PH41248 (Available on V2R4 and above) applied. To run zmf_sca module, you 
+need to ensure z/OSMF SCA plugin is configured properly on the target z/OS system or sysplex depends on the sharing of security configuration. For the configuration of z/OSMF SCA plugin, please refer to [**z/OSMF Configuration Guide**](https://www.ibm.com/docs/en/zos/2.5.0?topic=services-configure-security-configuration-assistant-service). 
 
 ### Ansible Config
 
@@ -69,17 +73,18 @@ This inventory file should be included when running the sample playbooks.
 ``` {.yaml}
 zos_systems:
   hosts:
-    sca_host1:
+    zos_host1:
       zmf_host: zosmf_host_name1
       zmf_port: zosmf_port_number1
-    sca_host2:
+    zos_host2:
       zmf_host: zosmf_host_name2
       zmf_port: zosmf_port_number2
 ```
+Please be noticed that whether or not using the same zosmf for "zos_host1" or "zos_host2" depends on if zos_host1 and zos_host2 are sharing same security data base (such as RACF DB). 
 
 - **zos_systems**: Group name of the target z/OS systems.
 
-- **sca_host1**: Nickname for each target z/OS system on which the security
+- **zos_host1**: Nickname for each target z/OS system on which the security
 validation is to be performed.
 You can modify it to refer to your own z/OS system.
 When the nickname is modified, make sure the host specific variables file is
@@ -100,7 +105,7 @@ you organize your variable values. **host_vars** file name must match the host
 name used in the **inventory** file and sample playbooks.
 
 The sample includes a **host_vars** file
-[**sca_host1.yml**](host_vars/sca_host1.yml) that can be easily customized.
+[**zos_host1.yml**](host_vars/zos_host1.yml) that can be easily customized.
 
 ``` {.yaml}
 # target_userid: target_userid
@@ -125,14 +130,10 @@ for authenticating with z/OSMF server.
 - **zmf_password**: The value of this property identifies the password to be
 used for authenticating with z/OSMF server.
 
-**`Notes:`**
-
-- **zmf_user** and **zmf_password** will be prompted to input when running the
-sample playbooks.
 
 ### Run the Playbook
 
-Access the sample Ansible playbook and ensure that you are within the playbook
+Access the sample Ansible playbook and ensure that you are under the playbook
 directory where the sample files are included.
 
 Use the Ansible command `ansible-playbook` to run the sample playbook.
@@ -147,17 +148,9 @@ ansible-playbook -i inventory.yml sca_security_audit.yml
 
 **`Notes:`**
 
-To run the sample playbooks, below preparation works are required:
-
-- Please refer to the sample security requirements file
-[sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json)
-for security requirements file format.
-
-- In sample playbooks, module
-`zmf_authenticate` is supported by z/OSMF APAR PH12143 (PTF UI66511 for V2R3,
-PTF UI66512 for V2R4).
-You are also allowed to authenticate with z/OSMF server with module
-`zmf_sca` directly.
+Before run the sample playbooks, please review and update the sample security requirements file
+[sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json) based on your need. The security 
+requirements in sca_sample_security_requirements_file.json are just samples and for your reference only. 
 
 ### Debugging
 

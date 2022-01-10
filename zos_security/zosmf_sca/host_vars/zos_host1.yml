@@ -17,8 +17,9 @@
 # Path of the security requirement file
 # path: /path/to/security/requirement/file
 
-# user name to be used for authenticating with the z/OSMF server
+# User name to be used for authenticating with the z/OSMF server
 # zmf_user: zosmf_user_name
 
-# password to be used for authenticating with the z/OSMF server
+# Password to be used for authenticating with the z/OSMF server
+# This is just a sample for your reference. You could use Ansible Vault to encrypt this variable so that it’s not displayed in clear text.
 # zmf_password: zosmf_password
