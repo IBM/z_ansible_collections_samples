@@ -1,15 +1,67 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.1.0] - 2022-02-10
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# This project provides sample playbooks which demonstrate how to validate
+# security requirements on the target z/OS systems by leveraging z/OSMF Security Configuration Assistant (SCA).
+# These playbooks leverage module `zmf_sca` provided by IBM z/OSMF collection included in the Red Hat Ansible
+# Certified Content for IBM Z.
+#
+# This playbook performs security validation using module `zmf_sca` provided with IBM z/OSMF collection.
+# The playbook will succeed if all requirements in the json format of SCA security descriptor file
+# are satisified, otherwise it will fail and return those unsatisified requirements.
+#
+# Usage:
+#   ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#   ansible-playbook -i inventory.yml sca_security_validation.yml
+#
+# Notes:
+#   Before run the sample playbooks, please review and update the sample security requirements file
+#   [sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json) based on your need. The security
+#   requirements in sca_sample_security_requirements_file.json are just samples and for your reference only.
+
+#
+# Requirements:
+#   IBM z/OSMF collection 1.1.0 or later
+#
+# Configure:
+#   target_userid - The value of this property identifies the target user/group id to be validated.
+#   location - The value of this property identifies the location of the security requirement file, local or remote.
+#   path - The value of this property identifies the path of the security requirement file.
+###############################################################################
 - hosts: zos_systems
   connection: local
   collections:
     - ibm.ibm_zosmf
   gather_facts: false
   tasks:
+    # ##########################################################################
+    # Module: zmf_authenticate
+    # ##########################################################################
+    # ##########################################################################
+    # Authenticate with z/OSMF server
+    # ##########################################################################
     - zmf_authenticate:
         zmf_host: "{{ zmf_host }}"
         zmf_port: "{{ zmf_port }}"
         zmf_user: "{{ zmf_user }}"
         zmf_password: "{{ zmf_password }}"
       register: result_auth
+    # ##########################################################################
+    # Module: zmf_sca
+    # ##########################################################################
+    # ##########################################################################
+    # Perform security validation
+    # ##########################################################################
     - name: Run security validation and expect all requirements are satisified
       zmf_sca:
         zmf_credential: "{{ result_auth }}"
