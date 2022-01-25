@@ -11,12 +11,12 @@
 ###############################################################################
 # This project provides sample playbooks which demonstrate how to validate
 # security requirements on the target z/OS systems by leveraging z/OSMF Security Configuration Assistant (SCA).
-# These playbooks leverage module `zmf_sca` provided by IBM z/OSMF collection included in the Red Hat Ansible
+# These playbooks leverage module `zmf_sca`, which is provided by the IBM z/OSMF collection included in the Red Hat Ansible
 # Certified Content for IBM Z.
 #
-# This playbook performs security audit using module `zmf_sca` provided with IBM z/OSMF collection.
-# The playbook will succeed if no access to any items described by the SCA security descriptor file, otherwise it will fail and
-# return those unqualified items.
+# This playbook performs a security audit using module `zmf_sca`, which is provided with the IBM z/OSMF collection.
+# The playbook will succeed if there is no access to any items described by the SCA security descriptor file, otherwise it will fail and
+# return the items that are unqualified.
 #
 # Usage:
 #   ansible-playbook -i <inventory> <playbook>
@@ -25,8 +25,8 @@
 #   ansible-playbook -i inventory.yml sca_security_audit.yml
 #
 # Notes:
-#   Before run the sample playbooks, please review and update the sample security requirements file
-#   [sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json) based on your need. The security
+#   Before running the sample playbooks, please review and update the sample security requirements file
+#   [sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json) based on your needs. The security
 #   requirements in sca_sample_security_requirements_file.json are just samples and for your reference only.
 
 #
@@ -66,7 +66,7 @@
     - name: Run security validation for auditing purpose and expect no access to any items
       zmf_sca:
         zmf_credential: "{{ result_auth }}"
-        location: "{{location}}" # The location of security requirement file: local if it's in the same host with Ansible engine or remote
+        location: "{{location}}" # The location of the security requirement file: local if it is in the same host as the Ansible engine or remote
         path_of_security_requirements: "{{path}}" # Path of the security requirement file
         expected_result: "all-failed" # Expect no access to any security resources described in the security requirement file
         target_userid: "{{target_userid}}" # Target user or group id to be validated
