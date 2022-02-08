@@ -19,7 +19,7 @@ Review the playbook notes sections for additional details and configuration.
 Performing the security validation by using the module `zmf_sca`, which is provided with the IBM z/OSMF collection.
 The playbook will succeed if all requirements in the json format of the SCA security descriptor file
 are satisified, otherwise it will fail and return the requirements that have not been satisfied. 
-The json format of SCA security descriptor file is flexible and can be used to describe security requirements based on your needs. For an example of an SCA secruity descriptor file, please refer to [**here**](https://github.com/IBM/IBM-Z-zOS/tree/main/zOSMF/Zosmf-SCA).
+The json format of SCA security descriptor file is flexible and can be used to describe security requirements based on your needs. For an example of an SCA secruity descriptor file, please refer to [sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json).
 
 - [**sca_security_audit.yml**](sca_security_audit.yml) -
 Performing the security audit using the module `zmf_sca`, which is provided with the IBM z/OSMF collection.
