@@ -88,6 +88,10 @@ often repeated and in need of automation.
     - [Discover registered Db2 subsystems](zos_subsystems/db2/db2_discover_subsystems)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
+- Security
+  - [Security validation](zos_management/zosmf_security_configuration_assistant)
+  - [Security audit](zos_management/zosmf_security_configuration_assistant)
+
 
 ## Blogs
 Don't have time to explore a collection, particular module or a playbook?  
