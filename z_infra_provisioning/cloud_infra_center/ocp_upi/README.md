@@ -34,7 +34,7 @@ The playbook contains the following topics:
 
   3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8 for z/VM and version 4.7, 4.8 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9 for z/VM and version 4.7, 4.8, 4.9 for KVM.
 
 # Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
@@ -251,9 +251,9 @@ Update your settings based on the samples. The following propeties are **require
 | `openshift_version` |4.7| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
 | `openshift_minor_version` |7| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
-| `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB  | |
-| `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB | |
-| `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor size >= 35 GiB  | |
+| `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
+| `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |
+| `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
 | `os_control_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned Control Plane nodes| |
 | `os_compute_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned Compute nodes| |
 | `create_server_zone` |''| The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>Default value is '', which means to use the default availability zone. <br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`]|
@@ -279,7 +279,7 @@ Others are **optional**, you can enable them and update value if you need more s
 | `os_bootstrap_ip` | \<bootstrap ip addr\> |'x.x.x.x, <br>**required** when `auto_allocated_ip` is false
 | `os_master_ip` | \<master ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
 | `os_infra_ip` |\<infra ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
-| `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting
+| `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting, get detail from [doc.openshift.com](https://docs.openshift.com/container-platform/4.9/installing/installing_bare_metal/installing-bare-metal.html#installation-configure-proxy_installing-bare-metal)
 | `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
@@ -321,7 +321,7 @@ ansible-playbook -i inventory.yaml 03-create-cluster-compute.yaml
 
 After above steps, you will get one ready OpenShift Container Platform on the IBM Cloud Infrastructure Center.
 
-### Something is wrong?
+### Something is wrong/trouble shooting?
 
 #### Any above steps failed, clean up environment and then rerun the installation steps.
 

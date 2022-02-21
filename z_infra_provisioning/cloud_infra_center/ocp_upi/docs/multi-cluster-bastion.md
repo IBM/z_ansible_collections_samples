@@ -28,8 +28,8 @@ master-0              IN A 172.26.105.200
 master-1              IN A 172.26.105.207
 master-2              IN A 172.26.105.202
 
-worker-2e582              IN A 172.26.105.208
-worker-5e74f              IN A 172.26.105.209
+worker-0              IN A 172.26.105.208
+worker-1              IN A 172.26.105.209
 
 etcd-0              IN A 172.26.105.200
 etcd-1              IN A 172.26.105.207
@@ -152,13 +152,13 @@ backend ocp4-machine-config-server
 
 backend ocp4-router-http
    mode tcp
-         server worker-34de5 worker-34de5.openshift.first.com:80 check
-         server worker-4fe2f worker-4fe2f.openshift.first.com:80 check
+         server worker-0 worker-0.openshift.first.com:80 check
+         server worker-1 worker-1.openshift.first.com:80 check
 
 backend ocp4-router-https
    mode tcp
-         server worker-34de5 worker-34de5.openshift.first.com:443 check
-         server worker-4fe2f worker-4fe2f.openshift.first.com:443 check
+         server worker-0 worker-0.openshift.first.com:443 check
+         server worker-1 worker-1.openshift.first.com:443 check
 
 # the second cluster configuration 
 frontend ocp4-kubernetes-api-server-second
@@ -205,13 +205,13 @@ backend ocp4-machine-config-server-second
 
 backend ocp4-router-http-second
    mode tcp
-         server worker-2e582 worker-2e582.openshift.second.com:80 check
-         server worker-5e74f worker-5e74f.openshift.second.com:80 check
+         server worker-0 worker-0.openshift.second.com:80 check
+         server worker-1 worker-1.openshift.second.com:80 check
 
 backend ocp4-router-https-seconds
    mode tcp
-         server worker-2e582 worker-2e582.openshift.second.com:443 check
-         server worker-5e74f worker-5e74f.openshift.second.com:443 check
+         server worker-0 worker-0.openshift.second.com:443 check
+         server worker-1 worker-1.openshift.second.com:443 check
 ```
 
 **Note**: The second cluster's frontend and backend names can not be the same as first cluster ones.
