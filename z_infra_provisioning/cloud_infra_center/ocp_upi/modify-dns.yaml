@@ -48,6 +48,12 @@
   - name: Combine cluster name and base domain
     shell: "cat /tmp/.new_ocp_node.yml | grep cluster_domain_name | awk -F '=' '{print $2}'"
     register: cluster_domain_name
+  
+  - name: Check all worker configuration exists in named
+    shell: cat /var/named/{{ cluster_domain_name.stdout  }}.zone | grep  'worker' | wc -l
+    register: all_worker_count
+    check_mode: no 
+    ignore_errors: true
 
   - name: Check new worker DNS configuraition exists in named
     shell: cat /var/named/{{ cluster_domain_name.stdout  }}.zone | grep  'worker-{{dns_new_worker_index.stdout  }}' | wc -l
@@ -55,19 +61,34 @@
     check_mode: no 
     ignore_errors: true
 
-  - name: 'Get the line number if new worker node exists in named'
-    shell: grep -n 'worker-{{dns_new_worker_index.stdout  }}' /var/named/{{ cluster_domain_name.stdout  }}.zone | grep -Eo '^[^:]+' | head -n1 
-    register: exist_new_worker
-    when: exist_new_worker_count.stdout != "0"
+  - name: 'Get the last line number of worker'
+    shell: grep -n 'worker' /var/named/{{ cluster_domain_name.stdout  }}.zone |tail -1| cut --delimiter=":" --fields=1
+    register: last_worker_ln
+    when: all_worker_count.stdout != "0"
+  
+  # - name: show msg new worker 
+  #   debug:
+  #     msg: "{{last_worker_ln.stdout}}"
+
+  - name: Add new worker dns record into named
+    shell: 
+      cmd: "sed -i '{{ last_worker_ln.stdout }} aworker-{{ dns_new_worker_index.stdout }}              IN A {{ dns_new_worker_ip.stdout  }}\n' /var/named/{{ cluster_domain_name.stdout  }}.zone"
+    when: 
+      - last_worker_ln.stdout != "0"
+      - exist_new_worker_count.stdout == "0"
 
   - name: Add new worker dns record into named
     shell: 
       cmd: "sed -i '/^etcd-0/ iworker-{{ dns_new_worker_index.stdout }}              IN A {{ dns_new_worker_ip.stdout  }}\n' /var/named/{{ cluster_domain_name.stdout  }}.zone"
-    when: exist_new_worker_count.stdout == "0"
+    when: 
+      - last_worker_ln == "0" 
+      - exist_new_worker_count.stdout == "0"
 
   - name: Update new worker dns record if new worker node exists in named
     shell: "sed -i '{{ exist_new_worker.stdout }}s/.*/worker-{{ dns_new_worker_index.stdout  }}              IN A {{ dns_new_worker_ip.stdout }}/'  /var/named/{{ cluster_domain_name.stdout  }}.zone"
-    when: exist_new_worker_count.stdout != "0"
+    when: 
+      - last_worker_ln == "0" 
+      - exist_new_worker_count.stdout != "0"
 
   - name: Restart named-chroot.service
     service:
