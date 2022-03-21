@@ -90,6 +90,13 @@
   when:
   - disk_type == "dasd"
 
+- name: 'Convert master flavor from value into number'
+  command:
+    cmd: "openstack flavor show {{ os_flavor_master }} -c disk -f value"
+  register: master_flavor_size
+  when:
+  - disk_type == "scsi"
+
 - name: 'Create the Control Plane servers with boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
@@ -109,6 +116,7 @@
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
+    volume_size: "{{ master_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 

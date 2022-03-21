@@ -59,6 +59,13 @@
   when:
   - disk_type == "dasd"
 
+- name: 'Convert compute node flavor from value into number'
+  command:
+    cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
+  register: compute_flavor_size
+  when:
+  - disk_type == "scsi"
+
 - name: 'Create the Compute servers with boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
@@ -72,6 +79,7 @@
     - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
+    volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
