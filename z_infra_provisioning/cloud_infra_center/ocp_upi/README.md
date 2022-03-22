@@ -6,7 +6,7 @@ Before you get started with Ansible, familiarize yourself with the basics of Red
 
  [Red Hat OpenShift Container Platform installation and update](https://docs.openshift.com/container-platform/4.8/architecture/architecture-installation.html#architecture-installation)
 
-[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.1.4)
+[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.1.5)
 
 # About this playbook
 
@@ -34,7 +34,7 @@ The playbook contains the following topics:
 
   3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9 for z/VM and version 4.7, 4.8, 4.9 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10 for z/VM and version 4.7, 4.8, 4.9, 4.10 for KVM.
 
 # Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
@@ -112,7 +112,7 @@ sudo subscription-manager register --username <username> --password <password> -
 ```
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
-**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2. 
+**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.3 and RHEL8.5. 
 ```sh
 sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
 ```
@@ -172,7 +172,7 @@ openstack
 
 ### 3. Setting the IBM Cloud Infrastructure Center environment variables on your Linux server
 
-Check’ [setting environment variables](https://www.ibm.com/docs/en/cic/1.1.4?topic=descriptions-setting-environment-variables) for more details.
+Check’ [setting environment variables](https://www.ibm.com/docs/en/cic/1.1.5?topic=descriptions-setting-environment-variables) for more details.
 
 1. If your Linux server does not have SSH key, use the following command-line SSH to generate a key pair: 
 ```sh
@@ -226,7 +226,7 @@ icic-services status
 ```
 - Login to the IBM Cloud Infrastructure Center web console and select Home > Environment Checker, click the Run Environment Checker button to confirm the cluster does not have any failed messages.
 
-If you meet any **not running** service or **failed** message, check the IBM Cloud Infrastructure Center [Troubleshooting](https://www.ibm.com/docs/en/cic/1.1.4?topic=troubleshooting) document to fix before running the ansible playbook.
+If you meet any **not running** service or **failed** message, check the IBM Cloud Infrastructure Center [Troubleshooting](https://www.ibm.com/docs/en/cic/1.1.5?topic=troubleshooting) document to fix before running the ansible playbook.
 
 
 ### 4. Download this playbook on your Linux server
@@ -248,8 +248,8 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.7| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
-| `openshift_minor_version` |7| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
+| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
+| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |

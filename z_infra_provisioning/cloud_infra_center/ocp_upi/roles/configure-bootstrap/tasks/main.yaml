@@ -53,6 +53,13 @@
   when:
   - disk_type == "dasd"
 
+- name: 'Convert bootstrap flavor from value into number'
+  command:
+    cmd: "openstack flavor show {{ os_flavor_bootstrap }} -c disk -f value"
+  register: bootstrap_flavor_size
+  when:
+  - disk_type == "scsi"
+
 - name: 'Create the bootstrap server with boot volume'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
@@ -66,6 +73,7 @@
     - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
+    volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   when:
   - disk_type == "scsi"
