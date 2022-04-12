@@ -40,6 +40,7 @@ often repeated and in need of automation.
   - [zHMC](z_systems_administration/zhmc)
     - [Gather facts for CPC and its adapters and partitions](z_systems_administration/zhmc/docs/usecase_playbooks.md)
     - [zHMC Concepts](z_systems_administration/zhmc/docs/module_playbooks.md)
+    - [Manage z/OS Certificates](zos_concepts/certificate_management#readme)
 
 ### z/OS® Topics
 - Administration
