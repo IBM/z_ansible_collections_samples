@@ -46,6 +46,7 @@ often repeated and in need of automation.
   - [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
   - [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user) - \[[Playback](https://mediacenter.ibm.com/media/Managing+z+OS+Users+with+Ansible+/1_bnud4enw)]
   - [Synchronize APF authorized libraries from a configuration cloned from GitHub](zos_concepts/program_authorization/git_apf) - \[[Playback](https://mediacenter.ibm.com/media/Using+Ansible+to+synchronize+z+OS+APF+libraries+from+a+GitHub+configuration+file/1_e6qsiwmg)]
+  - [Manage z/OS Certificates](zos_concepts/certificate_management#readme)
 - Basic Operations
   - [Data Set Basics](zos_concepts/data_sets/data_set_basics)
   - [Copy Directory to PDS, Edit member and Submit Job](zos_concepts/data_sets/copy_edit_submit)
