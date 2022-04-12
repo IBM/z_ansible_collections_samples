@@ -1,0 +1,53 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-install-config
+
+- name: 'Remove the install_config.yaml'
+  file:
+    state: absent
+    path: install-config.yaml
+
+- name: 'Get the subnet range'
+  command:
+    cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
+  register: sunbet_range
+
+- name: Create install-config.yaml
+  template:
+    src:  templates/install-config-yaml.j2
+    dest: "install-config.yaml"
+
+- name: Configure Machine Network in Install Configuration
+  script: tools/config-machine-network.py {{ sunbet_range.stdout_lines[0] }}
+  args:
+    executable: python3
+
+- name: Add http proxy and https proxy in install-config.yaml
+  shell: 
+    cmd: |
+      sed -i '/baseDomain/a proxy:' install-config.yaml
+      sed -i '/proxy/a \ \ httpProxy: {{ http_proxy }}' install-config.yaml
+      sed -i '/httpProxy/a \ \ httpsProxy: {{ https_proxy }}' install-config.yaml
+      sed -i '/httpsProxy/a \ \ noProxy: {{ no_proxy }}' install-config.yaml
+  when:
+  - use_proxy == true 
+    
+- name: Update cluster domain name in install-config.yaml
+  shell: 
+    cmd: |
+      sed -i "s/cluster_basedomain/{{ base_domain }}/g" install-config.yaml
+      sed -i "s/cluster_name/{{ cluster_name }}/g" install-config.yaml
+      cp -r install-config.yaml .install-config.yaml
+     
+- name: Empty Compute Pools
+  script: tools/empty-compute-node.py
+  args:
+    executable: python3

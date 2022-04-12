@@ -30,10 +30,10 @@ ansible_user: zos_target_username
 ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
 
 # The path to the root of IBM python installation
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
+pyz: path_to_python_installation_on_zos_target
 
 # The path to root of ZOAU installation
-ZOAU: "/usr/lpp/IBM/zoautil"
+zoau: path_to_zoau_installation_on_zos_target
 
 # The environment variables that should be set on z/OS host when running playbook.
 # You should not need to change environment_vars

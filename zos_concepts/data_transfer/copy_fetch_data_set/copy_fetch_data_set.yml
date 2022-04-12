@@ -1,0 +1,188 @@
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to copy data to and from a z/OS system
+# using modules included in the Red Hat Ansible Certified Content for IBM Z
+# core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_fetch_data_set.yml
+#
+# Notes:
+#  This sample demonstrates various ways to copy and fetch data sets using
+#  Ansible z/OS core modules. Each module has options available on how
+#  automation can be controlled. This sample does not demonstrate all options,
+#  refer to documentation or ansible-doc for those options.
+#
+# Requirements:
+#   IBM z/OS core collection 1.2.0 or later
+#
+# Configure:
+#   tgt_tmp_dir - this is the USS directory on the target which will be written
+#                 to for this example.
+#   ctl_tmp_dir - this is the directory on the controller which will be written
+#                 to for this example.
+# Optional:
+#   data_set_name - this is the data set name that will be created during
+#                   execution of this sample.
+#   system_name - this is the system name that will be used during this example,
+#                 determined by executing `uname -n` on the target.
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  vars:
+    tgt_tmp_dir: "/tmp"
+    ctl_tmp_dir: "/tmp"
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    # ##########################################################################
+    # Fact setting for use by this playbook
+    # ##########################################################################
+    - name: Setting fact `data_set_name` for use by this sample
+      set_fact:
+        data_set_name: "{{ tmp_ds.stdout }}"
+
+    - name: Fact `data_set_name` set with value
+      debug:
+        msg: "{{ data_set_name }}"
+
+    - name: Detect character set for locale on target {{ inventory_hostname }}
+      command: locale -c charmap
+      register: result
+
+    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
+        target {{ inventory_hostname }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Set variable `target_charset` with target {{ inventory_hostname }}
+        charset
+      set_fact:
+        target_charset: "{{ result.stdout | default('IBM-1047') }}"
+
+    - name: Detecting system name
+      #shell: "uname -a |awk '{print $2}'"
+      command: uname -n
+      register: result
+
+    - name: Setting fact `system_name` for use by this sample
+      set_fact:
+        system_name: "{{ result.stdout }}"
+
+    - name: Fact `system_name` set with value
+      debug:
+        msg: "{{ system_name }}"
+
+
+    # ##########################################################################
+    # Modules zos_copy, zos_fetch, zos_data_set
+    # ##########################################################################
+    # ##########################################################################
+    # 1. Create a PDS on remote z/OS system
+    # 2. Copy a local file to the PDS member
+    # 3. Fetch the PDS back to the control node
+    # 4. Copy the fetched directory to a PDS, replacing the existing data set
+    # ##########################################################################
+
+    - name: Create a PDS on remote host
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        type: pds
+        format: fba
+        record_length: 100
+        size: 5M
+      register: result
+
+    - name: Response for creating the PDS
+      debug:
+        msg: "{{ result }}"
+
+    - name: Copy local file to the created PDS member
+      zos_copy:
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
+        dest: "{{ data_set_name }}(HELLO)"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+      register: result
+
+    - name: Response for copying file to PDS member
+      debug:
+        msg: "{{ result }}"
+
+    - name: Fetch the PDS back to the control node
+      zos_fetch:
+        src: "{{ data_set_name }}"
+        dest: "{{ ctl_tmp_dir }}/"
+        flat: yes
+        encoding:
+          from: "{{ target_charset }}"
+          to: ISO8859-1
+      register: result
+
+    - name: Response for fetching the PDS to control node
+      debug:
+        msg: "{{ result }}"
+
+    - name: Add additional files to the fetched directory
+      file:
+        path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
+        state: touch
+      with_sequence: count=4
+      delegate_to: localhost
+      register: result
+
+    - name: Response for populating the local directory
+      debug:
+        msg: "{{ result }}"
+
+    - name: Copy the updated directory back to the remote host
+      zos_copy:
+        src: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
+        dest: "{{ data_set_name }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
+      register: result
+
+    - name: Response for copying
+      debug:
+        msg: "{{ result }}"
+
+    - name: Remove the data set from remote host
+      zos_data_set:
+        name: "{{ data_set_name }}"
+        state: absent
+      register: result
+
+    - name: Response for removing data set
+      debug:
+        msg: "{{ result }}"
+
+    - name: Remove fetched directory from control node
+      file:
+        path: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
+        state: absent
+      delegate_to: localhost
+      register: result
+
+    - name: Response for removing fetched directory
+      debug:
+        msg: "{{ result }}"

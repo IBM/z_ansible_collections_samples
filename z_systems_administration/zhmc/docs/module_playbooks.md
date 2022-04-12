@@ -14,18 +14,18 @@ Here is an example for invoking the
 playbook that creates a partition named ``sample-part-1``:
 
 ```
-$ ansible-playbook module_create_partition.yml
+$ ansible-playbook -i inventory.yml module_create_partition.yml
 
-PLAY [localhost] ***************************************************************
+PLAY [my_hmc_list] *****************************************************************************************************
 
-TASK [Gathering Facts] *********************************************************
-ok: [localhost]
+TASK [Gathering Facts] *************************************************************************************************
+ok: [myhmc13]
 
-TASK [Ensure partition sample-part-1 exists and is stopped] ********************
-changed: [localhost]
+TASK [Ensure partition sample-part-1 exists and is stopped] ************************************************************
+changed: [myhmc13 -> localhost]
 
-TASK [Print the result] ********************************************************
-ok: [localhost] => {
+TASK [Print the result] ************************************************************************************************
+ok: [myhmc13] => {
     "result": {
         "changed": true,
         "failed": false,
@@ -45,9 +45,7 @@ ok: [localhost] => {
             "autogenerate-partition-id": true,
             "available-features-list": [
                 {
-                    "description": "The DPM storage management approach in
-                     which FCP and FICON storage resources are defined in
-                     Storage Groups, which are attached to Partitions.",
+                    "description": "The DPM storage management approach in which FCP and FICON storage resources are defined in Storage Groups, which are attached to Partitions.",
                     "name": "dpm-storage-management",
                     "state": true
                 }
@@ -99,8 +97,8 @@ ok: [localhost] => {
             "name": "sample-part-1",
             "nic-uris": [],
             "nics": [],
-            "object-id": "dff1eccc-370f-11eb-a525-00106f239d19",
-            "object-uri": "/api/partitions/dff1eccc-370f-11eb-a525-00106f239d19",
+            "object-id": "d11a3452-c9b3-11eb-a3ef-00106f239d19",
+            "object-uri": "/api/partitions/d11a3452-c9b3-11eb-a3ef-00106f239d19",
             "os-name": "",
             "os-type": "",
             "os-version": "",
@@ -124,9 +122,8 @@ ok: [localhost] => {
     }
 }
 
-PLAY RECAP *********************************************************************
-localhost                  : ok=3    changed=1    unreachable=0    failed=0
-                             skipped=0    rescued=0    ignored=0
+PLAY RECAP *************************************************************************************************************
+myhmc13                    : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
 And here is an example for invoking the
@@ -134,18 +131,18 @@ And here is an example for invoking the
 playbook that deletes that partition again:
 
 ```
-$ ansible-playbook module_delete_partition.yml
+$ ansible-playbook -i inventory.yml module_delete_partition.yml
 
-PLAY [localhost] ***************************************************************
+PLAY [my_hmc_list] *****************************************************************************************************
 
-TASK [Gathering Facts] *********************************************************
-ok: [localhost]
+TASK [Gathering Facts] *************************************************************************************************
+ok: [myhmc13]
 
-TASK [Ensure partition sample-part-1 does not exist] ***************************
-changed: [localhost]
+TASK [Ensure partition sample-part-1 does not exist] *******************************************************************
+changed: [myhmc13 -> localhost]
 
-TASK [Print the result] ********************************************************
-ok: [localhost] => {
+TASK [Print the result] ************************************************************************************************
+ok: [myhmc13] => {
     "result": {
         "changed": true,
         "failed": false,
@@ -153,7 +150,6 @@ ok: [localhost] => {
     }
 }
 
-PLAY RECAP *********************************************************************
-localhost                  : ok=3    changed=1    unreachable=0    failed=0
-                             skipped=0    rescued=0    ignored=0
+PLAY RECAP *************************************************************************************************************
+myhmc13                    : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```

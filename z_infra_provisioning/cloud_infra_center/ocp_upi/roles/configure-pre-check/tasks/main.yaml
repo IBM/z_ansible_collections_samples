@@ -1,0 +1,90 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-pre-check
+
+- name: Check DNS server connection
+  shell: ping -c 1 -w 2 {{ os_dns_domain }}
+  
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+
+- name: Check if jq package is installed
+  fail:
+    msg: "jq package is not installed!"
+  failed_when: "'jq' not in ansible_facts.packages"
+
+- name: Check if tar package is installed
+  fail:
+    msg: "tar package is not installed!"
+  failed_when: "'tar' not in ansible_facts.packages"
+
+- name: Check if wget package is installed
+  fail:
+    msg: "wget package is not installed"
+  failed_when: "'wget' not in ansible_facts.packages"
+
+- name: Check if gzip package is installed
+  fail:
+    msg: "gzip package is not installed"
+  failed_when: "'gzip' not in ansible_facts.packages"
+
+- name: Get validate environment api url
+  shell: openstack catalog show -f json validator | jq -r '.endpoints[] | "\(.url)"' | head -n 1
+  register: validate_url
+
+- name: Get icic token
+  command:
+    cmd: openstack token issue -c id -f value
+  register: icic_token 
+
+- name: Get nova api url
+  shell: openstack catalog show -f json nova | jq -r '.endpoints[] | "\(.url)"' | head -n 1
+  register: nova_url
+
+- name: Get storage provider url
+  shell: openstack catalog show -f json cinder | jq -r '.endpoints[] | "\(.url)"' | head -n 1
+  register: storage_provider_url
+
+- name: Check icic resource requirements
+  script: tools/check-icic-resources.py {{ nova_url.stdout_lines[0] }} {{ storage_provider_url.stdout_lines[0] }} {{ icic_token.stdout_lines[0] }} {{ os_compute_nodes_number }}
+  args:
+    executable: python3
+    
+- name: Get security group
+  shell: openstack quota show -f json | grep "secgroups" | awk -F ':' '{print$2}' | tr -d ','
+  register:
+    security_group
+
+- name: Check security group
+  fail:
+    msg: "Security group number is not enough, current: {{ security_group.stdout_lines[0] }}, minimum required: 3"
+  failed_when: "security_group.stdout_lines[0]|int < 3"
+
+- name: Get security group rule
+  shell: openstack quota show -f json | grep "secgroup-rules" | awk -F ':' '{print$2}' | tr -d ','
+  register:
+    security_group_rule
+  
+- name: Check security group rule
+  fail:
+    msg: "Security group rules number is not enough, current: {{ security_group_rule.stdout_lines[0] }}, required: 60"
+  failed_when: "security_group_rule.stdout_lines[0]|int < 60"
+
+- name: Get server group quota
+  shell: openstack quota show -c server-groups -f value
+  register:
+    server_group
+
+- name: Check server group quota
+  fail:
+    msg: "Server group number is not enough, current: {{ server_group.stdout_lines[0] }}, required: 1"
+  failed_when: "server_group.stdout_lines[0]|int < 1"

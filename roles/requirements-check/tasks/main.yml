@@ -1,0 +1,136 @@
+################################################################################
+# Copyright (c) IBM Corporation 2021
+################################################################################
+
+################################################################################
+# requirement-check role that reads the local file runtime-requirements.txt to
+# determine the if the controllers installed Ansible version on the controller
+# is a match to the version identified in runtime-requirements.txt
+#
+# Note: The perferred way to have implemented this role would have been done
+# with Python packaging.specifiers.SpecifierSet() from lib pacakging
+# `pip install packaging` but would introduce a dependency.
+################################################################################
+---
+  # - name: Parse the registry for collection entries
+  #   include_vars: runtime-requirements.txt
+
+  - name: DEBUG(-v) List of supported Ansible versions for this playbook
+    set_fact:
+      runtime_ansible_req: "{{ runtime_ansible_req | default([]) }} +[ '{{ item }}.n' ]"
+    loop: "{{requires_ansible_version}}"
+
+  - name: Ansible requirement check ensuring the Ansible runtime version meets the playbook requirement
+    include_tasks:
+      ansible_check.yml
+    with_items: "{{requires_ansible_version}}"
+    loop_control:
+      loop_var: tmp
+
+  - name: DEBUG(-v) Display ansible_check role variable ansible_version_checks
+    ansible.builtin.debug:
+      var: ansible_version_checks
+      verbosity: 1
+
+  - name: DEBUG(-v) Display dictionary `ansible_version_checks` version failures counted that did not meet Ansible version requirement
+    debug:
+      var: ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', True)|list|length
+      verbosity: 1
+
+  - name: Collection requirement check ensuring if the collection version meets the playbook requirement
+    include_tasks:
+      collection_check.yml
+
+  - name: Ansible engine version for this playbook requirement check completed
+    assert:
+      that:
+          ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', False)|list|length > 0
+      success_msg: "[SUCCESS] This playbook has the required dependency Ansible version {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }} installed."
+      fail_msg: "[FAIL] This playbook requires Ansible versions {{runtime_ansible_req}} and has detected {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }}. Please review the playbook documentation for the required Ansible version."
+      quiet: true
+    register: result_ansible_check
+    ignore_errors: true
+
+  - name: Display if the Ansible the engine version for this playbook requirement succeded or failed
+    ansible.builtin.debug:
+        msg: "{{result_ansible_check.msg}}"
+    when: result_ansible_check is defined and (result_ansible_check | bool)
+
+  - name: Display if the Ansible collection version for this playbook requirement succeded or failed
+    debug:
+      msg: "{{item.msg}}"
+    loop: "{{result_collection_status.results}}"
+    loop_control:
+      label: "{{ item.msg }}"
+
+  - name: Evaluating if the collection requirements for this playbook are installed
+    set_fact:
+      result_collection_status_failed: True
+      result_collection_status_msg: "{{item.msg}}"
+    loop: "{{result_collection_status.results}}"
+    loop_control:
+      label: "{{ item.msg }}"
+    when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
+
+  - fail:
+      msg: "{{result_collection_status_msg}}"
+    when: result_collection_status_failed is defined and result_collection_status_failed == True
+
+  - fail:
+      msg: "{{result_ansible_check.msg}}"
+    when: result_ansible_check.msg is regex("FAIL")
+
+  # - name: DEBUG(-v) Display if Ansible collection version for this playbook requirement passed
+  #   fail:
+  #     msg: "{{item.msg}}"
+  #   loop: "{{result_collection_status.results}}"
+  #   loop_control:
+  #     label: "{{ item.msg }}"
+  #   # when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
+
+  # - name: DEBUG(-v) Display collection version check
+  #   ansible.builtin.debug:
+  #     msg: "{{item.msg}}"
+  #   loop: "{{result_collection_status.results}}"
+  #   loop_control:
+  #     label: "{{ item.msg }}"
+  #  # when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
+
+
+
+
+  # - fail:
+  #     msg: "{{result_ansible_check.msg}}"
+  #   when: result_ansible_check.msg is regex("FAIL")
+
+  # - fail:
+  #     msg: "{{foo}}"
+  #   when: foo is regex("FAIL")
+
+    
+  # - name: DEBUG(-v) Display collection version check
+  #   fail:
+  #     msg: "{{item.msg}}"
+  #   loop: "{{result_collection_status.results}}"
+  #   loop_control:
+  #     label: "{{ item.msg }}"
+  #   when: item.msg is regex("FAIL")
+  
+
+  #############################################
+  # - name: Ansible requirement check completed
+  #   assert:
+  #     that:
+  #         ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', False)|list|length > 0
+  #     success_msg: "[SUCCESS] Ansible version {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }} is installed."
+  #     fail_msg: "[FAIL] This playbook requires Ansible {{ansible_version_checks[item].version}} and version {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }} is installed."
+  #     quiet: true
+  #   register: result_ansible_status
+  #   with_items: "{{ansible_version_checks}}"
+
+  # - name: DEBUG(-v) Display Ansible version check
+  #   ansible.builtin.debug:
+  #       msg: "{{item.msg}}"
+  #   loop: "{{result_ansible_status.results}}"
+  #   loop_control:
+  #     label: "{{ item.msg }}"

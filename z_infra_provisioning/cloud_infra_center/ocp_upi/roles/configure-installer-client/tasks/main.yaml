@@ -1,0 +1,47 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-installer-and-image
+
+- name: Download OpenShift Installer
+  become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-install-linux.tar.gz
+    dest: .
+    mode: 0755
+    group: root
+    owner: root
+
+- name: Unzip OpenShift Installer
+  command:
+    cmd: tar -zvxf openshift-install-linux.tar.gz
+  
+- name: Remove OpenShift Installer Archive
+  file:
+    state: absent
+    path: openshift-install-linux.tar.gz
+
+- name: Download OpenShift Client
+  become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-client-linux.tar.gz
+    dest: .
+    mode: 0755
+    group: root
+    owner: root
+
+- name: Unzip OpenShift Client Archive
+  command:
+    cmd: tar -zvxf openshift-client-linux.tar.gz
+  
+- name: Remove OpenShift Client Archive
+  file:
+    state: absent
+    path: openshift-client-linux.tar.gz

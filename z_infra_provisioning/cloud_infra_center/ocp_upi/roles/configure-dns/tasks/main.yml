@@ -1,0 +1,110 @@
+# =================================================================
+# Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==================================================================
+
+---
+# tasks file for configure-dns
+- include_vars: cluster-template.yaml
+
+- name: Install bind-chroot for dns 
+  yum:
+    name: bind-chroot
+    state: latest
+    
+- name: Create /var/named directory
+  file:
+    path: /var/named
+    state: directory
+
+- name: Combine cluster name and base domain
+  set_fact: 
+    cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
+
+- name: Get the subnet range from localhost
+  set_fact:
+    subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
+
+- name: Create dns subnet definition
+  template:
+    src: var/named/cluster_domain_name.zone.j2
+    dest: /var/named/{{ cluster_domain_name }}.zone
+    owner: named
+    group: named
+  notify:
+   - restart dns
+
+- name: Unmanage resolve.conf in NetworkManager
+  lineinfile:
+    line: dns=none
+    dest: /etc/NetworkManager/NetworkManager.conf
+    insertafter: "\\[main\\].*"
+    regexp: "^dns=.*"
+
+- name: Check if DNS is already defined
+  shell: grep -c "^{{ cluster_domain_name }}" /etc/resolv.conf || true
+  register: check
+
+- name: Use local dns in resolv.conf
+  blockinfile:
+    dest: /etc/resolv.conf
+    insertbefore: BOF
+    block: |
+      search {{ cluster_domain_name }}
+      nameserver {{ bastion_private_ip_address }} 
+  when: check.stdout == "0"
+
+- name: Reverse the order of the decimals in the specified bastion subnet
+  set_fact: 
+    bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
+  
+- name: Create dns subnet zone for bastion
+  template:
+    src: var/named/bastion.in-addr.arpa.zone.j2
+    dest: /var/named/{{ bastion_reverse }}.in-addr.arpa.zone
+    owner: named
+    group: named
+  notify:
+   - restart dns
+ 
+- name: Create /etc/named.conf
+  template:
+    src: etc/named.conf.j2
+    dest: /etc/named.conf
+  notify:
+   - restart dns
+
+- name: Update cluster_subnet_range
+  shell: 
+    cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
+  notify:
+   - restart dns
+
+- name: Update bastion_subnet_prefix_reverse
+  shell: 
+    cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
+  notify:
+   - restart dns
+
+- name: Add dns to firewall
+  firewalld:
+    permanent: true
+    service: dns
+    state: enabled
+    zone: "{{ item }}"
+  with_items:
+    - internal
+    - public
+  notify:
+  - restart firewalld

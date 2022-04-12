@@ -1,0 +1,119 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- hosts: localhost
+  gather_facts: no
+
+  tasks:
+  - name: 'Import common yaml'
+    import_tasks: common.yaml
+
+  - name: 'Export Infra ID'
+    shell:
+      cmd: "jq -r .infraID metadata.json"
+    register: infra_id
+
+  - name: 'Get the created worker nodes name and store them in a file'
+    shell: "./oc get nodes --kubeconfig auth/kubeconfig --no-headers | awk '{print$1}' | grep -w worker | grep -Po '.(?=.{0}$)' | sort -r | head -n1"
+    register: latest_worker_index
+
+  - name: 'Increment worker node index'
+    set_fact: new_worker_index={{ latest_worker_index.stdout|int + 1 }}
+  
+  - name: Get existing node count
+    shell: "cat .new_ocp_node.yml | grep total_count | awk -F '=' '{print $2}'"
+    register: existing_node_count
+
+  # - name: get new worker index
+  #   debug:
+  #     msg: "{{new_worker_index.stdout_lines}}"
+
+  - name: 'Generate worker node json file'
+    script: tools/generate-new-worker-ignition.sh {{ os_compute_server_name }}-{{ new_worker_index }}
+
+  - name: 'Create the Compute ports'
+    os_port:
+      name: "{{ os_port_worker }}-{{ new_worker_index }}"
+      network: "{{ use_network_name }}"
+      security_groups:
+      - "{{ os_sg_worker }}"
+      fixed_ips:
+      - subnet: "{{ use_network_subnet }}"
+        ip_address: "{{ ip }}"
+    register: ports
+    when:
+    - auto_allocated_ip == false
+
+  - name: 'Create the Compute ports'
+    os_port:
+      name: "{{ os_port_worker }}-{{ new_worker_index }}"
+      network: "{{ use_network_name }}"
+      security_groups:
+      - "{{ os_sg_worker }}"
+    register: ports
+    when:
+    - auto_allocated_ip == true
+
+  - name: 'Set Compute ports tag'
+    command:
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ new_worker_index }}"
+
+  - name: 'Create the Compute servers'
+    os_server:
+      name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
+      image: "rhcos"
+      flavor: "{{ os_flavor_worker }}"
+      auto_ip: no
+      timeout: 2400
+      userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
+      availability_zone: "{{ create_server_zone }}"
+      nics:
+      - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
+    when:
+    - disk_type == "dasd"
+
+  - name: 'Create the Compute servers with boot volume'
+    os_server:
+      name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
+      image: "rhcos"
+      flavor: "{{ os_flavor_worker }}"
+      auto_ip: no
+      timeout: 2400
+      userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
+      availability_zone: "{{ create_server_zone }}"
+      nics:
+      - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
+      boot_from_volume: True
+      terminate_volume: True
+    when:
+    - disk_type == "scsi"
+  
+  - name: Get new node IP
+    environment:
+      KUBECONFIG: "./auth/kubeconfig"
+    shell: |
+      openstack server show {{ os_compute_server_name }}-{{ new_worker_index }} -c addresses -f value | awk -F = '{print$2}'
+    register: new_worker_ip
+
+  - name: 'Save new worker info into yaml'
+    shell: |
+      rm -rf .new_ocp_node.yml
+      echo total_count={{ existing_node_count.stdout | int + 1 }} >> .new_ocp_node.yml
+      echo cluster_domain_name={{ cluster_name }}.{{ base_domain }} >> .new_ocp_node.yml
+      echo new_worker_index={{ new_worker_index }} >> .new_ocp_node.yml
+      echo new_worker_ip={{ new_worker_ip.stdout }} >> .new_ocp_node.yml
+
+- import_playbook: approve.yaml

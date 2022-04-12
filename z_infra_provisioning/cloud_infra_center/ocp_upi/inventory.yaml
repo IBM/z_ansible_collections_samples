@@ -1,0 +1,79 @@
+# =================================================================
+# Copyright 2021 https://github.com/openshift/installer
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =================================================================
+
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+#
+# Change Summary: 
+# - Add bastion host
+# - Add auto allocated ip
+# - Modify items and delete unnecessary Ansible items
+
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: "{{ansible_playbook_python}}"
+      
+      use_network_name: '<network-name-from-icic>'
+      use_network_subnet: '<subnet-id-from-network-name-in-icic>'
+
+      vm_type: 'kvm' # kvm or zvm
+      disk_type: 'dasd' # dasd or scsi
+      openshift_version: '4.7'
+      openshift_minor_version: '7'
+      
+      auto_allocated_ip: true  # true or false
+      #allocation_pool_start: '<ip range start>'
+      #allocation_pool_end: '<ip range end>'
+      os_flavor_bootstrap: 'medium'
+      os_flavor_master: 'medium'
+      os_flavor_worker: 'medium' 
+
+      create_server_zone: ''
+      os_control_nodes_number: 3
+      os_compute_nodes_number: 3
+
+      #os_bootstrap_ip: '<bootstrap ip addr>'
+      #os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
+      #os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
+      
+      use_proxy: false # true or false
+      #http_proxy: '<http-proxy>'
+      #https_proxy: '<https-proxy>'
+      #no_proxy: '<no-proxy>'
+
+      approve_nodes_csr: 10 # minute
+
+    bastion:
+      ansible_ssh_host: '<linux-server-ip-addr>'
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+      bastion_private_ip_address: '<bastion-ip-addr>'
+      bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
+      dns_forwarder: '<upstream-dns-ip-addr>'
+
+  vars:
+    os_dns_domain: '<external-dns-ip-addr>'
+    cluster_name: '<cluster-name>'
+    base_domain: '<cluster-base-domain>'
+    pullsecret: '<pull-secret>'
+    sshkey: '<ssh-key>'

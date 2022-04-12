@@ -1,8 +1,8 @@
 ---
 # Sample module-level playbook of the IBM Z HMC Collection
 
-- hosts: localhost
-  connection: local
+- hosts:
+    - my_hmc_list
   vars_files:
     - vault.yml
   vars:
@@ -12,6 +12,7 @@
   tasks:
 
     - name: "Ensure domains 2..max on 2 arbitrary adapters are attached to partition {{ partition_name }}"
+      delegate_to: localhost
       zhmc_crypto_attachment:
         hmc_host: "{{ hmc_host }}"
         hmc_auth: "{{ hmc_auth }}"

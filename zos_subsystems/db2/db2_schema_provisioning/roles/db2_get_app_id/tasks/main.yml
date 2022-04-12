@@ -1,0 +1,18 @@
+---
+# tasks file for db2_get_app_id
+
+- name: Retrieve application id
+  uri:
+    url: "{{ base_url }}/applications/{{app_name}}/"
+    validate_certs: no
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    status_code: 200
+  register: app_response
+
+- name: Register application id
+  set_fact:
+    APP_ID: "{{app_response.json.id}}"

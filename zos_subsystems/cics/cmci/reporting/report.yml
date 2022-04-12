@@ -94,21 +94,9 @@
     #        msg: '{{ result }}'
 
     ############################################################################
-    # Use an inline template to extract the selected attributes to a report var
+    # Write the report csv file using a template
     ############################################################################
     - name: Create CSV report from template
-      set_fact:
-        csv: |
-          {{ attributes | join(',') }}
-          {% for record in result.records %}
-          {% for attribute in attributes %}
-          {{ record[attribute] }}{% if not loop.last %},{% endif %}
-          {% endfor %}
-
-          {% endfor %}
-
-    ############################################################################
-    # Write the report to a file
-    ############################################################################
-    - name: Write the report to a file
-      copy: content="{{ csv }}" dest=report.csv
+      template:
+        src: csv.j2
+        dest: report.csv

@@ -1,0 +1,25 @@
+# Definition file details
+ZOSMF_DEFINITION_FILE: sample_definition_file.xml
+
+# Version of z/OSMF used to make REST calls
+ZOSMF_VERSION: "1.0"
+
+# ***************************************************
+#   Variables for invoking z/OSMF REST API services
+# ***************************************************
+
+# z/OSMF host and port information
+ZOSMF_HOST: zosmf_target_host
+ZOSMF_PORT: zosmf_target_port
+
+# Desired destination folder on target host for holding definition file
+ZOSMF_DEST_FOLDER: /path/to/folder
+
+# Credentials to access z/OSMF
+ZOSMF_USER: user
+ZOSMF_PASS: pass
+
+# Nickname of the system on which the workflow is to be created.
+# Use the nickname that is specified for the system definition
+# in the z/OSMF Systems task.
+ZOSMF_SYSTEM: zosmf_system

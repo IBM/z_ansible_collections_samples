@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workflow>
+    <autoTakeOwnership>false</autoTakeOwnership>
+    <workflowInfo>
+        <workflowID scope="none">uri_workflow</workflowID>
+        <workflowDescription>sample workflow for uri sample</workflowDescription>
+        <workflowVersion>1.0</workflowVersion>
+        <vendor>IBM</vendor>
+        <General/>
+    </workflowInfo>
+    <step name="Sample_Automated_Step" optional="true">
+        <title>This is a very simple JCL job</title>
+        <description>This optional step submits an empty job using IEFBR14.</description>
+        <instructions>This step is performed automatically.</instructions>
+        <weight>1</weight>
+        <skills>Submit a job to run on z/OS</skills>
+        <autoEnable>true</autoEnable>
+        <template>
+            <inlineTemplate>//STEP1      EXEC  PGM=IEFBR14
+        //SYSEXEC   DD   DUMMY
+        //* PRINT DD SYSOUT=A
+        /*
+                </inlineTemplate>
+                <submitAs>JCL</submitAs>
+            </template>
+    </step>
+</workflow>

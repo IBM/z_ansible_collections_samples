@@ -1,5 +1,7 @@
 # I/O configuration of CPC CPCA
 
+From HMC: 10.11.12.13
+
 ## Basic CPC information
 
 | Name | Description          | Model    | Mode | IFLs | Mem [GiB] |

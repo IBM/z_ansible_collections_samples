@@ -1,13 +1,27 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
-# Contributed by the Ansible Content for IBM Z Team
-#
+# © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
 ###############################################################################
+# This playbook clones a Git repository to the user provided directory on the
+# target z/OS system. It then loads the master configuration file containing a set
+# of libraries (data sets) that are required to be present on the target z/OS
+# system's APF authorized list.
+
+# It then generates a list of libraries to be added to APF authorized list by
+# comparing the the current APF list and the master list in GitHub. Lastly, it
+# makes the APF statement entries in the user specified data set or data set
+# member.
+
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
 #
-# Ansible core sample repo: https://github.com/IBM/z_ansible_collections_samples
+# Example:
+#  ansible-playbook -i inventories copy-sort-fetch.yml
 #
+# Requirements:
+#     - IBM z/OS core collection 1.2.0 or later
+#     - Git for z/OS
 # vars:
 #   git_repo:
 #     description: The git repository to be cloned
@@ -37,7 +51,6 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: no
-  environment: "{{ environment_vars }}"
   vars:
     git_repo: "git://github.com/IBM/z_ansible_collections_samples.git"
     git_branch: "playbook/2926/zos_apf"
@@ -45,6 +58,7 @@
     file_name: "{{ checkout_dir }}/zos_concepts/program_authorization/git_apf/roles/list-load/files/list.bom"
     persistent_ds:
       data_set_name: "APFTEST.SYS1.PARMLIB(PROG00)"
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Get home directory

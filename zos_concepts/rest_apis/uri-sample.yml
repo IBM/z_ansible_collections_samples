@@ -1,0 +1,140 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates basic use cases for invoking a REST API
+# service, particularly the z/OSMF REST API services.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories uri-sample.yml
+#
+###############################################################################
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment:
+    "{{ environment_vars }}"
+
+  tasks:
+    - name: Copy definition file over to target host
+      zos_copy:
+        src: "{{ playbook_dir }}/files/{{ ZOSMF_DEFINITION_FILE }}"
+        dest: "{{ ZOSMF_DEST_FOLDER }}"
+        force: true
+        is_binary: true
+
+    - name: Query list of available ZOSMF workflows
+      uri:
+        url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows
+        user: "{{ ZOSMF_USER }}"
+        password: "{{ ZOSMF_PASS }}"
+        method: GET
+        headers:
+          Content-Type: application/json
+          X-CSRF-ZOSMF-HEADER: required_header
+        force_basic_auth: yes
+        validate_certs: no
+        status_code: 200
+        return_content: yes
+
+      register: zosmf_result
+
+    - name: Initialize existing_workflow_key variable
+      set_fact:
+        existing_workflow_key: ''
+
+    - name: Assign existing_workflow_key variable if the 'sample_uri_workflow' has already been created
+      set_fact:
+        existing_workflow_key: "{{ item.workflowKey if 'sample_uri_workflow' in item.workflowName else existing_workflow_key}}"
+      loop: "{{ zosmf_result.json.workflows }}"
+
+    - name: Create workflow if not already created
+      uri:
+        url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows
+        user: "{{ ZOSMF_USER }}"
+        password: "{{ ZOSMF_PASS }}"
+        method: POST
+        body_format: json
+        body:
+          workflowName: sample_uri_workflow
+          workflowDefinitionFile: "{{ ZOSMF_DEST_FOLDER }}/{{ ZOSMF_DEFINITION_FILE }}"
+          system: "{{ ZOSMF_SYSTEM }}"
+          owner: "{{ ZOSMF_USER }}"
+        headers:
+          Content-Type: application/json
+          X-CSRF-ZOSMF-HEADER: required_header
+        force_basic_auth: yes
+        validate_certs: no
+        status_code: 201
+        return_content: yes
+      register: zosmf_create_result
+      when: existing_workflow_key == ''
+
+    - name: Initialize sample_workflow_key variable for workflow created in previous step (used for starting and cancelling workflow)
+      set_fact:
+        sample_workflow_key: ''
+
+    - name: Set variable for sample workflow
+      set_fact:
+        sample_workflow_key: "{{ zosmf_create_result.json.workflowKey }}"
+      when: existing_workflow_key == ''
+
+    # Initiates the Starter_Automated_Step in the sample_definition_file.xml
+    - name: Start workflow after creation
+      uri:
+        url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows/{{ sample_workflow_key }}/operations/start
+        user: "{{ ZOSMF_USER }}"
+        password: "{{ ZOSMF_PASS }}"
+        method: PUT
+        headers:
+          Content-Type: application/json
+          X-CSRF-ZOSMF-HEADER: required_header
+        force_basic_auth: yes
+        validate_certs: no
+        status_code: 202
+        return_content: yes
+      register: zosmf_start_result
+      when: sample_workflow_key != ''
+
+    - name: Cancel workflow after starting
+      uri:
+        url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows/{{ existing_workflow_key }}/operations/cancel
+        user: "{{ ZOSMF_USER }}"
+        password: "{{ ZOSMF_PASS }}"
+        method: PUT
+        headers:
+          Content-Type: application/json
+          X-CSRF-ZOSMF-HEADER: required_header
+        force_basic_auth: yes
+        validate_certs: no
+        status_code: 200
+        return_content: yes
+      register: zosmf_cancel_result
+      when: existing_workflow_key != ''
+
+    - name: Delete workflow if already created
+      uri:
+        url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows/{{ existing_workflow_key }}
+        user: "{{ ZOSMF_USER }}"
+        password: "{{ ZOSMF_PASS }}"
+        method: DELETE
+        headers:
+          Content-Type: application/json
+          X-CSRF-ZOSMF-HEADER: required_header
+        force_basic_auth: yes
+        validate_certs: no
+        status_code: 204
+        return_content: yes
+      register: zosmf_delete_result
+      when: existing_workflow_key != ''
+
+    - name: Remove definition file
+      file:
+        path: "{{ ZOSMF_DEST_FOLDER }}/{{ ZOSMF_DEFINITION_FILE }}"
+        state: absent

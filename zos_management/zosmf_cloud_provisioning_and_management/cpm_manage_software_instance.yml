@@ -1,0 +1,82 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2021-04-21
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to perform various actions to manage a
+# provisioned software service instance on the target z/OS systems using role
+# `zmf_cpm_manage_software_instance` provided by IBM z/OSMF collection included
+# in the Red Hat Ansible Certified Content for IBM Z.
+#
+# The actions that can be performed on the provisioned instance are described
+# in the local record file that is associated with the provisioned instance.
+#
+# Usage:
+#   ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#   ansible-playbook -i inventory.yml cpm_manage_software_instance.yml
+#
+# Requirements:
+#   IBM z/OSMF collection 1.0.0 or later
+#
+# Configure:
+#   instance_action_name    - the action to be performed on a provisioned
+#                             software instance, for example, `Deprovision`.
+#                             Actions that can be performed on a provisioned
+#                             instance are described in local record file that
+#                             is associated with the provisioned instance.
+#                             The `name` variable in `actions` array under
+#                             `registry-info` identifies the various actions
+#                             that can be performed on the instance.
+#   instance_info_json_path - the full file path of the provisioned instance
+#                             json file that is created by the playbook
+#                             `cpm_provision_software_service`.
+#
+# Optional:
+#   input_vars - the input variable names and values for the action to be
+#                performed on the provisioned instance. This variable is
+#                required if the action processing expects specific inputs
+#                from user. This is a dictionary variable and needs to be in
+#                following format:
+#                `[{ "name":"VAR1","value":"VAR1_VALUE"},{..},...]`
+###############################################################################
+
+---
+- name: manage a provisioned software service instance
+  hosts: cpm_host1
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+  vars_prompt:
+    - name: zmf_user
+      prompt: "Enter your z/OSMF username"
+      private: no
+    - name: zmf_password
+      prompt: "Enter your z/OSMF password"
+      private: yes
+    - name: instance_info_file
+      prompt: "Enter instance info file full path"
+      private: no
+    - name: action 
+      prompt: "Enter action to perform"
+      private: no
+  tasks:
+    # ##########################################################################
+    # Role: zmf_cpm_manage_software_instance
+    # ##########################################################################
+    # ##########################################################################
+    # Manage a provisioned software service instance
+    # ##########################################################################
+    - include_role:
+        name: zmf_cpm_manage_software_instance
+      vars:
+        instance_action_name: "{{ action }}"
+        instance_info_json_path: "{{ instance_info_file }}"
+        input_vars: '<optional-fill-me-input-vars>'

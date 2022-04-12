@@ -1,0 +1,226 @@
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to perform encoding conversions on USS
+# using modules included in the Red Hat Ansible Certified  Content for
+# IBM Z core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories convert_encoding.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `system_name`.
+#
+# Requirements:
+#   IBM z/OS core collection 1.1.0 or later
+#
+# Configure:
+#   tgt_tmp_dir - this is the USS directory on the target which will be written
+#                 to for this example.
+#   ctl_tmp_dir - this is the directory on the controller which will be written
+#                 to for this example.
+# Optional:
+#   system_name - this is the system name that will be used during this example,
+#                 determined by executing `uname -n` on the target.
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  vars:
+    tgt_tmp_dir: "/tmp"
+    ctl_tmp_dir: "/tmp"
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Fact setting for use by this playbook
+    # ##########################################################################
+    - name: Detecting system name
+      command: uname -n
+      register: result
+
+    - name: Setting fact `system_name` for use by this sample
+      set_fact:
+        system_name: "{{ result.stdout }}"
+
+    - name: Fact `system_name` set with value
+      debug:
+        msg: "{{ system_name }}"
+
+    # ##########################################################################
+    # Modules zos_encode
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | Create shell script on target, encode with the targets charset, execute
+    # | script if mode == 755, else fail
+    # +-------------------------------------------------------------------------
+    - name: Create shell script {{ tgt_tmp_dir }}/date.sh
+        on target {{ inventory_hostname }}
+      copy:
+        dest: "{{ tgt_tmp_dir }}/date.sh"
+        content: |
+          date
+        owner: "{{ ansible_user }}"
+        mode: "0755"
+        force: yes
+
+    - name: Detect character set for locale on target {{ inventory_hostname }}
+      command: locale -c charmap
+      register: result
+
+    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
+        target {{ inventory_hostname }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Set variable `target_charset` with target {{ inventory_hostname }}
+        charset
+      set_fact:
+        target_charset: "{{ result.stdout | default('IBM-1047') }}"
+
+    - name: Encode script {{ tgt_tmp_dir }}/date.sh encoding
+        from ISO8859-1 to "{{ target_charset }}"
+      zos_encode:
+        src: "{{ tgt_tmp_dir }}/date.sh"
+        dest: "{{ tgt_tmp_dir }}/date.sh"
+        from_encoding: ISO8859-1
+        to_encoding: "{{ target_charset }}"
+        backup: no
+      register: result
+
+    - name: Response for encode script {{ tgt_tmp_dir }}/date.sh encoding from ISO8859-1 to {{ target_charset }}
+      debug:
+        msg: "{{ result }}"
+    - name: Setting fact `script_sh_mode` with script file permissions
+      set_fact:
+        script_sh_mode: "{{ result.mode }}"
+
+    - name: Display script contents after changing encoding to "{{ target_charset }}"
+      command: cat {{ tgt_tmp_dir }}/date.sh
+      register: result
+
+    - name: Response for display script contents after changing encoding
+        to "{{ target_charset }}"
+      debug:
+        msg: "{{ result.stdout }}"
+
+    - name: Executing {{ tgt_tmp_dir }}/date.sh on target if permission is 0755
+      shell: "{{ tgt_tmp_dir }}/date.sh"
+      register: result
+      when: script_sh_mode == "0755"
+
+    - name: Response for executing {{ tgt_tmp_dir }}/date.sh on target if
+        permission is 0755
+      debug:
+        msg: "{{ result.stdout_lines }}"
+      when: result.stdout_lines is defined
+
+    - name: File permissions check
+      fail:
+        msg: "File {{ tgt_tmp_dir }}/date.sh permissions were not equal to 0755"
+      when: result.stdout_lines is not defined
+      ignore_errors: yes
+
+    - name: Remove {{ tgt_tmp_dir }}/date.sh on target {{ inventory_hostname }}
+      file:
+        path: "{{ tgt_tmp_dir }}/date.sh"
+        state: absent
+      register: result
+
+    - name: Response for remove {{ tgt_tmp_dir }}/date.sh on
+        target {{ inventory_hostname }}
+      debug:
+        msg: "{{ result }}"
+
+    # +-------------------------------------------------------------------------
+    # | Create 4 files on USS target, encode them and and delete them
+    # +-------------------------------------------------------------------------
+
+    - name: Detecting the character set for the locale on the target
+      command: locale -c charmap
+      register: result
+
+    - name: Response for detecting the character set for the locale on the
+        target
+      debug:
+        msg: "{{ result }}"
+
+    - name: Set variable `target_charset` with target {{ inventory_hostname }}
+        charset
+      set_fact:
+        target_charset: "{{ result.stdout | default('IBM-1047') }}"
+
+    - name: Create directory {{ tgt_tmp_dir }}/encode/
+      file:
+        path: "{{ tgt_tmp_dir }}/encode/"
+        state: directory
+
+    - name: Create a series of USS files in {{ tgt_tmp_dir }}/encode
+      file:
+        path: "{{ tgt_tmp_dir }}/encode/{{ item }}.txt"
+        state: touch
+      with_sequence: count=4
+      register: result
+
+    - name: Response for create a series of USS files
+        in {{ tgt_tmp_dir }}/encode
+      debug:
+        msg: "{{ result }}"
+
+    - name: Populate a series of USS files in {{ tgt_tmp_dir }}/encode
+        with 'hello world'
+      shell: 'echo "hello world" >{{ tgt_tmp_dir }}/encode/{{ item }}.txt'
+      with_sequence: count=4
+      register: result
+
+    - name: Response for populate a series of USS files
+        in {{ tgt_tmp_dir }}/encode with 'hello world'
+      debug:
+        msg: "{{ result }}"
+
+    - name: Encode files in {{ tgt_tmp_dir }}/encode/` from
+        charset ISO8859-1 to {{ target_charset }}
+      zos_encode:
+        src: "{{ tgt_tmp_dir }}/encode/"
+        dest: "{{ tgt_tmp_dir }}/encode/"
+        from_encoding: ISO8859-1
+        to_encoding: "{{ target_charset }}"
+      register: result
+
+    - name: Response for encode files in {{ tgt_tmp_dir }}/encode/` from
+        charset ISO8859-1 to {{ target_charset }}
+      debug:
+        msg: "{{ result }}"
+
+    - name: Display a series of USS files contents in {{ tgt_tmp_dir }}/encode
+      command: "cat {{ tgt_tmp_dir }}/encode/{{ item }}.txt"
+      with_sequence: count=4
+      register: result
+
+    - name: Response for display a series of USS files contents
+        in {{ tgt_tmp_dir }}/encode
+      debug:
+        msg: "{{ result }}"
+
+    - name: Remove files on target in {{ tgt_tmp_dir }}/encode
+      file:
+        path: "{{ tgt_tmp_dir }}/encode"
+        state: absent
+      register: result
+
+    - name: Response for remove files on target in {{ tgt_tmp_dir }}/encode
+      debug:
+        msg: "{{ result }}"

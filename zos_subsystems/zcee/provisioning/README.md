@@ -78,7 +78,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 ### 4. Run desired playbook
 
 ```bash
-ansible-playbook -i inventory.yml <playbook-name>
+ansible-playbook -i inventories/zos_host <playbook-name>
 ```
 
 # Copyright

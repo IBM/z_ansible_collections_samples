@@ -1,0 +1,53 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2021
+################################################################################
+
+################################################################################
+# Variables used and needing confirugation for this playbook
+################################################################################
+
+# Definition file details
+ZOSMF_DEFINITION_FILE: sample_definition_file.xml
+
+# Version of z/OSMF used to make REST calls
+ZOSMF_VERSION: "1.0"
+
+################################################################################
+#   Variables for invoking z/OSMF REST API services
+################################################################################
+
+# z/OSMF host and port information
+ZOSMF_HOST: zosmf_target_host
+ZOSMF_PORT: zosmf_target_port
+
+# Desired destination folder on target host for holding definition file
+ZOSMF_DEST_FOLDER: /path/to/folder
+
+# Credentials to access z/OSMF
+ZOSMF_USER: user
+ZOSMF_PASS: pass
+
+# Nickname of the system on which the workflow is to be created.
+# Use the nickname that is specified for the system definition
+# in the z/OSMF Systems task.
+ZOSMF_SYSTEM: zosmf_system
+
+################################################################################
+# Environment varibles
+################################################################################
+
+# The python installation home path on the z/OS managed node (target),
+# e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+PYZ: "path_to_python_installation_on_zos_target"
+
+# The ZOAU installation home on the z/OS managed node (target),
+# e.g, zoau: "/usr/lpp/IBM/zoautil"
+ZOAU: "path_to_zoau_installation_on_zos_target"
+
+# The z/OS managed node (target) Python binary installation path,
+# e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+# NOTE: This needs not configuration because it uses variable substituion to
+# correctly set the variable`ansible_python_interpreter`
+ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
+

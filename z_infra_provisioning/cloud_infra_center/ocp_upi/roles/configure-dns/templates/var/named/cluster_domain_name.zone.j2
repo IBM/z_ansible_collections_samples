@@ -1,0 +1,40 @@
+{% set bootstrap = cluster_nodes['bootstrap'] %}
+{% set masters = cluster_nodes['masters'] %}
+{% set infra = cluster_nodes['infra'] %}
+$TTL 900
+
+@                     IN SOA bastion.{{ cluster_name }}.{{ base_domain }}. hostmaster.{{ cluster_name }}.{{ base_domain }}. (
+                        2019062002 1D 1H 1W 3H
+                      )
+                      IN NS bastion.{{ cluster_name }}.{{ base_domain }}.
+
+bastion               IN A {{ bastion_public_ip_address }}
+api                   IN A {{ bastion_public_ip_address }}
+api-int               IN A {{ bastion_public_ip_address }}
+apps                  IN A {{ bastion_public_ip_address }}
+*.apps                IN A {{ bastion_public_ip_address }}
+
+{% for item in bootstrap.keys() %}
+{{ item }}           IN A {{ bootstrap[item].ip }}
+{% endfor %}
+
+{% for item in masters.keys() %}
+{{ item }}              IN A {{ masters[item].ip }}
+{% endfor %}
+
+{% if infra is defined %}
+{% for item in infra.keys() %}
+{{ item }}              IN A {{ infra[item].ip }}
+{% endfor %}
+{% endif %}
+
+{% for item in masters.keys() %}
+{{ masters[item].etcd }}              IN A {{ masters[item].ip }}
+{% endfor %}
+
+_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.{{ cluster_name }}.{{ base_domain }}.
+{% for item in masters.keys() %}
+  {% if loop.index != 1 %}
+                  IN SRV 0 10 2380 etcd-{{(loop.index - 1) }}.{{ cluster_name }}.{{ base_domain }}.
+  {% endif %}
+{% endfor %}

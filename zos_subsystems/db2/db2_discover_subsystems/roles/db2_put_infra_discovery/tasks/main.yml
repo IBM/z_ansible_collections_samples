@@ -1,0 +1,16 @@
+---
+# tasks file for db2_put_infra_discovery
+
+
+- name: Infrastructure Discovery
+  uri:
+    url: "{{ doe_server }}:{{ doe_server_port }}/ws/infrastructure/discovery/"
+    validate_certs: no
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    status_code: 200
+  register: discovery_data
+

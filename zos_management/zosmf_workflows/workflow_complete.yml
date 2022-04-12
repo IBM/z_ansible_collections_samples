@@ -1,0 +1,80 @@
+###############################################################################
+# © Copyright IBM Corporation 2021
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.0.0] - 2021-04-21
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to complete a z/OSMF workflow forcibly
+# or idempotently on the target z/OS systems using role `zmf_workflow_complete`
+# provided by IBM z/OSMF collection included in the Red Hat Ansible Certified
+# Content for IBM Z.
+#
+# Usage:
+#   ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#   ansible-playbook -i inventory.yml workflow_complete.yml
+#
+# Notes:
+#   To run the sample playbooks, below preparation works are required:
+#   - It is recommended that you use the naming rule
+#     `workflow_name: "ansible_${ workflow_name }_{{ inventory_hostname }}"`
+#     when creating a workflow instance.
+#   - Submitting a z/OSMF workflow found on Ansible control node is currently
+#     not supported. The workflow definition file
+#     `workflow_sample_automation_steps.xml` is used to create the workflow
+#     instance. You need to manually upload it to the target z/OS system. For
+#     example, you can upload it to the directory `/var/zosmf/workflow_def/`,
+#     then modify the value of variable `workflow_file` in the sample playbook
+#     to refer to the location of the workflow definition file.
+#   - Only automated steps are supported when starting a z/OSMF workflow.
+#
+# Requirements:
+#   IBM z/OSMF collection 1.0.0 or later
+#
+# Configure:
+#   workflow_name - name of the workflow instance.
+#   workflow_file - location of the workflow definition file.
+#
+# Optional:
+#   force_complete       - whether to complete the workflow instance forcibly
+#                          or idempotently. Default is False (idempotently).
+#   complete_check_times - the maximum number of time that is used for periodic
+#                          checks of the workflow status. Default is 10.
+#   complete_check_delay - the interval time (seconds) between periodic checks
+#                          of the workflow status. Default is 5.
+###############################################################################
+
+---
+- name: complete a z/OSMF workflow forcibly or idempotently
+  hosts: zos_systems
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+  vars_prompt:
+    - name: zmf_user
+      prompt: "Enter your z/OSMF username (skip if zmf_crt and zmf_key are supplied)"
+      private: no
+    - name: zmf_password
+      prompt: "Enter your z/OSMF password (skip if zmf_crt and zmf_key are supplied)"
+      private: yes
+  tasks:
+    # ##########################################################################
+    # Role: zmf_workflow_complete
+    # ##########################################################################
+    # ##########################################################################
+    # Complete a z/OSMF workflow forcibly or idempotently
+    # ##########################################################################
+    - include_role:
+        name: zmf_workflow_complete
+      vars:
+        workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
+        workflow_file: "/var/zosmf/workflow_def/workflow_sample_automation_steps.xml"
+        # force_complete: False
+        # complete_check_times: 10
+        # complete_check_delay: 5
