@@ -1,4 +1,4 @@
-# Managed z/OS Certificates
+# Manage z/OS Certificates
 
 This playbook demonstrates how to copy data to and from a z/OS system using modules included in the Red Hat Ansible Certified Content for IBM Z core collection.
 
