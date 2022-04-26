@@ -10,7 +10,7 @@
 ---
 # tasks file for configure-installer-and-image
 
-- name: Download OpenShift Installer
+- name: Download openShift installer
   become: yes
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-install-linux.tar.gz
@@ -19,16 +19,16 @@
     group: root
     owner: root
 
-- name: Unzip OpenShift Installer
+- name: Unzip openShift installer
   command:
     cmd: tar -zvxf openshift-install-linux.tar.gz
   
-- name: Remove OpenShift Installer Archive
+- name: Remove openShift installer archive
   file:
     state: absent
     path: openshift-install-linux.tar.gz
 
-- name: Download OpenShift Client
+- name: Download openShift client
   become: yes
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-client-linux.tar.gz
@@ -37,11 +37,11 @@
     group: root
     owner: root
 
-- name: Unzip OpenShift Client Archive
+- name: Unzip openShift client archive
   command:
     cmd: tar -zvxf openshift-client-linux.tar.gz
   
-- name: Remove OpenShift Client Archive
+- name: Remove openShift client archive
   file:
     state: absent
     path: openshift-client-linux.tar.gz

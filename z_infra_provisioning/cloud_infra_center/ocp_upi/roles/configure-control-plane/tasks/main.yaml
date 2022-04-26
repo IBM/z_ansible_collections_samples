@@ -38,13 +38,13 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
-- name: 'List the Server groups'
+- name: 'List the server groups'
   command:
     # os-compute-api-version 2.15 or higher is required for the 'soft-anti-affinity' policy
     cmd: "openstack --os-compute-api-version=2.15 server group list -f json -c ID -c Name"
   register: server_group_list
 
-- name: 'Parse the Server group ID from existing'
+- name: 'Parse the server group ID from existing'
   set_fact:
     server_group_id: "{{ (server_group_list.stdout | from_json | json_query(list_query) | first).ID }}"
   vars:
@@ -52,7 +52,7 @@
   when:
   - "os_cp_server_group_name|string in server_group_list.stdout"
 
-- name: 'Create the Control Plane server group'
+- name: 'Create the control server group'
   command:
     # os-compute-api-version 2.15 or higher is required for the 'soft-anti-affinity' policy
     cmd: "openstack --os-compute-api-version=2.15 server group create -f json -c id --policy=soft-anti-affinity {{ os_cp_server_group_name }}"
@@ -60,20 +60,20 @@
   when:
   - server_group_id is not defined
 
-- name: 'Parse the Server group ID from creation'
+- name: 'Parse the server group ID from creation'
   set_fact:
     server_group_id: "{{ (server_group_created.stdout | from_json).id }}"
   when:
   - server_group_id is not defined
 
-- name: 'Create the Control Plane servers'
+- name: 'Create the control servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
-    timeout: 2400
+    timeout: "{{ create_server_timeout|int * 60 }}" 
     # The ignition filename will be concatenated with the Control Plane node
     # name and its 0-indexed serial number.
     # In this case, the first node will look for this filename:
@@ -97,14 +97,14 @@
   when:
   - disk_type == "scsi"
 
-- name: 'Create the Control Plane servers with boot volume'
+- name: 'Create the control servers with default boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
-    timeout: 2400
+    timeout: "{{ create_server_timeout|int * 60 }}" 
     # The ignition filename will be concatenated with the Control Plane node
     # name and its 0-indexed serial number.
     # In this case, the first node will look for this filename:
@@ -123,3 +123,39 @@
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
   - disk_type == "scsi"
+  - volume_type_id is not defined
+  
+- name: Create control boot volume
+  os_volume:
+    state: present
+    name: "{{ item.1 }}-{{ item.0 }}-boot"
+    image: "rhcos"
+    size: "{{ master_flavor_size.stdout_lines[0]}}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    bootable: yes
+    timeout: "{{ create_server_timeout|int * 60 }}" 
+  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
+  when: 
+  - disk_type == "scsi"
+  - volume_type_id is defined
+
+- name: 'Create the control server with boot volume'
+  os_server:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    flavor: "{{ os_flavor_master }}"
+    boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"
+    auto_ip: no
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}" 
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
+    nics:
+    - port-name: "{{ os_port_master }}-{{ item.0 }}"
+    meta: "{{ cluster_id_tag }}"
+    terminate_volume: True
+  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
+  environment: 
+    PYTHONWARNINGS: 'ignore::UserWarning'
+  when:
+  - disk_type == "scsi"
+  - volume_type_id is defined

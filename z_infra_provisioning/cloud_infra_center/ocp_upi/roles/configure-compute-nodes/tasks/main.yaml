@@ -43,14 +43,14 @@
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
-- name: 'Create the Compute servers'
+- name: 'Create the compute servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
-    timeout: 2400
+    timeout: "{{ create_server_timeout|int * 60 }}" 
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.0 }}"
@@ -66,14 +66,14 @@
   when:
   - disk_type == "scsi"
 
-- name: 'Create the Compute servers with boot volume'
+- name: 'Create the compute servers with default boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "rhcos"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
-    timeout: 2400
+    timeout: "{{ create_server_timeout|int * 60 }}" 
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.0 }}"
@@ -84,3 +84,37 @@
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "scsi"
+  - volume_type_id is not defined
+
+- name: 'Create compute boot volume'
+  os_volume:
+    state: present
+    name: "{{ item.1 }}-{{ item.0 }}-boot"
+    image: "rhcos"
+    size: "{{ compute_flavor_size.stdout_lines[0]}}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    bootable: yes
+    timeout: "{{ create_server_timeout|int * 60 }}" 
+  with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
+  when:
+  - disk_type == "scsi"
+  - volume_type_id is defined
+
+- name: 'Create the compute server with boot volume'
+  os_server:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    flavor: "{{ os_flavor_worker }}"
+    boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"
+    auto_ip: no
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}" 
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
+    nics:
+    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
+    meta: "{{ cluster_id_tag }}"
+    terminate_volume: True
+  with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
+  when:
+  - disk_type == "scsi"
+  - volume_type_id is defined

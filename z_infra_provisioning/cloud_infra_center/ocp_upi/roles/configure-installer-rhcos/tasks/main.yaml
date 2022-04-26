@@ -20,7 +20,7 @@
   - vm_type == "kvm"
   - disk_type == "scsi"
   
-- name: Download RHCOS Image
+- name: Download RHCOS image
   become: yes
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-metal.s390x.raw.gz
@@ -32,7 +32,7 @@
   - vm_type == "zvm"
   - disk_type == "scsi"
 
-- name: Download RHCOS Image
+- name: Download RHCOS image
   become: yes
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-dasd.s390x.raw.gz
@@ -44,27 +44,27 @@
   - vm_type == "zvm"
   - disk_type == "dasd"
 
-- name: Unzip RHCOS Image
+- name: Unzip RHCOS image
   command:
     cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
   when: 
   - vm_type == "zvm"
 
-- name: Upload RHCOS Image to ICIC Glance
+- name: Upload RHCOS image to ICIC glance
   command: 
     cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw rhcos
   when: 
   - vm_type == "zvm"
   - disk_type == "scsi"
 
-- name: Upload RHCOS Image to ICIC Glance
+- name: Upload RHCOS image to ICIC glance
   command: 
     cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw rhcos
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
 
-- name: Download RHCOS Image
+- name: Download RHCOS image
   become: yes
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-openstack.s390x.qcow2.gz
@@ -75,26 +75,26 @@
   when: 
   - vm_type == "kvm"
 
-- name: Unzip RHCOS Image
+- name: Unzip RHCOS image
   command:
     cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
   when: 
   - vm_type == "kvm"
 
-- name: Upload RHCOS Image to ICIC Glance
+- name: Upload RHCOS image to ICIC glance
   command: 
     cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=qcow2 --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2 rhcos
   when: 
   - vm_type == "kvm"
 
-- name: Remove Local RHCOS image
+- name: Remove local RHCOS image
   file:
     state: absent
     path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw
   when: 
   - vm_type == "zvm"
 
-- name: Remove Local RHCOS image
+- name: Remove local RHCOS image
   file:
     state: absent
     path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2

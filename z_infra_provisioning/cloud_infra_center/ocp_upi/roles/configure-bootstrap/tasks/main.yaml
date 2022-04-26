@@ -44,7 +44,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
-    timeout: 3600
+    timeout: "{{ create_server_timeout|int * 60 }}" 
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
@@ -60,13 +60,13 @@
   when:
   - disk_type == "scsi"
 
-- name: 'Create the bootstrap server with boot volume'
+- name: 'Create the bootstrap server with default boot volume'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "rhcos"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
-    timeout: 3600
+    timeout: "{{ create_server_timeout|int * 60 }}" 
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
@@ -77,3 +77,35 @@
     terminate_volume: True
   when:
   - disk_type == "scsi"
+  - volume_type_id is not defined
+
+- name: 'Create bootstrap boot volume'
+  os_volume:
+    state: present
+    name: "{{ os_bootstrap_server_name }}-boot"
+    image: "rhcos"
+    size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    bootable: yes
+    timeout: "{{ create_server_timeout|int * 60 }} "
+  when: 
+  - disk_type == "scsi"
+  - volume_type_id is defined
+
+- name: 'Create the bootstrap server with boot volume'
+  os_server:
+    name: "{{ os_bootstrap_server_name }}"
+    flavor: "{{ os_flavor_bootstrap }}"
+    boot_volume: "{{ os_bootstrap_server_name }}-boot"
+    userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    auto_ip: no
+    availability_zone: "{{ create_server_zone }}"
+    nics:
+    - port-name: "{{ os_port_bootstrap }}"
+    meta: "{{ cluster_id_tag }}"
+    terminate_volume: True
+  when:
+  - disk_type == "scsi"
+  - volume_type_id is defined

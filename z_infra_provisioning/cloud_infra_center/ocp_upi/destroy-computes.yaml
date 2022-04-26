@@ -45,13 +45,13 @@
       cmd: "jq -r .infraID metadata.json"
     register: infra_id
 
-  - name: 'Remove the Compute servers'
+  - name: 'Remove the compute servers'
     os_server:
       name: "{{ item.1 }}-{{ item.0 }}"
       state: absent
     with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
 
-  - name: 'Get Compute servers from ICIC command line'
+  - name: 'Get compute servers from ICIC command line'
     shell: |
        openstack server list -c Name -f value | grep worker
     register: computes
