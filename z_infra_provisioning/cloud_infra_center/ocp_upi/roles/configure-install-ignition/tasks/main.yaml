@@ -10,15 +10,15 @@
 ---
 # tasks file for configure-install-ignition
 
-- name: Create Install Ignition Configs
+- name: Create install ignition configs
   command:
     cmd: ./openshift-install create ignition-configs
 
-- name: Export Infra ID
+- name: Export infra ID
   script: tools/infra-id.sh
   register: infra_id
 
-- name: Edit Bootstrap Ignition
+- name: Edit bootstrap ignition
   script: tools/ignition-modify.py
   args:
     executable: python3
@@ -26,26 +26,26 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
-- name: Upload Boostrap Ignition
+- name: Upload boostrap ignition
   command:
     cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw --container-format=bare --file bootstrap.ign "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
 
-- name: Get Image Url
+- name: Get image url
   script: tools/get-image-path.sh "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
   register: image_url
   
-- name: Get Glance Token
+- name: Get glance token
   command:
     cmd: openstack token issue -c id -f value
   register: glance_token
   
-- name: Generate Bootstrap Ignition Shim
+- name: Generate bootstrap ignition shim
   script: tools/generate-bootstrap-ignitionshim.py {{ image_url.stdout_lines[0] }} {{ glance_token.stdout }} {{ infra_id.stdout_lines[0] }}
   args:
     executable: python3
 
-- name: Generate Master Ignition
+- name: Generate master ignition
   script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_control_nodes_number }}
 
-- name: Generate Worker Ignition
+- name: Generate worker ignition
   script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}

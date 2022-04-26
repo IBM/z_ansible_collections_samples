@@ -64,7 +64,7 @@
       path: auth/
       state: absent
   
-  - name: 'Remove the file of Compute server names'
+  - name: 'Remove the file of compute server names'
     file:
       state: absent
       path: .compute-nodes-{{ infra_id.stdout_lines[0] }}.json

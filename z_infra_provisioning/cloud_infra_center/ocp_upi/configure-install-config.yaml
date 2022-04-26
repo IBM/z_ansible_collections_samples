@@ -8,7 +8,7 @@
 # =================================================================
 
 ---
-- name: Configure Install Config
+- name: Configure install config
   hosts: localhost
   roles:
   - configure-install-config

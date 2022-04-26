@@ -21,7 +21,7 @@
   - name: 'Import common yaml'
     import_tasks: common.yaml
 
-  - name: 'Export Infra ID'
+  - name: 'Export infra ID'
     shell:
       cmd: "jq -r .infraID metadata.json"
     register: infra_id
@@ -44,7 +44,7 @@
   - name: 'Generate worker node json file'
     script: tools/generate-new-worker-ignition.sh {{ os_compute_server_name }}-{{ new_worker_index }}
 
-  - name: 'Create the Compute ports'
+  - name: 'Create the compute server ports'
     os_port:
       name: "{{ os_port_worker }}-{{ new_worker_index }}"
       network: "{{ use_network_name }}"
@@ -57,7 +57,7 @@
     when:
     - auto_allocated_ip == false
 
-  - name: 'Create the Compute ports'
+  - name: 'Create the compute server ports'
     os_port:
       name: "{{ os_port_worker }}-{{ new_worker_index }}"
       network: "{{ use_network_name }}"
@@ -67,39 +67,84 @@
     when:
     - auto_allocated_ip == true
 
-  - name: 'Set Compute ports tag'
+  - name: 'Set compute server ports tag'
     command:
       cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ new_worker_index }}"
 
-  - name: 'Create the Compute servers'
+  - name: 'Create the compute servers'
     os_server:
       name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
       image: "rhcos"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
-      timeout: 2400
+      timeout: "{{ create_server_timeout|int * 60 }}"
       userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
       availability_zone: "{{ create_server_zone }}"
       nics:
       - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
     when:
     - disk_type == "dasd"
+  
+  - name: 'Convert compute server flavor from value into number'
+    command:
+      cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
+    register: compute_flavor_size
+    when:
+    - disk_type == "scsi"
 
-  - name: 'Create the Compute servers with boot volume'
+  - name: 'Create the compute servers with default boot volume'
     os_server:
       name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
       image: "rhcos"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
-      timeout: 2400
+      timeout: "{{ create_server_timeout|int * 60 }}"
       userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
       availability_zone: "{{ create_server_zone }}"
       nics:
       - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
       boot_from_volume: True
+      volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
       terminate_volume: True
     when:
     - disk_type == "scsi"
+    - volume_type_id is not defined
+
+  - name: 'Create compute boot volume'
+    os_volume:
+      state: present
+      name: "{{ os_compute_server_name }}-{{ new_worker_index }}-boot"
+      image: "rhcos"
+      size: "{{ compute_flavor_size.stdout_lines[0]}}"
+      volume_type: "{{ volume_type_id }}"
+      metadata: "{{ cluster_id_tag }}"
+      timeout: "{{ create_server_timeout|int * 60 }}" 
+    when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+  
+  - name: 'Set compute volume bootable'
+    shell: openstack volume set --bootable "{{ os_compute_server_name }}-{{ new_worker_index }}-boot"
+    when: 
+    - disk_type == "scsi"
+    - volume_type_id is defined
+
+  - name: 'Create the compute server with boot volume'
+    os_server:
+      name: "{{ os_compute_server_name }}-{{ new_worker_index }}"
+      flavor: "{{ os_flavor_worker }}"
+      boot_volume: "{{ os_compute_server_name }}-{{ new_worker_index }}-boot"
+      auto_ip: no
+      availability_zone: "{{ create_server_zone }}"
+      timeout: "{{ create_server_timeout|int * 60 }}" 
+      userdata: "{{ lookup('file', [ os_compute_server_name , new_worker_index , 'ignition.json'] | join('-')) | string }}"
+      nics:
+      - port-name: "{{ os_port_worker }}-{{ new_worker_index }}"
+      meta: "{{ cluster_id_tag }}"
+      terminate_volume: True
+    when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
   
   - name: Get new node IP
     environment:

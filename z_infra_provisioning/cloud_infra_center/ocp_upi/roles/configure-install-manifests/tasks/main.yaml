@@ -10,15 +10,15 @@
 ---
 # tasks file for configure-install-manifests
 
-- name: Create Install Manifests
+- name: Create install manifests
   command:
     cmd: ./openshift-install create manifests
 
-- name: Remove Machine and MachineSet
+- name: Remove machine and machineset
   shell:
     cmd: rm -f openshift/99_openshift-cluster-api_master-machines-*.yaml openshift/99_openshift-cluster-api_worker-machineset-*.yaml
 
-- name: Make Control-plane Nodes Unschedulable
+- name: Make control-plane nodes unschedulable
   script: tools/make-control-plane-unschedulable.py
   args:
     executable: python3

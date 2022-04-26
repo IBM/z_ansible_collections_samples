@@ -8,7 +8,7 @@
 # =================================================================
 
 ---
-- name: Configure Install Manifests
+- name: Configure install manifests
   hosts: localhost
   roles:
   - configure-install-manifests

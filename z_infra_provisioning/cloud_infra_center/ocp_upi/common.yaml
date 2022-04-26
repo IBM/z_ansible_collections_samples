@@ -14,7 +14,7 @@
 # limitations under the License.
 # =================================================================
 
-- name: 'Export Infra ID'
+- name: 'Export infra ID'
   shell:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
