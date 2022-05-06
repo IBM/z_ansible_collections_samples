@@ -1,5 +1,5 @@
 ---
-- hosts: zvm
+- hosts: zos_host
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
