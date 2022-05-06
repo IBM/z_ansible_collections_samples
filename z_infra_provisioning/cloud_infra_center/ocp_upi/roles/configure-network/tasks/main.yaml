@@ -101,12 +101,12 @@
   when: (allocation_pool_start is not defined and allocation_pool_end is defined) or
         (allocation_pool_start is defined and allocation_pool_end is not defined)
 
-- name: 'Export Infra ID'
+- name: 'Export infra ID'
   shell:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
-- name: 'Generate random string for the Compute ports and store them in a json file'
+- name: 'Generate random string for the compute server ports and store them in a json file'
   script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
   args:
     executable: python3
@@ -123,7 +123,7 @@
   when:
   - auto_allocated_ip == false
 
-- name: 'Create the Control Plane ports'
+- name: 'Create the control server ports'
   os_port:
     name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
@@ -136,7 +136,7 @@
   when:
   - auto_allocated_ip == false
 
-- name: 'Create the Compute ports'
+- name: 'Create the compute server ports'
   os_port:
     name: "{{ item.1  }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
@@ -159,7 +159,7 @@
   - auto_allocated_ip == true
 
 
-- name: 'Create the Control Plane ports'
+- name: 'Create the control server ports'
   os_port:
     name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
@@ -169,7 +169,7 @@
   when:
   - auto_allocated_ip == true
 
-- name: 'Create the Compute ports'
+- name: 'Create the compute server ports'
   os_port:
     name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
@@ -183,12 +183,12 @@
   command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_bootstrap }}"
 
-- name: 'Set Control Plane ports tag'
+- name: 'Set control server ports tag'
   command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
 
-- name: 'Set Compute ports tag'
+- name: 'Set compute server ports tag'
   command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
   with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"

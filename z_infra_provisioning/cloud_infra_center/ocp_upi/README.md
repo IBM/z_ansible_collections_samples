@@ -254,8 +254,8 @@ Update your settings based on the samples. The following propeties are **require
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |
 | `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
-| `os_control_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned Control Plane nodes| |
-| `os_compute_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned Compute nodes| |
+| `os_control_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned control server nodes| |
+| `os_compute_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned compute server nodes| |
 | `create_server_zone` |''| The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>Default value is '', which means to use the default availability zone. <br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`]|
 | `pullsecret` | \<pull-secret\> |  Get from [cloud.redhat.com](https://console.redhat.com/openshift/install/ibmz/user-provisioned)|
 | `sshkey` | \<ssh-key\>| The SSH public key for the core user in RHEL CoreOS |
@@ -279,11 +279,13 @@ Others are **optional**, you can enable them and update value if you need more s
 | `os_bootstrap_ip` | \<bootstrap ip addr\> |'x.x.x.x, <br>**required** when `auto_allocated_ip` is false
 | `os_master_ip` | \<master ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
 | `os_infra_ip` |\<infra ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
+| `volume_type_id` |\<storage template id\>|The bootable volume type from backend storage provider. Get it from `openstack volume type list -c ID -f value`
 | `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting, get detail from [doc.openshift.com](https://docs.openshift.com/container-platform/4.9/installing/installing_bare_metal/installing-bare-metal.html#installation-configure-proxy_installing-bare-metal)
 | `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
 | `approve_nodes_csr` |10| Default is 10 minutes that used to wait for approving node csrs
+| `create_server_timeout` |10| Default is 10 minutes that used to create instances and volumes from backend storage provider
 
 ## Creation of the cluster
 

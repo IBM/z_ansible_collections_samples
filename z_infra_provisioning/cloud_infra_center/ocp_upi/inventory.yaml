@@ -39,6 +39,8 @@ all:
 
       vm_type: 'kvm' # kvm or zvm
       disk_type: 'dasd' # dasd or scsi
+      #volume_type_id: '<storage-template-id>'
+      
       openshift_version: '4.7'
       openshift_minor_version: '7'
       
@@ -63,6 +65,7 @@ all:
       #no_proxy: '<no-proxy>'
 
       approve_nodes_csr: 10 # minute
+      create_server_timeout: 10 # minute
 
     bastion:
       ansible_ssh_host: '<linux-server-ip-addr>'
