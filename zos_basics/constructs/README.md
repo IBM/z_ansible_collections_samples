@@ -31,10 +31,10 @@ playbook for additional details and configuration.
 ## Configuration
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
   information from the managed z/OS host.
-  - Review [inventory documentation](../../../docs/share/zos_core/configure_inventory.md)
+  - Review [inventory documentation](../../docs/share/zos_core/configure_inventory.md)
 - Configure the included **host_vars** [zos_host.yml](inventories/host_vars/zos_host.yml)
   with the information from your z/OS system.
-  - Review [host_vars documentation](../../../docs/share/zos_core/configure_host_vars.md)
+  - Review [host_vars documentation](../../docs/share/zos_core/configure_host_vars.md)
     and any additional noted variables in the configuration.
 
 ### Run desired playbook with the supported Ansible --tags
