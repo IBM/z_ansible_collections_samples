@@ -26,7 +26,7 @@
     cn: '{{cert_label}}.svl.ibm.com'
     ou: '{{cert_label}}'
     country: 'US'
-    expiry_date: '2021-12-28'
+    expiry_date: '2022-06-15'
     keyring: 'SharedRing1'
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 

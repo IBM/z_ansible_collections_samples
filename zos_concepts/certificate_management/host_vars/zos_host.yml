@@ -11,7 +11,7 @@ PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ################################################################################
 # the path to root of ZOAU installation
 ################################################################################
-ZOAU: "/zoau/1.1.1"
+ZOAU: "/zoau/v1.1.1-ptf1"
 # ZOAU: "path_to_zoau"
 # ZOAU: "/zoau/v1.1.0-ga"
 # ZOAU: "/zoau/v1.1.1"
