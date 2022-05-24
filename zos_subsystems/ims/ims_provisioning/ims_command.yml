@@ -19,7 +19,7 @@
     zos_tso_command:
       commands:
         - time
-    ignore_errors: yes
+    ignore_errors: True
 
   - name: sleep for a bit
     raw:
