@@ -15,6 +15,12 @@
     zos_tso_command:
       commands:
         - time
+    ignore_errors: yes
+
+  - name: sleep for a bit
+    raw:
+      sleep 600;
+    delegate_to: localhost
 
   - name: Display IMS active
     ims_command:
