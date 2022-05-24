@@ -20,6 +20,9 @@
       commands:
         - time
     ignore_errors: True
+    ignore_unreachable: yes
+
+  - meta: clear_host_errors
 
   - name: sleep for a bit
     raw:
