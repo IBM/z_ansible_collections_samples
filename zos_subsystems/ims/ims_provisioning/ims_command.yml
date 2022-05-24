@@ -19,7 +19,7 @@
 
   - name: sleep for a bit
     raw:
-      sleep 600;
+      sleep 1800;
     delegate_to: localhost
 
   - name: Display IMS active
