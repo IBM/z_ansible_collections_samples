@@ -24,12 +24,13 @@
 
   - meta: clear_host_errors
 
-  # - name: sleep for a bit
-  #   raw:
-  #     sleep 1800;
-  #   delegate_to: localhost
 
   - name: Display IMS active
     ims_command:
       command: "DIS ACT"
       plex: PLEX1
+
+  - name: sleep for 30 minutes
+    raw:
+      sleep 1800;
+    delegate_to: localhost
