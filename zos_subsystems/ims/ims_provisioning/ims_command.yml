@@ -21,6 +21,7 @@
     ims_command:
       command: "DIS ACT"
       plex: PLEX1
+    ignore_errors: yes
 
   - name: sleep for 30 minutes
     raw:
