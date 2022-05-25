@@ -10,24 +10,24 @@
   # - name: Ping the z/OS host
   #   zos_ping:
   #   register: result
-  - name: sleep for a bit
-    raw:
-      sleep 5;
-    delegate_to: localhost
+  # - name: sleep for a bit
+  #   raw:
+  #     sleep 5;
+  #   delegate_to: localhost
 
   - name: issue tso command
     zos_tso_command:
       commands:
         - time
-    ignore_errors: True
+    ignore_errors: yes
     ignore_unreachable: yes
 
   - meta: clear_host_errors
 
-  - name: sleep for a bit
-    raw:
-      sleep 1800;
-    delegate_to: localhost
+  # - name: sleep for a bit
+  #   raw:
+  #     sleep 1800;
+  #   delegate_to: localhost
 
   - name: Display IMS active
     ims_command:
