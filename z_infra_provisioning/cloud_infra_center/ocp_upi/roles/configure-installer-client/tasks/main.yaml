@@ -13,11 +13,9 @@
 - name: Download openshift installer
   become: yes
   get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-install-linux.tar.gz
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-install-linux.tar.gz
     dest: .
     mode: 0755
-    group: root
-    owner: root
 
 - name: Unzip openshift installer
   command:
@@ -31,11 +29,9 @@
 - name: Download openshift client
   become: yes
   get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-client-linux.tar.gz
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-client-linux.tar.gz
     dest: .
     mode: 0755
-    group: root
-    owner: root
 
 - name: Unzip openshift client archive
   command:

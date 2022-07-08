@@ -62,42 +62,37 @@
     msg: "use_network_subnet is not defined!"
   failed_when: use_network_subnet is not defined
 
-- name: "Get subnet name of subnet {{ use_network_subnet }}"
-  command:
-    cmd: "openstack subnet show {{ use_network_subnet }} -c name -f value"
-  register: os_subnet_name
-
-- name: "Get first start of allocation pool of subnet {{ os_subnet_name.stdout }}"
+- name: "Get first start of allocation pool of subnet {{ use_network_subnet }}"
   shell: |
-     openstack subnet show {{ os_subnet_name.stdout }} -c allocation_pools -f json | grep start | awk -F ':' '{print$2}'|tr -d '",'
+     openstack subnet show {{ use_network_subnet }} -c allocation_pools -f json | grep start | awk -F ':' '{print$2}'|tr -d '",'
   register: default_allocation_pool_start
 
-- name: "Get first end of allocation pool of subnet {{ os_subnet_name.stdout }}"
+- name: "Get first end of allocation pool of subnet {{ use_network_subnet }}"
   shell: |
-     openstack subnet show {{ os_subnet_name.stdout }} -c allocation_pools -f json | grep end | awk -F ':' '{print$2}'|tr -d '",'
+     openstack subnet show {{ use_network_subnet }} -c allocation_pools -f json | grep end | awk -F ':' '{print$2}'|tr -d '",'
   register: default_allocation_pool_end
 
-- name: "Remove all DNS nameserver of subnet {{ os_subnet_name.stdout }}"
+- name: "Remove all DNS nameserver of subnet {{ use_network_subnet }}"
   command:
-    cmd: "openstack subnet set --no-dns-nameservers {{ os_subnet_name.stdout }} "
+    cmd: "openstack subnet set --no-dns-nameservers {{ use_network_subnet }} "
 
-- name: 'Update new DNS nameserver and allocation pool of subnet {{ os_subnet_name.stdout }}'
+- name: 'Update new DNS nameserver and allocation pool of subnet {{ use_network_subnet }}'
   command:
-    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ os_subnet_name.stdout }}"
+    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ use_network_subnet }}"
   when:
   - allocation_pool_start is defined
   - allocation_pool_end is defined 
 
-- name: 'Update new DNS nameserver of subnet {{ os_subnet_name.stdout }}'
+- name: 'Update new DNS nameserver of subnet {{ use_network_subnet }}'
   command:
-    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} {{ os_subnet_name.stdout }}"
+    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} {{ use_network_subnet }}"
   when:
   - allocation_pool_start is not defined
   - allocation_pool_end is not defined 
 
-- name: 'Update new DNS nameserver and partial allocation pool of subnet {{ os_subnet_name.stdout }}'
+- name: 'Update new DNS nameserver and partial allocation pool of subnet {{ use_network_subnet }}'
   command:
-    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ os_subnet_name.stdout }}"
+    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
   when: (allocation_pool_start is not defined and allocation_pool_end is defined) or
         (allocation_pool_start is defined and allocation_pool_end is not defined)
 

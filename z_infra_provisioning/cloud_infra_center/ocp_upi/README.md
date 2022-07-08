@@ -138,14 +138,13 @@ sudo dnf install redhat-rpm-config gcc libffi-devel python3-devel openssl-devel 
 ```
 Then create the requirements file and use pip3 to install the python modules:
 
-**Note**: The requirements.txt are tested for python-openstackclient =5.5.0.
+**Note**: The requirements.txt are tested for python-openstackclient=5.5.0.
 ```sh
 cat <<'EOF' >> requirements.txt 
 # The order of packages is significant, because pip processes them in the order
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
 pbr!=2.1.0,>=2.0.0 # Apache-2.0
-
 cliff>=3.5.0 # Apache-2.0
 iso8601>=0.1.11 # MIT
 openstacksdk>=0.57.0 # Apache-2.0
@@ -156,9 +155,8 @@ python-keystoneclient>=3.22.0 # Apache-2.0
 python-novaclient>=17.0.0 # Apache-2.0
 python-cinderclient>=3.3.0 # Apache-2.0
 stevedore>=2.0.1 # Apache-2.0
-openstacksdk==0.57.0
-netaddr==0.8.0
-python-openstackclient==5.2.0
+netaddr>=0.8.0
+python-openstackclient>=5.5.0
 EOF
 
 sudo pip3 install -r requirements.txt python-openstackclient --ignore-installed
@@ -248,8 +246,8 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
-| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
+| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
+| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.  <br>For openshift_version `4.10` for example, the only rhcos release available is `4.10.3`, and user can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/4.10/) to see whats there | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |

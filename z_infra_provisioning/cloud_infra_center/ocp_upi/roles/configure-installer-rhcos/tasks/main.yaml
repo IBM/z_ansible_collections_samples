@@ -23,11 +23,9 @@
 - name: Download RHCOS image
   become: yes
   get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-metal.s390x.raw.gz
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-metal.s390x.raw.gz
     dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
     mode: 0755
-    group: root
-    owner: root
   when: 
   - vm_type == "zvm"
   - disk_type == "scsi"
@@ -35,11 +33,9 @@
 - name: Download RHCOS image
   become: yes
   get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-dasd.s390x.raw.gz
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-dasd.s390x.raw.gz
     dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
     mode: 0755
-    group: root
-    owner: root
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
@@ -67,11 +63,9 @@
 - name: Download RHCOS image
   become: yes
   get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-openstack.s390x.qcow2.gz
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-openstack.s390x.qcow2.gz
     dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
     mode: 0755
-    group: root
-    owner: root
   when: 
   - vm_type == "kvm"
 
