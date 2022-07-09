@@ -1,0 +1,101 @@
+# =================================================================
+# Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =================================================================
+
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+#
+# Change Summary: 
+# - Change Ansible playbook name
+
+---
+- name: modify dns on bastion
+  hosts: bastion
+  
+  tasks:
+  - name: Copy bastion info from remote into bastion server
+    copy:
+      src: .new_ocp_node.yml
+      dest: /tmp
+      force: yes
+
+  - name: Get new worker node IP 
+    shell: "cat /tmp/.new_ocp_node.yml | grep new_worker_ip | awk -F '=' '{print $2}'"
+    register: dns_new_worker_ip
+
+  - name: Get new worker node index 
+    shell: "cat /tmp/.new_ocp_node.yml | grep new_worker_index | awk -F '=' '{print $2}'"
+    register: dns_new_worker_index
+
+  - name: Combine cluster name and base domain
+    shell: "cat /tmp/.new_ocp_node.yml | grep cluster_domain_name | awk -F '=' '{print $2}'"
+    register: cluster_domain_name
+  
+  - name: Check all worker configuration exists in named
+    shell: cat /var/named/{{ cluster_domain_name.stdout  }}.zone | grep  'worker' | wc -l
+    register: all_worker_count
+    check_mode: no 
+    ignore_errors: true
+
+  - name: Check new worker DNS configuraition exists in named
+    shell: cat /var/named/{{ cluster_domain_name.stdout  }}.zone | grep  'worker-{{dns_new_worker_index.stdout  }}' | wc -l
+    register: exist_new_worker_count
+    check_mode: no 
+    ignore_errors: true
+
+  - name: 'Get the last line number of worker'
+    shell: grep -n 'worker' /var/named/{{ cluster_domain_name.stdout  }}.zone |tail -1| cut --delimiter=":" --fields=1
+    register: last_worker_ln
+    when: all_worker_count.stdout != "0"
+  
+  # - name: show msg new worker 
+  #   debug:
+  #     msg: "{{last_worker_ln.stdout}}"
+
+  - name: Add new worker dns record into named
+    shell: 
+      cmd: "sed -i '{{ last_worker_ln.stdout }} aworker-{{ dns_new_worker_index.stdout }}              IN A {{ dns_new_worker_ip.stdout  }}\n' /var/named/{{ cluster_domain_name.stdout  }}.zone"
+    when: 
+      - last_worker_ln.stdout != "0"
+      - exist_new_worker_count.stdout == "0"
+
+  - name: Add new worker dns record into named
+    shell: 
+      cmd: "sed -i '/^etcd-0/ iworker-{{ dns_new_worker_index.stdout }}              IN A {{ dns_new_worker_ip.stdout  }}\n' /var/named/{{ cluster_domain_name.stdout  }}.zone"
+    when: 
+      - last_worker_ln == "0" 
+      - exist_new_worker_count.stdout == "0"
+
+  - name: Update new worker dns record if new worker node exists in named
+    shell: "sed -i '{{ exist_new_worker.stdout }}s/.*/worker-{{ dns_new_worker_index.stdout  }}              IN A {{ dns_new_worker_ip.stdout }}/'  /var/named/{{ cluster_domain_name.stdout  }}.zone"
+    when: 
+      - last_worker_ln == "0" 
+      - exist_new_worker_count.stdout != "0"
+
+  - name: Restart named-chroot.service
+    service:
+      name: named-chroot.service
+      state: restarted
+
+  - name: Check if named-chroot is running
+    service:
+      name: named-chroot
+      state: started

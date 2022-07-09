@@ -1,0 +1,13 @@
+################################################################################
+# © Copyright IBM Corporation 2021
+################################################################################
+
+# group of the target z/OS systems
+zos_systems:
+  hosts:
+    zos_host1:
+      zmf_host: zosmf_host_name1
+      zmf_port: zosmf_port_number1
+    zos_host2:
+      zmf_host: zosmf_host_name2
+      zmf_port: zosmf_port_number2

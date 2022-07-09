@@ -17,9 +17,9 @@
 ---
 # tasks file for configure-haproxy
 
-- include_vars: bastion-template.yaml
+- include_vars: cluster-template.yaml
 
-- name: install haproxy
+- name: Install haproxy
   yum:
     name:
       - haproxy
@@ -30,19 +30,19 @@
   - restart haproxy
   - restart firewalld
 
-- name: create /etc/haproxy
+- name: Create /etc/haproxy
   file: 
     path: /etc/haproxy
     state: directory
 
-- name: create /etc/haproxy/haproxy.cfg
+- name: Create /etc/haproxy/haproxy.cfg
   template:
     src: etc/haproxy/haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
   notify: 
   - restart haproxy
 
-- name: allow http traffic
+- name: Allow http traffic
   firewalld:
     service: http
     permanent: yes
@@ -51,7 +51,7 @@
   notify:
   - restart firewalld
 
-- name: allow http traffic
+- name: Allow http traffic
   firewalld:
     service: http
     permanent: yes
@@ -60,8 +60,7 @@
   notify:
   - restart firewalld
 
-
-- name: allow https traffic
+- name: Allow https traffic
   firewalld:
     service: https
     permanent: yes
@@ -70,7 +69,7 @@
   notify:
   - restart firewalld
  
-- name: allow https traffic
+- name: Allow https traffic
   firewalld:
     service: https
     permanent: yes
@@ -79,7 +78,7 @@
   notify:
   - restart firewalld
   
-- name: allow traffic at port 443
+- name: Allow traffic at port 443
   firewalld:
     port: 443/tcp
     permanent: yes
@@ -91,7 +90,7 @@
   notify:
   - restart firewalld
 
-- name: allow traffic at port 6443
+- name: Allow traffic at port 6443
   firewalld:
     port: 6443/tcp
     permanent: yes
@@ -103,7 +102,7 @@
   notify:
   - restart firewalld
 
-- name: allow traffic at port 22623
+- name: Allow traffic at port 22623
   firewalld:
     port: 22623/tcp
     permanent: yes
@@ -115,4 +114,36 @@
   notify:
   - restart firewalld
 
+- name: Restart haproxy
+  service: name=haproxy state=restarted
 
+- name: Restart firewalld
+  service: name=firewalld state=restarted
+
+- name: Check if haproxy is running
+  service:
+    name: haproxy
+    state: started
+
+- name: Check if firewalld is running
+  service:
+    name: firewalld
+    state: started
+
+# - name: Report status of haproxy
+#   fail:
+#     msg: |
+#       Service haproxy is not running.
+#       Output of `systemctl status haproxy`:
+#       {{ service_haproxy_status.stdout }}
+#       {{ service_haproxy_status.stderr }}
+#   when: services_state.ansible_facts.services['haproxy.service'].state != 'started'  
+
+# - name: Report status of firewalld
+#   fail:
+#     msg: |
+#       Service firewalld is not running.
+#       Output of `systemctl status firewalld`:
+#       {{ service_firewalld_status.stdout }}
+#       {{ service_firewalld_status.stderr }}
+#   when: services_state.ansible_facts.services['firewalld.service'].state != 'started'  

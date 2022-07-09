@@ -30,69 +30,52 @@ playbook notes sections for additional details and configuration.
 - [**accept_ptf**](roles/accept_ptf/README.md) - Holds tasks related to ACCEPT a PTF.
 - [**query_csi**](roles/query_csi/README.md) - Holds tasks related to QUERY data from CSI.
 
-## Ansible Collection Requirement
+## Playbook Requirements
+This playbook requires:
 
-   IBM z/OS core collection 1.3.0 or later
+- [IBM® z/OS® core collection 1.3.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+- [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-## Getting Started
+## Configuration
+- Configure the included [inventory.yml](inventories/inventory.yml) with the
+  information from the managed z/OS host.
+  - Review [inventory documentation](../../docs/share/zos_core/configure_inventory.md)
+- Configure the included **host_vars** [zos_host.yml](inventories/host_vars/zos_host.yml)
+  with the information from your z/OS system.
+  - Review [host_vars documentation](../../docs/share/zos_core/configure_host_vars.md)
+    and any additional noted variables in the configuration.
+- Update the playbook specific variables found in each playbook and review the
+  role README files.
 
-If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../docs/share/configuration_guide.md) or
-continue with getting started below.
+##Run the playbook
 
-Optionally, you can use the sample
-[host_setup](../../../zos_administration/host_setup/README.md)
-to discover and create your **inventory** and **host_vars** artifacts. It should
-be noted that when you use the **host_setup** it will generate a configuration
-for the most common dependencies, some playbooks require more customized
-configurations, in this case, you can review the sample documentation and
-add the additional required variables.
 
-## Getting Started: CLI
 
-If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../docs/share/configuration_guide.md) or
-continue with getting started below.
+This project has included a `site.yml` playbook that serves as the master playbook
+that provides additional prerequisite checks.
 
-### 1. Update [inventory.yml](inventory.yml) with the information about your system(s)
-
-```yaml
-zsystem:
-  hosts:
-    zos:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
-```
-
-### 2. Update the environment variables for the z/OS system in [host_vars/zos_host.yml](host_vars/zos_host.yml)
-
-```yaml
-# the path to the root of IBM python installation
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
-
-# the path to root of ZOAU installation
-ZOAU: "/usr/lpp/IBM/zoautil"
-```
-
-### 3. Update the playbook specific variables in [host_vars/zos_host.yml](host_vars/zos_host.yml) based on desired behavior
-
-### 4. Run desired playbook
+If you want to run the master playbook `site.yml` it will check that your environment
+has the correct version of Ansible as well as the collection needed to execute
+correctly. To run the master playbook, use command:
 
 ```bash
-ansible-playbook -i inventory.yml <playbook-name>
+ansible-playbook -i inventories site.yml
+```
+
+You can skip the prerequisite check and run the appropriate playbook with
+command:
+
+```bash
+ansible-playbook -i inventories <playbook-name>
 ```
 
 # Copyright
-
 © Copyright IBM Corporation 2021
 
 # License
-
 Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 # Support
-
 Please refer to the [support section](../../../README.md#support) for more
 details.

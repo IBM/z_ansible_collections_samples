@@ -2,168 +2,214 @@
 
 IBM® Cloud Infrastructure Center is an advanced infrastructure management product, providing on-premises cloud deployments of IBM z/VM®-based and KVM based Linux® virtual machines on the IBM Z® and IBM LinuxONE platforms.
 
-More details: https://www.ibm.com/docs/en/cic/1.1.3
+Before you get started with Ansible, familiarize yourself with the basics of Red Hat® OpenShift® and IBM Cloud Infrastructure Center. The following links provide basic information and an overview. 
+
+ [Red Hat OpenShift Container Platform installation and update](https://docs.openshift.com/container-platform/4.8/architecture/architecture-installation.html#architecture-installation)
+
+[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.1.5)
 
 # About this playbook
 
-The purposes of this playbook:
+> The current version of this playbook: [version](./version)
 
-1. Use IBM® Cloud Infrastructure Center to install Red Hat® OpenShift® Container Platform via user-provisioned infrastructure (UPI)
+> The instruction of [checkout to specific version](./checkout-to-version.md#Checkout-to-specific-version)
+
+The playbook contains the following topics:
+
+1. How to use the IBM Cloud Infrastructure Center to install Red Hat OpenShift Container Platform via user-provisioned infrastructure (UPI)
 
 2. Enhance the existing UPI process, such as 
 
-- Rhcos images can be automatically downloaded and uploaded.
+- Red Hat OpenShift images can be automatically downloaded and uploaded.
 
-- Nodes’ IPs can be allocated instead of be fixed.
+- Nodes’ IPs can be allocated instead of being fixed.
 
 - Worker nodes’ CSR can be automatically approved.
 
 - Additional scripts are provided: 
 
-  1. Add or remove a new OpenShift compute node 
+  1. Add or remove a new Red Hat OpenShift compute node 
 
-  2. Configure image registry. 
+  2. Configure the image registry
 
-  3. Requirements pre-check before installation
+  3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.3 and RH OpenShift Container Platform version 4.6 and, 4.7 for z/VM and version 4.7 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10 for z/VM and version 4.7, 4.8, 4.9, 4.10 for KVM.
 
-# Installing OpenShift on IBM® Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
+# Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
-The User-Provisioned Infrastructure (UPI) process installs OpenShift in stages, providing opportunities for modifications or integrating with existing infrastructure.
+The User-Provisioned Infrastructure (UPI) process installs Red Hat OpenShift in steps, providing the opportunity for modifications or integration into the existing infrastructure.
 
-It contrasts with the fully-automated Installer-Provisioned Infrastructure (IPI) which creates everything in one go.
+Contrary to the fully-automated Installer-Provisioned Infrastructure (IPI) that creates everything in one go.
 
-With UPI, creating the cloud (OpenStack) resources (e.g. Nova servers, Neutron ports, security groups) is the responsibility of the person deploying OpenShift.
+Creating the cloud (OpenStack) resources (e.g. Nova servers, Neutron ports, security groups) is the responsibility of the person deploying Red Hat OpenShift using the UPI.
 
-The installer is still used to generate the ignition files and monitor the installation process.
+The UPI installer is used to generate the ignition files and monitor the installation process. 
 
 This provides a greater flexibility at the cost of a more explicit and interactive process.
 
-Below is a step-by-step guide to a UPI installation that mimics an automated IPI installation; prerequisites and steps described below should be adapted to the constraints of the target infrastructure.
+Below is a step-by-step guide how to do a UPI installation that mimics an automated IPI installation;
 
-Please be aware of the [Known Issues](https://github.com/openshift/installer/blob/master/docs/user/openstack/known-issues.md#known-issues-specific-to-user-provisioned-installations)
+Check the [Known Issues](https://github.com/openshift/installer/blob/master/docs/user/openstack/known-issues.md#known-issues-specific-to-user-provisioned-installations)
 of this method of installation.
 
+# Workflow
+![ocp_upi_ansible](https://media.github.ibm.com/user/95263/files/febe2900-0efe-11ec-82e9-b0d714a4a51c)
+
+This is the overall workflow running Ansible playbook, mainly has the following steps:
+- [Prepare](#prepare)
+- [Create Cluster](#create-cluster)
+  - [Something is Wrong](#something-is-wrong)
+
+After you performed the previous steps successfully, you get one ready OpenShift Container Platform on the IBM Cloud Infrastructure Center. 
+- [Day2 Operation](#day2-operation)
+- [Uninstall Red Hat OpenShift Container Platform](#uninstall-red-hat-openshift-container-platform)
+
+# Quickstart
+
 ## Prerequisites
+-  You have installed the IBM Cloud Infrastructure Center
 
-The file `inventory.yaml` contains the variables most likely to need customisation.
+## Prepare
 
-For a successful IBM® Cloud Infrastructure Center UPI installation (3 worker nodes) are required:
-```
-Security Groups: 3
-Security Group Rules: 60
-Subnets: 1
-Server Groups: 1
-RAM: 112 GB
-vCPUs: 28
-Volume Storage: 175 GB
-Instances: 7
-Depending on the type of image registry backend an additional 100 GB volume.
-```
+### 1. Preparation of the servers
 
-- IBM® Cloud Infrastructure Center virtual machines type ("kvm" or "zvm")
-  - inventory: `vm_type`
-- IBM® Cloud Infrastructure Center disk type ("dasd" or "scsi")
-  - inventory: `disk_type`
-- OpenShift version
-  - inventory: `openshift_version` and `openshift_minor_version`
-- Nova flavors
-  - inventory: `os_flavor_master` and `os_flavor_worker`
-- The `openshift-install` binary
-- A subnet range for the Nova servers / OpenShift Nodes, that does not conflict with your existing network, and 
-  - inventory: `os_subnet_range`
-- The availability zone in which to create the server
-  - inventory: `availability_zone`
-  - the default value is '', which means to use the default availability zone
-  - to select the host where instances are launched: `availability_zone: 'ZONE:HOST:NODE'`, HOST and NODE are optional parameters, so you can use the `availability_zone 'ZONE::NODE'`, `availability_zone: 'ZONE:HOST'` or `availability_zone: 'ZONE'`
-- A DNS zone you can configure
-  - it must be the resolver for the base domain, for the installer and for the end-user machines
-  - it will host two records: for API and apps access
-  - inventory: `vars.os_dns_domain`
-- Bastion node
-  - Ensure networks connectivity among CIC control nodes, DNS, HAProxy, Installer or Bastion node.
-  - You can use your own Bastion Node that installed DNS server and Load Balancer, or choose a RHEL8 machine.
-    - Ensure that you can ssh to bastion node or RHEL8 machine via root user without password.
-    - Uncomment `bastion` and `vars` part in inventory.yaml and fill the information on bastion node.
-    - inventory: `bastion.ansible_ssh_host`, `vars.cluster_domain_name`, `vars.os_dns_domain`.
-    - If using a new RHEL 8 machine as bastion node, please remember to run [Configure bastion](#configure-bastion) step to automatically create DNS and HAProxy.
+- **(Required)** A Linux server, the machine that runs Ansible.
+    - RHEL8 is the operation system version we tested
+    - Ansible >= 2.8
+    - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
+    - You can use a single LPAR server or virtual machine
+      - Disk with at least 20 GiB
+- **(Optional)** A Bastion server, a machine that is used to configure DNS and Load Balancer for the Red Hat OpenShift installation
+    - If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, the bastion server **is not** required.
+    - If you have external or existing DNS server, but no Load Balancer for the Red Hat Openshift installation, please set `os_dns_domain` property, and then use a separate YAML `configure-haproxy` to configure the HAProxy in bastion server.
+    - If you have existing Load Balancer, but no DNS server for the Red Hat Openshift installation, you can use a separate YAML `configure-dns` to configure the DNS server in bastion server.
+    - If you don't have any existing DNS server or Load Balancer for the Red Hat Openshift installation, you need to create one Linux server as the bastion server and run playbook to configure DNS server and Load Balancer. You can also use the same Linux server that runs Ansible.
+    - The firewalld service should be enabled and running in bastion server.
 
+### 2. Installation of packages on a Linux server
 
-## Getting Started
-
-You can use any ICIC nodes or any RHEL8 machine to run ansible scripts to deploy OCP UPI, it's recommended to using RHEL8 machine, following these steps to start it:
-* [Provision a Red Hat machine](#provision-a-red-hat-machine)
-* [Install required packages](#install-required-packages)
-* [Generate an SSH private key and add it to the CIC control node](#generate-an-ssh-private-key-and-add-it-to-the-cic-control-node)
-* [Connect the CIC client by using command line](#connect-the-cic-client-by-using-command-line)
-* [OpenShift Configuration Directory](#openshift-configuration-directory)
-* [Prepare the configuration before installation](#prepare-the-configuration-before-installation)
-* [Run ansible playbook to deploy OCP UPI](#run-ansible-playbook-to-deploy-ocp-upi)
-
-## Provision a Red Hat machine
-Provision a Red Hat machine based on the following specifications, or using existing ICIC compute nodes, the minimum system requirements: `1 vCPU, 2GB memory, 30GB Disk`.
-
-**Note:** The operating system which this Ansible script runs on successfully is s390x.
-
-## Install required packages
-
-**Requirements:**
+**Packages:**
 
 * Python3
-* Ansible
+* Ansible >=2.8
 * jq
+* wget
+* git
+* tar
+* gzip
+* firewalld
 * Python modules required in the playbooks. Namely:
   * openstackclient 
   * openstacksdk >= 0.57.0
   * netaddr
 
-**Verify the installation:**
+**Register:**
+
+Use the following command to register the Linux server, then automatically associate any available subscription matching that system:
 ```sh
-$ openstack
-(openstack)
+sudo subscription-manager register --username <username> --password <password> --auto-attach
+```
+After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
+
+**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.3 and RHEL8.5. 
+```sh
+sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
 ```
 
-**Make sure that `python` points to Python3:**
+**Installation:**
+
+Install the packages from the repository in the Linux server:
+```sh
+sudo dnf install python3 ansible jq wget git firewalld tar gzip -y
+```
+Make sure that `python` points to Python3
 ```sh
 sudo alternatives --set python /usr/bin/python3
 ```
-
-## Generate an SSH private key and add it to the CIC control node
-
-You can use this key to SSH into the ICIC nodes and Bastion Node. 
-1. Create the SSH Key
+Upgrade the pip package and dnf:
 ```sh
-$ ssh-keygen -f ~/.ssh/id_rsa -t rsa
+sudo -H pip3 install --upgrade pip
+sudo dnf update -y
 ```
-2. Add your SSH key to ICIC control nodes and bastion nodes.
+Install the required package through dnf:
 ```sh
-$ ssh-copy-id root@<CIC-control-node-ip>
-$ ssh-copy-id root@<Bastion-Node>
+sudo dnf install redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
+```
+Then create the requirements file and use pip3 to install the python modules:
+
+**Note**: The requirements.txt are tested for python-openstackclient =5.5.0.
+```sh
+cat <<'EOF' >> requirements.txt 
+# The order of packages is significant, because pip processes them in the order
+# of appearance. Changing the order has an impact on the overall integration
+# process, which may cause wedges in the gate later.
+pbr!=2.1.0,>=2.0.0 # Apache-2.0
+
+cliff>=3.5.0 # Apache-2.0
+iso8601>=0.1.11 # MIT
+openstacksdk>=0.57.0 # Apache-2.0
+osc-lib>=2.3.0 # Apache-2.0
+oslo.i18n>=3.15.3 # Apache-2.0
+oslo.utils>=3.33.0 # Apache-2.0
+python-keystoneclient>=3.22.0 # Apache-2.0
+python-novaclient>=17.0.0 # Apache-2.0
+python-cinderclient>=3.3.0 # Apache-2.0
+stevedore>=2.0.1 # Apache-2.0
+openstacksdk==0.57.0
+netaddr==0.8.0
+python-openstackclient==5.2.0
+EOF
+
+sudo pip3 install -r requirements.txt python-openstackclient --ignore-installed
+``` 
+
+**Verification:**
+```sh
+openstack
+(openstack)
 ```
 
-## Connect the CIC client by using command line
+### 3. Setting the IBM Cloud Infrastructure Center environment variables on your Linux server
 
-1. Copy the `icicrc` file to your user's home directory.
+Check’ [setting environment variables](https://www.ibm.com/docs/en/cic/1.1.5?topic=descriptions-setting-environment-variables) for more details.
+
+1. If your Linux server does not have SSH key, use the following command-line SSH to generate a key pair: 
 ```sh
-$ scp -r root@<CIC-control-node-ip>:/opt/ibm/icic/icicrc opt/ibm/icic/icicrc
+ssh-keygen -t rsa
 ```
 
-2. Copy the `icic.crt` file to your certs directory
+2. Copy the key to the IBM Cloud Infrastructure Center management node and bastion server:
 ```sh
-$ scp -r root@<CIC-control-node-ip>:/etc/pki/tls/certs/icic.crt /etc/pki/tls/certs/
+ssh-copy-id user@host
 ```
 
-3. Run source `icicrc` to set the environment variables.
+3. Test the new key:
 ```sh
-$ source /opt/ibm/icic/icicrc
+ssh user@host
+```
+The login should now complete without asking for a password. 
+
+4. Copy the `icicrc` file from the IBM Cloud Infrastructure Center management node to your user's `/opt/ibm/icic/icicrc` directory:
+```sh
+scp -r user@host:/opt/ibm/icic/icicrc /opt/ibm/icic/icicrc
+```
+
+5. Copy the `icic.crt` file from the IBM Cloud Infrastructure Center management node to your certs directory `/etc/pki/tls/certs/`:
+```
+scp -r user@host:/etc/pki/tls/certs/icic.crt /etc/pki/tls/certs/
+```
+
+6. Run the source `icicrc` to set the environment variables:
+```
+source /opt/ibm/icic/icicrc
  Please input the username: admin
  Please input the password of admin:
 ```
 
-4. Verify the Red Hat machine is connected to ICIC successfully.
+7. Verify the Linux server is connected to the IBM Cloud Infrastructure Center successfully.
 ```sh
-$ openstack project list
+openstack project list
 +----------------------------------+-------------+
 | ID                               | Name        |
 +----------------------------------+-------------+
@@ -173,446 +219,150 @@ $ openstack project list
 +----------------------------------+-------------+
 ```
 
-## OpenShift Configuration Directory
+8. Verify that all components in the IBM Cloud Infrastructure Center all components are working as desired.
+- Login to the IBM Cloud Infrastructure Center command line and confirm all the IBM Cloud Infrastructure Center services are in status running.
+```sh
+icic-services status
+```
+- Login to the IBM Cloud Infrastructure Center web console and select Home > Environment Checker, click the Run Environment Checker button to confirm the cluster does not have any failed messages.
 
-This repository contains Ansible playbooks to deploy OpenShift on IBM® Cloud Infrastructure Center.
+If you meet any **not running** service or **failed** message, check the IBM Cloud Infrastructure Center [Troubleshooting](https://www.ibm.com/docs/en/cic/1.1.5?topic=troubleshooting) document to fix before running the ansible playbook.
 
-### Download this playbook
+
+### 4. Download this playbook on your Linux server
 
 All the configuration files, logs and installation state are kept in a single directory:
 ```sh
-$ git clone https://github.com/IBM/z_ansible_collections_samples.git
-$ cp -r z_ansible_collections_samples/z_infra_provisioning/cloud_infra_center/ocp_upi ocp_upi
-$ cd ocp_upi
+git clone https://github.com/IBM/z_ansible_collections_samples.git
+cp -r z_ansible_collections_samples/z_infra_provisioning/cloud_infra_center/ocp_upi ocp_upi
+cd ocp_upi
 ```
 
-## Prepare the configuration before installation
+### 5. Configure your settings in inventory.yaml
 
-### OpenShift installer and CLI
+Update your settings based on the samples. The following propeties are **required**:
 
-Config the `openshift_version` and `openshift_minor_version` in inventory.yaml, the ansible will download the specified openshift installer and CLI binary files.
+| Property | Default | Description | 
+| ------ | ------ | ------ |
+| `use_network_name` | \<network name from icic\> |`openstack network list -c Name -f value`|
+| `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
+| `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
+| `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
+| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
+| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
+| `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
+| `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
+| `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |
+| `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
+| `os_control_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned Control Plane nodes| |
+| `os_compute_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned Compute nodes| |
+| `create_server_zone` |''| The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>Default value is '', which means to use the default availability zone. <br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`]|
+| `pullsecret` | \<pull-secret\> |  Get from [cloud.redhat.com](https://console.redhat.com/openshift/install/ibmz/user-provisioned)|
+| `sshkey` | \<ssh-key\>| The SSH public key for the core user in RHEL CoreOS |
+| `os_dns_domain` | \<external DNS ip addr\> or \<bastion ip addr\>|If you want to use your external or existing DNS server set `os_dns_domain` to use it, others set bastion machine ip address|
+| `cluster_name` | \<cluster-name\> |The name of the cluster, such as `openshift`.| 
+| `base_domain` | \<cluster-base-domain\> |The base domain of the cluster, the base domain is used to create routes to your OpenShift Container Platform cluster components, such as `example.com`| 
 
-### Red Hat Enterprise Linux CoreOS (RHCOS) image
+If you need the Ansible playbook to help configure DNS server or HAProxy server on bastion server, you need to configure correct bastion properties.
+| Property| <div style="width:220px">Default</div> | Description                           |
+| --------------------------------------- | ------------------------------------- |:-----|
+| `ansible_ssh_host` | \<linux server ip addr\> | 'x.x.x.x'<br> **required** when use bastion server, give the IP address of bastion server.
+| `bastion_private_ip_address` | \<bastion ip addr\>      |IP address of your bastion node<br>**required** when use bastion server, give the IP address of bastion server.
+| `dns_forwarder` | \<upstream DNS ip addr\> |For nameserver where requests should be forwarded for resolution.<br>**required** when use bastion server
 
-A proper [RHCOS](https://docs.openshift.com/container-platform/4.7/architecture/architecture-rhcos.html) image in the IBM® Cloud Infrastructure Center cluster or project is required for successful installation.
+Others are **optional**, you can enable them and update value if you need more specified settings.
 
-To use Red Hat Enterprise Linux CoreOS (RHCOS) images to provision virtual machines, ansible playbooks will download the images from the RHCOS [image mirror](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/). The images then can be uploaded to IBM® Cloud Infrastructure Center to provision a virtual machine.
+| Property| <div style="width:220px">Default</div> | Description                           |
+| --------------------------------------- | ------------------------------------- |:-----|
+| `allocation_pool_start` |\<ip range start\> |'x.x.x.x'
+| `allocation_pool_end` |\<ip range end\> |'x.x.x.x'
+| `os_bootstrap_ip` | \<bootstrap ip addr\> |'x.x.x.x, <br>**required** when `auto_allocated_ip` is false
+| `os_master_ip` | \<master ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
+| `os_infra_ip` |\<infra ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
+| `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting, get detail from [doc.openshift.com](https://docs.openshift.com/container-platform/4.9/installing/installing_bare_metal/installing-bare-metal.html#installation-configure-proxy_installing-bare-metal)
+| `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
+| `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
+| `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
+| `approve_nodes_csr` |10| Default is 10 minutes that used to wait for approving node csrs
 
-**z/VM**
+## Creation of the cluster
 
-Supported versions: `4.6`, `4.7 `.
+1. **Step1**:
 
-Two types of RHCOS images are supported.
-```
-- RHCOS DASD images
-- RHCOS SCSI images
-```
-
-Config the `vm_type` as "zvm" and `disk_type` as "dasd" or "scsi" in `inventory.yaml`
-
-**KVM**
-
-Supported version: `4.7`.
-
-Config the `vm_type` as "kvm" and `disk_type` as "" in `inventory.yaml`
-
-### Prepare configuration and ignition files before installation
-
-The ansible playbooks has automated origin complex UPI mannul process, such as correcting configuration, creating manifests, creating ignition files and uploading ignition files to glance. 
-
-### Config HAproxy and DNS on a bastion node (default)
-
-User can choose to use your own bastion node to deploy cluster. If there aren't DNS server and Haproxy on bastion node, highly recommend installing them by ansible playbook [Configure Bastion](#configure-bastion), or you have an external DNS server which is managed in other DNS provider, if so, you need to add openshift recorder in your DNS server and Load Balancer manually, please see the following [example](#sample-dns-zone-database) to add it.
-
-#### Sample DNS zone database
-```
-$TTL 900
-
-@                     IN SOA bastion.openshift.example.com. hostmaster.openshift.example.com. (
-                        2019062002 1D 1H 1W 3H
-                      )
-                      IN NS bastion.openshift.example.com.
-
-bastion               IN A 172.26.103.100
-api                   IN A 172.26.103.100
-api-int               IN A 172.26.103.100
-apps                  IN A 172.26.103.100
-*.apps                IN A 172.26.103.100
-
-bootstrap           IN A 172.26.103.230
-
-master-0              IN A 172.26.103.231
-master-1              IN A 172.26.103.232
-master-2              IN A 172.26.103.233
-
-worker-62c41              IN A 172.26.103.234
-worker-a7c60              IN A 172.26.103.235
-worker-c94d1              IN A 172.26.103.236
-
-etcd-0              IN A 172.26.103.231
-etcd-1              IN A 172.26.103.232
-etcd-2              IN A 172.26.103.233
-
-_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.openshift.example.com.
-                      IN SRV 0 10 2380 etcd-1.openshift.example.com.
-                      IN SRV 0 10 2380 etcd-2.openshift.example.com.
+```sh
+ansible-playbook -i inventory.yaml 01-preparation.yaml
 ```
 
-#### Sample HAProxy 
-```
-frontend ocp4-kubernetes-api-server
-   mode tcp
-   option tcplog
-   bind api.openshift.example.com:6443
-   bind api-int.openshift.example.com:6443
-   default_backend ocp4-kubernetes-api-server
+2. **Step2**:
 
-frontend ocp4-machine-config-server
-   mode tcp
-   option tcplog
-   bind api.openshift.example.com:22623
-   bind api-int.openshift.example.com:22623
-   default_backend ocp4-machine-config-server
+**Note**: This step is optional.
 
-frontend ocp4-router-http
-   mode tcp
-   option tcplog
-   bind apps.openshift.example.com:80
-   default_backend ocp4-router-http
+> Skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
 
-frontend ocp4-router-https
-   mode tcp
-   option tcplog
-   bind apps.openshift.example.com:443
-   default_backend ocp4-router-https
-
-backend ocp4-kubernetes-api-server
-   mode tcp
-   balance source
-   server bootstrap bootstrap.openshift.example.com:6443 check
-   server master-0 master-0.openshift.example.com:6443 check
-   server master-1 master-1.openshift.example.com:6443 check
-   server master-2 master-2.openshift.example.com:6443 check
-
-backend ocp4-machine-config-server
-   mode tcp
-   balance source
-   server bootstrap bootstrap.openshift.example.com:22623 check
-   server master-0 master-0.openshift.example.com:22623 check
-   server master-1 master-1.openshift.example.com:22623 check
-   server master-2 master-2.openshift.example.com:22623 check
-
-backend ocp4-router-http
-   mode tcp
-         server worker-62c41 worker-62c41.openshift.example.com:80 check
-         server worker-a7c60 worker-a7c60.openshift.example.com:80 check
-         server worker-c94d1 worker-c94d1.openshift.example.com:80 check
-
-backend ocp4-router-https
-   mode tcp
-         server worker-62c41 worker-62c41.openshift.example.com:443 check
-         server worker-a7c60 worker-a7c60.openshift.example.com:443 check
-         server worker-c94d1 worker-c94d1.openshift.example.com:443 check
+> If you use your external or existing DNS server, but no Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS server part, and use this playbook to configure HAProxy in your bastion server.
+```sh
+ansible-playbook -i inventory.yaml configure-haproxy.yaml
 ```
 
-#### Verify DNS record
-
-You can use the nslookup <hostname> command to verify name resolution. 
-```
-$ nslookup master-0.openshift.example.com
-Server:		172.26.100.8
-Address:	172.26.100.8#53
-
-Name:	master-0.openshift.example.com
-Address: 172.26.103.231
+> If you don't have any existing DNS server or Load Balancer, please use this playbook to configure DNS server and HAProxy in your bastion server. 
+```sh
+ansible-playbook -i inventory.yaml bastion.yaml
 ```
 
-#### Update inventory.yaml file as bastion node IP
-Update bastion node info, dns domain and OCP nodes IP addresses in `inventory.yaml`
-
+3. **Step3**:
+```sh
+ansible-playbook -i inventory.yaml 02-create-cluster-control.yaml
 ```
-    # Bastion DNS and HAProxy settings (Only for fixed IP address)
-    bastion:
-      ansible_ssh_host: 172.26.103.100
-      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
 
-      # Configure the IP address of your private subnet
-      # These default values will work by default
-      # with the default configuration defined in
-      # tony-hypervisor-setup
-      bastion_private_ip_address: 172.26.103.100
-      gateway_ip: 172.26.0.1
-      bastion_subnet_prefix_reverse: 103.26.172
-      cluster_subnet_prefix: 172.26.103
-      bastion_public_ip_address: "{{ ansible_default_ipv4.address }}"
+4. **Step4**:
+```sh
+ansible-playbook -i inventory.yaml 03-create-cluster-compute.yaml
+```
+
+After above steps, you will get one ready OpenShift Container Platform on the IBM Cloud Infrastructure Center.
+
+### Something is wrong/trouble shooting?
+
+#### Any above steps failed, clean up environment and then rerun the installation steps.
+
++ Failed on `01-preparation.yaml` ,`bastion.yaml` and `02-create-cluster-control.yaml`.
   
-  vars:
-    os_dns_domain: "172.26.103.100"
-    cluster_domain_name: "openshift.example.com"
-```
+  - use: `ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
++ Failed on `02-create-cluster-compute.yaml`.
 
-### Modify other user-provided values in inventory.yaml
+  - use: `ansible-playbook -i inventory.yaml destroy-computes.yaml`
 
-1. Allocated IP or Fixed IP:
+## Day2 Operation
 
-The `auto_allocated_ip` default value is true, then IPs will be allocated from subnet range. 
-If you need specify IP addresses, set `auto_allocated_ip` to false.
-
-```
-auto_allocated_ip: true
-```
-
-### Prepare the install config file
-
-Prepare the `install-config.yaml` as below: 
-
-```
-apiVersion: v1
-baseDomain: example.com
-compute:
-- architecture: s390x
-  hyperthreading: Enabled
-  name: worker
-  platform: {}
-  replicas: 0
-controlPlane:
-  architecture: s390x
-  hyperthreading: Enabled
-  name: master
-  platform: {}
-  replicas: 3
-metadata:
-  creationTimestamp: null
-  name: openshift
-networking:
-  clusterNetwork:
-  - cidr: 10.128.0.0/14
-    hostPrefix: 23
-  machineNetwork:
-  - cidr: 10.0.0.0/16
-  networkType: OpenShiftSDN
-  serviceNetwork:
-  - 172.30.0.0/16
-platform:
-  none: {}
-publish: External
-pullSecret: xxxxx
-sshKey: xxxxxx
-```
-Most of these are self-explanatory. *metadata.name* and *baseDomain* will together form the fully qualified domain name which the API interface will expect to the called, and the default name with which OpenShift will expose newly created applications. And it should be the same as `cluster_domain_name` in `inventory.yaml`.
-
-Afterwards, you should have `install-config.yaml` in your current directory:
-
+### Add a new compute node
+Use this playbook to add new compute node as allocated IP:
 ```sh
-$ tree
-.
-└── install-config.yaml
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml 
 ```
-
-## Run ansible playbook to deploy OCP UPI
-
-### Check requirements for enviroment before installation
-
-You can run below command to check whether your enviroment meet the minimum requirements:
-
-```
-$ ansible-playbook -i inventory.yaml configure-pre-check.yaml
-```
-
-### Prepare configuration and ignition files
-
-Before OpenShift installation, some special configuration should be modified, such as configure machine network, generate and upload igntions.
-
+Use this playbook to add new compute node as fixed IP:
 ```sh
-$ ansible-playbook -i inventory.yaml main.yaml
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.xs
 ```
-
-### Security Groups
-
+**Please notice:**
+The new compute node should be updated corresponding DNS and Load Balancer. If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, you may skip this part.
+* If you use our `bastion.yaml` playbook to configure the DNS server and Load Balancer, you can use this playbook to update those two directly.
 ```sh
-$ ansible-playbook -i inventory.yaml configure-security-groups.yaml
+ansible-playbook -i inventory.yaml modify-bastion.yaml
 ```
-
-The playbook creates one Security group for the Control Plane and one for the Compute nodes, then attaches rules for enabling communication between the nodes.
-
-### Network, Subnet and external router
-
+* If you use our `configure-haproxy.yaml` playbook to configure the Load Balancer, you can use this playbook to update HAProxy too.
 ```sh
-$ ansible-playbook -i inventory.yaml configure-network.yaml
+ansible-playbook -i inventory.yaml modify-haproxy.yaml
 ```
-The playbook use an existing network to deploy OCP, so it will overwrite DNS nameserver of this network.
-
-### Configure bastion
-
+* If you use our `configure-dns.yaml` playbook to configure the DNS server, you can use this playbook to update DNS too.
 ```sh
-$ ansible-playbook -i inventory.yaml configure-bastion-properties.yaml
-$ ansible-playbook -i inventory.yaml configure-dns.yaml
-$ ansible-playbook -i inventory.yaml configure-haproxy.yaml
+ansible-playbook -i inventory.yaml modify-dns.yaml
 ```
 
-The nodes' hostnames and IP addresses will be read from nodes' port and configured in bastion node's DNS and Haproxy.
+## Uninstall Red Hat OpenShift Container Platform
 
-At this stage, if you want to add another cluster's DNS and HAProxy configuration on the same bastion node, you need to add the second configuration manually. Because above steps will cover the older configuration. You can refer to [configure another cluster's DNS and HAProxy on the same bastion node](docs/multi-cluster-bastion.md)
+`ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
-### OpenShift Bootstrap
-
-```sh
-$ ansible-playbook -i inventory.yaml configure-bootstrap.yaml
-```
-
-The playbook sets the *allowed address pairs* on each port attached to our OpenShift nodes.
-
-After the bootstrap server is active, you can check the console log to see that it is getting the ignition correctly:
-
-```sh
-$ openstack console log show "$INFRA_ID-bootstrap"
-```
-
-You can also SSH into the server (using its floating IP address) and check on the bootstrapping progress:
-
-```sh
-$ ssh core@203.0.113.24
-[core@openshift-qlvwv-bootstrap ~]$ journalctl -b -f -u bootkube.service
-```
-
-### OpenShift Control Plane
-
-```sh
-$ ansible-playbook -i inventory.yaml configure-control-plane.yaml
-```
-
-Our control plane will consist of three nodes. The servers will be passed the `master-?-ignition.json` files prepared earlier.
-
-The playbook places the Control Plane in a Server Group with "soft anti-affinity" policy.
-
-The master nodes should load the initial Ignition and then keep waiting until the bootstrap node stands up the Machine Config Server which will provide the rest of the configuration.
-
-### Wait for the Control Plane to Complete
-
-When that happens, the masters will start running their own pods, run etcd and join the "bootstrap" cluster. Eventually, they will form a fully operational control plane.
-
-You can monitor this via the following command:
-
-```sh
-$ ./openshift-install wait-for bootstrap-complete
-```
-
-Eventually, it should output the following:
-
-```plaintext
-INFO API v1.14.6+f9b5405 up
-INFO Waiting up to 30m0s for bootstrapping to complete...
-```
-
-This means the masters have come up successfully and are joining the cluster.
-
-Eventually, the `wait-for` command should end with:
-
-```plaintext
-INFO It is now safe to remove the bootstrap resources
-```
-
-### Access the OpenShift API
-
-You can use the `oc` or `kubectl` commands to talk to the OpenShift API. The admin credentials are in `auth/kubeconfig`:
-
-```sh
-$ export KUBECONFIG="$PWD/auth/kubeconfig"
-$ oc get nodes
-$ oc get pods -A
-```
-
-**NOTE**: Only the API will be up at this point. The OpenShift UI will run on the compute nodes.
-
-### Delete the Bootstrap Resources
-
-```sh
-$ ansible-playbook -i inventory.yaml down-bootstrap.yaml
-```
-
-The teardown playbook deletes the bootstrap port, server and floating IP address.
-
-If you haven't done so already, you should also disable the bootstrap Ignition URL.
-
-### OpenShift Compute Nodes
-
-```sh
-$ ansible-playbook -i inventory.yaml configure-compute-nodes.yaml
-```
-
-This process is similar to the masters, but the workers need to be approved before they're allowed to join the cluster.
-
-The workers need no ignition override.
-
-### Configure the storage backend of image registry 
-
-```sh
-$ ansible-playbook -i inventory.yaml configure-image-registry.yaml
-```
-
-The Image Registry Operator is not initially available for platforms that do not provide default storage. We set the image registry to an empty directory for non-production clusters.
-
-And the image registry will be exposed, this allows you to log in to the registry from outside the cluster using the route address, and to tag and push images using the route host.
-
-Log in with podman: 
-
-```sh
-$ HOST=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
-$ podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false $HOST
-```
-
-### Wait for the OpenShift Installation to Complete
-
-Run the following command to verify the OpenShift cluster is fully deployed:
-
-```sh
-$ ./openshift-install --log-level debug wait-for install-complete
-```
-
-Upon success, it will print the URL to the OpenShift Console (the web UI) as well as admin username and password to log in.
-
-### Add a new OpenShift compute node
-
-#### using existing network
-Allocated IP:
-```sh
-$ ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e os_network="<Network_name>" -e os_subnet="<Network_subnet>"
-```
-
-Fixed IP:
-
-```sh
-$ ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=172.26.104.34 -e os_network="<Network_name>" -e os_subnet="<Network_subnet>"
-```
-
-#### using new network
-
-Allocated IP:
-```sh
-$ ansible-playbook -i inventory.yaml add-new-compute-node.yaml 
-```
-
-Fixed IP:
-
-```sh
-$ ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=172.26.104.34
-```
-
-You can add a new compute node after installation, and specify the hostname index and ip address.  
-
-## Destroy the OpenShift Cluster
-
-```sh
-$ ansible-playbook -i inventory.yaml  \
-	down-bootstrap.yaml      \
-	down-control-plane.yaml  \
-	down-compute-nodes.yaml  \
-	down-network.yaml        \
-	down-security-groups.yaml
-```
-
-Then, remove the `api` and `*.apps` DNS records.
 
 ## Copyright
 © Copyright IBM Corporation 2021

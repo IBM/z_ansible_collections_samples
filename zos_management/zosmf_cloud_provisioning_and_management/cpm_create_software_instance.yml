@@ -1,0 +1,130 @@
+###############################################################################
+# © Copyright IBM Corporation 2022
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.1.0] - 2022-02-08
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to create a software service instance
+# in the B(IBM Cloud Provisioning and Management (CP&M)) software
+# instances registry for a software that is already provisioned or configured,
+# using role `zmf_cpm_create_software_instance` provided by IBM z/OSMF
+# collection included in the Red Hat Ansible Certified Content for IBM Z.
+#
+# This playbook creates a local record file of instance information, which is
+# returned in JSON format and is used as the input to other playbooks
+# `cpm_manage_software_instance.yml` and `cpm_remove_software_instance.yml`.
+#
+# Usage:
+#   ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#   ansible-playbook -i inventory.yml cpm_create_software_instance.yml
+#
+# Requirements:
+#   IBM z/OSMF collection 1.1.0 or later
+#
+# Configure:
+#
+#    zmf_user:
+#        description:
+#            - User name to be used for authenticating with the z/OSMF server.
+#            - This variable will be prompted when playbook is run.
+#    zmf_password:
+#        description:
+#           - Password to be used for authenticating with z/OSMF server.>
+#            - This variable will be prompted when playbook is run.
+#    systems_name:
+#        description:
+#            - The name of the system where the software is currently manullay
+#              configured
+#    sysplex_name:
+#        description:
+#            - The name of the sysplex where the software is currently manullay
+#              configured
+#    external_name:
+#        description:
+#            - The external name associated with the manually configured
+#              software
+#    vendor_name:
+#        description:
+#            - The vendor who proivded the software
+#    software_type:
+#        description:
+#            - The software type of the configured software
+#    product_version:
+#        description:
+#            - The software product version of the configured software 
+#    instance_description:
+#        description:
+#            - Description for the configured software
+#    instance_provider:
+#        description:
+#            - User who provided the software instance information
+#    instance_owner:
+#        description:
+#            - Owner of the software instance. Software instance can be removed
+#              only by this user
+#
+# Optional:
+#    instance_var_json_path:
+#        description:
+#            - Directory path for the JSON file that holds variables associated with
+#              software instance. Specify the file name that includes variables
+#              associated with the configured softare instance e.g. /tmp/myVar.json. 
+#              File contains json array of variables with name, value and visibility
+#              format where name identifies variable name, value identifies variable
+#              value and visibility identifies whether variable is "public" or "private".
+#              For example,
+#            - C([)
+#            - C({)
+#            - C("name":"VAR1",)
+#            - C("value":"VAR1_VALUE",)
+#            - C("visibility":"public")
+#            - C(},)
+#            - C({)
+#            - C("name":"VAR2",)
+#            - C("value":"VAR2_VALUE",)
+#            - C("visibility":"public")
+#            - C(},)
+#            - C(....]) 
+###############################################################################
+
+---
+- name: create instance of z/OS software in software instance registry
+  hosts: cpm_host1
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+  vars_prompt:
+    - name: zmf_user
+      prompt: "Enter your z/OSMF username"
+      private: no
+    - name: zmf_password
+      prompt: "Enter your z/OSMF password"
+      private: yes
+  
+  tasks:
+    # ##########################################################################
+    # Role: zmf_cpm_create_software_instance
+    # ##########################################################################
+    # ##########################################################################
+    # Create a z/OS software instance in CP&M registry
+    # ##########################################################################
+    - include_role:
+        name: zmf_cpm_create_software_instance
+      vars:
+        system_name: "<fill-me-system-name>"
+        sysplex_name: "<fill-me-sysplex-name>"
+        external_name: "<fill-me-external-name>"
+        software_type: "<fill-me-software-type>"
+        vendor_name: "<fill-me-software-type>"
+        product_version: "<fill-me-product-version>"
+        instance_description: "<fill-me-instance-description>"
+        instance_owner: "<fill-me-instance-owner>"
+        instance_provider: "<fill-me-instance-provider>"
+        instance_info_json_path: "<optional-fill-me-file-path-and-name>"

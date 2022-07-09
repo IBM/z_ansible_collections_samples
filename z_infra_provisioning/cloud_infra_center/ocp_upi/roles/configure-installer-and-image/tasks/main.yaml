@@ -45,6 +45,11 @@
   file:
     state: absent
     path: openshift-client-linux.tar.gz
+
+- name: Remove OpenShift RHCOS images
+  file:
+    state: absent
+    path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
     
 - name: Download RHCOS Image
   become: yes
@@ -89,6 +94,11 @@
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
+
+- name: Remove OpenShift RHCOS images
+  file:
+    state: absent
+    path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
 
 - name: Download RHCOS Image
   become: yes

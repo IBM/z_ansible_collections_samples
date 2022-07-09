@@ -37,65 +37,69 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
-- name: 'Create the cluster network'
-  os_network:
-    name: "{{ os_network }}"
-
-- name: 'Set the cluster network tag'
+- name: 'Get the subnet range'
   command:
-    cmd: "openstack network set --tag {{ cluster_id_tag }} {{ os_network }}"
+    cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
+  register: sunbet_range
 
-- name: 'Create a subnet'
-  os_subnet:
-    name: "{{ os_subnet }}"
-    network_name: "{{ os_network }}"
-    cidr: "{{ os_subnet_range }}"
-    dns_nameservers: "{{ os_dns_domain }}"
-    allocation_pool_start: "{{ os_subnet_range | next_nth_usable(10) }}"
-    allocation_pool_end: "{{ os_subnet_range | ipaddr('last_usable') }}"
-  when:
-  - allocation_pool_start is not defined
-  - allocation_pool_end is not defined 
+- local_action:
+    module: copy
+    content: "{{ sunbet_range.stdout_lines[0]}}"
+    dest: ".subnet_range.yml"
 
-- name: 'Create a subnet'
-  os_subnet:
-    name: "{{ os_subnet }}"
-    network_name: "{{ os_network }}"
-    cidr: "{{ os_subnet_range }}"
-    dns_nameservers: "{{ os_dns_domain }}"
-    allocation_pool_start: "{{ allocation_pool_start }}"
-    allocation_pool_end: "{{ allocation_pool_end }}"
+- name: 'Save some basic info into yaml'
+  shell: |
+    rm -rf .new_ocp_node.yml
+    echo total_count={{ os_control_nodes_number | int }} >> .new_ocp_node.yml
+
+- name: 'Check netowrk name is properly set'
+  fail:
+    msg: "use_network_name is not defined!"
+  failed_when: use_network_name is not defined
+
+- name: 'Check network subnet is properly set'
+  fail:
+    msg: "use_network_subnet is not defined!"
+  failed_when: use_network_subnet is not defined
+
+- name: "Get subnet name of subnet {{ use_network_subnet }}"
+  command:
+    cmd: "openstack subnet show {{ use_network_subnet }} -c name -f value"
+  register: os_subnet_name
+
+- name: "Get first start of allocation pool of subnet {{ os_subnet_name.stdout }}"
+  shell: |
+     openstack subnet show {{ os_subnet_name.stdout }} -c allocation_pools -f json | grep start | awk -F ':' '{print$2}'|tr -d '",'
+  register: default_allocation_pool_start
+
+- name: "Get first end of allocation pool of subnet {{ os_subnet_name.stdout }}"
+  shell: |
+     openstack subnet show {{ os_subnet_name.stdout }} -c allocation_pools -f json | grep end | awk -F ':' '{print$2}'|tr -d '",'
+  register: default_allocation_pool_end
+
+- name: "Remove all DNS nameserver of subnet {{ os_subnet_name.stdout }}"
+  command:
+    cmd: "openstack subnet set --no-dns-nameservers {{ os_subnet_name.stdout }} "
+
+- name: 'Update new DNS nameserver and allocation pool of subnet {{ os_subnet_name.stdout }}'
+  command:
+    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ os_subnet_name.stdout }}"
   when:
   - allocation_pool_start is defined
   - allocation_pool_end is defined 
 
-- name: 'Create a subnet'
-  os_subnet:
-    name: "{{ os_subnet }}"
-    network_name: "{{ os_network }}"
-    cidr: "{{ os_subnet_range }}"
-    dns_nameservers: "{{ os_dns_domain }}"
-    allocation_pool_start: "{{ os_subnet_range | next_nth_usable(10) }}"
-    allocation_pool_end: "{{ allocation_pool_end }}"
+- name: 'Update new DNS nameserver of subnet {{ os_subnet_name.stdout }}'
+  command:
+    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} {{ os_subnet_name.stdout }}"
   when:
   - allocation_pool_start is not defined
-  - allocation_pool_end is defined 
-
-- name: 'Create a subnet'
-  os_subnet:
-    name: "{{ os_subnet }}"
-    network_name: "{{ os_network }}"
-    cidr: "{{ os_subnet_range }}"
-    dns_nameservers: "{{ os_dns_domain }}"
-    allocation_pool_start: "{{ allocation_pool_start }}"
-    allocation_pool_end: "{{ os_subnet_range | ipaddr('last_usable') }}"
-  when:
-  - allocation_pool_start is defined
   - allocation_pool_end is not defined 
 
-- name: 'Set the cluster subnet tag'
+- name: 'Update new DNS nameserver and partial allocation pool of subnet {{ os_subnet_name.stdout }}'
   command:
-    cmd: "openstack subnet set --tag {{ cluster_id_tag }} {{ os_subnet }}"
+    cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ os_subnet_name.stdout }}"
+  when: (allocation_pool_start is not defined and allocation_pool_end is defined) or
+        (allocation_pool_start is defined and allocation_pool_end is not defined)
 
 - name: 'Export Infra ID'
   shell:
@@ -107,14 +111,10 @@
   args:
     executable: python3
 
-- name: 'Read compute nodes names'
-  set_fact:
-    compute_nodes_json: "{{ lookup('file', '.compute-nodes-{{ infra_id.stdout_lines[0] }}.json') | from_json }}"
-
 - name: 'Create the bootstrap server port'
   os_port:
     name: "{{ os_port_bootstrap }}"
-    network: "{{ os_network }}"
+    network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
@@ -126,55 +126,56 @@
 - name: 'Create the Control Plane ports'
   os_port:
     name: "{{ item.1 }}-{{ item.0 }}"
-    network: "{{ os_network }}"
+    network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
     - subnet: "{{ os_subnet }}"
       ip_address: "{{ os_master_ip[item.0] }}"
-  with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
   - auto_allocated_ip == false
 
 - name: 'Create the Compute ports'
   os_port:
-    name: "{{ os_port_worker }}-{{ item.1 }}"
-    network: "{{ os_network }}"
+    name: "{{ item.1  }}-{{ item.0 }}"
+    network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_worker }}"
     fixed_ips:
     - subnet: "{{ os_subnet }}"
       ip_address: "{{ os_infra_ip[item.0]}}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  with_indexed_items:  "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
   - auto_allocated_ip == false
 
 - name: 'Create the bootstrap server port'
   os_port:
     name: "{{ os_port_bootstrap }}"
-    network: "{{ os_network }}"
+    network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_master }}"
   when:
   - auto_allocated_ip == true
 
+
 - name: 'Create the Control Plane ports'
   os_port:
     name: "{{ item.1 }}-{{ item.0 }}"
-    network: "{{ os_network }}"
+    network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_master }}"
-  with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
   - auto_allocated_ip == true
 
 - name: 'Create the Compute ports'
   os_port:
-    name: "{{ os_port_worker }}-{{ item.1 }}"
-    network: "{{ os_network }}"
+    name: "{{ item.1 }}-{{ item.0 }}"
+    network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_worker }}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+  with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
   - auto_allocated_ip == true
     
@@ -185,9 +186,9 @@
 - name: 'Set Control Plane ports tag'
   command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
-  with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
 
 - name: 'Set Compute ports tag'
   command:
-    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ item.1 }}"
-  with_indexed_items: "{{ compute_nodes_json.compute_node_names }}"
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
+  with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"

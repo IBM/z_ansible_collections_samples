@@ -1,0 +1,17 @@
+- name: Listing DB2 Applications for the specific user
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - "vars/db2_discover_applications.yml"
+
+  tasks:
+    - name: Discover DB2 Applications
+      block:
+
+        # Authenticate user
+        - include_role:
+            name: db2_login
+
+        # Get the list of applications
+        - include_role:
+            name: db2_get_list_apps

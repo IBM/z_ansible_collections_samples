@@ -1,0 +1,17 @@
+- name: Deprovision Db2 Schema
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - "vars/db2_schema.yml"
+
+  tasks:
+    - name: Deprovision Db2 schema
+      block:
+
+        # Authenticate user
+        - include_role:
+            name: db2_login
+
+        # Delete existing instance of an application
+        - include_role:
+            name: db2_delete_app_instance

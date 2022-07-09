@@ -1,0 +1,90 @@
+###############################################################################
+# © Copyright IBM Corporation 2022
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# [1.1.0] - 2022-02-08
+#  - Released initial version
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to to obtain a specific software instance
+# defined in the IBM Cloud Provisioning and Management (CP&M) software
+# instances registry, using role `zmf_cpm_get_software_instance`
+# provided by IBM z/OSMF collection included in the Red Hat Ansible Certified
+# Content for IBM Z. It also shows how to retrieve a specific variable associated
+# with software instance obtained from registry
+#
+# This playbook creates a local record file of instance information, which is
+# returned in JSON format and is used as the input to other playbooks
+# `cpm_manage_software_instance.yml` and `cpm_remove_software_instance.yml`.
+#
+# Usage:
+#   ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#   ansible-playbook -i inventory.yml cpm_get_software_instance.yml
+#
+# Requirements:
+#   IBM z/OSMF collection 1.0.0 or later
+#
+# Configure:
+# Requirements:
+#   IBM z/OSMF collection 1.1.0 or later
+#
+# Configure:
+#
+#    zmf_user:
+#        description:
+#            - User name to be used for authenticating with the z/OSMF server.
+#            - This variable will be prompted when playbook is run.
+#    zmf_password:
+#        description:
+#           - Password to be used for authenticating with z/OSMF server.>
+#            - This variable will be prompted when playbook is run.
+#    external_software_name:
+#        description:
+#            - The external name associated with the software instance created in
+#              CP&M software instance registry before.
+###############################################################################
+
+---
+- name: Sample for retrieving software instance from registry
+  hosts: cpm_host1
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+  vars_prompt:
+    - name: zmf_user
+      prompt: "Enter your z/OSMF username"
+      private: no
+    - name: zmf_password
+      prompt: "Enter your z/OSMF password"
+      private: yes
+  vars:
+    - name: instance_info_json_path
+    
+  tasks:
+    # ##########################################################################
+    # Role: zmf_cpm_get_software_instance
+    # ##########################################################################
+    # ##########################################################################
+    # Obtain a z/OS software instance from registry and retrieve specific variable
+    # ##########################################################################
+    - include_role:
+        name: zmf_cpm_get_software_instance
+      vars:
+        external_software_name: "<fill-me>"
+
+    - name: Obtain Variable Value
+      vars:
+           instance_info_json: "{{lookup('file', instance_info_json_path)}}"
+
+      set_fact:
+    
+         VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
+
+    - name: Display VAR1 value
+      debug:
+          msg: "VAR1 Value is : {{ VAR1.value }}"
