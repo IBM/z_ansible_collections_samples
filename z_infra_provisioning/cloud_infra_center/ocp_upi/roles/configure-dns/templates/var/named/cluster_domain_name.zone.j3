@@ -3,10 +3,10 @@
 {% set infra = cluster_nodes['infra'] %}
 $TTL 900
 
-@                     IN SOA bastion.{{ cluster_domain_name }}. hostmaster.{{ cluster_domain_name }}. (
+@                     IN SOA bastion.{{ cluster_name }}.{{ base_domain }}. hostmaster.{{ cluster_name }}.{{ base_domain }}. (
                         2019062002 1D 1H 1W 3H
                       )
-                      IN NS bastion.{{ cluster_domain_name }}.
+                      IN NS bastion.{{ cluster_name }}.{{ base_domain }}.
 
 bastion               IN A {{ bastion_public_ip_address }}
 api                   IN A {{ bastion_public_ip_address }}
@@ -35,9 +35,9 @@ apps                  IN A {{ bastion_public_ip_address }}
 #etcd-{{ (loop.index - 1) }}                IN A {{ ip }}
 {% endfor %}
 
-_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.{{ cluster_domain_name }}.
+_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.{{ cluster_name }}.{{ base_domain }}.
 {% for item in masters.keys() %}
   {% if loop.index != 1 %}
-                  IN SRV 0 10 2380 etcd-{{(loop.index - 1) }}.{{ cluster_domain_name }}.
+                  IN SRV 0 10 2380 etcd-{{(loop.index - 1) }}.{{ cluster_name }}.{{ base_domain }}.
   {% endif %}
 {% endfor %}

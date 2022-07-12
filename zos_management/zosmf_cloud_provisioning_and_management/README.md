@@ -3,7 +3,7 @@
 This project provides sample playbooks which demonstrate how to provision
 and manage z/OS middlewares/softwares, such as CICS, Db2, MQ, z/OS Connect,
 and WebSphere Liberty, on the target z/OS systems using templates published
-in the `z/OSMF software services catalog`. These playbooks leverage roles 
+in the `z/OSMF software services catalog`. There are also sample playbooks that demonstrates how to create an instance of pre-provisioned or preconfigured software as well as playbook to list the published templates. These playbooks leverage roles 
 provided by IBM z/OSMF collection included in the Red Hat Ansible 
 Certified Content for IBM Z to provision and manage z/OS middleware/software.
 
@@ -18,7 +18,7 @@ Review the playbook notes sections for additional details and configuration.
 ## Playbook Summary
 
 - [**cpm_provision_software_service.yml**](cpm_provision_software_service.yml) -
-Provision a z/OS middleware/software such as ICS, Db2, MQ, z/OS Connect,
+Provision a z/OS middleware/software such as CICS, Db2, MQ, z/OS Connect,
 and WebSphere Liberty on the target z/OS systems using z/OS middleware/software 
 template published inthe z/OSMF software services catalog and role
 `zmf_cpm_provision_software_service` provided with IBM z/OSMF collection.
@@ -39,6 +39,19 @@ identifies the various actions that can be performed on the instance.
 - [**cpm_remove_software_instance.yml**](cpm_remove_software_instance.yml) -
 Remove a deprovisioned software service instance on the target z/OS systems
 using role `zmf_cpm_remove_software_instance`.
+
+- [**cpm_create_software_instance.yml**](cpm_create_software_instance.yml) -
+Create a software service instance in the B(IBM Cloud Provisioning and Management (CP&M)) software
+      instances registry for a software that is already provisioned or configured on the target z/OS system
+using role `zmf_cpm_create_software_instance`.
+
+- [**cpm_get_software_instance.yml**](cpm_get_software_instance.yml) -
+Obtain a specific software instance defined in the B(IBM Cloud Provisioning and Management (CP&M)) software instances registry
+using role `zmf_cpm_get_software_instance`.
+
+- [**cpm_list_software_templates.yml**](cpm_list_software_templates.yml) -
+Obtain list of all the published templates that can be used to provision z/OS middleware such as IBM Customer Information Control System (CICS®), IBM Db2®, IBM MQ, and IBM WebSphere Application Server or any other software service from B(IBM Cloud Provisioning and Management (CP&M)) catalog
+using role `zmf_cpm_list_software_templates`.
 
 ## Ansible Collection Requirement
 

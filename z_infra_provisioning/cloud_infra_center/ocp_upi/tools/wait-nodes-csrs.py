@@ -7,28 +7,33 @@
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
-
 import time
 import os
 import sys
+from dateutil import rrule
+from datetime import datetime, timedelta
 
-work_name = sys.argv[1]
+total_count = sys.argv[1]
+approve_node_csr = sys.argv[2]
+
+converted_csr = int(approve_node_csr)
+
+now = datetime.now()
+hundredMinutesLater = now + timedelta(minutes=converted_csr)
 
 def get_worker_status():
-    cmd = "./oc get nodes --kubeconfig auth/kubeconfig | grep %s | awk '{print $2}'" % work_name
-    status = os.popen(cmd).read()
-    if not status:
-        return None
+    cmd = "./oc get nodes --kubeconfig auth/kubeconfig --no-headers=true | wc -l"
+    count = os.popen(cmd).read()
+    if count == total_count:
+        return True
     else:
-        return status.split('\n')[0:-1]
+        return False
 
-for i in range(0, 60):
-    # wait up to 10 minutes to approve csrs util worker nodes' status get ready
+for dt in rrule.rrule(rrule.MINUTELY, dtstart=now, until=hundredMinutesLater):
     worker_status = get_worker_status()
-    if (not worker_status) or worker_status[0] != "Ready":
+    if  worker_status == False:
         cmd = "./oc get csr -o name --kubeconfig auth/kubeconfig | xargs ./oc adm certificate approve --kubeconfig auth/kubeconfig"
         os.system(cmd)
-        time.sleep(10)
+        time.sleep(60)
     else:
         break
-        

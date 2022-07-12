@@ -23,9 +23,12 @@
   args:
     executable: python3
 
+- name: 'Import common yaml'
+  import_tasks: common.yaml
+
 - name: Upload Boostrap Ignition
   command:
-    cmd: openstack image create --disk-format=raw --container-format=bare --file bootstrap.ign "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
+    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw --container-format=bare --file bootstrap.ign "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
 
 - name: Get Image Url
   script: tools/get-image-path.sh "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
@@ -42,4 +45,7 @@
     executable: python3
 
 - name: Generate Master Ignition
-  script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }}
+  script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_control_nodes_number }}
+
+- name: Generate Worker Ignition
+  script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}

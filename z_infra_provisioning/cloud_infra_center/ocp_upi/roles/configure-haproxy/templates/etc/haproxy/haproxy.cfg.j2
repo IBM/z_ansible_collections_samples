@@ -34,66 +34,65 @@ defaults
 frontend ocp4-kubernetes-api-server
    mode tcp
    option tcplog
-   bind api.{{ cluster_domain_name }}:6443
-   bind api-int.{{ cluster_domain_name }}:6443
+   bind api.{{ cluster_name }}.{{ base_domain }}:6443
+   bind api-int.{{ cluster_name }}.{{ base_domain }}:6443
    default_backend ocp4-kubernetes-api-server
 
 frontend ocp4-machine-config-server
    mode tcp
    option tcplog
-   bind api.{{ cluster_domain_name }}:22623
-   bind api-int.{{ cluster_domain_name }}:22623
+   bind api.{{ cluster_name }}.{{ base_domain }}:22623
+   bind api-int.{{ cluster_name }}.{{ base_domain }}:22623
    default_backend ocp4-machine-config-server
 
 frontend ocp4-router-http
    mode tcp
    option tcplog
-   bind apps.{{ cluster_domain_name }}:80
+   bind apps.{{ cluster_name }}.{{ base_domain }}:80
    default_backend ocp4-router-http
 
 frontend ocp4-router-https
    mode tcp
    option tcplog
-   bind apps.{{ cluster_domain_name }}:443
+   bind apps.{{ cluster_name }}.{{ base_domain }}:443
    default_backend ocp4-router-https
 
 backend ocp4-kubernetes-api-server
    mode tcp
    balance source
-   server bootstrap bootstrap.{{ cluster_domain_name }}:6443 check
+   server bootstrap bootstrap.{{ cluster_name }}.{{ base_domain }}:6443 check
 {% for item in masters.keys() %}
-   server {{ item }} {{ item }}.{{ cluster_domain_name }}:6443 check
+   server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:6443 check
 {% endfor %}
 
 backend ocp4-machine-config-server
    mode tcp
    balance source
-   server bootstrap bootstrap.{{ cluster_domain_name }}:22623 check
+   server bootstrap bootstrap.{{ cluster_name }}.{{ base_domain }}:22623 check
 {% for item in masters.keys() %}
-   server {{ item }} {{ item }}.{{ cluster_domain_name }}:22623 check
+   server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:22623 check
 {% endfor %}
 
 backend ocp4-router-http
    mode tcp
-{% if infra is defined %}
+{% if infra is defined and infra|length > 0 %}
    {% for item in infra.keys() %}
-      server {{ item }} {{ item }}.{{ cluster_domain_name }}:80 check
+      server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:80 check
    {% endfor %}
 {% else %}
-    {% for item in masters.keys() %}
-      server {{ item }} {{ item }}.{{ cluster_domain_name }}:80 check
+   {% for item in masters.keys() %}
+      server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:80 check
    {% endfor %}
 {% endif %}
 
 backend ocp4-router-https
    mode tcp
-{% if infra is defined %}
+{% if infra is defined and infra|length > 0 %}
    {% for item in infra.keys() %}
-      server {{ item }} {{ item }}.{{ cluster_domain_name }}:443 check
+      server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:443 check
    {% endfor %}
 {% else %}
-    {% for item in masters.keys() %}
-      server {{ item }} {{ item }}.{{ cluster_domain_name }}:443 check
+   {% for item in masters.keys() %}
+   server {{ item }} {{ item }}.{{ cluster_name }}.{{ base_domain }}:443 check
    {% endfor %}
 {% endif %}
-

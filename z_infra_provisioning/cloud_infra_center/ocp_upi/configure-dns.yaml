@@ -29,5 +29,6 @@
 ---
 - name: configure dns on bastion
   hosts: bastion
+  serial: 2
   roles:
   - configure-dns

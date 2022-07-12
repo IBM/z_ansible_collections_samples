@@ -1,0 +1,14 @@
+---
+# tasks file for db2_get_list_apps
+
+- name: Retrieve application id
+  uri:
+    url: "{{ base_url }}/applications/"
+    validate_certs: no
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    status_code: 200
+  register: app_response

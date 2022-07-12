@@ -72,7 +72,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
-    availability_zone: "{{ availability_zone }}"
+    availability_zone: "{{ create_server_zone }}"
     timeout: 2400
     # The ignition filename will be concatenated with the Control Plane node
     # name and its 0-indexed serial number.
@@ -84,11 +84,18 @@
     scheduler_hints:
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }}"
-  with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
   - disk_type == "dasd"
+
+- name: 'Convert master flavor from value into number'
+  command:
+    cmd: "openstack flavor show {{ os_flavor_master }} -c disk -f value"
+  register: master_flavor_size
+  when:
+  - disk_type == "scsi"
 
 - name: 'Create the Control Plane servers with boot volume'
   os_server:
@@ -96,7 +103,7 @@
     image: "rhcos"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
-    availability_zone: "{{ availability_zone }}"
+    availability_zone: "{{ create_server_zone }}"
     timeout: 2400
     # The ignition filename will be concatenated with the Control Plane node
     # name and its 0-indexed serial number.
@@ -109,8 +116,9 @@
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }}"
     boot_from_volume: True
+    volume_size: "{{ master_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
-  with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"
+  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:

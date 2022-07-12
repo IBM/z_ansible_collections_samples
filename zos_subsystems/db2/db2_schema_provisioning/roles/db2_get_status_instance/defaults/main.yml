@@ -1,0 +1,18 @@
+---
+# defaults file for db2_get_status_instance
+
+# Hostname of the system on which Db2 for z/OS DevOps Experience is running.
+# Server name used to access the DOE rest apis
+doe_server: zos_target_address
+
+# Port number of Db2 DevOps Experience Server. Default: 12023
+doe_server_port: valid_port_number
+
+# Base url used to access DOE REST API
+base_url: "{{ doe_server }}:{{ doe_server_port }}/ws/policy"
+
+# Username used to access the DOE REST API
+username: valid_username
+
+# Password used to access the DOE REST API
+password: valid_password

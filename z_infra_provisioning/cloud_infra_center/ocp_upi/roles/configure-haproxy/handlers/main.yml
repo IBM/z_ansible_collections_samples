@@ -16,14 +16,14 @@
 
 ---
 # handlers file for configure-haproxy
-- name: turn on haproxy_connect_any
+- name: Turn on haproxy_connect_any
   seboolean: 
     name: haproxy_connect_any
     state: yes
     persistent: yes
   listen: "restart haproxy"
 
-- name: restart haproxy
+- name: Restart haproxy
   service:
     name: haproxy.service
     state: restarted

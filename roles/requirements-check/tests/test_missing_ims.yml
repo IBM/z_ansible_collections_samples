@@ -1,0 +1,22 @@
+################################################################################
+# Copyright (c) IBM Corporation 2021
+################################################################################
+
+---
+- hosts: localhost
+  gather_facts: no
+
+  tasks:
+  - name: Negative test that expects to fail on a missng IMS version 999.0.0
+    include_vars: test_missing_ims_collection.txt
+
+  - name: Display the registered collections and properites in `registry.yml`.
+    include_role:
+      name: ../../requirements-check
+
+################################################################################
+# Run command: `ansible-playbook -i inventory.yml roles/requirements-check/tests/test_missing_ims.yml`
+# Output:
+#   TASK [../../requirements-check : fail] **************************************************************************************************************************************************************************
+#   fatal: [localhost]: FAILED! => {"changed": false, "msg": "[FAIL] This playbook requires Ansible collection ibm_zos_ims version 999.0.0 and no version is installed."}
+################################################################################

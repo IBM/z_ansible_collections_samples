@@ -1,0 +1,116 @@
+################################################################################
+# Copyright (c) IBM Corporation 2021
+################################################################################
+
+################################################################################
+# Task `collection_check` that will process the runtime-requirements.txt and
+# compare the required collections and collection versions to the installed
+# collections and collection versions and determine if the collections meet the
+# playbook requirements.
+################################################################################
+
+---
+- name: Extracting Ansible enviroment variable COLLECTIONS_PATHS from localhost
+  shell:
+    cmd: ansible-config dump|grep -i COLLECTIONS_PATHS|awk -F" = " '{print $2}'
+  register: ansible_collections_paths
+
+- name: DEBUG(-v) Display Ansible COLLECTIONS_PATHS environment variable
+  ansible.builtin.debug:
+    var: ansible_collections_paths
+    verbosity: 1
+  when: ansible_collections_paths is defined and (ansible_collections_paths | bool)
+
+- name: Set fact `collection_paths` with Ansible COLLECTIONS_PATHS
+  set_fact:
+    collection_paths: "{{ ansible_collections_paths.stdout if ansible_collections_paths.stdout != \"\" else ['~/.ansible/collections'] }}"
+
+- name: Evaluate Ansible COLLECTIONS_PATHS existance and status
+  stat:
+    path: "{{ item }}"
+  register: collection_paths_status
+  with_items: "{{ collection_paths }}"
+  # ignore_errors: True (Should we?)
+
+- name: DEBUG(-v) Display Ansible COLLECTIONS_PATHS existance and status
+  ansible.builtin.debug:
+    var: collection_paths_status
+    verbosity: 1
+  when: collection_paths_status is defined and (collection_paths_status | bool)
+
+- name: Populate temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
+  set_fact:
+    temp_collection_paths_dict: "{{temp_collection_paths_dict | default([]) + [{'collection_path':item.stat.path,'installed_version':None}  ]}}"
+  when: item.stat.exists
+  with_items: "{{collection_paths_status.results}}"
+
+- name: DEBUG(-v) Display temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
+  ansible.builtin.debug:
+    var: temp_collection_paths_dict
+    verbosity: 1
+  when: temp_collection_paths_dict is defined and (temp_collection_paths_dict | bool)
+
+- name: Combine dictionary `temp_collection_paths_dict` with `requires_collection` dictionary
+  set_fact:
+    requires_collection: "{{ requires_collection | combine({ item.key : {'installed': temp_collection_paths_dict} }, recursive=true) }}"
+  with_dict: "{{requires_collection}}"
+
+- name: DEBUG(-v) Display dictionary `requires_collection`
+  ansible.builtin.debug:
+    var: requires_collection
+    verbosity: 1
+  when: requires_collection is defined and (requires_collection | bool)
+
+- name: Create `_collection_status_dict` dictionary with all collection stats
+  set_fact:
+    _collection_status_dict: "{{_collection_status_dict | default([]) + [{'ansible_collection_path':item.1.collection_path,
+                                                'required_collection_name':item.0.name,
+                                                'required_collection_version': item.0.version|string,
+                                                'installed_collection_home':item.1.collection_path + '/ansible_collections/ibm/' + item.0.name,
+                                                'installed_collection_version': None,
+                                                'installed_collection_meta':item.1.collection_path + '/ansible_collections/ibm/'+ item.0.name + '/meta/'+ item.0.name+'_meta.yml',
+                                                'installed_collection_manifest':item.1.collection_path + '/ansible_collections/ibm/'+ item.0.name + '/MANIFEST.json'
+                                                }  ]}}"
+  with_subelements:
+    - "{{ requires_collection }}"
+    - "installed"
+
+- name: DEBUG(-v) Display dictionary `_collection_status_dict`
+  ansible.builtin.debug:
+    var: _collection_status_dict
+    verbosity: 1
+  when: _collection_status_dict is defined and (_collection_status_dict | bool)
+
+- name: Invoke Ansible version filter to update _collection_status_dict with additional facts
+  ansible_version:
+    data: "{{_collection_status_dict}}"
+  register: result_ansible_version_filter
+
+- name: DEBUG(-v) Display Ansible version filter result
+  ansible.builtin.debug:
+    var: result_ansible_version_filter
+    verbosity: 1
+  when: result_ansible_version_filter is defined and (result_ansible_version_filter | bool)
+
+- name: DEBUG(-v) Display dictionary `_collection_status_dict` after Ansible filter is applied
+  ansible.builtin.debug:
+    var: _collection_status_dict
+    verbosity: 1
+  when: _collection_status_dict is defined and (_collection_status_dict | bool)
+
+- name: Ansible collection version check in progress
+  assert:
+      that: (
+              item.installed_collection_version != None and
+              item.required_collection_version != None and
+              item.installed_collection_version is version(item.required_collection_version,'>=')
+            )
+      success_msg: "[SUCCESS] Ansible collection {{item.required_collection_name}} version {{item.installed_collection_version}} is installed."
+      fail_msg: "[FAIL] This playbook requires Ansible collection {{item.required_collection_name}} version {{item.required_collection_version}} and {{item.installed_collection_version if item.installed_collection_version != None else 'no version' }} is installed."
+      quiet: true
+  register: result_collection_status
+  ignore_errors: true
+  loop: "{{ result_ansible_version_filter.results}}"
+
+
+
