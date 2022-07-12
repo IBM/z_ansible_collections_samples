@@ -23,18 +23,16 @@
       src: "{{ playbook_dir }}/files/server-proc1.j2"
       dest: "{{ servertempfile.path }}"
     delegate_to: localhost
-    
   - debug:
       msg: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
   - name: Copy the template to a data set member
     ibm.ibm_zos_core.zos_copy:
       src: "{{ servertempfile.path }}"
       dest: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
-      
-  # - name: Copy the template to User Private Proclib
-  #   ibm.ibm_zos_core.zos_copy:
-  #     src: "{{ servertempfile.path }}"
-  #     dest: "{{ user_private_proclib }}({{ softwareServiceInstanceName }})"
+  - name: Copy the template to User Private Proclib
+    ibm.ibm_zos_core.zos_copy:
+      src: "{{ servertempfile.path }}"
+      dest: "{{ user_private_proclib }}({{ softwareServiceInstanceName }})"
   always:
     - name: Remove temporary file
       file:

@@ -12,9 +12,6 @@
         tcp: yes
       register: command_result1
 
-    - debug:
-        msg: "{{command_result1}}"  
-
     - name: Allocate HTTP Port
       zport:
         name: '*'
@@ -24,9 +21,6 @@
         tcp: yes
       register: command_result2
 
-    - debug: 
-        msg: "{{command_result2}}"  
-        
     - name: Set TCPPORT variables to new port numbers 
       set_stats:
         data:
