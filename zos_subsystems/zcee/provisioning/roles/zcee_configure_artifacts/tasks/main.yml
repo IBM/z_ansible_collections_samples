@@ -18,83 +18,13 @@
 #         to: "{{ target_charset }}" #IBM-1047
 #     mode: '775'
 
-# server.xml
-- name: Create temporary directory to store server.xml
-  tempfile:
-    state: file
-  delegate_to: localhost
-  register: srvtempxml
-- block:
-  - name: Write template to the temp file
-    template:
-      src: “{{ playbook_dir }}/files/server.xml”
-      dest: “{{ srvtempxml.path }}”
-    delegate_to: localhost
-
-  - name: Copy the template to a data set member
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ srvtempxml.path }}"
-      dest: "{{ zcee_config_path }}/server.xml"
-      encoding:
-        from: ISO8859-1
-        to: "{{ target_charset }}"
-  always:
-    - name: Remove temporary file
-      file:
-        state: absent
-        path: "{{ srvtempxml.path }}"
-      delegate_to: localhost
-      when: srvtempxml is defined
-
-# bootstrap.properties
-
-- name: Create temporary directory to store bootstrap.properties
-  tempfile:
-    state: file
-  delegate_to: localhost
-  register: bootstrap
-- block:
-  - name: Write template to the temp file
-    template:
-      src: “{{ playbook_dir }}/files/bootstrap.properties”
-      dest: “{{ bootstrap.path }}”
-    delegate_to: localhost
-
-  - name: Copy the template to a data set member
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ bootstrap.path }}"
-      dest: "{{ zcee_config_path }}/bootstrap.properties"
-      encoding:
-        from: ISO8859-1
-        to: "{{ target_charset }}"
-  always:
-  - name: Remove temporary file
-    file:
-      state: absent
-      path: "{{ bootstrap.path }}"
-    delegate_to: localhost
-    when: bootstrap is defined
-
-
-
-# # Copy all the files that are referred in defaults/main.yml
-# - name: Copy artifacts files
-#   ibm.ibm_zos_core.zos_copy:
-#     src: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     encoding:
-#       from: ISO8859-1
-#       to: "{{ target_charset }}"
-#   with_items: "{{ files_to_copy }}"
-#   when: files_to_copy is defined and files_to_copy | length > 0
-
-
-#   - name: Copy artifacts files
-#   ibm.ibm_zos_core.zos_copy:
-#     src: "{{ srvtempxml.path }}""
-#     dest: "{{ zcee_config_path }}/server.xml"
-#     encoding:
-#       from: ISO8859-1
-#       to: "{{ target_charset }}"
-#   with_items: "{{ files_to_copy }}"
-#   when: files_to_copy is defined and files_to_copy | length > 0
+# Copy all the files that are referred in defaults/main.yml
+- name: Copy artifacts files
+  ibm.ibm_zos_core.zos_copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    encoding:
+      from: ISO8859-1
+      to: "{{ target_charset }}"
+  with_items: "{{ files_to_copy }}"
+  when: files_to_copy is defined and files_to_copy | length > 0

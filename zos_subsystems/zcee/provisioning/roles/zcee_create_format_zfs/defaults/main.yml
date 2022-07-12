@@ -31,7 +31,7 @@ zcon_zos_vsam_volume: DIPTI1
 ################################################################################
 # Specifies a data class that is used to define a zFS data set for the z/OS Connect EE instance.
 ################################################################################
-zcon_zfs_dataclass: ''
+zcon_zfs_dataclass: '' 
 
 ################################################################################
 # Specifies the path to the base zCEE configuration directory. 
