@@ -135,6 +135,10 @@ contributing to this repository.
 - Communicate frequently with the project members whether its before a feature
   request or during a pull request, this is the best way to ensure everyone's
   interest are met.
+- Contributions must be complete and functional Ansible playbook that adheres to
+  the [playbook structure outline](#playbook-structure).
+- When a pull request is opened, it must include the complete STDOUT log
+  as certification the playbook is functional.
 
 ## Playbook Development Guidelines
 
@@ -191,21 +195,25 @@ would look like:
 
 ```py
 <repo>/zos_concept/new_playbook/
-├── README.md           # This playbooks main documentation file
+├── README.md             # This playbooks main documentation file
 │
-├── site.yml            # The main project playbook
-├── another.yml         # another.yml and more.yml are imported by site. yml
+├── runtime-requirements  # This lists the playbooks requirements
+│
+├── site.yml              # The main project playbook
+├── another.yml           # another.yml, more.yml playbooks that can be imported by site.yml or not
 ├── more.yml
 │
-├── ansible.cfg         # Custom Ansible configuration if needed
-├── inventory.yml       # inventory file for users to configure
+├── ansible.cfg           # Custom Ansible configuration if needed
+├── inventories/          # inventories folder
+│   └── host_vars/        # Assign variables to particular systems
+│       └── zos_host.yml
+│   └── group_vars/       # Assign variables to particular groups
+│       └── all.yml
+│   ├── inventory.yml     # Inventory
 │
-├── files/              # Additional files your playbook might require
+├── files/                # Additional files your playbook might require
 │
-├── host_vars           # Assign variables to particular systems
-│   └── zos_host.yml
-│
-├── docs/               # Additional docs needed for your playbook/workflow
+├── docs/                 # Additional docs needed for your playbook/workflow
 │   ├── *.md
 │   ├──/images
 │
