@@ -1,0 +1,24 @@
+//******************************************************************
+//*  DFSIFP Job
+//*
+//*  This job is used to execute the IMSFP procedure,
+//*  which is an online procedure that initiates a
+//*  Fast Path region where Fast Path applications run.
+//*
+//***********************************************************@SCPYRT**
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//***********************************************************@ECPYRT**
+//*
+//IFPJOB   JOB 1,IMS,MSGLEVEL=1,PRTY=11,CLASS=A,MSGCLASS=A,REGION=52K
+//       EXEC IMSFP,
+//       IMSID={{ DFS_IMS_SSID }}

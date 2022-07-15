@@ -1,0 +1,125 @@
+//*********************************************************************
+//*  MFSDCT Procedure
+//*
+//*  This procedure executes the Message Format Service Device
+//*  Characteristics Table (MFSDCT) utility (DFSUTB00)
+//*  to define new screen sizes in a descriptor member
+//*  of the IMS.PROCLIB library without performing an
+//*  IMS system definition.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  Licensed Materials - Property of IBM                             *
+//*                                                                   *
+//*  5635-A06                                                         *
+//*                                                                   *
+//*      Copyright IBM Corp. 1974,2016 All Rights Reserved            *
+//*                                                                   *
+//*  US Government Users Restricted Rights - Use, duplication or      *
+//*  disclosure restricted by GSA ADP Schedule contract with          *
+//*  IBM Corp.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//         PROC RGN=4M,SOUT=A,SYS2=,PXREF=NOXREF,
+//            PCOMP=NOCOMP,PSUBS=NOSUBS,PDIAG=NODIAG,
+//            COMPR=NOCOMPRESS,COMPR2=COMPRESS,
+//            LN=55,SN=8,DEVCHAR=0,COMPR3=NOCOMPREND,
+//            DIRUPDT=UPDATE,DCTSUF=,
+//            DSCTSUF=,DSCMSUF=,FMTMAST=N
+//*
+//            NODE3=IMS
+//S1       EXEC PGM=DFSUTB00,REGION=&RGN,
+//        PARM=('DCTSUF=&DCTSUF,DSCTSUF=&DSCTSUF',
+//         'DSCMSUF=&DSCMSUF,DEVCHAR=&DEVCHAR',
+//         'FMTMAST=&FMTMAST')
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//SYSLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC,DISP=SHR
+//         DD DSN={{ zCloud_MACLIB }},DISP=SHR
+//         DD DSN={{ zCloud_MODGEN }},DISP=SHR
+//PROCLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB,DISP=SHR
+//SYSIN    DD DSN=&&SYSIN,UNIT=SYSDA,
+//         SPACE=(CYL,(1,1)),DCB=BLKSIZE=800
+//SYSLIN DD DSN=&&SYSPUNCH,UNIT=SYSDA,
+//         SPACE=(CYL,(1,1)),DCB=BLKSIZE=800
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(RECFM=FBA,LRECL=133,BLKSIZE=1330)
+//SYSUDUMP DD SYSOUT=&SOUT
+//DCTIN    DD DSN=&&DCTIN,DISP=(NEW,PASS),
+//         UNIT=SYSDA,SPACE=(CYL,(1,1))
+//DEFLTS   DD DSN=&&DEFLTS,DISP=(NEW,PASS),
+//         UNIT=SYSDA,SPACE=(CYL,(1,1))
+//DCTLNK   DD DSN=&&DCTLNK,DISP=(NEW,PASS),
+//         UNIT=SYSDA,SPACE=(TRK,(1,1)),
+//         DCB=BLKSIZE=800
+//S2       EXEC PGM=ASMA90,REGION=&RGN,
+//            PARM='OBJECT,NODECK,NOLIST',
+//            COND=(0,LT)
+//SYSLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC,DISP=SHR
+//         DD DSN={{ zCloud_MACLIB }},DISP=SHR
+//         DD DSN={{ zCloud_MODGEN }},DISP=SHR
+//SYSLIN   DD DSN=&&DCT,DISP=(NEW,PASS),
+//         UNIT=SYSDA,SPACE=(CYL,(1,1)),
+//         DCB=BLKSIZE=800
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(BLKSIZE=605),
+//         SPACE=(605,(100,50),RLSE,,ROUND)
+//SYSUT1   DD UNIT=SYSDA,DISP=(,DELETE),
+//         SPACE=(CYL,(15,15))
+//SYSIN    DD DSN=&&DCTIN,DISP=(OLD,DELETE)
+//S3       EXEC PGM=IEWL,
+//            PARM=('SIZE=(880K,64K)',NCAL,LET,REUS,
+//            XREF,LIST),
+//            REGION=&RGN,
+//            COND=(0,LT)
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(RECFM=FBA,LRECL=121,BLKSIZE=605),
+//         SPACE=(605,(10,10),RLSE,,ROUND)
+//SYSLMOD  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//SYSUT1   DD UNIT=(SYSDA,SEP=(SYSLMOD,SYSPUNCH)),
+//         SPACE=(CYL,(10,1))
+//SYSLIN   DD DSN=&&DCTLNK,DISP=(SHR,DELETE)
+//DCT      DD DSN=&&DCT,DISP=(SHR,DELETE)
+//S4       EXEC PGM=DFSUPAA0,REGION=&RGN,
+//            PARM=(&PXREF,&PCOMP,&PSUBS,&PDIAG,
+//            &COMPR,'LINECNT=&LN,STOPRC=&SN',
+//            'DEVCHAR=&DEVCHAR'),COND=(0,LT)
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//*SYSLIB - USER OPTION
+//SYSIN    DD DSN=&&DEFLTS,DISP=(OLD,DELETE)
+//REFIN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.REFERAL,DISP=OLD
+//REFOUT   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.REFERAL,DISP=OLD
+//REFRD    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.REFERAL,DISP=OLD
+//SYSTEXT  DD DSN=&&TXTPASS,UNIT=SYSDA,
+//         SPACE=(CYL,(1,1)),DCB=BLKSIZE=800
+//SYSUT3   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//DUMMY    DD DISP=SHR,
+//         DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB(REFCPY)
+//UTPRINT  DD SYSOUT=&SOUT
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(RECFM=FBA,LRECL=133,BLKSIZE=1330)
+//SYSUDUMP DD SYSOUT=&SOUT
+//SEQBLKS  DD DSN=&&BLKS,DISP=(NEW,PASS),
+//         UNIT=SYSDA,SPACE=(CYL,(1,1))
+//S5       EXEC PGM=DFSUNUB0,REGION=&RGN,
+//            PARM=(&COMPR2,&COMPR3,&DIRUPDT,
+//            'DEVCHAR=&DEVCHAR'),COND=((0,LT,S1),
+//            (0,LT,S2),(0,LT,S3),(8,LT,S4))
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}&SYS2.SDFSRESL,DISP=SHR
+//SEQBLKS  DD DSN=&&BLKS,DISP=(OLD,DELETE)
+//UTPRINT  DD SYSOUT=&SOUT,
+//         DCB=(RECFM=FBA,LRECL=133,BLKSIZE=1330)
+//SYSUDUMP DD SYSOUT=&SOUT
+//FORMAT   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.FORMAT,DISP=SHR
+//DUMMY    DD DISP=SHR,
+//         DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB(FMTCPY)
+//SYSPRINT DD SYSOUT=&SOUT
+//SYSUT3   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(CYL,(1,1))

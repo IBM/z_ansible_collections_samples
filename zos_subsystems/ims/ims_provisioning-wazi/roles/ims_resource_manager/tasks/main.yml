@@ -1,0 +1,95 @@
+---
+# Tasks for Resource Manager (RM)
+- name: Resource Manager
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    # AL: Use mvs_raw to replace JCL
+    - set_fact:
+        bpe_rm_config: '{{ role_path }}/templates/bpe_rm_config.txt'
+        ri_config: '{{ role_path }}/templates/ri_config.txt'
+        rm_config: '{{ role_path }}/templates/rm_config.txt'
+
+    - name: Define BPECONFG
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECONFG)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ bpe_rm_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: rm == "config"
+
+    - name: Add CSLRI000 member
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(CSLRI000)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ ri_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: rm == "config"
+
+    - name: Add RM member to PROCLIB
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}RM)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ rm_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: rm == "config"
+
+    # Start RM
+    - name: Start RM
+      zos_operator:
+        cmd: 's {{ DFS_IMS_SSID }}RM'
+        verbose: true
+      when: rm == "start"
+
+    # Stop RM
+    - name: Stop RM
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}RM'
+        verbose: true
+      when: rm == "stop"
+
+    # Query RM status
+    - name: Query RM status
+      ims_command:
+        command: QUERY IMSPLEX NAME(*) TYPE(RM) SHOW(STATUS)
+        plex:  '{{ DFS_IMSPlex }}'
+      when: rm == "query"

@@ -1,0 +1,23 @@
+---
+# tasks file for save-templates-to-datasets
+
+- name: Send copy script
+  template:
+    src: '{{ role_path }}/templates/cp-to-datasets.j2'
+    dest: '{{ uss_file_path }}/cp-to-datasets.j2'
+    
+- name: Encode template
+  shell: iconv -f ISO8859-1 -t IBM-1047 cp-to-datasets.j2 > cp-to-datasets.j21; chtag -tc IBM-1047 cp-to-datasets.j21; mv cp-to-datasets.j21 cp-to-datasets.j2
+  args:  
+    chdir: '{{ uss_file_path }}'
+
+- name: Make script executable
+  file: 
+    path: '{{ uss_file_path }}/cp-to-datasets.j2'
+    state: file
+    mode: a+x
+
+- name: Copy required files to datasets
+  shell: "./cp-to-datasets.j2"
+  args: 
+    chdir: '{{ uss_file_path }}'

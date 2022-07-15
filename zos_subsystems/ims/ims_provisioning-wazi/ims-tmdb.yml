@@ -1,0 +1,55 @@
+---
+- name: Provision IMS DB/DC
+  hosts: all
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+  #  - "{{ vars_folder_name }}/ims-dbdc.yml"
+  environment: "{{ system_environment }}"
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  tasks:
+    # # These are obtained through the open shift UI. for now they are hardcoded in the host_vars env variabes
+    # - set_fact:
+    #     DFS_IMS_SSID: '{{ opr_ssid }}'
+    #     DFS_IMSPlex: '{{ opr_plex }}'
+    #     DFS_DS_VOLUME1: '{{ opr_volume }}'
+    #     DYNAMICALLY_RESERVE_PORTS: '{{ opr_reserve_ports }}'
+    #     JOB_CLASS: '{{ opr_job_class }}'
+
+    # - set_fact:
+    #     DFS_PORTID: '{{ opr_port_id }}'
+    #     DFS_SSLPORTID: '{{ opr_sslport_id: }}'
+    #     DFS_REGION_TCPIPPORT: '{{ opr_region_port_id }}'
+    #     DFS_REGION_SSLTCPIPPORT: '{{ opr_region_sslport_id }} '
+    #   when: not DYNAMICALLY_RESERVE_PORTS
+
+    - block:
+        - debug:
+            msg: This is DFS_DS_VOLUME1 "{{ DFS_DS_VOLUME1 }}"
+
+        - name: Check CTL Up
+          zos_job_query:
+            job_name: "{{ DFS_IMS_SSID }}CTL"
+          register: ctl_output
+          ignore_errors: true
+          
+        - include_role:
+            name: provision_ims
+          # when: ctl_output.failed and k8s_cr_event == "create"
+          when: (ctl_output.failed or ctl_output.jobs[0].job_name == "") and k8s_cr_event == "create"
+
+        # - include_role:
+        #     name: monitor_ims
+        #   when: not ctl_output.failed and running_in_k8s == "reconcile"
+
+        - include_role:
+            name: deprovision_ims
+          when: k8s_cr_event == "delete"
+
+
+  # handlers:
+  #   - include: handlers/handlers.yml

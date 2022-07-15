@@ -1,0 +1,3 @@
+ARMRST=N,                         /* SHOULD ARM RESTART RM ON FAILURE  */
+RMNAME={{ DFS_IMS_SSID[-1] }}RM1, /* RM NAME (RMID = RM1RM)            */
+IMSPLEX(NAME={{ DFS_IMSPlex }})   /* IMSPLEX NAME (CSLPLEX1)           */

@@ -1,0 +1,89 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSOZ
+//*
+//* FUNCTION: ADD CSL CONTROL STATEMENT MEMBERS TO IMS PROCLIB
+//*********************************************************************
+//*
+//*
+//********************************************************************
+//PROCUPDT PROC MBR=TEMPNAME
+//*
+//P        EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//********************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES THE CONFIGURATION FILE FOR BPE WITH
+//* CQS, OM, RM, SCI.
+//*
+//BPECONFG EXEC PROC=PROCUPDT,MBR=BPECONFG
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* CONFIGURATION FILE FOR BPE WITH CQS, OM, RM, SCI - BPECONFG        *
+*--------------------------------------------------------------------*
+
+LANG=ENU                             /* LANGUAGE FOR MESSAGES      */
+                                     /* (ENU = U.S. ENGLISH)       */
+
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+
+TRCLEV=(*,LOW,BPE)                   /* DEFAULT ALL TRACES TO LOW  */
+
+# NOTE: KEEP THE FOLLOWING FOR COMPATIBILITY WITH 6.1 BPE
+
+TRCLEV=(*,LOW,SCI)                   /* DEFAULT SCI TRACES TO LOW  */
+
+/*
+//*
+//* THE FOLLOWING STEP ADDS THE CSLSI000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES THE SCI INITIALIZATION PROCLIB MEMBER.
+//*
+//CSLSI000 EXEC PROC=PROCUPDT,MBR=CSLSI000
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* SCI INITIALIZATION PROCLIB MEMBER.                                 *
+*--------------------------------------------------------------------*
+
+ARMRST=N,                     /* SHOULD ARM RESTART SCI ON FAILURE  */
+SCINAME={{ DFS_IMS_SSID[-1] }}SCI1,                 /* SCI NAME (SCIID = SCI1SCI)         */
+IMSPLEX(NAME={{ DFS_IMSPlex }})           /* IMSPLEX NAME (CSLPLEX1)            */
+
+*--------------------------------------------------------------------*
+* END OF MEMBER CSLSI000                                             *
+*--------------------------------------------------------------------*
+/*
+//* THE FOLLOWING STEP ADDS THE SCI PROC MEMBER TO IMS PROCLIB
+//* THIS MEMBER DEFINES THE IMS COMMON SERVICE LAYER PROCLIB
+//* MEMBER
+//*
+//*
+//{{ DFS_IMS_SSID }}SCI EXEC PROC=PROCUPDT,MBR={{ DFS_IMS_SSID }}SCI
+//P.SYSUT1 DD DATA,DLM=$$
+//*------------------------------------------------------------------*
+//*   SCI                                                            *
+//*------------------------------------------------------------------*
+//*     PARAMETERS:                                                  *
+//*     BPECFG  - NAME OF BPE MEMBER                                 *
+//*     SCIINIT - SUFFIX FOR YOUR CSLSIXXX MEMBER                    *
+//*     ARMRST  - INDICATES IF ARM SHOULD BE USED                    *
+//*     SCINAME - NAME OF THE SCI BEING STARTED                      *
+//*------------------------------------------------------------------*
+//*
+//IEFPROC  EXEC PGM=BPEINI00,REGION=3000K,
+//  PARM=('BPECFG=BPECONFG','BPEINIT=CSLSINI0','SCIINIT=000',
+//            'ARMRST=N','SCINAME={{ DFS_IMS_SSID[-1] }}SCI1')
+//*
+//STEPLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//*
+//PROCLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB,DISP=SHR
+//*
+//SYSPRINT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//*
+$$
