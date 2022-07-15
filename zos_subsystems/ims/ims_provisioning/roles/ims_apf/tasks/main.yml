@@ -24,7 +24,7 @@
         src: '{{ uss_file_path }}/DFSSETPG.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
         max_rc: 12
       register: response
       when: auth_datasets

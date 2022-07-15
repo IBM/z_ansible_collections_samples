@@ -1,0 +1,13 @@
+---
+ansible-navigator:
+  ansible:
+    inventory:
+      entries:
+      - inventories/zosendpoint
+  execution-environment:
+    container-engine: docker
+    enabled: true
+    image: quay.io/adn1107/ims-ee:latest
+    pull:
+      policy: missing
+

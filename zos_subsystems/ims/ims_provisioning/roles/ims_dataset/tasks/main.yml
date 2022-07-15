@@ -78,7 +78,7 @@
         src: '{{ uss_file_path }}/DFSDYNAL.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       register: response
       when: system_datasets == "allocate"
 

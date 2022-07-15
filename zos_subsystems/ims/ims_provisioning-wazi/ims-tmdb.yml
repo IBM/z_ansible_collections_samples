@@ -1,0 +1,96 @@
+---
+- name: IMS TMDB Operations
+  hosts: all
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+  environment: '{{ system_environment }}'
+
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  tasks:
+    # THIS SHOULD NOT BE NEEDED WITH LATEST ADCD RELASE SEPT 2022
+    # - name: check if libpython3.8.so exists
+    #   stat:
+    #     path: "/u/{{ansible_user}}/libpython3.8.so"
+    #   register: stat_result
+
+    # - name: soft link to python8 to make ZOAU happy
+    #   shell: ln -s /usr/lpp/IBM/cyp/v3r9/pyz/lib/libpython3.9.so /u/{{ansible_user}}/libpython3.8.so
+    #   when: not stat_result.stat.exists
+
+    - name: get proclibs
+      shell: pproc
+      register: proclib_ds
+
+    # JOB_CARD will be the default job card inserted for dynamically generated JCL
+    # ensure MSGCLASS and CLASS are correct for desired environment
+    - set_fact:
+        JOB_CARD: |-
+          //ANSIBLE JOB 'testing',
+          //*  NOTIFY={{ TARGET_USERNAME | upper }},
+          //  USER={{ TARGET_USERNAME | upper }},
+          //  MSGCLASS={{ MSG_CLASS }},
+          //  MSGLEVEL=(1,1),
+          //  CLASS={{ JOB_CLASS }}
+        IST_VTAM_IMSAPPLID: '{{ DFS_IMS_SSID }}'
+        ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+        TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
+        ROUTE: '{{ DFS_IMS_SSID }}'
+        DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}CFG1'
+        DFS_DS_VOLUME2: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}CFG1'
+
+    - set_fact:
+        system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'
+      vars:
+        new_item: { STEPLIB: '{{ STEPLIB }}' }
+      with_dict: '{{ system_environment }}'
+
+    - block:
+
+      - tempfile:
+          state: directory
+        register: tmdb_tmp_dir
+
+      - set_fact:
+          DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"
+
+      - debug:
+          msg: IMS source location is '{{ DFS_AUTH_LIB_SYSHLQ }}'
+
+      - name: Check CTL Up
+        zos_operator:
+          cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+        register: ctl_output
+
+      - debug:
+          msg: '{{ ctl_output }}'
+
+      - block:
+
+        - include_role:
+            name: provision_ims
+
+        - include_role:
+            name: monitor_ims
+
+        when:
+          - ims_function == "create"
+          - (ctl_output.content is defined and ctl_output.content is search("NOT FOUND"))
+
+      - include_role:
+          name: deprovision_ims
+        when: ims_function == "delete"
+
+
+      always:
+        - name: Delete the temporary provision files directory
+          file:
+            path: "{{ tmdb_tmp_dir.path }}"
+            state: absent
+      vars:
+        uss_file_path: '{{ tmdb_tmp_dir.path }}'
+

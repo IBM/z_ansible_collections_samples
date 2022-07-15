@@ -1,0 +1,107 @@
+//******************************************************************
+//*  IMSPLIGO Procedure
+//*
+//*  This procedure is a three-step compile, bind, and go
+//*  procedure combining the IMSPLI procedure with an
+//*  execution step for a stand-alone DL/I batch processing
+//*  region.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//************* C O N D I T I O N A L   C H A N G E ******************
+//*  IMPORTANT: This procedure needs to be modified if
+//*  any of the following are true:
+//*  - Dual DD statements are required for the system log
+//*  Look for the 'Conditional Change' comment lines.
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//***********************************************************@SCPYRT**
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//***********************************************************@ECPYRT**
+//*
+//       PROC MBR=TEMPNAME,PAGES=50,SYS2=,
+//            LNGPRFX=IEL,
+//            LIBPRFX=CEE,
+//            SOUT=A,RGN=4M,
+//            PSB=,BUF=7,SPIE=0,TEST=0,EXCPVR=0,
+//            RST=0,PRLD=,SRCH=,CKPTID=,MON=N,
+//            LOGA=0,FMTO=T,IMSID={{ DFS_IMS_SSID }},SWAP=,RGN=4M,
+//            LOGT=2400,
+//            DBRC=,IRLM=,IRLMNM=,BKO=N,IOB=,
+//            SSM=,APARM=,LOCKMAX=,IMSPLEX={{DFS_IMSPlex}}
+//*
+//C      EXEC PGM=IEL1AA,REGION=4M,
+//            PARM=(XREF,A,OBJ,NODECK,NOMACRO,,
+//            'OPT(TIME)')
+//STEPLIB  DD DSN=&LNGPRFX..SIELCOMP,DISP=SHR
+//         DD DSN=&LIBPRFX..SCEERUN,DISP=SHR
+//SYSUT1   DD UNIT=SYSDA,
+//         SPACE=(1024,(200,50),RLSE,,ROUND),
+//         DCB=BLKSIZE=1024,DISP=(,DELETE)
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(LRECL=125,BLKSIZE=629,RECFM=VBA),
+//         SPACE=(605,(&PAGES.0,&PAGES),RLSE)
+//SYSLIN   DD UNIT=SYSDA,SPACE=(80,(250,100),RLSE),
+//         DCB=({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB),
+//         DISP=(,PASS)
+//L      EXEC PGM=IEWL,PARM='XREF,LIST,LET',
+//            COND=(9,LT,C),REGION=4M
+//SYSLIB   DD DSN=&LIBPRFX..SCEELKED,DISP=SHR
+//SDFSRESL DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//SYSLIN   DD DSN=*.C.SYSLIN,DISP=(OLD,DELETE)
+//         DD DISP=SHR,
+//         DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB(PLITDLI)
+//         DD DDNAME=SYSIN
+//SYSLMOD  DD DISP=SHR,
+//         DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PGMLIB(&MBR)
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,RECFM=FBA,BLKSIZE=605),
+//         SPACE=(605,(&PAGES.0,&PAGES),RLSE)
+//SYSUT1   DD UNIT=SYSDA,DISP=(,DELETE),
+//         SPACE=(CYL,(5,1),RLSE)
+//G      EXEC PGM=DFSRRC00,REGION=&RGN,TIME=5,
+//            COND=(9,LT),
+//            PARM=(DLI,&MBR,&PSB,&BUF,
+//            &SPIE&TEST&EXCPVR&RST,
+//            &PRLD,&SRCH,&CKPTID,&MON,&LOGA,
+//            &FMTO,&IMSID,&SWAP,&DBRC,&IRLM,
+//            &IRLMNM,&BKO,&IOB,&SSM,'&APARM',
+//            &LOCKMAX,,,&IMSPLEX)
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PGMLIB,DISP=SHR
+//         DD DSN=&LIBPRFX..SCEERUN,DISP=SHR
+//DFSRESLB DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//IMS      DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PSBLIB,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.DBDLIB,DISP=SHR
+//PROCLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB,DISP=SHR
+//IEFRDER  DD DSN=IMSLOG,DISP=(NEW,KEEP),
+//         VOL=(,,,99),UNIT=(&LOGT,,DEFER),
+//         DCB=(RECFM=VB,BLKSIZE=4096,
+//         LRECL=4092,BUFNO=2)
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF DUAL DD STATEMENTS ARE REQUIRED FOR THE SYSTEM LOG,
+//* THEN UN-COMMENT THE FOLLOWING IEFRDER2 STATEMENT:
+//*IEFRDER2 DD DSN=IMSLOG2,DISP=(NEW,KEEP),
+//*         UNIT=(&LOGT,,DEFER,SEP=IEFRDER),
+//*         VOL=(,,,99),DCB=(RECFM=VB,BLKSIZE=4096,
+//*         LRECL=4092,BUFNO=2)
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//SYSPRINT DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,BLKSIZE=605,RECFM=FBA),
+//         SPACE=(605,(500,500),RLSE,,ROUND)
+//SYSUDUMP DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,BLKSIZE=605,RECFM=FBA),
+//         SPACE=(605,(500,500),RLSE,,ROUND)

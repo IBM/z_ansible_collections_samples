@@ -24,7 +24,7 @@
           src: '{{ uss_file_path }}/DFSGNPRE.j2'
           location: USS
           wait: true
-          wait_time_s: 30
+          wait_time_s: "{{ zos_job_submit_wait_s }}"
         when: preprocess
 
       - block:
@@ -44,7 +44,7 @@
           src: '{{ uss_file_path }}/DFS4STG1.j2'
           location: USS
           wait: true
-          wait_time_s: 30
+          wait_time_s: "{{ zos_job_submit_wait_s }}"
           max_rc: 2
         when: stage1
 
@@ -67,6 +67,6 @@
           src: '{{ uss_file_path }}/DFS4STG2.j2'
           location: USS
           wait: true
-          wait_time_s: 30
+          wait_time_s: "{{ zos_job_submit_wait_s }}"
           max_rc: 2
         when: stage2

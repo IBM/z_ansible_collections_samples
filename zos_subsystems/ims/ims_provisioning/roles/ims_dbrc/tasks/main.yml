@@ -25,7 +25,7 @@
         src: '{{ uss_file_path }}/DFSDFDRC.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: dbrc_defaults
 
     - block:
@@ -45,5 +45,5 @@
         src: '{{ uss_file_path }}/DFSE314J.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: prep_dbrc

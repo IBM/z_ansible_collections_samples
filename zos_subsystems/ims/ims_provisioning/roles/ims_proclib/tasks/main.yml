@@ -23,7 +23,7 @@
         src: '{{ uss_file_path }}/DFSE302J.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: add
 
     # Add ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
@@ -46,7 +46,7 @@
         src: '{{ uss_file_path }}/DFSE303J.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: bpeconfg
 
 
@@ -67,7 +67,7 @@
         src: '{{ uss_file_path }}/DFS4CPYP.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: copy
 
 
@@ -88,7 +88,7 @@
         src: '{{ uss_file_path }}/DFSE313J.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: copy_to_jobs
 
 
@@ -109,7 +109,7 @@
         src: '{{ uss_file_path }}/DFSCPYST.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: copy_stage_libs
 
 
@@ -130,7 +130,7 @@
         src: '{{ uss_file_path }}/DFSPROCB.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: create_sample
 
 

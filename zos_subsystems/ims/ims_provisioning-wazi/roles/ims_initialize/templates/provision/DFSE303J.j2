@@ -1,0 +1,112 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSOZ
+//*
+//* FUNCTION: ADD CSL CONTROL STATEMENT MEMBERS TO IMS PROCLIB
+//*********************************************************************
+//*
+//*
+//********************************************************************
+//PROCUPDT PROC MBR=TEMPNAME
+//*
+//P        EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//********************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES THE CONFIGURATION FILE FOR BPE WITH
+//* CQS, OM, RM, SCI.
+//*
+//BPECONFG EXEC PROC=PROCUPDT,MBR=BPECONFG
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* CONFIGURATION FILE FOR BPE WITH CQS, OM, RM, SCI - BPECONFG        *
+*--------------------------------------------------------------------*
+
+LANG=ENU                             /* LANGUAGE FOR MESSAGES      */
+                                     /* (ENU = U.S. ENGLISH)       */
+
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+
+TRCLEV=(*,LOW,BPE)                   /* DEFAULT ALL TRACES TO LOW  */
+
+# NOTE: KEEP THE FOLLOWING FOR COMPATIBILITY WITH 6.1 BPE
+
+TRCLEV=(STG,LOW,BPE)                 /* STORAGE TRACE              */
+TRCLEV=(CBS,LOW,BPE)                 /* CONTROL BLK SRVCS TRACE    */
+TRCLEV=(DISP,LOW,BPE)                /* DISPATCHER TRACE           */
+TRCLEV=(AWE,LOW,BPE)                 /* AWE SERVER TRACE           */
+TRCLEV=(LATC,LOW,BPE)                /* LATCH TRACE                */
+TRCLEV=(SSRV,LOW,BPE)                /* SYSTEM SERVICES TRACE      */
+TRCLEV=(USRX,LOW,BPE)                /* USER EXIT SERVICES TRACE   */
+
+# NOTE: KEEP THE FOLLOWING FOR COMPATIBILITY WITH 6.1 BPE
+
+TRCLEV=(CQS,LOW,CQS)                 /* CQS ADDRESS SPACE TRACE    */
+TRCLEV=(STR,LOW,CQS)                 /* STRUCTURE TRACE            */
+TRCLEV=(INTF,LOW,CQS)                /* INTERFACE TRACE            */
+
+*--------------------------------------------------------------------*
+* END OF MEMBER BPECONFG                                             *
+*--------------------------------------------------------------------*
+
+*
+/*
+//*
+//*
+//*
+//* THE FOLLOWING STEP ADDS THE DFSDF000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER CONTAINS PARAMETERS RELATED TO DRD.
+//*
+//DFSDF000 EXEC PROC=PROCUPDT,MBR=DFSDF000
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* COMMON SERVICE LAYER SECTION                                       *
+*--------------------------------------------------------------------*
+<SECTION=COMMON_SERVICE_LAYER>
+
+CMDSEC=N                         /* NO CMD AUTHORIZATION CHECKING   */
+IMSPLEX={{ DFS_IMSPlex }}                    /* IMSPLEX NAME                    */
+MODBLKS=DYN                      /* DRD ENABLED;MODBLKS OLC DISABLE */
+*
+*--------------------------------------------------------------------*
+* DYNAMIC RESOURCES SECTION                                          *
+*--------------------------------------------------------------------*
+<SECTION=DYNAMIC_RESOURCES>
+
+AUTOEXPORT=AUTO,                 /* AUTO EXPORT RESOURCES TO RDDS   */
+AUTOIMPORT=AUTO,                 /* AUTO IMPORT RESOURCES FR RDDS   */
+RDDSDSN=(
+  {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS1,
+  {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS2,
+  {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS3)
+*--------------------------------------------------------------------*
+* LOGGER SECTION                                                 *
+*--------------------------------------------------------------------*
+<SECTION=LOGGER>
+OLDSDEF=(OLDS=(00,01,02,03,04,05,99),BUFNO=005,MODE=DUAL)
+WADSDEF=(WADS=(0,1,8,9))
+ARC={{ARC}}
+*
+*------------------------------------------------------------------*
+* IMS Catalog Section                                            *
+*------------------------------------------------------------------*
+<SECTION=CATALOG>
+CATALOG=Y                                     /*Enable IMS catalog*/
+ALIAS=DFSC                      /*Use standard catalog prefix DFSC*/
+*
+*----------------------------------------------------------------*
+* Database Section                                               *
+*----------------------------------------------------------------*
+<SECTION=DATABASE>
+UNREGCATLG=(DFSCX000,DFSCD000) /*Unregistered IMS catalog DB names*/
+*
+*--------------------------------------------------------------------*
+* END OF MEMBER DFSDF000                                             *
+*--------------------------------------------------------------------*
+//*

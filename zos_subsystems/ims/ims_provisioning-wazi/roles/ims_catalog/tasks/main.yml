@@ -1,0 +1,198 @@
+---
+# Catalog Services
+- name: Catalog Services
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - block:
+
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      - include_role:
+          name: send-template
+        vars:
+          path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
+
+      when: catalog == "allocate" and not provision
+
+    - name: Allocate IMS catalog DB
+      zos_job_submit:
+        src: '{{ uss_file_path }}/DFSALCAT.j2'
+        location: USS
+        wait: true
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
+        return_output: "{{ zos_job_submit_return_output }}"
+      when: catalog == "allocate"
+
+    - name: Load Catalog
+      ims_catalog_populate:
+        mode: LOAD
+        dbrc: False
+        modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
+        acb_lib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.ACBLIB"
+        ]
+        reslib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.SDFSRESL"
+        ]
+        steplib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.SDFSRESL"
+        ]
+        proclib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB"
+        ]
+        dbd_lib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.DBDLIB"
+        ]
+        psb_lib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PSBLIB"
+        ]
+        buffer_pool_param_dataset: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB(DFSVSMHP)"
+        primary_log_dataset:
+          dataset_name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.IMSLOG1'
+          disposition: NEW
+          normal_disposition: DELETE
+          record_format: FB
+          record_length: 4092
+          block_size: 4096
+          primary: 100
+          primary_unit: CYL
+          secondary: 75
+          secondary_unit: CYL
+          type: SEQ
+        secondary_log_dataset:
+          dataset_name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.IMSLOG2'
+          disposition: NEW
+          normal_disposition: DELETE
+          record_format: FB
+          record_length: 4092
+          block_size: 4096
+          primary: 100
+          primary_unit: CYL
+          secondary: 75
+          secondary_unit: CYL
+          type: SEQ
+        control_statements:
+          managed_acbs:
+            setup: true
+      when: catalog == "load"
+
+    - name: Update Catalog
+      ims_catalog_populate:
+        mode: UPDATE
+        dbrc: False
+        modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
+        acb_lib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.ACBLIB"
+        ]
+        reslib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.SDFSRESL"
+        ]
+        steplib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.SDFSRESL"
+        ]
+        proclib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB"
+        ]
+        dbd_lib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.DBDLIB"
+        ]
+        psb_lib: [
+          "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PSBLIB"
+        ]
+        buffer_pool_param_dataset: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB(DFSVSMHP)"
+        primary_log_dataset:
+          dataset_name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.IMSLOG1'
+          disposition: NEW
+          normal_disposition: DELETE
+          record_format: FB
+          record_length: 4092
+          block_size: 4096
+          primary: 100
+          primary_unit: CYL
+          secondary: 75
+          secondary_unit: CYL
+          type: SEQ
+      when: catalog == "update"
+
+    - name: Create ACBs for catalog setup
+      ibm.ibm_zos_ims.ims_acb_gen:
+        command_input: BUILD
+        psb_name:
+          - DFSCPL00
+          - DFSCP000
+          - DFSCP001
+        dbd_name:
+          - DFSCD000
+          - DFSCX000
+        psb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+        dbd_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+        acb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
+        reslib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+        steplib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+      when: catalog == "setup"
+      register: response
+      failed_when: response.rc > 8
+
+    - name: Query Catalog Service
+      ims_command:
+        command: QUERY PGM SHOW(DFSCPL00)
+        plex:  '{{ DFS_IMSPlex }}'
+      when: catalog == "query"
+
+    - name: Delete IMS Catalog
+      zos_data_set:
+        batch:
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001.D'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001.S'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000.A00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.BSDS'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1002'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.STG'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      when: catalog == "delete"
+

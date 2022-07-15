@@ -1,0 +1,627 @@
+---
+# tasks file for ims_dataset_services
+- name: IMS Dataset Operations
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - block:
+
+      - name: Allocate work dataset zCloud IMS
+        zos_data_set:
+          name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL"
+          state: present
+          replace: true
+          type: PDS
+          space_primary: 5
+          space_secondary: 2
+          space_type: CYL
+          record_format: FB
+          record_length: 80
+          block_size: 3200
+          directory_blocks: 46
+          volumes: "{{ DFS_DS_VOLUME1 if not DFS_DS_VOLUME1 == None else omit }}"
+          sms_storage_class: "{{ DFS_SMS_CLASS if DFS_SMS_ENVIRONMENT else omit }}"
+
+      when: work_dataset == "allocate"
+
+
+    - block:
+
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      # 5/23/22: AL not need if used zos_data_set
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSALSY2.j2'
+
+      # 5/20/22: AL Use zos_data_set to replace JCL DFSALSY2.j2
+      - name: Allocate IMS system definition data sets
+        zos_data_set:
+          batch:
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 5
+              space_secondary: 2
+              space_type: CYL
+              record_format: FB
+              record_length: 80
+              block_size: 3200
+              directory_blocks: 200
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OBJDSET'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 10
+              space_secondary: 3
+              space_type: CYL
+              record_format: FB
+              record_length: 80
+              block_size: 3200
+              directory_blocks: 120
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENIN'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 8
+              space_secondary: 3
+              space_type: CYL
+              record_format: FB
+              record_length: 80
+              block_size: 11440
+              directory_blocks: 92
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENOUT'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 5
+              space_secondary: 3
+              space_type: CYL
+              record_format: FB
+              record_length: 80
+              block_size: 11440
+              directory_blocks: 92
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 2
+              space_secondary: 2
+              space_type: CYL
+              record_format: U
+              block_size: 32760
+              directory_blocks: 92
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TFORMAT'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 2
+              space_type: CYL
+              record_format: U
+              block_size: 32760
+              directory_blocks: 46
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.REFERAL'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 2
+              space_secondary: 2
+              space_type: CYL
+              record_format: FB
+              record_length: 80
+              block_size: 0
+              directory_blocks: 92
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+            - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS'
+              state: present
+              replace: True
+              type: PDS
+              space_primary: 22
+              space_secondary: 15
+              space_type: TRK
+              record_format: U
+              record_length: 0
+              block_size: 13030
+              directory_blocks: 50
+              volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+#      when: sysdef_datasets == "allocate"
+
+      - name: Copy System Datasets
+        zos_copy:
+          src: "{{ item.src }}"
+          dest: "{{ item.dest }}"
+          remote_src: True
+          volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+        loop:
+          - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSRESL', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL' }
+          - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC' }
+          - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.ADFSMAC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC' }
+          - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.ADFSLOAD', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSLOAD' }
+          - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.ADFSSRC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC' }
+
+      when: sysdef_datasets == "allocate"
+
+      # ---- AL: end of using zos_data_set
+      # 5/20/22: AL Use the above instead of JCL
+      # - name: Allocate IMS system definition data sets
+      #   zos_job_submit:
+      #     src: '{{ uss_file_path }}/DFSALSY2.j2'
+      #     location: USS
+      #     encoding:
+      #       from: ISO8859-1
+      #       to: IBM-1047
+      #     wait: true
+        # 5/8 AL ignore errors for now
+        #ignore_errors: true
+      # when: sysdef_datasets == "allocate"
+
+
+    - block:
+
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSALSY1.j2'
+
+      # AL: Try send-templates instead of send-template to see if encoding works correctly
+      - include_role:
+          name: send-templates
+        vars:
+          template_path: '{{ eager_role_path }}/templates/DFSALSY1.j2'
+
+
+
+      # 5/23/22: AL use zos_data_set instead of JCL
+      # - name: Allocate all IMS datasets
+      #   zos_data_set:
+      #     batch:
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: LIBRARY
+      #         directory_blocks: 92
+      #         space_primary: 6
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 46
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 92
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.IMSMON'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: VB
+      #         record_length: 6140
+      #         block_size: 6144
+      #         space_primary: 1
+      #         space_secondary: 1
+      #         space_type: CYL
+      #         type: SEQ
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 46
+      #         space_primary: 1
+      #         space_secondary: 1
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 92
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 92
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 150
+      #         space_primary: 10
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 150
+      #         space_primary: 8
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: FB
+      #         record_length: 80
+      #         block_size: 80
+      #         space_primary: 1
+      #         space_type: TRK
+      #         type: SEQ
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: FB
+      #         record_length: 80
+      #         block_size: 0
+      #         type: PDS
+      #         directory_blocks: 46
+      #         space_primary: 1
+      #         space_secondary: 1
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATA'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 92
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: U
+      #         block_size: 32760
+      #         type: PDS
+      #         directory_blocks: 92
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: FB
+      #         record_length: 80
+      #         block_size: 80
+      #         type: PDS
+      #         directory_blocks: 46
+      #         space_primary: 1
+      #         space_secondary: 1
+      #         space_type: CYL
+      #       - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCPPARMS'
+      #         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #         record_format: FB
+      #         record_length: 80
+      #         block_size: 3120
+      #         type: PDS
+      #         directory_blocks: 20
+      #         space_primary: 2
+      #         space_secondary: 2
+      #         space_type: CYL
+
+      # - name: Define clusters
+      #   zos_mvs_raw:
+      #     program_name: idcams
+      #     auth: yes
+      #     dds:
+      #       - dd_input:
+      #           dd_name: sysin
+      #           content: |
+      #                 " DEFINE CLUSTER( -
+      #                       NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1) -
+      #                       CYL(10 10)  -
+      #                       FREESPACE(20 20)                -
+      #                       INDEXED                         -
+      #                       KEYS(32 0)                      -
+      #                       NOERASE                         -
+      #                       NONSPANNED                      -
+      #                       NOREUSE                         -
+      #                       SHAREOPTIONS(3 3)               -
+      #                       SPEED                           -
+      #                       UNORDERED                       -
+      #                       RECORDSIZE(4086 32600)          -
+      #                       {% if DFS_SMS_ENVIRONMENT %}
+      #                           STORAGECLASS({{DFS_SMS_CLASS}})                 -
+      #                       {% endif %}
+      #                       {% if not DFS_DS_VOLUME1 == None  %}
+      #                           VOLUMES({{ DFS_DS_VOLUME1 }})                 -
+      #                       {% endif %}
+      #                           UNIQUE                          -
+      #                       )
+      #                 "
+      # when: runtime_datasets == "allocate"
+
+      # 5/23/22: AL temp comment out to use the above code instead
+      - name: Allocate all IMS data sets
+        zos_job_submit:
+          src: '{{ uss_file_path }}/DFSALSY1.j2'
+          location: USS
+          wait: true
+          return_output: "{{ zos_job_submit_return_output }}"
+          encoding:
+            from: ISO8859-1
+            to: IBM-1047
+
+      when: runtime_datasets == "allocate"
+
+    - block:
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      # Send the template over
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'
+
+      # AL: use send-templates
+      - include_role:
+          name: send-templates
+        vars:
+          template_path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'
+
+      when: system_datasets == "allocate" and not provision
+
+    - name: Dynamically allocate IMS system datasets
+      zos_job_submit:
+        src: '{{ uss_file_path }}/DFSDYNAL.j2'
+        location: USS
+        wait: true
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
+        return_output: "{{ zos_job_submit_return_output }}"
+        encoding:
+          from: ISO8859-1
+          to: IBM-1047
+      register: response
+      when: system_datasets == "allocate"
+
+
+    - name: Delete Sysdef libs
+      zos_data_set:
+        batch:
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OBJDSET'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENIN'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENOUT'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TFORMAT'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.REFERAL'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSLOAD'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      when: sysdef_datasets == "delete"
+
+
+    - name: Delete IMS Runtime Libs
+      zos_data_set:
+        batch:
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.IMSMON'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDS'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP00'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS00'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP01'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS01'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP02'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS02'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP03'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS03'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP04'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS04'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP05'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS05'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP99'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS99'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS0'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS8'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS9'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSTRA01'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSTRA02'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATA'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCPPARMS'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.QBLKS'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SHMSG'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SHMSG1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG2'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO2'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO3'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO4'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBCP1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBCP2'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBDUMP'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS2'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS3'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EXITLIB'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      when: runtime_datasets == "delete"

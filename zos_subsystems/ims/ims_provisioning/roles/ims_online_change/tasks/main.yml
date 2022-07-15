@@ -24,7 +24,7 @@
         src: '{{ uss_file_path }}/DFSENOLC.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: enable_olc
 
 
@@ -53,5 +53,5 @@
         src: '{{ uss_file_path }}/DFS4ACTV.j2'
         location: USS
         wait: true
-        wait_time_s: 30
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
       when: active_libs

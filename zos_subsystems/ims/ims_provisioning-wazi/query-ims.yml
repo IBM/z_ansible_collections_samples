@@ -1,0 +1,36 @@
+- name: Examples of query different IMS services
+  hosts: all
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+  environment: '{{ system_environment }}'
+
+  tasks:
+
+    - block:
+        # Make sure CQS is started before doing this query
+        # - include_role:
+        #     name: ims_common_queue
+        #   vars:
+        #     cqs: query
+
+        # Query OM
+        - include_role:
+            name: ims_operations_manager
+          vars:
+            om: query
+
+        # Query SCI
+        - include_role:
+            name: ims_structured_call_interface
+          vars:
+            sci: query
+
+        # Query RM
+        - include_role:
+            name: ims_resource_manager
+          vars:
+            rm: query
+
+

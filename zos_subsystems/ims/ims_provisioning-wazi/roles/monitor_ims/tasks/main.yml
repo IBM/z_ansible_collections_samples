@@ -1,0 +1,109 @@
+---
+# tasks file for monitor_ims
+- name: Monitor IMS
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    # Query OM status
+    - name: Query OM status
+      ims_command:
+        command: QUERY IMSPLEX NAME(*) TYPE(OM) SHOW(STATUS)
+        plex:  '{{ DFS_IMSPlex }}'
+      register: om_status
+      ignore_errors: true
+
+    - debug:
+        msg: '{{ om_status }}'
+
+    # Start OM if it's down
+    - block:
+
+      - include_role:
+          name: ims_operations_manager
+        vars:
+          om: config
+
+      - include_role:
+          name: ims_operations_manager
+        vars:
+          om: start
+
+      when: om_status.failed
+
+    # Query SCI status
+    - name: Query SCI status
+      ims_command:
+        command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
+        plex:  '{{ DFS_IMSPlex }}'
+      register: sci_status
+      ignore_errors: true
+
+    - debug:
+        msg: '{{ sci_status.ims_output[0] }}'
+
+    # Start SCI if it's down
+    - block:
+
+      - include_role:
+          name: ims_structured_call_interface
+        vars:
+          sci: config
+
+      - include_role:
+          name: ims_structured_call_interface
+        vars:
+          sci: start
+
+      when: sci_status.failed
+
+    # Query RM status
+    - name: Query RM status
+      ims_command:
+        command: QUERY IMSPLEX NAME(*) TYPE(RM) SHOW(STATUS)
+        plex:  '{{ DFS_IMSPlex }}'
+      register: rm_status
+      ignore_errors: true
+
+    - debug:
+        msg: '{{ rm_status.ims_output[0] }}'
+
+    # Start RM if it's down
+    - block:
+
+      - include_role:
+          name: ims_resource_manager
+        vars:
+          rm: config
+
+      - include_role:
+          name: ims_resource_manager
+        vars:
+          rm: start
+
+      when: rm_status.ims_output[0].type_2_response[0].Status == 'ABENDED'
+
+
+    - name: Query IMS Connect
+      ims_command:
+        command: QUERY IMSCON TYPE(CONFIG) SHOW(ALL)
+        plex: '{{ DFS_IMSPlex }}'
+      register: imscon_status
+      ignore_errors: true
+
+    - debug:
+        msg: '{{ imscon_status.ims_output[0] }}'
+
+    - block:
+
+      - name: ICON start
+        zos_job_submit:
+          src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
+          location: DATA_SET
+          wait: true
+          wait_time_s: "{{ zos_job_submit_wait_s }}"
+          return_output: "{{ zos_job_submit_return_output }}"
+
+      when: imscon_status.failed

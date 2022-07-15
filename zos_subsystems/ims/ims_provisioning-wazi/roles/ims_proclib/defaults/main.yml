@@ -1,0 +1,14 @@
+---
+# defaults file for provision-ims-dbdc
+
+ARC: '03'
+
+# Default vars for proclib services
+send: false
+delete: false
+create_sample: false
+add: false
+bpeconfg: false
+copy: false
+copy_to_jobs: false
+copy_stage_libs: false

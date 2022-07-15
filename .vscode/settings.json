@@ -1,0 +1,14 @@
+{
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/ansible-community/schemas/main/f/ansible.json#/$defs/playbook": [
+      "file:///Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning/aws-demo.yml",
+      "file:///Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning-wazi/roles/ims_catalog/tasks/main.yml"
+    ],
+    "file:///Users/adn/.vscode/extensions/ibm.zopeneditor-2.1.1/resources/zapp-schema-0.0.3.json": [
+      "zapp.yaml"
+    ],
+    "file:///Users/adn/.vscode/extensions/ibm.zopeneditor-2.1.1/resources/zcodeformat-schema-0.0.1.json": [
+      "zcodeformat.yaml"
+    ]
+  }
+}

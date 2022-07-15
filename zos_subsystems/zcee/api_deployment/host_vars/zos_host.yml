@@ -80,7 +80,7 @@ TARGET_USERNAME: omvsadm
 # ensure MSGCLASS and CLASS are correct for desired environment
 JOB_CARD: |-
   //ANSIBLE JOB 'testing',
-  //  NOTIFY={{ TARGET_USERNAME | upper }},
+  //*  NOTIFY={{ TARGET_USERNAME | upper }},
   //  USER={{ TARGET_USERNAME | upper }},
   //  MSGCLASS=E,
   //  MSGLEVEL=(1,1),

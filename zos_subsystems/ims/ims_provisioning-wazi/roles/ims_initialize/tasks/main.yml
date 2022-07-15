@@ -1,0 +1,137 @@
+---
+# tasks file for initialize
+- name: Initialize provisioning
+  collections:
+    - ibm.ibm_zos_core
+
+  block:
+    # TODO: add option to reserve specific ports
+
+    - name: Reserve ports for ICON
+      block:
+
+        - name: When specific ports are desired
+          block:
+
+            - name: Create TCPIP profile temp dataset
+              zos_data_set:
+                name: "{{ TCPIP_PROFILE_TMP }}"
+                state: present
+                replace: true
+                type: PDSE
+                volumes: "{{ DFS_DS_VOLUME1 if not DFS_DS_VOLUME1 == None else omit }}"
+                sms_storage_class: "{{ DFS_SMS_CLASS if DFS_SMS_ENVIRONMENT else omit}}"
+
+            - name: Create TCPIP profile temp dataset member
+              zos_data_set:
+                name: "{{ TCPIP_PROFILE_TMP }}({{ TCPIP_PROFILE_TMP_MEMBER }})"
+                state: present
+                replace: true
+                type: MEMBER
+                volumes: "{{ DFS_DS_VOLUME1 if not DFS_DS_VOLUME1 == None else omit }}"
+                sms_storage_class: "{{ DFS_SMS_CLASS if DFS_SMS_ENVIRONMENT else omit }}"
+
+            - name: Reserve ICON HTTP Port
+              zport:
+                name: '*'
+                dsname: '{{ TCPIP_PROFILE }}'
+                tmp_dsname: "{{ TCPIP_PROFILE_TMP }}({{ TCPIP_PROFILE_TMP_MEMBER }})"
+                tcp: yes
+              register: port_alloc_result1
+
+            - name: Reserve ICON SSL Port
+              zport:
+                name: '*'
+                dsname: '{{ TCPIP_PROFILE }}'
+                tmp_dsname: "{{ TCPIP_PROFILE_TMP }}({{ TCPIP_PROFILE_TMP_MEMBER }})"
+                tcp: yes
+              register: port_alloc_result2
+
+            - name: Reserve IMS HTTP Port
+              zport:
+                name: '*'
+                dsname: '{{ TCPIP_PROFILE }}'
+                tmp_dsname: "{{ TCPIP_PROFILE_TMP }}({{ TCPIP_PROFILE_TMP_MEMBER }})"
+                tcp: yes
+              register: port_alloc_result3
+
+            - name: Reserve IMS SSL Port
+              zport:
+                name: '*'
+                dsname: '{{ TCPIP_PROFILE }}'
+                tmp_dsname: "{{ TCPIP_PROFILE_TMP }}({{ TCPIP_PROFILE_TMP_MEMBER }})"
+                tcp: yes
+              register: port_alloc_result4
+
+            - name: Delete TCPIP profile temp dataset
+              zos_data_set:
+                name: '{{ TCPIP_PROFILE_TMP }}'
+                state: absent
+
+
+        - set_fact:
+            DFS_REGION_TCPIPPORT: '{{ port_alloc_result1.port }}'
+            DFS_PORTID: '{{ port_alloc_result3.port }}'
+            DFS_REGION_SSLTCPIPPORT: '{{ port_alloc_result2.port }}'
+            DFS_SSLPORTID: '{{ port_alloc_result4.port }}'
+
+      when: DYNAMICALLY_RESERVE_PORTS
+
+    # * Need this because Ansible lazily interprets role_path
+    # * Results in wrong paths being sent when passing vars that use role_path var
+    - block:
+
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      - include_role:
+          name: send-templates
+        vars:
+          template_path: '{{ eager_role_path }}/templates/provision/*'
+
+      when: provision
+
+    - block:
+        - name: Copy imsjava to target
+          copy:
+            src: '{{ role_path }}/files/java/imsjava.tar'
+            dest: '/u/{{ TARGET_USERNAME }}/imsjava.tar'
+
+        - name: Unarchive templates on target
+          shell: 'tar -Co . -xf imsjava.tar ; rm imsjava.tar'
+          args:
+            chdir: /u/{{ TARGET_USERNAME }}
+
+        - name: Create dfsjvmpr.props for potential JMP regions
+          shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props #{{ JAVA_CONF_PATH }}
+      when: DFS_INIT_JAVA_CONF
+
+
+    - name: Send PROCLIB members
+      block:
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+        - name: Create temporary directory to store PROCLIB members
+          tempfile:
+            state: directory
+          register: proclib_tmp_dir
+        - name: Send PROCLIB member templates to USS directory
+          include_role:
+            name: send-templates
+          vars:
+            template_path: '{{eager_role_path}}/templates/procs/*'
+            uss_file_path: '{{ proclib_tmp_dir.path }}'
+        - name: Remove extensions from filenames
+          shell: >
+            for procname in $(ls *.j2); do
+            basename="$(echo ${procname} | cut -d'.' -f1)";
+            cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
+            done
+          args:
+            chdir: '{{ proclib_tmp_dir.path }}'
+      always:
+        - name: Delete the temporary PROCLIB files directory
+          file:
+            path: '{{ proclib_tmp_dir.path }}'
+            state: absent
+      when: send_procs

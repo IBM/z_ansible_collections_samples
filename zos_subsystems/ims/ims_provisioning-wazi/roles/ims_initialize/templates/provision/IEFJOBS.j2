@@ -1,0 +1,99 @@
+/* REXX */
+/*------------------------------------------------------------*/
+/*                                                            */
+/* Create a member in IEFJOBS for each procedure created by   */
+/* the IMS stage 2                                            */
+/*                                                            */
+/*------------------------------------------------------------*/
+trace o
+
+/*------------------------------------------------------------*/
+/* Set input parameters                                       */
+/*------------------------------------------------------------*/
+proclib = '{{ zCloud_PROCLIB }}'
+todsn = '{{ zCloud_IEFJOBS }}'
+user = '{{ DFS_IMS_USERID }}'
+imsid = '{{ DFS_IMS_SSID }}'
+useIEFJOBS = '{{ DFS_useIEFJOBS }}'
+
+/*------------------------------------------------------------*/
+/* If not using IEFJOBS file, just return                     */
+/*------------------------------------------------------------*/
+
+if useIEFJOBS = 'N' then do
+  exit 0
+  end
+
+/*------------------------------------------------------------*/
+/* Check existence of IEFJOBS file                            */
+/*------------------------------------------------------------*/
+if todsn = '' then do
+  exit 0       /* null value indicates no IEFJOBS file, leave */
+  end
+rc_msg = MSG("OFF")
+rc_sysdsn = SYSDSN("'" || todsn || "'")
+rc_msg = MSG(rc_msg)
+If rc_sysdsn = 'OK' then do
+  End
+Else do
+  say rc_sysdsn
+  exit 8
+  End
+
+/*------------------------------------------------------------*/
+/* Build procedure name list.                                 */
+/*------------------------------------------------------------*/
+procnm.0 = 6
+procnm.1 = {{ DFS_IMS_SSID }}CTL
+procnm.2 = {{ DFS_IMS_SSID }}DLI
+procnm.3 = {{ DFS_IMS_SSID }}DRC
+procnm.4 = {{ DFS_IMS_SSID }}OM
+procnm.5 = {{ DFS_IMS_SSID }}SC
+procnm.6 = {{ DFS_IMS_SSID }}RM
+
+/*------------------------------------------------------------*/
+
+/*------------------------------------------------------------*/
+/* Loop through procedure names.                              */
+/*------------------------------------------------------------*/
+Do i = 1 to procnm.0
+
+    /*--------------------------------------------------------*/
+    /* Point at a member of the output file with the same     */
+    /* name as this procedure name.                           */
+    /*--------------------------------------------------------*/
+    "ALLOCATE DSNAME('"||todsn||"("||STRIP(procnm.i)||")') DDNAME(TESTFILE)"
+
+    /*--------------------------------------------------------*/
+    /* Create the job card.                                   */
+    /*--------------------------------------------------------*/
+    lines.1 = '//' || STRIP(procnm.i)
+    lines.1 = LEFT(lines.1,11) || 'JOB '
+    lines.1 = lines.1 || '(' || user || '),'
+    lines.1 = lines.1 || "'"
+    lines.1 = lines.1 || imsid 'CTL-REG'
+    lines.1 = lines.1 || "'"
+    lines.1 = lines.1 || ',MSGCLASS=T,TIME=NOLIMIT'
+
+    /*--------------------------------------------------------*/
+    /* Create the JCLLIB card                                 */
+    /*--------------------------------------------------------*/
+    lines.2 = LEFT('//',11)
+    lines.2 = lines.2 || 'JCLLIB ORDER=(' || proclib || ')'
+
+    /*--------------------------------------------------------*/
+    /* Create the EXEC card.                                  */
+    /*--------------------------------------------------------*/
+    lines.3 = '//' || STRIP(procnm.i)
+    lines.3 = LEFT(lines.3,11) || 'EXEC  ' || STRIP(procnm.i)
+
+    /*--------------------------------------------------------*/
+    /* Write the cards into the output file member and free   */
+    /* the member.                                            */
+    /*--------------------------------------------------------*/
+    "EXECIO 3 DISKW TESTFILE ( STEM LINES. FINIS )"
+    "FREE DDNAME(TESTFILE)"
+
+    End
+
+Exit 0
