@@ -1,0 +1,73 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-installer-and-image
+
+- name: Download openshift installer
+  #  become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-install-linux.tar.gz
+    dest: .
+    mode: 0644
+    #group: root
+    #owner: root
+
+- name: Download openshift client
+  #become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-client-linux.tar.gz
+    dest: .
+    mode: 0644
+    #group: root
+    #owner: root
+
+# tasks file for configure-installer-and-image
+
+- name: Check if kvm is scsi disk
+  fail:
+    msg: "kvm does not support scsi disk type"
+  failed_when: 
+  - vm_type == "kvm"
+  - disk_type == "scsi"
+  
+- name: Download RHCOS image
+  #become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-metal.s390x.raw.gz
+    dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
+    mode: 0644
+    #group: root
+    #owner: root
+  when: 
+  - vm_type == "zvm"
+  - disk_type == "scsi"
+
+- name: Download RHCOS image
+  #become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-dasd.s390x.raw.gz
+    dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
+    mode: 0644
+    #group: root
+    #owner: root
+  when: 
+  - vm_type == "zvm"
+  - disk_type == "dasd"
+
+- name: Download RHCOS image
+  #become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-openstack.s390x.qcow2.gz
+    dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
+    mode: 0644
+    #group: root
+    #owner: root
+  when: 
+  - vm_type == "kvm"
