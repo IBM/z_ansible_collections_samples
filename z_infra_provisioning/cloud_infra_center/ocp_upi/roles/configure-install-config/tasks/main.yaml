@@ -40,6 +40,23 @@
   when:
   - use_proxy == true 
     
+- name: Add local registry info in install-config.yaml
+  shell:
+    cmd: |
+      sed -i '/baseDomain/a imageContentSources:' install-config.yaml
+      sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: {{ localreg_source2 }} ' install-config.yaml
+      sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: {{ localreg_source1 }} ' install-config.yaml
+  when:
+  - use_localreg == true
+
+- name: Add additional certificates to install-config.yaml
+  lineinfile:
+    line: '{{ additional_certs }}'
+    path: install-config.yaml
+    insertafter: EOF
+  when: additional_certs is defined
+
+    
 - name: Update cluster domain name in install-config.yaml
   shell: 
     cmd: |
