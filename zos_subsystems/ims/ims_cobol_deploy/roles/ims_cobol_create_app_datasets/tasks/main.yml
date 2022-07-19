@@ -1,0 +1,31 @@
+---
+# tasks file for ims_cobol_create_app_datasets
+
+- name: Allocate new data sets
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}"
+    record_length: "{{ item.logical_record_length }}"
+    block_size: "{{item.block_size}}"
+    type: "{{ item.type | upper}}"
+    space_primary: "{{ item.primary_size }}"
+    space_secondary: "{{ item.secondary_size }}"
+    space_type: TRK
+    state: present
+    directory_blocks: "{{ item.dir_blocks }}"
+    replace: true
+    volume: "{{ DFS_DS_VOLUME1 if DFS_DS_VOLUME1 and not DFS_SMS_ENVIRONMENT | default(false) else omit}}"
+  loop: "{{ datasets }}"
+  
+- name: Allocate new data sets
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}.INPUT"
+    record_length: "{{ item.logical_record_length }}"
+    block_size: "{{item.block_size}}"
+    type: "{{ item.type | upper}}"
+    state: present
+    space_primary: "{{ item.primary_size }}"
+    space_secondary: "{{ item.secondary_size }}"
+    space_type: TRK
+    replace: true
+    volume: "{{ DFS_DS_VOLUME1 if DFS_DS_VOLUME1 and not DFS_SMS_ENVIRONMENT | default(false) else omit}}"
+  loop: "{{ loads }}"

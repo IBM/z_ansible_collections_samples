@@ -1,0 +1,16 @@
+---
+# defaults file for ims_cobol_copy_acblib_to_inactive_acb
+ROUTE: '{{ DFS_IMS_SSID }}'
+
+acblib:
+ - name: ACCOUNT
+ - name: ACCTYPE
+ - name: CUSTACCS
+ - name: CUSTOMER
+ - name: CUSTTYPE
+ - name: HISTORY
+ - name: TSTAT
+ - name: TSTATTYP
+ - name: TTYPE
+ - name: IBACSUM
+ - name: IBLOAD

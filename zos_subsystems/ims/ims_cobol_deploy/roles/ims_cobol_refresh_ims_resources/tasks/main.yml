@@ -1,0 +1,37 @@
+---
+  # tasks file for ims_cobol_refresh_ims_resources
+  # Refresh IMS application resources
+
+  - name: stop ims program
+    ibm.ibm_zos_ims.ims_command:
+      command: STOP PGM {{ PGM_NAME }}
+      plex: "{{ IMSPLEX }}"
+      route: "{{ ROUTE }}"
+  
+  - name: stop ims transaction
+    ibm.ibm_zos_ims.ims_command:
+      command: STOP TRAN {{ TRAN_NAME }}
+      plex: "{{ IMSPLEX }}"
+      route: "{{ ROUTE }}"
+
+  - include_role:
+      name: ims_cobol_stop_mpp_region
+    vars:
+      mpp: true
+
+  - include_role:
+      name: ims_cobol_define_mpp_region
+    vars:
+      mpp: true
+
+  - name: start ims program
+    ibm.ibm_zos_ims.ims_command:
+      command: START PGM {{ PGM_NAME }}
+      plex: "{{ IMSPLEX }}"
+      route: "{{ ROUTE }}"
+  
+  - name: start ims transaction
+    ibm.ibm_zos_ims.ims_command:
+      command: START TRAN {{ TRAN_NAME }}
+      plex: "{{ IMSPLEX }}"
+      route: "{{ ROUTE }}"

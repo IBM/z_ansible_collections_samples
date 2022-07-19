@@ -1,0 +1,14 @@
+---
+# defaults file for ims_cobol_execute_permissions_and_copy_ussDatasets
+
+
+SAMPLE_FILE_DIR: "/u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}"
+
+PROJECT_NAME: ims-cobol-app-deploy
+
+loadData:
+  - name: ACCOUNT
+  - name: CUSTACCS
+  - name: CUSTOMER
+  - name: HISTORY
+  - name: TSTAT

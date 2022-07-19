@@ -1,0 +1,8 @@
+---
+# defaults file for ims_cobol_copy_extract_files
+
+USE_GIT: no
+
+SAMPLE_FILE_DIR: "/u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}"
+
+PROJECT_NAME: ims-cobol-app-deploy

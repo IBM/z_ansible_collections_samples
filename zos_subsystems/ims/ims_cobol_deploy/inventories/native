@@ -1,0 +1,11 @@
+zsystem:
+  hosts:
+    native:
+      ansible_host: zos_target_address
+      ansible_user: ansuser
+      ansible_python_interpreter: /var/hamb380/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3.8
+
+cluster_master:
+  hosts:
+    9.37.222.124:
+      ansible_user: ibmadmin
