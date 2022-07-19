@@ -1,0 +1,22 @@
+{{ JOB_CARD }}
+//*
+//* FUNCTION: COPY DFSMPR JOBS TO IMS JOBS DATA SET(S)
+//*********************************************************************
+//COPYJOBS PROC MBR=TEMPNAME
+//*
+//CM       EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//*********************************************************************
+//*
+//*-----------------------------------------------
+//* COPY EXECUTION JOB FOR MPP
+//*-----------------------------------------------
+//{{ DFSMPR_NAME }}  EXEC PROC=COPYJOBS,MBR={{ DFSMPR_NAME }}
+//CM.SYSUT1 DD DATA,DLM=ZZ
+{{ lookup('template', '{0}/templates/{1}.j2'.format(eager_role_path, DFSMPR_NAME)) }}
+//*
+ZZ

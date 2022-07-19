@@ -1,0 +1,31 @@
+- name: De-provisioning of IMS COBOL Application 
+  hosts: zsystem
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+  gather_facts: false
+  vars_files:
+    - "{{ vars_folder_name }}/ims_cobol.yml"
+  environment: '{{ system_environment }}'
+
+  tasks:
+    - name: IMS COBOL App De-provision
+      block:
+
+        # Remove old registered datasets
+        - include_role:
+            name: ims_cobol_remove_old_registered_databases
+
+        # Stop and delete ims application resources
+        - include_role:
+            name: ims_cobol_stop_app_resources
+
+        # Stop and delete ims databases
+        - include_role:
+            name: ims_cobol_stop_ims_databases
+
+        # Stop the MPP Region
+        - include_role:
+            name: ims_cobol_stop_mpp_region
+          vars:
+            mpp: true

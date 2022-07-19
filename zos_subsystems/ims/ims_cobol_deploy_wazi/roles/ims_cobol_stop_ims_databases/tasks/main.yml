@@ -1,0 +1,138 @@
+---
+# tasks file for ims_cobol_stop_ims_databases
+# Delete databases
+- name: Stop DB ACCOUNT
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(ACCOUNT) STOP(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: DBR DB ACCOUNT
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(ACCOUNT) STOP(ACCESS) OPTION(FEOV)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Delete DB ACCOUNT
+  ibm.ibm_zos_ims.ims_command:
+    command: DELETE DB NAME(ACCOUNT)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Stop DB CUSTACCS
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(CUSTACCS) STOP(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: DBR DB CUSTACCS
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(CUSTACCS) STOP(ACCESS) OPTION(FEOV)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Delete CUSTACCS
+  ibm.ibm_zos_ims.ims_command:
+    command: DELETE DB NAME(CUSTACCS)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Stop DB CUSTOMER
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(CUSTOMER) STOP(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: DBR DB CUSTOMER
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(CUSTOMER) STOP(ACCESS) OPTION(FEOV)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Delete DB CUSTOMER
+  ibm.ibm_zos_ims.ims_command:
+    command: DELETE DB NAME(CUSTOMER)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Stop DB HISTORY
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(HISTORY) STOP(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: DBR DB HISTORY
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(HISTORY) STOP(ACCESS) OPTION(FEOV)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Delete Db HISTORY
+  ibm.ibm_zos_ims.ims_command:
+    command: DELETE DB NAME(HISTORY)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Stop DB TSTAT
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(TSTAT) STOP(SCHD)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: DBR DB TSTAT
+  ibm.ibm_zos_ims.ims_command:
+    command: UPDATE DB NAME(TSTAT) STOP(ACCESS) OPTION(FEOV)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
+- name: Delete DB TSTAT
+  ibm.ibm_zos_ims.ims_command:
+    command: DELETE DB NAME(TSTAT)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '10'
+  ignore_errors: yes
+
