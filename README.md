@@ -91,6 +91,7 @@ often repeated and in need of automation.
 - Security
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
+  - [Security provision](zos_management/zosmf_security_configuration_assistant)
 
 
 ## Blogs
