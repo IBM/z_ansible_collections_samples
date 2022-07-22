@@ -1,13 +1,13 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2022
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
 # repository.
 #
 # releases:
-#     2020.05.19:
-#         date: 2020-05-19
+#     2022.07.20:
+#         date: 2022-07-20
 #         changes:
 #             added:
 #                 - new features are added
