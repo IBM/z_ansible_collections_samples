@@ -29,7 +29,11 @@ return the items that are unqualified.
 - [**sca_security_provision.yml**](sca_security_provision.yml) -
 Performing the security provision by using the module `zmf_sca`, which is provided with the IBM z/OSMF collection.
 The playbook will succeed if all requirements in the json format of the SCA security descriptor file
+<<<<<<< HEAD
 are either already satisified or successfully provisioned, otherwise it will fail and return the requirements that are still not satisfied. 
+=======
+are satisified or provisioned to be satisified, otherwise it will fail and return the requirements that have not been satisfied. 
+>>>>>>> 6498aa3 (sca provision)
 The json format of SCA security descriptor file is flexible and can be used to describe security requirements based on your needs. For an example of an SCA secruity descriptor file, please refer to [sca_sample_security_requirements_file.json](files/sca_sample_security_requirements_file.json).
 
 ## Ansible Collection Requirement
