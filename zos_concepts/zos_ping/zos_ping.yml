@@ -16,9 +16,9 @@
 #  ansible-playbook -i "hostaddress," <playbook>
 #
 # Example:
-#  ansible-playbook -i inventory zos-ping.yaml
+#  ansible-playbook -i inventory zos-ping.yml
 #   or
-#  ansible-playbook -i "mysystem.to.connect.com," zos-ping.yaml
+#  ansible-playbook -i "mysystem.to.connect.com," zos_ping.yml
 
 ---
 - hosts: all
@@ -33,7 +33,7 @@
     # Ping the host with Ansible ping module to see if the target is available
     # ##########################################################################
     - name: Ping host - {{ inventory_hostname }}
-      ping:
+      zos_ping:
       register: result
 
     # ##########################################################################
