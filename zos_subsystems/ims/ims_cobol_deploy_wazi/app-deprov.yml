@@ -1,4 +1,4 @@
-- name: De-provisioning of IMS COBOL Application 
+- name: De-provisioning of IMS COBOL Application on Wazi
   hosts: zsystem
   collections:
     - ibm.ibm_zos_core

@@ -1,6 +1,6 @@
-# IMS COBOL Application Deployment
+# IMS COBOL Application Deployment on Wazi
 
-This project provides the required sample playbooks and roles to deploy an IMS COBOL application.
+This project provides the required sample playbooks and roles to deploy an IMS COBOL application on a Wazi environment.
 
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -116,7 +116,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 
 # Copyright
 
-© Copyright IBM Corporation 2021
+© Copyright IBM Corporation 2022
 
 # License
 

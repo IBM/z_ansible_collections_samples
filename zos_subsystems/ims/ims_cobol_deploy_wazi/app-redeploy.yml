@@ -1,5 +1,5 @@
 ---
-- name: IMS Cobol Application Re-deployment
+- name: IMS Cobol Application Re-deployment on Wazi
   hosts: zsystem
   collections:
     - ibm.ibm_zos_core
