@@ -18,6 +18,7 @@ This playbook requires:
 - [IBM® z/OS® core collection 1.2.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [Ansible® 2.9, 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
+
 ## Configuration
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
   information from the managed z/OS host.
@@ -26,6 +27,11 @@ This playbook requires:
   with the information from your z/OS system.
   - Review [host_vars documentation](../../../docs/share/zos_core/configure_host_vars.md)
     and any additional noted variables in the configuration.
+- If using ibm.ibm_zos_core prior to 1.4.0-beta.1, you will need to add a line into the playbook
+  - at the top, in the 'hosts' section, there must be a line:
+  - connection: ibm.ibm_zos_core.zos_ssh
+  - This will NOT work with 1.4.0-beta.1 or later, and should be commented out or removed
+
 
 ## Run the playbook
 This project has included a `site.yml` playbook that serves as the master playbook
