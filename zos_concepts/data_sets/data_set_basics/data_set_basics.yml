@@ -100,7 +100,6 @@
         format: fb
         record_length: 100
         size: 5M
-        volume: dimato
       register: result
 
     - name: Response for data set creation
@@ -117,9 +116,10 @@
       debug:
         msg: "{{ result }}"
 
-    - zos_copy:
+    - name: zos_copy
+      zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
-        dest: "/tmp/HELLO"
+        dest: "{{ tgt_tmp_dir }}/HELLO"
        #remote_src: yes
       register: result
 
