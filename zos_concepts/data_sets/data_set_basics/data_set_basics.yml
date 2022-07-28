@@ -44,7 +44,7 @@
 
   tasks:
     # ##########################################################################
-    # Generate a temporary data set name
+    # Generate and set temporary names for data sets
     # ##########################################################################
     - name: Create temp sequential data set name
       command: "mvstmp {{ ansible_user | upper }}"
@@ -54,29 +54,16 @@
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_pds
 
-    # ##########################################################################
-    # Fact setting for use by this playbook
-    # ##########################################################################
-    - name: Setting fact `data_set_name` for use by this sample
+    - name: Set names for sequential data set and pds for use by this sample
       set_fact:
         data_set_name: "{{ tmp_ds_seq.stdout }}"
         pds_name: "{{ tmp_ds_pds.stdout }}"
 
-    - name: Fact `data_set_name` set with value
+    - name: Fact `data_set_name` and `pds_name` set with values
       debug:
-        msg: "{{ data_set_name }}"
-
-    - name: Detecting system name
-      command: uname -n
-      register: result
-
-    - name: Setting fact `system_name` for use by this sample
-      set_fact:
-        system_name: "{{ result.stdout }}"
-
-    - name: Fact `system_name` set with value
-      debug:
-        msg: "{{ system_name }}"
+        msg:
+          - "sequential data set name - {{ data_set_name }}"
+          - "pds name - {{ pds_name }}"
 
     ############################################################################
     # Modules zos_data_set, zos_fetch
