@@ -1,25 +1,25 @@
 create_server
 =========
 
-Create an instance of a WebSphere Liberty server. 
+Create an instance of a WebSphere Liberty server.
 
 Requirements
 ------------
 
-None 
+None
 
 Role Variables
 --------------
 
 | Variable      | Definition                             | Set                                              |
 | ------------- | ---------------------------------------|--------------------------------------------------|
-| server_instance_name | The unique name for the instance of Liberty server | `host_vars/zos_host.yml`       |
-| liberty_bin_path | The path to the Liberty installation bin folder | `host_vars/zos_host.yml`            |
+| server_instance_name | Unique name of the instance of the Liberty server | `host_vars/zos_host.yml`       |
+| liberty_bin_path | Path to the Liberty installation bin folder | `host_vars/zos_host.yml`            |
 
 Dependencies
 ------------
 
-None 
+None
 
 Example Playbook
 ----------------
@@ -27,12 +27,23 @@ Example Playbook
   - include_role:
           name: create_server
 ```
+
+Copyright
+---------
+
+© Copyright IBM Corporation 2021
+
 License
 -------
 
-BSD
+Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Stephanie Lieu - @Stephanie-Lieu or @steph-lieu
+
+Support
+-------
+
+Please refer to the [support section](https://github.com/IBM/z_ansible_collections_samples/blob/master/README.md#support) for more details.

@@ -1,6 +1,5 @@
 ---
 # tasks file for roles/configure_server
-  
   #handles the server.xml file 
   - name: Check for server.xml file
     local_action: stat path="{{playbook_dir}}/roles/configure_server/templates/server.xml.j2"

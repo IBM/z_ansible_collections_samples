@@ -1,25 +1,25 @@
 configure_server
 =========
 
-Transfer custom configuration files, such as  `bootstrap.properties`, `jvm.options`, or `server.xml`, for the server based on which files are in the `/templates` folder.  
-If the file is in the `/templates` folder, it will transfer the file, otherwise it will continue going through the playbook.
+Transfer custom configuration files, such as  `bootstrap.properties`, `jvm.options`, or `server.xml` to the server based on which files are in the `/templates` folder.  
+If the file is not in the `/templates` folder, it will continue going through the playbook without transferring the configuration file.
 
 Requirements
 ------------
 
-None 
+None
 
 Role Variables
 --------------
 
 | Variable      | Definition                             | Set                                              |
 | ------------- | ---------------------------------------|--------------------------------------------------|
-| liberty_server_path | The path to the current Liberty server instance | `host_vars/zos_host.yml`          |
+| liberty_server_path | Path to the current Liberty server instance | `host_vars/zos_host.yml`          |
 
 Dependencies
 ------------
 
-None 
+None
 
 Example Playbook
 ----------------
@@ -35,7 +35,7 @@ Copyright
 License
 -------
 
-Licensed under Apache License, Version 2.0
+Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 Author Information
 ------------------

@@ -1,20 +1,24 @@
-mount_zFS
+angel_config
 =========
 
-Mount the created z/OS&reg; file system (zFS) to the defined user directory.
+Define STARTED profiles for an angel process and enable the server to connect to the angel process.
 
 Requirements
 ------------
 
-The [create_zFS role](create_zFS). A data set must be created and formatted before being mounted.
+[IBM&reg; z/OS&reg; core collection 1.3.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 
 Role Variables
 --------------
 
 | Variable      | Definition                             | Set                                              |
 | ------------- | ---------------------------------------|--------------------------------------------------|
-| data_set_name | Name of the data set to be mounted | `host_vars/zos_host.yml`                         |
-| environment_vars.WLP_USER_DIR | Path to the mount point | `host_vars/zos_host.yml`                    |
+| PROC_LIB      | Name of the procedure library | `host_vars/zos_host.yml`                         |
+| SERVER_PROC   | Unique name for the STARTED command to run the server process | `host_vars/zos_host.yml`        |
+| ANGEL_PROC    | Unique name for the STARTED command to run the angel process | `host_vars/zos_host.yml` |
+| TARGET_USER   | User id of the angel process | `host_vars/zos_host.yml` |
+| USER_GROUP    | Group of the target user | `host_vars/zos_host.yml` |
+
 
 Dependencies
 ------------
@@ -23,11 +27,11 @@ None
 
 Example Playbook
 ----------------
-
 ```yaml
     - include_role:
-        name: mount_zFS
+        name: angel_config
 ```
+
 Copyright
 ---------
 

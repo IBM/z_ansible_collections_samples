@@ -4,7 +4,6 @@
     - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{environment_vars}}"
-  connection: ibm.ibm_zos_core.zos_ssh
 
   tasks: 
     - name: Provision, configure, and start Liberty server instance
@@ -33,28 +32,33 @@
       
       #role used to transfer custom configuration files; runs based on boolean value of CUSTOMIZE variable 
       - include_role: 
-          name: configure_server
+          name: configure_server 
         when: CUSTOMIZE | bool 
 
       #invoke role to enable starting the server as a STARTED task 
       - include_role: 
           name: started_server 
 
-      #role used to create started profiles for angel process and enable access to authorized z/OS services; runs based on boolean value of SECURITY variable
+      #role used to create started profiles for angel process; runs based on boolean value of ANGEL variable
       - include_role: 
-          name: security
-        when: SECURITY | bool
-        
+          name: angel_config 
+        when: ANGEL | bool 
+      
+      #role used to enable access to z/OS authorized services; runs based on AUTHORIZED_SERVICES variable
+      - include_role:
+          name: authorized_services
+        when: (ANGEL | bool) and (AUTHORIZED_SERVICES | bool) #angel process must be enabled for authorized services
+
       #Start the angel process 
       - name: Start angel process 
         zos_operator:
           cmd: "START {{ANGEL_PROC}}" 
         tags: start_angel #if tags are used while running the playbook, it has precendence over the when conditional
-        when: SECURITY | bool #assumes if you enable authorized services, you would want to start the angel process
+        when: ANGEL | bool #assumes if you enable the angel process, you would want to start the angel process
 
       #Start and stop server process as STARTED tasks 
       #If you start the server with a STARTED task, must also stop the server with a STARTED task
-      - name: Start server process 
+      - name: Start server process #start if not already started 
         zos_operator:
           cmd: "START {{SERVER_PROC}}" 
         tags: start
