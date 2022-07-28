@@ -1,12 +1,21 @@
 ################################################################################
 # © Copyright IBM Corporation 2020
 ################################################################################
+
+################################################################################
+# Description of the properties used in this configuration:
+# - Property `ansible_host` is the z/OS managed node (target),
+#    e.g, ansible_host: "zvm1.vmec.svl.ibm.com"
+# - Property `ansible_user` is the z/OS managed user to connect and run as over SSH,
+#    e.g, ansible_user: "zosadm"
+# - Property `ansible_python_interpreter` is the z/OS managed node (target) Python
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+################################################################################
+
 ---
 source_system:
   hosts:
     zos_host:
-      ansible_host: ec33016A.vmec.svl.ibm.com
-      ansible_user: omvsadm
-      #ansible_python_interpreter: /python/3.8.3.ptf1/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
-      ansible_python_interpreter: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+      ansible_host: zos_target_address
+      ansible_user: zos_target_username
 

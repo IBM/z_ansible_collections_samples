@@ -1,5 +1,5 @@
 ---
-# defaults file for security
+# defaults file for roles/authorized_services
 
 #boolean value variables to define if z/OS authorized services will be enabled
 SAFCRED: yes

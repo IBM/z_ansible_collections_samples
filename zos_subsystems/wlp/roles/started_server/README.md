@@ -1,12 +1,12 @@
 Role Name
 =========
 
-Define STARTED profiles for the PROCs for the server process. 
+Define STARTED profiles for the PROCs for the server process.
 
 Requirements
 ------------
 
-Ansible Collection: ibm.ibm_zos_core
+[IBM&reg; z/OS&reg; core collection 1.3.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 
 
 Role Variables
@@ -14,11 +14,11 @@ Role Variables
 
 | Variable      | Definition                             | Set                                              |
 | ------------- | ---------------------------------------|--------------------------------------------------|
-| PROC_LIB      | The name of procedure library | `host_vars/zos_host.yml`                         |
-| SERVER_PROC   | The unique name for the STARTED command to run the server | `host_vars/zos_host.yml`        |
-| ANGEL_PROC    | The unique name for the STARTED command to run the angel process | `host_vars/zos_host.yml` | 
-| TARGET_USER   | USERID for the angel process | `host_vars/zos_host.yml` | 
-| USER_GROUP    | Group for TARGET_USER | `host_vars/zos_host.yml` | 
+| PROC_LIB      | Name of procedure library | `host_vars/zos_host.yml`                         |
+| SERVER_PROC   | Unique name for the STARTED command to run the server process | `host_vars/zos_host.yml`        |
+| ANGEL_PROC    | Unique name for the STARTED command to run the angel process | `host_vars/zos_host.yml` |
+| TARGET_USER   | User id of the angel process | `host_vars/zos_host.yml` |
+| USER_GROUP    | Group for the target user | `host_vars/zos_host.yml` |
 
 Dependencies
 ------------
@@ -41,7 +41,7 @@ Copyright
 License
 -------
 
-Licensed under Apache License, Version 2.0
+Licensed under [Apache License, Version 2.0]((https://opensource.org/licenses/Apache-2.0))
 
 Author Information
 ------------------

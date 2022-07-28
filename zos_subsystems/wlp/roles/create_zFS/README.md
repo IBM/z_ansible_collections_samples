@@ -1,19 +1,19 @@
 create_zFS
 =========
 
-Create and format a z/OS file system (zFS).
+Create and format a z/OS&reg; file system (zFS).
 
 Requirements
 ------------
 
-Ansible Collection: ibm.ibm_zos_core
+[IBM&reg; z/OS&reg; core collection 1.3.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 
 Role Variables
 --------------
 
 | Variable      | Definition                             | Set                                              |
 | ------------- | ---------------------------------------|--------------------------------------------------|
-| data_set_name | The name of the data set to be mounted | `host_vars/zos_host.yml`                         |
+| data_set_name | Name of the data set to be mounted | `host_vars/zos_host.yml`                         |
 
 
 Dependencies
@@ -26,21 +26,22 @@ Example Playbook
 ```yaml
     - include_role:
         name: create_zFS
-         
+
 ```
 Copyright
 ---------
+
 © Copyright IBM Corporation 2021
 
 License
 -------
 
-Licensed under Apache License, Version 2.0
+Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 Author Information
 ------------------
 
-Stephanie Lieu -@stephanie-lieu or @steph-lieu
+Stephanie Lieu - @Stephanie-Lieu or @steph-lieu
 
 Support
 -------

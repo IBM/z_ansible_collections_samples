@@ -1,0 +1,39 @@
+---
+# tasks file for roles/angel_config
+  
+  #Angel Procedure
+  - name: Copy the angel procedure template to procedure library
+    ibm.ibm_zos_core.zos_copy:
+      src: "{{liberty_path}}/templates/zos/procs/bbgzangl.jcl"
+      dest: "{{PROC_LIB}}({{ANGEL_PROC}})" 
+      remote_src: true
+
+  - name: "Edit JCL angel procedure root"
+    ibm.ibm_zos_core.zos_lineinfile:
+      src: "{{PROC_LIB}}({{ANGEL_PROC}})"
+      state: present
+      regexp: "//  SET ROOT='/u/MSTONE1/wlp'" #initial template value
+      line: "//  SET ROOT='{{liberty_path}}'"
+
+  - name: Define initial security
+    ibm.ibm_zos_core.zos_tso_command: 
+      commands: 
+        #Create started profile to be able to run angel process as started tasks
+        - rdef started {{ANGEL_PROC}} uacc(none) stdata(user({{TARGET_USER}}) group({{USER_GROUP}}) privileged(no) trusted(no) trace(yes))
+
+        #Create a server profile for the angel process -- allows server access to the angel process 
+        - RDEF SERVER BBG.ANGEL UACC(NONE) 
+        - PERMIT BBG.ANGEL CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
+
+        #Enables server to use z/OS authorized services 
+        - RDEF SERVER BBG.AUTHMOD.BBGZSAFM UACC(NONE)
+        - PERMIT BBG.AUTHMOD.BBGZSAFM CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
+    register: command_result
+    failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
+    ignore_errors: yes
+  
+  - name: Refresh
+    ibm.ibm_zos_core.zos_tso_command:
+      commands:
+        - SETROPTS RACLIST(SERVER) GENERIC(SERVER) REFRESH
+        - SETROPTS RACLIST(STARTED) REFRESH

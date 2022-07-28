@@ -4,7 +4,6 @@
     - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{environment_vars}}"
-  connection: ibm.ibm_zos_core.zos_ssh
 
   tasks: 
   
@@ -18,12 +17,12 @@
     #   shell: '{{liberty_bin_path}}/server stop {{server_instance_name}}'
     #   tags: stop 
     
-    #Stop the angel process
+    #Stop the angel process 
     - name: Stop angel 
       zos_operator: 
         cmd: "STOP {{ANGEL_PROC}}"
       tags: stop_angel #if tags are used while running the playbook, it has precedence over the when conditional
-      when: SECURITY | bool #assumes if you enable authorized services, you would want to stop the angel process 
+      when: ANGEL | bool #assumes if you enable authorized services, you would want to stop the angel process 
 
     #Remove server instance by deleting directory 
     - name: Delete the server directory
