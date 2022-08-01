@@ -86,7 +86,7 @@ For more information on python configuration requirements on z/OS, refer to [Ans
         zosendpoint:
           ansible_host: ec0000a.vmec.svl.ibm.com
           ansible_user: ibmuser
-          ansible_python_interpreter: /python3/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+          ansible_python_interpreter: /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
 
     ```
 

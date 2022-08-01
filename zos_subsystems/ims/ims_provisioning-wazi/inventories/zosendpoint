@@ -1,10 +1,14 @@
 all:
   hosts:
     zosendpoint:
-      ansible_host: ec33023a.vmec.svl.ibm.com
-      # ansible_user: ibmuser
-      ansible_user: omvsadm
-      ansible_python_interpreter: /python3/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+      ansible_host:  ansible-zdt11.fyre.ibm.com
+      ansible_user: ibmuser
+      ansible_python_interpreter: /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
+      ansible_port: 2022 
+
+      # ansible_host: ec33023a.vmec.svl.ibm.com
+      # ansible_user: omvsadm
+      # ansible_python_interpreter: /python3/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
 
 
 

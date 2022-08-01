@@ -71,7 +71,7 @@ TRCLEV=(INTF,LOW,CQS)                /* INTERFACE TRACE            */
 <SECTION=COMMON_SERVICE_LAYER>
 
 CMDSEC=N                         /* NO CMD AUTHORIZATION CHECKING   */
-IMSPLEX={{ DFS_IMSPlex }}                    /* IMSPLEX NAME                    */
+IMSPLEX={{ DFS_IMSPlex }}        /* IMSPLEX NAME                    */
 MODBLKS=DYN                      /* DRD ENABLED;MODBLKS OLC DISABLE */
 *
 *--------------------------------------------------------------------*
@@ -92,6 +92,19 @@ RDDSDSN=(
 OLDSDEF=(OLDS=(00,01,02,03,04,05,99),BUFNO=005,MODE=DUAL)
 WADSDEF=(WADS=(0,1,8,9))
 ARC={{ARC}}
+*
+*-----------------------------------------------------------------*
+* IMS Catalog Section                                             *
+*-----------------------------------------------------------------*
+<SECTION=CATALOG>
+CATALOG=Y                                     /*Enable IMS catalog*/
+ALIAS=DFSC                      /*Use standard catalog prefix DFSC*/
+*
+*-----------------------------------------------------------------*
+* Database Section                                                *
+*-----------------------------------------------------------------*
+<SECTION=DATABASE>
+UNREGCATLG=(DFSCX000,DFSCD000) /*Unregistered IMS catalog DB names*/
 *
 *--------------------------------------------------------------------*
 * END OF MEMBER DFSDF000                                             *

@@ -97,17 +97,40 @@
       when: sci == "config"
 
 
-    # Start SCI
-    - name: Start SCI
-      zos_operator:
-        cmd: 's {{ DFS_IMS_SSID }}sci'
-        verbose: true
+    - block:
+
+      # Start SCI
+      - name: Start SCI
+        zos_operator:
+          cmd: 's {{ DFS_IMS_SSID }}SCI'
+          verbose: true
+
+      - wait_for:
+          timeout: 10
+
+      - zos_job_output:
+          job_name: '{{ DFS_IMS_SSID }}SCI'
+        register: output
+
+      - set_fact:
+          sci_output: '{{ output.jobs[0].ret_code.msg }}'
+
+      - block:
+
+        # Start SCI
+        - name: Start SCI
+          zos_operator:
+            cmd: 's {{ DFS_IMS_SSID }}SCI'
+            verbose: true
+
+        when: sci_output != 'AC'
+
       when: sci == "start"
 
     # Stop SCI
     - name: Stop SCI
       zos_operator:
-        cmd: 'c {{ DFS_IMS_SSID }}sci'
+        cmd: 'c {{ DFS_IMS_SSID }}SCI'
         verbose: true
       when: sci == "stop"
 

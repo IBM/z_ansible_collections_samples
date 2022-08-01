@@ -7,7 +7,7 @@
 //            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
 //SYSIN    DD DUMMY
 //        PEND
-{# //INSTUPDT PROC MBR=TEMPNAME  
+{# //INSTUPDT PROC MBR=TEMPNAME
 //*
 //P        EXEC PGM=IEBGENER
 //SYSPRINT DD SYSOUT=*
@@ -450,9 +450,11 @@ ODACCESS=(ODBMAUTOCONN=Y,IMSPLEX=(MEMBER=HWS1,TMEMBER={{ DFS_IMSPlex }}),
 **  ON THE ODBMCFG=001 parameter.                                  *
 **                                                                **
 ********************************************************************
-ODBMNAME={{ DFS_IMS_SSID }}OD{{ DFS_PORTIDSuf }}
-IMSPLEX(NAME={{ DFS_IMSPlex }})
-ODBMCFG=001
+ARMRST=N,                /* SHOULD ARM RESTART OM ON FAILURE */      
+IMSPLEX(NAME={{ DFS_IMSPlex }}),    /* IMSPLEX NAME (CSLPLEX1) */               
+ODBMCFG=001,          /*suffix for CSLDCxxx  (CSLDC001)         */   
+ODBMNAME=ODBM1,                     /* ODBM NAME = ODBM1) */     
+RRS=N           /* RRS=Y will use ODBA access                */    
 /*
 //***************************************************************
 //***************************************************************
@@ -508,15 +510,23 @@ ODBMCFG=001
 **  MAXTHRDS=                                                     **
 **  FPBUF=                                                        **
 **  FPBOF=                                                        **
-**  CNBA=                                                         **
+**  CNBA=          AL: From ims_initialize                        **                       
+**  Remove the following:   9/26                                  **
+**    FPBUF=10                                                    **
+**    FPBOF=10                                                    ** 
+**    CNBA=0                                                      **   
 ********************************************************************
-//* <SECTION=LOCAL_DATASTORE_CONFIGURATION>
-//* ODBM(NAME= zCloud_IMSODBM or 'IMSODBM_PLACEHOLDER'
-//* DATASTORE(NAME= DFS_IMS_SSID 
-//* ALIAS(NAME=DFS_IMS_SSID )
-//* )
-//* )
-//*
+<SECTION=GLOBAL_DATASTORE_CONFIGURATION>                                     
+IDRETRY=5                 /* Retry connection 5 times before quit */
+MAXTHRDS=2               /* 10 threads max to any IMS Datastore  */
+TIMER=30                  /* 30 seconds between ID retry attempts */
+<SECTION=LOCAL_DATASTORE_CONFIGURATION>        
+ODBM(NAME=ODBM1,                 /* Define parms for ODBM1         */
+     DATASTORE(NAME={{ DFS_IMS_SSID }},        /* Setup Datastore */
+       ALIAS(NAME={{ DFS_IMS_SSID }} /* This alias will be used by */
+             )          /* the DATASTORE                       */
+     )
+    )
 /*
 //***************************************************************
 //***************************************************************
@@ -738,21 +748,21 @@ POOLID=(VSM1,VSRBF=(2048,500,D))
 //***************************************************************
 //PHONEIN EXEC PROC=INSTUPDT,MBR=PHONEIN
 //P.SYSUT1 DD *
-S11 1 1 1 1       00001                             
-L        ISRT  A1111111                             
+S11 1 1 1 1       00001
+L        ISRT  A1111111
 L        DATA  LAST1     FIRST1    8-111-1111D01/R01
-L        ISRT  A1111111                             
+L        ISRT  A1111111
 L        DATA  LAST2     FIRST2    8-111-2222D02/R02
-L        ISRT  A1111111                             
+L        ISRT  A1111111
 L        DATA  LAST3     FIRST3    8-111-3333D03/R03
-L        ISRT  A1111111                             
+L        ISRT  A1111111
 L        DATA  LAST4     FIRST4    8-111-4444D04/R04
-L        ISRT  A1111111                             
+L        ISRT  A1111111
 L        DATA  LAST5     FIRST5    8-111-5555D05/R05
-L        ISRT  A1111111                             
+L        ISRT  A1111111
 L        DATA  LAST6     FIRST6    8-111-6666D06/R06
 /*
 //DFSIVF1 EXEC PROC=INSTUPDT,MBR=DFSIVF1
 //P.SYSUT1 DD DISP=SHR,
-//         DSN={{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC(DFSIVF1)
+//         DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSISRC(DFSIVF1)
 /*  #}

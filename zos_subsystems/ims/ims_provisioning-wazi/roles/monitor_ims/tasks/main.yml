@@ -31,7 +31,7 @@
         vars:
           om: start
 
-      when: '{{ om_status.failed }}'
+      when: om_status.failed
 
     # Query SCI status
     - name: Query SCI status
@@ -57,7 +57,7 @@
         vars:
           sci: start
 
-      when: '{{ sci_status.failed }}'
+      when: sci_status.failed
 
     # Query RM status
     - name: Query RM status
@@ -105,5 +105,4 @@
           wait: true
           wait_time_s: 30
 
-      when: '{{ imscon_status.failed }}'
-
+      when: imscon_status.failed

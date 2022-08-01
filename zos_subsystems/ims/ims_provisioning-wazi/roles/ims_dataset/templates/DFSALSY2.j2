@@ -33,7 +33,10 @@
       NEW CATALOG                 -
       SPACE(5,2) CYL              -
       DIR(200)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -48,7 +51,10 @@
       NEW CATALOG                 -
       SPACE(10,3) CYL             -
       DIR(120)                    -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -63,7 +69,10 @@
       NEW CATALOG                 -
       SPACE(8,3) CYL              -
       DIR(92)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -78,7 +87,10 @@
       NEW CATALOG                 -
       SPACE(5,3) CYL              -
       DIR(92)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -92,7 +104,10 @@
       NEW CATALOG                 -
       SPACE(2,2) CYL              -
       DIR(92)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -106,7 +121,10 @@
       NEW CATALOG                 -
       SPACE(2) CYL                -
       DIR(46)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -121,7 +139,10 @@
       NEW CATALOG                 -
       SPACE(2,2) CYL              -
       DIR(92)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -136,7 +157,10 @@
       NEW CATALOG                 -
       SPACE(22,15) TRACKS         -
       DIR(50)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})          -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})
@@ -146,12 +170,15 @@
 //STEP1B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSRESL),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.SDFSRESL),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(200,50,850))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSRESL,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSRESL,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
 //SYSIN    DD  *
@@ -162,13 +189,16 @@
 //STEP2B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
 //             DSNTYPE=LIBRARY,
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSMAC),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(2776,4000))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSMAC,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
 //SYSIN    DD  *
@@ -179,12 +209,15 @@
 //STEP3B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OPTIONS,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.OPTIONS),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.OPTIONS),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(1,1,2))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.OPTIONS,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.OPTIONS,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSIN    DD  *
@@ -195,12 +228,15 @@
 {#//STEP4B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.MODBLKS),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.MODBLKS),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(22,15,50))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.MODBLKS,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.MODBLKS,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSIN    DD  *
@@ -211,13 +247,16 @@
 //STEP5B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
 //             DSNTYPE=LIBRARY,
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSMAC),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.ADFSMAC),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(1848,270))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSMAC,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.ADFSMAC,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSIN    DD  *
@@ -228,13 +267,16 @@
 //STEP6B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSLOAD,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
 //             DSNTYPE=LIBRARY,
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSLOAD),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.ADFSLOAD),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(1840,250))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSLOAD,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.ADFSLOAD,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSIN    DD  *
@@ -245,13 +287,16 @@
 //STEP7B    EXEC PGM=IEBCOPY
 //SYSPRINT DD  SYSOUT=A
 //OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC,DISP=(NEW,CATLG),
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
 //             VOL=SER={{ DFS_DS_VOLUME1 }},
 {% endif %}
 //             DSNTYPE=LIBRARY,
-//             DCB=({{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSSRC),
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.ADFSSRC),
 //             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(3535,500))
-//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSSRC,DISP=SHR
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.ADFSSRC,DISP=SHR
 //SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
 //SYSIN    DD  *

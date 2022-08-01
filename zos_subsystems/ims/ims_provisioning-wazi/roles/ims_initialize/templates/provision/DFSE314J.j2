@@ -36,7 +36,7 @@
 //INITRCON EXEC PROC=DBRC
 //D.SYSIN  DD *
   INIT.RECON SSID({{ DFS_IMS_SSID }}) CATDS               -
-             FORCER CHECK44 NONEW  -
+             NOFORCER CHECK44 NONEW  -
              DASDUNIT({{ DFS_IMS_UNIT }}) TAPEUNIT()
 //*
 //******************************************************************

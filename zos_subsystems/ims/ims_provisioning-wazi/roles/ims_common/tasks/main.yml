@@ -22,7 +22,6 @@
       when: ctl == "stop"
       ignore_errors: yes
 
-
     - name: Wait for IMS ready
       include_role:
         name: submit-rexx

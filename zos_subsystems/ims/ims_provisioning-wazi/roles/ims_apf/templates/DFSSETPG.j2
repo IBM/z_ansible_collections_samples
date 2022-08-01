@@ -14,7 +14,7 @@
 //**************************************************************@ECPYRT**
 //* FUNCTION: Authorize IMS Data sets
 //***********************************************************************
-{% set volume = 'VOL=' + DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else 'SMS' %}
+{% set volume = 'VOL=' + DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else DFS_SMS_CLASS %}
 //STEP01   EXEC PGM=IEFBR14
 //SYSPRINT DD SYSOUT=*
 // SETPROG APF,FORMAT=DYNAMIC

@@ -8,15 +8,6 @@
   block:
 
     - set_fact:
-        remote_app_src: 'https://na.artifactory.swg-devops.com/artifactory/sys-ims-cloudnative-team-zoscb-docker-local/demofiles.tar'
-        remote_app_api_key: 'FOOBAR'
-        app_dbd_src: "DBD"
-        app_psb_src: "PSB"
-        app_cobol_src: "COBOL"
-        app_data_src: "LoadData"
-        app_pli_src: "PLI"
-
-    - set_fact:
         ODBM_JOB_CARD: |-
           //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
           //  NOTIFY={{ TARGET_USERNAME | upper }},
@@ -39,8 +30,6 @@
         name: ims_initialize
       vars:
         send_procs: true
-        # AL: 5/4/22 temp comment out to reduce operator size
-        # DFS_INIT_JAVA_CONF: true
         DFS_INIT_JAVA_CONF: false
 
     - include_role:
@@ -121,7 +110,7 @@
         copy: true
         copy_to_jobs: true
         copy_stage_libs: true
-        add: true                # AL
+        add: true
 
     - include_role:
         name: ims_exit

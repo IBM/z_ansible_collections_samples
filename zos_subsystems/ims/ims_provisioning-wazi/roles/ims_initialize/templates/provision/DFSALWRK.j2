@@ -38,7 +38,10 @@
       NEW CATALOG                 -
       SPACE(5,2) CYL              -
       DIR(46)                     -
-{% if not DFS_SMS_ENVIRONMENT %}
+{% if not DFS_DS_VOLUME1 == None %}
       VOL({{ DFS_DS_VOLUME1 }})                 -
+{% endif %}
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
 {% endif %}
       UNIT({{ DFS_IMS_UNIT }})

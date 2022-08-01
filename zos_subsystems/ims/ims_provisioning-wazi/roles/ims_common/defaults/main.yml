@@ -1,14 +1,2 @@
 ---
 # defaults file for provision-ims-dbdc
-
-# the path where JCL and other scripts will be stored
-uss_file_path: /tmp
-# the path where additional utilities are located
-uss_utilities_path: /tmp
-
-sci: start
-# ctl: start
-om: start
-rm: start
-icon: start
-cold_start: true

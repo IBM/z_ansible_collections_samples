@@ -1,55 +1,112 @@
 ---
-- name: Provision IMS DB/DC
+- name: IMS TMDB Operations
   hosts: all
   gather_facts: false
   # * Include different variable files depending on environment/inventory used
   vars_files:
-    - vars_wazi/ims-dbdc.yml
   #  - "{{ vars_folder_name }}/ims-dbdc.yml"
-  environment: "{{ system_environment }}"
+    - vars_wazi/ims-dbdc.yml
+  #   - "vars_broker/ims-dbdc.yml"
+  environment: '{{ system_environment }}'
+  # vars:
+  #   TARGET_USERNAME: '{{ ansible_user }}'
+  #   #PYZ: /etc/zstack/ims-prov/python/latest
+  #   PYZ: /usr/lpp/IBM/cyp/v3r9/pyz
+  #   #ZOAU: /etc/zstack/ims-prov/zoau/latest
+  #   ZOAU: /usr/lpp/IBM/zoautil
+  #   ZOAU_HOME: "{{ ZOAU }}"
+  #   PYTHONPATH: "{{ ZOAU }}/lib"
+  #   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  #   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin:."
+  #   #PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin:/usr/lpp/cobol/cob630/igyv6r3/bin"
+
+  #   system_environment:
+  #     _BPXK_AUTOCVT: "ON"
+  #     ZOAU_HOME: "{{ ZOAU }}"
+  #     PYTHONPATH: "{{ ZOAU }}/lib"
+  #     LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  #     PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin:/usr/lpp/cobol/cob630/igyv6r3/bin"
+  #     _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  #     _TAG_REDIR_ERR: "txt"
+  #     _TAG_REDIR_IN: "txt"
+  #     _TAG_REDIR_OUT: "txt"
+  #     LANG: "C"
+  #     STEPLIB:
+
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
 
   tasks:
-    # # These are obtained through the open shift UI. for now they are hardcoded in the host_vars env variabes
-    # - set_fact:
-    #     DFS_IMS_SSID: '{{ opr_ssid }}'
-    #     DFS_IMSPlex: '{{ opr_plex }}'
-    #     DFS_DS_VOLUME1: '{{ opr_volume }}'
-    #     DYNAMICALLY_RESERVE_PORTS: '{{ opr_reserve_ports }}'
-    #     JOB_CLASS: '{{ opr_job_class }}'
 
-    # - set_fact:
-    #     DFS_PORTID: '{{ opr_port_id }}'
-    #     DFS_SSLPORTID: '{{ opr_sslport_id: }}'
-    #     DFS_REGION_TCPIPPORT: '{{ opr_region_port_id }}'
-    #     DFS_REGION_SSLTCPIPPORT: '{{ opr_region_sslport_id }} '
-    #   when: not DYNAMICALLY_RESERVE_PORTS
+    # JOB_CARD will be the default job card inserted for dynamically generated JCL
+    # ensure MSGCLASS and CLASS are correct for desired environment
+    - set_fact:
+        JOB_CARD: |-
+          //ANSIBLE JOB 'testing',
+          //  NOTIFY={{ TARGET_USERNAME | upper }},
+          //  USER={{ TARGET_USERNAME | upper }},
+          //  MSGCLASS={{ MSG_CLASS }},
+          //  MSGLEVEL=(1,1),
+          //  CLASS={{ JOB_CLASS }}
+        IST_VTAM_IMSAPPLID: '{{ DFS_IMS_SSID }}'
+        ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+        TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
+        ROUTE: '{{ DFS_IMS_SSID }}'
+        DFS_DS_VOLUME2: '{{ DFS_DS_VOLUME1 }}'
+
+    - set_fact:
+        system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'
+      vars:
+        new_item: { STEPLIB: '{{ STEPLIB }}' }
+      with_dict: '{{ system_environment }}'
 
     - block:
-        - debug:
-            msg: This is DFS_DS_VOLUME1 "{{ DFS_DS_VOLUME1 }}"
 
-        - name: Check CTL Up
-          zos_job_query:
-            job_name: "{{ DFS_IMS_SSID }}CTL"
-          register: ctl_output
-          ignore_errors: true
-          
+      - tempfile:
+          state: directory
+        register: tmdb_tmp_dir
+
+      - set_fact:
+          DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"
+
+      - debug:
+          msg: IMS source location is '{{ DFS_AUTH_LIB_SYSHLQ }}'
+
+      - name: Check CTL Up
+        zos_job_query:
+          job_name: "{{ DFS_IMS_SSID }}CTL"
+        register: ctl_output
+        ignore_errors: true
+
+      - debug:
+          msg: '{{ ctl_output }}'
+
+      - block:
+
         - include_role:
             name: provision_ims
-          # when: ctl_output.failed and k8s_cr_event == "create"
-          when: (ctl_output.failed or ctl_output.jobs[0].job_name == "") and k8s_cr_event == "create"
 
-        # - include_role:
-        #     name: monitor_ims
-        #   when: not ctl_output.failed and running_in_k8s == "reconcile"
+        # AL: temp comment out & replace 
+        # when: ctl_output.jobs[0].job_name == "" and k8s_cr_event == "create"
+        when: k8s_cr_event == "create"
 
-        - include_role:
-            name: deprovision_ims
-          when: k8s_cr_event == "delete"
+      - include_role:
+          name: monitor_ims
+        # AL: temp comment out & replace 
+        # when: ctl_output.jobs[0].job_name == (DFS_IMS_SSID + "CTL") and k8s_cr_event == "create"
+        when: k8s_cr_event == "create"
+
+      - include_role:
+          name: deprovision_ims
+        when: k8s_cr_event == "delete"
 
 
-  # handlers:
-  #   - include: handlers/handlers.yml
+      always:
+        - name: Delete the temporary provision files directory
+          file:
+            path: "{{ tmdb_tmp_dir.path }}"
+            state: absent
+      vars:
+        uss_file_path: '{{ tmdb_tmp_dir.path }}'
+

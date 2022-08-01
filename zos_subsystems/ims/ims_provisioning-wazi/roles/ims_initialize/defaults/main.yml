@@ -2,15 +2,8 @@
 # defaults file for provision-ims-dbdc
 send_procs: false
 
-# the path where JCL and other scripts will be stored
-uss_file_path: /tmp
-# the path where additional utilities are located
-uss_utilities_path: /tmp
-
-DFS_INIT_JAVA_CONF: true
 
 DFS_PORTIDSuf: 99
 
 
 ARC: '03'
-

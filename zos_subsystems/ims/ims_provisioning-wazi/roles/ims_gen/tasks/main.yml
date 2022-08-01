@@ -9,42 +9,40 @@
 
     - name: Prep DBDGEN step 1
       ims_dbd_gen:
-        src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
+        src: '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSISRC'
         location: DATA_SET
         member_list:
           [
-            'DFSIVD1' : 'IVPDB1',
-            'DFSIVD1I' : 'IVPDB1I',
-            'DFSDRD1' : 'IVPDRD1',
-            'DFSIVD2' : 'IVPDB2',
-            'DFSIVD3' : 'IVPDB3',
-            'DFSIVD4' : 'IVPDB4',
-            'DFSIVD5' : 'IVPDB5',
+            'DFSIVD1': 'IVPDB1',
+            'DFSIVD1I': 'IVPDB1I',
+            'DFSDRD1': 'IVPDRD1',
+            'DFSIVD2': 'IVPDB2',
+            'DFSIVD3': 'IVPDB3',
+            'DFSIVD4': 'IVPDB4',
+            'DFSIVD5': 'IVPDB5',
             DI21PART,
             DBFSAMD1,
             DBFSAMD2,
             DBFSAMD3,
             DBFSAMD4,
-            'DFSAUTDB' : 'AUTODB',
-            'DFSLAUTO' : 'AUTOLDB',
-            'DFSEMPDB' : 'EMPDB2',
-            'DFSEMLDB' : 'EMPLDB2',
-            'DFSIND11' : 'SINDEX11',
-            'DFSIND22' : 'SINDEX22',
-            'DFSIPODB' : 'IPODB'
+            'DFSAUTDB': 'AUTODB',
+            'DFSLAUTO': 'AUTOLDB',
+            'DFSEMPDB': 'EMPDB2',
+            'DFSEMLDB': 'EMPLDB2',
+            'DFSIND11': 'SINDEX11',
+            'DFSIND22': 'SINDEX22',
+            'DFSIPODB': 'IPODB'
           ]
         "replace": true
         dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
         sys_lib:
-          - '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSMAC'
+          - '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC'
           - SYS1.MACLIB
       when: dbd_gen
 
-
-
     - name: Prep PSB step 2
       ims_psb_gen:
-        src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
+        src: '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSISRC'
         location: DATA_SET
         member_list:
           [
@@ -103,7 +101,7 @@
         "replace": true
         dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
         sys_lib:
-          - '{{DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSMAC'
+          - '{{DFS_AUTH_LIB_SYSHLQ}}.SDFSMAC'
           - SYS1.MACLIB
       when: psb_gen
 

@@ -1,18 +1,19 @@
-PYZ: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
-ZOAU: /zoau/v1.0.3-ptf2
+PYZ: /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
+ZOAU: /usr/lpp/IBM/zoautil
+# Use PY38 to work around ZOAU pythonlib3.8.so requirement
+PY38: '/u/{{ ansible_user }}/pythonlib'
 system_environment:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"
-  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  # PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PY38 }}:{{ PYZ }}/lib:/lib:/usr/lib:."
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
   _TAG_REDIR_ERR: "txt"
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
-  STEPLIB: IMSBLD.I15RTSMM.COMRESL1
+  STEPLIB:
 
 # vars_folder_name is the name of the folder at the root of the project
 # which contains variable files to be imported by various playbooks
@@ -20,7 +21,7 @@ system_environment:
 # for example:
 #  vars_files:
 #    - "{{ vars_folder_name }}/ims-dbdc.yml"
-vars_folder_name: vars_zvm
+vars_folder_name: vars_wazi
 
 # ---------------------------------------------------------------------------- #
 #                               TCPIP information                              #
@@ -53,7 +54,7 @@ TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP(imsprof)'
 
 
 # The z/OS username to use for job submission
-TARGET_USERNAME: omvsadm
+TARGET_USERNAME: '{{ ansible_user }}'
 
 # JOB_CARD will be the default job card inserted for dynamically generated JCL
 # ensure MSGCLASS and CLASS are correct for desired environment
@@ -61,9 +62,9 @@ JOB_CARD: |-
   //ANSIBLE JOB 'testing',
   //  NOTIFY={{ TARGET_USERNAME | upper }},
   //  USER={{ TARGET_USERNAME | upper }},
-  //  MSGCLASS=E,
+  //  MSGCLASS={{ MSG_CLASS }},
   //  MSGLEVEL=(1,1),
-  //  CLASS=A
+  //  CLASS={{ JOB_CLASS }}
 
 
 # Where to install MVSUTILS/MVSCMD and other needed tools/scripts
@@ -75,94 +76,95 @@ uss_utilities_path: /u/{{ TARGET_USERNAME }}
 # end of a playbook
 uss_file_path: /u/{{ TARGET_USERNAME }}
 
-# The API key to use for artifactory repositories
-api_key: ''
 
-# The user ID to use for IMS related provisioning steps
-DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
+# AL: 7/27/22 the following vars may not be required?
 
-# The SSID for the IMS to be provisioned
-DFS_IMS_SSID: IMS1
+# # The API key to use for artifactory repositories
+# api_key: ''
 
-# ---------------------------------------------------------------------------- #
-# The first HLQ to be used to store IMS related datasets
-# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
-# specific datasets
-DFS_AUTH_LIB_HLQ1: IMSTESTL
-# The second HLQ to be used to store IMS related datasets
-# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
-# specific datasets
-DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}'
-# ---------------------------------------------------------------------------- #
-# The first HLQ for system datasets that will be used
-# by IMS during provisioning. These should exist prior to
-# running playbooks
-DFS_AUTH_LIB_SYSHLQ1: IMSBLD
-# The second HLQ for system datasets that will be used
-# by IMS during provisioning. These should exist prior to
-# running playbooks
-DFS_AUTH_LIB_SYSHLQ2: I15RTSMM
-# ---------------------------------------------------------------------------- #
-# The fully qualified dataset name for the JOBS PDS
-# this will hold jobs for starting and stoppng IMS resources
-DFS_JOBLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
+# # The user ID to use for IMS related provisioning steps
+# DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
 
-# The fully qualified dataset name for the IMS RESLIB
-DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+# # The SSID for the IMS to be provisioned
+# DFS_IMS_SSID: IMS1
 
-# The fully qualified dataset name for the IMS PROCLIB
-DFS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+# # ---------------------------------------------------------------------------- #
+# # The first HLQ to be used to store IMS related datasets
+# # these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# # specific datasets
+# DFS_AUTH_LIB_HLQ1: IMSTESTL
+# # The second HLQ to be used to store IMS related datasets
+# # these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# # specific datasets
+# DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}'
+# # ---------------------------------------------------------------------------- #
+# # The first HLQ for system datasets that will be used
+# # by IMS during provisioning. These should exist prior to
+# # running playbooks
+# DFS_AUTH_LIB_SYSHLQ1: IMSBLD
+# # The second HLQ for system datasets that will be used
+# # by IMS during provisioning. These should exist prior to
+# # running playbooks
+# DFS_AUTH_LIB_SYSHLQ2: I15RTSMM
+# # ---------------------------------------------------------------------------- #
+# # The fully qualified dataset name for the JOBS PDS
+# # this will hold jobs for starting and stoppng IMS resources
+# DFS_JOBLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
+
+# # The fully qualified dataset name for the IMS RESLIB
+# DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+
+# # The fully qualified dataset name for the IMS PROCLIB
+# DFS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
 
 
-# ---------------------------------------------------------------------------- #
-#  AL:  Common Services related settings                                       #
-# ---------------------------------------------------------------------------- #
-OM_CONFIG: false
+# # ---------------------------------------------------------------------------- #
+# #  AL:  Common Services related settings                                       #
+# # ---------------------------------------------------------------------------- #
+# OM_CONFIG: false
 
-# ---------------------------------------------------------------------------- #
-#                            storage related settings                           #
-# ---------------------------------------------------------------------------- #
+# # ---------------------------------------------------------------------------- #
+# #                            storage related settings                           #
+# # ---------------------------------------------------------------------------- #
 
-# Are the volumes we want to use managed by the storage management subsystem (SMS)?
-DFS_SMS_ENVIRONMENT: false
+# # Are the volumes we want to use managed by the storage management subsystem (SMS)?
+# DFS_SMS_ENVIRONMENT: true
 
-# ------------------- Storage Management Subsystem settings ------------------ #
-# -------------------------- used when SMS is in use ------------------------- #
+# # ------------------- Storage Management Subsystem settings ------------------ #
+# # -------------------------- used when SMS is in use ------------------------- #
 
-# If the volumes are managed by SMS, what SMS storage class should be used?
-DFS_SMS_CLASS: CLASS2
-# If the volumes are managed by SMS, what SMS management class should be used?
-DFS_SMS_MCLASS: NONE
+# # If the volumes are managed by SMS, what SMS storage class should be used?
+# DFS_SMS_CLASS: SCNOSMS
+# # If the volumes are managed by SMS, what SMS management class should be used?
+# DFS_SMS_MCLASS: NONE
 
-# -------------------------- volume related settings ------------------------- #
-# ------------------------ for when SMS is not in use ------------------------ #
+# # -------------------------- volume related settings ------------------------- #
+# # ------------------------ for when SMS is not in use ------------------------ #
 
-# first volume to use to store IMS datasets
-DFS_DS_VOLUME1: USRV01
-# DFS_DS_VOLUME1: JERRYL
-# second volume to use to store IMS datasets
-DFS_DS_VOLUME2: USRV01
-# DFS_DS_VOLUME2: JERRYL
+# # first volume to use to store IMS datasets
+# DFS_DS_VOLUME1: USER00
+# # second volume to use to store IMS datasets
+# DFS_DS_VOLUME2: 
 
-# ---------------------------------------------------------------------------- #
+# # ---------------------------------------------------------------------------- #
 
-# IMSPlex name
-DFS_IMSPlex: PLEX1
+# # IMSPlex name
+# DFS_IMSPlex: PLEX1
 
-# The language environment runtime dataset to use
-zCloud_LERuntime: CEE.SCEERUN
+# # The language environment runtime dataset to use
+# zCloud_LERuntime: CEE.SCEERUN
 
-zCloud_MACLIB: SYS1.MACLIB
+# zCloud_MACLIB: SYS1.MACLIB
 
-# Dataset containing zos CSS library
-zCloud_CSSLIB: SYS1.CSSLIB
+# # Dataset containing zos CSS library
+# zCloud_CSSLIB: SYS1.CSSLIB
 
-# ---------------------------------------------------------------------------- #
-#                             Java related settings                            #
-# ---------------------------------------------------------------------------- #
+# # ---------------------------------------------------------------------------- #
+# #                             Java related settings                            #
+# # ---------------------------------------------------------------------------- #
 
-# The location to create and reference the profile that has environment settings and JVM options.
-JAVA_CONF_PATH: /u/dfsjvmpr.props
+# # The location to create and reference the profile that has environment settings and JVM options.
+# JAVA_CONF_PATH: /u/dfsjvmpr.props
 
-# Working directory for the IMS Java region (JMP)
-DFS_workingdir: /u/{{ TARGET_USERNAME }}
+# # Working directory for the IMS Java region (JMP)
+# DFS_workingdir: /u/{{ TARGET_USERNAME }}

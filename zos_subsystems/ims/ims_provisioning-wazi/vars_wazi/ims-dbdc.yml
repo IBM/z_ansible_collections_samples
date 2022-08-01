@@ -33,9 +33,13 @@ STEPLIB: DFSF10.SDFSRESL
 api_key: ''
 
 k8s_cr_event: create
+wazi: True     # AL: temp var for apf, will remove later
 
 # The SSID for the IMS to be provisioned
 DFS_IMS_SSID: IMWZ
+
+# The user ID to use for IMS related provisioning steps
+DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
 
 # ---------------------------------------------------------------------------- #
 # The first HLQ to be used to store IMS related datasets
@@ -55,14 +59,18 @@ DFS_AUTH_LIB_SYSHLQ1: DFSF10
 # by IMS during provisioning. These should exist prior to
 # running playbooks
 DFS_AUTH_LIB_SYSHLQ2:
-# DFS_AUTH_LIB_SYSHLQ2: I15RTSMM
 
 DFS_AUTH_LIB_SYSHLQ:
 # ---------------------------------------------------------------------------- #
 
+# ---------------------------------------------------------------------------- #
+#                            job related settings                           #
+# ---------------------------------------------------------------------------- #
+JOB_CLASS: A
+MSG_CLASS: H
 
 # ---------------------------------------------------------------------------- #
-#  AL:  Common Services related settings                                       #
+#  Common Services related settings                                            #
 # ---------------------------------------------------------------------------- #
 OM_CONFIG: false
 
@@ -71,13 +79,15 @@ OM_CONFIG: false
 # ---------------------------------------------------------------------------- #
 
 # Are the volumes we want to use managed by the storage management subsystem (SMS)?
-DFS_SMS_ENVIRONMENT: true
+DFS_SMS_ENVIRONMENT: true 
+#DFS_SMS_ENVIRONMENT: false
 
 # ------------------- Storage Management Subsystem settings ------------------ #
 # -------------------------- used when SMS is in use ------------------------- #
 
 # If the volumes are managed by SMS, what SMS storage class should be used?
-DFS_SMS_CLASS: SCNOSMS
+# DFS_SMS_CLASS: SCNOSMS       # SCNOSMS does not work as expected
+DFS_SMS_CLASS: SCIMS
 # If the volumes are managed by SMS, what SMS management class should be used?
 DFS_SMS_MCLASS: NONE
 
@@ -85,11 +95,10 @@ DFS_SMS_MCLASS: NONE
 # ------------------------ for when SMS is not in use ------------------------ #
 
 # first volume to use to store IMS datasets
-# DFS_DS_VOLUME1: C4IMF1
-DFS_DS_VOLUME1: D4IMF1
+DFS_DS_VOLUME1: USER00
 # second volume to use to store IMS datasets
 # DFS_DS_VOLUME2: C4IMF1
-DFS_DS_VOLUME2: D4IMF1
+DFS_DS_VOLUME2:
 
 # ---------------------------------------------------------------------------- #
 
@@ -110,6 +119,10 @@ zCloud_CSSLIB: SYS1.CSSLIB
 
 # The location to create and reference the profile that has environment settings and JVM options.
 JAVA_CONF_PATH: /u/dfsjvmpr.props
+REGION_NUM: 1
+
+# Working directory for the IMS Java region (JMP)
+DFS_workingdir: /u/{{ TARGET_USERNAME }}
 
 # ---------------------------------------------------------------------------- #
 #                             IMS Discovery Settings                           #

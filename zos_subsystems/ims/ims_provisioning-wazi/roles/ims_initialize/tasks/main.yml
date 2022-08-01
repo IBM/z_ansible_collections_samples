@@ -19,7 +19,8 @@
                 state: present
                 replace: true
                 type: PDSE
-                volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+                volumes: "{{ DFS_DS_VOLUME1 if not DFS_DS_VOLUME1 == None else omit }}"
+                sms_storage_class: "{{ DFS_SMS_CLASS if DFS_SMS_ENVIRONMENT else omit}}"
 
             - name: Create TCPIP profile temp dataset member
               zos_data_set:
@@ -27,7 +28,8 @@
                 state: present
                 replace: true
                 type: MEMBER
-                volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+                volumes: "{{ DFS_DS_VOLUME1 if not DFS_DS_VOLUME1 == None else omit }}"
+                sms_storage_class: "{{ DFS_SMS_CLASS if DFS_SMS_ENVIRONMENT else omit }}"
 
             - name: Reserve ICON HTTP Port
               zport:

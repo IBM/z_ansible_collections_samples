@@ -59,6 +59,12 @@
           wait_for_job: false
           cold_start: false
 
+    # Stop ODBM
+    - include_role:
+        name: ims_odbm
+      vars:
+        odbm: stop
+
     # Stop OM by calling its role
     - block:
       - include_role:
