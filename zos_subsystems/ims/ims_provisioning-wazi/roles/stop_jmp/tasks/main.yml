@@ -1,0 +1,15 @@
+---
+# JMP Services
+- name: JMP Services
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+      - name: Stop JMP Regions
+        ims_command:
+          command: 'STOP REGION JOBNAME {{ DFS_IMS_SSID }}JMP{{ item }}'
+          plex: '{{ DFS_IMSPlex }}'
+        with_sequence: start={{ REGION_NUM }} end={{ REGION_NUM }}
+        ignore_errors: yes
