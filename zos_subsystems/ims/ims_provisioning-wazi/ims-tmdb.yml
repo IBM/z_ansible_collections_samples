@@ -8,30 +8,6 @@
     - vars_wazi/ims-dbdc.yml
   #   - "vars_broker/ims-dbdc.yml"
   environment: '{{ system_environment }}'
-  # vars:
-  #   TARGET_USERNAME: '{{ ansible_user }}'
-  #   #PYZ: /etc/zstack/ims-prov/python/latest
-  #   PYZ: /usr/lpp/IBM/cyp/v3r9/pyz
-  #   #ZOAU: /etc/zstack/ims-prov/zoau/latest
-  #   ZOAU: /usr/lpp/IBM/zoautil
-  #   ZOAU_HOME: "{{ ZOAU }}"
-  #   PYTHONPATH: "{{ ZOAU }}/lib"
-  #   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  #   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin:."
-  #   #PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin:/usr/lpp/cobol/cob630/igyv6r3/bin"
-
-  #   system_environment:
-  #     _BPXK_AUTOCVT: "ON"
-  #     ZOAU_HOME: "{{ ZOAU }}"
-  #     PYTHONPATH: "{{ ZOAU }}/lib"
-  #     LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
-  #     PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin:/usr/lpp/cobol/cob630/igyv6r3/bin"
-  #     _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
-  #     _TAG_REDIR_ERR: "txt"
-  #     _TAG_REDIR_IN: "txt"
-  #     _TAG_REDIR_OUT: "txt"
-  #     LANG: "C"
-  #     STEPLIB:
 
   collections:
     - ibm.ibm_zos_core
@@ -87,15 +63,10 @@
         - include_role:
             name: provision_ims
 
-        # AL: temp comment out & replace 
-        # when: ctl_output.jobs[0].job_name == "" and k8s_cr_event == "create"
-        when: k8s_cr_event == "create"
+        - include_role:
+            name: monitor_ims
 
-      - include_role:
-          name: monitor_ims
-        # AL: temp comment out & replace 
-        # when: ctl_output.jobs[0].job_name == (DFS_IMS_SSID + "CTL") and k8s_cr_event == "create"
-        when: k8s_cr_event == "create"
+        when: ctl_output.jobs[0].job_name == "" and k8s_cr_event == "create"
 
       - include_role:
           name: deprovision_ims

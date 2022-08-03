@@ -97,19 +97,10 @@
             src: '{{ role_path }}/files/java/imsjava.tar'
             dest: '/u/{{ TARGET_USERNAME }}/imsjava.tar'
 
-            # dest: '{{ uss_file_path }}/imsjava.tar'
-
         - name: Unarchive templates on target
           shell: 'tar -Co . -xf imsjava.tar ; rm imsjava.tar'
           args:
             chdir: /u/{{ TARGET_USERNAME }}
-
-        # - name: Create unique tempfile used for dfsjvmpr.props
-        #   tempfile:
-        #     state: file
-        #   register: dfsjvmpr_tmp
-        # - set_fact:
-        #     JAVA_CONF_PATH: '{{ dfsjvmpr_tmp.path }}'
 
         - name: Create dfsjvmpr.props for potential JMP regions
           shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props #{{ JAVA_CONF_PATH }}

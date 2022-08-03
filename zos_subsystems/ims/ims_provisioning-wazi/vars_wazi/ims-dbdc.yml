@@ -33,7 +33,6 @@ STEPLIB: DFSF10.SDFSRESL
 api_key: ''
 
 k8s_cr_event: create
-wazi: True     # AL: temp var for apf, will remove later
 
 # The SSID for the IMS to be provisioned
 DFS_IMS_SSID: IMWZ
@@ -79,8 +78,8 @@ OM_CONFIG: false
 # ---------------------------------------------------------------------------- #
 
 # Are the volumes we want to use managed by the storage management subsystem (SMS)?
-DFS_SMS_ENVIRONMENT: true 
-#DFS_SMS_ENVIRONMENT: false
+#DFS_SMS_ENVIRONMENT: true 
+DFS_SMS_ENVIRONMENT: false
 
 # ------------------- Storage Management Subsystem settings ------------------ #
 # -------------------------- used when SMS is in use ------------------------- #
@@ -95,7 +94,8 @@ DFS_SMS_MCLASS: NONE
 # ------------------------ for when SMS is not in use ------------------------ #
 
 # first volume to use to store IMS datasets
-DFS_DS_VOLUME1: USER00
+DFS_DS_VOLUME1: A5USR1
+# DFS_DS_VOLUME1: USER00
 # second volume to use to store IMS datasets
 # DFS_DS_VOLUME2: C4IMF1
 DFS_DS_VOLUME2:
@@ -131,7 +131,7 @@ HOSTNAME:
 EC_SYSTEM:
 
 
-DFS_INIT_JAVA_CONF: true
+DFS_INIT_JAVA_CONF: false
 
 DFS_IMS_UNIT: SYSALLDA
 DFS_IMS_UNIT2: 3390
