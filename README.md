@@ -21,21 +21,13 @@ the repository and configure your GitHub
 to receive ongoing updates about specific activity on GitHub.
 
 ## Contribute Ansible Playbooks
-<<<<<<< HEAD
 
-=======
->>>>>>> master
 We are accepting Ansible playbooks from the community. These playbooks
 should relate to **IBM Z**, and should either leverage the
 **Red Hat Ansible Certified Content for IBM Z** collections, or highlight
 additional capabilities and use-cases for **Z automation**. Check out the
 [contribution guidelines](docs/share/contribution-guidelines.md) for more
 information.
-<<<<<<< HEAD
-
-## Playbooks
-=======
->>>>>>> master
 
 ## Playbooks
 Playbooks are organized by topics that align to tasks and use cases that are
