@@ -1,6 +1,4 @@
 
-hostname: zos_target_address
-
 temp_dir: /tmp
 
 # Placeholder variable for using the application binary packaged with this sample
