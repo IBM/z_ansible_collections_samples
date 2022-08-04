@@ -30,8 +30,6 @@ additional capabilities and use-cases for **Z automation**. Check out the
 information.
 
 ## Playbooks
-
-## Playbooks
 Playbooks are organized by topics that align to tasks and use cases that are
 often repeated and in need of automation.
 
