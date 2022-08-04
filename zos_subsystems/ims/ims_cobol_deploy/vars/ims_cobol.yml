@@ -1,4 +1,4 @@
-hostname: ec33027a.vmec.svl.ibm.com
+hostname: zos_target_address
 
 temp_dir: /tmp
 
