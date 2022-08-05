@@ -1,5 +1,5 @@
 # =================================================================
-# Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
+# Copyright 2022 https://github.com/multi-arch/multiarch-ci-playbooks
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -28,11 +28,21 @@
 
 ---
 - import_playbook: configure-pre-check.yaml
+
 - import_playbook: configure-installer-client.yaml
+  when: disconnected_installation == false 
+- import_playbook: configure-installer-client-local.yaml
+  when: disconnected_installation == true
+
 - import_playbook: configure-install-config.yaml
 - import_playbook: configure-install-manifests.yaml
 - import_playbook: configure-install-ignition.yaml
+
 - import_playbook: configure-installer-rhcos.yaml
+  when: disconnected_installation == false
+- import_playbook: configure-installer-rhcos-local.yaml
+  when: disconnected_installation == true
+
 - import_playbook: configure-security-groups.yaml
 - import_playbook: configure-network.yaml
 - import_playbook: configure-bastion-properties.yaml

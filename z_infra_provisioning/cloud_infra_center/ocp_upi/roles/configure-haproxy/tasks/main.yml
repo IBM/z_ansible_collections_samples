@@ -114,6 +114,9 @@
   notify:
   - restart firewalld
 
+- name: Set setenforce 0
+  shell: setenforce 0
+
 - name: Restart haproxy
   service: name=haproxy state=restarted
 
