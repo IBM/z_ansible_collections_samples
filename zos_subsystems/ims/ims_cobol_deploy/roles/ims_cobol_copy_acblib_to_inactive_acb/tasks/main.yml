@@ -1,0 +1,28 @@
+---
+# tasks file for ims_cobol_copy_acblib_to_inactive_acb
+# Check which ACB library is inactive
+- name: "Create temporary directory for the proc"
+  tempfile:
+    state: directory
+  register: temp_file_path
+  delegate_to: localhost
+- name: Interpret templates
+  block:
+    - set_fact:
+        eager_role_path: '{{role_path}}'
+    - name: Compile templates and put results in temporary directory for the proc
+      template:
+        src: "{{ eager_role_path }}/templates/COPYACB.j2"
+        dest: "{{ temp_file_path.path }}/COPYACB.j2"
+        output_encoding: "ASCII"
+      delegate_to: localhost
+    - name: Copy acblib to inactive acblib
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ temp_file_path.path }}/COPYACB.j2"
+        location: LOCAL
+        wait: true
+        wait_time_s: 120
+        return_output: True
+        encoding:
+          from: ISO8859-1
+          to: IBM-037

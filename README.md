@@ -21,6 +21,7 @@ the repository and configure your GitHub
 to receive ongoing updates about specific activity on GitHub.
 
 ## Contribute Ansible Playbooks
+
 We are accepting Ansible playbooks from the community. These playbooks
 should relate to **IBM Z**, and should either leverage the
 **Red Hat Ansible Certified Content for IBM Z** collections, or highlight

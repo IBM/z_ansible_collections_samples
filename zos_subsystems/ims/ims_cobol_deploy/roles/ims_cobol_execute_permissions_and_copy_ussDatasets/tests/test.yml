@@ -1,0 +1,5 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - ims_cobol_execute_permissions_and_copy_ussDatasets

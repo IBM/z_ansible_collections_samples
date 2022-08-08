@@ -1,0 +1,68 @@
+---
+# tasks file for ims_cobol_define_mpp_region
+- name: "Create temporary directory for the proc"
+  tempfile:
+    state: directory
+  register: temp_file_path
+  delegate_to: localhost
+- name: Interpret templates
+  block:
+    - set_fact:
+        eager_role_path: '{{role_path}}'
+    - name: Compile templates and put results in temporary directory for the proc
+      template:
+        src: "{{ playbook_dir }}/roles/ims_cobol_define_mpp_region/templates/CRE_DFSMPR.j2"
+        dest: "{{ temp_file_path.path }}/CRE_DFSMPR.j2"
+        output_encoding: "ASCII"
+      delegate_to: localhost
+    - name: Create DFSMPR JOB
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ temp_file_path.path }}/CRE_DFSMPR.j2"
+        location: LOCAL
+        wait: true
+        encoding:
+          from: ISO8859-1
+          to: IBM-037
+      register: output
+    - debug:
+        msg: "{{ output.jobs[0].job_id }}"
+  when: mpp
+
+- name: "Create temporary directory"
+  tempfile:
+    state: directory
+  register: temp_file_path1
+  delegate_to: localhost
+- name: Interpret templates
+  block:
+    - name: Compile templates and put results in temporary directory
+      template:
+        src: "{{ playbook_dir }}/roles/ims_cobol_define_mpp_region/templates/CRE_MPP.j2"
+        dest: "{{ temp_file_path1.path }}/CRE_MPP.j2"
+        output_encoding: "ASCII"
+      delegate_to: localhost
+    - name: submit job on remote system
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ temp_file_path1.path }}/CRE_MPP.j2"
+        location: LOCAL
+        wait: true
+      register: job_output
+    - debug:
+        msg: "{{ job_output.jobs[0].job_id }}"
+    - name: Job output 
+      ibm.ibm_zos_core.zos_job_output:
+        job_id: "{{ job_output.jobs[0].job_id }}"
+  always:
+    - name: Delete the temporary directory (optional)
+      block:
+        - name: Delete the temp directory1
+          file:
+            path: "{{ temp_file_path.path }}"
+            state: absent
+          delegate_to: localhost
+        - name: Delete the temp directory 2
+          file:
+            path: "{{ temp_file_path1.path }}"
+            state: absent
+          delegate_to: localhost
+  when: mpp

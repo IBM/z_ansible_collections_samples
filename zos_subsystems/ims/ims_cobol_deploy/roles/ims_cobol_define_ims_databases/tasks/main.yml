@@ -1,0 +1,72 @@
+---
+# tasks file for ims_cobol_define_ims_databases
+# Create and start IMS databases
+- name: Create DB ACCOUNT
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE DB NAME(ACCOUNT) SET(ACCTYPE(UPD) RESIDENT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Create DB CUSTACCS
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE DB NAME(CUSTACCS) SET(ACCTYPE(UPD) RESIDENT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Create DB CUSTOMER
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE DB NAME(CUSTOMER) SET(ACCTYPE(UPD) RESIDENT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Create DB HISTORY
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE DB NAME(HISTORY) SET(ACCTYPE(UPD) RESIDENT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Create DB TSTAT
+  ibm.ibm_zos_ims.ims_command:
+    command: CREATE DB NAME(TSTAT) SET(ACCTYPE(UPD) RESIDENT(Y))
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+  register: response
+  failed_when: response.ims_output[0].type_2_response[0].CC > '11'
+
+- name: Display status
+  ibm.ibm_zos_ims.ims_command:
+    command: QUERY DB NAME(ACCOUNT) SHOW(STATUS)
+    plex: "{{DFS_IMSPlex}}"
+    route: "{{ROUTE}}"
+    
+- name: Start databases
+  ibm.ibm_zos_ims.ims_command:
+    batch:
+      -
+        command: UPDATE DB NAME(ACCOUNT) START(ACCESS)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: UPDATE DB NAME(CUSTACCS) START(ACCESS)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: UPDATE DB NAME(CUSTOMER) START(ACCESS)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: UPDATE DB NAME(HISTORY) START(ACCESS)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
+      -
+        command: UPDATE DB NAME(TSTAT) START(ACCESS)
+        plex: "{{DFS_IMSPlex}}"
+        route: "{{ROUTE}}"
