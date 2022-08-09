@@ -50,7 +50,7 @@
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_seq
 
-    - name: Create temp sequential data set name
+    - name: Create temp PDS name
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_pds
 
