@@ -17,38 +17,34 @@
   become: yes
   get_url:
     url: '{{ local_rhcos_image }}'
-    dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-{{ ansible_architecture }}.gz
+    dest: ./rhcos-local-{{ ansible_architecture }}.gz
     mode: 0755
 
 - name: Unzip RHCOS image
   command:
-    cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-{{ ansible_architecture }}.gz
-
-- name: Get download RHCOS image
-  shell: "ls -1d -- *rhcos-{{ openshift_version }}.{{ openshift_minor_version }}*"
-  register: rhcos_img
+    cmd: gzip -d -f rhcos-local-{{ ansible_architecture }}.gz
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture={{ ansible_architecture }} --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file={{ rhcos_img.stdout }} rhcos
+    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture={{ ansible_architecture }} --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-local-s390x rhcos
   when: 
   - vm_type == "zvm"
   - disk_type == "scsi"
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture={{ ansible_architecture }} --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file={{ rhcos_img.stdout }} rhcos
+    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture={{ ansible_architecture }} --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-local-s390x rhcos
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=qcow2 --property architecture={{ ansible_architecture }} --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file={{ rhcos_img.stdout }} rhcos
+    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=qcow2 --property architecture={{ ansible_architecture }} --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-local-s390x rhcos
   when: 
   - vm_type == "kvm"
 
 - name: Remove local RHCOS image
   file:
     state: absent
-    path: {{ rhcos_img.stdout }}
+    path: ./rhcos-local-s390x

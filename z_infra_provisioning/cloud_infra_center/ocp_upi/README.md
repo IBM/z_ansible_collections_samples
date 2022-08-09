@@ -282,13 +282,13 @@ Others are **optional**, you can enable them and update value if you need more s
 | `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
-| `disconnected_installation` |false| (Boolean) true or false, if true then Openshift Container Platform will use all the local packages to download
+| `disconnect_installation` |false| (Boolean) true or false, if true then Openshift Container Platform will use all the local packages to download
 | `local_openshift_install` |\<local-openshift-install-url\>| This is always the latest installer download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz), use an SSH or HTTP client to store the Openshift installation package, and put the link here
 | `local_openshift_client` |\<local-openshift-client-url\>| This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here
 | `local_rhcos_image` |\<local-rhcos-image-url\>| This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here
-| `local_mirror_registry` |\<local-mirror-registry-name\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following to [guide](https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-installation-images.html) setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/) 
-| `local_mirror_source_release` |`quay.io/openshift-release-dev/ocp-release`| Get source from your mirrored repository to install under imageContentSources
-| `local_mirror_source_dev` |`quay.io/openshift-release-dev/ocp-v4.0-art-dev`| Get source from your mirrored repository to install under imageContentSources
+| `local_mirror_registry` |\<local-mirror-registry-name\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following to [guide](https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-installation-images.html) setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
+| `local_mirror_source_release` |`quay.io/openshift-release-dev/ocp-release`| Get source from your mirrored repository to install
+| `local_mirror_source_dev` |`quay.io/openshift-release-dev/ocp-v4.0-art-dev`| Get source from your mirrored repository to install
 | `approve_nodes_csr` |10| Default is 10 minutes that used to wait for approving node csrs
 | `create_server_timeout` |10| Default is 10 minutes that used to create instances and volumes from backend storage provider
 
@@ -328,9 +328,9 @@ ansible-playbook -i inventory.yaml 03-create-cluster-compute.yaml
 
 After above steps, you will get one ready OpenShift Container Platform on the IBM Cloud Infrastructure Center.
 
-### Something is wrong/trouble shooting?
+## Something is wrong/trouble shooting?
 
-#### Any above steps failed, clean up environment and then rerun the installation steps.
+#### 1. Any above steps failed, clean up environment and then rerun the installation steps.
 
 + Failed on `01-preparation.yaml` ,`bastion.yaml` and `02-create-cluster-control.yaml`.
   
@@ -339,6 +339,36 @@ After above steps, you will get one ready OpenShift Container Platform on the IB
 + Failed on `02-create-cluster-compute.yaml`.
 
   - use: `ansible-playbook -i inventory.yaml destroy-computes.yaml`
+
+### 2. Making master scheduleable when deploying only 3 masters
+Use this playbook to deploy Openshift as only 3 masters, set the `os_compute_nodes_number` as 0.
+After step3 is completed, please remember to configure master as scheduleable:
+```
+./oc patch schedulers.config.openshift.io/cluster --type merge -p '{"spec":{"mastersSchedulable":true}}'
+```
+
+### 3. View instance log
+```
+openstack console log show <instance>
+```
+
+### 4. SSH access to the instances
+Get the IP address of the node on the private network:
+```
+# openstack server list
++--------------------------------------+---------------------------+--------+---------------------+-------+--------+
+| ID                                   | Name                      | Status | Networks            | Image | Flavor |
++--------------------------------------+---------------------------+--------+---------------------+-------+--------+
+| 31ab0fac-0394-48f5-bf70-89aec014ce1c | openshift-v8q6x-master-2  | ACTIVE | flat01=172.24.0.13 | rhcos |        |
+| 39865dde-e519-4a77-9fee-c88e8a9d2479 | openshift-v8q6x-master-1  | ACTIVE | flat01=172.24.0.12 | rhcos |        |
+| 77cc7ff9-db77-476c-ab42-5df0a951a3ef | openshift-v8q6x-master-0  | ACTIVE | flat01=172.24.0.11 | rhcos |        |
+| 671e35f5-fa37-4340-886c-cc217369740f | openshift-v8q6x-bootstrap | ACTIVE | flat01=172.24.0.10 | rhcos |        |
++--------------------------------------+---------------------------+--------+---------------------+-------+--------+
+```
+And connect to it using the SSH private key server:
+```
+ssh core@<server_ip_address>
+```
 
 ## Day2 Operation
 
@@ -370,9 +400,8 @@ ansible-playbook -i inventory.yaml modify-dns.yaml
 
 `ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
-
 ## Copyright
-© Copyright IBM Corporation 2021
+© Copyright IBM Corporation 2022
 
 ## License
 Licensed under

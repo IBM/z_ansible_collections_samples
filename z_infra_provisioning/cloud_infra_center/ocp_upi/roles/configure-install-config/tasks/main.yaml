@@ -47,7 +47,7 @@
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ local_mirror_registry }}\n\ \ source: {{ local_mirror_source_release }} ' install-config.yaml
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ local_mirror_registry }}\n\ \ source: {{ local_mirror_source_dev }} ' install-config.yaml
   when:
-  - disconnected_installation == true
+  - disconnect_installation == true
 
 - name: Add additional certificates to install-config.yaml
   lineinfile:

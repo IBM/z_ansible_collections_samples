@@ -42,7 +42,7 @@
 
 - name: Unzip RHCOS image
   command:
-    cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-{{ ansible_architecture }}.raw.gz
+    cmd: gzip -d -f rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-{{ ansible_architecture }}.raw.gz
   when: 
   - vm_type == "zvm"
 
@@ -71,7 +71,7 @@
 
 - name: Unzip RHCOS image
   command:
-    cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-{{ ansible_architecture }}.qcow2.gz
+    cmd: gzip -d -f rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-{{ ansible_architecture }}.qcow2.gz
   when: 
   - vm_type == "kvm"
 

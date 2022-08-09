@@ -37,12 +37,12 @@ all:
       use_network_name: '<network-name-from-icic>'
       use_network_subnet: '<subnet-id-from-network-name-in-icic>'
 
-      vm_type: 'kvm' # kvm or zvm
+      vm_type: 'zvm' # kvm or zvm
       disk_type: 'dasd' # dasd or scsi
       #volume_type_id: '<storage-template-id>'
       
-      openshift_version: '4.7'
-      openshift_minor_version: '7'
+      openshift_version: '4.10'
+      openshift_minor_version: '16'
       
       auto_allocated_ip: true  # true or false
       #allocation_pool_start: '<ip range start>'
@@ -64,7 +64,7 @@ all:
       #https_proxy: '<https-proxy>'
       #no_proxy: '<no-proxy>'
 
-      disconnected_installation: false # true or false
+      disconnect_installation: false # true or false
       #local_openshift_install: '<local-openshift-install-url>'
       #local_openshift_client: '<local-openshift-client-url>'
       #local_rhcos_image: '<local-rhcos-image-url>'

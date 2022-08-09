@@ -4,37 +4,12 @@ set -e
 # Variable Setup
 source $HOME/.bashrc
 
-LOCAL_REGISTRY_USERNAME="redhat"
-LOCAL_REGISTRY_PASSWORD="redhat"
-LOCAL_REGISTRY_HOSTNAME="image.registry.ats.ocp410.com"
+LOCAL_REGISTRY_USERNAME="icic"
+LOCAL_REGISTRY_PASSWORD="icic"
+LOCAL_REGISTRY_HOSTNAME="image.registry.icic.ocp.com"
 LOCAL_REGISTRY_PORT="5008"
 
 GENERATE_CRT="true" #"true" to generate self-sign certificates
-
-if [ -z "${LOCAL_REGISTRY_USERNAME}" ];then
-  read -r -p "Enter registry username [redhat]: " input
-  LOCAL_REGISTRY_USERNAME=${input:-redhat}
-fi
-
-if [ -z "${LOCAL_REGISTRY_PASSWORD}" ];then
-  read -r -p "Enter registry password [redhat]: " input
-  LOCAL_REGISTRY_PASSWORD=${input:-redhat}
-fi
-
-if [ -z "${LOCAL_REGISTRY_HOSTNAME}" ];then
-  read -r -p "Enter registry URL [$(hostname -f)]: " input
-  LOCAL_REGISTRY_HOSTNAME=${input:-$(hostname -f)}
-fi
-
-if [ -z "${LOCAL_REGISTRY_PORT}" ];then
-  read -r -p "Enter registry port [5008]: " input
-  LOCAL_REGISTRY_PORT=${input:-5008}
-fi
-
-if [ -z "${GENERATE_CRT}" ];then
-  read -r -p "Generate self sign certificate? (Only will generate if true) [true]: " input
-  GENERATE_CRT=${input:-true}
-fi
 
 # Persist Answers
 grep -q LOCAL_REGISTRY_USERNAME $HOME/.bashrc || echo "export LOCAL_REGISTRY_USERNAME=$LOCAL_REGISTRY_USERNAME" >> $HOME/.bashrc
@@ -67,7 +42,7 @@ firewall-cmd --reload >/dev/null
 
 # Create Registry Container
 echo "Creating registry container..."
-podman create --name ocp410-registry -p ${LOCAL_REGISTRY_PORT}:5000 \
+podman create --name ocp-registry -p ${LOCAL_REGISTRY_PORT}:5000 \
 -v /opt/registry/data:/var/lib/registry:z \
 -v /opt/registry/auth:/auth:z \
 -e "REGISTRY_AUTH=htpasswd" \
@@ -77,24 +52,28 @@ podman create --name ocp410-registry -p ${LOCAL_REGISTRY_PORT}:5000 \
 -v /opt/registry/certs:/certs:z \
 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
 -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
-localhost/gcp0571/docker_registry2:latest >/dev/null
+docker.io/ibmcom/registry:2.6.2.5 >/dev/null
 
 echo "Enabling registry service..."
 echo '[Unit]
-Description=ocp410-registry Podman Container
+Description=ocp-registry Podman Container
 After=network.target
 
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/bin/podman start -a ocp410-registry
-ExecStop=/usr/bin/podman stop -t 10 ocp410-registry
+ExecStart=/usr/bin/podman start -a ocp-registry
+ExecStop=/usr/bin/podman stop -t 10 ocp-registry
 
 [Install]
-WantedBy=multi-user.target' > /etc/systemd/system/ocp410-registry.service
+WantedBy=multi-user.target' > /etc/systemd/system/ocp-registry.service
 
-systemctl start ocp410-registry
-systemctl enable ocp410-registry >/dev/null 2>&1
+systemctl start ocp-registry
+systemctl enable ocp-registry >/dev/null 2>&1
+
+host_ip_addr=$(hostname -I | cut -d' ' -f1)
+echo "Add registry into /etc/hosts..."
+echo "${host_ip_addr} ${LOCAL_REGISTRY_HOSTNAME}" >> /etc/hosts
 
 sleep 5
 
