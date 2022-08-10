@@ -21,8 +21,7 @@
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
 #                 to for this example.
-#   ctl_tmp_dir - this is the directory on the controller which will be written
-#                 to for this example.
+#
 # Optional:
 #   data_set_name - this is the data set name that will be created during
 #                   execution of this sample.
@@ -39,7 +38,6 @@
   gather_facts: no
   vars:
     tgt_tmp_dir: "/tmp"
-    ctl_tmp_dir: "/tmp"
   environment: "{{ environment_vars }}"
 
   tasks:
