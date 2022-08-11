@@ -14,9 +14,9 @@
 # These playbooks leverage module `zmf_sca`, which is provided by the IBM z/OSMF collection included in the Red Hat Ansible
 # Certified Content for IBM Z.
 #
-# This playbook performs a security provision using module `zmf_sca`, which is provided with the IBM z/OSMF collection.
+# This playbook performs a security provisioning using module `zmf_sca`, which is provided with the IBM z/OSMF collection.
 # The playbook will succeed if all the requirements described by the SCA security descriptor file
-# are satisified or provisioned to be satisified, otherwise it will fail and return the items that are unsatisified.
+# are either already satisified or successfully provisioned, otherwise it will fail and return the items that are still not satisfied. 
 #
 # Usage:
 #   ansible-playbook -i <inventory> <playbook>
@@ -34,7 +34,7 @@
 #   IBM z/OSMF collection 1.2.0 or later
 #
 # Configure:
-#   state - "provisioned" is needed for security requirements provision.
+#   state - "provisioned" is needed for security provisioning.
 #   target_userid - The value of this property identifies the target user/group id to be validated.
 #   location - The value of this property identifies the location of the security requirement file, local or remote.
 #   path - The value of this property identifies the path of the security requirement file.
