@@ -62,6 +62,8 @@ zsystem:
 
 2. Update the environment variables for the z/OS&reg; system in [host_vars/zos_host.yml](host_vars/zos_host.yml)
 
+> **_NOTE:_**  if `WLP_USER_DIR` is not specified, it will default to `${wlp.install.dir}/usr`.
+ 
 ```yaml
 # the path to the root of IBM python installation
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
