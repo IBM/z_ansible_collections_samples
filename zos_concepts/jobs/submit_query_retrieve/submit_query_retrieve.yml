@@ -60,13 +60,12 @@
         msg: "{{ data_set_name }}"
 
     ############################################################################
-    # Modules zos_data_set, zos_tso_command, zos_job_submit, zos_job_query,
+    # Modules zos_data_set, zos_job_submit, zos_job_query,
     # zos_job_output
     ############################################################################
     # +-------------------------------------------------------------------------
     # | Create a data set and member, create JCL on USS target, copy USS JCL to
-    # | data set, rename data set using TSO commands, submit JCL in data set,
-    # | query job, get job output.
+    # | data set, submit JCL in data set, query job, get job output.
     # +-------------------------------------------------------------------------
     - name: Create a PDS data set {{ data_set_name }}
       zos_data_set:
@@ -83,11 +82,10 @@
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
-    # | "with_sequence" is a type of Ansible loop. The loop here only runs for a
-    # | single iteration and is included solely to demonstrate how easy and
-    # | straightforward it would be to perform the operation for multiple
-    # | members. The end result of this block is a single member 'MEM1' is 
-    # | created.
+    # | "with_sequence" is a type of conditional Ansible loop. The loop here 
+    # | only runs for a single iteration and is included solely to demonstrate
+    # | how easy it is to perform the operation for multiple members. The result
+    # | is that single member 'MEM1' is created.
     # +-------------------------------------------------------------------------
     - name: Create a PDS member and replace if member exist
       zos_data_set:
@@ -105,6 +103,10 @@
       file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl"
         state: directory
+
+    - name: Response for ensure JCL folder exists in USS to manage JCL
+      debug:
+        msg: "{{ result }}"
 
     - name: Write HELLO JCL to USS in {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         on target {{ inventory_hostname }}
@@ -133,39 +135,30 @@
       debug:
         msg: "{{ result }}"
 
-    - name: TSO commands to manage data set (LU, LISTDS, RENAME, LISTDS)
-      zos_tso_command:
-        commands:
-          - LU {{ ansible_user }}
-          - LISTDS '{{ data_set_name }}'
-          - RENAME '{{ data_set_name }}' '{{ data_set_name }}.LLQ'
-          - LISTDS '{{ data_set_name }}.LLQ'
-      register: result
-
-    - name: Response for TSO commands to manage data
-        set (LU, LISTDS, RENAME, LISTDS)
-      debug:
-        msg: "{{ result }}"
-
-    - name: Submit the JCL {{ data_set_name }}.LLQ(MEM1)
+    # +-------------------------------------------------------------------------
+    # | Similar to how we created the PDS member earlier, this is another
+    # | Ansible loop with a single iteration designed to showcase how multiple
+    # | jobs could be submitted under a single task for members of a single PDS
+    # +-------------------------------------------------------------------------
+    - name: Submit the JCL {{ data_set_name }}(MEM1)
       zos_job_submit:
-        src: "{{ data_set_name }}.LLQ(MEM{{ item }})"
+        src: "{{ data_set_name }}(MEM{{ item }})"
         location: DATA_SET
         wait: true
-      register: response
+      register: result
       with_sequence: count=1
 
-    - name: Response for submit the JCL {{ data_set_name }}.LLQ(MEM1)
+    - name: Response for submit the JCL {{ data_set_name }}.(MEM1)
       debug:
         msg: "{{ result }}"
 
-    - name: Query submitted job 'HELLO' in data set {{ data_set_name }}.LLQ
+    - name: Query submitted job 'HELLO' in data set {{ data_set_name }}
       zos_job_query:
         job_name: HELLO
       register: result
 
     - name: Response for query submitted job 'HELLO' in data
-        set {{ data_set_name }}.LLQ
+        set {{ data_set_name }}
       debug:
         msg: "{{ result }}"
 
@@ -178,15 +171,13 @@
       debug:
         msg: "{{ result }}"
 
-    # +-------------------------------------------------------------------------
-    # | Submit target JCL from USS, query for the submitted job and obtain the
-    # | job output, cleanup USS files and data sets.
-    # +-------------------------------------------------------------------------
+    - name: pause
+      pause:
 
-    - name: Response for write sample {{job_name}} JCL in {{ tgt_tmp_dir }}/ansible/jcl
-            on USS target
-      debug:
-        msg: "{{ result }}"
+    # +-------------------------------------------------------------------------
+    # | JCL from a USS file can also be submitted as a job by leveraging the 
+    # | zos_job_submit module.
+    # +-------------------------------------------------------------------------
 
     - name: Submit {{job_name}} jcl located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}
@@ -194,6 +185,8 @@
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}"
         location: USS
         wait: True
+      register: result
+        
 
     - name: Response for submit {{job_name}} jcl located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}
@@ -209,20 +202,32 @@
             on USS target
       debug:
         msg: "{{ result }}"
+    
+    # +-------------------------------------------------------------------------
+    # | The following section is commented out because it creates identical 
+    # | output to when the same job was submited earlier in the playbook 
+    # | from the PDS member. Feel free to uncomment the following section to
+    # | view the full job output.
+    # +-------------------------------------------------------------------------
 
-    - name: Get {{job_name}} job output on USS target
-      zos_job_output:
-        job_name: "{{job_name}}"
-      register: result
+    # - name: Get {{job_name}} job output on USS target
+    #   zos_job_output:
+    #     job_name: "{{job_name}}"
+    #   register: result
 
-    - name: Response for Get {{job_name}} job output on USS target
-      debug:
-        msg: "{{ result }}"
+    # - name: Response for Get {{job_name}} job output on USS target
+    #   debug:
+    #     msg: "{{ result }}"
+
+    # +-------------------------------------------------------------------------
+    # | Clean up - remove JCL files from USS, delete PDS.
+    # +-------------------------------------------------------------------------
 
     - name: Remove {{job_name}} JCL and folder on USS target
       file:
         path: "{{ tgt_tmp_dir }}/ansible"
         state: absent
+      register: result
 
     - name: Response for remove {{job_name}} JCL and folder on
             USS target
@@ -231,7 +236,7 @@
 
     - name: Delete data set {{ data_set_name }}
       zos_data_set:
-        name: "{{ data_set_name }}.LLQ"
+        name: "{{ data_set_name }}"
         state: absent
       register: result
 
