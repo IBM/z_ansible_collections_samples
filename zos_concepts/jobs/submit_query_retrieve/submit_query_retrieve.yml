@@ -64,9 +64,9 @@
     # zos_job_output
     ############################################################################
     # +-------------------------------------------------------------------------
-    # | Create a data set, create JCL on USS target, copy USS JCL to data set,
-    # | rename data set using TSO commands, submit JCL in data set, query job,
-    # | get job output, delete data set using TSO command
+    # | Create a data set and member, create JCL on USS target, copy USS JCL to
+    # | data set, rename data set using TSO commands, submit JCL in data set,
+    # | query job, get job output.
     # +-------------------------------------------------------------------------
     - name: Create a PDS data set {{ data_set_name }}
       zos_data_set:
@@ -82,6 +82,13 @@
       debug:
         msg: "{{ result }}"
 
+    # +-------------------------------------------------------------------------
+    # | "with_sequence" is a type of Ansible loop. The loop here only runs for a
+    # | single iteration and is included solely to demonstrate how easy and
+    # | straightforward it would be to perform the operation for multiple
+    # | members. The end result of this block is a single member 'MEM1' is 
+    # | created.
+    # +-------------------------------------------------------------------------
     - name: Create a PDS member and replace if member exist
       zos_data_set:
         name: "{{ data_set_name }}(MEM{{ item }})"
@@ -101,8 +108,10 @@
 
     - name: Write HELLO JCL to USS in {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         on target {{ inventory_hostname }}
-      shell: "echo {{ lookup('file', playbook_dir + '/files/HELLO.jcl') | quote }} > {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
-      changed_when: true
+      zos_copy:
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
+        dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
+      # changed_when: true
       register: result
 
     - name: Response for write HELLO JCL to USS
@@ -111,10 +120,12 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Populate {{ data_set_name }} member with data from USS file in
+    - name: Populate {{ data_set_name }} member with data from USS file
         in {{ tgt_tmp_dir }}/ansible/jcl
-      command: 'cp {{ tgt_tmp_dir }}/ansible/jcl/HELLO "//''{{ data_set_name }}(MEM{{ item }})''"'
-      with_sequence: count=1
+      zos_copy:
+        src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
+        remote_src: True
+        dest: "{{ data_set_name }}(MEM1)"
       register: result
 
     - name: Response for populate {{ data_set_name }} member with data from
@@ -167,45 +178,10 @@
       debug:
         msg: "{{ result }}"
 
-    - name: TSO command delete data set {{ data_set_name }}.LLQ
-      zos_tso_command:
-        commands:
-          - DELETE '{{ data_set_name }}.LLQ'
-      register: result
-
-    - name: Response for TSO command delete data set {{ data_set_name }}.LLQ
-      debug:
-        msg: "{{ result }}"
-
-    - name: Remove files on target in {{ tgt_tmp_dir }}/ansible
-      file:
-        path: "{{ tgt_tmp_dir }}/ansible"
-        state: absent
-      register: result
-
-    - name: Response for remove files on target in {{ tgt_tmp_dir }}/ansible
-      debug:
-        msg: "{{ result }}"
-
-
     # +-------------------------------------------------------------------------
-    # | Create a directory in USS on the target, write sample JCL on target,
-    # | submit the target JCL, query for the submitted job and obtain the
-    # | job output, demonstrate creating and deleting data sets
+    # | Submit target JCL from USS, query for the submitted job and obtain the
+    # | job output, cleanup USS files and data sets.
     # +-------------------------------------------------------------------------
-
-    - name: Create directory {{ tgt_tmp_dir }}/ansible/jcl on USS
-            target
-      file:
-        path: "{{ tgt_tmp_dir }}/ansible/jcl"
-        state: directory
-
-    - name: Write sample {{ job_name }} JCL in {{ tgt_tmp_dir }}/ansible/jcl
-            on USS
-            target
-      shell: "echo {{ lookup('file', playbook_dir + '/files/{{job_name}}.jcl') | quote }} > {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}"
-      changed_when: true
-      register: result
 
     - name: Response for write sample {{job_name}} JCL in {{ tgt_tmp_dir }}/ansible/jcl
             on USS target
@@ -255,7 +231,7 @@
 
     - name: Delete data set {{ data_set_name }}
       zos_data_set:
-        name: "{{ data_set_name }}"
+        name: "{{ data_set_name }}.LLQ"
         state: absent
       register: result
 
