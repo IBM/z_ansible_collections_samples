@@ -253,29 +253,6 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Create a PDS data set {{ data_set_name }}
-      zos_data_set:
-        name: "{{ data_set_name }}"
-        type: pds
-        size: 5M
-        format: fb
-        record_length: 25
-        replace: yes
-      register: result
-
-    - name: Response create a PDS data set {{ data_set_name }}
-      debug:
-        msg: "{{ result }}"
-
-    - name: Check if data set {{ data_set_name }} was created
-      command: "dls {{ data_set_name }}"
-      register: result
-      changed_when: true
-
-    - name: Response for check if data set {{ data_set_name }} was created
-      debug:
-        msg: "{{ result }}"
-
     - name: Delete data set {{ data_set_name }}
       zos_data_set:
         name: "{{ data_set_name }}"
