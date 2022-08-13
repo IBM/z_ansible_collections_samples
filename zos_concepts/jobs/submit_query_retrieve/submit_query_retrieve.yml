@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2021, 2022
 ###############################################################################
 
 ###############################################################################
@@ -15,21 +15,17 @@
 #
 #  Additional facts for this playbook can be configured to override the defaults
 #  by reviewing the "Fact setting" section of this playbook, for example,
-#  `data_set_name` and `system_name`.
+#  `data_set_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0 or later
+#   IBM z/OS core collection 1.1.0 or later # FIXME - update to correct version.
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
 #                 to for this example.
-#   ctl_tmp_dir - this is the directory on the controller which will be written
-#                 to for this example.
 # Optional:
 #   data_set_name - this is the data set name that will be created during
 #                   execution of this sample.
-#   system_name - this is the system name that will be used during this example,
-#                 determined by executing `uname -n` on the target.
 #   job_name - this is the job name what will be used in this sample, if you
 #              change the HELLO.JCL job name, you must update this variable
 ###############################################################################
@@ -41,7 +37,6 @@
   gather_facts: no
   vars:
     tgt_tmp_dir: "/tmp"
-    ctl_tmp_dir: "/tmp"
     job_name: "HELLO"
   environment: "{{ environment_vars }}"
 
@@ -53,32 +48,16 @@
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
 
-    - set_fact:
-        tmp_data_set: "{{ tmp_ds.stdout }}"
-
     # ##########################################################################
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Setting fact `data_set_name` for use by this sample
       set_fact:
-        data_set_name: "{{ tmp_data_set }}"
+        data_set_name: "{{ tmp_ds.stdout }}"
 
     - name: Fact `data_set_name` set with value
       debug:
         msg: "{{ data_set_name }}"
-
-    - name: Detecting system name
-      #shell: "uname -a |awk '{print $2}'"
-      command: uname -n
-      register: result
-
-    - name: Setting fact `system_name` for use by this sample
-      set_fact:
-        system_name: "{{ result.stdout }}"
-
-    - name: Fact `system_name` set with value
-      debug:
-        msg: "{{ system_name }}"
 
     ############################################################################
     # Modules zos_data_set, zos_tso_command, zos_job_submit, zos_job_query,
@@ -216,20 +195,20 @@
     # +-------------------------------------------------------------------------
 
     - name: Create directory {{ tgt_tmp_dir }}/ansible/jcl on USS
-            target {{ system_name }}
+            target
       file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl"
         state: directory
 
     - name: Write sample {{ job_name }} JCL in {{ tgt_tmp_dir }}/ansible/jcl
             on USS
-            target {{ system_name }}
+            target
       shell: "echo {{ lookup('file', playbook_dir + '/files/{{job_name}}.jcl') | quote }} > {{ tgt_tmp_dir }}/ansible/jcl/{{job_name}}"
       changed_when: true
       register: result
 
     - name: Response for write sample {{job_name}} JCL in {{ tgt_tmp_dir }}/ansible/jcl
-            on USS target {{ system_name }}
+            on USS target
       debug:
         msg: "{{ result }}"
 
@@ -245,32 +224,32 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Query the submitted job {{job_name}} on USS target {{ system_name }}
+    - name: Query the submitted job {{job_name}} on USS target
       zos_job_query:
         job_name: "{{job_name}}"
       register: result
 
     - name: Response for Query the submitted job {{job_name}}
-            on USS target {{ system_name }}
+            on USS target
       debug:
         msg: "{{ result }}"
 
-    - name: Get {{job_name}} job output on USS target {{ system_name }}
+    - name: Get {{job_name}} job output on USS target
       zos_job_output:
         job_name: "{{job_name}}"
       register: result
 
-    - name: Response for Get {{job_name}} job output on USS target {{ system_name }}
+    - name: Response for Get {{job_name}} job output on USS target
       debug:
         msg: "{{ result }}"
 
-    - name: Remove {{job_name}} JCL and folder on USS target {{ system_name }}
+    - name: Remove {{job_name}} JCL and folder on USS target
       file:
         path: "{{ tgt_tmp_dir }}/ansible"
         state: absent
 
     - name: Response for remove {{job_name}} JCL and folder on
-            USS target {{ system_name }}
+            USS target
       debug:
         msg: "{{ result }}"
 
