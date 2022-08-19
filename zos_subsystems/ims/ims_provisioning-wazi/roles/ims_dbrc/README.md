@@ -5,8 +5,8 @@ This role defines DBRC's default settings and prepares DBRC.
 
 Requirements
 ------------
-
-* Ansible Collection: ibm.ibm_zos_core and ibm.ibm_zos_ims
+* IBM z/OS core collection 1.4.0
+* IBM z/OS IMS collection 1.2.0
 
 
 Role Variables
@@ -46,11 +46,11 @@ Example Playbook:
 
 ## Copyright
 
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2022
 
 License
 -------
 
-Copyright (c) IBM Corporation 2020 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
 

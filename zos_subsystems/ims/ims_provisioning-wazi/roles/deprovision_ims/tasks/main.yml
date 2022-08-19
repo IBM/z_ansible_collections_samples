@@ -1,20 +1,11 @@
 ---
 # tasks file for deprovision_ims
-- name: Provision IMS
+- name: Deprovision IMS
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
 
   block:
-
-    # - include_role:
-    #     name: ims_cobol_scan_dir
-
-    # - include_role:
-    #     name: ims_cobol_stop_delete_ims_databases
-
-    # - include_role:
-    #     name: ims_cobol_remove_old_registered_databases
 
     - include_role:
         name: install-bzip2

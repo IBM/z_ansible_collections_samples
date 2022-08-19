@@ -1,2 +1,1 @@
-ansible-playbook -vvv -i inventories/zosendpoint ims-tmdb.yml -e \
-    "{ k8s_cr_event: create }"
+ansible-playbook -vv -i inventories/zosendpoint ims-tmdb.yml 

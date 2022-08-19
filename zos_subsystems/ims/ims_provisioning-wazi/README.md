@@ -60,8 +60,8 @@ Inside each role:
 
 
 ## Ansible Collection Requirements
-* IBM z/OS core collection 1.2.1
-* IBM z/OS IMS collection 1.1.0
+* IBM z/OS core collection 1.4.0
+* IBM z/OS IMS collection 1.2.0
 
 ## Getting Started
 
@@ -99,20 +99,20 @@ For more information on python configuration requirements on z/OS, refer to [Ans
 2. Update the environment variables for the z/OS system in [host_vars/zosendpoint.yml](host_vars/zosendpoint.yml)
     ```yaml
     # the path to the root of IBM python installation
-    PYZ: "/usr/lpp/IBM/cyp/v3r9/pyz/bin"
+    PYZ: "/usr/lpp/IBM/cyp/v3r9/pyz"
 
     # the path to root of ZOAU installation
     ZOAU: "/usr/lpp/IBM/zoautil"
     ```
 
-3. Update the playbook specific variables in host_vars/zos.yml based on desired behavior
+3. Update the playbook specific variables in [host_vars/zosendpoint.yml](host_vars/zosendpoint.yml)based on desired behavior
 
 
 ## Run the playbook
 
 1. Run provisioning IMS playbook, type the following from the root of this repository:
 
-`ansible-playbook -i inventories/zosendpoint ims-tmdb.yml -e "{ k8s_cr_event: create }" `
+`ansible-playbook -i inventories/zosendpoint ims-tmdb.yml `
 
 2. Run query IMS services, type the following from the root of this repository:
 
@@ -120,7 +120,7 @@ For more information on python configuration requirements on z/OS, refer to [Ans
 
 3. Run de-provisioning IMS playbook, type the following from the root of this repository:
 
-`ansible-playbook -i inventories/zosendpoint ims-dbdc.yml -e "{ k8s_cr_event: delete }" `
+`ansible-playbook -i inventories/zosendpoint ims-dbdc.yml -e "{ ims_function: delete }" `
 
 ## Copyright
 

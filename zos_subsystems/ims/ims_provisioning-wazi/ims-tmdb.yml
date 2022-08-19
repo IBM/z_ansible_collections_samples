@@ -4,9 +4,7 @@
   gather_facts: false
   # * Include different variable files depending on environment/inventory used
   vars_files:
-  #  - "{{ vars_folder_name }}/ims-dbdc.yml"
     - vars_wazi/ims-dbdc.yml
-  #   - "vars_broker/ims-dbdc.yml"
   environment: '{{ system_environment }}'
 
   collections:
@@ -66,11 +64,11 @@
         - include_role:
             name: monitor_ims
 
-        when: ctl_output.jobs[0].job_name == "" and k8s_cr_event == "create"
+        when: ctl_output.jobs[0].job_name == "" and ims_function == "create"
 
       - include_role:
           name: deprovision_ims
-        when: k8s_cr_event == "delete"
+        when: ims_function == "delete"
 
 
       always:

@@ -1,36 +1,36 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+This role de-provisions an IMS instance.  It stops all IMS services and delete all datasets created by provision_ims role.
 
 Requirements
 ------------
+* IBM z/OS core collection 1.4.0
+* IBM z/OS IMS collection 1.2.0
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+* ansible_user: This user ID (used to log in the USS) is passed to this role.
+
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+This roles utilizes many other roles in IMS to accomplish the deprovision task.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+This role can be included in another role as the following:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+    - include_role:
+        name: deprovision_ims
 
-License
--------
+## License
+Licensed under [Apache License](https://opensource.org/licenses/Apache-2.0).
 
-BSD
 
 Author Information
 ------------------

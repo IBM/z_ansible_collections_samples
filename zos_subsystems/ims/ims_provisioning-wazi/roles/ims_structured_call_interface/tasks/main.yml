@@ -7,27 +7,6 @@
 
   block:
 
-    # - block:
-    #   - set_fact:
-    #       eager_role_path: '{{role_path}}'
-
-    #   # Send the template over
-    #   - include_role:
-    #       name: send-template
-    #     vars:
-    #       path: '{{ eager_role_path }}/templates/DFSE303S.j2'
-    #   when: sci == "config" and not provision
-
-    # # Allocate and configure SCI
-    # - name: Define SCI component
-    #   zos_job_submit:
-    #     src: '{{ uss_file_path }}/DFSE303S.j2'
-    #     location: USS
-    #     wait: true
-    #     wait_time_s: 30
-    #   when: sci == "config"
-
-    # AL: Use mvs_raw to replace JCL
     - set_fact:
         bpe_sci_config: '{{ role_path }}/templates/bpe_sci_config.txt'
         si_config: '{{ role_path }}/templates/si_config.txt'

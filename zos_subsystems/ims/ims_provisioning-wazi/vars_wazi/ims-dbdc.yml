@@ -32,7 +32,7 @@ STEPLIB: DFSF10.SDFSRESL
 # The API key to use for artifactory repositories
 api_key: ''
 
-k8s_cr_event: create
+ims_function: create
 
 # The SSID for the IMS to be provisioned
 DFS_IMS_SSID: IMWZ

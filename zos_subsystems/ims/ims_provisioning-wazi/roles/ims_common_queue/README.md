@@ -5,8 +5,9 @@ CQS role defines CQS component and query its status.
 
 Requirements
 ------------
+* IBM z/OS core collection 1.4.0
+* IBM z/OS IMS collection 1.2.0
 
-* Ansible Collection: ibm.ibm_zos_core and ibm.ibm_zos_ims
 
 Role Variables
 --------------
@@ -28,18 +29,15 @@ Example Playbook
 ```yaml
         - include_role:
             name: common_queue_services
-            tasks_from: common_queue_services
           vars:
             cqs: config
 
 ```
 
-License
--------
+## Copyright
+© Copyright IBM Corporation 2022
 
-Copyright (c) IBM Corporation 2020 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+## License
+Licensed under
+[Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
-Author Information
-------------------
-
-An Lam (an.lam@ibm.com)

@@ -1,7 +1,0 @@
-#/bin/sh
-
-set -e
-
-{% for file in datasets %}
-cp {{ file.file_name }}.j2 "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ file.hlq }}({{ file.ds_member }})'" 
-{% endfor %}

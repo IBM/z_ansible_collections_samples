@@ -5,8 +5,9 @@ This role allocates all required data sets for IMS provisioning and de-allocates
 
 Requirements
 ------------
+* IBM z/OS core collection 1.4.0
+* IBM z/OS IMS collection 1.2.0
 
-* Ansible Collection: ibm.ibm_zos_core and ibm.ibm_zos_ims
 
 Role Variables
 --------------
@@ -42,7 +43,7 @@ Example Playbook
 
 ## Copyright
 
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2022
 
 License
 -------

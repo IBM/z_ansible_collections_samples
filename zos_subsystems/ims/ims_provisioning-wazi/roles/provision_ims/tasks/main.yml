@@ -125,7 +125,7 @@
         psb_gen: true
         acb_gen: true
 
-    # AL: Generate catalog file after gen
+    # Generate catalog file after gen
     - include_role:
         name: ims_catalog
       vars:

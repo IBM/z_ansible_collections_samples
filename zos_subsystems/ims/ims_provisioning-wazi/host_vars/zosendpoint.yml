@@ -1,4 +1,4 @@
-PYZ: /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
+PYZ: /usr/lpp/IBM/cyp/v3r9/pyz
 ZOAU: /usr/lpp/IBM/zoautil
 # Use PY38 to work around ZOAU pythonlib3.8.so requirement
 PY38: '/u/{{ ansible_user }}/pythonlib'
@@ -7,7 +7,7 @@ system_environment:
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"
   LIBPATH: "{{ ZOAU }}/lib:{{ PY38 }}:{{ PYZ }}/lib:/lib:/usr/lib:."
-  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin"
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
   _TAG_REDIR_ERR: "txt"
   _TAG_REDIR_IN: "txt"

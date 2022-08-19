@@ -1,63 +1,50 @@
-Catalog Services
+Role Name
 =========
 
-This role allocates, loads and deletes all IMS catalogs.
+This role performs tasks related to catalog depending on `catalog` variable value (see details 
+in role variable section).  The following sequence can be followed to start up catalog service:
+1. Allocate
+2. Setup
+3. Load
 
 Requirements
 ------------
+* IBM z/OS core collection 1.4.0
+* IBM z/OS IMS collection 1.2.0
 
-* Ansible Collection: ibm.ibm_zos_core and ibm.ibm_zos_ims
 
 Role Variables
 --------------
 
-| Variable                           | Definition                                                                                                                                                          |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DFS_AUTH_LIB_HQL1                | The first qualifier of library name, for example 'IMSTEST'                                                                                                                            |
-| DFS_AUTH_LIB_HQL2                           | The second qualifier of library name, for example 'IMS1'       
-| catalog                | If catalog = "allocate", catalogs will be allocated.  If catalog = "load", catalogs will be loaded.  If catalog = "delete", catalogs will be deleted                                                                                                                          |
-                                                                                          
+* ansible_user: This user ID (used to log in the USS) is passed to this role.
+* catalog:
+  - "allocate": allocate datasets required by IMS catalog
+  - "load": load the catalog
+  - "update": update the catalog
+  - "setup": create ACB for catalog
+  - "delete": delete the catalog
 
 Dependencies
 ------------
 
 None
 
-Example Playbook: How to allocate and load catalog
+Example Playbook
 ----------------
 
-```yaml
-        - include_role:
-            name: ims_catalog
-          vars:
-            catalog: allocate
- 
-         - include_role:
-            name: ims_catalog
-          vars:
-            catalog: load
+This role can be included in another role as the following:
 
-```
-
-Example Playbook: How to delete catalog
-----------------
-
-```yaml
-        - include_role:
-            name: ims_catalog
-          vars:
-            catalog: delete
- 
-```
+    - include_role:
+        name: ims_catalog
+      vars:
+        catalog: allocate
 
 
 ## Copyright
 
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2022
 
-License
--------
-
-Copyright (c) IBM Corporation 2020 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
-
+## License
+Licensed under
+[Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 

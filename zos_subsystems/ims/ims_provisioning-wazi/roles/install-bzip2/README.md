@@ -28,12 +28,10 @@ Example Playbook
       name: install-bzip2
 ```
 
-License
--------
+## Copyright
 
-BSD
+© Copyright IBM Corporation 2022
 
-Author Information
-------------------
-
-Blake Becker (blake.becker@ibm.com)
+## License
+Licensed under
+[Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
