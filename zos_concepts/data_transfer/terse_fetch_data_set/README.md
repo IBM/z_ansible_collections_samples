@@ -31,13 +31,13 @@ This playbook requires:
     and any additional noted variables in the configuration.
 
 ## Run the playbook
-This project has included a `site.yml` playbook that serves as the master playbook
+This project has included a `site.yml` playbook that serves as the primary playbook
 that provides additional prerequisite checks then it invokes the `data_set_basics.yml`
 playbook.
 
-If you want to run the master playbook `site.yml` it will check that your environment
+If you want to run the primary playbook `site.yml` it will check that your environment
 has the correct version of Ansible as well as the collection needed to execute
-correctly. To run the master playbook, use command:
+correctly. To run the primary playbook, use command:
 
 ```bash
 ansible-playbook -i inventories site.yml
