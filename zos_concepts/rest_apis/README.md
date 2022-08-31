@@ -59,7 +59,7 @@ The `uri-sample` playbook starts by copying over the [sample_definition_file.xml
 * Running the playbook the **second** time will result in
     * Cancellation of the **sample_workflow**
     * Deletion of the **sample_workflow**
-  
+
 ### Using Ansible Vault to Encrypt Passwords or Sensitive Data
 The `ZOSMF_PASS` variable is stored in plaintext as shown above in the *group_vars/all.yml* file. If desired, the `ZOSMF_PASS` can be encrypted in several different ways; we will walk through one of those ways.
 
@@ -99,13 +99,13 @@ ZOSMF_PASS: !vault |
 ```
 
 ## Run the playbook
-This project has included a `site.yml` playbook that serves as the master playbook
+This project has included a `site.yml` playbook that serves as the primary playbook
 that provides additional prerequisite checks then it invokes the `uri-sample.yml`
 playbook.
 
-If you want to run the master playbook `site.yml` it will check that your environment
+If you want to run the primary playbook `site.yml` it will check that your environment
 has the correct version of Ansible as well as the collection needed to execute
-correctly. To run the master playbook, use command:
+correctly. To run the primary playbook, use command:
 
 ```bash
 ansible-playbook -i inventories site.yml
