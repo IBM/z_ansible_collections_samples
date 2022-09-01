@@ -1,5 +1,9 @@
 ---
 # tasks file for roles/mount_zFS
+  - name: Create mountpoint if it does not exist
+    ansible.builtin.file:
+      path: "{{ environment_vars.WLP_USER_DIR }}"
+      state: directory
 
   - name: Query information about the main mountpoint
     shell: df "{{environment_vars.WLP_USER_DIR}}"
