@@ -3,5 +3,10 @@
 
   - name: Create server with variables 
     shell: "{{liberty_bin_path}}/server create {{server_instance_name}}" 
+    register: result 
+
+  - name: Result from creating a server
+    debug: 
+      msg: "{{result}}"
     
  

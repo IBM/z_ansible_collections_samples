@@ -34,6 +34,14 @@ playbook notes sections for additional details and configuration.
 - [**angel_config**](roles/angel_config/README.md)- Holds tasks to create a SAF STARTED profile for the Liberty angel process to run as a STARTED task, or to create a SAF SERVER profile to enable the Liberty server access to z/OS&reg; authorized services.
 - [**authorized_services**](roles/authorized_services/README.md)- Holds tasks to enable optional z/OS&reg; authorized services.
 
+## Permissions
+
+Before getting started, you must ensure you have the proper permissions to use **RACF commands** to run the roles listed below. 
+
+1. [**started_server**](roles/started_server/README.md)
+2. [**angel_config**](roles/angel_config/README.md)
+3. [**authorized_services**](roles/authorized_services/README.md)
+
 
 ## Getting Started
 
@@ -57,7 +65,6 @@ zsystem:
     zos:
       ansible_host: zos_target_address
       ansible_user: zos_target_username
-      ansible_python_interpreter: path_to_python_interpreter_binary_on_zos_target
 ```
 
 2. Update the environment variables for the z/OS&reg; system in [host_vars/zos_host.yml](host_vars/zos_host.yml)
@@ -81,17 +88,33 @@ WLP_USER_DIR: '/u/oeusr01'
 liberty_path: '/usr/lpp/zWAS/WAS900/Liberty/V19R00'
 ```
 
-3. Update custom server variables based on the desired behavior for the Liberty instance in [host_vars/zos_host.yml](host_vars/zos_host.yml)
+3. Add a name for the zFS dataset that will be mounted to the user directory in [host_vars/zos_host.yml](host_vars/zos_host.yml) 
+
+```yaml
+data_set_name: targetuser.liberty.zfs
+```
+
+4. Update user information for creating STARTED profiles in [host_vars/zos_host.yml](host_vars/zos_host.yml)
+> **_NOTE:_**  Ensure you have the correct permissions to write to the `PROC_LIB` you specified.
+
+```yaml
+TARGET_USER: target_user
+USER_GROUP: user_group
+
+#Procedure library for JCL Procedure template
+PROC_LIB: USER.PRIVATE.PROCLIB
+```
+
+5. Update custom server variables based on the desired behavior for the Liberty instance in [host_vars/zos_host.yml](host_vars/zos_host.yml)
 
 ```yaml
 CUSTOMIZE: no
 ANGEL: no
 AUTHORIZED_SERVICES: no
-
 ```
 
-4. Customize the availability of authorized services on the z/OS&reg; system for the server
-Within the `authorized_services` role, there are variables with boolean values to represent which z/OS&reg; authorized services to enable.
+6. Customize the availability of authorized services on the z/OS&reg; system for the server.
+Within the `authorized_services` role, there are variables with boolean values in [authorized_services/defaults/main.yml](authorized_services/defaults/main.yml) to represent which z/OS&reg; authorized services to enable.
 ```yaml
 SAFCRED: yes
 ZOSWLM: yes
@@ -102,7 +125,7 @@ PRODMGR: no
 ZOSAIO: no
 ```
 
-5. Run playbook
+7. Run playbook
 
 > **_NOTE:_**  Running the commands with tags will have precedence over the conditionals within the playbook
 
