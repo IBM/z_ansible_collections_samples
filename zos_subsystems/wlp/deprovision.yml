@@ -11,6 +11,11 @@
       zos_operator:
         cmd: "STOP {{SERVER_PROC}}" 
       tags: stop
+      register: stop_result 
+
+    - name: Response from stopping server process 
+      debug: 
+        msg: "{{stop_result}}"
 
     # #Stop the server -- USS shell example -- if you start the server in the shell, must also stop the server in the shell
     # - name: Stop the server
@@ -23,7 +28,12 @@
         cmd: "STOP {{ANGEL_PROC}}"
       tags: stop_angel #if tags are used while running the playbook, it has precedence over the when conditional
       when: ANGEL | bool #assumes if you enable authorized services, you would want to stop the angel process 
+      register: angel_stop_result 
 
+    - name: Response from stopping angel process 
+      debug: 
+        msg: "{{angel_stop_result}}"
+        
     #Remove server instance by deleting directory 
     - name: Delete the server directory
       shell: 'rm -rf {{liberty_server_path}}'

@@ -2,6 +2,7 @@
 # tasks file for roles/authorized_services
 # This role could only be executed if the server is connected to an angel process
 # Individual tasks to enable each z/OS authorized service based on variable boolean values in defaults/main.yml folder
+# `failed_when` statement conditionals are used in each task to prevent this role from stopping when the authorized service is already detected
 
 - name: Enables SAF authorized user registry services and SAF authorization services (SAFCRED)
   ibm.ibm_zos_core.zos_tso_command: 

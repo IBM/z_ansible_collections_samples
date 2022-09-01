@@ -55,6 +55,11 @@
           cmd: "START {{ANGEL_PROC}}" 
         tags: start_angel #if tags are used while running the playbook, it has precendence over the when conditional
         when: ANGEL | bool #assumes if you enable the angel process, you would want to start the angel process
+        register: angel_start_result 
+
+      - name: Response from starting angel process 
+        debug: 
+          msg: "{{angel_start_result}}"
 
       #Start and stop server process as STARTED tasks 
       #If you start the server with a STARTED task, must also stop the server with a STARTED task
@@ -62,6 +67,11 @@
         zos_operator:
           cmd: "START {{SERVER_PROC}}" 
         tags: start
+        register: start_result 
+      
+      - name: Response from starting server process 
+        debug: 
+          msg: "{{start_result}}"
           
       # #Start the server -- USS shell example -- if you start the server in the shell, must also stop the server in the shell
       # - name: Start the newly created WLP server #z/os operator task 

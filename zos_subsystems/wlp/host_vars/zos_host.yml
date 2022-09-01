@@ -46,13 +46,10 @@ environment_vars:
   WLP_USER_DIR: "/u/oeusr01"
   WLP_OUTPUT_DIR: "u/oeusr01/servers"
 
-#Name for dataset to be mounted to user directory
-data_set_name: OMVSADM.P0000040.T0765319.C0000000
-
 # ---------------------------------------------------------------------------- #
 #                        Liberty related variables                             #
 # ---------------------------------------------------------------------------- #
-server_instance_name: server_test
+server_instance_name: ansible_sample
 
 liberty_path: '/usr/lpp/zWAS/WAS900/Liberty/V19R00' 
 liberty_bin_path: '{{liberty_path}}/bin'
@@ -61,8 +58,8 @@ liberty_server_path: '{{environment_vars.WLP_USER_DIR}}/servers/{{server_instanc
 # ---------------------------------------------------------------------------- #
 #                  User information for STARTED profiles                       #
 # ---------------------------------------------------------------------------- #
-TARGET_USER: OMVSADM
-USER_GROUP: SYS1
+TARGET_USER: target_user
+USER_GROUP: user_group
 
 #Procedure library for JCL Procedure template
 PROC_LIB: USER.PRIVATE.PROCLIB
@@ -70,6 +67,9 @@ PROC_LIB: USER.PRIVATE.PROCLIB
 SERVER_PROC: WLPSRV1
 #Name of angel process procedure for STARTED profile
 ANGEL_PROC: WLPANGL
+
+#Name for zFS dataset to be mounted to user directory
+data_set_name: targetuser.liberty.zfs
   
 # ---------------------------------------------------------------------------- #
 #                        Playbook customization variables                      #
