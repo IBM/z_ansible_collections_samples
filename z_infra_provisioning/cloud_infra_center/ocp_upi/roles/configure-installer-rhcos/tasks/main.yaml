@@ -42,7 +42,7 @@
 
 - name: Unzip RHCOS image
   command:
-    cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
+    cmd: gzip -d -f rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
   when: 
   - vm_type == "zvm"
 
@@ -71,7 +71,7 @@
 
 - name: Unzip RHCOS image
   command:
-    cmd: gzip -d rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
+    cmd: gzip -d -f rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
   when: 
   - vm_type == "kvm"
 
