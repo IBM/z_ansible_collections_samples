@@ -101,5 +101,5 @@
 
   - name: Failed task after approving all pending CSR within {{ approve_nodes_csr }} minutes
     fail:
-      msg: "Please increase default approving CSR minutes by approve_nodes_csr, or approving all pending CSR manually via: oc get csr | grep -i pend | awk ‘{print $1}’ | xargs oc adm certificate approve"
+      msg: "Please increase default approving CSR minutes by approve_nodes_csr, or approving all pending CSR manually via: oc get csr | grep -i pend | awk '{print $1}' | xargs oc adm certificate approve"
     failed_when: second_node_count.stdout != total_node_count.stdout

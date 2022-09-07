@@ -150,7 +150,7 @@
     environment:
       KUBECONFIG: "./auth/kubeconfig"
     shell: |
-      openstack server show {{ os_compute_server_name }}-{{ new_worker_index }} -c addresses -f value | awk -F = '{print$2}'
+      openstack server list | grep {{ os_compute_server_name }}-{{ new_worker_index }} | grep -oP '(?<=)\d+(\.\d+){3}''
     register: new_worker_ip
 
   - name: 'Save new worker info into yaml'
@@ -160,5 +160,6 @@
       echo cluster_domain_name={{ cluster_name }}.{{ base_domain }} >> .new_ocp_node.yml
       echo new_worker_index={{ new_worker_index }} >> .new_ocp_node.yml
       echo new_worker_ip={{ new_worker_ip.stdout }} >> .new_ocp_node.yml
+    when: new_worker_ip is defined
 
 - import_playbook: approve.yaml
