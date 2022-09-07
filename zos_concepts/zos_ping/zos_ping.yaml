@@ -1,0 +1,44 @@
+###############################################################################
+# Copyright (c) 2020, 2022 IBM CORPORATION
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+###############################################################################
+# Description:
+#  This playbook is used to verify connectivity to one or more target systems.
+#
+#  All potential Python and ZOAU installations are output by the playbook
+#  in case the Python or ZOAU installation desired by the user is different
+#  than the one selected by this playbook.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#   or
+#  ansible-playbook -i "hostaddress," <playbook>
+#
+# Example:
+#  ansible-playbook -i inventory zos-ping.yml
+#   or
+#  ansible-playbook -i "mysystem.to.connect.com," zos_ping.yml
+
+---
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Ping the host with Ansible ping module to see if the target is available
+    # ##########################################################################
+    - name: Ping host - {{ inventory_hostname }}
+      zos_ping:
+      register: result
+
+    # ##########################################################################
+    # Display the response from the pin module
+    # ##########################################################################
+    - name: Response
+      debug:
+        msg: "{{ result.ping }}"
