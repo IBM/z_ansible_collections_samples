@@ -35,7 +35,7 @@ This playbook requires:
 
 ## Run the playbook
 This project has included a `site.yml` playbook that serves as the master playbook
-that provides additional prerequisite checks then it invokes the `zos_ping.yml`
+that provides additional prerequisite checks then it invokes the `zos_ping.yaml`
 playbook.
 
 If you want to run the master playbook `site.yml` it will check that your environment
@@ -50,7 +50,7 @@ You can skip the prerequisite check and run the `zos_ping.yml` with
 command:
 
 ```bash
-ansible-playbook -i inventories zos_ping.yml
+ansible-playbook -i inventories zos_ping.yaml
 ```
 
 # Changelog
