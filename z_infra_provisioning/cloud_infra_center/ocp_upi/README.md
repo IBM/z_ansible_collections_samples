@@ -131,7 +131,6 @@ sudo alternatives --set python /usr/bin/python3
 Upgrade the pip package and dnf:
 ```sh
 sudo -H pip3 install --upgrade pip
-sudo dnf update -y
 ```
 Install the required package through dnf:
 ```sh
