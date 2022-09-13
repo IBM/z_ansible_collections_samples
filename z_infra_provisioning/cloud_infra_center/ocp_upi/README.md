@@ -76,7 +76,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 
 - **(Required)** A Linux server, the machine that runs Ansible.
     - RHEL8 is the operation system version we tested
-    - Ansible >= 2.8
+    - Ansible == 2.8
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
@@ -92,7 +92,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 **Packages:**
 
 * Python3
-* Ansible >=2.8
+* Ansible 
 * jq
 * wget
 * git
@@ -101,7 +101,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 * firewalld
 * Python modules required in the playbooks. Namely:
   * openstackclient 
-  * openstacksdk >= 0.57.0
+  * openstacksdk 
   * netaddr
 
 **Register:**
@@ -112,7 +112,7 @@ sudo subscription-manager register --username <username> --password <password> -
 ```
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
-**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.3 and RHEL8.5. 
+**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.4 and RHEL8.6. 
 ```sh
 sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
 ```
@@ -130,7 +130,6 @@ sudo alternatives --set python /usr/bin/python3
 Upgrade the pip package and dnf:
 ```sh
 sudo -H pip3 install --upgrade pip
-sudo dnf update -y
 ```
 Install the required package through dnf:
 ```sh
@@ -144,19 +143,21 @@ cat <<'EOF' >> requirements.txt
 # The order of packages is significant, because pip processes them in the order
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
-pbr!=2.1.0,>=2.0.0 # Apache-2.0
-cliff>=3.5.0 # Apache-2.0
-iso8601>=0.1.11 # MIT
-openstacksdk>=0.57.0 # Apache-2.0
-osc-lib>=2.3.0 # Apache-2.0
-oslo.i18n>=3.15.3 # Apache-2.0
-oslo.utils>=3.33.0 # Apache-2.0
-python-keystoneclient>=3.22.0 # Apache-2.0
-python-novaclient>=17.0.0 # Apache-2.0
-python-cinderclient>=3.3.0 # Apache-2.0
-stevedore>=2.0.1 # Apache-2.0
-netaddr>=0.8.0
-python-openstackclient>=5.5.0
+pbr==5.4.5
+cliff==3.1.0
+iso8601==0.1.12
+openstacksdk==0.46.0
+osc-lib==2.0.0
+oslo.i18n==4.0.1
+oslo.utils==3.42.1
+python-keystoneclient==4.0.0
+python-cinderclient==7.0.0
+python-novaclient==17.0.0
+stevedore==1.32.0
+dogpile-cache==0.9.0
+stevedore==1.32.0
+netaddr==0.7.19
+python-openstackclient==5.2.2
 EOF
 
 sudo pip3 install -r requirements.txt python-openstackclient --ignore-installed
@@ -190,6 +191,7 @@ The login should now complete without asking for a password.
 
 4. Copy the `icicrc` file from the IBM Cloud Infrastructure Center management node to your user's `/opt/ibm/icic/icicrc` directory:
 ```sh
+mkdir -p /opt/ibm/icic
 scp -r user@host:/opt/ibm/icic/icicrc /opt/ibm/icic/icicrc
 ```
 
