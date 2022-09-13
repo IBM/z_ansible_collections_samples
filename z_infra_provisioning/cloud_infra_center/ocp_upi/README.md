@@ -76,7 +76,6 @@ After you performed the previous steps successfully, you get one ready OpenShift
 
 - **(Required)** A Linux server, the machine that runs Ansible.
     - RHEL8 is the operation system version we tested
-    - Python == 3.6.8
     - Ansible == 2.8
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
