@@ -113,7 +113,8 @@
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    #- subnet: "{{ os_subnet }}"
+    - subnet_id: "255.255.252.0"
       ip_address: "{{ os_bootstrap_ip }}"
   when:
   - auto_allocated_ip == false
@@ -125,7 +126,8 @@
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    # subnet: "{{ os_subnet }}"
+    - subnet_id: "255.255.252.0"
       ip_address: "{{ os_master_ip[item.0] }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
@@ -138,7 +140,8 @@
     security_groups:
     - "{{ os_sg_worker }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    # subnet: "{{ os_subnet }}"
+    - subnet_id: "255.255.252.0"
       ip_address: "{{ os_infra_ip[item.0]}}"
   with_indexed_items:  "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:

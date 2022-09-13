@@ -34,38 +34,75 @@ all:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
       
-      use_network_name: '<network-name-from-icic>'
-      use_network_subnet: '<subnet-id-from-network-name-in-icic>'
+      use_network_name: 'VLAN1284'
+      use_network_subnet: '51688967-9b2d-46af-9f9e-dd13b9fcb988'
 
       vm_type: 'kvm' # kvm or zvm
       disk_type: 'dasd' # dasd or scsi
       #volume_type_id: '<storage-template-id>'
       
-      openshift_version: '4.7'
-      openshift_minor_version: '7'
+      openshift_version: '4.10'
+      openshift_minor_version: '16'
       
-      auto_allocated_ip: true  # true or false
+      auto_allocated_ip: false  # true or false
       #allocation_pool_start: '<ip range start>'
       #allocation_pool_end: '<ip range end>'
-      os_flavor_bootstrap: 'medium'
-      os_flavor_master: 'medium'
-      os_flavor_worker: 'medium' 
+      os_flavor_bootstrap: 'm1.medium'
+      os_flavor_master: 'm1.medium'
+      os_flavor_worker: 'm1.medium' 
 
-      create_server_zone: ''
+      create_server_zone: 'z14_AZ'
       os_control_nodes_number: 3
-      os_compute_nodes_number: 3
+      os_compute_nodes_number: 2
 
-      #os_bootstrap_ip: '<bootstrap ip addr>'
-      #os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
-      #os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
+      os_bootstrap_ip: '10.20.82.25'
+      os_master_ip: ['10.20.82.17', '10.20.82.18', '10.20.82.19']
+      os_infra_ip: ['10.20.82.20', '10.20.82.21']
       
       use_proxy: false # true or false
       #http_proxy: '<http-proxy>'
       #https_proxy: '<https-proxy>'
       #no_proxy: '<no-proxy>'
 
-      approve_nodes_csr: 10 # minute
-      create_server_timeout: 10 # minute
+      use_localreg: true # true or false
+      localreg_mirror: "intreg0.fpet.pokprv.stglabs.ibm.com:5000/ocp4/openshift4"
+      localreg_source1: "quay.io/openshift-release-dev/ocp-release"
+      localreg_source2: "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+      localreg_media: "http://fpetutil.fpet.pokprv.stglabs.ibm.com/lzocpc"
+
+      additional_certs: |
+        additionalTrustBundle: |
+          -----BEGIN CERTIFICATE-----
+          MIIEuzCCAyOgAwIBAgIBATANBgkqhkiG9w0BAQsFADBGMSQwIgYDVQQKDBtGUEVU
+          LlBPS1BSVi5TVEdMQUJTLklCTS5DT00xHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1
+          dGhvcml0eTAeFw0yMTA4MTYxNTA2MjJaFw00MTA4MTYxNTA2MjJaMEYxJDAiBgNV
+          BAoMG0ZQRVQuUE9LUFJWLlNUR0xBQlMuSUJNLkNPTTEeMBwGA1UEAwwVQ2VydGlm
+          aWNhdGUgQXV0aG9yaXR5MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA
+          58r05eSLyAlHWu2mMtXUPRareADrIKfumz6O9YSrcxXXXs21P5YsIVMMi79v9DOi
+          LWyVdIQ5sX8ABSkIFmvyR0+uryd7zOlFuZJ34eIyQ8hJJVcmIJw+3n8x8sa0HbZ8
+          ao3OZz3YrM1svAey4XBINl9won50lrx8asbRC29EJtPE6URrB4qO6Fenx9IZ67nW
+          GC8KeXSTliX161PS7JNDcQOb5obtIP7SGjsCVL5xXVfrSPzcc6Kbg1soErpVTJ1u
+          ZqI5Bg35duVUdq8nyFNcpPZ0bJcIyT7eN11oh50/gzDc7bgnp2RJJosPl+FDEEXZ
+          44QxnioHOiRIngUkCM7dDgrPjdq2PCTiw+YykmR6KThdm0bnZ81Nyso/9CEnWZqU
+          DYpbSnO6Gkz/aTdxAZ9b0jKxlsDuPRH0yHUuNCsecUadeOazQyHvr3mecaOCxc2E
+          vPLrj8T01n6Un5n1K3AgZ9Qtp3DzxvQmhkBLe183V870FMYnzoVE2R5p9Tanztqb
+          AgMBAAGjgbMwgbAwHwYDVR0jBBgwFoAUWl1Gycb6XU6QdKILW25GCvvciRAwDwYD
+          VR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAcYwHQYDVR0OBBYEFFpdRsnG+l1O
+          kHSiC1tuRgr73IkQME0GCCsGAQUFBwEBBEEwPzA9BggrBgEFBQcwAYYxaHR0cDov
+          L2lwYS1jYS5mcGV0LnBva3Bydi5zdGdsYWJzLmlibS5jb20vY2Evb2NzcDANBgkq
+          hkiG9w0BAQsFAAOCAYEA545ByUeL8jtRnfGrqQQJuRE/+exUe+/e4sWzASHC6Z/z
+          y0rjcM5dMdNYTGiy2lidF4lcBV0mTc28ubO0vZ68MzH4uYT4KObsC0e4xxKO2EH6
+          6RL6oJ9f2zKpOu28fcyKRjA74OLb+69354Qpr8TmQhkWRb7tE9hj1OQHrj+uJG+l
+          CQzvAKxDBYWqDwAkWhsBXi/EBesCkCXoJDlyE9my8eAndUOLRNDqlFZJPDuasJrZ
+          EdQJie9exU+CU1+Hm0oQH3HWsfvSgg/vAUk9MXrTxets0eVY22G5kZKSZvSnN9A7
+          oL8PNCuq3BZleSNxgeovoBp3mIMrFfwHIRwu8EL3CeFecV6wOaZrFBRU938mLwVa
+          RPPm1I4wxEnqSn9yqLkBiFGbb0o5ELfGMv2zHGiR+wHGYbelbS2ewCLgo/+w690E
+          rtlwkB3+yU4Qwld+BiRSb84CvGufVSeZ2abPk7Kf67fLRfKtIHza4hzJwpo6z4wq
+          bRaUkgKe6w4n+XYm7WGg
+          -----END CERTIFICATE-----
+
+      approve_nodes_csr: 15 # minute
+      create_server_timeout: 15 # minute
 
     bastion:
       ansible_ssh_host: '<linux-server-ip-addr>'
@@ -75,8 +112,8 @@ all:
       dns_forwarder: '<upstream-dns-ip-addr>'
 
   vars:
-    os_dns_domain: '<external-dns-ip-addr>'
-    cluster_name: '<cluster-name>'
-    base_domain: '<cluster-base-domain>'
-    pullsecret: '<pull-secret>'
-    sshkey: '<ssh-key>'
+    os_dns_domain: '10.0.10.4'
+    cluster_name: 'lzocpfm1'
+    base_domain: 'fpet.pokprv.stglabs.ibm.com'
+    pullsecret: '{"auths":{"intreg0.fpet.pokprv.stglabs.ibm.com:5000": {"auth": "b2Nwc3lzdGVtOldFZlZxY1hkREdTSjdiUg==","email": "rjbrenn@us.ibm.com"}}}'
+    sshkey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBlBQw4IBxyn9W2hF+MDTRW21fq91PT3e0fwnKa2aTQz fpmitaro@us.ibm.com'

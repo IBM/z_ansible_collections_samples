@@ -1,0 +1,38 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-installer-and-image
+
+- name: Download openshift installer
+  #  become: yes
+  get_url:
+    url: '{{ localreg_media }}/openshift-install'
+    dest: .
+    mode: 0755
+    #group: root
+    #owner: root
+
+- name: Download openshift client
+  #become: yes
+  get_url:
+    url: '{{ localreg_media }}/openshift-client-linux.tar.gz'
+    dest: .
+    mode: 0644
+    #group: root
+    #owner: root
+
+- name: Unzip openshift client archive
+  command:
+    cmd: tar -zvxf openshift-client-linux.tar.gz
+  
+- name: Remove openshift client archive
+  file:
+    state: absent
+    path: openshift-client-linux.tar.gz
