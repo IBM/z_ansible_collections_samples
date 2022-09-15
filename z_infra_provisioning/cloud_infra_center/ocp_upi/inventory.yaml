@@ -64,6 +64,15 @@ all:
       #https_proxy: '<https-proxy>'
       #no_proxy: '<no-proxy>'
 
+      use_localreg: false # true or false
+      #localreg_mirror: "intreg0.fpet.pokprv.stglabs.ibm.com:5000/ocp4/openshift4"
+
+      #local_openshift_install: '<local-openshift-install-url>'
+      #local_openshift_client: '<local-openshift-client-url>'
+      #local_rhcos_image: '<local-rhcos-image-url>'
+
+      #additional_certs: "{{ lookup('file', '/etc/pki/ca-trust/source/anchors/image_registry.crt') | indent (width=2) }}"
+
       approve_nodes_csr: 10 # minute
       create_server_timeout: 10 # minute
 
