@@ -158,6 +158,7 @@ dogpile-cache==0.9.0
 stevedore==1.32.0
 netaddr==0.7.19
 python-openstackclient==5.2.2
+cryptography==3.2.1
 EOF
 
 sudo pip3 install -r requirements.txt python-openstackclient --ignore-installed
@@ -192,7 +193,7 @@ The login should now complete without asking for a password.
 4. Copy the `icicrc` file from the IBM Cloud Infrastructure Center management node to your user's `/opt/ibm/icic/icicrc` directory:
 ```sh
 mkdir -p /opt/ibm/icic
-scp -r user@host:/opt/ibm/icic/icicrc /opt/ibm/icic/icicrc
+scp -r user@host:/opt/ibm/icic/icicrc /opt/ibm/icic/
 ```
 
 5. Copy the `icic.crt` file from the IBM Cloud Infrastructure Center management node to your certs directory `/etc/pki/tls/certs/`:
