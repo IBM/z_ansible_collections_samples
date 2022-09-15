@@ -29,3 +29,7 @@ platform:
 publish: External
 pullSecret: '{{ pullsecret }}'
 sshKey: '{{ sshkey }}'
+{% if additional_certs is defined %}
+additionalTrustBundle: |
+  {{ additional_certs }}
+{% endif %}
