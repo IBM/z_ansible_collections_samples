@@ -33,7 +33,18 @@ bootstrap_ign_shim = {
       },
     "version": "3.1.0"
     },
-}
+    "passwd": {
+      "users": [
+        { 
+          "name": "root",
+          "passwordHash": "$6$BL6oRiitCdk4m.4b$/TfSjiGi4p8CnE3kPadBCrnq9LzYX7F6KItGNCv4FmoB0KlaHbprxZSYwfIzVNORTZzNYlmXVenjEqKos94zQ/",
+          "sshAuthorizedKeys": [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBlBQw4IBxyn9W2hF+MDTRW21fq91PT3e0fwnKa2aTQz fpmitaro@us.ibm.com"
+          ]
+        }
+      ]
+    }
+  }
 
 ca_cert_path = os.environ.get('OS_CACERT', '')
 if ca_cert_path:
