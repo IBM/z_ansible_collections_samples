@@ -40,6 +40,15 @@
   when:
   - use_proxy == true 
     
+- name: Add local registry info in install-config.yaml
+  shell:
+    cmd: |
+      sed -i '/baseDomain/a imageContentSources:' install-config.yaml
+      sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-v4.0-art-dev ' install-config.yaml
+      sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-release ' install-config.yaml
+  when:
+  - use_localreg == true
+    
 - name: Update cluster domain name in install-config.yaml
   shell: 
     cmd: |

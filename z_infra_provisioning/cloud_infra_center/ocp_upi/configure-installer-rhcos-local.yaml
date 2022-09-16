@@ -8,7 +8,7 @@
 # =================================================================
 
 ---
-- import_playbook: configure-bootstrap.yaml
-- import_playbook: configure-control-plane.yaml
-- import_playbook: wait-for-bootstrap-complete.yaml
-- import_playbook: destroy-bootstrap.yaml
+- name: Download openshift RHCOS image from local mirror
+  hosts: localhost
+  roles:
+  - configure-installer-rhcos-local
