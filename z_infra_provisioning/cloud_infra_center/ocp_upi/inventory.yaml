@@ -34,8 +34,8 @@ all:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
       
-      use_network_name: 'VLAN1284'
-      use_network_subnet: '51688967-9b2d-46af-9f9e-dd13b9fcb988'
+      use_network_name: 'VLAN1287'
+      use_network_subnet: '22c2cf48-7412-4d28-88ec-6d7ef7143626'
 
       vm_type: 'kvm' # kvm or zvm
       disk_type: 'dasd' # dasd or scsi
@@ -55,9 +55,9 @@ all:
       os_control_nodes_number: 3
       os_compute_nodes_number: 2
 
-      os_bootstrap_ip: '10.20.82.25'
-      os_master_ip: ['10.20.82.17', '10.20.82.18', '10.20.82.19']
-      os_infra_ip: ['10.20.82.20', '10.20.82.21']
+      os_bootstrap_ip: '10.20.84.40'
+      os_master_ip: ['10.20.84.35', '10.20.84.36', '10.20.84.37']
+      os_infra_ip: ['10.20.84.38', '10.20.84.39']
       
       use_proxy: false # true or false
       #http_proxy: '<http-proxy>'
