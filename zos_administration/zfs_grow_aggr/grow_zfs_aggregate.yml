@@ -3,27 +3,24 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to copy data to and from a z/OS system
-# using modules included in the Red Hat Ansible Certified Content for IBM Z
-# core collection.
+# This sample playbook demonstrates how to grow a ZFS aggregate using modules
+# included in the Red Hat Ansible Certified Content for IBM Z core collection.
 #
 # Usage:
 #  ansible-playbook -i <inventories> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventories copy_fetch_data_set.yml # FIXME! TODO
-#
-# Notes:
-#  This sample demonstrates ... TODO
+#  ansible-playbook -i inventories grow_zfs_aggregate.yml
 #
 # Requirements:
 #   IBM z/OS core collection 1.2.0 or later
 #
 # Configure:
 # Optional:
-#   zfs_dsn     - this is the ZFS data set aggregate. 
 #   mount_point - this is the z/OS USS location where the ZFS aggr would be
 #                 mounted.
+#   aggr_growth_size - this is the new size of the ZFS data set after it is
+#                       grown.
 ###############################################################################
 
 ---
@@ -40,6 +37,7 @@
     # ##########################################################################
     # Generate and set temporary data set name.
     # ##########################################################################
+
     - name: Create temp ZFS data set name
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_zfs_dsn
@@ -55,6 +53,7 @@
     # ##########################################################################
     # Create and Mount ZFS data set.
     # ##########################################################################
+
     - name: Create ZFS.
       zos_data_set:
         name: "{{ zfs_dsn }}"
@@ -97,12 +96,6 @@
       shell: "df -kP {{ mount_point }}"
       register: df_output_before
 
-    # - name: Echo aggrinfo_output_before and percent-use BEFORE growth.
-    #   debug:
-    #     msg:
-    #       - "{{ aggrinfo_output_before.stdout_lines }}"
-    #       - "{{ df_output_before.stdout_lines }}"
-
     - name: Grow ZFS aggregate.
       command: zfsadm grow -aggregate {{ zfs_dsn }} -size "{{ aggr_growth_size }}"
       register: grow_output
@@ -129,13 +122,10 @@
           - "{{ aggrinfo_output_after.stdout_lines }}"
           - "{{ df_output_after.stdout_lines }}"
 
-
-
     # ##########################################################################
-    # clean up.
+    # clean up - unmount and delete ZFS data sets
     # ##########################################################################
 
-    # unmount data set
     - name: Unmount ZFS data set.
       command: "/usr/sbin/unmount {{ mount_point }}"
 
