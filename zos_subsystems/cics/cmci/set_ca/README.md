@@ -36,7 +36,7 @@ ansible-galaxy collection install ibm.ibm_zos_cics
 
 To run this playbook, you will need to have local access to the CA certificate in
 PEM format.  Extract your certificate and convert it to PEM format, saving it along
-side the playbook, with the name `ca_caerts.pem`.
+side the playbook, with the name `ca_certs.pem`.
 
 For more information about the CMCI REST API, see the
 [CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/5.6?topic=environment-cics-management-client-interface-cmci).
