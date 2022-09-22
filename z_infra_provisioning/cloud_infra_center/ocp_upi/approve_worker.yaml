@@ -1,0 +1,29 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+- name: sleep 10s
+  command: "sleep 10"
+  loop: "{{range(3)|list}}"
+  async: 11
+  poll: 0
+  register: async_loop
+
+- debug: var=async_loop
+
+- name: wait
+  async_status:
+    jid: "{{item.ansible_job_id}}"
+    mode: status
+  retries: 11
+  delay: 1
+  loop: "{{async_loop.results}}"
+  register: async_loop_jobs
+  until: async_loop_jobs.finished
+
+- debug: var=async_loop_jobs

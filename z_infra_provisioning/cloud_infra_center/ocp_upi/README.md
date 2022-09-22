@@ -343,14 +343,22 @@ After above steps, you will get one ready OpenShift Container Platform on the IB
 
 ## Day2 Operation
 
-### Add a new compute node
-Use this playbook to add new compute node as allocated IP:
+### Add compute node
+Use this playbook to add a new compute node as allocated IP:
 ```sh
 ansible-playbook -i inventory.yaml add-new-compute-node.yaml 
 ```
-Use this playbook to add new compute node as fixed IP:
+Use this playbook to add a new compute node as fixed IP:
 ```sh
-ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.xs
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x
+```
+Use this playbook to add multiple compute nodes as allocated IP:
+```sh
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e worker_number=3
+```
+Use this playbook to add multiple compute nodes as fixed IP, separate the IP list with commas:
+```sh
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x,x.x.x.x -e worker_number=2
 ```
 **Please notice:**
 The new compute node should be updated corresponding DNS and Load Balancer. If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, you may skip this part.
