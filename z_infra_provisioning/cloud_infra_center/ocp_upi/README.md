@@ -352,28 +352,16 @@ Use this playbook to add a new compute node as fixed IP:
 ```sh
 ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x
 ```
-Use this playbook to add multiple compute nodes as allocated IP:
+Use this playbook to add multiple compute nodes as allocated IP, and update bastion info automatically:
 ```sh
-ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e worker_number=3
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e worker_number=3 -e update_bastion=true
 ```
-Use this playbook to add multiple compute nodes as fixed IP, separate the IP list with commas:
+Use this playbook to add multiple compute nodes as fixed IP, separate the IP list with commas, and update bastion info automatically:
 ```sh
-ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x,x.x.x.x -e worker_number=2
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x,x.x.x.x -e worker_number=2 -e update_bastion=true
 ```
 **Please notice:**
-The new compute node should be updated corresponding DNS and Load Balancer. If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, you may skip this part.
-* If you use our `bastion.yaml` playbook to configure the DNS server and Load Balancer, you can use this playbook to update those two directly.
-```sh
-ansible-playbook -i inventory.yaml modify-bastion.yaml
-```
-* If you use our `configure-haproxy.yaml` playbook to configure the Load Balancer, you can use this playbook to update HAProxy too.
-```sh
-ansible-playbook -i inventory.yaml modify-haproxy.yaml
-```
-* If you use our `configure-dns.yaml` playbook to configure the DNS server, you can use this playbook to update DNS too.
-```sh
-ansible-playbook -i inventory.yaml modify-dns.yaml
-```
+> If you use your own bastion server, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update bastion info.
 
 ## Uninstall Red Hat OpenShift Container Platform
 
