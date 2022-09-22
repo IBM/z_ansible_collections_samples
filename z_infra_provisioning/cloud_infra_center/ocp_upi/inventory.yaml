@@ -51,7 +51,7 @@ all:
       os_flavor_master: 'm1.medium'
       os_flavor_worker: 'm1.medium' 
 
-      create_server_zone: 'z15_AZ'
+      create_server_zone: 'z16_AZ'
       os_control_nodes_number: 3
       os_compute_nodes_number: 2
 
