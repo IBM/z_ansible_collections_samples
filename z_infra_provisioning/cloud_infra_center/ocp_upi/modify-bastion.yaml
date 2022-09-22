@@ -25,7 +25,22 @@
 #
 # Change Summary: 
 # - Change Ansible playbook name
-
 ---
-- import_playbook: modify-dns.yaml
-- import_playbook: modify-haproxy.yaml
+- name: modify dns on bastion
+  hosts: bastion
+  
+  tasks:
+  - name: 'Modify bastion dns for new worker'
+    include_tasks: modify-dns.yaml
+    vars:
+        worker_ip: "{{ item.split(',')[1] | replace('ip=','') }}"
+        worker_index: "{{ item.split(',')[0][-4:] }}"
+        cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
+    with_lines: cat .new_worker_index
+
+  - name: 'Modify bastion haproxy for new worker'
+    include_tasks: modify-haproxy.yaml
+    vars:
+      worker_index: "{{ item.split(',')[0][-4:] }}"
+      cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
+    with_lines: cat .new_worker_index
