@@ -202,8 +202,5 @@
     register: worker_csr_sleeper
     with_lines: cat .new_worker_name
 
-  - debug:
-      var: worker_csr_sleeper.stdout
-
-- import_playbook: modify_bastion.yml
+- import_playbook: modify-bastion.yaml
   when: update_bastion == "true"
