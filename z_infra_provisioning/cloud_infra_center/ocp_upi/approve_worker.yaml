@@ -7,23 +7,19 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 
-- name: sleep 10s
-  command: "sleep 10"
-  loop: "{{range(3)|list}}"
-  async: 11
-  poll: 0
-  register: async_loop
-
-- debug: var=async_loop
-
-- name: wait
-  async_status:
-    jid: "{{item.ansible_job_id}}"
-    mode: status
-  retries: 11
-  delay: 1
-  loop: "{{async_loop.results}}"
-  register: async_loop_jobs
-  until: async_loop_jobs.finished
-
-- debug: var=async_loop_jobs
+- name: Approving the worker CSR
+  block:
+    - name: Approve CSR in loop
+      environment:
+        KUBECONFIG: "./auth/kubeconfig"
+      shell: |
+        ./oc get csr -o name | xargs oc adm certificate approve &> /dev/null
+        echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
+      register: result
+      until: result.stdout.find("{{ workerid }}") != -1
+      retries: 30
+      delay: 10
+  rescue:
+    - name: Approve CSR failed
+      debug:
+        msg: 'Please approve all pending CSR manually via: oc get csr -o name | xargs oc adm certificate approve'
