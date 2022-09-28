@@ -291,7 +291,6 @@ Others are **optional**, you can enable them and update value if you need more s
 | `local_openshift_client` |\<local-openshift-client-url\>| This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here
 | `local_rhcos_image` |\<local-rhcos-image-url\>| This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here
 | `additional_certs` |`{{ lookup('file', '/opt/registry/certs/domain.crt') \| indent (width=2) }}`| The local mirror registry repo additionally need SSL certificated to be accessed, those can be added cert file via the `additional_certs` variable.
-| `approve_nodes_csr` |10| Default is 10 minutes that used to wait for approving node csrs
 | `create_server_timeout` |10| Default is 10 minutes that used to create instances and volumes from backend storage provider
 
 ## Creation of the cluster
