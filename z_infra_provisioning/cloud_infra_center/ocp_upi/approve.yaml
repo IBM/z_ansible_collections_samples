@@ -11,95 +11,19 @@
   gather_facts: no
 
   tasks:
-  - name: Approving all pending CSR
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get csr | awk '{print $1'} | grep -v NAME | xargs ./oc adm certificate approve
-    register: csr_approved_1
-    ignore_errors: yes
-  #- name: viewing first csr approved
-  #  debug:
-  #    msg: "{{csr_approved_1.stdout_lines}}"
-  - pause: seconds=60
-
-  - name: Second round approving all pending CSR
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get csr | awk '{print $1'} | grep -v NAME | xargs ./oc adm certificate approve
-    register: csr_approved_2
-    ignore_errors: yes
-
-  # - name: viewing second csr approved
-  #   debug:
-  #     msg: "{{csr_approved_2.stdout_lines}}"
-  - pause: seconds=60
-
-  - name: Third round approving all pending CSR
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get csr | awk '{print $1'} | grep -v NAME | xargs ./oc adm certificate approve
-    register: csr_approved_3
-    ignore_errors: yes
-
-  # - name: viewing third csr approved
-  #   debug:
-  #     msg: "{{csr_approved_3.stdout_lines}}"
-
-  - pause: seconds=60
-
-  - name: Fourth round approving all pending CSR
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get csr | awk '{print $1'} | grep -v NAME | xargs ./oc adm certificate approve
-    register: csr_approved_4
-    ignore_errors: yes
-
-  # - name: viewing fourth csr approved
-  #   debug:
-  #     msg: "{{csr_approved_4.stdout_lines}}"
-
-  - pause: seconds=60
-
-  - name: Fifth round approving all pending CSR
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get csr | awk '{print $1'} | grep -v NAME | xargs ./oc adm certificate approve
-    register: csr_approved_5
-    ignore_errors: yes
-  # - name: viewing fifth csr approved
-  #   debug:
-  #     msg: "{{csr_approved_4.stdout_lines}}"
-
-  - name: Get ready nodes count from OCP cluster
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get nodes --no-headers=true | grep worker | wc -l
-    register: existing_node_count
-
-  - name: Get total node count from yaml file
-    shell: "cat .new_ocp_node.yml | grep total_count | awk -F '=' '{print $2}'"
-    register: total_node_count
-
-  - name: Waiting more than {{ approve_nodes_csr }} minutes within poor performance node
-    script: tools/wait-nodes-csrs.py {{ total_node_count.stdout }} {{ approve_nodes_csr }}
-    args:
-      executable: python3
-    when: existing_node_count.stdout != total_node_count.stdout
-
-  - name: Second get ready nodes count from OCP cluster
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    shell: |
-      ./oc get nodes --no-headers=true | grep worker | wc -l
-    register: second_node_count
-
-  - name: Failed task after approving all pending CSR within {{ approve_nodes_csr }} minutes
-    fail:
-      msg: "Please increase default approving CSR minutes by approve_nodes_csr, or approving all pending CSR manually via: oc get csr | grep -i pend | awk '{print $1}' | xargs oc adm certificate approve"
-    failed_when: second_node_count.stdout != total_node_count.stdout
+  - name: Approving the worker CSR
+    block:
+      - name: Approve CSR in loop
+        environment:
+          KUBECONFIG: "./auth/kubeconfig"
+        shell: |
+          ./oc get csr -o name | xargs oc adm certificate approve &> /dev/null
+          echo $(./oc get nodes |grep 'worker-'|wc -l)
+        register: csr_worker
+        until: csr_worker.stdout == {{ os_compute_nodes_number }}
+        retries: 30
+        delay: 10
+    rescue:
+      - name: Approve CSR failed
+        debug:
+          msg: 'Please approve all pending CSR manually via: oc get csr -o name | xargs oc adm certificate approve'

@@ -73,7 +73,6 @@ all:
 
       #additional_certs: "{{ lookup('file', '/opt/registry/certs/domain.crt') | indent (width=2) }}"
 
-      approve_nodes_csr: 10 # minute
       create_server_timeout: 10 # minute
 
     bastion:
