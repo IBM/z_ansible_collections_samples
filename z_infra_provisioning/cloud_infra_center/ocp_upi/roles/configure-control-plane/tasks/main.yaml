@@ -85,11 +85,6 @@
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }}"
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
-  register: create_master
-  changed_when: False
-  failed_when:
-    - create_master.module_stderr.find('0 has length 1; 2 is required')  == -1
-    - create_master.rc != 0
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
@@ -117,11 +112,6 @@
     volume_size: "{{ master_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
-  register: create_master
-  changed_when: False
-  failed_when:
-    - create_master.module_stderr.find('0 has length 1; 2 is required')  == -1
-    - create_master.rc != 0
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
@@ -138,11 +128,6 @@
     metadata: "{{ cluster_id_tag }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
-  register: create_master
-  changed_when: False
-  failed_when:
-    - create_master.module_stderr.find('0 has length 1; 2 is required')  == -1
-    - create_master.rc != 0
   when: 
   - disk_type == "scsi"
   - volume_type_id is defined
@@ -168,11 +153,6 @@
     meta: "{{ cluster_id_tag }}"
     terminate_volume: True
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
-  register: create_master
-  changed_when: False
-  failed_when:
-    - create_master.module_stderr.find('0 has length 1; 2 is required')  == -1
-    - create_master.rc != 0
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
