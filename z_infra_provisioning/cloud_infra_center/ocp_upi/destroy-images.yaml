@@ -14,10 +14,22 @@
 # limitations under the License.
 # =================================================================
 
----
-- import_playbook: destroy-controls.yaml
-- import_playbook: destroy-bootstrap.yaml
-- import_playbook: destroy-computes.yaml 
-- import_playbook: destroy-network.yaml
-- import_playbook: destroy-security-groups.yaml
-- import_playbook: destroy-files.yaml
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- hosts: localhost
+  gather_facts: no
+
+  tasks:
+
+  - name: Get existing rhcos image from ICIC glance
+    shell: "openstack image list --format value| grep -w 'rhcos'| wc -l"
+    register: icic_rhcos_count
+
+  - name: 'Remove the rhcos image'
+    shell:
+      cmd: "openstack image delete rhcos"
+    when: icic_rhcos_count.stdout | int == 1
