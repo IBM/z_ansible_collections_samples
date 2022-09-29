@@ -369,9 +369,17 @@ ansible-playbook -i inventory.yaml modify-dns.yaml
 ```
 
 ## Uninstall Red Hat OpenShift Container Platform
-
 `ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
+## Remove RHCOS images
+In order to save image space, our playbook will not delete the uploaded image automatically, user can use this individual playbook to remove it.
+`ansible-playbook -i inventory.yaml destroy-images.yaml`
+
+And we store the SHA256 value into image properties to verify downloading images, the SHA256 comes from the `gz` packages.
+```
+| owner_specified.openstack.object | images/rhcos                                                                     |
+| owner_specified.openstack.sha256 | fc265b2d5b6c9f6d175e8b15f672aba78f6e4707875f9accaa2cb74e3d90d27b
+```
 
 ## Copyright
 © Copyright IBM Corporation 2021
