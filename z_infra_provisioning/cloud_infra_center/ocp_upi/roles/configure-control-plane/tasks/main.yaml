@@ -89,6 +89,10 @@
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
   - disk_type == "dasd"
+  register: create_master
+  failed_when:
+    - '"failed: [localhost]" in create_master'
+    - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master'
 
 - name: 'Convert master flavor from value into number'
   command:
@@ -124,6 +128,10 @@
   when:
   - disk_type == "scsi"
   - volume_type_id is not defined
+  register: create_master
+  failed_when:
+    - '"failed: [localhost]" in create_master'
+    - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master'
   
 - name: Create control boot volume
   os_volume:
