@@ -30,7 +30,6 @@
     set_fact: 
       add_worker_number: "{{ worker_number | default(1) }}"
       add_worker_ip: "{{ ip | default('random') }}"
-      update_bastion: "{{ update_bastion | default(false) }}"
 
   - name: 'Set worker ip'
     set_fact: 
@@ -56,17 +55,9 @@
       rm -rf .new_worker_name
       cut -d"," -f1 .new_worker_index >> .new_worker_name
 
-  - name: 'Add node ip into worker index'
-    shell: 
-      for i in $(seq 1 {{ add_worker_ip| length }}); do sed -i "s|$|$i|" .new_worker_index; done
-    when: add_worker_ip != "random"
-
   - name: 'Add worker ip'
     shell: |
-      for i in $(seq 1 {{ add_worker_ip| length }})
-      do
-          sed -i -e "0,/random$i/s//{{ item }}/" .new_worker_index
-      done
+        sed -i '0,/random/s//{{ item }}/' .new_worker_index
     with_items:
       - "{{ add_worker_ip}}"
     when: add_worker_ip != "random"
@@ -83,7 +74,7 @@
       - "{{ os_sg_worker }}"
       fixed_ips:
         - subnet: "{{ use_network_subnet }}"
-          ip_address: "{{ item.split(',')[1][:-2] | replace('ip=','') }}"
+          ip_address: "{{ item.split(',')[1] | replace('ip=','') }}"
     register: ports
     with_lines: cat .new_worker_index
     when: add_worker_ip != "random"
@@ -183,11 +174,6 @@
     - disk_type == "scsi"
     - volume_type_id is defined
 
-  - name: Remove last two characters in .new_worker_index
-    shell:
-      sed -i 's/.\{2\}$//' .new_worker_index
-    when: add_worker_ip != "random"
-
   - name: 'Update worker ip into new_worker_index file'
     shell: |
       worker_ip=$(openstack server list | grep "{{ item }}" | grep -oP "(?<=)\d+(\.\d+){3}")
@@ -203,4 +189,6 @@
     with_lines: cat .new_worker_name
 
 - import_playbook: modify-bastion.yaml
-  when: update_bastion == "true"
+  when: 
+  - update_bastion is defined
+  - update_bastion == "true"
