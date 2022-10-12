@@ -93,7 +93,7 @@
   - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
-  shell: openstack volume set --bootable "{{ os_bootstrap_server_name }}-boot"
+  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
   when: 
   - disk_type == "scsi"
   - volume_type_id is defined
