@@ -101,7 +101,7 @@
   - volume_type_id is defined
 
 - name: 'Set compute volume bootable'
-  shell: openstack volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
+  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when: 
   - disk_type == "scsi"
