@@ -47,11 +47,6 @@
     content: "{{ sunbet_range.stdout_lines[0]}}"
     dest: ".subnet_range.yml"
 
-- name: 'Save some basic info into yaml'
-  shell: |
-    rm -rf .new_ocp_node.yml
-    echo total_count={{ os_control_nodes_number | int }} >> .new_ocp_node.yml
-
 - name: 'Check netowrk name is properly set'
   fail:
     msg: "use_network_name is not defined!"
