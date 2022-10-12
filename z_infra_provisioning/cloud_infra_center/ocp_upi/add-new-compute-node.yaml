@@ -150,7 +150,7 @@
     - volume_type_id is defined
   
   - name: 'Set compute volume bootable'
-    shell: openstack volume set --bootable "{{ item }}-boot"
+    shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
     with_lines: cat .new_worker_name
     when: 
     - disk_type == "scsi"
