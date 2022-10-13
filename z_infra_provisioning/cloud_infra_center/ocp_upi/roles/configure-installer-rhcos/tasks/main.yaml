@@ -28,17 +28,28 @@
   register: openshift_rhcos_checksum_results
 
 - name: Get existing RHCOS image from ICIC glance
-  shell: "openstack image list --format value| grep -w 'rhcos'| awk '{print$1}'"
+  shell: |
+    if [ {{ vm_type }} == "kvm" ]; then
+      a=$(openstack image list --format value| grep -w 'rhcos_qcow2'| awk '{print$1}')
+    else
+      a=$(openstack image list --format value| grep -w 'rhcos_{{ disk_type }}'| awk '{print$1}')
+    fi
+    if [ -z $a ]; then echo empty; else echo $a; fi
   register: icic_rhcos_id
+
+- name: debug 
+  debug:
+    msg: "{{icic_rhcos_id}}"
 
 - name: Get existing RHCOS image SHA256 from ICIC glance
   shell: |
     if [ ! -z "{{ icic_rhcos_id.stdout }}" ]; then
-      echo $(openstack image show --format json -c properties {{ icic_rhcos_id.stdout }} | grep owner_specified.openstack.sha256 | cut -d ':' -f2 | sed 's/[^a-zA-Z0-9]//g')
+      echo $(openstack image show --format json -c properties {{ icic_rhcos_id.stdout }} | grep gz_sha256 | cut -d ':' -f2 | sed 's/[^a-zA-Z0-9]//g')
     else
       echo "rhcos"
     fi
   register: icic_rhcos_sha256_value
+  when: icic_rhcos_id.stdout != "empty"
 
 - name: Compare existing rhcos image with sha256
   shell: |
@@ -47,18 +58,37 @@
     elif [ ! -z "{{ icic_rhcos_id.stdout }}" ] && [ {{ vm_type }} = "zvm" ] && [ {{ disk_type }} = "dasd" ]; then
       count=$(grep -E '{{ icic_rhcos_sha256_value.stdout }}.*rhcos-dasd.s390x.raw.gz' .sha256sum_remote.txt | wc -l)
     elif [ ! -z "{{ icic_rhcos_id.stdout }}" ] && [ {{ vm_type }} = "kvm" ]; then
-      count=$(grep -E '{{ icic_rhcos_sha256_value.stdout }}.*rhcos-openstack.s390x.raw.gz' .sha256sum_remote.txt | wc -l)
+      count=$(grep -E '{{ icic_rhcos_sha256_value.stdout }}.*rhcos-openstack.*' .sha256sum_remote.txt | wc -l)
     else
       count=0
     fi
     echo $count
   register: use_local_rhcos
+  when: icic_rhcos_id.stdout != "empty"
 
-- name: Remove the existing RHCOS image from ICIC glance
-  shell: "openstack image delete rhcos"
+# - name: Remove the existing RHCOS image without sha256 from ICIC glance
+#   shell: "openstack image delete {{ item }}"
+#   with_items: "{{ icic_rhcos_id.stdout_lines }}"
+#   when: 
+#   - icic_rhcos_id.stdout != ""
+#   - icic_rhcos_sha256_value.stdout == ""
+
+- name: Remove the existing RHCOS image with unmatch sha256 from ICIC glance
+  shell: "openstack image delete {{ item }}"
+  with_items: "{{ icic_rhcos_id.stdout_lines }}"
   when: 
-  - icic_rhcos_id.stdout != ""
+  - icic_rhcos_id.stdout != "empty"
   - use_local_rhcos.stdout | int != 1
+
+- name: Get new RHCOS image from ICIC glance
+  shell: |
+    if [ {{ vm_type }} == "kvm" ]; then
+      out=$(openstack image list | grep -w 'rhcos_qcow2' | wc -l)
+    else
+      out=$(openstack image list | grep -w 'rhcos_{{ disk_type }}' | wc -l)
+    fi
+    echo $out
+  register: icic_rhcos_count
 
 - name: Download openshift rhcos metal image
   get_url:
@@ -67,7 +97,7 @@
   when:
   - vm_type == "zvm"
   - disk_type == "scsi"
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Download openshift rhcos dasd image
   get_url:
@@ -76,7 +106,7 @@
   when:
   - vm_type == "zvm"
   - disk_type == "dasd"
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Download openshift rhcos qcow2 image
   get_url:
@@ -84,50 +114,50 @@
     dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
   when:
   - vm_type == "kvm"
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Generate sha256 for local rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz
   shell: "sha256sum {{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz > .sha256sum_local.txt"
   when:
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Get sha256 for local rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz
   shell: "cat .sha256sum_local.txt | awk -F ' ' '{print $1}'"
   register: openshift_rhcos_sha256_results
   when:
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Unzip openshift rhcos image
   command:
     cmd: |
         gzip -d -f rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz
-  when: use_local_rhcos.stdout | int != 1
+  when: icic_rhcos_count.stdout | int != 1
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=raw  --property sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos_{{ disk_type }}
   when: 
   - vm_type == "zvm"
   - disk_type == "scsi"
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=raw  --property sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos_{{ disk_type }}
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=qcow2 --property sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos
+    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos_qcow2
   when: 
   - vm_type == "kvm"
-  - use_local_rhcos.stdout | int != 1
+  - icic_rhcos_count.stdout | int != 1
 
 - name: Remove local RHCOS image
   file:
     state: absent
     path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x
-  when: use_local_rhcos.stdout | int != 1
+  when: icic_rhcos_count.stdout | int != 1

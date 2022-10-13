@@ -97,7 +97,22 @@
   - name: 'Create the compute servers'
     os_server:
       name: "{{ item }}"
-      image: "rhcos"
+      image: "rhcos_qcow2"
+      flavor: "{{ os_flavor_worker }}"
+      auto_ip: no
+      timeout: "{{ create_server_timeout|int * 60 }}"
+      userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+      availability_zone: "{{ create_server_zone }}"
+      nics:
+        - port-name: "{{ item }}"
+    with_lines: cat .new_worker_name
+    when:
+    - vm_type == "kvm"
+    
+  - name: 'Create the compute servers'
+    os_server:
+      name: "{{ item }}"
+      image: "rhcos_{{ disk_type }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -108,6 +123,7 @@
     with_lines: cat .new_worker_name
     when:
     - disk_type == "dasd"
+    - vm_type == "zvm"
   
   - name: 'Convert compute server flavor from value into number'
     command:
@@ -119,7 +135,7 @@
   - name: 'Create the compute servers with default boot volume'
     os_server:
       name: "{{ item }}"
-      image: "rhcos"
+      image: "rhcos_{{ disk_type }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -133,13 +149,14 @@
     with_lines: cat .new_worker_name
     when:
     - disk_type == "scsi"
+    - vm_type == "zvm"
     - volume_type_id is not defined
 
   - name: 'Create compute boot volume'
     os_volume:
       state: present
       name: "{{ item }}-boot"
-      image: "rhcos"
+      image: "rhcos_{{ disk_type }}"
       size: "{{ compute_flavor_size.stdout_lines[0]}}"
       volume_type: "{{ volume_type_id }}"
       metadata: "{{ cluster_id_tag }}"
@@ -147,6 +164,7 @@
     with_lines: cat .new_worker_name
     when:
     - disk_type == "scsi"
+    - vm_type == "zvm"
     - volume_type_id is defined
   
   - name: 'Set compute volume bootable'
@@ -172,6 +190,7 @@
     with_lines: cat .new_worker_name
     when:
     - disk_type == "scsi"
+    - vm_type == "zvm"
     - volume_type_id is defined
 
   - name: 'Update worker ip into new_worker_index file'
