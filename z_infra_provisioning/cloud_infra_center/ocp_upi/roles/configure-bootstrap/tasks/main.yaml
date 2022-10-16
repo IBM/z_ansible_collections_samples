@@ -41,7 +41,7 @@
 - name: 'Create the bootstrap server'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "rhcos_qcow2"
+    image: "icic_rhcos_qcow2"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -56,7 +56,7 @@
 - name: 'Create the bootstrap server'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "rhcos_{{ disk_type }}"
+    image: "icic_rhcos_{{ disk_type }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -80,7 +80,7 @@
 - name: 'Create the bootstrap server with default boot volume'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "rhcos_{{ disk_type }}"
+    image: "icic_rhcos_{{ disk_type }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -101,7 +101,7 @@
   os_volume:
     state: present
     name: "{{ os_bootstrap_server_name }}-boot"
-    image: "rhcos_{{ disk_type }}"
+    image: "icic_rhcos_{{ disk_type }}"
     size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"

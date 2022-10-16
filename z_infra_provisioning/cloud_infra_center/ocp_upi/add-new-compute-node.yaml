@@ -97,7 +97,7 @@
   - name: 'Create the compute servers'
     os_server:
       name: "{{ item }}"
-      image: "rhcos_qcow2"
+      image: "icic_rhcos_qcow2"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -112,7 +112,7 @@
   - name: 'Create the compute servers'
     os_server:
       name: "{{ item }}"
-      image: "rhcos_{{ disk_type }}"
+      image: "icic_rhcos_{{ disk_type }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -135,7 +135,7 @@
   - name: 'Create the compute servers with default boot volume'
     os_server:
       name: "{{ item }}"
-      image: "rhcos_{{ disk_type }}"
+      image: "icic_rhcos_{{ disk_type }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -156,7 +156,7 @@
     os_volume:
       state: present
       name: "{{ item }}-boot"
-      image: "rhcos_{{ disk_type }}"
+      image: "icic_rhcos_{{ disk_type }}"
       size: "{{ compute_flavor_size.stdout_lines[0]}}"
       volume_type: "{{ volume_type_id }}"
       metadata: "{{ cluster_id_tag }}"
