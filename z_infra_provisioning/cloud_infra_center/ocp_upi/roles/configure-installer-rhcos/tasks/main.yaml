@@ -30,16 +30,12 @@
 - name: Get existing RHCOS image from ICIC glance
   shell: |
     if [ {{ vm_type }} == "kvm" ]; then
-      a=$(openstack image list --format value| grep -w 'rhcos_qcow2'| awk '{print$1}')
+      a=$(openstack image list --format value| grep -w 'icic_rhcos_qcow2'| awk '{print$1}')
     else
-      a=$(openstack image list --format value| grep -w 'rhcos_{{ disk_type }}'| awk '{print$1}')
+      a=$(openstack image list --format value| grep -w 'icic_rhcos_{{ disk_type }}'| awk '{print$1}')
     fi
     if [ -z $a ]; then echo empty; else echo $a; fi
   register: icic_rhcos_id
-
-- name: debug 
-  debug:
-    msg: "{{icic_rhcos_id}}"
 
 - name: Get existing RHCOS image SHA256 from ICIC glance
   shell: |
@@ -83,9 +79,9 @@
 - name: Get new RHCOS image from ICIC glance
   shell: |
     if [ {{ vm_type }} == "kvm" ]; then
-      out=$(openstack image list | grep -w 'rhcos_qcow2' | wc -l)
+      out=$(openstack image list | grep -w 'icic_rhcos_qcow2' | wc -l)
     else
-      out=$(openstack image list | grep -w 'rhcos_{{ disk_type }}' | wc -l)
+      out=$(openstack image list | grep -w 'icic_rhcos_{{ disk_type }}' | wc -l)
     fi
     echo $out
   register: icic_rhcos_count
@@ -144,7 +140,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos_{{ disk_type }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x icic_rhcos_{{ disk_type }}
   when: 
   - vm_type == "zvm"
   - disk_type == "scsi"
@@ -152,7 +148,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos_{{ disk_type }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x icic_rhcos_{{ disk_type }}
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
@@ -160,7 +156,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x rhcos_qcow2
+    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x icic_rhcos_qcow2
   when: 
   - vm_type == "kvm"
   - icic_rhcos_count.stdout | int != 1

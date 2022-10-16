@@ -69,7 +69,7 @@
 - name: 'Create the control servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "rhcos_qcow2"
+    image: "icic_rhcos_qcow2"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -98,7 +98,7 @@
 - name: 'Create the control servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "rhcos_{{ disk_type }}"
+    image: "icic_rhcos_{{ disk_type }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -134,7 +134,7 @@
 - name: 'Create the control servers with default boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "rhcos_{{ disk_type }}"
+    image: "icic_rhcos_{{ disk_type }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -168,7 +168,7 @@
   os_volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
-    image: "rhcos_{{ disk_type }}"
+    image: "icic_rhcos_{{ disk_type }}"
     size: "{{ master_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
