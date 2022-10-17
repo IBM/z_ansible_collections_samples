@@ -61,36 +61,27 @@
   - use_local_rhcos.stdout | int != 1
 
 - name: Download openshift rhcos metal image
-  become: yes
   get_url:
     url: "{{ openshift_rhcos_url }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-metal.s390x.raw.gz"
     dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
-    mode: 0755
-    force: yes
   when:
   - vm_type == "zvm"
   - disk_type == "scsi"
   - use_local_rhcos.stdout | int != 1
 
 - name: Download openshift rhcos dasd image
-  become: yes
   get_url:
     url: "{{ openshift_rhcos_url }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-dasd.s390x.raw.gz"
     dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
-    mode: 0755
-    force: yes
   when:
   - vm_type == "zvm"
   - disk_type == "dasd"
   - use_local_rhcos.stdout | int != 1
 
 - name: Download openshift rhcos qcow2 image
-  become: yes
   get_url:
     url: "{{ openshift_rhcos_url }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-openstack.s390x.qcow2.gz"
     dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
-    mode: 0755
-    force: yes
   when:
   - vm_type == "kvm"
   - use_local_rhcos.stdout | int != 1

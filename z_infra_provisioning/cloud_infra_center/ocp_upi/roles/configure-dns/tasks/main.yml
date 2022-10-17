@@ -18,12 +18,18 @@
 # tasks file for configure-dns
 - include_vars: cluster-template.yaml
 
-- name: Install bind-chroot for dns 
+- name: Install bind-chroot for dns
+  become: yes
+  become_user: root
+  become_method: sudo
   yum:
     name: bind-chroot
     state: latest
     
 - name: Create /var/named directory
+  become: yes
+  become_user: root
+  become_method: sudo
   file:
     path: /var/named
     state: directory
@@ -37,6 +43,9 @@
     subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
 
 - name: Create dns subnet definition
+  become: yes
+  become_user: root
+  become_method: sudo
   template:
     src: var/named/cluster_domain_name.zone.j2
     dest: /var/named/{{ cluster_domain_name }}.zone
@@ -46,6 +55,9 @@
    - restart dns
 
 - name: Unmanage resolve.conf in NetworkManager
+  become: yes
+  become_user: root
+  become_method: sudo
   lineinfile:
     line: dns=none
     dest: /etc/NetworkManager/NetworkManager.conf
@@ -53,10 +65,16 @@
     regexp: "^dns=.*"
 
 - name: Check if DNS is already defined
+  become: yes
+  become_user: root
+  become_method: sudo
   shell: grep -c "^{{ cluster_domain_name }}" /etc/resolv.conf || true
   register: check
 
 - name: Use local dns in resolv.conf
+  become: yes
+  become_user: root
+  become_method: sudo
   blockinfile:
     dest: /etc/resolv.conf
     insertbefore: BOF
@@ -70,6 +88,9 @@
     bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
   
 - name: Create dns subnet zone for bastion
+  become: yes
+  become_user: root
+  become_method: sudo
   template:
     src: var/named/bastion.in-addr.arpa.zone.j2
     dest: /var/named/{{ bastion_reverse }}.in-addr.arpa.zone
@@ -79,6 +100,9 @@
    - restart dns
  
 - name: Create /etc/named.conf
+  become: yes
+  become_user: root
+  become_method: sudo
   template:
     src: etc/named.conf.j2
     dest: /etc/named.conf
@@ -86,18 +110,27 @@
    - restart dns
 
 - name: Update cluster_subnet_range
+  become: yes
+  become_user: root
+  become_method: sudo
   shell: 
     cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
   notify:
    - restart dns
 
 - name: Update bastion_subnet_prefix_reverse
+  become: yes
+  become_user: root
+  become_method: sudo
   shell: 
     cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
   notify:
    - restart dns
 
 - name: Add dns to firewall
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     permanent: true
     service: dns
