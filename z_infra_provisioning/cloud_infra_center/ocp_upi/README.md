@@ -34,7 +34,7 @@ The playbook contains the following topics:
 
   3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10 for z/VM and version 4.7, 4.8, 4.9, 4.10 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10, 4.11for z/VM and version 4.7, 4.8, 4.9, 4.10, 4.11for KVM.
 
 # Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
@@ -76,7 +76,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 
 - **(Required)** A Linux server, the machine that runs Ansible.
     - RHEL8 is the operation system version we tested
-    - Ansible == 2.8
+    - Ansible == 2.8 or 2.9
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
@@ -121,7 +121,7 @@ sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms
 
 Install the packages from the repository in the Linux server:
 ```sh
-sudo dnf install python3 ansible jq wget git firewalld tar gzip -y
+sudo dnf install python3 ansible jq wget git firewalld tar gzip redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
 ```
 Make sure that `python` points to Python3
 ```sh
@@ -131,10 +131,7 @@ Upgrade the pip package and dnf:
 ```sh
 sudo -H pip3 install --upgrade pip
 ```
-Install the required package through dnf:
-```sh
-sudo dnf install redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
-```
+
 Then create the requirements file and use pip3 to install the python modules:
 
 **Note**: The requirements.txt are tested for python-openstackclient=5.5.0.
@@ -154,7 +151,7 @@ python-keystoneclient==4.0.0
 python-cinderclient==7.0.0
 python-novaclient==17.0.0
 stevedore==1.32.0
-dogpile-cache
+dogpile-cache==0.9.0
 stevedore==1.32.0
 netaddr==0.7.19
 python-openstackclient==5.2.2
@@ -316,6 +313,13 @@ ansible-playbook -i inventory.yaml configure-haproxy.yaml
 ```sh
 ansible-playbook -i inventory.yaml bastion.yaml
 ```
+> If you don't have any existing DNS server or Load Balancer and use the non-root user,run the command as below and enter the password for your user.
+```sh
+ansible-playbook -i inventory.yaml bastion.yaml -K
+BECOME:
+```
+
+
 
 3. **Step3**:
 ```sh

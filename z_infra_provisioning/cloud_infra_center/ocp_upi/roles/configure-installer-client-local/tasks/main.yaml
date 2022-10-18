@@ -11,24 +11,17 @@
 # tasks file for configure-installer-and-image
 
 - name: Download openshift installer
-  #  become: yes
   get_url:
     url: '{{ local_openshift_install }}'
     dest: ./openshift-install-linux.tar.gz
     dest: .
-    mode: 0755
-    #group: root
-    #owner: root
+
 
 - name: Download openshift client
-  #become: yes
   get_url:
     url: '{{ local_openshift_client }}'
     dest: ./openshift-client-linux.tar.gz
     dest: .
-    mode: 0644
-    #group: root
-    #owner: root
 
 - name: Unzip openshift client archive
   command:

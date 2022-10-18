@@ -20,6 +20,9 @@
 - include_vars: cluster-template.yaml
 
 - name: Install haproxy
+  become: yes
+  become_user: root
+  become_method: sudo
   yum:
     name:
       - haproxy
@@ -31,11 +34,17 @@
   - restart firewalld
 
 - name: Create /etc/haproxy
+  become: yes
+  become_user: root
+  become_method: sudo
   file: 
     path: /etc/haproxy
     state: directory
 
 - name: Create /etc/haproxy/haproxy.cfg
+  become: yes
+  become_user: root
+  become_method: sudo
   template:
     src: etc/haproxy/haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
@@ -43,6 +52,9 @@
   - restart haproxy
 
 - name: Allow http traffic
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     service: http
     permanent: yes
@@ -52,6 +64,9 @@
   - restart firewalld
 
 - name: Allow http traffic
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     service: http
     permanent: yes
@@ -61,6 +76,9 @@
   - restart firewalld
 
 - name: Allow https traffic
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     service: https
     permanent: yes
@@ -70,6 +88,9 @@
   - restart firewalld
  
 - name: Allow https traffic
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     service: https
     permanent: yes
@@ -79,6 +100,9 @@
   - restart firewalld
   
 - name: Allow traffic at port 443
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     port: 443/tcp
     permanent: yes
@@ -91,6 +115,9 @@
   - restart firewalld
 
 - name: Allow traffic at port 6443
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     port: 6443/tcp
     permanent: yes
@@ -103,6 +130,9 @@
   - restart firewalld
 
 - name: Allow traffic at port 22623
+  become: yes
+  become_user: root
+  become_method: sudo
   firewalld:
     port: 22623/tcp
     permanent: yes
@@ -114,21 +144,39 @@
   notify:
   - restart firewalld
 
-- name: Set setenforce 0
-  shell: setenforce 0
-  
-- name: Restart haproxy
-  service: name=haproxy state=restarted
+- name: Allow selinux for haproxy
+  become: yes
+  become_user: root
+  become_method: sudo
+  shell: setsebool -P haproxy_connect_any=1
+
+- name: start haproxy
+  become: yes
+  become_user: root
+  become_method: sudo
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
 
 - name: Restart firewalld
+  become: yes
+  become_user: root
+  become_method: sudo
   service: name=firewalld state=restarted
 
 - name: Check if haproxy is running
+  become: yes
+  become_user: root
+  become_method: sudo
   service:
     name: haproxy
     state: started
 
 - name: Check if firewalld is running
+  become: yes
+  become_user: root
+  become_method: sudo
   service:
     name: firewalld
     state: started

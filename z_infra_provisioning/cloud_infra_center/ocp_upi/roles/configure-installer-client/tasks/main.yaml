@@ -40,11 +40,9 @@
   register: openshift_install_checksum_results
 
 - name: Download openshift installer
-  become: yes
   get_url:
     url: "{{ openshift_client_url }}/openshift-install-linux.tar.gz"
     dest: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
-    mode: 0755
   register: openshift_install_download_results
   when:
     - not openshift_local_tar_results.stat.exists or
@@ -57,11 +55,9 @@
   when: openshift_install_download_results.changed
 
 - name: Download openshift client
-  become: yes
   get_url:
     url: "{{ openshift_client_url }}/openshift-client-linux.tar.gz"
     dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
-    mode: 0755
   register: openshift_client_download_results
   when:
     - not openshift_client_local_tar_results.stat.exists or
