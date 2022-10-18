@@ -68,7 +68,7 @@ _etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.openshift.second.com.
                       IN SRV 0 10 2380 etcd-2.openshift.second.com.
 ```
 
-equired DNS records
+required DNS records
 
 |Record |Description|
 |------ |------------------------------------|
