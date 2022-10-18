@@ -151,7 +151,7 @@ python-keystoneclient==4.0.0
 python-cinderclient==7.0.0
 python-novaclient==17.0.0
 stevedore==1.32.0
-dogpile-cache
+dogpile-cache==0.9.0
 stevedore==1.32.0
 netaddr==0.7.19
 python-openstackclient==5.2.2
