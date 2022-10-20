@@ -26,10 +26,29 @@
   tasks:
 
   - name: Get existing rhcos image from ICIC glance
-    shell: "openstack image list --format value| grep -w 'rhcos'| wc -l"
+    shell: "openstack image list --format value| grep -w 'icic_rhcos_qcow2'| wc -l"
     register: icic_rhcos_count
+    when:
+    - vm_type == "kvm"
 
   - name: 'Remove the rhcos image'
     shell:
-      cmd: "openstack image delete rhcos"
-    when: icic_rhcos_count.stdout | int == 1
+      cmd: "openstack image delete icic_rhcos_qcow2"
+    when: 
+    - vm_type == "kvm"
+    - icic_rhcos_count is defined
+    - icic_rhcos_count.stdout | int == 1
+
+  - name: Get existing rhcos image from ICIC glance
+    shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ disk_type }}'| wc -l"
+    register: icic_rhcos_count
+    when:
+    - vm_type == "zvm"
+
+  - name: 'Remove the rhcos image'
+    shell:
+      cmd: "openstack image delete icic_rhcos_{{ disk_type }}"
+    when: 
+    - vm_type == "zvm"
+    - icic_rhcos_count is defined
+    - icic_rhcos_count.stdout | int == 1
