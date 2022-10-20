@@ -246,8 +246,8 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
-| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.  <br>For openshift_version `4.10` for example, the only rhcos release available is `4.10.3`, and user can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/4.10/) to see whats there | 
+| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.8` or `4.9` or `4.10` or `4.11`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
+| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |
