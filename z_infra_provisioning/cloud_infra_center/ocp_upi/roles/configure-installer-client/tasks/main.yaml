@@ -1,7 +1,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -10,9 +10,19 @@
 ---
 # tasks file for configure-installer-and-image
 
+- name: Verify openshift minor version
+  shell: |
+    version=$(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    if [ -z $version ]; then
+      echo $(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    else
+      echo $version
+    fi
+  register: icic_ocp_version
+
 - name: 'Set fact for openshift client'
   set_fact:
-    openshift_client_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}"
+    openshift_client_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ icic_ocp_version.stdout }}"
     openshift_install_dir: "."
 
 - name: Get checksum for local openshift-install-linux.tar.gz

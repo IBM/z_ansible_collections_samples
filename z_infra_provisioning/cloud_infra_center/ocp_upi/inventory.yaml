@@ -41,8 +41,8 @@ all:
       disk_type: 'dasd' # dasd or scsi
       #volume_type_id: '<storage-template-id>'
       
-      openshift_version: '4.7'
-      openshift_minor_version: '7'
+      openshift_version: '4.11'
+      openshift_minor_version: 'latest' #9
       
       auto_allocated_ip: true  # true or false
       #allocation_pool_start: '<ip range start>'

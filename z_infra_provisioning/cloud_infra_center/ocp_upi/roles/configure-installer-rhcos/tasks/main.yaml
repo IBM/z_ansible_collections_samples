@@ -1,7 +1,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -11,9 +11,19 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
-- name: 'Set fact for openshift client'
+- name: Verify openshift minor version
+  shell: |
+    version=$(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/sha256sum.txt | grep rhcos | wc -l)
+    if [ $version -eq "0" ] || [ "{{ openshift_minor_version }}" -eq "latest" ]; then
+      echo $(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
+    else
+      echo "{{ openshift_version }}.{{ openshift_minor_version }}"
+    fi
+  register: icic_ocp_version
+
+- name: 'Set fact for openshift rhcos url'
   set_fact:
-    openshift_rhcos_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}"
+    openshift_rhcos_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ icic_ocp_version.stdout }}"
     openshift_install_dir: "."
 
 - name: Download checksum for the rhcos image
@@ -88,8 +98,8 @@
 
 - name: Download openshift rhcos metal image
   get_url:
-    url: "{{ openshift_rhcos_url }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-metal.s390x.raw.gz"
-    dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
+    url: "{{ openshift_rhcos_url }}/rhcos-{{ icic_ocp_version.stdout }}-s390x-metal.s390x.raw.gz"
+    dest: "{{ openshift_install_dir }}/rhcos-{{ icic_ocp_version.stdout }}-s390x.gz"
   when:
   - vm_type == "zvm"
   - disk_type == "scsi"
@@ -97,8 +107,8 @@
 
 - name: Download openshift rhcos dasd image
   get_url:
-    url: "{{ openshift_rhcos_url }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-dasd.s390x.raw.gz"
-    dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
+    url: "{{ openshift_rhcos_url }}/rhcos-{{ icic_ocp_version.stdout }}-s390x-dasd.s390x.raw.gz"
+    dest: "{{ openshift_install_dir }}/rhcos-{{ icic_ocp_version.stdout }}-s390x.gz"
   when:
   - vm_type == "zvm"
   - disk_type == "dasd"
@@ -106,18 +116,18 @@
 
 - name: Download openshift rhcos qcow2 image
   get_url:
-    url: "{{ openshift_rhcos_url }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x-openstack.s390x.qcow2.gz"
-    dest: "{{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz"
+    url: "{{ openshift_rhcos_url }}/rhcos-{{ icic_ocp_version.stdout }}-s390x-openstack.s390x.qcow2.gz"
+    dest: "{{ openshift_install_dir }}/rhcos-{{ icic_ocp_version.stdout }}-s390x.gz"
   when:
   - vm_type == "kvm"
   - icic_rhcos_count.stdout | int != 1
 
-- name: Generate sha256 for local rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz
-  shell: "sha256sum {{ openshift_install_dir }}/rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz > .sha256sum_local.txt"
+- name: Generate sha256 for local rhcos-{{ icic_ocp_version.stdout }}-s390x.gz
+  shell: "sha256sum {{ openshift_install_dir }}/rhcos-{{ icic_ocp_version.stdout }}-s390x.gz > .sha256sum_local.txt"
   when:
   - icic_rhcos_count.stdout | int != 1
 
-- name: Get sha256 for local rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz
+- name: Get sha256 for local rhcos-{{ icic_ocp_version.stdout}}-s390x.gz
   shell: "cat .sha256sum_local.txt | awk -F ' ' '{print $1}'"
   register: openshift_rhcos_sha256_results
   when:
@@ -126,12 +136,12 @@
 - name: Unzip openshift rhcos image
   command:
     cmd: |
-        gzip -d -f rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.gz
+        gzip -d -f rhcos-{{ icic_ocp_version.stdout }}-s390x.gz
   when: icic_rhcos_count.stdout | int != 1
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x icic_rhcos_{{ disk_type }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ disk_type }}
   when: 
   - vm_type == "zvm"
   - disk_type == "scsi"
@@ -139,7 +149,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x icic_rhcos_{{ disk_type }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ disk_type }}
   when: 
   - vm_type == "zvm"
   - disk_type == "dasd"
@@ -147,7 +157,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   command: 
-    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x icic_rhcos_qcow2
+    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_qcow2
   when: 
   - vm_type == "kvm"
   - icic_rhcos_count.stdout | int != 1
@@ -155,5 +165,5 @@
 - name: Remove local RHCOS image
   file:
     state: absent
-    path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x
+    path: rhcos-{{ icic_ocp_version.stdout }}-s390x
   when: icic_rhcos_count.stdout | int != 1
