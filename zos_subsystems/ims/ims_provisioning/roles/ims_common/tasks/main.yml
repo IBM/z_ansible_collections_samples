@@ -7,6 +7,15 @@
 
   block:
 
+    - set_fact:
+        eager_role_path: '{{role_path}}'
+
+
+    - include_role:
+        name: send-template
+      vars:
+        path: '{{ eager_role_path }}/templates/WaitJob.j2'
+
     # Start IMS control region if start_ctl is true
     - name: Start IMS control region
       zos_operator:
