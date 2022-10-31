@@ -35,13 +35,11 @@
             DYNAMICALLY_RESERVE_PORTS: false
             send_procs: true
             DFS_INIT_JAVA_CONF: false
-            # provision: true
 
         - include_role:
             name: ims_proclib
           vars:
             create_sample: true
-            # provision: true
 
         - include_role:
             name: ims_sysdef
@@ -49,7 +47,6 @@
             preprocess: true
             stage1: true
             stage2: true
-            # provision: true
 
         - include_role:
             name: ims_racf
