@@ -10,6 +10,7 @@ uss_utilities_path: /tmp
 DFS_INIT_JAVA_CONF: true
 
 DFS_PORTIDSuf: 99
+DFS_IMSXCFGroup: IMSXCFGN
 
 
 ARC: '03'
