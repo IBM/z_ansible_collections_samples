@@ -14,14 +14,12 @@
   get_url:
     url: '{{ local_openshift_install }}'
     dest: ./openshift-install-linux.tar.gz
-    dest: .
 
 
 - name: Download openshift client
   get_url:
     url: '{{ local_openshift_client }}'
     dest: ./openshift-client-linux.tar.gz
-    dest: .
 
 - name: Unzip openshift client archive
   command:
