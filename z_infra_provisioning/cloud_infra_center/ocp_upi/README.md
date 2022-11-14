@@ -151,7 +151,7 @@ python-keystoneclient==4.0.0
 python-cinderclient==7.0.0
 python-novaclient==17.0.0
 stevedore==1.32.0
-dogpile-cache==0.9.0
+dogpile-cache
 stevedore==1.32.0
 netaddr==0.7.19
 python-openstackclient==5.2.2
@@ -316,7 +316,6 @@ ansible-playbook -i inventory.yaml bastion.yaml
 > If you don't have any existing DNS server or Load Balancer and use the non-root user,run the command as below and enter the password for your user.
 ```sh
 ansible-playbook -i inventory.yaml bastion.yaml -K
-BECOME:
 ```
 
 
