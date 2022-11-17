@@ -6,6 +6,9 @@
     - "{{ vars_folder_name }}/ims-dbdc.yml"
   environment: '{{ system_environment }}'
 
+  vars:
+    - provision: true
+
   tasks:
     - name: Create temporary directory to store provisioning files
       tempfile:
