@@ -150,14 +150,20 @@
   become_method: sudo
   shell: setsebool -P haproxy_connect_any=1
 
-- name: start haproxy
+# - name: start haproxy
+#   become: yes
+#   become_user: root
+#   become_method: sudo
+#   service:
+#     name: haproxy
+#     state: started
+#     enabled: yes
+
+- name: Restart haproxy
   become: yes
   become_user: root
   become_method: sudo
-  service:
-    name: haproxy
-    state: started
-    enabled: yes
+  service: name=haproxy state=restarted
 
 - name: Restart firewalld
   become: yes
