@@ -38,10 +38,22 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
+- name: 'Get image name for kvm'
+  set_fact: 
+    image_name: icic_rhcos_qcow2
+  when: 
+    - vm_type == "kvm"
+
+- name: 'Get image name for ZVM'
+  set_fact:
+    image_name: "icic_rhcos_{{ disk_type }}"
+  when:
+    - vm_type == "zvm"
+
 - name: 'Create the bootstrap server'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "icic_rhcos_qcow2"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -52,11 +64,12 @@
     meta: "{{ cluster_id_tag }}"
   when:
   - vm_type == "kvm"
+  - volume_type_id is not defined
 
 - name: 'Create the bootstrap server'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -75,12 +88,12 @@
   register: bootstrap_flavor_size
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
+
 
 - name: 'Create the bootstrap server with default boot volume'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -101,21 +114,19 @@
   os_volume:
     state: present
     name: "{{ os_bootstrap_server_name }}-boot"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
     timeout: "{{ create_server_timeout|int * 60 }} "
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Create the bootstrap server with boot volume'
@@ -133,5 +144,6 @@
     terminate_volume: True
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
+
+
