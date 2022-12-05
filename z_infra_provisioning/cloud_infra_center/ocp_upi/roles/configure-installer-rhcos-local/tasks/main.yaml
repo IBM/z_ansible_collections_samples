@@ -86,6 +86,14 @@
     cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=qcow2 --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2 icic_rhcos_qcow2
   when: 
   - vm_type == "kvm"
+  - volume_type_id is not defined
+
+- name: Upload RHCOS image to ICIC glance
+  command: 
+    cmd: openstack image create --tag {{ cluster_id_tag }} --property disk_type=SCSI --disk-format=qcow2 --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2 icic_rhcos_qcow2
+  when: 
+  - vm_type == "kvm"
+  - volume_type_id is defined
 
 - name: Remove local RHCOS image
   file:

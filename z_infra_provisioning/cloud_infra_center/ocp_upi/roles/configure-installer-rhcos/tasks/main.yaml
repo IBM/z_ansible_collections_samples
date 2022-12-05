@@ -161,6 +161,16 @@
   when: 
   - vm_type == "kvm"
   - icic_rhcos_count.stdout | int != 1
+  - volume_type_id is not defined
+
+
+- name: Upload RHCOS image to ICIC glance
+  command: 
+    cmd: openstack image create --disk-format=qcow2 --property disk_type=SCSI --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property disk_type=SCSI --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_qcow2
+  when: 
+  - vm_type == "kvm"
+  - icic_rhcos_count.stdout | int != 1
+  - volume_type_id is defined
 
 - name: Remove local RHCOS image
   file:

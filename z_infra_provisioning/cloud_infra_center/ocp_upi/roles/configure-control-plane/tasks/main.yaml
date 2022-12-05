@@ -38,6 +38,18 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
+- name: 'Get image name for kvm'
+  set_fact: 
+    image_name: icic_rhcos_qcow2
+  when: 
+    - vm_type == "kvm"
+
+- name: 'Get image name for ZVM'
+  set_fact:
+    image_name: "icic_rhcos_{{ disk_type }}"
+  when:
+    - vm_type == "zvm"
+
 - name: 'List the server groups'
   command:
     # os-compute-api-version 2.15 or higher is required for the 'soft-anti-affinity' policy
@@ -69,7 +81,7 @@
 - name: 'Create the control servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_qcow2"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -89,6 +101,7 @@
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
   - vm_type == "kvm"
+  - volume_type_id is not defined
   register: create_master
   failed_when:
     - create_master.failed == true
@@ -98,7 +111,7 @@
 - name: 'Create the control servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -134,7 +147,7 @@
 - name: 'Create the control servers with default boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -168,7 +181,7 @@
   os_volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     size: "{{ master_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
@@ -176,7 +189,6 @@
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Set control volume bootable'
@@ -184,10 +196,9 @@
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
-- name: 'Create the control server with boot volume'
+- name: 'Create the controller server with boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_master }}"
@@ -205,5 +216,5 @@
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
+

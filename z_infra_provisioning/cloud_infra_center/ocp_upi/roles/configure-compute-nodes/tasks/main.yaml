@@ -43,10 +43,22 @@
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
+- name: 'Get image name for kvm'
+  set_fact: 
+    image_name: icic_rhcos_qcow2
+  when: 
+    - vm_type == "kvm"
+
+- name: 'Get image name for ZVM'
+  set_fact:
+    image_name: "icic_rhcos_{{ disk_type }}"
+  when:
+    - vm_type == "zvm"
+
 - name: 'Create the compute servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_qcow2"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -58,11 +70,12 @@
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - vm_type == "kvm"
+  - volume_type_id is not defined
 
 - name: 'Create the compute servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -86,7 +99,7 @@
 - name: 'Create the compute servers with default boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -108,7 +121,7 @@
   os_volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     size: "{{ compute_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
@@ -116,7 +129,6 @@
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Set compute volume bootable'
@@ -124,7 +136,6 @@
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Create the compute server with boot volume'
@@ -143,5 +154,5 @@
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
+
