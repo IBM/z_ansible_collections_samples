@@ -21,6 +21,19 @@
   - name: 'Import common yaml'
     import_tasks: common.yaml
 
+  - name: 'Get image name for kvm'
+    set_fact: 
+     image_name: icic_rhcos_qcow2
+    when: 
+    - vm_type == "kvm"
+
+  - name: 'Get image name for ZVM'
+    set_fact:
+     image_name: "icic_rhcos_{{ disk_type }}"
+    when:
+    - vm_type == "zvm"
+  
+
   - name: 'Export infra ID'
     shell:
       cmd: "jq -r .infraID metadata.json"
@@ -97,7 +110,7 @@
   - name: 'Create the compute servers'
     os_server:
       name: "{{ item }}"
-      image: "icic_rhcos_qcow2"
+      image: "{{ image_name }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -108,11 +121,12 @@
     with_lines: cat .new_worker_name
     when:
     - vm_type == "kvm"
+    - volume_type_id is not defined
     
   - name: 'Create the compute servers'
     os_server:
       name: "{{ item }}"
-      image: "icic_rhcos_{{ disk_type }}"
+      image: "{{ image_name }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -124,6 +138,7 @@
     when:
     - disk_type == "dasd"
     - vm_type == "zvm"
+    - volume_type_id is not defined
   
   - name: 'Convert compute server flavor from value into number'
     command:
@@ -135,7 +150,7 @@
   - name: 'Create the compute servers with default boot volume'
     os_server:
       name: "{{ item }}"
-      image: "icic_rhcos_{{ disk_type }}"
+      image: "i{{ image_name }}"
       flavor: "{{ os_flavor_worker }}"
       auto_ip: no
       timeout: "{{ create_server_timeout|int * 60 }}"
@@ -156,7 +171,7 @@
     os_volume:
       state: present
       name: "{{ item }}-boot"
-      image: "icic_rhcos_{{ disk_type }}"
+      image: "{{ image_name }}"
       size: "{{ compute_flavor_size.stdout_lines[0]}}"
       volume_type: "{{ volume_type_id }}"
       metadata: "{{ cluster_id_tag }}"
@@ -164,7 +179,6 @@
     with_lines: cat .new_worker_name
     when:
     - disk_type == "scsi"
-    - vm_type == "zvm"
     - volume_type_id is defined
   
   - name: 'Set compute volume bootable'
@@ -190,7 +204,6 @@
     with_lines: cat .new_worker_name
     when:
     - disk_type == "scsi"
-    - vm_type == "zvm"
     - volume_type_id is defined
 
   - name: 'Update worker ip into new_worker_index file'
