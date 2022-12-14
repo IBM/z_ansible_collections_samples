@@ -18,7 +18,7 @@
 - name: 'Get the subnet range'
   command:
     cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
-  register: sunbet_range
+  register: subnet_range
 
 - name: Create install-config.yaml
   template:
@@ -26,7 +26,7 @@
     dest: "install-config.yaml"
 
 - name: Configure machine network in install configuration
-  script: tools/config-machine-network.py {{ sunbet_range.stdout_lines[0] }}
+  script: tools/config-machine-network.py {{ subnet_range.stdout_lines[0] }}
   args:
     executable: python3
 
