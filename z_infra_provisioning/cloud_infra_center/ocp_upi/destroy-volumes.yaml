@@ -1,5 +1,5 @@
 # =================================================================
-# Copyright 2021 https://github.com/openshift/installer
+# Copyright 2022 https://github.com/openshift/installer
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -50,7 +50,7 @@
 
   - name: 'Get controller volumes from ICIC command line'
     shell: |
-       openstack volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep master | cut -d '-' -f 1-3
+       openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep master | cut -d '-' -f 1-3
     register: controller_vols
     ignore_errors: true
 
@@ -66,7 +66,7 @@
 
   - name: 'Get compute volumes from ICIC command line'
     shell: |
-       openstack volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep worker | cut -d '-' -f 1-3
+       openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep worker | cut -d '-' -f 1-3
     register: compute_vols
     ignore_errors: true
 
