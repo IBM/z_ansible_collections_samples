@@ -1,5 +1,5 @@
 # =================================================================
-# Copyright 2021 https://github.com/openshift/installer
+# Copyright 2022 https://github.com/openshift/installer
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -37,6 +37,12 @@
 
 - name: 'Import common yaml'
   import_tasks: common.yaml
+
+- name: 'Get image name for ZVM'
+  set_fact:
+    image_name: "icic_rhcos_{{ disk_type }}"
+  when:
+    - vm_type == "zvm"
 
 - name: 'List the server groups'
   command:
@@ -69,36 +75,7 @@
 - name: 'Create the control servers'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_qcow2"
-    flavor: "{{ os_flavor_master }}"
-    auto_ip: no
-    availability_zone: "{{ create_server_zone }}"
-    timeout: "{{ create_server_timeout|int * 60 }}" 
-    # The ignition filename will be concatenated with the Control Plane node
-    # name and its 0-indexed serial number.
-    # In this case, the first node will look for this filename:
-    #    "{{ infraID }}-master-0-ignition.json"
-    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
-    nics:
-    - port-name: "{{ os_port_master }}-{{ item.0 }}"
-    scheduler_hints:
-      group: "{{ server_group_id }}"
-    meta: "{{ cluster_id_tag }}"
-  with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
-  environment: 
-    PYTHONWARNINGS: 'ignore::UserWarning'
-  when:
-  - vm_type == "kvm"
-  register: create_master
-  failed_when:
-    - create_master.failed == true
-    - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master | string'
-
-
-- name: 'Create the control servers'
-  os_server:
-    name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -134,7 +111,7 @@
 - name: 'Create the control servers with default boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
@@ -168,7 +145,7 @@
   os_volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     size: "{{ master_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
@@ -176,7 +153,6 @@
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Set control volume bootable'
@@ -184,10 +160,9 @@
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
-- name: 'Create the control server with boot volume'
+- name: 'Create the controller server with boot volume'
   os_server:
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_master }}"
@@ -205,5 +180,5 @@
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
+

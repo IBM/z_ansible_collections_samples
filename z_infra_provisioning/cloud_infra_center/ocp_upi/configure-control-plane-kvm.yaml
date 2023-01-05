@@ -1,17 +1,15 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 
 ---
-- import_playbook: configure-compute-nodes-kvm.yaml
-  when: vm_type == "kvm"
-- import_playbook: configure-compute-nodes-zvm.yaml
-  when: vm_type == "zvm"
-
-- import_playbook: approve.yaml
-- import_playbook: wait-for-install-complete.yaml
+- name: Create the control plane in kvm
+  hosts: localhost
+  roles:
+  - configure-control-plane-kvm
+  

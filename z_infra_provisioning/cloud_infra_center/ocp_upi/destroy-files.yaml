@@ -24,6 +24,9 @@
   gather_facts: no
 
   tasks:
+  - name: 'Import common yaml'
+    import_tasks: common.yaml
+
   - find:
       paths: .
       patterns: "*.json"
