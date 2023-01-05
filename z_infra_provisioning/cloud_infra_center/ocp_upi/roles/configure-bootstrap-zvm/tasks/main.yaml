@@ -55,7 +55,7 @@
     availability_zone: "{{ create_server_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   when:
   - disk_type == "dasd"
   - vm_type == "zvm"
@@ -79,7 +79,7 @@
     availability_zone: "{{ create_server_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
@@ -118,7 +118,7 @@
     availability_zone: "{{ create_server_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   when:
   - disk_type == "scsi"

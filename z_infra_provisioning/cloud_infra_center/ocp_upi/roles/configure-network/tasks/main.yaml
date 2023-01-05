@@ -70,6 +70,8 @@
 - name: "Remove all DNS nameserver of subnet {{ use_network_subnet }}"
   command:
     cmd: "openstack subnet set --no-dns-nameservers {{ use_network_subnet }} "
+  when:
+  - vm_type == "kvm"
 
 - name: 'Update new DNS nameserver and allocation pool of subnet {{ use_network_subnet }}'
   command:
@@ -77,6 +79,7 @@
   when:
   - allocation_pool_start is defined
   - allocation_pool_end is defined 
+  - vm_type == "kvm"
 
 - name: 'Update new DNS nameserver of subnet {{ use_network_subnet }}'
   command:
@@ -84,6 +87,7 @@
   when:
   - allocation_pool_start is not defined
   - allocation_pool_end is not defined 
+  - vm_type == "kvm"
 
 - name: 'Create a subnet'
   os_subnet:
@@ -124,8 +128,26 @@
 - name: 'Set the cluster subnet tag'
   command:
     cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
-  when: (allocation_pool_start is not defined and allocation_pool_end is defined) or
-        (allocation_pool_start is defined and allocation_pool_end is not defined)
+  when:
+  - (allocation_pool_start is not defined and allocation_pool_end is defined) or
+    (allocation_pool_start is defined and allocation_pool_end is not defined)
+  - vm_type == "kvm"
+
+- name: 'Update allocation pool of subnet {{ use_network_subnet }}'
+  command:
+    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ use_network_subnet }}"
+  when:
+  - allocation_pool_start is defined
+  - allocation_pool_end is defined 
+  - vm_type == "zvm"
+
+- name: 'Update partial allocation pool of subnet {{ use_network_subnet }}'
+  command:
+    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
+  when: 
+  - (allocation_pool_start is not defined and allocation_pool_end is defined) or
+    (allocation_pool_start is defined and allocation_pool_end is not defined)
+  - vm_type == "zvm"
 
 - name: 'Export infra ID'
   shell:
