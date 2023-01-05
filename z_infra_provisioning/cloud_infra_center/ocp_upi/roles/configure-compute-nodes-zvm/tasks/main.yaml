@@ -61,7 +61,7 @@
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.0 }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
   - disk_type == "dasd"
@@ -85,7 +85,7 @@
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.0 }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
@@ -127,7 +127,7 @@
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_worker }}-{{ item.0 }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:

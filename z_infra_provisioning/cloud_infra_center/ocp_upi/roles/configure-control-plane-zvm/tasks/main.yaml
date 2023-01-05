@@ -89,7 +89,7 @@
     - port-name: "{{ os_port_master }}-{{ item.0 }}"
     scheduler_hints:
       group: "{{ server_group_id }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 
     PYTHONWARNINGS: 'ignore::UserWarning'
@@ -125,7 +125,7 @@
     - port-name: "{{ os_port_master }}-{{ item.0 }}"
     scheduler_hints:
       group: "{{ server_group_id }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ master_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
@@ -173,7 +173,7 @@
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
     - port-name: "{{ os_port_master }}-{{ item.0 }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment: 
