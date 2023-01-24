@@ -28,6 +28,10 @@ This repository provides a number of samples that show how to use the CICS colle
 
     The `resource_lifecycle_and_csd` sample shows how to perform full CICS resource lifecycle with the CMCI modules, creating and installing a definition from CSD.
 
+1. [Custom CA for HTTPS connections](cmci/set_ca)
+
+    The `set_ca` sample shows how to use the CMCI modules with a custom CA bundle, typically useful when you have an internal CA.
+
 ---
 
 These CICS samples are just some of the samples available for the Red Hat Ansible Certified Content for IBM Z. You can find samples covering other aspects at the [root of the repository](https://github.com/IBM/z_ansible_collections_samples).

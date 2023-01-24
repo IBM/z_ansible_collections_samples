@@ -1,0 +1,84 @@
+---
+################################################################################
+# Description of the properties used in this configuration:
+# - Property `PYZ` is the python installation home path on the z/OS managed node (target),
+#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+# - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
+#    e.g, zoau: "/usr/lpp/IBM/zoautil"
+# - Property `JAVA` is the Java installation home on the z/OS managed node (target), 
+#    e.g, JAVA: "/usr/lpp/java170/J7.0_64" 
+# - property `ansible_python_interpreter` is the z/OS managed node (target) Python
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+#
+# Note, PYZ, ZOAU, and JAVA environment variables must be configured.
+################################################################################
+
+
+# the path to the root of IBM python installation
+PYZ: "path_to_python_installation_on_zos_target"
+
+
+################################################################################
+# Do not configure, variable substituion will correctly set the
+# variable`ansible_python_interpreter`
+################################################################################
+ansible_python_interpreter: "{{PYZ}}/bin/python3"
+
+# the path to root of ZOAU installation
+ZOAU: "path_to_zoau_installation_on_zos_target"
+
+#the path to the root of Java installation
+JAVA: "path_to_java_installation_on_zos_target" 
+
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU: "{{ZOAU}}/bin"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:{{JAVA}}"
+  JAVA_HOME: "{{JAVA}}"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+  WLP_USER_DIR: "/u/oeusr01"
+  WLP_OUTPUT_DIR: "u/oeusr01/servers"
+
+# ---------------------------------------------------------------------------- #
+#                        Liberty related variables                             #
+# ---------------------------------------------------------------------------- #
+server_instance_name: ansible_sample
+
+liberty_path: '/usr/lpp/zWAS/WAS900/Liberty/V19R00' 
+liberty_bin_path: '{{liberty_path}}/bin'
+liberty_server_path: '{{environment_vars.WLP_USER_DIR}}/servers/{{server_instance_name}}'
+
+# ---------------------------------------------------------------------------- #
+#                  User information for STARTED profiles                       #
+# ---------------------------------------------------------------------------- #
+TARGET_USER: target_user
+USER_GROUP: user_group
+
+#Procedure library for JCL Procedure template
+PROC_LIB: USER.PRIVATE.PROCLIB
+#Name of server procedure for STARTED profile
+SERVER_PROC: WLPSRV1
+#Name of angel process procedure for STARTED profile
+ANGEL_PROC: WLPANGL
+
+#Name for zFS dataset to be mounted to user directory
+data_set_name: targetuser.liberty.zfs
+  
+# ---------------------------------------------------------------------------- #
+#                        Playbook customization variables                      #
+# ---------------------------------------------------------------------------- #
+#Boolean value to determine if configure_server role runs -- transfers optional configuration files
+CUSTOMIZE: no
+
+#Boolean value to determine if the angel process related roles run --  creates started profiles for angel process and starts angel process
+ANGEL: no 
+
+#Boolean value to determine if the authorized_services role runs -- enables z/OS authorized services
+AUTHORIZED_SERVICES: no

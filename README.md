@@ -71,6 +71,8 @@ often repeated and in need of automation.
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
+  - [WLP](zos_subsystems/wlp)
+    - [Provision a new Websphere Application Server Liberty Profile](zos_subsystems/wlp)
   - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
 - Application & Service Deployment
   - [ZCEE](zos_subsystems/zcee)

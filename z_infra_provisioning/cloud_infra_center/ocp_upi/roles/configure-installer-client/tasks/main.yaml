@@ -1,7 +1,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -10,33 +10,80 @@
 ---
 # tasks file for configure-installer-and-image
 
-- name: Download openshift installer
-  become: yes
+- name: Verify openshift minor version
+  shell: |
+    version=$(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    if [ -z $version ]; then
+      echo $(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    else
+      echo $version
+    fi
+  register: icic_ocp_version
+
+- name: 'Set fact for openshift client'
+  set_fact:
+    openshift_client_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ icic_ocp_version.stdout }}"
+    openshift_install_dir: "."
+
+- name: Get checksum for local openshift-install-linux.tar.gz
+  stat:
+    path: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: openshift_local_tar_results
+
+- name: Get checksum for local openshift-client-linux.tar.gz
+  stat:
+    path: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: openshift_client_local_tar_results
+
+- name: Download checksum for the latest openshift-install-linux.tar.gz
   get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-install-linux.tar.gz
-    dest: .
-    mode: 0755
+    url: "{{ openshift_client_url }}/sha256sum.txt"
+    dest: "{{ openshift_install_dir }}/sha256sum.txt"
+
+- name: Get checksum for the latest openshift-install-linux.tar.gz
+  slurp:
+    src: "{{ openshift_install_dir }}/sha256sum.txt"
+  register: openshift_install_checksum_results
+
+- name: Download openshift installer
+  get_url:
+    url: "{{ openshift_client_url }}/openshift-install-linux.tar.gz"
+    dest: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
+  register: openshift_install_download_results
+  when:
+    - not openshift_local_tar_results.stat.exists or
+      (openshift_local_tar_results.stat.checksum is defined and
+      openshift_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
 
 - name: Unzip openshift installer
   command:
-    cmd: tar -zvxf openshift-install-linux.tar.gz
-  
-- name: Remove openshift installer archive
+    cmd: tar -zvxf "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
+  when: openshift_install_download_results.changed
+
+- name: Download openshift client
+  get_url:
+    url: "{{ openshift_client_url }}/openshift-client-linux.tar.gz"
+    dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+  register: openshift_client_download_results
+  when:
+    - not openshift_client_local_tar_results.stat.exists or
+      (openshift_client_local_tar_results.stat.checksum is defined and
+      openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
+
+- name: Unzip openshift client
+  command:
+    cmd: tar -zvxf "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+  when: openshift_client_download_results.changed
+
+- name: Remove openshift install archive
   file:
     state: absent
     path: openshift-install-linux.tar.gz
 
-- name: Download openshift client
-  become: yes
-  get_url:
-    url: https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/openshift-client-linux.tar.gz
-    dest: .
-    mode: 0755
-
-- name: Unzip openshift client archive
-  command:
-    cmd: tar -zvxf openshift-client-linux.tar.gz
-  
 - name: Remove openshift client archive
   file:
     state: absent
