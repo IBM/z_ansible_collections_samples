@@ -26,76 +26,32 @@
 # Change Summary: 
 # - Change Ansible playbook name
 
----
-- name: modify dns on bastion
-  hosts: bastion
+- name: 'Get worker node IP'
+  set_fact: 
+    dns_new_worker_ip: "{{ worker_ip }}"
+    dns_new_worker_index: "{{ worker_index }}"
+    cluster_domain_name: "{{ cluster_domain_name }}"
   
-  tasks:
-  - name: Copy bastion info from remote into bastion server
-    copy:
-      src: .new_ocp_node.yml
-      dest: /tmp
-      force: yes
-
-  - name: Get new worker node IP 
-    shell: "cat /tmp/.new_ocp_node.yml | grep new_worker_ip | awk -F '=' '{print $2}'"
-    register: dns_new_worker_ip
-
-  - name: Get new worker node index 
-    shell: "cat /tmp/.new_ocp_node.yml | grep new_worker_index | awk -F '=' '{print $2}'"
-    register: dns_new_worker_index
-
-  - name: Combine cluster name and base domain
-    shell: "cat /tmp/.new_ocp_node.yml | grep cluster_domain_name | awk -F '=' '{print $2}'"
-    register: cluster_domain_name
+- name: 'Get the last line number of worker'
+  shell: grep -n 'worker' /var/named/{{ cluster_domain_name  }}.zone |tail -1| cut --delimiter=":" --fields=1
+  register: last_worker_ln
   
-  - name: Check all worker configuration exists in named
-    shell: cat /var/named/{{ cluster_domain_name.stdout  }}.zone | grep  'worker' | wc -l
-    register: all_worker_count
-    check_mode: no 
-    ignore_errors: true
+- name: show msg new worker 
+  debug:
+    msg: "{{last_worker_ln.stdout}}"
 
-  - name: Check new worker DNS configuraition exists in named
-    shell: cat /var/named/{{ cluster_domain_name.stdout  }}.zone | grep  'worker-{{dns_new_worker_index.stdout  }}' | wc -l
-    register: exist_new_worker_count
-    check_mode: no 
-    ignore_errors: true
+- name: Add new worker dns record into named
+  shell: 
+    cmd: "sed -i '{{ last_worker_ln.stdout }} aworker-{{ dns_new_worker_index }}              IN A {{ dns_new_worker_ip  }}\n' /var/named/{{ cluster_domain_name  }}.zone"
+  when: 
+    - last_worker_ln.stdout != "0"
 
-  - name: 'Get the last line number of worker'
-    shell: grep -n 'worker' /var/named/{{ cluster_domain_name.stdout  }}.zone |tail -1| cut --delimiter=":" --fields=1
-    register: last_worker_ln
-    when: all_worker_count.stdout != "0"
-  
-  # - name: show msg new worker 
-  #   debug:
-  #     msg: "{{last_worker_ln.stdout}}"
+- name: Restart named-chroot.service
+  service:
+    name: named-chroot.service
+    state: restarted
 
-  - name: Add new worker dns record into named
-    shell: 
-      cmd: "sed -i '{{ last_worker_ln.stdout }} aworker-{{ dns_new_worker_index.stdout }}              IN A {{ dns_new_worker_ip.stdout  }}\n' /var/named/{{ cluster_domain_name.stdout  }}.zone"
-    when: 
-      - last_worker_ln.stdout != "0"
-      - exist_new_worker_count.stdout == "0"
-
-  - name: Add new worker dns record into named
-    shell: 
-      cmd: "sed -i '/^etcd-0/ iworker-{{ dns_new_worker_index.stdout }}              IN A {{ dns_new_worker_ip.stdout  }}\n' /var/named/{{ cluster_domain_name.stdout  }}.zone"
-    when: 
-      - last_worker_ln == "0" 
-      - exist_new_worker_count.stdout == "0"
-
-  - name: Update new worker dns record if new worker node exists in named
-    shell: "sed -i '{{ exist_new_worker.stdout }}s/.*/worker-{{ dns_new_worker_index.stdout  }}              IN A {{ dns_new_worker_ip.stdout }}/'  /var/named/{{ cluster_domain_name.stdout  }}.zone"
-    when: 
-      - last_worker_ln == "0" 
-      - exist_new_worker_count.stdout != "0"
-
-  - name: Restart named-chroot.service
-    service:
-      name: named-chroot.service
-      state: restarted
-
-  - name: Check if named-chroot is running
-    service:
-      name: named-chroot
-      state: started
+- name: Check if named-chroot is running
+  service:
+    name: named-chroot
+    state: started

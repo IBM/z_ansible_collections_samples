@@ -1,0 +1,25 @@
+---
+# tasks file for ims_cobol_register_db_to_recons
+- name: Register databases to recons
+  ibm.ibm_zos_ims.ims_dbrc:
+    command:
+      - INIT.DB   DBD(CUSTOMER) SHARELVL(0)
+      - INIT.DBDS  DBD(CUSTOMER) DDN(CUSTOMER) DSN({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CUSTOMER.DB) GENMAX(2)
+      - INIT.DB   DBD(ACCOUNT) SHARELVL(0)
+      - INIT.DBDS  DBD(ACCOUNT) DDN(ACCOUNT) DSN({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACCOUNT.DB) GENMAX(2)
+      - INIT.DB   DBD(CUSTACCS) SHARELVL(0)
+      - INIT.DBDS  DBD(CUSTACCS) DDN(CUSTACCS) DSN({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CUSTACCS.DB) GENMAX(2) 
+      - INIT.DB   DBD(HISTORY) SHARELVL(0)
+      - INIT.DBDS  DBD(HISTORY) DDN(HISTORY) DSN({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HISTORY.DB) GENMAX(2)
+      - INIT.DB   DBD(TSTAT) SHARELVL(0)
+      - INIT.DBDS  DBD(TSTAT) DDN(TSTAT) DSN({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TSTAT.DB) GENMAX(2)
+    steplib:
+      - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+    dbd_lib: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB"
+    recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1"
+    recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2"
+    recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
+  register: response
+  failed_when: response.rc > 12
+
+

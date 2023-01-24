@@ -53,7 +53,7 @@
 
   - name: 'Get compute servers from ICIC command line'
     shell: |
-       openstack server list -c Name -f value | grep worker
+       openstack server list -c Name -f value | awk '/{{ infra_id.stdout_lines[0] }}/ && /worker/' 
     register: computes
     ignore_errors: true
 

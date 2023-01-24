@@ -34,7 +34,7 @@ The playbook contains the following topics:
 
   3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10 for z/VM and version 4.7, 4.8, 4.9, 4.10 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10, 4.11for z/VM and version 4.7, 4.8, 4.9, 4.10, 4.11for KVM.
 
 # Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
@@ -76,7 +76,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 
 - **(Required)** A Linux server, the machine that runs Ansible.
     - RHEL8 is the operation system version we tested
-    - Ansible >= 2.8
+    - Ansible == 2.8 or 2.9
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
@@ -92,7 +92,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 **Packages:**
 
 * Python3
-* Ansible >=2.8
+* Ansible 
 * jq
 * wget
 * git
@@ -101,7 +101,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 * firewalld
 * Python modules required in the playbooks. Namely:
   * openstackclient 
-  * openstacksdk >= 0.57.0
+  * openstacksdk 
   * netaddr
 
 **Register:**
@@ -112,7 +112,7 @@ sudo subscription-manager register --username <username> --password <password> -
 ```
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
-**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.3 and RHEL8.5. 
+**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.4 and RHEL8.6. 
 ```sh
 sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
 ```
@@ -121,7 +121,7 @@ sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms
 
 Install the packages from the repository in the Linux server:
 ```sh
-sudo dnf install python3 ansible jq wget git firewalld tar gzip -y
+sudo dnf install python3 ansible jq wget git firewalld tar gzip redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
 ```
 Make sure that `python` points to Python3
 ```sh
@@ -130,38 +130,35 @@ sudo alternatives --set python /usr/bin/python3
 Upgrade the pip package and dnf:
 ```sh
 sudo -H pip3 install --upgrade pip
-sudo dnf update -y
 ```
-Install the required package through dnf:
-```sh
-sudo dnf install redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
-```
+
 Then create the requirements file and use pip3 to install the python modules:
 
-**Note**: The requirements.txt are tested for python-openstackclient =5.5.0.
+**Note**: The requirements.txt are tested for python-openstackclient=5.5.0.
 ```sh
 cat <<'EOF' >> requirements.txt 
 # The order of packages is significant, because pip processes them in the order
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
-pbr!=2.1.0,>=2.0.0 # Apache-2.0
-
-cliff>=3.5.0 # Apache-2.0
-iso8601>=0.1.11 # MIT
-openstacksdk>=0.57.0 # Apache-2.0
-osc-lib>=2.3.0 # Apache-2.0
-oslo.i18n>=3.15.3 # Apache-2.0
-oslo.utils>=3.33.0 # Apache-2.0
-python-keystoneclient>=3.22.0 # Apache-2.0
-python-novaclient>=17.0.0 # Apache-2.0
-python-cinderclient>=3.3.0 # Apache-2.0
-stevedore>=2.0.1 # Apache-2.0
-openstacksdk==0.57.0
-netaddr==0.8.0
-python-openstackclient==5.2.0
+pbr==5.4.5
+cliff==3.1.0
+iso8601==0.1.12
+openstacksdk==0.46.0
+osc-lib==2.0.0
+oslo.i18n==4.0.1
+oslo.utils==3.42.1
+python-keystoneclient==4.0.0
+python-cinderclient==7.0.0
+python-novaclient==17.0.0
+stevedore==1.32.0
+dogpile-cache
+stevedore==1.32.0
+netaddr==0.7.19
+python-openstackclient==5.2.2
+cryptography==3.2.1
 EOF
 
-sudo pip3 install -r requirements.txt python-openstackclient --ignore-installed
+sudo pip3 install -r requirements.txt --ignore-installed
 ``` 
 
 **Verification:**
@@ -192,12 +189,13 @@ The login should now complete without asking for a password.
 
 4. Copy the `icicrc` file from the IBM Cloud Infrastructure Center management node to your user's `/opt/ibm/icic/icicrc` directory:
 ```sh
-scp -r user@host:/opt/ibm/icic/icicrc /opt/ibm/icic/icicrc
+mkdir -p /opt/ibm/icic
+scp user@host:/opt/ibm/icic/icicrc /opt/ibm/icic/
 ```
 
 5. Copy the `icic.crt` file from the IBM Cloud Infrastructure Center management node to your certs directory `/etc/pki/tls/certs/`:
 ```
-scp -r user@host:/etc/pki/tls/certs/icic.crt /etc/pki/tls/certs/
+scp user@host:/etc/pki/tls/certs/icic.crt /etc/pki/tls/certs/
 ```
 
 6. Run the source `icicrc` to set the environment variables:
@@ -248,8 +246,8 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.6` or `4.7` or `4.8`| |
-| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `7` or `13` | 
+| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.8` or `4.9` or `4.10` or `4.11`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
+| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
 | `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |
@@ -284,7 +282,12 @@ Others are **optional**, you can enable them and update value if you need more s
 | `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
-| `approve_nodes_csr` |10| Default is 10 minutes that used to wait for approving node csrs
+| `use_localreg` |false| (Boolean) true or false, if true then Openshift Container Platform will use local packages to download
+| `localreg_mirror` |\<local-mirror-registry\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
+| `local_openshift_install` |\<local-openshift-install-url\>| This is always the latest installer download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz), use an SSH or HTTP client to store the Openshift installation package, and put the link here
+| `local_openshift_client` |\<local-openshift-client-url\>| This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here
+| `local_rhcos_image` |\<local-rhcos-image-url\>| This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here
+| `additional_certs` |`{{ lookup('file', '/opt/registry/certs/domain.crt') \| indent (width=2) }}`| The local mirror registry repo additionally need SSL certificated to be accessed, those can be added cert file via the `additional_certs` variable.
 | `create_server_timeout` |10| Default is 10 minutes that used to create instances and volumes from backend storage provider
 
 ## Creation of the cluster
@@ -310,6 +313,12 @@ ansible-playbook -i inventory.yaml configure-haproxy.yaml
 ```sh
 ansible-playbook -i inventory.yaml bastion.yaml
 ```
+> If you don't have any existing DNS server or Load Balancer and use the non-root user,run the command as below and enter the password for your user.
+```sh
+ansible-playbook -i inventory.yaml bastion.yaml -K
+```
+
+
 
 3. **Step3**:
 ```sh
@@ -337,34 +346,38 @@ After above steps, you will get one ready OpenShift Container Platform on the IB
 
 ## Day2 Operation
 
-### Add a new compute node
-Use this playbook to add new compute node as allocated IP:
+### Add compute node
+Use this playbook to add a new compute node as allocated IP:
 ```sh
 ansible-playbook -i inventory.yaml add-new-compute-node.yaml 
 ```
-Use this playbook to add new compute node as fixed IP:
+Use this playbook to add a new compute node as fixed IP:
 ```sh
-ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.xs
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x
+```
+Use this playbook to add multiple compute nodes as allocated IP, and update bastion info automatically:
+```sh
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e worker_number=3 -e update_bastion=true
+```
+Use this playbook to add multiple compute nodes as fixed IP, separate the IP list with commas, and update bastion info automatically:
+```sh
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x,x.x.x.x -e worker_number=2 -e update_bastion=true
 ```
 **Please notice:**
-The new compute node should be updated corresponding DNS and Load Balancer. If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, you may skip this part.
-* If you use our `bastion.yaml` playbook to configure the DNS server and Load Balancer, you can use this playbook to update those two directly.
-```sh
-ansible-playbook -i inventory.yaml modify-bastion.yaml
-```
-* If you use our `configure-haproxy.yaml` playbook to configure the Load Balancer, you can use this playbook to update HAProxy too.
-```sh
-ansible-playbook -i inventory.yaml modify-haproxy.yaml
-```
-* If you use our `configure-dns.yaml` playbook to configure the DNS server, you can use this playbook to update DNS too.
-```sh
-ansible-playbook -i inventory.yaml modify-dns.yaml
-```
+> If you use your own bastion server, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update bastion info.
 
 ## Uninstall Red Hat OpenShift Container Platform
-
 `ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
+## Remove RHCOS images
+In order to save image space, our playbook will not delete the uploaded image automatically, user can use this individual playbook to remove it.
+`ansible-playbook -i inventory.yaml destroy-images.yaml`
+
+And we store the SHA256 value into image properties to verify downloading images, the SHA256 comes from the `gz` packages.
+```
+| owner_specified.openstack.object | images/rhcos                                                                     |
+| owner_specified.openstack.sha256 | fc265b2d5b6c9f6d175e8b15f672aba78f6e4707875f9accaa2cb74e3d90d27b
+```
 
 ## Copyright
 © Copyright IBM Corporation 2021

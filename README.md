@@ -21,6 +21,7 @@ the repository and configure your GitHub
 to receive ongoing updates about specific activity on GitHub.
 
 ## Contribute Ansible Playbooks
+
 We are accepting Ansible playbooks from the community. These playbooks
 should relate to **IBM Z**, and should either leverage the
 **Red Hat Ansible Certified Content for IBM Z** collections, or highlight
@@ -70,6 +71,8 @@ often repeated and in need of automation.
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
+  - [WLP](zos_subsystems/wlp)
+    - [Provision a new Websphere Application Server Liberty Profile](zos_subsystems/wlp)
   - [z/OSMF Cloud Provisioning and Management](zos_management/zosmf_cloud_provisioning_and_management)
 - Application & Service Deployment
   - [ZCEE](zos_subsystems/zcee)
@@ -92,6 +95,7 @@ often repeated and in need of automation.
 - Security
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
+  - [Security provision](zos_management/zosmf_security_configuration_assistant)
 
 
 ## Blogs

@@ -20,4 +20,8 @@
 - import_playbook: destroy-computes.yaml 
 - import_playbook: destroy-network.yaml
 - import_playbook: destroy-security-groups.yaml
-- import_playbook: destroy-images-files.yaml
+- import_playbook: destroy-volumes.yaml
+  when: 
+  - volume_type_id is defined
+  - vm_type == "kvm"
+- import_playbook: destroy-files.yaml
