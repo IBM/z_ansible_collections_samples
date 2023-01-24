@@ -3,8 +3,9 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to submit jobs, query and retrieve job
-# output using modules included in the Red Hat Ansible Certified  Content for
+# This sample playbook demonstrates how to initialize a z/OS DASD volume and
+# create, copy over, and submit JCL to a data set on the newly initialized
+# volume using modules included in the Red Hat Ansible Certified Content for
 # IBM Z core collection.
 #
 # Usage:

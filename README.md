@@ -54,6 +54,7 @@ often repeated and in need of automation.
   - [Operator Basics](zos_concepts/zos_operator/zos_operator_basics)
   - [Convert Encoding](zos_concepts/encoding/convert_encoding)
   - [Job Submit Response Parsing and Constructs](zos_basics/constructs)
+  - [Initialize DASD volume, Copy JCL to PDS, and Submit Job](zos_concepts/volume_management/volume_initialization/init_dasd_vol_and_run_sample_jcl)
 - Concepts
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
