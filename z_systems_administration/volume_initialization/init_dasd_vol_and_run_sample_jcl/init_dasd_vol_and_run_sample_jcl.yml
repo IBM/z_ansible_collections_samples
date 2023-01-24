@@ -1,0 +1,141 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to submit jobs, query and retrieve job
+# output using modules included in the Red Hat Ansible Certified  Content for
+# IBM Z core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories init_dasd_vol_and_run_sample_jcl.yml
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `data_set_name`.
+#
+# Requirements:
+#   IBM z/OS core collection 1.6.0 or later.
+#
+# Configure:
+#   vol_unit - this is the unit address (device number) of the target device.
+#   new_volser - this is the volume serial name to init the device as.
+###############################################################################
+
+- name: Sample zos_ickdsf_init playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    vol_unit: 'volume_unit_address'
+    new_volser: 'volume_serial_name'
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name.
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    # ##########################################################################
+    # Fact setting for use by this playbook
+    # ##########################################################################
+    - name: Setting fact `pds_name` for use by this sample.
+      set_fact:
+        pds_name: "{{ tmp_ds.stdout }}"
+
+    - name: Fact `pds_name` set with value.
+      debug:
+        var: pds_name
+
+    ############################################################################
+    # Modules zos_ickdsf_init, zos_data_set, zos_copy, zos_job_submit,
+    # zos_job_output.
+    ############################################################################
+    # +-------------------------------------------------------------------------
+    # | Vary target volume offline, initialize volume, and vary target volume
+    # | online.
+    # | Create a data set and member, copy local JCL to data member, submit JCL
+    # | and print results of job output.
+    # +-------------------------------------------------------------------------
+    ############################################################################
+
+    - name: Take volume offline.
+      zos_operator:
+        cmd: 'vary {{ vol_unit }},offline'
+
+    - name: Initialize target volume - skip verify online check, verify no data
+            sets currently exist on target volume, create an index, volume will
+            not be SMS managed.
+      zos_ickdsf_init:
+        volume_address: "{{ vol_unit }}"
+        verify_offline: False
+        volid: "{{ new_volser }}"
+        index: True
+        sms_managed: False
+        verify_no_data_sets_exist: True
+      register: output
+
+    - name: Response for intialize target volume.
+      debug:
+        var: output
+
+    - name: Bring volume back online.
+      zos_operator:
+        cmd: 'vary {{ vol_unit }},online'
+
+    - name: Create partioned data set.
+      zos_data_set:
+        name: "{{ pds_name }}"
+        type: PDS
+        volumes: "{{ new_volser }}"
+
+    - name: Create a PDS member and replace if member exist.
+      zos_data_set:
+        name: "{{ pds_name }}(HELLO)"
+        type: MEMBER
+        replace: yes
+
+    - name: Copy JCL to data set.
+      zos_copy:
+        src: "{{ playbook_dir }}/files/HELLO.JCL"
+        dest: "{{ pds_name }}(HELLO)"
+
+    - name: Submit the JCL at {{ pds_name }}(HELLO).
+      zos_job_submit:
+        src: "{{ pds_name }}(HELLO)"
+        location: DATA_SET
+      register: result
+
+    - name: Setting fact `job_id_pds` for id of job submitted above.
+      set_fact:
+        job_id_pds: "{{ result.job_id }}"
+
+    - name: Get job output for job {{ job_id_pds }} from PDS member.
+      zos_job_output:
+        job_id: "{{ job_id_pds }}"
+      register: result
+
+    - name: Response for get job output for job "{{ job_id_pds }}" from PDS
+        member.
+      debug:
+        msg: "{{ result }}"
+
+    - pause:
+
+    ############################################################################
+    # +-------------------------------------------------------------------------
+    # | Clean up - delete PDS and member.
+    # +-------------------------------------------------------------------------
+    ############################################################################
+    - name: Delete data set {{ pds_name }}.
+      zos_data_set:
+        name: "{{ pds_name }}"
+        state: absent
