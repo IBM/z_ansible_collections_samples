@@ -21,8 +21,7 @@
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
 #                 to for this example.
-#   ctl_tmp_dir - this is the directory on the controller which will be written
-#                 to for this example.
+#
 # Optional:
 #   data_set_name - this is the data set name that will be created during
 #                   execution of this sample.
@@ -39,44 +38,30 @@
   gather_facts: no
   vars:
     tgt_tmp_dir: "/tmp"
-    ctl_tmp_dir: "/tmp"
   environment: "{{ environment_vars }}"
 
   tasks:
     # ##########################################################################
-    # Generate a temporary data set name
+    # Generate and set temporary names for data sets
     # ##########################################################################
     - name: Create temp sequential data set name
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_seq
 
-    - name: Create temp sequential data set name
+    - name: Create temp PDS name
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_pds
 
-    # ##########################################################################
-    # Fact setting for use by this playbook
-    # ##########################################################################
-    - name: Setting fact `data_set_name` for use by this sample
+    - name: Set names for sequential data set and pds for use by this sample
       set_fact:
         data_set_name: "{{ tmp_ds_seq.stdout }}"
         pds_name: "{{ tmp_ds_pds.stdout }}"
 
-    - name: Fact `data_set_name` set with value
+    - name: Fact `data_set_name` and `pds_name` set with values
       debug:
-        msg: "{{ data_set_name }}"
-
-    - name: Detecting system name
-      command: uname -n
-      register: result
-
-    - name: Setting fact `system_name` for use by this sample
-      set_fact:
-        system_name: "{{ result.stdout }}"
-
-    - name: Fact `system_name` set with value
-      debug:
-        msg: "{{ system_name }}"
+        msg:
+          - "sequential data set name - {{ data_set_name }}"
+          - "pds name - {{ pds_name }}"
 
     ############################################################################
     # Modules zos_data_set, zos_fetch
@@ -100,7 +85,6 @@
         format: fb
         record_length: 100
         size: 5M
-        volume: dimato
       register: result
 
     - name: Response for data set creation
@@ -117,9 +101,10 @@
       debug:
         msg: "{{ result }}"
 
-    - zos_copy:
+    - name: zos_copy
+      zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
-        dest: "/tmp/HELLO"
+        dest: "{{ tgt_tmp_dir }}/HELLO"
        #remote_src: yes
       register: result
 
