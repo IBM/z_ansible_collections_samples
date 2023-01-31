@@ -1,0 +1,157 @@
+###############################################################################
+# © Copyright IBM Corporation 2022
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to grow selected ZFS aggregates using
+# modules included in the Red Hat Ansible Certified Content for IBM Z core
+# collection.
+#
+# Usage:
+#  ansible-playbook -i <inventories> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories scan_and_grow_zfs_aggr.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.2.0 or later
+#
+# Configure:
+#   aggr_growth_size -  this is the new size of the aggregates if grow is called.
+#   threshold_limit - this is the percentage utilization beyond which point the
+#                     the ZFS aggregates would get grown.
+# Optional:
+#   mount_point - this is the z/OS USS location where the ZFS aggr would be
+#                 mounted.
+#   zfs_data_sets - this is a list of ZFS data sets this playbook will create
+#                   and use.
+#   mount_points - these are the z/OS USS locations where the aggregates will
+#                   be mounted.
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    aggr_growth_size: 2000
+    threshold_limit: "{{ 75 }}"
+    mount_point: "/tmp/zfs_aggr"
+
+    zfs_data_sets: 
+      - "{{ ansible_user | upper }}.ANSIBLE.ZFSADM.FIRST"
+      - "{{ ansible_user | upper }}.ANSIBLE.ZFSADM.SECOND"
+      - "{{ ansible_user | upper }}.ANSIBLE.ZFSADM.THIRD"
+    
+    mount_points:
+      - "first"
+      - "second"
+      - "third"
+
+  tasks:
+
+    # ##########################################################################
+    # Create and Mount all ZFS data sets.
+    # ##########################################################################
+
+    - name: Create ZFS data sets
+      zos_data_set:
+        name: "{{ item | upper }}"
+        type: zfs
+        space_primary: 1
+        space_type: M
+        replace: yes
+      loop: "{{ zfs_data_sets }}"
+
+    - name: Create mount dirs on z/OS USS
+      file:
+        path: "{{ mount_point }}/{{ item }}"
+        state: directory
+      loop: "{{ mount_points }}"
+
+    - name: Mount ZFS data sets
+      command: /usr/sbin/mount -t zfs -f {{ item.0 | upper }} {{ mount_point }}/{{ item.1 }}
+      loop: "{{ zfs_data_sets | zip( mount_points ) | list }}"
+
+    - name: Confirm mount points
+      command: "df /{{ mount_point }}/{{ item }}"
+      loop: "{{ mount_points }}"
+      register: df_output
+
+    - name: Echo df output to confirm mount points
+      debug:
+        msg: "{{ df_output.results | map(attribute='stdout_lines') | flatten }}"
+
+    # ##########################################################################
+    # 1. Fill up ZFS aggregates with random data.
+    # 2. Scan through ZFS data sets to discover which ones are above threshold.
+    # 3. Call 'zfsadm grow' on identified ZFS aggregates
+    # ##########################################################################
+
+    - name: Write random bytes to ZFS aggregates
+      shell: head -c "{{250000*(1+index) }}" /dev/urandom > {{ mount_point }}/{{item}}/test.txt
+      loop: "{{ mount_points }}"
+      loop_control:
+        index_var: index
+
+    - name: Get aggrinfo report
+      command: zfsadm aggrinfo {{ item | upper }}
+      loop: "{{ zfs_data_sets }}"
+      register: aggrinfo_output_before
+
+    - name: Get percentage use BEFORE growth
+      shell: "df -kP {{ mount_point }}/{{ item }}"
+      loop: "{{ mount_points }}"
+      register: df_output_before
+
+    - name: Echo aggrinfo and percent-use BEFORE growth
+      debug:
+        msg:
+          - "{{ aggrinfo_output_before.results |  map(attribute='stdout_lines') | flatten }}"
+          - "{{ df_output_before.results | map(attribute='stdout_lines') | flatten }}" 
+
+    - name: Scan df_output to build list of data set names and utilization percentages
+      set_fact:
+        dsn_per_util_list: "{{ df_output_before.results | map(attribute='stdout') | map('regex_search', '\\n([a-zA-Z0-9\\.]+).*(\\b[0-9]+)%', ('\\1'), ('\\2'))  | list }}"
+
+    - name: Build grow_list
+      set_fact: 
+        grow_list: "{{ grow_list | default([]) + [item[0]] }}"
+      when: "{{ item[1] | int }} > {{ threshold_limit }}"
+      loop: "{{ dsn_per_util_list }}"
+    
+    - name: Echo grow_list
+      debug:
+        var: grow_list
+
+    - name: Grow ZFS aggregate
+      command: "zfsadm grow -aggregate {{ item }} -size {{ aggr_growth_size }}"
+      loop: "{{ grow_list }}"
+      register: grow_output
+
+    - name: Get percentage use AFTER growth
+      shell: "df -kP {{ mount_point }}/{{ item }}"
+      loop: "{{ mount_points }}"
+      register: df_output_after
+
+    - name: Echo 'zfsadm grow' output and percent-use AFTER growth.
+      debug:
+        msg:
+          - "{{ grow_output.results |  map(attribute='stdout_lines') | flatten }}"
+          - "{{ df_output_after.results | map(attribute='stdout_lines') | flatten }}" 
+
+    # ##########################################################################
+    # clean up - unmount and delete ZFS data sets
+    # ##########################################################################
+
+    - name: Unmount ZFS data sets
+      command: "/usr/sbin/unmount {{ mount_point }}/{{ item }}"
+      loop: "{{ mount_points }}"
+
+    - name: Delete ZFS data sets
+      zos_data_set:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ zfs_data_sets }}"
