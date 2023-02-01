@@ -115,5 +115,5 @@ all:
     os_dns_domain: '10.0.10.4'
     cluster_name: 'lzocpfm1'
     base_domain: 'fpet.pokprv.stglabs.ibm.com'
-    pullsecret: '{"auths":{"intreg0.fpet.pokprv.stglabs.ibm.com:5000": {"auth": "b2Nwc3lzdGVtOldFZlZxY1hkREdTSjdiUg==","email": "rjbrenn@us.ibm.com"}}}'
+    pullsecret: '{"auths":{"intreg0.fpet.pokprv.stglabs.ibm.com:5000": {"auth": "b2Nwc3lzdGVtOldFZlZxY1hkREdTSjdiUg=="}}}'
     sshkey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBlBQw4IBxyn9W2hF+MDTRW21fq91PT3e0fwnKa2aTQz fpmitaro@us.ibm.com'
