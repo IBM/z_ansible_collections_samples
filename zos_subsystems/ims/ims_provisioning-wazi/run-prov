@@ -1,1 +1,1 @@
-ansible-playbook -i inventories/zosendpoint ims-tmdb.yml
+ansible-playbook -vv -i inventories/zosendpoint ims-tmdb.yml

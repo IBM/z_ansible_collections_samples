@@ -1,1 +1,1 @@
-ansible-playbook -i inventories/zosendpoint ims-tmdb.yml  -e "{ ims_function: delete }"
+ansible-playbook -vv -i inventories/zosendpoint ims-tmdb.yml  -e "{ ims_function: delete }"
