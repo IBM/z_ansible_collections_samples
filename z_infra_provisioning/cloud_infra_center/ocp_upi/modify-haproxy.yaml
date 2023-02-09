@@ -26,72 +26,54 @@
 # Change Summary: 
 # - Change Ansible playbook name
 
----
-- name: modify HAProxy on bastion
-  hosts: bastion
+- name: 'Get worker node IP'
+  set_fact: 
+    haproxy_new_worker_index: "{{ worker_index }}"
+    cluster_domain_name: "{{ cluster_domain_name }}"
+
+- name: Check new worker-http exist in HAProxy
+  shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index }}" | wc -l
+  register: exist_worker_count
+  check_mode: no 
+  ignore_errors: true
+
+- name: 'Get the line number for backend http'
+  shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-http' |awk '{print$1}'
+  register: exist_new_worker_http
   
-  tasks:
-  - name: Copy bastion info from remote into bastion server
-    copy:
-      src: .new_ocp_node.yml
-      dest: /tmp
-      force: yes
+- name: 'Get the line number for backend https'
+  shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-https' |awk '{print$1}'
+  register: exist_new_worker_https
 
-  - name: Get new node IP 
-    shell: "cat /tmp/.new_ocp_node.yml | grep new_worker_ip | awk -F '=' '{print $2}'"
-    register: haproxy_new_worker_ip
+- name: 'Increment backend http'
+  set_fact: new_worker_http={{ exist_new_worker_http.stdout|int + 2 }}
 
-  - name: Get new node index 
-    shell: "cat /tmp/.new_ocp_node.yml | grep new_worker_index | awk -F '=' '{print $2}'"
-    register: haproxy_new_worker_index
+- name: 'Increment backend https'
+  set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
 
-  - name: Combine cluster name and base domain
-    shell: "cat /tmp/.new_ocp_node.yml | grep cluster_domain_name | awk -F '=' '{print $2}'"
-    register: cluster_domain_name
+- name: Add new worker http domain into dns 
+  shell: 
+    cmd: sed -i '{{ new_worker_http }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:80 check'  /etc/haproxy/haproxy.cfg
+  when: exist_worker_count.stdout == "0"
 
-  - name: Check new worker-http exist in HAProxy
-    shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index.stdout }}" | wc -l
-    register: exist_worker_count
-    check_mode: no 
-    ignore_errors: true
+- name: Add new worker https domain into dns 
+  shell: 
+    cmd: sed -i '{{ new_worker_https }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:443 check'  /etc/haproxy/haproxy.cfg
+  when: exist_worker_count.stdout == "0"
 
-  - name: 'Get the line number for backend http'
-    shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-http' |awk '{print$1}'
-    register: exist_new_worker_http
-  
-  - name: 'Get the line number for backend https'
-    shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-https' |awk '{print$1}'
-    register: exist_new_worker_https
+- name: Check the existing HAProxy configuration
+  fail:
+    msg: "The new worker configuration exists in haproxy.cfg, skip this playbook."
+  failed_when: exist_worker_count.stdout != "0"
 
-  - name: 'Increment backend http'
-    set_fact: new_worker_http={{ exist_new_worker_http.stdout|int + 2 }}
+- name: Restart HAProxy.service
+  service:
+    name: haproxy.service
+    state: restarted
 
-  - name: 'Increment backend https'
-    set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
-
-  - name: Add new worker http domain into dns 
-    shell: 
-      cmd: sed -i '{{ new_worker_http }} i\         \server worker-{{ haproxy_new_worker_index.stdout }} worker-{{ haproxy_new_worker_index.stdout }}.{{ cluster_domain_name.stdout }}:80 check'  /etc/haproxy/haproxy.cfg
-    when: exist_worker_count.stdout == "0"
-
-  - name: Add new worker https domain into dns 
-    shell: 
-      cmd: sed -i '{{ new_worker_https }} i\         \server worker-{{ haproxy_new_worker_index.stdout }} worker-{{ haproxy_new_worker_index.stdout }}.{{ cluster_domain_name.stdout }}:443 check'  /etc/haproxy/haproxy.cfg
-    when: exist_worker_count.stdout == "0"
-
-  - name: Check the existing HAProxy configuration
-    fail:
-      msg: "The new worker configuration exists in haproxy.cfg, skip this playbook."
-    failed_when: exist_worker_count.stdout != "0"
-
-  - name: Restart HAProxy.service
-    service:
-      name: haproxy.service
-      state: restarted
-
-  - name: Check if HAProxy is running
-    service:
-      name: haproxy
-      state: started
-    notify:
-    - restart firewalld
+- name: Check if HAProxy is running
+  service:
+    name: haproxy
+    state: started
+  notify:
+  - restart firewalld

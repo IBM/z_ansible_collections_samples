@@ -19,7 +19,7 @@
       delegate_to: localhost
 
     - name: Compress the template files to send
-      archive: 
+      community.general.archive:
         path: "{{ temp_file_path.path }}/*"
         dest: "{{ temp_file_path.path }}/templates.tar.bz2"
         format: bz2

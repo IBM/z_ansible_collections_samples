@@ -17,6 +17,9 @@
 ---
 # handlers file for configure-haproxy
 - name: Turn on haproxy_connect_any
+  become: yes
+  become_user: root
+  become_method: sudo
   seboolean: 
     name: haproxy_connect_any
     state: yes
@@ -24,12 +27,19 @@
   listen: "restart haproxy"
 
 - name: Restart haproxy
+  become: yes
+  become_user: root
+  become_method: sudo
   service:
     name: haproxy.service
     state: restarted
+    enabled: yes
   listen: "restart haproxy"
 
 - name: Restart firewalld.service
+  become: yes
+  become_user: root
+  become_method: sudo
   service:
     name: firewalld.service
     state: restarted

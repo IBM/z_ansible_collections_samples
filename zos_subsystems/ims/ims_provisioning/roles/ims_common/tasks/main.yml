@@ -21,21 +21,20 @@
         verbose: true
       when: ctl == "stop"
 
-
-    - name: Wait for IMS ready
-      include_role:
-        name: submit-rexx
-        public: yes
-      vars:
-        rexx_name: 'WaitJob.j2'
-        max_rc: 0
+    - name: Wait for IMS Ready message
+      zos_operator_action_query:
+        job_name: "{{ DFS_IMS_SSID }}CTL"
+      register: ims_ready_msg
+      retries: 5
+      delay: 5
+      until: ims_ready_msg.actions
       ignore_errors: true
-      when: wait_for_job
+      when: ctl == "start"
 
     - name: IMS cold start
-      ims_command:
-        command:  NRE CHECKPOINT 0 FMT ALL
-        plex:  '{{ DFS_IMSPlex }}'
+      ims_command: 
+        command: NRE CHECKPOINT 0 FMT ALL
+        plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
       when: cold_start
 

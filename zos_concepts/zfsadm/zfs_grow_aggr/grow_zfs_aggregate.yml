@@ -1,0 +1,135 @@
+###############################################################################
+# © Copyright IBM Corporation 2022
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to grow a ZFS aggregate using modules
+# included in the Red Hat Ansible Certified Content for IBM Z core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventories> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories grow_zfs_aggregate.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.2.0 or later
+#
+# Configure:
+# Optional:
+#   mount_point - this is the z/OS USS location where the ZFS aggr would be
+#                 mounted.
+#   aggr_growth_size - this is the new size of the ZFS data set after it is
+#                       grown.
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: no
+  environment: "{{ environment_vars }}"
+  vars:
+    mount_point: "/tmp/zfs_aggr"
+    aggr_growth_size: 2000
+  tasks:
+
+    # ##########################################################################
+    # Generate and set temporary data set name.
+    # ##########################################################################
+
+    - name: Create temp ZFS data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_zfs_dsn
+
+    - name: Setting fact `zfs_dsn` for use by this sample
+      set_fact:
+        zfs_dsn: "{{ tmp_zfs_dsn.stdout }}"
+    
+    - name: Fact `zfs_dsn` set with value
+      debug:
+        msg: "{{ zfs_dsn }}"
+
+    # ##########################################################################
+    # Create and Mount ZFS data set.
+    # ##########################################################################
+
+    - name: Create ZFS.
+      zos_data_set:
+        name: "{{ zfs_dsn }}"
+        type: zfs
+        space_primary: 1
+        space_type: M
+        replace: yes
+
+    - name: Create mount dir on z/OS USS.
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: Mount ZFS data set.
+      command: /usr/sbin/mount -t zfs -f {{ zfs_dsn | upper }} {{ mount_point }}
+
+    - name: Confirm mount point.
+      command: "df /{{ mount_point }}"
+      register: df_output
+
+    - name: Echo df output.
+      debug:
+        msg: "{{ df_output.stdout_lines }}"
+
+    # ##########################################################################
+    # 1. Fill up ZFS aggregate with random data.
+    # 2. Get aggrinfo (and print to console).
+    # 3. Call zfsadm grow command to grow ZFS aggregate.
+    # 4. Get post-growth aggrinfo (and print to console).
+    # ##########################################################################
+
+    - name: Write 1 million bytes to ZFS.
+      shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+    
+    - name: Get aggregate info BEFORE growth.
+      command: zfsadm aggrinfo {{ zfs_dsn | upper }}
+      register: aggrinfo_output_before
+
+    - name: Get percentage use BEFORE growth.
+      shell: "df -kP {{ mount_point }}"
+      register: df_output_before
+
+    - name: Grow ZFS aggregate.
+      command: zfsadm grow -aggregate {{ zfs_dsn }} -size "{{ aggr_growth_size }}"
+      register: grow_output
+
+    - name: Echo grow_output.
+      debug:
+        msg: "{{ grow_output.stdout_lines }}"
+
+    - name: Get aggregate info AFTER growth.
+      command: zfsadm aggrinfo {{ zfs_dsn | upper }}
+      register: aggrinfo_output_after
+
+    - name: Get percentage use AFTER growth.
+      shell: "df -kP {{ mount_point }}"
+      register: df_output_after
+
+    - name: Echo aggrinfo_output and percent-use AFTER growth.
+      debug:
+        msg:
+          - "BEFORE:"
+          - "{{ aggrinfo_output_before.stdout_lines }}"
+          - "{{ df_output_before.stdout_lines }}"
+          - "AFTER:"
+          - "{{ aggrinfo_output_after.stdout_lines }}"
+          - "{{ df_output_after.stdout_lines }}"
+
+    # ##########################################################################
+    # clean up - unmount and delete ZFS data sets
+    # ##########################################################################
+
+    - name: Unmount ZFS data set.
+      command: "/usr/sbin/unmount {{ mount_point }}"
+
+    - name: Delete ZFS data set.
+      zos_data_set:
+        name: "{{ zfs_dsn }}"
+        state: absent
