@@ -47,11 +47,6 @@
     content: "{{ sunbet_range.stdout_lines[0]}}"
     dest: ".subnet_range.yml"
 
-- name: 'Save some basic info into yaml'
-  shell: |
-    rm -rf .new_ocp_node.yml
-    echo total_count={{ os_control_nodes_number | int }} >> .new_ocp_node.yml
-
 - name: 'Check netowrk name is properly set'
   fail:
     msg: "use_network_name is not defined!"
@@ -75,6 +70,8 @@
 - name: "Remove all DNS nameserver of subnet {{ use_network_subnet }}"
   command:
     cmd: "openstack subnet set --no-dns-nameservers {{ use_network_subnet }} "
+  when:
+  - vm_type == "kvm"
 
 - name: 'Update new DNS nameserver and allocation pool of subnet {{ use_network_subnet }}'
   command:
@@ -82,6 +79,7 @@
   when:
   - allocation_pool_start is defined
   - allocation_pool_end is defined 
+  - vm_type == "kvm"
 
 - name: 'Update new DNS nameserver of subnet {{ use_network_subnet }}'
   command:
@@ -89,12 +87,31 @@
   when:
   - allocation_pool_start is not defined
   - allocation_pool_end is not defined 
+  - vm_type == "kvm"
 
 - name: 'Update new DNS nameserver and partial allocation pool of subnet {{ use_network_subnet }}'
   command:
     cmd: "openstack subnet set --dns-nameserver {{ os_dns_domain }} --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
-  when: (allocation_pool_start is not defined and allocation_pool_end is defined) or
-        (allocation_pool_start is defined and allocation_pool_end is not defined)
+  when:
+  - (allocation_pool_start is not defined and allocation_pool_end is defined) or
+    (allocation_pool_start is defined and allocation_pool_end is not defined)
+  - vm_type == "kvm"
+
+- name: 'Update allocation pool of subnet {{ use_network_subnet }}'
+  command:
+    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ use_network_subnet }}"
+  when:
+  - allocation_pool_start is defined
+  - allocation_pool_end is defined 
+  - vm_type == "zvm"
+
+- name: 'Update partial allocation pool of subnet {{ use_network_subnet }}'
+  command:
+    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
+  when: 
+  - (allocation_pool_start is not defined and allocation_pool_end is defined) or
+    (allocation_pool_start is defined and allocation_pool_end is not defined)
+  - vm_type == "zvm"
 
 - name: 'Export infra ID'
   shell:
@@ -113,7 +130,8 @@
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    #- subnet: "{{ os_subnet }}"
+    - subnet_id: "{{ use_network_subnet }}"
       ip_address: "{{ os_bootstrap_ip }}"
   when:
   - auto_allocated_ip == false
@@ -125,7 +143,8 @@
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    # subnet: "{{ os_subnet }}"
+    - subnet_id: "{{ use_network_subnet }}"
       ip_address: "{{ os_master_ip[item.0] }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
@@ -138,7 +157,8 @@
     security_groups:
     - "{{ os_sg_worker }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    # subnet: "{{ os_subnet }}"
+    - subnet_id: "{{ use_network_subnet }}"
       ip_address: "{{ os_infra_ip[item.0]}}"
   with_indexed_items:  "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:

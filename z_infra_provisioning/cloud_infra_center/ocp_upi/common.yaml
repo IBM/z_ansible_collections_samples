@@ -42,4 +42,9 @@
     os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-worker"
     # Ignition files
     os_bootstrap_ignition: "{{ infra_id.stdout_lines[0] }}-bootstrap-ignition.json"
+    # BFV volume names
+    os_bootstrap_bfv_name: "{{ infra_id.stdout_lines[0] }}-bootstrap-boot"
+    os_master_bfv_name: "{{ infra_id.stdout_lines[0] }}-master-boot"
+    os_worker_bfv_name: "{{ infra_id.stdout_lines[0] }}-worker-boot"
+
 

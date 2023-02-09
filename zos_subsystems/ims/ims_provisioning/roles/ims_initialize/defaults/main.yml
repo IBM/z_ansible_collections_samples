@@ -10,12 +10,13 @@ uss_utilities_path: /tmp
 DFS_INIT_JAVA_CONF: true
 
 DFS_PORTIDSuf: 99
+DFS_IMSXCFGroup: IMSXCFGN
 
 
 ARC: '03'
 
 # Desired port information for IMS 15
-DYNAMICALLY_RESERVE_PORTS: yes # if yes, ports listed below will be overwritten
+DYNAMICALLY_RESERVE_PORTS: no # if yes, ports listed below will be overwritten
 # If RESERVE_SPECIFIC_PORT is off, a port number will be selected from desired range
 # If on and port taken, playbook will fail
 # Only used if DYNAMICALLY_RESERVE_PORTS=yes

@@ -27,16 +27,6 @@
   - name: 'Import common yaml'
     import_tasks: common.yaml
 
-  - name: 'List rhcos and bootstrap ignition image'
-    command:
-      cmd: "openstack image list --tag {{ cluster_id_tag }} -f value -c ID"
-    register: images
-
-  - name: 'Remove the rhcos image'
-    shell:
-      cmd: "openstack image delete {{ item.1 }}"
-    with_indexed_items: "{{ images.stdout_lines }}"
-
   - find:
       paths: .
       patterns: "*.json"
@@ -68,11 +58,6 @@
     file:
       state: absent
       path: .compute-nodes-{{ infra_id.stdout_lines[0] }}.json
-    
-  - name: 'Remove the downloaded RHCOS image file'
-    file:
-      state: absent
-      path: rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
 
   - name: 'Remove the hidden openshift install state json files'
     file:
@@ -84,7 +69,27 @@
       state: absent
       path: .openshift_install.log
 
+  - name: 'Remove the hidden sha256sum_remote.txt files'
+    file:
+      state: absent
+      path: .sha256sum_remote.txt
+
+  - name: 'Remove the hidden sha256sum_local.txt files'
+    file:
+      state: absent
+      path: .sha256sum_local.txt
+
   - name: 'Remove the metadata.json files'
     file:
       state: absent
       path: metadata.json
+
+  - name: 'List bootstrap ignition image'
+    command:
+      cmd: "openstack image list --tag {{ cluster_id_tag }} -f value -c ID"
+    register: bootstrap_images
+
+  - name: 'Remove the bootstrap ignition'
+    shell:
+      cmd: "openstack image delete {{ item.1 }}"
+    with_indexed_items: "{{ bootstrap_images.stdout_lines }}"

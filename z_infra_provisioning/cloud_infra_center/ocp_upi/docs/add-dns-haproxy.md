@@ -68,6 +68,17 @@ _etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.openshift.second.com.
                       IN SRV 0 10 2380 etcd-2.openshift.second.com.
 ```
 
+required DNS records
+
+|Record |Description|
+|------ |------------------------------------|
+api.<cluster_name>.<base_domain>. | A DNS A/AAAA or CNAME record, and a DNS PTR record, to identify the API load balancer. These records must be resolvable by both clients external to the cluster and from all the nodes within the cluster.|
+|api-int.<cluster_name>.<base_domain>. | A DNS A/AAAA or CNAME record, and a DNS PTR record, to internally identify the API load balancer. These records must be resolvable from all the nodes within the cluster.|
+|*.apps.<cluster_name>.<base_domain>.  |A wildcard DNS A/AAAA or CNAME record that refers to the application ingress load balancer. The application ingress load balancer targets the machines that run the Ingress Controller pods. The Ingress Controller pods run on the compute machines by default. These records must be resolvable by both clients external to the cluster and from all the nodes within the cluster.|
+|bootstrap.<cluster_name>.<base_domain>. |A DNS A/AAAA or CNAME record, and a DNS PTR record, to identify the bootstrap machine. These records must be resolvable by the nodes within the cluster.|
+|<master><n>.<cluster_name>.<base_domain>. |DNS A/AAAA or CNAME records and DNS PTR records to identify each machine for the control plane nodes. These records must be resolvable by the nodes within the cluster.|
+|<worker><n>.<cluster_name>.<base_domain>. |DNS A/AAAA or CNAME records and DNS PTR records to identify each machine for the worker nodes. These records must be resolvable by the nodes within the cluster.|
+
 You need to change the `openshift.second.com` to the second cluster domain name, and change servers' IPs and worker nodes' names.
 
 2. Correct the zone file's owner
