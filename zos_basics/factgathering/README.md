@@ -43,7 +43,7 @@ cache_plugin=jsonfile
 fact_caching_connection=<some_folder_location>
 ```
 
-As an environment variables:
+As environment variables:
 - `export ANSIBLE_INVENTORY_CACHE_PLUGIN=jsonfile`
 - `export ANSIBLE_CACHE_PLUGIN_CONNECTION='<some_folder_location>'`
 
@@ -51,7 +51,10 @@ In the command line, set values for:
 - `ANSIBLE_CACHE_PLUGIN=jsonfile`
 - `ANSIBLE_CACHE_PLUGIN_CONNECTION='<some_folder_location>'`
 
-Example command to run playbook and output `ansible_files` to a local json file:
+Example command to run playbook and output `ansible_facts` to a local json file.
+`ansible_facts` is the variable in which the playbook stores various gathered
+facts. It is also where any facts gathered by default through the builtin
+Ansible fact gathering are stored.
 ```
 ANSIBLE_CACHE_PLUGIN=jsonfile ANSIBLE_CACHE_PLUGIN_CONNECTION='<some_folder_location>' ansible-playbook -i inventories gather-facts.yml
 ```
@@ -63,14 +66,14 @@ cache plugin can also be specified. The documentation for calling upon
 cache plugins can be found
 [here](https://docs.ansible.com/ansible/latest/plugins/cache.html).
 
-Some plugins implemented by Ansible 2.8:
+Some plugins implemented in Ansible:
 
-- json - [here](https://docs.ansible.com/ansible/2.8/plugins/cache/jsonfile.html)
-- redis - [here](https://docs.ansible.com/ansible/2.8/plugins/cache/redis.html)
-- mongo - [here](https://docs.ansible.com/ansible/2.8/plugins/cache/mongodb.html)
+- json - [here](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/jsonfile_cache.html)
+- redis - [here](https://docs.ansible.com/ansible/latest/collections/community/general/redis_cache.html)
+- mongo - [here](https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_cache.html)
 
-The full list of cache plugins can be found by following the steps
-listed [here](https://docs.ansible.com/ansible/2.8/plugins/cache.html#plugin-list).
+The full list of cache plugins can be found by following the steps in the
+section [here](https://docs.ansible.com/ansible/latest/plugins/cache.html#plugin-list).
 
 
 # Changelog
@@ -78,7 +81,7 @@ All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
-© Copyright IBM Corporation 2022
+© Copyright IBM Corporation 2023
 
 # License
 Licensed under [Apache License,

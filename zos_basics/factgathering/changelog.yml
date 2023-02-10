@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2022
+# Copyright (c) IBM Corporation 2023
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -26,8 +26,8 @@
 ################################################################################
 
 releases:
-    2021.09.03:
-        date: 2022-05-24
+    2023.02.09:
+        date: 2023-02-09
         changes:
             added:
                 - Released initial version

@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2022
+# © Copyright IBM Corporation 2023
 ###############################################################################
 # This sample playbook demonstrates the zos fact gathering module included in
 # the Red Hat Ansible Certified  Content for IBM Z core collection.
@@ -39,7 +39,7 @@
         - 'master*'
 
     # ##########################################################################
-    # Collected facts can be accessed via the ansible_facts dict.
+    # Collected facts can be accessed via the ansible_facts dict (dictionary).
     # ##########################################################################
   - name: Access and print info about master catalog.
     ansible.builtin.debug:
