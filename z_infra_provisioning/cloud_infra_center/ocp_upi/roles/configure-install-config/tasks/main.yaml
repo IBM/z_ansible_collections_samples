@@ -48,7 +48,14 @@
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-release ' install-config.yaml
   when:
   - use_localreg == true
-    
+
+- name: Update networkType from OpenShiftSDN to OVNKubernetes
+  shell:
+    cmd: |
+      sed -i '/networkType/d' install-config.yaml
+  when:
+  - openshift_version is version('4.12', '>=')
+
 - name: Update cluster domain name in install-config.yaml
   shell: 
     cmd: |

@@ -40,11 +40,11 @@
 - name: 'Get the subnet range'
   command:
     cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
-  register: sunbet_range
+  register: subnet_range
 
 - local_action:
     module: copy
-    content: "{{ sunbet_range.stdout_lines[0]}}"
+    content: "{{ subnet_range.stdout_lines[0]}}"
     dest: ".subnet_range.yml"
 
 - name: 'Check netowrk name is properly set'
@@ -56,6 +56,11 @@
   fail:
     msg: "use_network_subnet is not defined!"
   failed_when: use_network_subnet is not defined
+
+- name: 'Get subnet id'
+  command:
+    cmd: "openstack subnet show {{ use_network_subnet }} -c id -f value"
+  register: subnet_id
 
 - name: "Get first start of allocation pool of subnet {{ use_network_subnet }}"
   shell: |
@@ -76,7 +81,7 @@
 
 - name: 'Update partial allocation pool of subnet {{ use_network_subnet }}'
   command:
-    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start | default(sunbet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
+    cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start | default(subnet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
   when:
   - (allocation_pool_start is not defined and allocation_pool_end is defined) or
     (allocation_pool_start is defined and allocation_pool_end is not defined)
@@ -98,7 +103,7 @@
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    - subnet_id: "{{ subnet_id.stdout }}"
       ip_address: "{{ os_bootstrap_ip }}"
   when:
   - auto_allocated_ip == false
@@ -110,7 +115,7 @@
     security_groups:
     - "{{ os_sg_master }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    - subnet_id: "{{ subnet_id.stdout }}"
       ip_address: "{{ os_master_ip[item.0] }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
@@ -123,7 +128,7 @@
     security_groups:
     - "{{ os_sg_worker }}"
     fixed_ips:
-    - subnet: "{{ os_subnet }}"
+    - subnet_id: "{{ subnet_id.stdout }}"
       ip_address: "{{ os_infra_ip[item.0]}}"
   with_indexed_items:  "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
@@ -135,9 +140,10 @@
     network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_master }}"
+    fixed_ips:
+    - subnet_id: "{{ subnet_id.stdout }}"
   when:
   - auto_allocated_ip == true
-
 
 - name: 'Create the control server ports'
   os_port:
@@ -145,6 +151,8 @@
     network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_master }}"
+    fixed_ips:
+    - subnet_id: "{{ subnet_id.stdout }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
   - auto_allocated_ip == true
@@ -155,6 +163,8 @@
     network: "{{ use_network_name }}"
     security_groups:
     - "{{ os_sg_worker }}"
+    fixed_ips:
+    - subnet_id: "{{ subnet_id.stdout }}"
   with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
   - auto_allocated_ip == true
