@@ -83,7 +83,6 @@
         attributes:
           enablestatus: disabled
 
-
     - name: Wait for CICS bundles to all be disabled
       ibm.ibm_zos_cics.cmci_get:
         cmci_host: "{{ cmci_host }}"
@@ -101,7 +100,6 @@
       retries: 5
       until: bundlestatus.records | rejectattr('enablestatus', 'equalto', 'DISABLED') | count == 0
 
-
     - name: Enable CICS bundles
       ibm.ibm_zos_cics.cmci_update:
         cmci_host: "{{ cmci_host }}"
@@ -117,7 +115,6 @@
             name: "{{ bundle_name }}"
         attributes:
           enablestatus: enabled
-
 
     - name: Wait for CICS bundles to enable
       ibm.ibm_zos_cics.cmci_get:
@@ -136,7 +133,6 @@
       retries: 5
       until: bundlestatus.records | rejectattr('enablestatus', 'equalto', 'ENABLED') | count == 0
 
-
     - name: Print final status
       ansible.builtin.debug:
-        msg: '{{ bundlestatus }}'
+        msg: "{{ bundlestatus }}"

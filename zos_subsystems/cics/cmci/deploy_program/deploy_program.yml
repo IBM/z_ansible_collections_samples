@@ -3,7 +3,7 @@
 ---
 - name: CICS Program Deploy
 
-  hosts: 'all'
+  hosts: "all"
   gather_facts: false
 
   tasks:
@@ -34,13 +34,13 @@
     - name: NEWCOPY PROGRAM in CICS
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_action:
-        context: '{{ context }}'
-        scope: '{{ scope }}'
-        cmci_host: '{{ cmci_host }}'
-        cmci_port: '{{ cmci_port | int }}'
-        scheme: '{{ scheme }}'
+        context: "{{ context }}"
+        scope: "{{ scope }}"
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        scheme: "{{ scheme }}"
         action_name: NEWCOPY
         type: CICSProgram
         resources:
           filter:
-            program: '{{ program }}'
+            program: "{{ program }}"
