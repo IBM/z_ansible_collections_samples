@@ -18,7 +18,7 @@
 # Notes:
 #  This sample playbook demonstrates how to use any of the cmci modules with a
 #  certificate issued from a self-signed CA.  This sample is set up to execute
-#  on the Ansible control node, as it requires access to other files, in the 
+#  on the Ansible control node, as it requires access to other files, in the
 #  playbook directory.
 #
 #  To use this sample, create a PEM-formatted certificate bundle file alongside
@@ -30,32 +30,29 @@
 #   IBM z/OS CICS collection 1.0.0 or later
 ###############################################################################
 ---
-- name:  CICS CMCI Report
+- name: CICS CMCI Report
 
-  collections:
-      - ibm.ibm_zos_cics
-
-  hosts: 'localhost'
-  gather_facts: 'false'
+  hosts: "localhost"
+  gather_facts: false
 
   vars_prompt:
-   - name: cmci_host
-     prompt: Target CMCI hostname
-     private: no
-   - name: cmci_port
-     prompt: Target CMCI port
-     private: no
-   - name: cmci_user
-     prompt: CMCI user name (leave blank for unauthenticated)
-   - name: cmci_password
-     prompt: CMCI password (leave blank for unauthenticated)
+    - name: cmci_host
+      prompt: Target CMCI hostname
+      private: false
+    - name: cmci_port
+      prompt: Target CMCI port
+      private: false
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
 
   tasks:
     ############################################################################
     # Install module dependencies
     ############################################################################
     - name: Make sure CMCI module dependencies are installed
-      pip:
+      ansible.builtin.pip:
         name:
           - requests
           - xmltodict
@@ -67,20 +64,20 @@
     - name: Get information about CICS regions
       environment:
         REQUESTS_CA_BUNDLE: "ca_certs.pem"
-      cmci_get:
-        cmci_host: '{{ cmci_host }}'
-        cmci_port: '{{ cmci_port | int }}'
-        cmci_user: '{{ cmci_user | default(omit) }}'
-        cmci_password: '{{ cmci_password | default(omit) }}'
-        scheme: 'https'
-        context: ''
-        type: 'CICSCICSplex'
+      ibm.ibm_zos_cics.cmci_get:
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        scheme: "https"
+        context: ""
+        type: "CICSCICSplex"
       register: result
-    
+
     ############################################################################
     # Print the plexnames
     ############################################################################
     - name: Debug
-      debug:
-        msg: '{{ item.plexname }}'
+      ansible.builtin.debug:
+        msg: "{{ item.plexname }}"
       loop: "{{ result.records }}"
