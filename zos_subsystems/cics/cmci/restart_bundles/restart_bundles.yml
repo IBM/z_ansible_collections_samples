@@ -1,0 +1,142 @@
+# (c) Copyright IBM Corporation 2023
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+###############################################################################
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2023-02-22
+#  - Released initial version
+###############################################################################
+# This sample playbook demonstrates how to restart a set of CICS bundles.
+#
+# Usage:
+#  ansible-playbook restart_bundles.yml
+#
+# Notes:
+#  This sample playbook demonstrates how to restart a CICS bundle or set of
+#  CICS bundles, by disabling, waiting to reach a disabled state, enabling and
+#  waiting to reach an enabled state.
+#
+#  This sample additionally shows how to automate installation of
+#  pre-requisites for the `cmci_*` modules.
+#
+# Requirements:
+#   IBM z/OS CICS collection 1.0.0 or later
+###############################################################################
+---
+- name: Restart CICS bundles
+
+  hosts: "localhost"
+  gather_facts: false
+
+  vars_prompt:
+    - name: cmci_host
+      prompt: Target CMCI hostname
+      private: false
+    - name: cmci_port
+      prompt: Target CMCI port
+      private: false
+    - name: scheme
+      prompt: CMCI scheme
+      private: false
+      default: "https"
+    - name: context
+      prompt: Target CICSPlex SM context
+      private: false
+    - name: scope
+      prompt: Target CICSPlex SM scope
+      private: false
+    - name: bundle_name
+      prompt: Name or pattern of the CICS bundles to restart
+      private: false
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
+
+  tasks:
+    ############################################################################
+    # Install module dependencies
+    ############################################################################
+    - name: Make sure CMCI module dependencies are installed
+      ansible.builtin.pip:
+        name:
+          - requests
+          - xmltodict
+          - typing;python_version<"3.5"
+
+    - name: Disable CICS bundles
+      ibm.ibm_zos_cics.cmci_update:
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        context: "{{ context }}"
+        scope: "{{ scope }}"
+        scheme: "{{ scheme }}"
+        type: "CICSBundle"
+        resources:
+          filter:
+            name: "{{ bundle_name }}"
+        attributes:
+          enablestatus: disabled
+
+
+    - name: Wait for CICS bundles to all be disabled
+      ibm.ibm_zos_cics.cmci_get:
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        context: "{{ context }}"
+        scope: "{{ scope }}"
+        scheme: "{{ scheme }}"
+        type: "CICSBundle"
+        resources:
+          filter:
+            name: "{{ bundle_name }}"
+      register: bundlestatus
+      retries: 5
+      until: bundlestatus.records | rejectattr('enablestatus', 'equalto', 'DISABLED') | count == 0
+
+
+    - name: Enable CICS bundles
+      ibm.ibm_zos_cics.cmci_update:
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        context: "{{ context }}"
+        scope: "{{ scope }}"
+        scheme: "{{ scheme }}"
+        type: "CICSBundle"
+        resources:
+          filter:
+            name: "{{ bundle_name }}"
+        attributes:
+          enablestatus: enabled
+
+
+    - name: Wait for CICS bundles to enable
+      ibm.ibm_zos_cics.cmci_get:
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        context: "{{ context }}"
+        scope: "{{ scope }}"
+        scheme: "{{ scheme }}"
+        type: "CICSBundle"
+        resources:
+          filter:
+            name: "{{ bundle_name }}"
+      register: bundlestatus
+      retries: 5
+      until: bundlestatus.records | rejectattr('enablestatus', 'equalto', 'ENABLED') | count == 0
+
+
+    - name: Print final status
+      ansible.builtin.debug:
+        msg: '{{ bundlestatus }}'
