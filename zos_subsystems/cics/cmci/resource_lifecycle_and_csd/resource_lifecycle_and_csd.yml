@@ -55,6 +55,7 @@
       default: "https"
     - name: cmci_user
       prompt: CMCI user name (leave blank for unauthenticated)
+      private: false
     - name: cmci_password
       prompt: CMCI password (leave blank for unauthenticated)
     - name: context
