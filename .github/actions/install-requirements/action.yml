@@ -1,0 +1,19 @@
+---
+name: install-requirements
+description: Installs requirements from Ansible Galaxy
+inputs:
+  requirements:
+    description: >
+      Specify path to requirements - defaults to requirements.yml.
+    required: false
+    default: requirements.yml
+runs:
+  using: docker
+  image: docker://ghcr.io/ansible/creator-ee:v0.14.1
+  entrypoint: /usr/local/bin/ansible-galaxy
+  args:
+    - install
+    - --timeout 60
+    - --verbose
+    - -r
+    - ${{ inputs.requirements }}
