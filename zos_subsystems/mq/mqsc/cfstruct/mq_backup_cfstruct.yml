@@ -75,4 +75,4 @@
     - name: Check that backup_time_after is different to backup_time_before
       fail: 
         msg: "Backup time hasn't changed. Backup time from before backup: {{ backup_time_before }}, backup time after backup: {{ backup_time_after }}"
-      when:  backup_time_after ==  backup_time_before
+      when: backup_time_after ==  backup_time_before

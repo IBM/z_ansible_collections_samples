@@ -63,7 +63,7 @@
   tasks:
     - name: Get home directory
       shell: "echo \"$HOME\" "
-      register:  result
+      register: result
     - name: Set home_dir path
       set_fact:
         home_dir: "{{ result.stdout }}"

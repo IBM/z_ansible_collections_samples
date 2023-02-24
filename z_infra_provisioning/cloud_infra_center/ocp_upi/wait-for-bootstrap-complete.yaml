@@ -44,4 +44,4 @@
 
   - name: Show bootstrapping log
     debug:
-      var:  bootstrap_log.stdout_lines
+      var: bootstrap_log.stdout_lines

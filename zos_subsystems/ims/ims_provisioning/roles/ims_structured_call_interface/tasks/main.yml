@@ -95,5 +95,5 @@
     - name: Query SCI status
       ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
-        plex:  '{{ DFS_IMSPlex }}'
+        plex: '{{ DFS_IMSPlex }}'
       when: sci == "query"

@@ -98,5 +98,5 @@
     - name: Query CQS status
       ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(CQS) SHOW(STATUS)
-        plex:  '{{ DFS_IMSPlex }}'
+        plex: '{{ DFS_IMSPlex }}'
       when: cqs == "query"

@@ -111,5 +111,5 @@
     - name: Query OM status
       ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(OM) SHOW(STATUS)
-        plex:  '{{ DFS_IMSPlex }}'
+        plex: '{{ DFS_IMSPlex }}'
       when: om == "query"  

@@ -54,7 +54,7 @@ DFS_REGION_TCPIPPORT: 8800
 # DFS_REGION_SSLTCPIPPORT: 9966
 DFS_REGION_SSLTCPIPPORT: 8809
 # location of system tcpip profile
-TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
+TCPIP_PROFILE: SYS1.TCPPARMS(PROFILE)
 # A dataset is needed to store a TCPIP profile containing
 # changes to the default for dynamic port reservation
 # TCPIP_PROFILE_TMP is the name of the temporary dataset
