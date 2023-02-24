@@ -27,7 +27,7 @@ ansible_python_interpreter: "{{PYZ}}/bin/python3"
 # the path to root of ZOAU installation
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
-#the path to the root of Java installation
+# the path to the root of Java installation
 JAVA: "path_to_java_installation_on_zos_target" 
 
 environment_vars:
@@ -61,24 +61,24 @@ liberty_server_path: '{{environment_vars.WLP_USER_DIR}}/servers/{{server_instanc
 TARGET_USER: target_user
 USER_GROUP: user_group
 
-#Procedure library for JCL Procedure template
+# Procedure library for JCL Procedure template
 PROC_LIB: USER.PRIVATE.PROCLIB
-#Name of server procedure for STARTED profile
+# Name of server procedure for STARTED profile
 SERVER_PROC: WLPSRV1
-#Name of angel process procedure for STARTED profile
+# Name of angel process procedure for STARTED profile
 ANGEL_PROC: WLPANGL
 
-#Name for zFS dataset to be mounted to user directory
+# Name for zFS dataset to be mounted to user directory
 data_set_name: targetuser.liberty.zfs
   
 # ---------------------------------------------------------------------------- #
 #                        Playbook customization variables                      #
 # ---------------------------------------------------------------------------- #
-#Boolean value to determine if configure_server role runs -- transfers optional configuration files
+# Boolean value to determine if configure_server role runs -- transfers optional configuration files
 CUSTOMIZE: no
 
-#Boolean value to determine if the angel process related roles run --  creates started profiles for angel process and starts angel process
+# Boolean value to determine if the angel process related roles run --  creates started profiles for angel process and starts angel process
 ANGEL: no 
 
-#Boolean value to determine if the authorized_services role runs -- enables z/OS authorized services
+# Boolean value to determine if the authorized_services role runs -- enables z/OS authorized services
 AUTHORIZED_SERVICES: no

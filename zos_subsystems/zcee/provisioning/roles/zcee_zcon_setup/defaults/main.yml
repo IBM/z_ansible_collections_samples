@@ -9,4 +9,4 @@ softwareServiceInstanceName: ZC01
 ################################################################################
 # Specifies the path to the z/OS Connect EE installation directory on zFS.
 ################################################################################
-zcon_install_dir: /usr/lpp/zosconnect/v3r0 #TrySample/
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 # TrySample/

@@ -8,7 +8,7 @@
   tasks: 
     - name: Provision, configure, and start Liberty server instance
       block: 
-      #Checks to see if the server under given name exists
+      # Checks to see if the server under given name exists
       - name: Check if server instance exists
         stat: 
           path: "{{environment_vars.WLP_USER_DIR}}/servers/{{server_instance_name}}"
@@ -18,52 +18,52 @@
           msg: Liberty server instance exists
         when: instance.stat.exists == true
 
-      #invoke role to create zFS 
+      # invoke role to create zFS 
       - include_role:
           name: create_zFS 
 
-      #invoke role to mount a zFS 
+      # invoke role to mount a zFS 
       - include_role:
           name: mount_zFS
 
-      #invoke role to create a new server instance
+      # invoke role to create a new server instance
       - include_role: 
           name: create_server
       
-      #role used to transfer custom configuration files; runs based on boolean value of CUSTOMIZE variable 
+      # role used to transfer custom configuration files; runs based on boolean value of CUSTOMIZE variable 
       - include_role: 
           name: configure_server 
         when: CUSTOMIZE | bool 
 
-      #invoke role to enable starting the server as a STARTED task 
+      # invoke role to enable starting the server as a STARTED task 
       - include_role: 
           name: started_server 
 
-      #role used to create started profiles for angel process; runs based on boolean value of ANGEL variable
+      # role used to create started profiles for angel process; runs based on boolean value of ANGEL variable
       - include_role: 
           name: angel_config 
         when: ANGEL | bool 
       
-      #role used to enable access to z/OS authorized services; runs based on AUTHORIZED_SERVICES variable
+      # role used to enable access to z/OS authorized services; runs based on AUTHORIZED_SERVICES variable
       - include_role:
           name: authorized_services
-        when: (ANGEL | bool) and (AUTHORIZED_SERVICES | bool) #angel process must be enabled for authorized services
+        when: (ANGEL | bool) and (AUTHORIZED_SERVICES | bool) # angel process must be enabled for authorized services
 
-      #Start the angel process 
+      # Start the angel process 
       - name: Start angel process 
         zos_operator:
           cmd: "START {{ANGEL_PROC}}" 
-        tags: start_angel #if tags are used while running the playbook, it has precendence over the when conditional
-        when: ANGEL | bool #assumes if you enable the angel process, you would want to start the angel process
+        tags: start_angel # if tags are used while running the playbook, it has precendence over the when conditional
+        when: ANGEL | bool # assumes if you enable the angel process, you would want to start the angel process
         register: angel_start_result 
 
       - name: Response from starting angel process 
         debug: 
           msg: "{{angel_start_result}}"
 
-      #Start and stop server process as STARTED tasks 
-      #If you start the server with a STARTED task, must also stop the server with a STARTED task
-      - name: Start server process #start if not already started 
+      # Start and stop server process as STARTED tasks 
+      # If you start the server with a STARTED task, must also stop the server with a STARTED task
+      - name: Start server process # start if not already started 
         zos_operator:
           cmd: "START {{SERVER_PROC}}" 
         tags: start

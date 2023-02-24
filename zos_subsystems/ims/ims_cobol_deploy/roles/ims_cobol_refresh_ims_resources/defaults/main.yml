@@ -1,7 +1,7 @@
 ---
 # defaults file for ims_cobol_refresh_ims_resources
 
-IMSPLEX: '{{ DFS_IMSPlex }}' #PLEX1
+IMSPLEX: '{{ DFS_IMSPlex }}' # PLEX1
 ROUTE: '{{ DFS_IMS_SSID }}'
 
 # DFSMPR proc parameters
@@ -29,7 +29,7 @@ DB2_SSM: ''
 USE_PSEUDO_WFI: no 
 
 ## IMS application variables 	
-DFS_tranclass1: '005' #'008'
+DFS_tranclass1: '005' # '008'
 DFS_tranclass2: '000'
 DFS_tranclass3: '000'
 DFS_tranclass4: '000'

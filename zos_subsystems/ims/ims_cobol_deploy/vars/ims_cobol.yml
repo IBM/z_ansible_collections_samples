@@ -10,7 +10,7 @@ USE_GIT: no
 # The SSID of the IMS instance used
 ROUTE: '{{ DFS_IMS_SSID }}'
 
-#COBOL compiler library to use
+# COBOL compiler library to use
 COBOL_COMP_LIB_HLQ: IGYV6R20
 COBOL_IGZCJAVA_PATH: /usr/lpp/cobol/cob620/igyv6r2/lib
 
@@ -156,7 +156,7 @@ DB2_SSM: ''
 USE_PSEUDO_WFI: no
 
 ## IMS application variables
-DFS_tranclass1: '005' #'008'
+DFS_tranclass1: '005' # '008'
 DFS_tranclass2: '000'
 DFS_tranclass3: '000'
 DFS_tranclass4: '000'

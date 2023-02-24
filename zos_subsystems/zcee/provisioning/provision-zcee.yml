@@ -53,7 +53,7 @@
         # Invoke a role to create a server from a template
         - include_role:
             name: zcee_create_server
-            tasks_from: ims_sp #default
+            tasks_from: ims_sp # default
             # template_name: default #ims_sp #mq_sp #cics_sp
 
         # Invoke a role to configure zcee artifacts
