@@ -31,9 +31,9 @@
       - name: Create ACB for specific PSBs.
         ibm.ibm_zos_ims.ims_acb_gen:
           command_input: BUILD
-          psb_name: ['IBACSUM','IBLOAD']
+          psb_name: ['IBACSUM', 'IBLOAD']
           # dbd_name: ['ACCOUNT','CUSTACCS']
-          dbd_name: ['ACCOUNT','ACCTYPE', 'CUSTACCS', 'CUSTOMER', 'CUSTTYPE', 'HISTORY', 'TSTAT', 'TSTATTYP', 'TTYPE']
+          dbd_name: ['ACCOUNT', 'ACCTYPE', 'CUSTACCS', 'CUSTOMER', 'CUSTTYPE', 'HISTORY', 'TSTAT', 'TSTATTYP', 'TTYPE']
           # dbd_name: ['ACCOUNT','ACCTYPE',CUSTACCS', 'CUSTOMER','HISTORY','TSTAT']
           psb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
           dbd_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
