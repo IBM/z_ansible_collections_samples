@@ -70,7 +70,7 @@
 
         - name: Set Directory Permissions,Remove read and execute access for all users to the zFS file system
           file:
-            path:  '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
+            path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
             state: directory
             mode: '700'
             recurse: yes 

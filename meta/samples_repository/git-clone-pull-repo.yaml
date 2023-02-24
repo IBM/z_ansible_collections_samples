@@ -126,7 +126,7 @@
     ############################################################################
     - name: "Clone the repository
              https://github.com/{{ organization }}/{{ repo_name }}.git"
-      git:  repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
+      git: repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
             dest="{{repo_root_dest}}/{{repo_name}}"
             accept_hostkey=yes
             force=yes

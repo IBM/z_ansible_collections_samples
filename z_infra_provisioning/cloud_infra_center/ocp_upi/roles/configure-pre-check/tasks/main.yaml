@@ -112,7 +112,7 @@
 - name: Check if storage provider is configured
   fail:
     msg: "Storage provider is not enabled and active."
-  failed_when:  volume_type_id is defined and storage_backend.stdout |int < 1 
+  failed_when: volume_type_id is defined and storage_backend.stdout |int < 1 
 
 - name: Check storage template
   fail:

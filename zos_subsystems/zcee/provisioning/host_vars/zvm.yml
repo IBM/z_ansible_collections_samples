@@ -46,7 +46,7 @@ DFS_REGION_TCPIPPORT: 9977
 # HTTPS Port for IMS Connect
 DFS_REGION_SSLTCPIPPORT: 9966
 # location of system tcpip profile
-tcpip_profile:  SYS1.TCPPARMS(PROFILE)
+tcpip_profile: SYS1.TCPPARMS(PROFILE)
 # A dataset is needed to store a TCPIP profile containing
 # changes to the default for dynamic port reservation
 # tcpip_profile_tmp is the name of the temporary dataset
