@@ -541,7 +541,7 @@
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `job_sub_result`
       debug:
         msg: "{{item}}"
-      #with_items: "{{ job_sub_result | community.general.json_query('jobs[0].ddnames[*].ddname') }}"
+      # with_items: "{{ job_sub_result | community.general.json_query('jobs[0].ddnames[*].ddname') }}"
       loop: "{{ job_sub_result | community.general.json_query('jobs[0].ddnames[*].ddname') }}"
       tags: always
 

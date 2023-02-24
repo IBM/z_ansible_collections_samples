@@ -84,7 +84,7 @@ zcon_zos_stcjobs: ''
 zcon_zos_vsam_volume: '{{ DFS_DS_VOLUME1 }}'
 
 # User ID to get unauthenticated READ access to profile in APPL class.
-zcon_zos_guest_user: IBMUSER #WSGUEST
+zcon_zos_guest_user: IBMUSER # WSGUEST
 
 # Specifies the path to the base zCEE configuration directory.
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

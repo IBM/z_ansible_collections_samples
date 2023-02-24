@@ -22,19 +22,19 @@
     #   shell: '{{liberty_bin_path}}/server stop {{server_instance_name}}'
     #   tags: stop 
     
-    #Stop the angel process 
+    # Stop the angel process 
     - name: Stop angel 
       zos_operator: 
         cmd: "STOP {{ANGEL_PROC}}"
-      tags: stop_angel #if tags are used while running the playbook, it has precedence over the when conditional
-      when: ANGEL | bool #assumes if you enable authorized services, you would want to stop the angel process 
+      tags: stop_angel # if tags are used while running the playbook, it has precedence over the when conditional
+      when: ANGEL | bool # assumes if you enable authorized services, you would want to stop the angel process 
       register: angel_stop_result 
 
     - name: Response from stopping angel process 
       debug: 
         msg: "{{angel_stop_result}}"
         
-    #Remove server instance by deleting directory 
+    # Remove server instance by deleting directory 
     - name: Delete the server directory
       shell: 'rm -rf {{liberty_server_path}}'
 
@@ -46,7 +46,7 @@
         name: "{{data_set_name}}" 
         state: absent
 
-    #Remove JCL Procedures
+    # Remove JCL Procedures
     - name: Remove JCL server procedure from an existing procedure library
       zos_data_set:
         name: "{{PROC_LIB}}({{SERVER_PROC}})"

@@ -34,7 +34,7 @@ zcon_admin_server: '{{ TARGET_USERNAME }}'
 ################################################################################
 # Specifies user ID to get unauthenticated READ access to profile in APPL class.
 ################################################################################
-zcon_zos_guest_user: IBMUSER #WSGUEST
+zcon_zos_guest_user: IBMUSER # WSGUEST
 
 ################################################################################
 # Specifies the hostname for the z/OS system.
