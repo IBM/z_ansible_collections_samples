@@ -26,57 +26,56 @@
   gather_facts: false
 
   tasks:
-
     # ##########################################################################
     # Call z/OS fact gathering with the 'ipl' subset and filter down to
     # master_catalog facts.
     # ##########################################################################
-  - name: Collect z/OS facts on master_catalog.
-    zos_gather_facts:
-      gather_subset:
-        - 'ipl'
-      filter:
-        - 'master*'
+    - name: Collect z/OS facts on master_catalog.
+      zos_gather_facts:
+        gather_subset:
+          - "ipl"
+        filter:
+          - "master*"
 
-    # ##########################################################################
-    # Collected facts can be accessed via the ansible_facts dict (dictionary).
-    # ##########################################################################
-  - name: Access and print info about master catalog.
-    ansible.builtin.debug:
-      msg:
-      - "master catalog dsn: {{ ansible_facts.master_catalog_dsn }}"
-      - "master catalog volser: {{ ansible_facts.master_catalog_volser }}"
+      # ##########################################################################
+      # Collected facts can be accessed via the ansible_facts dict (dictionary).
+      # ##########################################################################
+    - name: Access and print info about master catalog.
+      ansible.builtin.debug:
+        msg:
+          - "master catalog dsn: {{ ansible_facts.master_catalog_dsn }}"
+          - "master catalog volser: {{ ansible_facts.master_catalog_volser }}"
 
-    # ##########################################################################
-    # Call z/OS fact gathering with the 'cpu' subset to collect CPC facts and
-    # 'iodf' subset.
-    # ##########################################################################
-  - name: Gather additional z/OS facts.
-    zos_gather_facts:
-      gather_subset:
-        - 'cpu'
-        - 'iodf'
+      # ##########################################################################
+      # Call z/OS fact gathering with the 'cpu' subset to collect CPC facts and
+      # 'iodf' subset.
+      # ##########################################################################
+    - name: Gather additional z/OS facts.
+      zos_gather_facts:
+        gather_subset:
+          - "cpu"
+          - "iodf"
 
-    # ##########################################################################
-    # Collected facts are stored in ansible_facts dict but ansible_dict does
-    # not need to be explicitly specified. Ansible will search for the keyword
-    # inside ansible_dict.
-    # ##########################################################################
-  - name: Access and print CPC and IODF info.
-    ansible.builtin.debug:
-      msg:
-      - "manufacturer: {{ cpc_nd_manufacturer }}"
-      - "model: {{ cpc_nd_model }}"
-      - "plant: {{ cpc_nd_plant }}"
-      - "iodf name: {{ iodf_name }}"
-      - "iodf config: {{ iodf_config }}"
+      # ##########################################################################
+      # Collected facts are stored in ansible_facts dict but ansible_dict does
+      # not need to be explicitly specified. Ansible will search for the keyword
+      # inside ansible_dict.
+      # ##########################################################################
+    - name: Access and print CPC and IODF info.
+      ansible.builtin.debug:
+        msg:
+          - "manufacturer: {{ cpc_nd_manufacturer }}"
+          - "model: {{ cpc_nd_model }}"
+          - "plant: {{ cpc_nd_plant }}"
+          - "iodf name: {{ iodf_name }}"
+          - "iodf config: {{ iodf_config }}"
 
-    # ##########################################################################
-    # Multiple runs of fact gathering with different subsets and filters are
-    # collected inside the ansible_facts variable. Enabling fact gathering
-    # at the top of this playbook (change the line "gather_facts: false" to
-    # gather_facts: true) will add many more facts to the ansible_facts dict.
-    # ##########################################################################
-  - name: Print out all collected facts.
-    ansible.builtin.debug:
-      var: ansible_facts
+      # ##########################################################################
+      # Multiple runs of fact gathering with different subsets and filters are
+      # collected inside the ansible_facts variable. Enabling fact gathering
+      # at the top of this playbook (change the line "gather_facts: false" to
+      # gather_facts: true) will add many more facts to the ansible_facts dict.
+      # ##########################################################################
+    - name: Print out all collected facts.
+      ansible.builtin.debug:
+        var: ansible_facts

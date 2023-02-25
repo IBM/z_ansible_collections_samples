@@ -6,22 +6,21 @@
     - ibm.ibm_zos_ims
 
   block:
-
     - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+        - set_fact:
+            eager_role_path: "{{role_path}}"
 
-      # Send the template over
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSSETPG.j2'
+        # Send the template over
+        - include_role:
+            name: send-template
+          vars:
+            path: "{{ eager_role_path }}/templates/DFSSETPG.j2"
 
       when: auth_datasets and not provision
 
     - name: Auth IMS datasets to z/OS
       zos_job_submit:
-        src: '{{ uss_file_path }}/DFSSETPG.j2'
+        src: "{{ uss_file_path }}/DFSSETPG.j2"
         location: USS
         wait: true
         wait_time_s: 30

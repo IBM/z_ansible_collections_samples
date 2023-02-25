@@ -8,8 +8,7 @@
 # =================================================================
 
 ---
-
 - name: Create the control plane in zvm
   hosts: localhost
   roles:
-  - configure-control-plane-zvm
+    - configure-control-plane-zvm

@@ -17,11 +17,11 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
-                    \nREJECT CHECK S({{ ptf }})."
+            \nREJECT CHECK S({{ ptf }})."
   register: reject_check_result
 
 # REJECT a SYSMOD
@@ -38,10 +38,10 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
-                    \nREJECT S({{ ptf }})."
+            \nREJECT S({{ ptf }})."
   tags: reject sysmod
   when: reject_check_result.ret_code.code <= 4

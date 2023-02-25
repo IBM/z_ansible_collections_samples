@@ -31,21 +31,20 @@
   gather_facts: no
   environment: "{{ environment_vars }}"
 
-
   tasks:
     # ##########################################################################
     # Generate a temporary data set name
     # ##########################################################################
     - block:
-      - name: Create a temporary data set
-        zos_data_set:
-          type: seq
-          space_primary: 5
-          space_secondary: 1
-          space_type: cyl
-          record_length: 1024
-        register: tmp_ds
-        failed_when: tmp_ds is not defined or tmp_ds.get('names', [])|length == 0
+        - name: Create a temporary data set
+          zos_data_set:
+            type: seq
+            space_primary: 5
+            space_secondary: 1
+            space_type: cyl
+            record_length: 1024
+          register: tmp_ds
+          failed_when: tmp_ds is not defined or tmp_ds.get('names', [])|length == 0
 
     - name: Get the result of temp data set creation
       debug:
@@ -64,15 +63,15 @@
     # | - Tear down by cleaning up files.
     # +-------------------------------------------------------------------------
     - block:
-      - name: Create a temporary data set
-        zos_data_set:
-          type: seq
-          space_primary: 5
-          space_secondary: 1
-          space_type: cyl
-          record_length: 1024
-        register: temp_data_set
-        failed_when: temp_data_set is not defined or temp_data_set.get('names', [])|length == 0
+        - name: Create a temporary data set
+          zos_data_set:
+            type: seq
+            space_primary: 5
+            space_secondary: 1
+            space_type: cyl
+            record_length: 1024
+          register: temp_data_set
+          failed_when: temp_data_set is not defined or temp_data_set.get('names', [])|length == 0
 
     - name: Get the result of temp data set creation
       debug:

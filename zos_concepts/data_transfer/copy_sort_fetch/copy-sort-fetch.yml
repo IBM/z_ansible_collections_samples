@@ -27,7 +27,6 @@
 #
 ###############################################################################
 
-
 - hosts: source_system
   collections:
     - ibm.ibm_zos_core
@@ -38,79 +37,79 @@
 
   tasks:
     - block:
-      - name: Copy local file containing data
-        include_role:
-          name: copy-local-data
-          public: yes
+        - name: Copy local file containing data
+          include_role:
+            name: copy-local-data
+            public: yes
 
-###############################################################################
-# Removing column headers is necessary due to the fact that, if the column
-# headers are present, starting byte of the first salary data point would be
-# over 71, which is greater than the maximum allowed by DFSORT.
-# By removing the first line, we are left with raw data and the starting byte
-# of salary is 57.
-###############################################################################
+        ###############################################################################
+        # Removing column headers is necessary due to the fact that, if the column
+        # headers are present, starting byte of the first salary data point would be
+        # over 71, which is greater than the maximum allowed by DFSORT.
+        # By removing the first line, we are left with raw data and the starting byte
+        # of salary is 57.
+        ###############################################################################
 
-      - name: Remove the column headers so that we are left with raw data
-        zos_lineinfile:
-          src: "{{ dest_tmp_data_set }}"
-          regexp: '^ case.*'
-          state: absent
-          line: ""
+        - name: Remove the column headers so that we are left with raw data
+          zos_lineinfile:
+            src: "{{ dest_tmp_data_set }}"
+            regexp: "^ case.*"
+            state: absent
+            line: ""
 
-###############################################################################
-# We will be using zos_mvs_raw module to sort the data set based on salary.
-# The task is equivalent to executing the following JCL:
-#
-#   //ANSIBLE JOB 'SORTDS',
-#   //  NOTIFY=OMVSADM,
-#   //  USER=OMVSADM,
-#   //  MSGCLASS=E,
-#   //  MSGLEVEL=(1,1),
-#   //  CLASS=A
-#   //*
-#   //SORT     EXEC PGM=SORT
-#   //SYSOUT   DD   SYSOUT=*
-#   //SORTIN   DD   DSN=DEST.SALARY.DATA.SET,DISP=SHR
-#   //SORTOUT  DD   DSN=DEST.SALARY.DATA.SET,DISP=OLD
-#   //SYSIN    DD   *
-#       SORT FIELDS=(62,9,BI,D)
-#   /*
-###############################################################################
+        ###############################################################################
+        # We will be using zos_mvs_raw module to sort the data set based on salary.
+        # The task is equivalent to executing the following JCL:
+        #
+        #   //ANSIBLE JOB 'SORTDS',
+        #   //  NOTIFY=OMVSADM,
+        #   //  USER=OMVSADM,
+        #   //  MSGCLASS=E,
+        #   //  MSGLEVEL=(1,1),
+        #   //  CLASS=A
+        #   //*
+        #   //SORT     EXEC PGM=SORT
+        #   //SYSOUT   DD   SYSOUT=*
+        #   //SORTIN   DD   DSN=DEST.SALARY.DATA.SET,DISP=SHR
+        #   //SORTOUT  DD   DSN=DEST.SALARY.DATA.SET,DISP=OLD
+        #   //SYSIN    DD   *
+        #       SORT FIELDS=(62,9,BI,D)
+        #   /*
+        ###############################################################################
 
-      - name: Sort the data set based on salary in descending order
-        zos_mvs_raw:
-          program_name: sort
-          parm: "MSGPRT=CRITICAL,LIST"
-          dds:
-            - dd_output:
-                dd_name: sysout
-                return_content:
-                  type: text
-            - dd_data_set:
-                dd_name: sortin
-                data_set_name: "{{ dest_tmp_data_set }}"
-                disposition: shr
-            - dd_data_set:
-                dd_name: sortout
-                data_set_name: "{{ dest_tmp_data_set }}"
-                disposition: old
-            - dd_input:
-                dd_name: sysin
-                content: "   SORT FIELDS=(57,9,BI,D)"
+        - name: Sort the data set based on salary in descending order
+          zos_mvs_raw:
+            program_name: sort
+            parm: "MSGPRT=CRITICAL,LIST"
+            dds:
+              - dd_output:
+                  dd_name: sysout
+                  return_content:
+                    type: text
+              - dd_data_set:
+                  dd_name: sortin
+                  data_set_name: "{{ dest_tmp_data_set }}"
+                  disposition: shr
+              - dd_data_set:
+                  dd_name: sortout
+                  data_set_name: "{{ dest_tmp_data_set }}"
+                  disposition: old
+              - dd_input:
+                  dd_name: sysin
+                  content: "   SORT FIELDS=(57,9,BI,D)"
 
-      - name: Fetch the sorted data set back to controller
-        zos_fetch:
-          src: "{{ dest_tmp_data_set }}"
-          dest: "{{ playbook_dir }}/SortedSalaryData.txt"
-          flat: true
+        - name: Fetch the sorted data set back to controller
+          zos_fetch:
+            src: "{{ dest_tmp_data_set }}"
+            dest: "{{ playbook_dir }}/SortedSalaryData.txt"
+            flat: true
 
-      - name: Add column headers back to the sorted file
-        lineinfile:
-          path: "{{ playbook_dir }}/SortedSalaryData.txt"
-          line: "{{ column_headers }}"
-          insertbefore: BOF
-        delegate_to: localhost
+        - name: Add column headers back to the sorted file
+          lineinfile:
+            path: "{{ playbook_dir }}/SortedSalaryData.txt"
+            line: "{{ column_headers }}"
+            insertbefore: BOF
+          delegate_to: localhost
 
       always:
         - name: Clean up remote data set

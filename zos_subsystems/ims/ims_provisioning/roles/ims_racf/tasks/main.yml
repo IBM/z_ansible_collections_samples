@@ -6,22 +6,20 @@
     - ibm.ibm_zos_ims
 
   block:
-
     - block:
+        - set_fact:
+            eager_role_path: "{{role_path}}"
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
-
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSC105J.j2'
+        - include_role:
+            name: send-template
+          vars:
+            path: "{{ eager_role_path }}/templates/DFSC105J.j2"
 
       when: prep_racf and not provision
 
     - name: RACF security exits for IMS
       zos_job_submit:
-        src: '{{ uss_file_path }}/DFSC105J.j2'
+        src: "{{ uss_file_path }}/DFSC105J.j2"
         location: USS
         wait: true
         wait_time_s: 30

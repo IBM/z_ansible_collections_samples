@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@
   yum:
     name: bind-chroot
     state: latest
-    
+
 - name: Create /var/named directory
   become: yes
   become_user: root
@@ -35,7 +35,7 @@
     state: directory
 
 - name: Combine cluster name and base domain
-  set_fact: 
+  set_fact:
     cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
 
 - name: Get the subnet range from localhost
@@ -52,7 +52,7 @@
     owner: named
     group: named
   notify:
-   - restart dns
+    - restart dns
 
 - name: Unmanage resolve.conf in NetworkManager
   become: yes
@@ -80,13 +80,13 @@
     insertbefore: BOF
     block: |
       search {{ cluster_domain_name }}
-      nameserver {{ bastion_private_ip_address }} 
+      nameserver {{ bastion_private_ip_address }}
   when: check.stdout == "0"
 
 - name: Reverse the order of the decimals in the specified bastion subnet
-  set_fact: 
+  set_fact:
     bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
-  
+
 - name: Create dns subnet zone for bastion
   become: yes
   become_user: root
@@ -97,8 +97,8 @@
     owner: named
     group: named
   notify:
-   - restart dns
- 
+    - restart dns
+
 - name: Create /etc/named.conf
   become: yes
   become_user: root
@@ -107,25 +107,25 @@
     src: etc/named.conf.j2
     dest: /etc/named.conf
   notify:
-   - restart dns
+    - restart dns
 
 - name: Update cluster_subnet_range
   become: yes
   become_user: root
   become_method: sudo
-  shell: 
+  shell:
     cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
   notify:
-   - restart dns
+    - restart dns
 
 - name: Update bastion_subnet_prefix_reverse
   become: yes
   become_user: root
   become_method: sudo
-  shell: 
+  shell:
     cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
   notify:
-   - restart dns
+    - restart dns
 
 - name: Add dns to firewall
   become: yes
@@ -140,4 +140,4 @@
     - internal
     - public
   notify:
-  - restart firewalld
+    - restart firewalld

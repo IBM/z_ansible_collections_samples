@@ -11,5 +11,4 @@
 - name: Create the control plane in kvm
   hosts: localhost
   roles:
-  - configure-control-plane-kvm
-  
+    - configure-control-plane-kvm

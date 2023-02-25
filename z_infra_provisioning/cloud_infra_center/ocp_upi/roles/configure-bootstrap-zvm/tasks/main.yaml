@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2022 https://github.com/openshift/installer
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 #
-# Change Summary: 
+# Change Summary:
 # - Move port creation to network.yaml
 # - Delete unnecessary Ansible tasks
 # - Add server creation timeout
@@ -35,60 +35,59 @@
 # openstacksdk
 # netaddr
 
-- name: 'Import common yaml'
+- name: "Import common yaml"
   import_tasks: common.yaml
 
-- name: 'Get image name for ZVM'
+- name: "Get image name for ZVM"
   set_fact:
     image_name: "icic_rhcos_{{ disk_type }}"
   when:
     - vm_type == "zvm"
 
-- name: 'Create the bootstrap server'
+- name: "Create the bootstrap server"
   os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
-    timeout: "{{ create_server_timeout|int * 60 }}" 
+    timeout: "{{ create_server_timeout|int * 60 }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
-    - port-name: "{{ os_port_bootstrap }}"
+      - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   when:
-  - disk_type == "dasd"
-  - vm_type == "zvm"
+    - disk_type == "dasd"
+    - vm_type == "zvm"
 
-- name: 'Convert bootstrap flavor from value into number'
+- name: "Convert bootstrap flavor from value into number"
   command:
     cmd: "openstack flavor show {{ os_flavor_bootstrap }} -c disk -f value"
   register: bootstrap_flavor_size
   when:
-  - disk_type == "scsi"
+    - disk_type == "scsi"
 
-
-- name: 'Create the bootstrap server with default boot volume'
+- name: "Create the bootstrap server with default boot volume"
   os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
-    timeout: "{{ create_server_timeout|int * 60 }}" 
+    timeout: "{{ create_server_timeout|int * 60 }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
-    - port-name: "{{ os_port_bootstrap }}"
+      - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   when:
-  - disk_type == "scsi"
-  - vm_type == "zvm"
-  - volume_type_id is not defined
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
 
-- name: 'Create bootstrap boot volume'
+- name: "Create bootstrap boot volume"
   os_volume:
     state: present
     name: "{{ os_bootstrap_server_name }}-boot"
@@ -97,17 +96,17 @@
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
     timeout: "{{ create_server_timeout|int * 60 }} "
-  when: 
-  - disk_type == "scsi"
-  - volume_type_id is defined
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
-- name: 'Set bootstrap volume bootable'
+- name: "Set bootstrap volume bootable"
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
-  when: 
-  - disk_type == "scsi"
-  - volume_type_id is defined
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
-- name: 'Create the bootstrap server with boot volume'
+- name: "Create the bootstrap server with boot volume"
   os_server:
     name: "{{ os_bootstrap_server_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
@@ -117,9 +116,9 @@
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
-    - port-name: "{{ os_port_bootstrap }}"
+      - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined

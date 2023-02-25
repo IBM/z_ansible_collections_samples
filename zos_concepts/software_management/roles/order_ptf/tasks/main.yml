@@ -16,19 +16,19 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_unix:
           dd_name: "SMPNTS"
           path: "{{smpe_root}}/smpnts/"
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY(GLOBAL) .'
-            - 'RECEIVE ORDER('
-            - '           CONTENT(PTFS({{ ptf }}))'
-            - '           ORDERSERVER(SERVINFO)'
-            - '           CLIENT(CLNTINFO)'
-            - '              )'
+            - "SET  BOUNDARY(GLOBAL) ."
+            - "RECEIVE ORDER("
+            - "           CONTENT(PTFS({{ ptf }}))"
+            - "           ORDERSERVER(SERVINFO)"
+            - "           CLIENT(CLNTINFO)"
+            - "              )"
             - DELETEPKG.
       - dd_input:
           dd_name: "SERVINFO"
@@ -51,14 +51,14 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_output:
           dd_name: "SMPLIST"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY(GLOBAL) .'
-            - 'LIST SYSMOD({{ ptf }}) HOLDDATA .'
+            - "SET  BOUNDARY(GLOBAL) ."
+            - "LIST SYSMOD({{ ptf }}) HOLDDATA ."
   when: order_result.ret_code.code <= 4

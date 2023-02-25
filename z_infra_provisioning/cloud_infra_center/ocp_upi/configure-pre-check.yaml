@@ -11,4 +11,4 @@
 - name: configure pre check
   hosts: localhost
   roles:
-  - configure-pre-check
+    - configure-pre-check

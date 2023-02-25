@@ -11,4 +11,4 @@
 - name: Configure install manifests
   hosts: localhost
   roles:
-  - configure-install-manifests
+    - configure-install-manifests

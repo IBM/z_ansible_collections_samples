@@ -17,14 +17,14 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY({{ target_zone }}) .'
-            - 'RESTORE S({{ ptf }})'
-            - 'CHECK'
-            - 'COMPRESS(ALL).'
+            - "SET  BOUNDARY({{ target_zone }}) ."
+            - "RESTORE S({{ ptf }})"
+            - "CHECK"
+            - "COMPRESS(ALL)."
   register: restore_check_result
 
 # RESTORE a SYSMOD
@@ -41,13 +41,13 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY({{ target_zone }}) .'
-            - 'RESTORE S({{ ptf }})'
-            - 'COMPRESS(ALL).'
+            - "SET  BOUNDARY({{ target_zone }}) ."
+            - "RESTORE S({{ ptf }})"
+            - "COMPRESS(ALL)."
   when: restore_check_result.ret_code.code <= 4
   register: restore_result
 
@@ -65,10 +65,10 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY(GLOBAL) .
-                    \nREJECT S({{ ptf }}) ."
+            \nREJECT S({{ ptf }}) ."
   tags: reject sysmod
   when: reject_sysmod | bool and restore_result.ret_code.code <= 4

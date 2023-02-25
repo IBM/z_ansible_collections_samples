@@ -23,7 +23,7 @@
 
 - name: Set fact `collection_paths` with Ansible COLLECTIONS_PATHS
   set_fact:
-    collection_paths: "{{ ansible_collections_paths.stdout if ansible_collections_paths.stdout != \"\" else ['~/.ansible/collections'] }}"
+    collection_paths: '{{ ansible_collections_paths.stdout if ansible_collections_paths.stdout != "" else [''~/.ansible/collections''] }}'
 
 - name: Evaluate Ansible COLLECTIONS_PATHS existance and status
   stat:
@@ -63,14 +63,15 @@
 
 - name: Create `_collection_status_dict` dictionary with all collection stats
   set_fact:
-    _collection_status_dict: "{{_collection_status_dict | default([]) + [{'ansible_collection_path':item.1.collection_path,
-                                                'required_collection_name':item.0.name,
-                                                'required_collection_version': item.0.version|string,
-                                                'installed_collection_home':item.1.collection_path + '/ansible_collections/ibm/' + item.0.name,
-                                                'installed_collection_version': None,
-                                                'installed_collection_meta':item.1.collection_path + '/ansible_collections/ibm/'+ item.0.name + '/meta/'+ item.0.name+'_meta.yml',
-                                                'installed_collection_manifest':item.1.collection_path + '/ansible_collections/ibm/'+ item.0.name + '/MANIFEST.json'
-                                                }  ]}}"
+    _collection_status_dict:
+      "{{_collection_status_dict | default([]) + [{'ansible_collection_path':item.1.collection_path,
+      'required_collection_name':item.0.name,
+      'required_collection_version': item.0.version|string,
+      'installed_collection_home':item.1.collection_path + '/ansible_collections/ibm/' + item.0.name,
+      'installed_collection_version': None,
+      'installed_collection_meta':item.1.collection_path + '/ansible_collections/ibm/'+ item.0.name + '/meta/'+ item.0.name+'_meta.yml',
+      'installed_collection_manifest':item.1.collection_path + '/ansible_collections/ibm/'+ item.0.name + '/MANIFEST.json'
+      }  ]}}"
   with_subelements:
     - "{{ requires_collection }}"
     - "installed"
@@ -100,14 +101,14 @@
 
 - name: Ansible collection version check in progress
   assert:
-      that: (
-              item.installed_collection_version != None and
-              item.required_collection_version != None and
-              item.installed_collection_version is version(item.required_collection_version,'>=')
-            )
-      success_msg: "[SUCCESS] Ansible collection {{item.required_collection_name}} version {{item.installed_collection_version}} is installed."
-      fail_msg: "[FAIL] This playbook requires Ansible collection {{item.required_collection_name}} version {{item.required_collection_version}} and {{item.installed_collection_version if item.installed_collection_version != None else 'no version' }} is installed."
-      quiet: true
+    that: (
+      item.installed_collection_version != None and
+      item.required_collection_version != None and
+      item.installed_collection_version is version(item.required_collection_version,'>=')
+      )
+    success_msg: "[SUCCESS] Ansible collection {{item.required_collection_name}} version {{item.installed_collection_version}} is installed."
+    fail_msg: "[FAIL] This playbook requires Ansible collection {{item.required_collection_name}} version {{item.required_collection_version}} and {{item.installed_collection_version if item.installed_collection_version != None else 'no version' }} is installed."
+    quiet: true
   register: result_collection_status
   ignore_errors: true
   loop: "{{ result_ansible_version_filter.results}}"

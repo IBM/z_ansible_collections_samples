@@ -6,22 +6,20 @@
     - ibm.ibm_zos_ims
 
   block:
-
     - block:
+        - set_fact:
+            eager_role_path: "{{role_path}}"
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
-
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
+        - include_role:
+            name: send-template
+          vars:
+            path: "{{ eager_role_path }}/templates/DFSALCAT.j2"
 
       when: catalog == "allocate" and not provision
 
     - name: Allocate IMS catalog DB
       zos_job_submit:
-        src: '{{ uss_file_path }}/DFSALCAT.j2'
+        src: "{{ uss_file_path }}/DFSALCAT.j2"
         location: USS
         wait: true
         wait_time_s: 30
@@ -32,24 +30,12 @@
         mode: LOAD
         dbrc: False
         modstat: IMSTESTL.IMS1.MODSTAT
-        acb_lib: [
-          IMSTESTL.IMS1.ACBLIB
-        ]
-        reslib: [
-          IMSTESTL.IMS1.SDFSRESL
-        ]
-        steplib: [
-          IMSTESTL.IMS1.SDFSRESL
-        ]
-        proclib: [
-          IMSTESTL.IMS1.PROCLIB
-        ]
-        dbd_lib: [
-          IMSTESTL.IMS1.DBDLIB
-        ]
-        psb_lib: [
-          IMSTESTL.IMS1.PSBLIB
-        ]
+        acb_lib: [IMSTESTL.IMS1.ACBLIB]
+        reslib: [IMSTESTL.IMS1.SDFSRESL]
+        steplib: [IMSTESTL.IMS1.SDFSRESL]
+        proclib: [IMSTESTL.IMS1.PROCLIB]
+        dbd_lib: [IMSTESTL.IMS1.DBDLIB]
+        psb_lib: [IMSTESTL.IMS1.PSBLIB]
         buffer_pool_param_dataset: "IMSTESTL.IMS1.PROCLIB(DFSVSMHP)"
         primary_log_dataset:
           dataset_name: IMSTESTL.IMS1.IMSLOG1
@@ -83,30 +69,30 @@
     - name: Delete IMS Catalog
       zos_data_set:
         batch:
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000.A00001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000.A00001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.BSDS'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.BSDS"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1001'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1001"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1002'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1002"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.STG'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.STG"
             state: absent
-          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
+          - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR"
             state: absent
       when: catalog == "delete"

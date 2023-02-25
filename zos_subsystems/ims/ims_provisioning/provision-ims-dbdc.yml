@@ -4,7 +4,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - "{{ vars_folder_name }}/ims-dbdc.yml"
-  environment: '{{ system_environment }}'
+  environment: "{{ system_environment }}"
 
   vars:
     - provision: true
@@ -15,10 +15,9 @@
         state: directory
       register: provision_tmp_dir
       tags:
-       - always
+        - always
 
     - block:
-
         - include_role:
             name: install-bzip2
 
@@ -120,7 +119,6 @@
           vars:
             prep_exits: true
 
-
         # Run DBD, PSB, and ACB gen
         - include_role:
             name: ims_gen
@@ -143,11 +141,10 @@
         - include_role:
             name: ims_catalog
           vars:
-            catalog: 'load'
+            catalog: "load"
 
         - include_role:
             name: ims_region
-
 
         # Start SCI
         - include_role:
@@ -201,4 +198,4 @@
       # tags:
       #  - always
       vars:
-        uss_file_path: '{{ provision_tmp_dir.path }}'
+        uss_file_path: "{{ provision_tmp_dir.path }}"

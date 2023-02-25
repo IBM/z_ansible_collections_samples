@@ -31,15 +31,16 @@
 ###############################################################################
 
 ---
-  - name: "Mirror a Git repository with an Ansible playbook"
-    hosts: localhost
-    gather_facts: no
-    vars:
-      organization: IBM
-      repo_name: z_ansible_collections_samples
-      repo_root_dest: "/tmp"
 
-    tasks:
+- name: "Mirror a Git repository with an Ansible playbook"
+  hosts: localhost
+  gather_facts: no
+  vars:
+    organization: IBM
+    repo_name: z_ansible_collections_samples
+    repo_root_dest: "/tmp"
+
+  tasks:
     ############################################################################
     # Check if the repository directory exists, if it does then we need only
     # perform a git pull, that is if its a really a git managed repo
@@ -52,23 +53,23 @@
 
     - name: Evaluating the directory {{repo_root_dest}}/{{repo_name}}
       debug:
-        msg: "{% if directory_exists.stat.exists and directory_exists.stat.isdir %}
-                  Found directory {{repo_root_dest}}/{{repo_name}}, will
-                  continue to evaluate the directory.
-              {% else %}
-                  No directory {{repo_root_dest}}/{{repo_name}} was found, will
-                  continue to Git clone the repository
-                  https://github.com/{{ organization }}/{{ repo_name }}.git
-              {% endif %}"
+        msg:
+          "{% if directory_exists.stat.exists and directory_exists.stat.isdir %}
+          Found directory {{repo_root_dest}}/{{repo_name}}, will
+          continue to evaluate the directory.
+          {% else %}
+          No directory {{repo_root_dest}}/{{repo_name}} was found, will
+          continue to Git clone the repository
+          https://github.com/{{ organization }}/{{ repo_name }}.git
+          {% endif %}"
 
     ############################################################################
     # If the repository directory exists, we should next evaluate the directory
     # if in fact it is Git managed and then perform a PULL, otherwise if it does
     # not exist we will simply Git clone the directory and complete.
     ############################################################################
-
     - name: Testing if directory {{repo_root_dest}}/{{repo_name}} is Git
-            managed.
+        managed.
       shell: |
         cd {{repo_root_dest}}/{{repo_name}}
         git rev-parse --is-inside-work-tree
@@ -82,16 +83,16 @@
       # 'fatal: not a git repository (or any of the parent directories): .git'
       # ------------------------------------------------------------------------
     - name: Evaluating if directory {{repo_root_dest}}/{{repo_name}} is Git
-            managed.
+        managed.
       assert:
         that:
           - is_git_managed.stdout_lines
         success_msg: "Determined directory {{repo_root_dest}}/{{repo_name}} is
-                      Git managed; continuing on to perform a Git pull."
+          Git managed; continuing on to perform a Git pull."
         fail_msg: "Directory {{repo_root_dest}}/{{repo_name}} exits but is NOT
-                   Git managed or corrupt. Please consider deleting the
-                   directory {{repo_root_dest}}/{{repo_name}} and rerunning the
-                   playbook so that it can Git clone."
+          Git managed or corrupt. Please consider deleting the
+          directory {{repo_root_dest}}/{{repo_name}} and rerunning the
+          playbook so that it can Git clone."
       ignore_errors: no
       when: directory_exists.stat.exists and directory_exists.stat.isdir
 
@@ -113,11 +114,12 @@
 
     - name: Result of Git clone
       debug:
-        msg: "{% if git_pull_result.changed and git_pull_result.stdout == 'Already up to date.' %}
-                  Git repository is Already up to date, no changes pulled.
-              {% else %}
-                  Git repository was updated, new content pulled.
-              {% endif %}"
+        msg:
+          "{% if git_pull_result.changed and git_pull_result.stdout == 'Already up to date.' %}
+          Git repository is Already up to date, no changes pulled.
+          {% else %}
+          Git repository was updated, new content pulled.
+          {% endif %}"
       when: is_git_managed is defined and is_git_managed.stdout is defined and is_git_managed.stdout
 
     ############################################################################
@@ -125,17 +127,17 @@
     # no locally managed repository exists.
     ############################################################################
     - name: "Clone the repository
-             https://github.com/{{ organization }}/{{ repo_name }}.git"
+        https://github.com/{{ organization }}/{{ repo_name }}.git"
       git: repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
-            dest="{{repo_root_dest}}/{{repo_name}}"
-            accept_hostkey=yes
-            force=yes
-            recursive=no
+        dest="{{repo_root_dest}}/{{repo_name}}"
+        accept_hostkey=yes
+        force=yes
+        recursive=no
       when: not directory_exists.stat.exists
       register: git_clone_result
 
     - name: "Results from cloning the Git repository
-             https://github.com/{{ organization }}/{{ repo_name }}.git"
+        https://github.com/{{ organization }}/{{ repo_name }}.git"
       debug:
         msg: "{{git_clone_result}}"
       when: git_clone_result.changed

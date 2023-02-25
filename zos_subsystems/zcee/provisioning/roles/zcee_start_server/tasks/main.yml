@@ -6,11 +6,11 @@
 #   register: response
 #   failed_when: "'JCL ERROR' in response.content | join"
 
-# - name: Get job info 
+# - name: Get job info
 #   ibm.ibm_zos_core.zos_job_query:
 #     job_name: '{{ server_name }}'
 
-# Create server proc - Option to start proc via jcl 
+# Create server proc - Option to start proc via jcl
 - name: Create temporary directory to store provisioning files
   tempfile:
     state: file
@@ -18,21 +18,21 @@
   register: servertempfile
 
 - block:
-  - name: Write template to the temp file
-    template:
-      src: "{{ playbook_dir }}/files/server-proc1.j2"
-      dest: "{{ servertempfile.path }}"
-    delegate_to: localhost
-  - debug:
-      msg: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
-  - name: Copy the template to a data set member
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ servertempfile.path }}"
-      dest: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
-  - name: Copy the template to User Private Proclib
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ servertempfile.path }}"
-      dest: "{{ user_private_proclib }}({{ softwareServiceInstanceName }})"
+    - name: Write template to the temp file
+      template:
+        src: "{{ playbook_dir }}/files/server-proc1.j2"
+        dest: "{{ servertempfile.path }}"
+      delegate_to: localhost
+    - debug:
+        msg: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
+    - name: Copy the template to a data set member
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ servertempfile.path }}"
+        dest: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
+    - name: Copy the template to User Private Proclib
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ servertempfile.path }}"
+        dest: "{{ user_private_proclib }}({{ softwareServiceInstanceName }})"
   always:
     - name: Remove temporary file
       file:
@@ -42,20 +42,20 @@
       when: servertempfile is defined
 
 - block:
-  - name: Write template to the temp file
-    template:
-      src: "{{ playbook_dir }}/files/server-proc2.j2"
-      dest: "{{ servertempfile.path }}"
-    delegate_to: localhost
-  - debug:
-      msg: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
-  - name: Copy the template to a data set member
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ servertempfile.path }}"
-      dest: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
-    when:   
-      - zcon_zos_stcjobs is defined
-      - zcon_stc_job_card != ''
+    - name: Write template to the temp file
+      template:
+        src: "{{ playbook_dir }}/files/server-proc2.j2"
+        dest: "{{ servertempfile.path }}"
+      delegate_to: localhost
+    - debug:
+        msg: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
+    - name: Copy the template to a data set member
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ servertempfile.path }}"
+        dest: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
+      when:
+        - zcon_zos_stcjobs is defined
+        - zcon_stc_job_card != ''
   always:
     - name: Remove temporary file
       file:
@@ -66,7 +66,7 @@
 
 - name: Start server
   ibm.ibm_zos_core.zos_operator:
-    cmd: 'start {{ server_name }}'
+    cmd: "start {{ server_name }}"
   register: response
   failed_when: "'JCL ERROR' in response.content | join"
 
@@ -75,4 +75,4 @@
 
 - name: Get job info
   ibm.ibm_zos_core.zos_job_query:
-    job_name: '{{ server_name }}'
+    job_name: "{{ server_name }}"
