@@ -50,4 +50,3 @@
           command:
             - SETROPTS CLASSACT(XFACILIT)
             - SETROPTS RACLIST(XFACILIT) REFRESH
-

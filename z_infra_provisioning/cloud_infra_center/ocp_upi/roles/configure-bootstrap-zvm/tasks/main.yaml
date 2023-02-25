@@ -123,5 +123,3 @@
   when:
   - disk_type == "scsi"
   - volume_type_id is defined
-
-

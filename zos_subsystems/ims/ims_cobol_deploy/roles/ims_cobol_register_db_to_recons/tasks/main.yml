@@ -21,5 +21,3 @@
     recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
   register: response
   failed_when: response.rc > 12
-
-

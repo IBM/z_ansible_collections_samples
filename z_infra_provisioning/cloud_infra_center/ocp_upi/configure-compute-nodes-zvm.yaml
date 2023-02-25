@@ -13,4 +13,3 @@
   hosts: localhost
   roles:
   - configure-compute-nodes-zvm
-

@@ -32,5 +32,3 @@
 
 - name: Executing the z/OS Ansible playbook `add-user.yml`
   import_playbook: add-user.yml
-
-

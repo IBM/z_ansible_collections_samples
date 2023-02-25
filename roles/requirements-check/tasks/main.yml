@@ -97,8 +97,6 @@
   #  # when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
 
 
-
-
   # - fail:
   #     msg: "{{result_ansible_check.msg}}"
   #   when: result_ansible_check.msg is regex("FAIL")

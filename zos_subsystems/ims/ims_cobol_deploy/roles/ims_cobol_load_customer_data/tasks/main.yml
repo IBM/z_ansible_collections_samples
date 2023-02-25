@@ -27,4 +27,3 @@
       register: output
     - debug:
         msg: "{{ output.jobs[0].job_id }}"
-

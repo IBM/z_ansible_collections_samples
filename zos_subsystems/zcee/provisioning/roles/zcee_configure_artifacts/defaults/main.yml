@@ -43,7 +43,3 @@ files_to_copy:
 # Specifies the character set any copied templates and files should be converted to.
 ################################################################################
 target_charset: "IBM-1047"
-
-
-
-

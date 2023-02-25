@@ -29,4 +29,3 @@
   - name: Display the registered collections and properites in `registry.yml`.
     include_role:
       name: requirements-check
-

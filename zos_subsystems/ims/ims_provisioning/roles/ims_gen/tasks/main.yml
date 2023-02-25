@@ -41,7 +41,6 @@
       when: dbd_gen
 
 
-
     - name: Prep PSB step 2
       ims_psb_gen:
         src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'

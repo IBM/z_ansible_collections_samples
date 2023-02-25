@@ -20,5 +20,3 @@ zcon_zos_proclib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB'
 # Specifies the user private proclib to hold the proc.
 ################################################################################
 user_private_proclib: USER.PRIVATE.PROCLIB
-
-

@@ -150,4 +150,3 @@
   - disk_type == "scsi"
   - vm_type == "kvm"
   - volume_type_id is defined
-

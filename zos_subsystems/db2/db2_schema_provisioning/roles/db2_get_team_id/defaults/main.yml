@@ -20,4 +20,3 @@ password: valid_password
 # The  name for the team which the instance is provisioned under.
 # Db2 DevOps Experience validates this name to ensure that it exists.
 team_name: ANSTEAM
-

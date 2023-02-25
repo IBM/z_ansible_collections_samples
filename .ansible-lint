@@ -57,7 +57,7 @@ skip_list:
   # - yaml[colons]
   # - yaml[commas]
   # - yaml[comments]
-  - yaml[empty-lines]
+  # - yaml[empty-lines]
   - yaml[indentation]
   - yaml[line-length]
   - yaml[new-line-at-end-of-file]

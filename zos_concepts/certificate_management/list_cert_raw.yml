@@ -44,4 +44,3 @@
       command:
           - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
     when: cert_type == 'SITE'
-

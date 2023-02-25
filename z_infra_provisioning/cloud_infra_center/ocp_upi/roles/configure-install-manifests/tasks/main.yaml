@@ -22,4 +22,3 @@
   script: tools/make-control-plane-unschedulable.py
   args:
     executable: python3
-

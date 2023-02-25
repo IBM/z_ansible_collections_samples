@@ -23,4 +23,3 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 # variable`ansible_python_interpreter`
 ################################################################################
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
-

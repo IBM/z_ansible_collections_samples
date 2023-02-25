@@ -33,4 +33,3 @@
       # ptf: 'UI74491'
       # zone: TGT
       # list_operands: 'SYSMOD({{ ptf }}) .'
-
