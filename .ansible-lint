@@ -20,7 +20,6 @@ skip_list:
   - args[module]
   - command-instead-of-module
   - command-instead-of-shell
-  - deprecated-bare-vars
   - deprecated-command-syntax
   - deprecated-local-action
   - fqcn[action-core]

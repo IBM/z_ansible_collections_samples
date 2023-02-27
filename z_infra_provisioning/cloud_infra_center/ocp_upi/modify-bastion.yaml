@@ -37,7 +37,8 @@
         if [ $count != "0" ] ; then
           echo 1 >> .validate_exist_ip
         fi
-      with_lines: cat .new_worker_index
+      with_lines:
+        - cat .new_worker_index
 
     - name: check .validate_exist_ip exists
       stat:
@@ -55,11 +56,13 @@
         worker_ip: "{{ item.split(',')[1] | replace('ip=','') }}"
         worker_index: "{{ item.split(',')[0][-4:] }}"
         cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-      with_lines: cat .new_worker_index
+      with_lines:
+        - cat .new_worker_index
 
     - name: "Modify bastion haproxy for new worker"
       include_tasks: modify-haproxy.yaml
       vars:
         worker_index: "{{ item.split(',')[0][-4:] }}"
         cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-      with_lines: cat .new_worker_index
+      with_lines:
+        - cat .new_worker_index

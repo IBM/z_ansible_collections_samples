@@ -76,7 +76,8 @@
 
     - name: "Generate worker node json file"
       script: tools/generate-new-worker-ignition.sh "{{ item }}"
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
 
     - name: "Create the compute server ports"
       os_port:
@@ -88,7 +89,8 @@
           - subnet: "{{ use_network_subnet }}"
             ip_address: "{{ item.split(',')[1] | replace('ip=','') }}"
       register: ports
-      with_lines: cat .new_worker_index
+      with_lines:
+        - cat .new_worker_index
       when: add_worker_ip != "random"
 
     - name: "Create the compute server ports"
@@ -98,13 +100,15 @@
         security_groups:
           - "{{ os_sg_worker }}"
       register: ports
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when: add_worker_ip == "random"
 
     - name: "Set compute server ports tag"
       command:
         cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item }}"
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
 
     - name: "Create the compute servers"
       os_server:
@@ -117,7 +121,8 @@
         availability_zone: "{{ create_server_zone }}"
         nics:
           - port-name: "{{ item }}"
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when:
         - vm_type == "kvm"
         - volume_type_id is not defined
@@ -133,7 +138,8 @@
         availability_zone: "{{ create_server_zone }}"
         nics:
           - port-name: "{{ item }}"
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when:
         - disk_type == "dasd"
         - vm_type == "zvm"
@@ -160,7 +166,8 @@
         boot_from_volume: true
         volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
         terminate_volume: true
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when:
         - disk_type == "scsi"
         - vm_type == "zvm"
@@ -175,14 +182,16 @@
         volume_type: "{{ volume_type_id }}"
         metadata: "{{ cluster_id_tag }}"
         timeout: "{{ create_server_timeout|int * 60 }}"
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
 
     - name: "Set compute volume bootable"
       shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
@@ -200,7 +209,8 @@
           - port-name: "{{ item }}"
         meta: "{{ cluster_id_tag }}"
         terminate_volume: true
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
@@ -209,7 +219,8 @@
       shell: |
         worker_ip=$(openstack server list | grep "{{ item }}" | grep -oP "(?<=)\d+(\.\d+){3}")
         sed -i -e "/{{ item }}/s/random/$worker_ip/g" .new_worker_index
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
       when: add_worker_ip == "random"
 
     - name: "Waiting for approve worker CSR"
@@ -217,7 +228,8 @@
       vars:
         workerid: "{{ item }}"
       register: worker_csr_sleeper
-      with_lines: cat .new_worker_name
+      with_lines:
+        - cat .new_worker_name
 
 - import_playbook: modify-bastion.yaml
   when:
