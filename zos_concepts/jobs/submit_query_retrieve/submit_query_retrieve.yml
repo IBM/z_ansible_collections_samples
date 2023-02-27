@@ -34,7 +34,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "HELLO"
@@ -77,7 +77,7 @@
         size: 5M
         format: fb
         record_length: 80
-        replace: yes
+        replace: true
       register: result
 
     - name: Response for create a PDS data set {{ data_set_name }}
@@ -95,7 +95,7 @@
       zos_data_set:
         name: "{{ data_set_name }}(MEM{{ item }})"
         type: MEMBER
-        replace: yes
+        replace: true
       with_sequence: count=1
       register: result
 
@@ -129,7 +129,7 @@
         in {{ tgt_tmp_dir }}/ansible/jcl
       zos_copy:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
-        remote_src: True
+        remote_src: true
         dest: "{{ data_set_name }}(MEM1)"
       register: result
 
@@ -200,7 +200,7 @@
       zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
         location: USS
-        wait: True
+        wait: true
       register: result
 
     - name: Response for submit {{ job_name }} jcl located on target

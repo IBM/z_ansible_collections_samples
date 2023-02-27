@@ -28,7 +28,7 @@
     - name: Load IMS catalog
       ims_catalog_populate:
         mode: LOAD
-        dbrc: False
+        dbrc: false
         modstat: IMSTESTL.IMS1.MODSTAT
         acb_lib: [IMSTESTL.IMS1.ACBLIB]
         reslib: [IMSTESTL.IMS1.SDFSRESL]

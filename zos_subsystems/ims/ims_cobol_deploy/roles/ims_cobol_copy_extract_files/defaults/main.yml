@@ -1,7 +1,7 @@
 ---
 # defaults file for ims_cobol_copy_extract_files
 
-USE_GIT: no
+USE_GIT: false
 
 SAMPLE_FILE_DIR: "/u/{{ TARGET_USERNAME }}/{{ PROJECT_NAME }}"
 

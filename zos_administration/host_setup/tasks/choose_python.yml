@@ -67,7 +67,7 @@
 
   rescue:
     - set_fact:
-        connection_success: False
+        connection_success: false
 
   always:
     - name: Remove temporary file

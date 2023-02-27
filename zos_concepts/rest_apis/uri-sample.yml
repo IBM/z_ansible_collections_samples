@@ -17,7 +17,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment:
     "{{ environment_vars }}"
 
@@ -38,10 +38,10 @@
         headers:
           Content-Type: application/json
           X-CSRF-ZOSMF-HEADER: required_header
-        force_basic_auth: yes
-        validate_certs: no
+        force_basic_auth: true
+        validate_certs: false
         status_code: 200
-        return_content: yes
+        return_content: true
 
       register: zosmf_result
 
@@ -69,10 +69,10 @@
         headers:
           Content-Type: application/json
           X-CSRF-ZOSMF-HEADER: required_header
-        force_basic_auth: yes
-        validate_certs: no
+        force_basic_auth: true
+        validate_certs: false
         status_code: 201
-        return_content: yes
+        return_content: true
       register: zosmf_create_result
       when: existing_workflow_key == ''
 
@@ -95,10 +95,10 @@
         headers:
           Content-Type: application/json
           X-CSRF-ZOSMF-HEADER: required_header
-        force_basic_auth: yes
-        validate_certs: no
+        force_basic_auth: true
+        validate_certs: false
         status_code: 202
-        return_content: yes
+        return_content: true
       register: zosmf_start_result
       when: sample_workflow_key != ''
 
@@ -111,10 +111,10 @@
         headers:
           Content-Type: application/json
           X-CSRF-ZOSMF-HEADER: required_header
-        force_basic_auth: yes
-        validate_certs: no
+        force_basic_auth: true
+        validate_certs: false
         status_code: 200
-        return_content: yes
+        return_content: true
       register: zosmf_cancel_result
       when: existing_workflow_key != ''
 
@@ -127,10 +127,10 @@
         headers:
           Content-Type: application/json
           X-CSRF-ZOSMF-HEADER: required_header
-        force_basic_auth: yes
-        validate_certs: no
+        force_basic_auth: true
+        validate_certs: false
         status_code: 204
-        return_content: yes
+        return_content: true
       register: zosmf_delete_result
       when: existing_workflow_key != ''
 

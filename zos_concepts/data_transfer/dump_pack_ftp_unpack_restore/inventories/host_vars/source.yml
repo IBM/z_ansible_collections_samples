@@ -36,7 +36,7 @@ target_user: ""
 target_password: ""
 
 # Indicates if terse and archive data sets should be deleted upon successful transfer?
-delete: yes
+delete: true
 
 # The python installation home path on the z/OS managed node (target),
 # e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"

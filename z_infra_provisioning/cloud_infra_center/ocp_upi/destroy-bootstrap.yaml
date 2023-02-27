@@ -21,7 +21,7 @@
 # openstacksdk
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
     - name: "Import common yaml"
@@ -31,4 +31,4 @@
       os_server:
         name: "{{ os_bootstrap_server_name }}"
         state: absent
-        delete_fip: yes
+        delete_fip: true

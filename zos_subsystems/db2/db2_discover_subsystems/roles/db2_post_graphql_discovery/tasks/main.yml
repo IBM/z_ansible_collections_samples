@@ -4,7 +4,7 @@
 - name: Graphql Discovery
   uri:
     url: "{{ doe_server }}:{{ doe_server_port }}/ws/model/graphql/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: POST

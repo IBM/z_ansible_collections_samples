@@ -3,7 +3,7 @@
 ###############################################################################
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
     - name: Send a rejection email to the user who requested a new UserID

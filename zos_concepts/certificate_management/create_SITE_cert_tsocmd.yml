@@ -5,7 +5,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     owner_id: "OMVSKERN"
@@ -27,7 +27,7 @@
             command:
               - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
               - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
-      ignore_errors: True
+      ignore_errors: true
 
     - include_role:
         name: issue_tso_cmd

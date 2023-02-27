@@ -76,7 +76,7 @@
     - name: Add CSLOIROM member
       zos_mvs_raw:
         pgm: IEBGENER
-        auth: no
+        auth: false
         dds:
           - dd_data_set:
               dd_name: sysut2

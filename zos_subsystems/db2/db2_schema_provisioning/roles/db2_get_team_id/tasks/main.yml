@@ -4,7 +4,7 @@
 - name: Retrieve team id
   uri:
     url: "{{ base_url }}/teams/{{team_name}}/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET

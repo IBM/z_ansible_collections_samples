@@ -45,7 +45,7 @@
       - rdef started {{SERVER_PROC}}.* uacc(none) stdata(user({{TARGET_USER}}) group({{USER_GROUP}}) privileged(no) trusted(no) trace(yes))
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Refresh
   ibm.ibm_zos_core.zos_tso_command:

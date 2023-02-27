@@ -23,7 +23,7 @@ output_volume: ""
 new_hlq: ""
 
 # should terse and archive data sets be deleted upon successful restore?
-delete: yes
+delete: true
 
 # should existing data sets be overwritten during restore
-replace: yes
+replace: true

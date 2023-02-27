@@ -54,7 +54,7 @@
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
@@ -78,16 +78,16 @@
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
       - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-    boot_from_volume: True
+    boot_from_volume: true
     volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
-    terminate_volume: True
+    terminate_volume: true
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
     - disk_type == "scsi"
@@ -120,14 +120,14 @@
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_worker }}"
     boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
       - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-    terminate_volume: True
+    terminate_volume: true
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
     - disk_type == "scsi"

@@ -5,7 +5,7 @@
     - name: Create an instance of the application with data
       uri:
         url: "{{ base_url }}/instances/"
-        validate_certs: no
+        validate_certs: false
         user: "{{ username }}"
         password: "{{ password }}"
         method: POST
@@ -32,7 +32,7 @@
     - name: Create an instance of the application with no data
       uri:
         url: "{{ base_url }}/instances/"
-        validate_certs: no
+        validate_certs: false
         user: "{{ username }}"
         password: "{{ password }}"
         method: POST

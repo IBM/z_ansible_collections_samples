@@ -16,7 +16,7 @@
                 port: "{{ DFS_REGION_TCPIPPORT if RESERVE_SPECIFIC_PORT else None | default(omit) }}"
                 dsname: "{{ TCPIP_PROFILE }}"
                 tmp_dsname: "{{ TCPIP_PROFILE_TMP }}"
-                tcp: yes
+                tcp: true
               register: port_alloc_result1
 
             - name: Reserve ICON SSL Port
@@ -25,7 +25,7 @@
                 port: "{{ DFS_REGION_SSLTCPIPPORT if RESERVE_SPECIFIC_PORT else None | default(omit) }}"
                 dsname: "{{ TCPIP_PROFILE }}"
                 tmp_dsname: "{{ TCPIP_PROFILE_TMP }}"
-                tcp: yes
+                tcp: true
               register: port_alloc_result2
 
         - set_stats:

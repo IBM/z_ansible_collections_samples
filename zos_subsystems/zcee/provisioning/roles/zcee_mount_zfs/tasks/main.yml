@@ -10,7 +10,7 @@
   file:
     path: "{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/.tmp_server"
     state: directory
-    recurse: yes
+    recurse: true
     mode: "700"
 
 - name: Query information about the main mountpoint

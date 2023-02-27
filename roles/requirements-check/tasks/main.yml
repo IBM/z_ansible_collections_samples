@@ -62,7 +62,7 @@
 
 - name: Evaluating if the collection requirements for this playbook are installed
   set_fact:
-    result_collection_status_failed: True
+    result_collection_status_failed: true
     result_collection_status_msg: "{{item.msg}}"
   loop: "{{result_collection_status.results}}"
   loop_control:

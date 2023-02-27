@@ -28,7 +28,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
@@ -90,7 +90,7 @@
               dd_name: sysut2
               data_set_name: "{{ temp_data_set.get('names')[0] }}"
               disposition: new
-              replace: yes
+              replace: true
               type: seq
               space_primary: 5
               space_secondary: 1

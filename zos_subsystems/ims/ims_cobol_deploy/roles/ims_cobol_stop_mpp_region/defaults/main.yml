@@ -2,7 +2,7 @@
 # defaults file for ims_cobol_stop_mpp_region
 
 # DFSMPR proc parameters
-SEND_CUSTOM_DFSMPR: yes
+SEND_CUSTOM_DFSMPR: true
 DFSMPR_NAME: DFSMPR{{ REGION_NUM | string }}
 
 # this will be appended to the region name, example: IMS1MPP5 where REGION_NUM='5' and DFS_IMS_SSID='IMS1'
@@ -20,10 +20,10 @@ ZOS_LERUNLIB: '{{ zCloud_LERuntime }}'
 ZOS_MACLIB: '{{ zCloud_MACLIB }}'
 
 # DB2 parameters
-WITH_DB2: no
+WITH_DB2: false
 DB2_SSM: ''
 
-USE_PSEUDO_WFI: no
+USE_PSEUDO_WFI: false
 
 ## IMS application variables
 DFS_tranclass1: '005' # '008'
@@ -33,4 +33,4 @@ DFS_tranclass4: '000'
 DFS_appname: 'Y'
 DFS_traname: 'Y'
 
-REPLACE_MEMBERS: yes
+REPLACE_MEMBERS: true

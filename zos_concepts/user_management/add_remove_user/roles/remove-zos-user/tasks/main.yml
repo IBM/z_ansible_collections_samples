@@ -27,17 +27,17 @@
     - name: Delete alias from catalog
       ibm.ibm_zos_core.zos_tso_command:
         commands: "DELETE '{{ userid | upper }}' ALIAS"
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Delete generic profile
       ibm.ibm_zos_core.zos_tso_command:
         commands: "DELDSD '{{ userid | upper }}.**'"
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Delete generic profile
       ibm.ibm_zos_core.zos_tso_command:
         commands: "DELDSD '{{ userid | upper }}.*'"
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Remove the user
       ibm.ibm_zos_core.zos_tso_command:
@@ -104,7 +104,7 @@
       ibm.ibm_zos_core.zos_operator:
         cmd: "SETOMVS SYNTAXCHECK=({{ bpxprm_member | upper }})"
       register: syntaxcheck_response
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Undo mount changes if bad syntaxcheck
       shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"

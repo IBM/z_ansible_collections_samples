@@ -30,14 +30,14 @@
               - command: STOP DB ALL
                 plex: "{{ DFS_IMSPlex }}"
                 route: "{{ DFS_IMS_SSID }}"
-          ignore_errors: yes
+          ignore_errors: true
 
         - name: Immediate IMS Shutdown
           ims_command:
             command: CHE FREEZE
             plex: "{{ DFS_IMSPlex }}"
             route: "{{ DFS_IMS_SSID }}"
-          ignore_errors: yes
+          ignore_errors: true
 
         # Stop ICON
         - block:

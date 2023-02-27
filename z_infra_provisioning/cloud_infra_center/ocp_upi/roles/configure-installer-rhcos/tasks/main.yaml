@@ -30,7 +30,7 @@
   get_url:
     url: "{{ openshift_rhcos_url }}/sha256sum.txt"
     dest: "{{ openshift_install_dir }}/.sha256sum_remote.txt"
-    force: yes
+    force: true
 
 - name: Get checksum for the rhcos image
   slurp:

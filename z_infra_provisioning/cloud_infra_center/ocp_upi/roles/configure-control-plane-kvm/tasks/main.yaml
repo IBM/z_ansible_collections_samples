@@ -77,7 +77,7 @@
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
     # The ignition filename will be concatenated with the Control Plane node
@@ -134,14 +134,14 @@
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_master }}"
     boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
       - port-name: "{{ os_port_master }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }}"
-    terminate_volume: True
+    terminate_volume: true
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment:
     PYTHONWARNINGS: "ignore::UserWarning"
