@@ -33,10 +33,10 @@
     # Generate a temporary data set name
     # ##########################################################################
     - name: Create temp data set name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.stdout }}"
     # ##########################################################################
     # Modules: zos_copy, zos_lineinfile, zos_mvs_raw, zos_job_submit
@@ -51,7 +51,7 @@
     # | - Using zos_data_set, delete the copied data set on z/OS host
     # +-------------------------------------------------------------------------
     - name: "Copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}"
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files"
         dest: "{{ tmp_data_set }}"
         encoding:
@@ -60,59 +60,59 @@
       register: result_copy_dir
 
     - name: "Response for copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}."
-      debug:
+      ansible.builtin.debug:
         var: result_copy_dir
 
     - name: "Copy PDS member {{ tmp_data_set }}(UPTIME) to a new PDS member {{ tmp_data_set }}(PSA)"
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_data_set }}(UPTIME)"
         dest: "{{ tmp_data_set }}(PSA)"
         remote_src: true
 
     - name: "Edit JCL PSA job card on z/OS managed node."
-      zos_lineinfile:
+      ibm.ibm_zos_core.zos_lineinfile:
         src: "{{ tmp_data_set }}(PSA)"
         state: present
         regexp: "//UPTIME    JOB (T043JM,JM00,1,0,0,0),'UPTIME - JRM',"
         line: "//PSA    JOB (T043JM,JM00,1,0,0,0),'PSA - JRM',"
 
     - name: "Edit JCL PSA step-name on z/OS managed node."
-      zos_lineinfile:
+      ibm.ibm_zos_core.zos_lineinfile:
         src: "{{ tmp_data_set }}(PSA)"
         state: present
         regexp: "//UPTIME  EXEC PGM=BPXBATCH"
         line: "//PSA  EXEC PGM=BPXBATCH"
 
     - name: "Edit JCL PSA USS command on z/OS managed node."
-      zos_lineinfile:
+      ibm.ibm_zos_core.zos_lineinfile:
         src: "{{ tmp_data_set }}(PSA)"
         state: present
         regexp: "SH uptime"
         line: "SH ps -A"
 
     - name: "Submit the JCL {{ tmp_data_set }}(PSA)"
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(PSA)"
         location: DATA_SET
         wait: true
       register: result_submit_psa
 
     - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
-      debug:
+      ansible.builtin.debug:
         var: result_submit_psa
 
     - name: "Submit the JCL {{ tmp_data_set }}(UPTIME)"
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(UPTIME)"
         location: DATA_SET
         wait: true
       register: result_submit_uptime
 
     - name: "Response for submitting JCL {{ tmp_data_set }}(UPTIME)"
-      debug:
+      ansible.builtin.debug:
         var: result_submit_uptime
 
     - name: "Delete data set {{ tmp_data_set }}"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}"
         state: absent

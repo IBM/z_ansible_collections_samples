@@ -9,25 +9,25 @@
       block:
 
         # Authenticate user
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_login
 
         # Get the application id
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_get_app_id
 
         # Get the team id and environment id
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_get_team_id
 
         # Get the subsystem id
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_get_subsystem_id
 
         # Create a new instance of an application with/without data
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_post_create_instance
 
         # Get the status of the newly created instance of an application
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_get_status_instance

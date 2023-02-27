@@ -11,7 +11,7 @@
 
     - name: "Ensure CPC {{ cpc_name }} has the desired description"
       delegate_to: localhost
-      zhmc_cpc:
+      ibm.ibm_zhmc.zhmc_cpc:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         name: "{{ cpc_name }}"
@@ -21,5 +21,5 @@
       register: result
 
     - name: Print the result
-      debug:
+      ansible.builtin.debug:
         var: result

@@ -15,7 +15,7 @@
 
   tasks:
     - name: Dump, pack, and transfer data sets
-      include_role:
+      ansible.builtin.include_role:
         name: dump-pack-ftp-data-sets
         public: true
 
@@ -30,7 +30,7 @@
 
   tasks:
     - name: Unpack and restore data sets
-      include_role:
+      ansible.builtin.include_role:
         name: unpack-restore-data-sets
       vars:
         # target_data_set and size_in_cyls will always be defined for all hosts

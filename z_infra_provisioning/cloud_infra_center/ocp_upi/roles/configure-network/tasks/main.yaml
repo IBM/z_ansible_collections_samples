@@ -35,69 +35,69 @@
 # openstacksdk
 
 - name: "Import common yaml"
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: "Get the subnet range"
-  command:
+  ansible.builtin.command:
     cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
   register: subnet_range
 
 - local_action:
-    module: copy
+    module: ansible.builtin.copy
     content: "{{ subnet_range.stdout_lines[0]}}"
     dest: ".subnet_range.yml"
 
 - name: "Check netowrk name is properly set"
-  fail:
+  ansible.builtin.fail:
     msg: "use_network_name is not defined!"
   failed_when: use_network_name is not defined
 
 - name: "Check network subnet is properly set"
-  fail:
+  ansible.builtin.fail:
     msg: "use_network_subnet is not defined!"
   failed_when: use_network_subnet is not defined
 
 - name: "Get subnet id"
-  command:
+  ansible.builtin.command:
     cmd: "openstack subnet show {{ use_network_subnet }} -c id -f value"
   register: subnet_id
 
 - name: "Get first start of allocation pool of subnet {{ use_network_subnet }}"
-  shell: |
+  ansible.builtin.shell: |
     openstack subnet show {{ use_network_subnet }} -c allocation_pools -f json | grep start | awk -F ':' '{print$2}'|tr -d '",'
   register: default_allocation_pool_start
 
 - name: "Get first end of allocation pool of subnet {{ use_network_subnet }}"
-  shell: |
+  ansible.builtin.shell: |
     openstack subnet show {{ use_network_subnet }} -c allocation_pools -f json | grep end | awk -F ':' '{print$2}'|tr -d '",'
   register: default_allocation_pool_end
 
 - name: "Update allocation pool of subnet {{ use_network_subnet }}"
-  command:
+  ansible.builtin.command:
     cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start }},end={{ allocation_pool_end }} {{ use_network_subnet }}"
   when:
     - allocation_pool_start is defined
     - allocation_pool_end is defined
 
 - name: "Update partial allocation pool of subnet {{ use_network_subnet }}"
-  command:
+  ansible.builtin.command:
     cmd: "openstack subnet set --allocation-pool start={{ allocation_pool_start | default(subnet_range.stdout_lines[0] | next_nth_usable(10)) }},end={{ allocation_pool_end | default(os_subnet_range | ipaddr('last_usable')) }} {{ use_network_subnet }}"
   when:
     - (allocation_pool_start is not defined and allocation_pool_end is defined) or
       (allocation_pool_start is defined and allocation_pool_end is not defined)
 
 - name: "Export infra ID"
-  shell:
+  ansible.builtin.shell:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
 - name: "Generate random string for the compute server ports and store them in a json file"
-  script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
+  ansible.builtin.script: tools/generate-random-compute-json.py {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
   args:
     executable: python3
 
 - name: "Create the bootstrap server port"
-  os_port:
+  openstack.cloud.port:
     name: "{{ os_port_bootstrap }}"
     network: "{{ use_network_name }}"
     security_groups:
@@ -109,7 +109,7 @@
     - auto_allocated_ip == false
 
 - name: "Create the control server ports"
-  os_port:
+  openstack.cloud.port:
     name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
     security_groups:
@@ -122,7 +122,7 @@
     - auto_allocated_ip == false
 
 - name: "Create the compute server ports"
-  os_port:
+  openstack.cloud.port:
     name: "{{ item.1  }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
     security_groups:
@@ -135,7 +135,7 @@
     - auto_allocated_ip == false
 
 - name: "Create the bootstrap server port"
-  os_port:
+  openstack.cloud.port:
     name: "{{ os_port_bootstrap }}"
     network: "{{ use_network_name }}"
     security_groups:
@@ -146,7 +146,7 @@
     - auto_allocated_ip == true
 
 - name: "Create the control server ports"
-  os_port:
+  openstack.cloud.port:
     name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
     security_groups:
@@ -158,7 +158,7 @@
     - auto_allocated_ip == true
 
 - name: "Create the compute server ports"
-  os_port:
+  openstack.cloud.port:
     name: "{{ item.1 }}-{{ item.0 }}"
     network: "{{ use_network_name }}"
     security_groups:
@@ -170,15 +170,15 @@
     - auto_allocated_ip == true
 
 - name: "Set bootstrap port tag"
-  command:
+  ansible.builtin.command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_bootstrap }}"
 
 - name: "Set control server ports tag"
-  command:
+  ansible.builtin.command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
 
 - name: "Set compute server ports tag"
-  command:
+  ansible.builtin.command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
   with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"

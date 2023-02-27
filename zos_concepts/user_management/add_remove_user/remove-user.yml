@@ -15,5 +15,5 @@
 
   tasks:
     - name: Remove user from z/OS system
-      include_role:
+      ansible.builtin.include_role:
         name: remove-zos-user

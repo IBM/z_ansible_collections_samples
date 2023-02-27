@@ -9,9 +9,9 @@
       block:
 
         # Authenticate user
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_login
 
         # Delete existing instance of an application
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_delete_app_instance

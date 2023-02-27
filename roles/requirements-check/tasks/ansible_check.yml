@@ -10,7 +10,7 @@
 
 ---
 - name: Ansible version check in progress
-  assert:
+  ansible.builtin.assert:
     msg: "This playbook requires Ansible version
       {{ tmp.split('.')[0]|int }}.{{ tmp.split('.')[1]|int }}.{{ tmp.split('.')[2]| default (0)|int }} -
       {{ tmp.split('.')[0]|int }}.{{ tmp.split('.')[1]|int }}.n and version
@@ -30,8 +30,8 @@
     var: result
     verbosity: 1
 
-- set_fact:
+- ansible.builtin.set_fact:
     temp_version: "{{ tmp.split('.')[0]}}.{{tmp.split('.')[1]}}.{{tmp.split('.')[2]| default (0)}}"
 
-- set_fact:
+- ansible.builtin.set_fact:
     ansible_version_checks: "{{ ansible_version_checks |combine({temp_version:{'version':temp_version,'failed':result.failed}}) }}"

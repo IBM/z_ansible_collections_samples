@@ -102,66 +102,66 @@
 
   tasks:
     - name: Gather potential dependency paths
-      raw: 'find / -level {{ max_search_depth }} -type f -perm -111 -name "python*" -o -type f -perm -111 -name "dtouch" 2>/dev/null || :'
+      ansible.builtin.raw: 'find / -level {{ max_search_depth }} -type f -perm -111 -name "python*" -o -type f -perm -111 -name "dtouch" 2>/dev/null || :'
       register: dependency_paths
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         potential_paths: "{{ dependency_paths|potential_paths }}"
 
     - name: Assert potential python installs were found
-      fail:
+      ansible.builtin.fail:
         msg: No potential python installs were found.
       when: potential_paths.get('python')|length == 0
 
     - name: Assert potential ZOAU installs were found
-      fail:
+      ansible.builtin.fail:
         msg: No potential ZOAU installs were found.
       when: potential_paths.get('zoau')|length == 0
 
-    - debug:
+    - ansible.builtin.debug:
         var: potential_paths
 
     - name: Find valid python installation
-      include_tasks:
+      ansible.builtin.include_tasks:
         file: "{{ playbook_dir }}/tasks/choose_python.yml"
       loop: "{{ potential_paths.get('python', []) }}"
 
     - name: Assert a valid python install was found
-      fail:
+      ansible.builtin.fail:
         msg: No useable python installation was found
       when: chosen_python is not defined
 
     - name: Get ZOAU build dates
-      raw: "{{ potential_paths | zoau_version_command_string }} 2>&1 || :"
+      ansible.builtin.raw: "{{ potential_paths | zoau_version_command_string }} 2>&1 || :"
       register: zoau_build_dates
 
-    - debug:
+    - ansible.builtin.debug:
         var: zoau_build_dates
 
     - name: Filter potential ZOAU options based on
-      set_fact:
+      ansible.builtin.set_fact:
         filtered_zoau: "{{ potential_paths.get('zoau') | filter_zoau_installs(zoau_build_dates.get('stdout_lines'), minimum_zoau_version) }}"
 
     - name: Find valid ZOAU install
-      include_tasks:
+      ansible.builtin.include_tasks:
         file: "{{ playbook_dir }}/tasks/choose_zoau.yml"
       loop: "{{ filtered_zoau }}"
       when: filtered_zoau is defined and filtered_zoau|length > 0
 
     - name: Assert a valid ZOAU install was found
-      fail:
+      ansible.builtin.fail:
         msg: No ZOAU installation found meeting requirements.
       when: chosen_zoau is not defined
 
 
     - name: Create host_vars directory if it does not already exist
-      file:
+      ansible.builtin.file:
         path: "{{ playbook_dir }}/host_vars"
         state: directory
       delegate_to: localhost
 
     - name: Create host_vars file
-      template:
+      ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/host_vars.j2"
         dest: "{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml"
         force: true
@@ -173,14 +173,14 @@
         is_110: "{{ True if '1.1.0' in chosen_zoau.get('build') else False }}"
       delegate_to: localhost
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         target_user: "{{ ansible_user }}"
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         target_host: "{{ ansible_host }}"
 
     - name: Create inventory file
-      template:
+      ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/inventory.j2"
         dest: "{{ playbook_dir }}/{{ inventory_hostname_short }}"
         force: true
@@ -189,9 +189,9 @@
         python_interpreter: "{{ chosen_python.get('interpreter') }}"
       delegate_to: localhost
 
-    - debug:
+    - ansible.builtin.debug:
         var: potential_paths
 
-    - debug:
+    - ansible.builtin.debug:
         msg: "Inventory file placed at '{{ playbook_dir }}/{{ inventory_hostname_short }}',
         host_vars file placed at '{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml'"

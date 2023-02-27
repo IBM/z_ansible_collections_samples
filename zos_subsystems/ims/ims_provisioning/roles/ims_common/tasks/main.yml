@@ -9,20 +9,20 @@
 
     # Start IMS control region if start_ctl is true
     - name: Start IMS control region
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 's {{ DFS_IMS_SSID }}CTL'
         verbose: true
       when: ctl == "start"
 
     # Stop IMS control region
     - name: Stop IMS control region
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}CTL'
         verbose: true
       when: ctl == "stop"
 
     - name: Wait for IMS Ready message
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         job_name: "{{ DFS_IMS_SSID }}CTL"
       register: ims_ready_msg
       retries: 5
@@ -32,7 +32,7 @@
       when: ctl == "start"
 
     - name: IMS cold start
-      ims_command:
+      ibm.ibm_zos_ims.ims_command:
         command: NRE CHECKPOINT 0 FMT ALL
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
@@ -40,7 +40,7 @@
 
 
     - name: ICON start
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: IMSTESTL.IMS1.JOBS(IMS1HWS1)
         location: DATA_SET
         wait: true
@@ -49,7 +49,7 @@
 
     # Stop ICON
     - name: Stop ICON
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}HWS'
         verbose: true
       when: icon == "stop"

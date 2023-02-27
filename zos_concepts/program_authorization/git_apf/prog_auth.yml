@@ -62,25 +62,25 @@
 
   tasks:
     - name: Get home directory
-      shell: "echo \"$HOME\" "
+      ansible.builtin.shell: "echo \"$HOME\" "
       register: result
     - name: Set home_dir path
-      set_fact:
+      ansible.builtin.set_fact:
         home_dir: "{{ result.stdout }}"
     - name: Git clone repository
-      include_role:
+      ansible.builtin.include_role:
         name: git-pull
     - name: Get current APF list
-      include_role:
+      ansible.builtin.include_role:
         name: apf-list
     - name: Load the list from the file in git repo and find out the delta from current APF list
-      include_role:
+      ansible.builtin.include_role:
         name: list-load
     - name: Create persistent dataset if not exist
-      shell: "dls `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` > /dev/null 2>&1 || dtouch `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` }}"
+      ansible.builtin.shell: "dls `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` > /dev/null 2>&1 || dtouch `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` }}"
     - name: APF add delta list
-      include_role:
+      ansible.builtin.include_role:
         name: apf-add
     - name: APF list to be added
-      debug:
+      ansible.builtin.debug:
         msg: "{{ add_list }}"

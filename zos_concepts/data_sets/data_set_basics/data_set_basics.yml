@@ -45,20 +45,20 @@
     # Generate and set temporary names for data sets
     # ##########################################################################
     - name: Create temp sequential data set name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_seq
 
     - name: Create temp PDS name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_pds
 
     - name: Set names for sequential data set and pds for use by this sample
-      set_fact:
+      ansible.builtin.set_fact:
         data_set_name: "{{ tmp_ds_seq.stdout }}"
         pds_name: "{{ tmp_ds_pds.stdout }}"
 
     - name: Fact `data_set_name` and `pds_name` set with values
-      debug:
+      ansible.builtin.debug:
         msg:
           - "sequential data set name - {{ data_set_name }}"
           - "pds name - {{ pds_name }}"
@@ -77,7 +77,7 @@
     # +-------------------------------------------------------------------------
 
     - name: Create a sequential data set
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: seq
         state: present
@@ -88,21 +88,21 @@
       register: result
 
     - name: Response for data set creation
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Create a USS file
-      file:
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: touch
       register: result
 
     - name: Response for USS file creation
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: zos_copy
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
        # remote_src: yes
@@ -110,22 +110,22 @@
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
         on target {{ inventory_hostname }}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy the USS file to the sequential data set
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
       register: result
 
     - name: Response for copying USS file to data set
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Create a PDS
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}"
         type: pds
         size: 5M
@@ -134,32 +134,32 @@
       register: result
 
     - name: Response for creating the PDS
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Create a PDS member
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: MEMBER
       register: result
 
     - name: Response for creating the PDS member
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy the sequential data set to PDS member
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         remote_src: true
       register: result
 
     - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Delete the data sets
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         batch:
           - name: "{{ data_set_name }}"
             state: absent
@@ -168,10 +168,10 @@
       register: result
 
     - name: Response for deleting the data sets
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Clean up {{ tgt_tmp_dir }}
-      file:
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent

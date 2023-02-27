@@ -17,13 +17,13 @@
 ---
 # tasks file for configure-haproxy
 
-- include_vars: cluster-template.yaml
+- ansible.builtin.include_vars: cluster-template.yaml
 
 - name: Install haproxy
   become: true
   become_user: root
   become_method: sudo
-  yum:
+  ansible.builtin.yum:
     name:
       - haproxy
       # - libsemanage-python
@@ -37,7 +37,7 @@
   become: true
   become_user: root
   become_method: sudo
-  file:
+  ansible.builtin.file:
     path: /etc/haproxy
     state: directory
 
@@ -45,7 +45,7 @@
   become: true
   become_user: root
   become_method: sudo
-  template:
+  ansible.builtin.template:
     src: etc/haproxy/haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
   notify:
@@ -55,7 +55,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: http
     permanent: true
     zone: public
@@ -67,7 +67,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: http
     permanent: true
     zone: internal
@@ -79,7 +79,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: https
     permanent: true
     zone: public
@@ -91,7 +91,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: https
     permanent: true
     zone: internal
@@ -103,7 +103,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     port: 443/tcp
     permanent: true
     zone: "{{ item }}"
@@ -118,7 +118,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     port: 6443/tcp
     permanent: true
     zone: "{{ item }}"
@@ -133,7 +133,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     port: 22623/tcp
     permanent: true
     zone: "{{ item }}"
@@ -148,7 +148,7 @@
   become: true
   become_user: root
   become_method: sudo
-  shell: setsebool -P haproxy_connect_any=1
+  ansible.builtin.shell: setsebool -P haproxy_connect_any=1
 
 # - name: start haproxy
 #   become: yes
@@ -163,19 +163,19 @@
   become: true
   become_user: root
   become_method: sudo
-  service: name=haproxy state=restarted
+  ansible.builtin.service: name=haproxy state=restarted
 
 - name: Restart firewalld
   become: true
   become_user: root
   become_method: sudo
-  service: name=firewalld state=restarted
+  ansible.builtin.service: name=firewalld state=restarted
 
 - name: Check if haproxy is running
   become: true
   become_user: root
   become_method: sudo
-  service:
+  ansible.builtin.service:
     name: haproxy
     state: started
 
@@ -183,7 +183,7 @@
   become: true
   become_user: root
   become_method: sudo
-  service:
+  ansible.builtin.service:
     name: firewalld
     state: started
 # - name: Report status of haproxy

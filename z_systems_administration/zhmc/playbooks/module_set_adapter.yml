@@ -13,7 +13,7 @@
 
     - name: "Ensure adapter {{ adapter_name }} has the desired description"
       delegate_to: localhost
-      zhmc_adapter:
+      ibm.ibm_zhmc.zhmc_adapter:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         cpc_name: "{{ cpc_name }}"
@@ -24,5 +24,5 @@
       register: result
 
     - name: Print the result
-      debug:
+      ansible.builtin.debug:
         var: result

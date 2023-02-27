@@ -52,7 +52,7 @@
     # ##########################################################################
     # remove a deprovisioned software service instance
     # ##########################################################################
-    - include_role:
+    - ansible.builtin.include_role:
         name: zmf_cpm_remove_software_instance
       vars:
         instance_info_json_path: "{{ instance_info_file }}"

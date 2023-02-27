@@ -13,7 +13,7 @@
 
     - name: "Ensure FCP storage group {{ stogroup_name }} exists"
       delegate_to: localhost
-      zhmc_storage_group:
+      ibm.ibm_zhmc.zhmc_storage_group:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         cpc_name: "{{ cpc_name }}"
@@ -29,5 +29,5 @@
       register: result
 
     - name: Print the result
-      debug:
+      ansible.builtin.debug:
         var: result

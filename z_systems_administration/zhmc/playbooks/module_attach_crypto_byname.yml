@@ -14,7 +14,7 @@
 
     - name: "Ensure domains 2..max on crypto adapters {{ crypto_adapters }} are attached to partition {{ partition_name }}"
       delegate_to: localhost
-      zhmc_crypto_attachment:
+      ibm.ibm_zhmc.zhmc_crypto_attachment:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         cpc_name: "{{ cpc_name }}"
@@ -27,5 +27,5 @@
       register: result
 
     - name: Print the result
-      debug:
+      ansible.builtin.debug:
         var: result

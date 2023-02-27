@@ -37,7 +37,7 @@
     # ##########################################################################
     - block:
         - name: Create a temporary data set
-          zos_data_set:
+          ibm.ibm_zos_core.zos_data_set:
             type: seq
             space_primary: 5
             space_secondary: 1
@@ -47,10 +47,10 @@
           failed_when: tmp_ds is not defined or tmp_ds.get('names', [])|length == 0
 
     - name: Get the result of temp data set creation
-      debug:
+      ansible.builtin.debug:
         var: tmp_ds
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.get('names')[0] }}"
 
     # ##########################################################################
@@ -64,7 +64,7 @@
     # +-------------------------------------------------------------------------
     - block:
         - name: Create a temporary data set
-          zos_data_set:
+          ibm.ibm_zos_core.zos_data_set:
             type: seq
             space_primary: 5
             space_secondary: 1
@@ -74,11 +74,11 @@
           failed_when: temp_data_set is not defined or temp_data_set.get('names', [])|length == 0
 
     - name: Get the result of temp data set creation
-      debug:
+      ansible.builtin.debug:
         var: temp_data_set
 
     - name: "Terse data set {{ tmp_data_set }} to {{ temp_data_set.get('names')[0] }}"
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         program_name: amaterse
         parm: "SPACK"
         dds:
@@ -103,11 +103,11 @@
       register: terse_response
 
     - name: Get the output of terse execution
-      debug:
+      ansible.builtin.debug:
         var: terse_response
 
     - name: "Fetch the tersed data set {{ temp_data_set.get('names')[0] }} to the local machine"
-      zos_fetch:
+      ibm.ibm_zos_core.zos_fetch:
         src: "{{ temp_data_set.get('names')[0] }}"
         dest: "{{ playbook_dir }}/"
         flat: true
@@ -115,17 +115,17 @@
       register: result
 
     - name: Result of fetching tersed PDS to the local machine
-      debug:
+      ansible.builtin.debug:
         var: result
 
     - name: "Remove the temporary data set {{ temp_data_set.get('names')[0] }}"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ temp_data_set.get('names')[0] }}"
         state: absent
       when: temp_data_set is defined and temp_data_set.names|length > 0
 
     - name: "Fetch {{ tmp_data_set }} to local machine"
-      zos_fetch:
+      ibm.ibm_zos_core.zos_fetch:
         src: "{{ tmp_data_set }}"
         dest: "{{ playbook_dir }}/"
         flat: true
@@ -135,10 +135,10 @@
       register: result
 
     - name: "Result of fetching {{ tmp_data_set }} to local machine"
-      debug:
+      ansible.builtin.debug:
         var: result
 
     - name: "Delete data set {{ tmp_data_set }}"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}"
         state: absent

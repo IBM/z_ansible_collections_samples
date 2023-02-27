@@ -15,7 +15,7 @@
     ring_name: "WEBSSL"
 
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Deleting keyring {{ring_name}}"

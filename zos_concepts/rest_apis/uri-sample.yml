@@ -23,14 +23,14 @@
 
   tasks:
     - name: Copy definition file over to target host
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/{{ ZOSMF_DEFINITION_FILE }}"
         dest: "{{ ZOSMF_DEST_FOLDER }}"
         force: true
         is_binary: true
 
     - name: Query list of available ZOSMF workflows
-      uri:
+      ansible.builtin.uri:
         url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows
         user: "{{ ZOSMF_USER }}"
         password: "{{ ZOSMF_PASS }}"
@@ -46,16 +46,16 @@
       register: zosmf_result
 
     - name: Initialize existing_workflow_key variable
-      set_fact:
+      ansible.builtin.set_fact:
         existing_workflow_key: ''
 
     - name: Assign existing_workflow_key variable if the 'sample_uri_workflow' has already been created
-      set_fact:
+      ansible.builtin.set_fact:
         existing_workflow_key: "{{ item.workflowKey if 'sample_uri_workflow' in item.workflowName else existing_workflow_key}}"
       loop: "{{ zosmf_result.json.workflows }}"
 
     - name: Create workflow if not already created
-      uri:
+      ansible.builtin.uri:
         url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows
         user: "{{ ZOSMF_USER }}"
         password: "{{ ZOSMF_PASS }}"
@@ -77,17 +77,17 @@
       when: existing_workflow_key == ''
 
     - name: Initialize sample_workflow_key variable for workflow created in previous step (used for starting and cancelling workflow)
-      set_fact:
+      ansible.builtin.set_fact:
         sample_workflow_key: ''
 
     - name: Set variable for sample workflow
-      set_fact:
+      ansible.builtin.set_fact:
         sample_workflow_key: "{{ zosmf_create_result.json.workflowKey }}"
       when: existing_workflow_key == ''
 
     # Initiates the Starter_Automated_Step in the sample_definition_file.xml
     - name: Start workflow after creation
-      uri:
+      ansible.builtin.uri:
         url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows/{{ sample_workflow_key }}/operations/start
         user: "{{ ZOSMF_USER }}"
         password: "{{ ZOSMF_PASS }}"
@@ -103,7 +103,7 @@
       when: sample_workflow_key != ''
 
     - name: Cancel workflow after starting
-      uri:
+      ansible.builtin.uri:
         url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows/{{ existing_workflow_key }}/operations/cancel
         user: "{{ ZOSMF_USER }}"
         password: "{{ ZOSMF_PASS }}"
@@ -119,7 +119,7 @@
       when: existing_workflow_key != ''
 
     - name: Delete workflow if already created
-      uri:
+      ansible.builtin.uri:
         url: https://{{ ZOSMF_HOST }}:{{ ZOSMF_PORT }}/zosmf/workflow/rest/{{ ZOSMF_VERSION }}/workflows/{{ existing_workflow_key }}
         user: "{{ ZOSMF_USER }}"
         password: "{{ ZOSMF_PASS }}"
@@ -135,6 +135,6 @@
       when: existing_workflow_key != ''
 
     - name: Remove definition file
-      file:
+      ansible.builtin.file:
         path: "{{ ZOSMF_DEST_FOLDER }}/{{ ZOSMF_DEFINITION_FILE }}"
         state: absent

@@ -9,9 +9,9 @@
       block:
 
         # Authenticate user
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_login
 
         # Get the list of applications
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_get_list_apps

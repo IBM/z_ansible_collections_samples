@@ -13,7 +13,7 @@
 
     - name: "Ensure domains 2..max on 2 arbitrary adapters are attached to partition {{ partition_name }}"
       delegate_to: localhost
-      zhmc_crypto_attachment:
+      ibm.ibm_zhmc.zhmc_crypto_attachment:
         hmc_host: "{{ hmc_host }}"
         hmc_auth: "{{ hmc_auth }}"
         cpc_name: "{{ cpc_name }}"
@@ -26,5 +26,5 @@
       register: result
 
     - name: Print the result‚
-      debug:
+      ansible.builtin.debug:
         var: result

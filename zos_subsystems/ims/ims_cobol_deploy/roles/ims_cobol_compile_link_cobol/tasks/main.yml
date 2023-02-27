@@ -2,7 +2,7 @@
 # tasks file for ims_cobol_compile_link_cobol
 # accepting the list to handle multiple COBOL programs
 - name: Compile and link cobol programs and database load programs
-  shell: export SYSLMOD="{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB";
+  ansible.builtin.shell: export SYSLMOD="{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB";
          export RESLIB="{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL";
          export SYSIN="{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMSRC({{item | regex_search(regexp)}})";
          export STEPLIB="{{ COBOL_COMP_LIB_HLQ }}.SIGYCOMP";

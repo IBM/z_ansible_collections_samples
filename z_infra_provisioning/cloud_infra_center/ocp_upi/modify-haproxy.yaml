@@ -27,52 +27,52 @@
 # - Change Ansible playbook name
 
 - name: "Get worker node IP"
-  set_fact:
+  ansible.builtin.set_fact:
     haproxy_new_worker_index: "{{ worker_index }}"
     cluster_domain_name: "{{ cluster_domain_name }}"
 
 - name: Check new worker-http exist in HAProxy
-  shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index }}" | wc -l
+  ansible.builtin.shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index }}" | wc -l
   register: exist_worker_count
   check_mode: false
   ignore_errors: true
 
 - name: "Get the line number for backend http"
-  shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-http' |awk '{print$1}'
+  ansible.builtin.shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-http' |awk '{print$1}'
   register: exist_new_worker_http
 
 - name: "Get the line number for backend https"
-  shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-https' |awk '{print$1}'
+  ansible.builtin.shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-https' |awk '{print$1}'
   register: exist_new_worker_https
 
 - name: "Increment backend http"
-  set_fact: new_worker_http={{ exist_new_worker_http.stdout|int + 2 }}
+  ansible.builtin.set_fact: new_worker_http={{ exist_new_worker_http.stdout|int + 2 }}
 
 - name: "Increment backend https"
-  set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
+  ansible.builtin.set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
 
 - name: Add new worker http domain into dns
-  shell:
+  ansible.builtin.shell:
     cmd: sed -i '{{ new_worker_http }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:80 check'  /etc/haproxy/haproxy.cfg
   when: exist_worker_count.stdout == "0"
 
 - name: Add new worker https domain into dns
-  shell:
+  ansible.builtin.shell:
     cmd: sed -i '{{ new_worker_https }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:443 check'  /etc/haproxy/haproxy.cfg
   when: exist_worker_count.stdout == "0"
 
 - name: Check the existing HAProxy configuration
-  fail:
+  ansible.builtin.fail:
     msg: "The new worker configuration exists in haproxy.cfg, skip this playbook."
   failed_when: exist_worker_count.stdout != "0"
 
 - name: Restart HAProxy.service
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     state: restarted
 
 - name: Check if HAProxy is running
-  service:
+  ansible.builtin.service:
     name: haproxy
     state: started
   notify:

@@ -57,7 +57,7 @@
     # ##########################################################################
 
     - name: Create ZFS data sets
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ item | upper }}"
         type: zfs
         space_primary: 1
@@ -66,22 +66,22 @@
       loop: "{{ zfs_data_sets }}"
 
     - name: Create mount dirs on z/OS USS
-      file:
+      ansible.builtin.file:
         path: "{{ mount_point }}/{{ item }}"
         state: directory
       loop: "{{ mount_points }}"
 
     - name: Mount ZFS data sets
-      command: /usr/sbin/mount -t zfs -f {{ item.0 | upper }} {{ mount_point }}/{{ item.1 }}
+      ansible.builtin.command: /usr/sbin/mount -t zfs -f {{ item.0 | upper }} {{ mount_point }}/{{ item.1 }}
       loop: "{{ zfs_data_sets | zip( mount_points ) | list }}"
 
     - name: Confirm mount points
-      command: "df /{{ mount_point }}/{{ item }}"
+      ansible.builtin.command: "df /{{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output
 
     - name: Echo df output to confirm mount points
-      debug:
+      ansible.builtin.debug:
         msg: "{{ df_output.results | map(attribute='stdout_lines') | flatten }}"
 
     # ##########################################################################
@@ -91,53 +91,53 @@
     # ##########################################################################
 
     - name: Write random bytes to ZFS aggregates
-      shell: head -c "{{250000*(1+index) }}" /dev/urandom > {{ mount_point }}/{{item}}/test.txt
+      ansible.builtin.shell: head -c "{{250000*(1+index) }}" /dev/urandom > {{ mount_point }}/{{item}}/test.txt
       loop: "{{ mount_points }}"
       loop_control:
         index_var: index
 
     - name: Get aggrinfo report
-      command: zfsadm aggrinfo {{ item | upper }}
+      ansible.builtin.command: zfsadm aggrinfo {{ item | upper }}
       loop: "{{ zfs_data_sets }}"
       register: aggrinfo_output_before
 
     - name: Get percentage use BEFORE growth
-      shell: "df -kP {{ mount_point }}/{{ item }}"
+      ansible.builtin.shell: "df -kP {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output_before
 
     - name: Echo aggrinfo and percent-use BEFORE growth
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ aggrinfo_output_before.results |  map(attribute='stdout_lines') | flatten }}"
           - "{{ df_output_before.results | map(attribute='stdout_lines') | flatten }}"
 
     - name: Scan df_output to build list of data set names and utilization percentages
-      set_fact:
+      ansible.builtin.set_fact:
         dsn_per_util_list: "{{ df_output_before.results | map(attribute='stdout') | map('regex_search', '\\n([a-zA-Z0-9\\.]+).*(\\b[0-9]+)%', ('\\1'), ('\\2'))  | list }}"
 
     - name: Build grow_list
-      set_fact:
+      ansible.builtin.set_fact:
         grow_list: "{{ grow_list | default([]) + [item[0]] }}"
       when: "{{ item[1] | int }} > {{ threshold_limit }}"
       loop: "{{ dsn_per_util_list }}"
 
     - name: Echo grow_list
-      debug:
+      ansible.builtin.debug:
         var: grow_list
 
     - name: Grow ZFS aggregate
-      command: "zfsadm grow -aggregate {{ item }} -size {{ aggr_growth_size }}"
+      ansible.builtin.command: "zfsadm grow -aggregate {{ item }} -size {{ aggr_growth_size }}"
       loop: "{{ grow_list }}"
       register: grow_output
 
     - name: Get percentage use AFTER growth
-      shell: "df -kP {{ mount_point }}/{{ item }}"
+      ansible.builtin.shell: "df -kP {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output_after
 
     - name: Echo 'zfsadm grow' output and percent-use AFTER growth.
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ grow_output.results |  map(attribute='stdout_lines') | flatten }}"
           - "{{ df_output_after.results | map(attribute='stdout_lines') | flatten }}"
@@ -147,11 +147,11 @@
     # ##########################################################################
 
     - name: Unmount ZFS data sets
-      command: "/usr/sbin/unmount {{ mount_point }}/{{ item }}"
+      ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
 
     - name: Delete ZFS data sets
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ item }}"
         state: absent
       loop: "{{ zfs_data_sets }}"

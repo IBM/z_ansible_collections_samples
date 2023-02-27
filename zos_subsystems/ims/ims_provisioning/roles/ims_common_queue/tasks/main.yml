@@ -7,7 +7,7 @@
 
   block:
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         ip_config: '{{ role_path }}/templates/ip_config.txt'
         sl_config: '{{ role_path }}/templates/sl_config.txt'
         sg_config: '{{ role_path }}/templates/sg_config.txt'
@@ -15,7 +15,7 @@
 
     # AL: Replace JCL with zos_mvs_raw
     - name: Copy input to member CQSIP000
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -35,7 +35,7 @@
       when: cqs == "config"
 
     - name: Copy input to member CQSSL000
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -55,7 +55,7 @@
       when: cqs == "config"
 
     - name: Copy input to member CQSSG000
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -75,7 +75,7 @@
       when: cqs == "config"
 
     - name: Copy input to member DFSSQ000
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -96,7 +96,7 @@
 
     # Query CQS status
     - name: Query CQS status
-      ims_command:
+      ibm.ibm_zos_ims.ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(CQS) SHOW(STATUS)
         plex: '{{ DFS_IMSPlex }}'
       when: cqs == "query"

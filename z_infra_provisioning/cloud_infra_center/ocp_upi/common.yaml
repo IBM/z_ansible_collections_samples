@@ -15,12 +15,12 @@
 # =================================================================
 
 - name: 'Export infra ID'
-  shell:
+  ansible.builtin.shell:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
 - name: 'Compute resource names'
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_id_tag: "openshiftClusterID={{ infra_id.stdout_lines[0] }}"
     primary_cluster_network_tag: "{{ infra_id.stdout_lines[0] }}-primaryClusterNetwork"
     os_network: "{{ infra_id.stdout_lines[0] }}-network"

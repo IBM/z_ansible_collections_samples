@@ -13,7 +13,7 @@
 
     - name: "Get facts for HMC user {{ user_name }}"
       delegate_to: localhost
-      zhmc_user:
+      ibm.ibm_zhmc.zhmc_user:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         name: "{{ user_name }}"
@@ -22,5 +22,5 @@
       register: result
 
     - name: Print the result
-      debug:
+      ansible.builtin.debug:
         var: result

@@ -47,12 +47,12 @@
     ############################################################################
 
     - name: Checking if the directory "{{repo_root_dest}}/{{repo_name}}" exists.
-      stat:
+      ansible.builtin.stat:
         path: "{{repo_root_dest}}/{{repo_name}}"
       register: directory_exists
 
     - name: Evaluating the directory {{repo_root_dest}}/{{repo_name}}
-      debug:
+      ansible.builtin.debug:
         msg:
           "{% if directory_exists.stat.exists and directory_exists.stat.isdir %}
           Found directory {{repo_root_dest}}/{{repo_name}}, will
@@ -70,7 +70,7 @@
     ############################################################################
     - name: Testing if directory {{repo_root_dest}}/{{repo_name}} is Git
         managed.
-      shell: |
+      ansible.builtin.shell: |
         cd {{repo_root_dest}}/{{repo_name}}
         git rev-parse --is-inside-work-tree
       register: is_git_managed
@@ -84,7 +84,7 @@
       # ------------------------------------------------------------------------
     - name: Evaluating if directory {{repo_root_dest}}/{{repo_name}} is Git
         managed.
-      assert:
+      ansible.builtin.assert:
         that:
           - is_git_managed.stdout_lines
         success_msg: "Determined directory {{repo_root_dest}}/{{repo_name}} is
@@ -102,18 +102,18 @@
       # where is_git_managed.stdout_lines is True
       # ------------------------------------------------------------------------
     - name: Update the existing Git managed repository {{repo_root_dest}}/{{repo_name}}
-      shell: |
+      ansible.builtin.shell: |
         git pull
       register: git_pull_result
       ignore_errors: false
       when: is_git_managed is defined and is_git_managed.stdout is defined and is_git_managed.stdout
 
     - name: Does the directory "{{repo_root_dest}}/{{repo_name}}" already exist?
-      debug:
+      ansible.builtin.debug:
         msg: "{{ git_pull_result }}"
 
     - name: Result of Git clone
-      debug:
+      ansible.builtin.debug:
         msg:
           "{% if git_pull_result.changed and git_pull_result.stdout == 'Already up to date.' %}
           Git repository is Already up to date, no changes pulled.
@@ -128,7 +128,7 @@
     ############################################################################
     - name: "Clone the repository
         https://github.com/{{ organization }}/{{ repo_name }}.git"
-      git: repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
+      ansible.builtin.git: repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
         dest="{{repo_root_dest}}/{{repo_name}}"
         accept_hostkey=yes
         force=yes
@@ -138,6 +138,6 @@
 
     - name: "Results from cloning the Git repository
         https://github.com/{{ organization }}/{{ repo_name }}.git"
-      debug:
+      ansible.builtin.debug:
         msg: "{{git_clone_result}}"
       when: git_clone_result.changed

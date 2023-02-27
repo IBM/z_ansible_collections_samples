@@ -14,12 +14,12 @@
     plex: "{{ IMSPLEX }}"
     route: "{{ ROUTE }}"
 
-- include_role:
+- ansible.builtin.include_role:
     name: ims_cobol_stop_mpp_region
   vars:
     mpp: true
 
-- include_role:
+- ansible.builtin.include_role:
     name: ims_cobol_define_mpp_region
   vars:
     mpp: true

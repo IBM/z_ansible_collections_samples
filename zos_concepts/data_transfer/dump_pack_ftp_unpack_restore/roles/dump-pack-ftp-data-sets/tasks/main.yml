@@ -3,7 +3,7 @@
 
 # tasks file for dump-pack-ftp-data-sets
 - name: Raise error if required variables are not set
-  fail:
+  ansible.builtin.fail:
     msg: Missing at least one required variable.
   failed_when: data_sets_to_dump is not defined or
     data_sets_to_dump|length == 0 or
@@ -15,7 +15,7 @@
     target_password == ""
 
 - name: Estimate the total used size of all provided data sets
-  include_role:
+  ansible.builtin.include_role:
     name: get-estimated-size-of-data-sets
   vars:
     data_sets: "{{ data_sets_to_dump }}"
@@ -54,7 +54,7 @@
           failed_when: dump_response.ret_code.code > 0
       always:
         - name: Get the output of dump execution
-          debug:
+          ansible.builtin.debug:
             var: dump_response
           when: dump_response is defined
 
@@ -91,12 +91,12 @@
 
       always:
         - name: Get the output of terse execution
-          debug:
+          ansible.builtin.debug:
             var: terse_response
           when: terse_response is defined
 
     - name: Determine name to use for target data set
-      set_fact:
+      ansible.builtin.set_fact:
         target_data_set: "{{ target_data_set if target_data_set is defined and target_data_set else terse_data_set_final.get('names')[0] }}"
       run_once: true
 
@@ -116,7 +116,7 @@
           register: ftp_response
           failed_when: ftp_response.ret_code.code > 0
       always:
-        - debug:
+        - ansible.builtin.debug:
             var: ftp_response
           when: ftp_response is defined
   always:

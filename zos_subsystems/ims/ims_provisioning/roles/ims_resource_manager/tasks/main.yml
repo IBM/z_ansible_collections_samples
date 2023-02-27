@@ -8,13 +8,13 @@
   block:
 
     # Specify configuration files
-    - set_fact:
+    - ansible.builtin.set_fact:
         bpe_rm_config: '{{ role_path }}/templates/bpe_rm_config.txt'
         ri_config: '{{ role_path }}/templates/ri_config.txt'
         rm_config: '{{ role_path }}/templates/rm_config.txt'
 
     - name: Define BPECONFG
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -34,7 +34,7 @@
       when: rm == "config"
 
     - name: Add CSLRI000 member
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -54,7 +54,7 @@
       when: rm == "config"
 
     - name: Add RM member to PROCLIB
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -75,21 +75,21 @@
 
     # Start RM
     - name: Start RM
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 's {{ DFS_IMS_SSID }}RM'
         verbose: true
       when: rm == "start"
 
     # Stop RM
     - name: Stop RM
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}RM'
         verbose: true
       when: rm == "stop"
 
     # Query RM status
     - name: Query RM status
-      ims_command:
+      ibm.ibm_zos_ims.ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(RM) SHOW(STATUS)
         plex: '{{ DFS_IMSPlex }}'
       when: rm == "query"

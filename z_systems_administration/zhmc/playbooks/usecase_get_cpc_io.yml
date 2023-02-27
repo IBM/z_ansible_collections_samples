@@ -11,7 +11,7 @@
 
     - name: "Get facts for CPC {{ cpc_name }}"
       delegate_to: localhost
-      zhmc_cpc:
+      ibm.ibm_zhmc.zhmc_cpc:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         name: "{{ cpc_name }}"
@@ -23,7 +23,7 @@
 
     - name: "Get facts for all adapters of CPC {{ cpc_name }}"
       delegate_to: localhost
-      zhmc_adapter:
+      ibm.ibm_zhmc.zhmc_adapter:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         cpc_name: "{{ cpc_name }}"
@@ -40,7 +40,7 @@
 
     - name: "Get facts for all partitions of CPC {{ cpc_name }}"
       delegate_to: localhost
-      zhmc_partition:
+      ibm.ibm_zhmc.zhmc_partition:
         hmc_host: "{{ ansible_host }}"
         hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
         cpc_name: "{{ cpc_name }}"
@@ -58,7 +58,7 @@
     #     var: partitions_out
 
     - name: "Creating output file"
-      template:
+      ansible.builtin.template:
         src: usecase_get_cpc_io.md.j2
         dest: "cpc_io_{{ cpc_name }}_{{ inventory_hostname }}.md"
         mode: '0755'

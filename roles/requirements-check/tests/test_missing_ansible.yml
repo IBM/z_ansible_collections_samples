@@ -8,10 +8,10 @@
 
   tasks:
     - name: Negative test that expects to fail on a missng Ansible version 200.0.0
-      include_vars: test_missing_ansible_version.txt
+      ansible.builtin.include_vars: test_missing_ansible_version.txt
 
     - name: Display the registered collections and properites in `registry.yml`.
-      include_role:
+      ansible.builtin.include_role:
         name: ../../requirements-check
 ################################################################################
 # Run command: `ansible-playbook -i inventory.yml roles/requirements-check/tests/test_missing_ansible.yml`

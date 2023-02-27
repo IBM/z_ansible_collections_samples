@@ -13,13 +13,13 @@
 
   tasks:
     - block:
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_operator_cmd
           vars:
             task_description: "Start Health Check"
             command: "S HZSPROC"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: "Set up profiles"
@@ -28,7 +28,7 @@
               - RDEFINE XFACILIT HZS.{{system_name}}.*.*.RUN UACC(NONE)
               - RDEFINE XFACILIT HZS.{{system_name}}.*.*.QUERY UACC(NONE)
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: "Permit access to {{ user_id }}"
@@ -43,7 +43,7 @@
                 PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
                   ID({{ user_id }}) ACCESS(READ)
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: "Activate and refresh RACF profile "

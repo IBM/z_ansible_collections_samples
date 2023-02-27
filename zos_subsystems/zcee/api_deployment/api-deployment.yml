@@ -10,23 +10,23 @@
       block:
 
         # Copies source code from remote repository onto target host.
-        - include_role:
+        - ansible.builtin.include_role:
             name: git_clone_private_repo
 
         # Prepares target host environment to preform the following zcee_generate_* roles.
-        - include_role:
+        - ansible.builtin.include_role:
             name: prep_zconbt
 
         # Loops through project directory to locate all properties files in order to generate multiple service archives.
         - name: Get list of service project directory
-          find:
+          ansible.builtin.find:
             paths: ["{{ SERVICE_ROOT_DIR }}"]
             patterns: '*.properties'
             recurse: true
           register: service_file_list
 
         # Uses the service archive list in the previous step to generate multiple service archives.
-        - include_role:
+        - ansible.builtin.include_role:
             name: zcee_generate_sar
           vars:
             project_directory: "{{ item.path | dirname }}"
@@ -35,14 +35,14 @@
             - "{{ service_file_list.files }}"
 
         # Generate the API archive file
-        - include_role:
+        - ansible.builtin.include_role:
             name: zcee_generate_aar
           vars:
             project_directory: "{{ API_PROJ_DIR }}"
             archive_file_name: "{{ API_ARCHIVE_FILE }}"
 
         # Generate the API Requester Archive
-        - include_role:
+        - ansible.builtin.include_role:
             name: zcee_generate_ara
           vars:
             properties_file: "{{ ARA_PROP_FILE }}"
@@ -50,7 +50,7 @@
 
         # Begin the process of deploying the archives by placing them into the drop-in folder.
         - name: Copy over archive files to proper folders
-          shell: |
+          ansible.builtin.shell: |
             cp {{ ARCHIVE_PATH }}/*.sar {{ SERVICE_DEPLOY_PATH }}
             cp {{ ARCHIVE_PATH }}/*.aar {{ API_DEPLOY_PATH }}
             chmod 777 {{ SERVICE_DEPLOY_PATH }}/*
@@ -58,7 +58,7 @@
 
         # Make an HTTP request to the z/OS Connect EE Server instance to retrieve all available APIs.
         - name: Get available APIs
-          uri:
+          ansible.builtin.uri:
             url: "{{ ZCEE_SERVER }}:{{ ZCEE_PORT }}/zosConnect/apis/"
             validate_certs: false
             user: "{{ USERNAME }}"
@@ -70,6 +70,6 @@
 
         # Verify the API was successfully deployed.
         - name: Verify response
-          fail:
+          ansible.builtin.fail:
             msg: The API did not successfully deploy
           when: api_response.json.apis[0].name != 'myapiname'  # Replace 'myapiname' with the name of your API

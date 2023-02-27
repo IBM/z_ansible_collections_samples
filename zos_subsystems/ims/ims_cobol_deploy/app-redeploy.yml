@@ -13,54 +13,54 @@
     # Rebuild and update ACBLIB (run all gens) if requested.
     - name: Rebuild and update ACBLIB.
       block:
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_run_gens
           vars:
             dbd_gen: true
             psb_gen: true
             acb_gen: true
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_check_acblib
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_copy_acblib_to_inactive_acb
       when: UPDATE_ACB
 
     # Compile and link cobol apps
-    - include_role:
+    - ansible.builtin.include_role:
         name: ims_cobol_compile_link_cobol
 
     # Create dynamic allocation
-    - include_role:
+    - ansible.builtin.include_role:
         name: ims_cobol_create_dynamic_alloc
 
     # Reload the data if requested
     - name: Reload the data.
       block:
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_stop_ims_databases
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_load_accounts
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_load_customer_accounts
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_load_customer_data
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_load_history
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_load_tsta
 
         # Restart IMS databases
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_define_ims_databases
       when: UPDATE_DATA
 
     # Refresh IMS application resources
-    - include_role:
+    - ansible.builtin.include_role:
         name: ims_cobol_refresh_ims_resources

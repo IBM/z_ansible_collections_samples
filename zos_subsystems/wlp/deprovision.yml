@@ -8,13 +8,13 @@
   tasks:
 
     - name: Stop the server
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "STOP {{SERVER_PROC}}"
       tags: stop
       register: stop_result
 
     - name: Response from stopping server process
-      debug:
+      ansible.builtin.debug:
         msg: "{{stop_result}}"
 
     # #Stop the server -- USS shell example -- if you start the server in the shell, must also stop the server in the shell
@@ -24,22 +24,22 @@
 
     # Stop the angel process
     - name: Stop angel
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "STOP {{ANGEL_PROC}}"
       tags: stop_angel # if tags are used while running the playbook, it has precedence over the when conditional
       when: ANGEL | bool # assumes if you enable authorized services, you would want to stop the angel process
       register: angel_stop_result
 
     - name: Response from stopping angel process
-      debug:
+      ansible.builtin.debug:
         msg: "{{angel_stop_result}}"
 
     # Remove server instance by deleting directory
     - name: Delete the server directory
-      shell: 'rm -rf {{liberty_server_path}}'
+      ansible.builtin.shell: 'rm -rf {{liberty_server_path}}'
 
     - name: unmount zFS file
-      shell: "/usr/sbin/unmount {{environment_vars.WLP_USER_DIR}}"
+      ansible.builtin.shell: "/usr/sbin/unmount {{environment_vars.WLP_USER_DIR}}"
 
     - name: delete zFS file
       ibm.ibm_zos_core.zos_data_set:
@@ -48,13 +48,13 @@
 
     # Remove JCL Procedures
     - name: Remove JCL server procedure from an existing procedure library
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{PROC_LIB}}({{SERVER_PROC}})"
         state: absent
         type: MEMBER
 
     - name: Remove JCL angel procedure from an existing procedure library
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{PROC_LIB}}({{ANGEL_PROC}})"
         state: absent
         type: MEMBER

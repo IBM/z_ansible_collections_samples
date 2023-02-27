@@ -9,12 +9,12 @@
       block:
 
         # Authenticate user
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_login
 
         # Get the application id
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_put_infra_discovery
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: db2_post_graphql_discovery

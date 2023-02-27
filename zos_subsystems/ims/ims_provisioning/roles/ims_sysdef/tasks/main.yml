@@ -7,10 +7,10 @@
 
   block:
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSGNPRE.j2"
@@ -26,10 +26,10 @@
       when: preprocess
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFS4STG1.j2"
@@ -46,10 +46,10 @@
       when: stage1
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFS4STG2.j2"

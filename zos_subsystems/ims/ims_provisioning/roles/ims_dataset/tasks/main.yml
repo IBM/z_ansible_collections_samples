@@ -7,7 +7,7 @@
 
   block:
     - name: Allocate work dataset zCloud IMS
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL"
         state: present
         replace: true
@@ -23,10 +23,10 @@
       when: work_dataset == "allocate"
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSALSY2.j2"
@@ -40,10 +40,10 @@
       when: sysdef_datasets == "allocate"
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSALSY1.j2"
@@ -57,11 +57,11 @@
       when: runtime_datasets == "allocate"
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
         # Send the template over
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSDYNAL.j2"

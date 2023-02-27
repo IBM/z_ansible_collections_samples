@@ -8,10 +8,10 @@
 # =================================================================
 
 ---
-- import_playbook: configure-compute-nodes-kvm.yaml
+- ansible.builtin.import_playbook: configure-compute-nodes-kvm.yaml
   when: vm_type == "kvm"
-- import_playbook: configure-compute-nodes-zvm.yaml
+- ansible.builtin.import_playbook: configure-compute-nodes-zvm.yaml
   when: vm_type == "zvm"
 
-- import_playbook: approve.yaml
-- import_playbook: wait-for-install-complete.yaml
+- ansible.builtin.import_playbook: approve.yaml
+- ansible.builtin.import_playbook: wait-for-install-complete.yaml

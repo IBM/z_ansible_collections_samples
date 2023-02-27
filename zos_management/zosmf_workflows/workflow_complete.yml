@@ -70,7 +70,7 @@
     # ##########################################################################
     # Complete a z/OSMF workflow forcibly or idempotently
     # ##########################################################################
-    - include_role:
+    - ansible.builtin.include_role:
         name: zmf_workflow_complete
       vars:
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"

@@ -19,7 +19,7 @@
     cert_label: "ANDY SITE"
 
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Displaying cert {{cert_label}}"
@@ -27,7 +27,7 @@
           - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
       when: cert_type == 'USER'
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Displaying cert {{cert_label}}"
@@ -35,7 +35,7 @@
           - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
       when: cert_type == 'CERTAUTH'
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Displaying cert {{cert_label}}"

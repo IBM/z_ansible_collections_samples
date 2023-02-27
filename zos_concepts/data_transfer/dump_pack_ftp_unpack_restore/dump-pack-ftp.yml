@@ -15,6 +15,6 @@
 
   tasks:
     - name: Dump, pack, and transfer data sets
-      include_role:
+      ansible.builtin.include_role:
         name: dump-pack-ftp-data-sets
         public: true

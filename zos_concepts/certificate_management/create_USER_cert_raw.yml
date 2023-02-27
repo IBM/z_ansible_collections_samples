@@ -19,7 +19,7 @@
     check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
 
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Clean up certs and keyring"
@@ -29,7 +29,7 @@
           - >
             RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create new self-signed USER cert and connect to keyring"
@@ -47,7 +47,7 @@
             RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
       when: sign_label == ' ' and not expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create new local-CA-signed USER cert and connect to keyring"
@@ -66,7 +66,7 @@
             RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
       when: not sign_label == ' ' and not expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create new self-signed USER cert and connect to keyring"
@@ -83,7 +83,7 @@
             RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
       when: sign_label == ' ' and expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create new local-CA-signed USER cert and connect to keyring"
@@ -101,7 +101,7 @@
             RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
       when: not sign_label == ' ' and expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: "Run Health Check for {{check_name}}"

@@ -8,7 +8,7 @@
   block:
 
     - name: Prep DBDGEN step 1
-      ims_dbd_gen:
+      ibm.ibm_zos_ims.ims_dbd_gen:
         src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
         location: DATA_SET
         member_list:
@@ -42,7 +42,7 @@
 
 
     - name: Prep PSB step 2
-      ims_psb_gen:
+      ibm.ibm_zos_ims.ims_psb_gen:
         src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
         location: DATA_SET
         member_list:
@@ -108,7 +108,7 @@
 
 
     - name: Prep ACBLIB step 3
-      ims_acb_gen:
+      ibm.ibm_zos_ims.ims_acb_gen:
         command_input: BUILD
         compression: POSTCOMP
         psb_name: ALL

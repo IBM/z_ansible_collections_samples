@@ -27,39 +27,39 @@
 
   tasks:
     - name: Create temporary directory to store bank files
-      tempfile:
+      ansible.builtin.tempfile:
         state: directory
       register: playbook_tmp_dir
 
     - block:
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_operator_cmd
           vars:
             task_description: 'Run Health Checker'
             command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: print_hc_buffer
           vars:
             hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
         - name: search for {{cert_label}} in report
-          set_fact:
+          ansible.builtin.set_fact:
             cert_found: true
           with_items: "{{hc_job_output.jobs.0.ddnames}}"
           when: item.content is search("{{cert_label}}")
 
-        - debug: msg="{{cert_label}} expiring - {{cert_found}}"
+        - ansible.builtin.debug: msg="{{cert_label}} expiring - {{cert_found}}"
 
-        - command: "date '+%b%d%y'"
+        - ansible.builtin.command: "date '+%b%d%y'"
           register: date_result
           when: cert_found
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             today: "{{ date_result.stdout }}"
           when: cert_found
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Back up current certificate'
@@ -71,7 +71,7 @@
                   RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{cert_type}}.BACKUP.{{today}}')
           when: cert_found and not cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
 
             name: issue_racf_cmd
           vars:
@@ -85,7 +85,7 @@
                       ID({{owner_id}})
           when: cert_found and cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Rekey and Generate new cert request for {{cert_type}}'
@@ -102,7 +102,7 @@
                   RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
           when: cert_found and not cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Rekey and Generate new cert request for {{cert_type}}'
@@ -120,7 +120,7 @@
                   RACDCERT ID({{owner_id}}) DELETE(LABEL('{{ cert_label }}'))
           when: cert_found and cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Install and connect local cert for {{cert_type}}'
@@ -138,7 +138,7 @@
                      RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and not sign_label == ' ' and not cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Install and connect local cert for {{cert_type}}'
@@ -156,7 +156,7 @@
                      RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and not sign_label == ' ' and cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Install and connect self-signed cert for {{cert_type}}'
@@ -174,7 +174,7 @@
                      RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and sign_label == ' ' and not cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_racf_cmd
           vars:
             task_description: 'Install and connect self-signed cert for {{cert_type}}'
@@ -192,7 +192,7 @@
                      RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: cert_found and sign_label == ' ' and cert_type == 'USER'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_operator_cmd
           vars:
             task_description: 'Run Health Check'
@@ -201,7 +201,7 @@
 
       always:
         - name: Delete the temporary directory
-          file:
+          ansible.builtin.file:
             path: "{{ playbook_tmp_dir.path }}"
             state: absent
       vars:

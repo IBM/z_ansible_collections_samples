@@ -22,8 +22,6 @@ skip_list:
   - command-instead-of-shell
   - deprecated-command-syntax
   - deprecated-local-action
-  - fqcn[action-core]
-  - fqcn[action]
   - fqcn[keyword]
   - ignore-errors
   - jinja[invalid]

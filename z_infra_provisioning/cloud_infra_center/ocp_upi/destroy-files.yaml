@@ -25,71 +25,71 @@
 
   tasks:
     - name: "Import common yaml"
-      import_tasks: common.yaml
+      ansible.builtin.import_tasks: common.yaml
 
-    - find:
+    - ansible.builtin.find:
         paths: .
         patterns: "*.json"
         excludes:
           - "metadata.json"
       register: find_results
 
-    - file:
+    - ansible.builtin.file:
         path: "{{ item['path'] }}"
         state: absent
       with_items: "{{ find_results['files'] }}"
 
-    - find:
+    - ansible.builtin.find:
         paths: .
         patterns: "*.ign"
       register: find_results_ign
 
-    - file:
+    - ansible.builtin.file:
         path: "{{ item['path'] }}"
         state: absent
       with_items: "{{ find_results_ign['files'] }}"
 
     - name: Remove the auth directory
-      file:
+      ansible.builtin.file:
         path: auth/
         state: absent
 
     - name: "Remove the file of compute server names"
-      file:
+      ansible.builtin.file:
         state: absent
         path: .compute-nodes-{{ infra_id.stdout_lines[0] }}.json
 
     - name: "Remove the hidden openshift install state json files"
-      file:
+      ansible.builtin.file:
         state: absent
         path: .openshift_install_state.json
 
     - name: "Remove the hidden openshift_install.log files"
-      file:
+      ansible.builtin.file:
         state: absent
         path: .openshift_install.log
 
     - name: "Remove the hidden sha256sum_remote.txt files"
-      file:
+      ansible.builtin.file:
         state: absent
         path: .sha256sum_remote.txt
 
     - name: "Remove the hidden sha256sum_local.txt files"
-      file:
+      ansible.builtin.file:
         state: absent
         path: .sha256sum_local.txt
 
     - name: "Remove the metadata.json files"
-      file:
+      ansible.builtin.file:
         state: absent
         path: metadata.json
 
     - name: "List bootstrap ignition image"
-      command:
+      ansible.builtin.command:
         cmd: "openstack image list --tag {{ cluster_id_tag }} -f value -c ID"
       register: bootstrap_images
 
     - name: "Remove the bootstrap ignition"
-      shell:
+      ansible.builtin.shell:
         cmd: "openstack image delete {{ item.1 }}"
       with_indexed_items: "{{ bootstrap_images.stdout_lines }}"

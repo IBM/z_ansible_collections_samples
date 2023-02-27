@@ -22,6 +22,6 @@
       default: "{{ lookup('env', 'password_value') }}"
       private: true
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: sa_delete_dynamic_resource
 ...

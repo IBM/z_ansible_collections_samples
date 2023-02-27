@@ -31,16 +31,16 @@
 
 - block:
     - name: Create temporary file
-      tempfile:
+      ansible.builtin.tempfile:
         state: file
       register: tempfile_1
       delegate_to: localhost
 
-    - debug:
+    - ansible.builtin.debug:
         var: item
 
     - name: Write to temporary file
-      template:
+      ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/test-vars.j2"
         dest: "{{ tempfile_1.path }}"
       vars:
@@ -51,7 +51,7 @@
       delegate_to: localhost
 
     - name: Load variables from temp file
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ tempfile_1.path }}"
 
     - name: Attempt to run zos_data_set using chosen dependency paths
@@ -64,13 +64,13 @@
       failed_when: false
 
     - name: Set ZOAU installation if completed successfully
-      set_fact:
+      ansible.builtin.set_fact:
         chosen_zoau: "{{ item }}"
       when: zos_data_set_response is defined and zos_data_set_response.get('names', [])|length > 0
 
   always:
     - name: Remove temporary file
-      file:
+      ansible.builtin.file:
         path: "{{ tempfile_1.path }}"
         state: absent
       delegate_to: localhost

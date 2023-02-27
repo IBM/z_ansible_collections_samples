@@ -115,7 +115,7 @@
     # ##########################################################################
     # Create a z/OS software instance in CP&M registry
     # ##########################################################################
-    - include_role:
+    - ansible.builtin.include_role:
         name: zmf_cpm_create_software_instance
       vars:
         system_name: "<fill-me-system-name>"

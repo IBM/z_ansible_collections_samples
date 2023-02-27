@@ -31,7 +31,7 @@
     # master_catalog facts.
     # ##########################################################################
     - name: Collect z/OS facts on master_catalog.
-      zos_gather_facts:
+      ibm.ibm_zos_core.zos_gather_facts:
         gather_subset:
           - "ipl"
         filter:
@@ -51,7 +51,7 @@
       # 'iodf' subset.
       # ##########################################################################
     - name: Gather additional z/OS facts.
-      zos_gather_facts:
+      ibm.ibm_zos_core.zos_gather_facts:
         gather_subset:
           - "cpu"
           - "iodf"

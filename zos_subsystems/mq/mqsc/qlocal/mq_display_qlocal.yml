@@ -10,17 +10,17 @@
 
   tasks:
     - name: Issue display command
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "{{ mq_cpf }} DIS QLOCAL( {{ mq_queue_name }} )"
         verbose: false
       register: display_output
 
     - name: Output response from display command
-      debug:
+      ansible.builtin.debug:
         msg: "{{ display_output.content }}"
 
     - name: Check the display worked
-      fail:
+      ansible.builtin.fail:
         msg: Display of queue failed
       when: (display_output.content is not search("CSQ9022I")) or
             (display_output.content is search("CSQM297I"))

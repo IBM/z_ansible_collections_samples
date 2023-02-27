@@ -74,7 +74,7 @@
     # ##########################################################################
     # Manage a provisioned software service instance
     # ##########################################################################
-    - include_role:
+    - ansible.builtin.include_role:
         name: zmf_cpm_manage_software_instance
       vars:
         instance_action_name: "{{ action }}"

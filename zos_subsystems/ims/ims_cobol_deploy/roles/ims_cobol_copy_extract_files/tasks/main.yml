@@ -2,27 +2,27 @@
 # tasks file for ims_cobol_copy_extract_files
 - name: Copy and extract files
   block:
-    - set_fact:
+    - ansible.builtin.set_fact:
         eager_role_path: '{{role_path}}'
 
-    - file:
+    - ansible.builtin.file:
         path: '{{ SAMPLE_FILE_DIR }}'
         state: absent
 
-    - file:
+    - ansible.builtin.file:
         path: '{{ SAMPLE_FILE_DIR }}'
         state: directory
 
-    - copy:
+    - ansible.builtin.copy:
         src: '{{ eager_role_path }}/files/demofiles.tar'
         dest: '{{ SAMPLE_FILE_DIR }}/demofiles.tar'
 
-    - shell: tar -Co . -xf demofiles.tar ; rm demofiles.tar
+    - ansible.builtin.shell: tar -Co . -xf demofiles.tar ; rm demofiles.tar
       args:
         chdir: '{{ SAMPLE_FILE_DIR }}'
 
     - name: Encode all template files
-      shell: "for filename in $(find . -type f); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done"
+      ansible.builtin.shell: "for filename in $(find . -type f); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done"
       args:
         chdir: '{{ SAMPLE_FILE_DIR }}'
 

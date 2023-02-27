@@ -49,45 +49,45 @@
     # Generate a temporary data set name
     # ##########################################################################
     - name: Create temp data set name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
 
     # ##########################################################################
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Setting fact `data_set_name` for use by this sample
-      set_fact:
+      ansible.builtin.set_fact:
         data_set_name: "{{ tmp_ds.stdout }}"
 
     - name: Fact `data_set_name` set with value
-      debug:
+      ansible.builtin.debug:
         msg: "{{ data_set_name }}"
 
     - name: Detect character set for locale on target {{ inventory_hostname }}
-      command: locale -c charmap
+      ansible.builtin.command: locale -c charmap
       register: result
 
     - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
         target {{ inventory_hostname }}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Set variable `target_charset` with target {{ inventory_hostname }}
         charset
-      set_fact:
+      ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
     - name: Detecting system name
       # shell: "uname -a |awk '{print $2}'"
-      command: uname -n
+      ansible.builtin.command: uname -n
       register: result
 
     - name: Setting fact `system_name` for use by this sample
-      set_fact:
+      ansible.builtin.set_fact:
         system_name: "{{ result.stdout }}"
 
     - name: Fact `system_name` set with value
-      debug:
+      ansible.builtin.debug:
         msg: "{{ system_name }}"
 
 
@@ -102,7 +102,7 @@
     # ##########################################################################
 
     - name: Create a PDS on remote host
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: pds
         format: fba
@@ -111,11 +111,11 @@
       register: result
 
     - name: Response for creating the PDS
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy local file to the created PDS member
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ data_set_name }}(HELLO)"
         encoding:
@@ -124,11 +124,11 @@
       register: result
 
     - name: Response for copying file to PDS member
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Fetch the PDS back to the control node
-      zos_fetch:
+      ibm.ibm_zos_core.zos_fetch:
         src: "{{ data_set_name }}"
         dest: "{{ ctl_tmp_dir }}/"
         flat: true
@@ -138,11 +138,11 @@
       register: result
 
     - name: Response for fetching the PDS to control node
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Add additional files to the fetched directory
-      file:
+      ansible.builtin.file:
         path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
         state: touch
       with_sequence: count=4
@@ -150,11 +150,11 @@
       register: result
 
     - name: Response for populating the local directory
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy the updated directory back to the remote host
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
         dest: "{{ data_set_name }}"
         encoding:
@@ -163,26 +163,26 @@
       register: result
 
     - name: Response for copying
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Remove the data set from remote host
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         state: absent
       register: result
 
     - name: Response for removing data set
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Remove fetched directory from control node
-      file:
+      ansible.builtin.file:
         path: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
         state: absent
       delegate_to: localhost
       register: result
 
     - name: Response for removing fetched directory
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"

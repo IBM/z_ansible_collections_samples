@@ -38,7 +38,7 @@
   tasks:
     - block:
         - name: Copy local file containing data
-          include_role:
+          ansible.builtin.include_role:
             name: copy-local-data
             public: true
 
@@ -51,7 +51,7 @@
         ###############################################################################
 
         - name: Remove the column headers so that we are left with raw data
-          zos_lineinfile:
+          ibm.ibm_zos_core.zos_lineinfile:
             src: "{{ dest_tmp_data_set }}"
             regexp: "^ case.*"
             state: absent
@@ -78,7 +78,7 @@
         ###############################################################################
 
         - name: Sort the data set based on salary in descending order
-          zos_mvs_raw:
+          ibm.ibm_zos_core.zos_mvs_raw:
             program_name: sort
             parm: "MSGPRT=CRITICAL,LIST"
             dds:
@@ -99,13 +99,13 @@
                   content: "   SORT FIELDS=(57,9,BI,D)"
 
         - name: Fetch the sorted data set back to controller
-          zos_fetch:
+          ibm.ibm_zos_core.zos_fetch:
             src: "{{ dest_tmp_data_set }}"
             dest: "{{ playbook_dir }}/SortedSalaryData.txt"
             flat: true
 
         - name: Add column headers back to the sorted file
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: "{{ playbook_dir }}/SortedSalaryData.txt"
             line: "{{ column_headers }}"
             insertbefore: BOF
@@ -113,6 +113,6 @@
 
       always:
         - name: Clean up remote data set
-          zos_data_set:
+          ibm.ibm_zos_core.zos_data_set:
             name: "{{ dest_tmp_data_set }}"
             state: absent

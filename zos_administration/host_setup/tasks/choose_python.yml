@@ -27,13 +27,13 @@
 
 - block:
     - name: Create temporary file
-      tempfile:
+      ansible.builtin.tempfile:
         state: file
       register: tempfile_1
       delegate_to: localhost
 
     - name: Write to temporary file
-      template:
+      ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/test-vars.j2"
         dest: "{{ tempfile_1.path }}"
       vars:
@@ -42,36 +42,36 @@
       delegate_to: localhost
 
     - name: Load variables from temp file
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ tempfile_1.path }}"
 
     - name: Attempt to run ping command using newly discovered
-      ping:
+      ansible.builtin.ping:
       vars:
         ansible_python_interpreter: "{{ item.get('interpreter') }}"
       environment: "{{ environment_vars }}"
       register: ping_response
       failed_when: false
 
-    - debug:
+    - ansible.builtin.debug:
         var: ping_response
 
     - name: Determine if ping was successful
-      set_fact:
+      ansible.builtin.set_fact:
         connection_success: "{{ True if ping_response.get('ping', '') == 'pong' else False }}"
 
     - name: Set python installation
-      set_fact:
+      ansible.builtin.set_fact:
         chosen_python: "{{ item }}"
       when: connection_success
 
   rescue:
-    - set_fact:
+    - ansible.builtin.set_fact:
         connection_success: false
 
   always:
     - name: Remove temporary file
-      file:
+      ansible.builtin.file:
         path: "{{ tempfile_1.path }}"
         state: absent
       delegate_to: localhost

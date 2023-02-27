@@ -50,7 +50,7 @@
     # ##########################################################################
     # Authenticate with z/OSMF server
     # ##########################################################################
-    - zmf_authenticate:
+    - ibm.ibm_zosmf.zmf_authenticate:
         zmf_host: "{{ zmf_host }}"
         zmf_port: "{{ zmf_port }}"
         zmf_user: "{{ zmf_user }}"
@@ -63,10 +63,10 @@
     # Perform security validation
     # ##########################################################################
     - name: Run security validation and expect all requirements are satisified
-      zmf_sca:
+      ibm.ibm_zosmf.zmf_sca:
         zmf_credential: "{{ result_auth }}"
         location: "{{location}}" # The location of the security requirement file: local if it is in the same host as the Ansible Engine or remote
         path_of_security_requirements: "{{path}}" # Path of the security requirement file
         target_userid: "{{target_userid}}" # Target user/group id to be validated
       register: result
-    - debug: var=result
+    - ansible.builtin.debug: var=result

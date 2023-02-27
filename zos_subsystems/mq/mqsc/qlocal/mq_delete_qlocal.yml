@@ -10,17 +10,17 @@
 
   tasks:
     - name: Delete the queue
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "{{ mq_cpf }} DELETE QLOCAL( {{ mq_queue_name }} )"
         verbose: false
       register: delete_output
 
     - name: If delete failed output readable failure information
-      debug:
+      ansible.builtin.debug:
         msg: "{{ delete_output.content }}"
       when: delete_output.content is not search("CSQ9022I")
 
     - name: Check the delete worked
-      fail:
+      ansible.builtin.fail:
         msg: Delete of queue failed
       when: delete_output.content is not search("CSQ9022I")

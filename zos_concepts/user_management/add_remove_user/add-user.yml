@@ -15,5 +15,5 @@
 
   tasks:
     - name: Add user to z/OS system
-      include_role:
+      ansible.builtin.include_role:
         name: add-zos-user

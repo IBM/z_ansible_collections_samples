@@ -8,13 +8,13 @@
 # =================================================================
 
 ---
-- import_playbook: configure-bootstrap-kvm.yaml
+- ansible.builtin.import_playbook: configure-bootstrap-kvm.yaml
   when: vm_type == "kvm"
-- import_playbook: configure-bootstrap-zvm.yaml
+- ansible.builtin.import_playbook: configure-bootstrap-zvm.yaml
   when: vm_type == "zvm"
-- import_playbook: configure-control-plane-kvm.yaml
+- ansible.builtin.import_playbook: configure-control-plane-kvm.yaml
   when: vm_type == "kvm"
-- import_playbook: configure-control-plane-zvm.yaml
+- ansible.builtin.import_playbook: configure-control-plane-zvm.yaml
   when: vm_type == "zvm"
-- import_playbook: wait-for-bootstrap-complete.yaml
-- import_playbook: destroy-bootstrap.yaml
+- ansible.builtin.import_playbook: wait-for-bootstrap-complete.yaml
+- ansible.builtin.import_playbook: destroy-bootstrap.yaml

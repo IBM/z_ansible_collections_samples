@@ -2,7 +2,7 @@
 # tasks file for send-templates
 
 - name: "Create temporary directory"
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
   register: temp_file_path
   delegate_to: localhost
@@ -10,7 +10,7 @@
 - name: Interpret templates
   block:
     - name: Compile templates and put results in temporary directory
-      template:
+      ansible.builtin.template:
         src: '{{ item }}'
         dest: "{{ temp_file_path.path }}/{{ item | basename }}"
         output_encoding: "ASCII"
@@ -26,23 +26,23 @@
       delegate_to: localhost
 
     - name: Copy template archive to target
-      copy:
+      ansible.builtin.copy:
         src: '{{ temp_file_path.path }}/templates.tar.bz2'
         dest: '{{ uss_file_path }}/'
 
     - name: Unarchive templates on target
-      shell: '{{ uss_utilities_path }}/bzip2 -df templates.tar.bz2; tar -Co . -xf templates.tar ; rm templates.tar'
+      ansible.builtin.shell: '{{ uss_utilities_path }}/bzip2 -df templates.tar.bz2; tar -Co . -xf templates.tar ; rm templates.tar'
       args:
         chdir: '{{ uss_file_path }}'
       register: output
 
     - name: Encode all template files
-      shell: "for filename in $(find . -name '*.j2'); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done"
+      ansible.builtin.shell: "for filename in $(find . -name '*.j2'); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done"
       args:
         chdir: '{{ uss_file_path }}'
   always:
     - name: Delete the temporary directory (optional)
-      file:
+      ansible.builtin.file:
         path: "{{ temp_file_path.path }}"
         state: absent
       delegate_to: localhost

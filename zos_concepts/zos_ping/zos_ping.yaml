@@ -33,12 +33,12 @@
     # Ping the host with Ansible ping module to see if the target is available
     # ##########################################################################
     - name: Ping host - {{ inventory_hostname }}
-      zos_ping:
+      ibm.ibm_zos_core.zos_ping:
       register: result
 
     # ##########################################################################
     # Display the response from the pin module
     # ##########################################################################
     - name: Response
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result.ping }}"

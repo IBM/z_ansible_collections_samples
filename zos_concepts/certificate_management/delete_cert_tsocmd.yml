@@ -21,7 +21,7 @@
     check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
 
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Deleting cert {{cert_label}}"
@@ -29,7 +29,7 @@
           - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
       when: cert_type == 'USER'
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Deleting cert {{cert_label}}"
@@ -37,7 +37,7 @@
           - RACDCERT CERTAUTH DELETE(LABEL('{{cert_label}}'))
       when: cert_type == 'CERTAUTH'
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Deleting cert {{cert_label}}"
@@ -45,7 +45,7 @@
           - RACDCERT SITE DELETE(LABEL('{{cert_label}}'))
       when: cert_type == 'SITE'
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: "Run Health Checker"

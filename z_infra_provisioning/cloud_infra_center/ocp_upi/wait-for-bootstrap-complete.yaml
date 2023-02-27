@@ -25,13 +25,13 @@
 
   tasks:
     - name: Wait-for bootstrap-complete
-      command: "./openshift-install wait-for bootstrap-complete"
+      ansible.builtin.command: "./openshift-install wait-for bootstrap-complete"
       async: 3600
       poll: 0
       register: bootstrap_complete_sleeper
 
     - name: "Waiting for bootstrap-complete"
-      async_status:
+      ansible.builtin.async_status:
         jid: "{{ bootstrap_complete_sleeper.ansible_job_id }}"
       register: job_result
       until: job_result.finished
@@ -39,9 +39,9 @@
       delay: 30
 
     - name: Check bootstrap log
-      shell: 'cat .openshift_install.log  | grep -A7 "bootstrapping to complete"'
+      ansible.builtin.shell: 'cat .openshift_install.log  | grep -A7 "bootstrapping to complete"'
       register: bootstrap_log
 
     - name: Show bootstrapping log
-      debug:
+      ansible.builtin.debug:
         var: bootstrap_log.stdout_lines

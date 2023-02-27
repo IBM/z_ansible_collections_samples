@@ -1,12 +1,12 @@
 # ---
 # # tasks file for ims_cobol_execute_permissions_and_copy_ussDatasets
 - name: Copy the file to uss
-  copy:
+  ansible.builtin.copy:
     src: '{{ role_path }}/templates/CPTOMVS.j2'
     dest: '{{ uss_file_path }}/CPTOMVS.j2'
 
 - name: execute permission for copy data
-  file:
+  ansible.builtin.file:
     path: '{{ uss_file_path }}/CPTOMVS.j2'
     state: file
     mode: a+x
@@ -38,5 +38,5 @@
 #   loop: "{{ loadData }}"
 
 - name: copy from uss to mvs - LOADDATA
-  shell: cp "{{ uss_file_path }}/{{PROJECT_NAME}}/LoadData/{{item.name}}.data" "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name}}.INPUT'"
+  ansible.builtin.shell: cp "{{ uss_file_path }}/{{PROJECT_NAME}}/LoadData/{{item.name}}.data" "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name}}.INPUT'"
   loop: "{{ loadData }}"

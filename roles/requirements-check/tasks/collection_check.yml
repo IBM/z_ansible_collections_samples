@@ -11,7 +11,7 @@
 
 ---
 - name: Extracting Ansible enviroment variable COLLECTIONS_PATHS from localhost
-  shell:
+  ansible.builtin.shell:
     cmd: ansible-config dump|grep -i COLLECTIONS_PATHS|awk -F" = " '{print $2}'
   register: ansible_collections_paths
 
@@ -22,11 +22,11 @@
   when: ansible_collections_paths is defined and (ansible_collections_paths | bool)
 
 - name: Set fact `collection_paths` with Ansible COLLECTIONS_PATHS
-  set_fact:
+  ansible.builtin.set_fact:
     collection_paths: '{{ ansible_collections_paths.stdout if ansible_collections_paths.stdout != "" else [''~/.ansible/collections''] }}'
 
 - name: Evaluate Ansible COLLECTIONS_PATHS existance and status
-  stat:
+  ansible.builtin.stat:
     path: "{{ item }}"
   register: collection_paths_status
   with_items: "{{ collection_paths }}"
@@ -39,7 +39,7 @@
   when: collection_paths_status is defined and (collection_paths_status | bool)
 
 - name: Populate temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
-  set_fact:
+  ansible.builtin.set_fact:
     temp_collection_paths_dict: "{{temp_collection_paths_dict | default([]) + [{'collection_path':item.stat.path,'installed_version':None}  ]}}"
   when: item.stat.exists
   with_items: "{{collection_paths_status.results}}"
@@ -51,7 +51,7 @@
   when: temp_collection_paths_dict is defined and (temp_collection_paths_dict | bool)
 
 - name: Combine dictionary `temp_collection_paths_dict` with `requires_collection` dictionary
-  set_fact:
+  ansible.builtin.set_fact:
     requires_collection: "{{ requires_collection | combine({ item.key : {'installed': temp_collection_paths_dict} }, recursive=true) }}"
   with_dict: "{{requires_collection}}"
 
@@ -62,7 +62,7 @@
   when: requires_collection is defined and (requires_collection | bool)
 
 - name: Create `_collection_status_dict` dictionary with all collection stats
-  set_fact:
+  ansible.builtin.set_fact:
     _collection_status_dict:
       "{{_collection_status_dict | default([]) + [{'ansible_collection_path':item.1.collection_path,
       'required_collection_name':item.0.name,
@@ -100,7 +100,7 @@
   when: _collection_status_dict is defined and (_collection_status_dict | bool)
 
 - name: Ansible collection version check in progress
-  assert:
+  ansible.builtin.assert:
     that: (
       item.installed_collection_version != None and
       item.required_collection_version != None and

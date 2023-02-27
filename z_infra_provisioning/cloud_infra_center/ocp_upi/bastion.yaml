@@ -8,5 +8,5 @@
 # =================================================================
 
 ---
-- import_playbook: configure-dns.yaml
-- import_playbook: configure-haproxy.yaml
+- ansible.builtin.import_playbook: configure-dns.yaml
+- ansible.builtin.import_playbook: configure-haproxy.yaml

@@ -20,7 +20,7 @@
 
   tasks:
     - block:
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_tso_cmd
           vars:
             task_description: "Create a new keyring"
@@ -29,7 +29,7 @@
               - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
       ignore_errors: true
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Create new SITE cert and connect to keyring"
@@ -40,7 +40,7 @@
           - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
       when: not expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: "Create new SITE cert and connect to keyring"
@@ -51,19 +51,19 @@
           - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
       when: expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: "Stop TN3270 server"
         command: "p TN3270"
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: "Start TN3270 server"
         command: "s TN3270"
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: "Run Health Checker"

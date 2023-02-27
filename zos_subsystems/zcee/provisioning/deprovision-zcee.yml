@@ -12,10 +12,10 @@
     - name: Deprovision zCEE instance
       block:
         - name: Stop zCEE server job
-          zos_operator:
+          ibm.ibm_zos_core.zos_operator:
             cmd: 'CANCEL ST{{ softwareServiceInstanceName }}'
         - name: Stop zCEE server from USS
-          shell: ./zosconnect stop {{softwareServiceInstanceName}}
+          ansible.builtin.shell: ./zosconnect stop {{softwareServiceInstanceName}}
           args:
             chdir: '{{ zcon_install_dir }}/bin'
           environment:
@@ -23,7 +23,7 @@
           ignore_errors: true
           register: response
           when: "'Server ZC01 is not running' is not in response.msg"
-        - debug:
+        - ansible.builtin.debug:
             msg: "{{ response.msg }}"
         - name: Delete dataset member from PROCLIB
           ibm.ibm_zos_core.zos_data_set:
@@ -36,7 +36,7 @@
             state: absent
             type: MEMBER
         - name: Unmount VSAM dataset
-          shell: /usr/sbin/unmount '{{ zcon_install_dir }}/wlp/etc'
+          ansible.builtin.shell: /usr/sbin/unmount '{{ zcon_install_dir }}/wlp/etc'
         - name: Delete VSAM LDS
           ibm.ibm_zos_core.zos_data_set:
             name: '{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}'

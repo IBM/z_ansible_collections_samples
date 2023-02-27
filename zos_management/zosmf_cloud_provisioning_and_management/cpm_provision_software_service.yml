@@ -69,7 +69,7 @@
     # ##########################################################################
     # Provision a z/OS software service
     # ##########################################################################
-    - include_role:
+    - ansible.builtin.include_role:
         name: zmf_cpm_provision_software_service
       vars:
         cpm_template_name: '<fill-me-template-name>'

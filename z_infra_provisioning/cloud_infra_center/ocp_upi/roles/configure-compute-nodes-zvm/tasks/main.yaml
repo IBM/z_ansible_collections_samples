@@ -36,21 +36,21 @@
 # netaddr
 
 - name: "Import common yaml"
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: Export infra ID
-  shell:
+  ansible.builtin.shell:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
 - name: "Get image name for ZVM"
-  set_fact:
+  ansible.builtin.set_fact:
     image_name: "icic_rhcos_{{ disk_type }}"
   when:
     - vm_type == "zvm"
 
 - name: "Create the compute servers"
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
@@ -67,14 +67,14 @@
     - vm_type == "zvm"
 
 - name: "Convert compute node flavor from value into number"
-  command:
+  ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
   register: compute_flavor_size
   when:
     - disk_type == "scsi"
 
 - name: "Create the compute servers with default boot volume"
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
@@ -95,7 +95,7 @@
     - volume_type_id is not defined
 
 - name: "Create compute boot volume"
-  os_volume:
+  openstack.cloud.volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
     image: "{{ image_name }}"
@@ -109,14 +109,14 @@
     - volume_type_id is defined
 
 - name: "Set compute volume bootable"
-  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
     - disk_type == "scsi"
     - volume_type_id is defined
 
 - name: "Create the compute server with boot volume"
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_worker }}"
     boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"

@@ -13,19 +13,19 @@
       block:
 
         # Remove old registered datasets
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_remove_old_registered_databases
 
         # Stop and delete ims application resources
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_stop_app_resources
 
         # Stop and delete ims databases
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_stop_ims_databases
 
         # Stop the MPP Region
-        - include_role:
+        - ansible.builtin.include_role:
             name: ims_cobol_stop_mpp_region
           vars:
             mpp: true

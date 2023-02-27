@@ -18,7 +18,7 @@
     check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
 
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create a new keyring"
@@ -26,7 +26,7 @@
           - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
           - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create new CA cert and connect to keyring"
@@ -42,7 +42,7 @@
                RING({{keyring}}))
       when: not expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_racf_cmd
       vars:
         task_description: "Create new CA cert and connect to keyring"
@@ -57,7 +57,7 @@
                RING({{keyring}}))
       when: expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: "Run Health Checker"

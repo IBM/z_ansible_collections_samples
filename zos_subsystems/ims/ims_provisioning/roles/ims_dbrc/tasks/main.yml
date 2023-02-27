@@ -7,11 +7,11 @@
 
   block:
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
         # Send the template over
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSDFDRC.j2"
@@ -27,10 +27,10 @@
       when: dbrc_defaults
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSE314J.j2"

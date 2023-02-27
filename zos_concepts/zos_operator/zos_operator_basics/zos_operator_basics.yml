@@ -51,15 +51,15 @@
     # ##########################################################################
     - name: Detecting system name
       # shell: "uname -a |awk '{print $2}'"
-      command: uname -n
+      ansible.builtin.command: uname -n
       register: result
 
     - name: Setting fact `system_name` for use by this sample
-      set_fact:
+      ansible.builtin.set_fact:
         system_name: "{{ result.stdout }}"
 
     - name: Fact `system_name` set with value
-      debug:
+      ansible.builtin.debug:
         msg: "{{ system_name }}"
 
     # ##########################################################################
@@ -73,22 +73,22 @@
     # +-------------------------------------------------------------------------
 
     - name: Query actionable messages on system {{ system_name }}
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: result_zos_operator_action_pre_query
 
     - name: Response for query actionable messages on system {{ system_name }}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result_zos_operator_action_pre_query }}"
       when: result_zos_operator_action_pre_query is defined and not result_zos_operator_action_pre_query.failed
 
     - name: Filter actionable messages that match 'IEE094D SPECIFY OPERAND', if more than one is found this demo will skip the operator task.
-      set_fact:
+      ansible.builtin.set_fact:
         bool_zos_operator_action_continue: "{{ result_zos_operator_action_pre_query | ibm.ibm_zos_core.filter_wtor_messages('IEE094D SPECIFY OPERAND') | length == 0}}"
       when: result_zos_operator_action_pre_query is defined and not result_zos_operator_action_pre_query.failed
 
     - name: Evaluate if there are any existing dump messages matching 'IEE094D SPECIFY OPERAND'
-      assert:
+      ansible.builtin.assert:
         that:
           - bool_zos_operator_action_continue is defined
           - bool_zos_operator_action_continue
@@ -98,67 +98,67 @@
 
     - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
         system {{ system_name }}
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "DUMP COMM=('test dump')"
       register: result_zos_operator
       when: bool_zos_operator_action_continue
 
     - name: Response for create an operator action
         (WTOR) "DUMP COMM=('test dump')" for system {{ system_name }}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result_zos_operator }}"
       when: bool_zos_operator_action_continue
 
     - name: Query actionable messages on system {{ system_name }}
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: result_zos_operator_action_query
       when: bool_zos_operator_action_continue
 
     - name: Response for query actionable messages on system {{ system_name }}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result_zos_operator_action_query }}"
       when: bool_zos_operator_action_continue and result_zos_operator_action_query is defined and not result_zos_operator_action_query.failed
 
     - name: Filter actionable messages that match only 'DUMP'
-      set_fact:
+      ansible.builtin.set_fact:
         filtered_zos_operator_action_query: "{{ result_zos_operator_action_query | ibm.ibm_zos_core.filter_wtor_messages('IEE094D SPECIFY OPERAND') }}"
       when: bool_zos_operator_action_continue and result_zos_operator_action_query is defined and not result_zos_operator_action_query.failed
 
     - name: Response for filter actionable messages that match only 'DUMP'
-      debug:
+      ansible.builtin.debug:
         msg: "{{ filtered_zos_operator_action_query }}"
       when: bool_zos_operator_action_continue and filtered_zos_operator_action_query is defined
 
     - name: Set reply value if there is one matching actionable message
-      set_fact:
+      ansible.builtin.set_fact:
         reply_num: "{{ result_zos_operator_action_query.actions[0].number }}"
       when: bool_zos_operator_action_continue and filtered_zos_operator_action_query is defined and  (filtered_zos_operator_action_query | length == 1)
 
     - name: Reply to operator action with "end"
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "{{ reply_num}}end"
       register: result_zos_operator_end
       when: bool_zos_operator_action_continue and reply_num is defined
 
     - name: Response for reply to operator action with "cancel"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result_zos_operator_end }}"
       when: bool_zos_operator_action_continue and result_zos_operator_end is defined and reply_num is defined
 
     - name: Verify actionable message on system {{ system_name }} is canceled
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: results_zos_operator_action_query_verify
       when: bool_zos_operator_action_continue
 
     - name: Verify no actionable messages match 'IEE094D SPECIFY OPERAND' with filter
-      set_fact:
+      ansible.builtin.set_fact:
         filtered_zos_operator_action_query_verify: "{{ results_zos_operator_action_query_verify | ibm.ibm_zos_core.filter_wtor_messages('IEE094D SPECIFY OPERAND') }}"
       when: bool_zos_operator_action_continue and results_zos_operator_action_query_verify is defined and not results_zos_operator_action_query_verify.failed
 
     - name: Response for verifying actionable messages on system {{ system_name }} are canceled
-      assert:
+      ansible.builtin.assert:
         that:
           - bool_zos_operator_action_continue
           - filtered_zos_operator_action_query_verify is defined and  (filtered_zos_operator_action_query_verify | length == 0)

@@ -8,14 +8,14 @@
   block:
 
     # Configuration files
-    - set_fact:
+    - ansible.builtin.set_fact:
         bpe_sci_config: '{{ role_path }}/templates/bpe_sci_config.txt'
         si_config: '{{ role_path }}/templates/si_config.txt'
         sci_config: '{{ role_path }}/templates/sci_config.txt'
 
 
     - name: Define BPECONFG
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -36,7 +36,7 @@
 
 
     - name: Add CSLSI000 member to PROCLIB
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -57,7 +57,7 @@
 
 
     - name: Add SCI PROC member to PROCLIB
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -79,21 +79,21 @@
 
     # Start SCI
     - name: Start SCI
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 's {{ DFS_IMS_SSID }}sci'
         verbose: true
       when: sci == "start"
 
     # Stop SCI
     - name: Stop SCI
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}sci'
         verbose: true
       when: sci == "stop"
 
     # Query SCI status
     - name: Query SCI status
-      ims_command:
+      ibm.ibm_zos_ims.ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
         plex: '{{ DFS_IMSPlex }}'
       when: sci == "query"

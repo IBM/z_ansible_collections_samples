@@ -19,68 +19,68 @@
 
   tasks:
     - name: "Import common yaml"
-      import_tasks: common.yaml
+      ansible.builtin.import_tasks: common.yaml
 
     - name: "Get image name for kvm"
-      set_fact:
+      ansible.builtin.set_fact:
         image_name: icic_rhcos_qcow2
       when:
         - vm_type == "kvm"
 
     - name: "Get image name for ZVM"
-      set_fact:
+      ansible.builtin.set_fact:
         image_name: "icic_rhcos_{{ disk_type }}"
       when:
         - vm_type == "zvm"
 
     - name: "Export infra ID"
-      shell:
+      ansible.builtin.shell:
         cmd: "jq -r .infraID metadata.json"
       register: infra_id
 
     - name: "Get worker number"
-      set_fact:
+      ansible.builtin.set_fact:
         add_worker_number: "{{ worker_number | default(1) }}"
         add_worker_ip: "{{ ip | default('random') }}"
 
     - name: "Set worker ip"
-      set_fact:
+      ansible.builtin.set_fact:
         add_worker_ip: "{{ ip.split(',') | default('random') }}"
       when: ip is defined
 
     - name: Check if worker number matches worker ip or not
-      fail:
+      ansible.builtin.fail:
         msg: "worker ip does not match the worker number"
       failed_when:
         - add_worker_ip != "random"
         - "{{ add_worker_ip| length }} != {{ add_worker_number | int }}"
 
     - name: "Generate worker index"
-      shell: |
+      ansible.builtin.shell: |
         rm -rf .new_worker_index
         shuf -i 1000-9999 -n {{ add_worker_number }} -o .new_worker_index
         sed -i -e 's/^/{{ os_compute_server_name }}-/' .new_worker_index
         sed -i -e 's/$/,ip=random/' .new_worker_index
 
     - name: Save worker name into temporary file
-      shell: |
+      ansible.builtin.shell: |
         rm -rf .new_worker_name
         cut -d"," -f1 .new_worker_index >> .new_worker_name
 
     - name: "Add worker ip"
-      shell: |
+      ansible.builtin.shell: |
         sed -i '0,/random/s//{{ item }}/' .new_worker_index
       with_items:
         - "{{ add_worker_ip}}"
       when: add_worker_ip != "random"
 
     - name: "Generate worker node json file"
-      script: tools/generate-new-worker-ignition.sh "{{ item }}"
+      ansible.builtin.script: tools/generate-new-worker-ignition.sh "{{ item }}"
       with_lines:
         - cat .new_worker_name
 
     - name: "Create the compute server ports"
-      os_port:
+      openstack.cloud.port:
         name: "{{ item.split(',')[0] }}"
         network: "{{ use_network_name }}"
         security_groups:
@@ -94,7 +94,7 @@
       when: add_worker_ip != "random"
 
     - name: "Create the compute server ports"
-      os_port:
+      openstack.cloud.port:
         name: "{{ item }}"
         network: "{{ use_network_name }}"
         security_groups:
@@ -105,13 +105,13 @@
       when: add_worker_ip == "random"
 
     - name: "Set compute server ports tag"
-      command:
+      ansible.builtin.command:
         cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item }}"
       with_lines:
         - cat .new_worker_name
 
     - name: "Create the compute servers"
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
@@ -128,7 +128,7 @@
         - volume_type_id is not defined
 
     - name: "Create the compute servers"
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
@@ -146,14 +146,14 @@
         - volume_type_id is not defined
 
     - name: "Convert compute server flavor from value into number"
-      command:
+      ansible.builtin.command:
         cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
       register: compute_flavor_size
       when:
         - disk_type == "scsi"
 
     - name: "Create the compute servers with default boot volume"
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         image: "i{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
@@ -174,7 +174,7 @@
         - volume_type_id is not defined
 
     - name: "Create compute boot volume"
-      os_volume:
+      openstack.cloud.volume:
         state: present
         name: "{{ item }}-boot"
         image: "{{ image_name }}"
@@ -189,7 +189,7 @@
         - volume_type_id is defined
 
     - name: "Set compute volume bootable"
-      shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
+      ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
       with_lines:
         - cat .new_worker_name
       when:
@@ -197,7 +197,7 @@
         - volume_type_id is defined
 
     - name: "Create the compute server with boot volume"
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         flavor: "{{ os_flavor_worker }}"
         boot_volume: "{{ item }}-boot"
@@ -216,7 +216,7 @@
         - volume_type_id is defined
 
     - name: "Update worker ip into new_worker_index file"
-      shell: |
+      ansible.builtin.shell: |
         worker_ip=$(openstack server list | grep "{{ item }}" | grep -oP "(?<=)\d+(\.\d+){3}")
         sed -i -e "/{{ item }}/s/random/$worker_ip/g" .new_worker_index
       with_lines:
@@ -224,14 +224,14 @@
       when: add_worker_ip == "random"
 
     - name: "Waiting for approve worker CSR"
-      include_tasks: approve_worker.yaml
+      ansible.builtin.include_tasks: approve_worker.yaml
       vars:
         workerid: "{{ item }}"
       register: worker_csr_sleeper
       with_lines:
         - cat .new_worker_name
 
-- import_playbook: modify-bastion.yaml
+- ansible.builtin.import_playbook: modify-bastion.yaml
   when:
     - update_bastion is defined
     - update_bastion == "true"

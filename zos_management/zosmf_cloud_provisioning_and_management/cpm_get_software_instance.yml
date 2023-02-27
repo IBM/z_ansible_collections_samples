@@ -72,7 +72,7 @@
     # ##########################################################################
     # Obtain a z/OS software instance from registry and retrieve specific variable
     # ##########################################################################
-    - include_role:
+    - ansible.builtin.include_role:
         name: zmf_cpm_get_software_instance
       vars:
         external_software_name: "<fill-me>"
@@ -81,9 +81,9 @@
       vars:
         instance_info_json: "{{lookup('file', instance_info_json_path)}}"
 
-      set_fact:
+      ansible.builtin.set_fact:
         VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
 
     - name: Display VAR1 value
-      debug:
+      ansible.builtin.debug:
         msg: "VAR1 Value is : {{ VAR1.value }}"

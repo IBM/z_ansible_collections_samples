@@ -15,5 +15,5 @@
 
   tasks:
     - name: Unpack and restore data sets
-      include_role:
+      ansible.builtin.include_role:
         name: unpack-restore-data-sets

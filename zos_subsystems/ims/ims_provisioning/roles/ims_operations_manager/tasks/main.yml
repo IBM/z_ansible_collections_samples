@@ -6,7 +6,7 @@
     - ibm.ibm_zos_ims
 
   block:
-    - set_fact:
+    - ansible.builtin.set_fact:
         bpe_config: '{{ role_path }}/templates/bpe_config.txt'
         oi_config: '{{ role_path }}/templates/oi_config.txt'
         om_config: '{{ role_path }}/templates/om_config.txt'
@@ -14,7 +14,7 @@
 
 
     - name: Define BPECONFG
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -34,7 +34,7 @@
       when: om == "config"
 
     - name: Add CSLOI000 member
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -54,7 +54,7 @@
       when: om == "config"
 
     - name: Add OM member to PROCLIB
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -74,7 +74,7 @@
       when: om == "config"
 
     - name: Add CSLOIROM member
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         pgm: IEBGENER
         auth: false
         dds:
@@ -95,21 +95,21 @@
 
     # Start OM
     - name: Start OM
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 's {{ DFS_IMS_SSID }}OM'
         verbose: true
       when: om == "start"
 
     # Stop OM
     - name: Stop OM
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}OM'
         verbose: true
       when: om == "stop"
 
     # Query OM status
     - name: Query OM status
-      ims_command:
+      ibm.ibm_zos_ims.ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(OM) SHOW(STATUS)
         plex: '{{ DFS_IMSPlex }}'
       when: om == "query"

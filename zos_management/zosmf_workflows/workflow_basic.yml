@@ -70,7 +70,7 @@
     # Authenticate with z/OSMF server
     # ##########################################################################
     - name: Authenticate with z/OSMF server
-      zmf_authenticate:
+      ibm.ibm_zosmf.zmf_authenticate:
         zmf_host: "{{ zmf_host }}"
         zmf_port: "{{ zmf_port }}"
         zmf_user: "{{ zmf_user }}"
@@ -88,26 +88,26 @@
     # 4. Check the status of the workflow instance
     # ##########################################################################
     - name: Check whether a workflow instance with the given name exists
-      zmf_workflow:
+      ibm.ibm_zosmf.zmf_workflow:
         state: "existed"
         zmf_credential: "{{ result_auth }}"
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
       delegate_to: localhost
       register: compare_result
-    - debug: var=compare_result
+    - ansible.builtin.debug: var=compare_result
 
     - name: Delete the workflow instance if already exists
-      zmf_workflow:
+      ibm.ibm_zosmf.zmf_workflow:
         state: "deleted"
         zmf_credential: "{{ result_auth }}"
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
       delegate_to: localhost
       register: delete_result
       when: compare_result.workflow_key
-    - debug: var=delete_result
+    - ansible.builtin.debug: var=delete_result
 
     - name: Create a new workflow instance and start it
-      zmf_workflow:
+      ibm.ibm_zosmf.zmf_workflow:
         state: "started"
         zmf_credential: "{{ result_auth }}"
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
@@ -116,13 +116,13 @@
         workflow_owner: "{{ zmf_user }}"
       delegate_to: localhost
       register: start_result
-    - debug: var=start_result
+    - ansible.builtin.debug: var=start_result
 
     - name: Check the status of the workflow instance
-      zmf_workflow:
+      ibm.ibm_zosmf.zmf_workflow:
         state: "check"
         zmf_credential: "{{ result_auth }}"
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
       delegate_to: localhost
       register: check_result
-    - debug: var=check_result
+    - ansible.builtin.debug: var=check_result

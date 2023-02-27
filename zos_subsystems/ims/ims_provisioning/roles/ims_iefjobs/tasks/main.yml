@@ -7,15 +7,15 @@
 
   block:
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: "{{ eager_role_path }}/templates/IEFJOBSX.j2"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: submit-rexx
             public: true
           vars:
@@ -25,17 +25,17 @@
       when: iefjobs == "delete"
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: "{{ eager_role_path }}/templates/IEFJOBS.j2"
 
       when: iefjobs == "create" and not provision
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: submit-rexx
         public: true
       vars:

@@ -7,10 +7,10 @@
 
   block:
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSALCAT.j2"
@@ -67,7 +67,7 @@
       when: catalog == "load"
 
     - name: Delete IMS Catalog
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         batch:
           - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF"
             state: absent
