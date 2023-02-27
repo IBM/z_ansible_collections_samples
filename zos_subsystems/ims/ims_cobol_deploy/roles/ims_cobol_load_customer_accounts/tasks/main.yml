@@ -1,6 +1,6 @@
 ---
 # tasks file for ims_cobol_load_customer_accounts
-- name: Create temporary directory for load customer accounts 
+- name: Create temporary directory for load customer accounts
   tempfile:
     state: directory
   register: temp_file_path

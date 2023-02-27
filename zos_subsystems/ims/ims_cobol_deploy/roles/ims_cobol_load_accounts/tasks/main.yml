@@ -29,6 +29,6 @@
       register: output
     - debug:
         msg: "{{ output.jobs[0].job_id }}"
-    - name: Job output 
+    - name: Job output
       ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ output.jobs[0].job_id }}"

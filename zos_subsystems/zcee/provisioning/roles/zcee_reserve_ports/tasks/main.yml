@@ -21,7 +21,7 @@
         tcp: yes
       register: command_result2
 
-    - name: Set TCPPORT variables to new port numbers 
+    - name: Set TCPPORT variables to new port numbers
       set_stats:
         data:
           zcon_https_port: '{{ command_result1.port }}'

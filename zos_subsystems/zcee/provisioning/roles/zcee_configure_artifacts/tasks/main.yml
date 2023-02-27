@@ -4,12 +4,12 @@
 #   ibm.ibm_zos_core.zos_copy:
 #     src: '{{ playbook_dir }}/files/server.xml'
 #     dest: '{{ ZCEE_CONFIG_PATH }}/server.xml'
-#     encoding:  
+#     encoding:
 #         from: ISO8859-1
 #         to: "{{ target_charset }}" #IBM-1047
 #     mode: '775'
 
-# - name: Encoding, copy to uss and set permissions bootstrap properties 
+# - name: Encoding, copy to uss and set permissions bootstrap properties
 #   ibm.ibm_zos_core.zos_copy:
 #     src: '{{ playbook_dir }}/files/bootstrap.properties'
 #     dest: '{{ ZCEE_CONFIG_PATH }}/bootstrap.properties'

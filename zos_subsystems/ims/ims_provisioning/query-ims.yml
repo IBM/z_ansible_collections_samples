@@ -9,7 +9,7 @@
   tasks:
 
     - block:
-        # Query CQS 
+        # Query CQS
         # Make sure CQS is started before doing this query
         - include_role:
             name: ims_common_queue

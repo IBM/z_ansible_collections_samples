@@ -1,5 +1,5 @@
-# Update zCloud_PROCLIB to the proclib in which the IMS started tasks should be copied to. 
-# The procedues will be used to start the IMS address spaces. 
+# Update zCloud_PROCLIB to the proclib in which the IMS started tasks should be copied to.
+# The procedues will be used to start the IMS address spaces.
 zCloud_PROCLIB: USER.PRIVATE.PROCLIB
 zCloud_MODGEN: SYS1.MODGEN
 
@@ -13,7 +13,7 @@ DFS_IMSXCFGroup: IMSXCFGN
 DFS_IMS_CRC: '@'
 DFS_IMS_LINEGRP: SPOOL
 
-DFS_useRRS: 'N' 
+DFS_useRRS: 'N'
 
 DFS_useIEFJOBS: 'N'
 zCloud_IEFJOBS: SYS1.IEFJOBS

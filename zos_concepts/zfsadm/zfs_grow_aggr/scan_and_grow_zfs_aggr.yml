@@ -40,11 +40,11 @@
     threshold_limit: "{{ 75 }}"
     mount_point: "/tmp/zfs_aggr"
 
-    zfs_data_sets: 
+    zfs_data_sets:
       - "{{ ansible_user | upper }}.ANSIBLE.ZFSADM.FIRST"
       - "{{ ansible_user | upper }}.ANSIBLE.ZFSADM.SECOND"
       - "{{ ansible_user | upper }}.ANSIBLE.ZFSADM.THIRD"
-    
+
     mount_points:
       - "first"
       - "second"
@@ -110,18 +110,18 @@
       debug:
         msg:
           - "{{ aggrinfo_output_before.results |  map(attribute='stdout_lines') | flatten }}"
-          - "{{ df_output_before.results | map(attribute='stdout_lines') | flatten }}" 
+          - "{{ df_output_before.results | map(attribute='stdout_lines') | flatten }}"
 
     - name: Scan df_output to build list of data set names and utilization percentages
       set_fact:
         dsn_per_util_list: "{{ df_output_before.results | map(attribute='stdout') | map('regex_search', '\\n([a-zA-Z0-9\\.]+).*(\\b[0-9]+)%', ('\\1'), ('\\2'))  | list }}"
 
     - name: Build grow_list
-      set_fact: 
+      set_fact:
         grow_list: "{{ grow_list | default([]) + [item[0]] }}"
       when: "{{ item[1] | int }} > {{ threshold_limit }}"
       loop: "{{ dsn_per_util_list }}"
-    
+
     - name: Echo grow_list
       debug:
         var: grow_list
@@ -140,7 +140,7 @@
       debug:
         msg:
           - "{{ grow_output.results |  map(attribute='stdout_lines') | flatten }}"
-          - "{{ df_output_after.results | map(attribute='stdout_lines') | flatten }}" 
+          - "{{ df_output_after.results | map(attribute='stdout_lines') | flatten }}"
 
     # ##########################################################################
     # clean up - unmount and delete ZFS data sets

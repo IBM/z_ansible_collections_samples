@@ -1,6 +1,6 @@
 ---
 # tasks file for ims_cobol_copy_extract_files
-- name: Copy and extract files 
+- name: Copy and extract files
   block:
     - set_fact:
         eager_role_path: '{{role_path}}'

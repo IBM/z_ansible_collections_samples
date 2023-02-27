@@ -7,8 +7,8 @@
   register: bzip2_stat_result
 
 - name: Copy bzip2
-  copy: 
-    src: "../files/bzip2" 
+  copy:
+    src: "../files/bzip2"
     dest: "{{ uss_utilities_path }}/bzip2"
     mode: a+x
   when: not bzip2_stat_result.stat.exists

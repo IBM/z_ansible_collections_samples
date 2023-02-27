@@ -33,12 +33,12 @@
 - name: Get image url
   script: tools/get-image-path.sh "bootstrap-ignition-{{ infra_id.stdout_lines[0] }}"
   register: image_url
-  
+
 - name: Get glance token
   command:
     cmd: openstack token issue -c id -f value
   register: glance_token
-  
+
 - name: Generate bootstrap ignition shim
   script: tools/generate-bootstrap-ignitionshim.py {{ image_url.stdout_lines[0] }} {{ glance_token.stdout }} {{ infra_id.stdout_lines[0] }}
   args:

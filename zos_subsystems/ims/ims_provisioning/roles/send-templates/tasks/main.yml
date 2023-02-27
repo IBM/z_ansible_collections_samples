@@ -23,7 +23,7 @@
         path: "{{ temp_file_path.path }}/*"
         dest: "{{ temp_file_path.path }}/templates.tar.bz2"
         format: bz2
-      delegate_to: localhost 
+      delegate_to: localhost
 
     - name: Copy template archive to target
       copy:
@@ -38,7 +38,7 @@
 
     - name: Encode all template files
       shell: "for filename in $(find . -name '*.j2'); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done"
-      args:  
+      args:
         chdir: '{{ uss_file_path }}'
   always:
     - name: Delete the temporary directory (optional)

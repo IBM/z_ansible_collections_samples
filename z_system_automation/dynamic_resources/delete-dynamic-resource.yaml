@@ -1,5 +1,5 @@
 ---
-# Copyright (c) IBM Corporation 2020, 2021 
+# Copyright (c) IBM Corporation 2020, 2021
 
 # This sample playbook demonstrates how to use the role sa_delete_dynamic_resource.
 # Example:
@@ -20,7 +20,7 @@
     - name: password
       prompt: "Enter your password"
       default: "{{ lookup('env', 'password_value') }}"
-      private: yes    
+      private: yes
   tasks:
     - include_role:
         name: sa_delete_dynamic_resource

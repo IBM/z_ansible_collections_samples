@@ -15,7 +15,7 @@ galaxy_info:
   # - Apache-2.0
   # - CC-BY-4.0
   license: "Apache License, Version 2.0"
-  # Check this license. This should correspnd to the same license as in the README  
+  # Check this license. This should correspnd to the same license as in the README
   min_ansible_version: 2.4
 
   # If this a Container Enabled role, provide the minimum Ansible Container version.

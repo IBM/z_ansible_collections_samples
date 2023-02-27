@@ -6,7 +6,7 @@
     dest: '{{ uss_file_path }}/CPTOMVS.j2'
 
 - name: execute permission for copy data
-  file: 
+  file:
     path: '{{ uss_file_path }}/CPTOMVS.j2'
     state: file
     mode: a+x

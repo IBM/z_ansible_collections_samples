@@ -180,7 +180,7 @@
               content:
                 - >-
                   1DATA SET UTILITY -
-                  GENERATE                                                                      
+                  GENERATE
                   PAGE 0001
                 - >-
                   -IEB352I WARNING: ONE OR MORE OF THE OUTPUT DCB PARMS COPIED FROM

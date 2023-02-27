@@ -32,7 +32,7 @@
       when: ctl == "start"
 
     - name: IMS cold start
-      ims_command: 
+      ims_command:
         command: NRE CHECKPOINT 0 FMT ALL
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'

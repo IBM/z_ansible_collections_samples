@@ -60,7 +60,7 @@
         - include_role:
             name: ims_cobol_define_ims_databases
       when: UPDATE_DATA
-    
+
     # Refresh IMS application resources
     - include_role:
         name: ims_cobol_refresh_ims_resources

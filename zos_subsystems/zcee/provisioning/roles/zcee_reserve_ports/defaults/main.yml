@@ -9,21 +9,21 @@ tcpip_profile: USER.PARMLIB(TCPPROF2)
 ################################################################################
 # Desired port information for IMS 15
 # DYNAMICALLY_RESERVE_PORTS: yes # if yes, ports listed below will be overwritten
-# If RESERVE_SPECIFIC_PORT is off, a port number will be selected from desired range 
+# If RESERVE_SPECIFIC_PORT is off, a port number will be selected from desired range
 # If on and port taken, playbook will fail
 # Only used if DYNAMICALLY_RESERVE_PORTS=yes
-# If DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports                        
+# If DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
 ################################################################################
 DYNAMICALLY_RESERVE_PORTS: yes
 
 ################################################################################
-# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will 
-# reserve an open port within the default range of the Ansible zport module.            
+# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will
+# reserve an open port within the default range of the Ansible zport module.
 ################################################################################
 RESERVE_SPECIFIC_PORT: yes
 
 ################################################################################
-# HTTP port for zCEE, may be determined at runtime.              
+# HTTP port for zCEE, may be determined at runtime.
 ################################################################################
 zcon_http_port: '1322'
 # ZCON_HTTP_PORT_ID: ''
@@ -37,4 +37,4 @@ zcon_https_port: '1321'
 ################################################################################
 # The host name of the system running zCEE.
 ################################################################################
-zcon_hostname: '{{ HOSTNAME }}' 
+zcon_hostname: '{{ HOSTNAME }}'

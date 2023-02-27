@@ -7,7 +7,7 @@
 zcon_install_dir: /usr/lpp/zosconnect/v3r0 # TrySample/
 
 ################################################################################
-# Specifies the path to the zCEE mount point. 
+# Specifies the path to the zCEE mount point.
 ################################################################################
 zcon_zfs_mountpoint: '/var/zosconnect'
 
@@ -17,6 +17,6 @@ zcon_zfs_mountpoint: '/var/zosconnect'
 softwareServiceInstanceName: ZC01
 
 ################################################################################
-# Specifies the path to the base zCEE configuration directory. 
+# Specifies the path to the base zCEE configuration directory.
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'
