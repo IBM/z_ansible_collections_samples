@@ -3,4 +3,3 @@
 - name: "Stop the Mpp region"
   shell: "/{{ DFS_IMS_SSID }}STOP REGION JOBNAME {{ DFS_IMS_SSID }}MPP{{ REGION_NUM|string }}"
   ignore_errors: yes
-  

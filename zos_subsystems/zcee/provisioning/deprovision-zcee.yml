@@ -42,4 +42,3 @@
             name: '{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}'
             state: absent
             volume: "{{ zcon_zos_vsam_volume }}"
-            

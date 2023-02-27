@@ -60,7 +60,7 @@ skip_list:
   # - yaml[empty-lines]
   # - yaml[indentation]
   - yaml[line-length]
-  - yaml[new-line-at-end-of-file]
+  # - yaml[new-line-at-end-of-file]
   - yaml[octal-values]
   - yaml[trailing-spaces]
   - yaml[truthy]
