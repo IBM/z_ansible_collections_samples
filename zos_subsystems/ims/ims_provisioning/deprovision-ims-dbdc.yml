@@ -2,7 +2,7 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
-  hosts: zsystem
+  hosts: zvm
   gather_facts: false
   # * Include different variable files depending on environment/inventory used
   vars_files:

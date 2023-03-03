@@ -1,3 +1,16 @@
-LANG=ENU
-TRCLEV=(*,LOW,BPE)    /* DEFAULT ALL TRACES TO LOW  */
-TRCLEV=(*,LOW,SCI)   /* DEFAULT SCI TRACES TO LOW  */
+*--------------------------------------------------------------------*
+* CONFIGURATION FILE FOR BPE WITH CQS, OM, RM, SCI - BPECONFG        *
+*--------------------------------------------------------------------*
+
+LANG=ENU                             /* LANGUAGE FOR MESSAGES      */
+                                     /* (ENU = U.S. ENGLISH)       */
+
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+
+TRCLEV=(*,LOW,BPE)                   /* DEFAULT ALL TRACES TO LOW  */
+
+# NOTE: KEEP THE FOLLOWING FOR COMPATIBILITY WITH 6.1 BPE
+
+TRCLEV=(*,LOW,SCI)                   /* DEFAULT SCI TRACES TO LOW  */

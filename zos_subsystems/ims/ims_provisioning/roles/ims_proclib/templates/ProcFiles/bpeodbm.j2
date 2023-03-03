@@ -1,0 +1,53 @@
+********************************************************************
+* CONFIGURATION FILE FOR BPE FOR ODBM                              *
+********************************************************************
+LANG=ENU                            /* LANGUAGE FOR MESSAGES     */
+                                    /* (ENU = U.S. ENGLISH)      */
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+TRCLEV=(*,HIGH,BPE,PAGES=20)        /* DEFAULT TRACES TO HIGH    */
+TRCLEV=(STG,MEDIUM,BPE)             /* STORAGE TRACE             */
+TRCLEV=(CBS,MEDIUM,BPE)             /* CONTROL BLK SRVCS TRACE   */
+TRCLEV=(DISP,HIGH,BPE)              /* DISPATCHER TRACE          */
+TRCLEV=(AWE,HIGH,BPE)               /* AWE SERVER TRACE          */
+TRCLEV=(SSRV,HIGH,BPE)              /* SYSTEM SERVICE TRACE      */
+#--------------------------------------#
+# DEFINITIONS FOR CQS TRACES           #
+#--------------------------------------#
+TRCLEV=(*,HIGH,CQS)                   /* SET DEFAULT FOR ALL CQS    */
+                                      /* TRACES TO HIGH.            */
+#
+#--------------------------------------#
+# DEFINITIONS FOR ODBM TRACES          #
+#--------------------------------------#
+TRCLEV=(*,HIGH,ODBM)                  /* SET DEFAULT FOR ALL ODBM   */
+                                      /* TRACES TO HIGH.            */
+#--------------------------------------#
+# DEFINITIONS FOR OM TRACES            #
+#--------------------------------------#
+TRCLEV=(*,HIGH,OM)                    /* SET DEFAULT FOR ALL OM     */
+                                      /* TRACES TO HIGH.            */
+#--------------------------------------#
+# DEFINITIONS FOR RM TRACES            #
+#--------------------------------------#
+TRCLEV=(*,HIGH,RM)                   /* SET DEFAULT FOR ALL RM     */
+                                     /* TRACES TO HIGH.            */
+#--------------------------------------#
+# DEFINITIONS FOR SCI TRACES           #
+#--------------------------------------#
+TRCLEV=(*,HIGH,SCI)                  /* SET DEFAULT FOR ALL SCI    */
+                                     /* TRACES TO HIGH.  UNCOMMENT */
+#
+# DEFINITIONS FOR IMS CONNECT TRACES
+#
+TRCLEV=(*,HIGH,HWS,PAGES=20)        /* DEFAULT TRACES TO HIGH    */
+TRCLEV=(HWSI,HIGH,HWS,PAGES=100)    /* OTMA COMM ACTIVITY TRACE  */
+TRCLEV=(HWSN,HIGH,HWS,PAGES=100)    /* LOCAL OPT DRIVER ACTIVITY */
+TRCLEV=(HWSW,HIGH,HWS,PAGES=100)    /* TCP/IP DRIVER ACTIVITY    */
+TRCLEV=(OTMA,HIGH,HWS,PAGES=100)    /* XCF CALLS TRACE           */
+TRCLEV=(TCPI,HIGH,HWS,PAGES=100)    /* TCP/IP CALLS TRACE        */
+#
+# DEFINITIONS FOR EXITS
+#
+EXITMBR=(HWSEXIT0,HWS)              /* ADAPTER EXITS             */

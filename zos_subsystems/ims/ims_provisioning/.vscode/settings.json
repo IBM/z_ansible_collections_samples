@@ -1,0 +1,11 @@
+{
+    "yaml.schemas": {
+        "file:///Users/pedrotrevino/.vscode/extensions/ibm.zopeneditor-3.0.0/resources/zapp-schema-1.0.0.json": [
+            "zapp.yaml"
+        ],
+        "file:///Users/pedrotrevino/.vscode/extensions/ibm.zopeneditor-3.0.0/resources/zcodeformat-schema-0.0.1.json": [
+            "zcodeformat.yaml"
+        ],
+        "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json": "file:///Users/pedrotrevino/Desktop/Coding/ims_provisioning/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning/host_vars/zvm.yml"
+    }
+}

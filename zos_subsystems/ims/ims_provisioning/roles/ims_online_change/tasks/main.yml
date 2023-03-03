@@ -11,41 +11,31 @@
       - set_fact:
           eager_role_path: '{{role_path}}'
 
-      # Send the template over
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSENOLC.j2'
-
-      when: enable_olc and not provision
-
-    - name: Enable IMS OLC
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSENOLC.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
-      when: enable_olc
-
+# ------------------------------------------------------------------------------------------------------ DFSENOLC
+      - name: Enable IMS OLC
+        zos_copy:
+          src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSMREC)"
+          dest: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT"
+          remote_src: true
+        when: enable_olc
+# ------------------------------------------------------------------------------------------------------
 
     - block:
       - set_fact:
           eager_role_path: '{{role_path}}'
 
       # Send the template over
+# ------------------------------------------------------------------------------------------------------
+# Calls a procedure, cannot convert, plus, the procedure was defined on the execution of ims_initialize
+# ------------------------------------------------------------------------------------------------------
+
+
       - include_role:
           name: send-template
         vars:
           path: '{{ eager_role_path }}/templates/DFS4ACTV.j2'
 
       when: active_libs and not provision
-
-      # - name: Enable IMS OLC
-      #   zos_copy:
-      #     src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSMREC)"
-      #     dest: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT"
-      #     remote_src: true
-      #   when: enable_olc
 
     # We need a module for the online change utility, no way around it
     - name: Establish active libs

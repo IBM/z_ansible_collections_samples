@@ -4,27 +4,35 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
-
   block:
 
     - block:
       - set_fact:
           eager_role_path: '{{role_path}}'
+# ------------------------------------------------------------------------------------------------------------------ DFSSETPG
+    - name: Authorize IMS datasets 
+      zos_apf:
+        force_dynamic: true
+        batch:
+          - library: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+            volume: '{{ DFS_DS_VOLUME1 }}'
+            sms: false
+          - library: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS'
+            volume: '{{ DFS_DS_VOLUME1 }}'
+            sms: false
+          - library: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA'
+            volume: '{{ DFS_DS_VOLUME1 }}'
+            sms: false
+          - library: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSB'
+            volume: '{{ DFS_DS_VOLUME1 }}'
+            sms: false
+          - library: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EXITLIB'
+            volume: '{{ DFS_DS_VOLUME1 }}'
+            sms: false
+      register: apf_output
+      failed_when: # Ignore the error msg "already present in APF" because if this playbook
+        - apf_output.rc > 0
+        - '"already present in APF" not in apf_output.stderr'
 
-      # Send the template over
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSSETPG.j2'
-
-      when: auth_datasets and not provision
-
-    - name: Auth IMS datasets to z/OS
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSSETPG.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
-        max_rc: 12
-      register: response
       when: auth_datasets
+# ------------------------------------------------------------------------------------------------------------------

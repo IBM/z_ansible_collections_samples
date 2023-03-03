@@ -1,0 +1,77 @@
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS34
+//*
+//* FUNCTION: IMS SKELETAL JCL FOR DBRC GENJCL.CA
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//CA%STPNO  EXEC PGM=DFSUCUM0,PARM='DBRC=Y'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*            JCL FOR CHANGE ACCUMULATION.
+//*
+//STEPLIB   DD DISP=SHR,DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1  EQ  '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2  EQ  '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3  EQ  '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DISP=SHR,DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB
+//SYSOUT    DD SYSOUT=*
+//SORTLIB   DD DSN=SYS1.SORTLIB,DISP=SHR
+//SORTWK01  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK02  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK03  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK04  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK05  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK06  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+%DELETE  (%CAODSN EQ '')
+//DFSUCUMO  DD DSN=%CAODSN,
+//             DISP=OLD
+%ENDDEL
+%DELETE (%CAODSN NE '')
+//DFSUCUMO  DD DUMMY,DCB=BLKSIZE=100
+%ENDDEL
+//DFSUCUMN  DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.CA.%CAGRP.CA%TIME,
+//             DISP=(NEW,CATLG),
+//             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(1,1))
+%SELECT  RLDS((%CAGRP),(FROM(%DSLLGTM)))
+//DFSULOG   DD DSN=%LOGDSN,
+//             DCB=RECFM=VB,
+//             DISP=OLD
+%ENDSEL
+%DELETE  (%LOGSEL EQ 'YES')
+//DFSULOG   DD DUMMY,DCB=BLKSIZE=100
+%ENDDEL
+//DFSUDD1   DD DUMMY
+//SYSIN     DD *
+%CADB0
+/*

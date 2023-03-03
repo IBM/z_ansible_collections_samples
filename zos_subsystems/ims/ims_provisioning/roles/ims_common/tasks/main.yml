@@ -28,7 +28,7 @@
       retries: 5
       delay: 5
       until: ims_ready_msg.actions
-      ignore_errors: true
+      # ignore_errors: true
       when: ctl == "start"
 
     - name: IMS cold start

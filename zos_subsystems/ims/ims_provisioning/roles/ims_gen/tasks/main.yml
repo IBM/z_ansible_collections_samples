@@ -40,8 +40,6 @@
           - SYS1.MACLIB
       when: dbd_gen
 
-
-
     - name: Prep PSB step 2
       ims_psb_gen:
         src: '{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSISRC'
@@ -106,7 +104,6 @@
           - IMSBLD.I15RTSMM.SDFSMAC
           - SYS1.MACLIB
       when: psb_gen
-
 
     - name: Prep ACBLIB step 3
       ims_acb_gen:

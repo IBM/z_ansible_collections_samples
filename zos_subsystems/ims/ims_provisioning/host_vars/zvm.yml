@@ -1,5 +1,5 @@
 PYZ: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
-ZOAU: /zoau/v1.0.3-ptf2
+ZOAU: /zoau/v1.1.1-ptf1
 
 system_environment:
   _BPXK_AUTOCVT: "ON"
@@ -103,6 +103,12 @@ DFS_AUTH_LIB_SYSHLQ1: IMSBLD
 # by IMS during provisioning. These should exist prior to
 # running playbooks
 DFS_AUTH_LIB_SYSHLQ2: I15RTSMM
+
+# ---------------------------------------------------------------------------- #
+#  Jobs related settings                                                       #
+# ---------------------------------------------------------------------------- #
+JOB_CLASS: K
+MSG_CLASS: E
 # ---------------------------------------------------------------------------- #
 # The fully qualified dataset name for the JOBS PDS
 # this will hold jobs for starting and stoppng IMS resources
@@ -113,6 +119,8 @@ DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
 
 # The fully qualified dataset name for the IMS PROCLIB
 DFS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+
+DFS_IMS_MFS_FORMAT: IMSTESTG.MFS.FORMAT
 
 
 # ---------------------------------------------------------------------------- #

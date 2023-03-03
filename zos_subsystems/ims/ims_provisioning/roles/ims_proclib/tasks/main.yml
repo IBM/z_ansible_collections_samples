@@ -10,21 +10,69 @@
 
       - set_fact:
           eager_role_path: '{{role_path}}'
-
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE302J.j2'
-
-      when: add and not provision
-
-    - name: Add IMS procs
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE302J.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+# -------------------------------------------------------------------------------------------------------------- DFSE302J
+    - name: Allocating Proclib Members
+      block:
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+        - name: Create temporary directory to store PROCLIB members
+          tempfile:
+            state: directory
+          register: procfiles_tmp_dir
+        - name: Send PROCLIB member templates to USS directory
+          include_role:
+            name: send-templates
+          vars:
+            template_path: '{{eager_role_path}}/templates/ProcFiles/*'
+            uss_file_path: '{{ procfiles_tmp_dir.path }}'
+        - name: Remove extensions from filenames
+          shell: >
+            for procname in $(ls *.j2); do
+            basename="$(echo ${procname} | cut -d'.' -f1)";
+            cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
+            done
+          args:
+            chdir: '{{ procfiles_tmp_dir.path }}'
+      always:
+        - name: Delete the temporary PROCLIB files directory
+          file:
+            path: '{{ procfiles_tmp_dir.path }}'
+            state: absent
       when: add
+
+    - block:
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+    - name: Allocating TCFSLIB Members
+      block:
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+        - name: Create temporary directory to store TCFSLIB members
+          tempfile:
+            state: directory
+          register: tcf_tmp_dir
+        - name: Send TCFSLIB member templates to USS directory
+          include_role:
+            name: send-templates
+          vars:
+            template_path: '{{eager_role_path}}/templates/TcfFiles/*'
+            uss_file_path: '{{ tcf_tmp_dir.path }}'
+        - name: Remove extensions from filenames
+          shell: >
+            for procname in $(ls *.j2); do
+            basename="$(echo ${procname} | cut -d'.' -f1)";
+            cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB(${basename})'" ;
+            done
+          args:
+            chdir: '{{ tcf_tmp_dir.path }}'
+      always:
+        - name: Delete the temporary TCFSLIB files directory
+          file:
+            path: '{{ tcf_tmp_dir.path }}'
+            state: absent
+      when: add
+
+# --------------------------------------------------------------------------------------------------------------
 
     # Add ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
     # THIS MEMBER DEFINES THE CONFIGURATION FILE FOR BPE WITH
@@ -34,69 +82,113 @@
       - set_fact:
           eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE303J.j2'
-
-      when: bpeconfg and not provision
-
-    - name: Define IMS subcomponents
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE303J.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+# -------------------------------------------------------------------------------------------------------------- DFSE303J
+    - name: Allocating BPECONFG Members
+      block:
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+        - name: Create temporary directory to store BPECONFG members
+          tempfile:
+            state: directory
+          register: bpe_tmp_dir
+        - name: Send BPECONFG member templates to USS directory
+          include_role:
+            name: send-templates
+          vars:
+            template_path: '{{eager_role_path}}/templates/Bpeconfg/*'
+            uss_file_path: '{{ bpe_tmp_dir.path }}'
+        - name: Remove extensions from filenames
+          shell: >
+            for procname in $(ls *.j2); do
+            basename="$(echo ${procname} | cut -d'.' -f1)";
+            cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
+            done
+          args:
+            chdir: '{{ bpe_tmp_dir.path }}'
+      always:
+        - name: Delete the temporary BPECONFG files directory
+          file:
+            path: '{{ bpe_tmp_dir.path }}'
+            state: absent
       when: bpeconfg
-
+# --------------------------------------------------------------------------------------------------------------
 
     - block:
 
       - set_fact:
           eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFS4CPYP.j2'
-
-      when: copy and not provision
-
-    - name: Copy procs in IMS PROCLIB
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFS4CPYP.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+# -------------------------------------------------------------------------------------------------------------- DFS4CPYP
+      - name: Copy PROCS to Private Proclib
+        zos_copy:
+          src: "{{ item.src }}"
+          dest: "{{ item.dest }}"
+          remote_src: True
+          force: True
+        loop:
+          - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(IMS)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}CTL)' }
+          - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DLISAS)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DLI)' }
+          - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DBRC)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DRC)' }
+          - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}OM)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}OM)' }
+          - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}SCI)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SCI)' }
+          - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}RM)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}RM)' }
       when: copy
-
+# --------------------------------------------------------------------------------------------------------------
 
     - block:
 
       - set_fact:
           eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE313J.j2'
-
-      when: copy_to_jobs and not provision
-
-    - name: Copy procs to jobs dataset
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE313J.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+# -------------------------------------------------------------------------------------------------------------- DFSE313J
+    - name: Allocating JOBS Members
+      block:
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+        - name: Create temporary directory to store JOBS members
+          tempfile:
+            state: directory
+          register: jobs_tmp_dir
+        - name: Send JOBS member templates to USS directory
+          include_role:
+            name: send-templates
+          vars:
+            template_path: '{{eager_role_path}}/templates/Jobs/*'
+            uss_file_path: '{{ jobs_tmp_dir.path }}'
+        - name: Remove extensions from filenames
+          shell: >
+            for procname in $(ls *.j2); do
+            basename="$(echo ${procname} | cut -d'.' -f1)";
+            cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS(${basename})'" ;
+            done
+          args:
+            chdir: '{{ jobs_tmp_dir.path }}'
+      always:
+        - name: Delete the temporary JOBS files directory
+          file:
+            path: '{{ jobs_tmp_dir.path }}'
+            state: absent
       when: copy_to_jobs
-
+# -------------------------------------------------------------------------------------------------------------- 
 
     - block:
 
       - set_fact:
           eager_role_path: '{{role_path}}'
 
+# -------------------------------------------------------------------------------------------------------------- DFSCPYST
+      # - name: COPY STAGING LIBRARIES TO ACTIVE LIBRARIES
+      #   zos_copy:
+      #     src: "{{ item.src }}"
+      #     dest: "{{ item.dest }}"
+      #     remote_src: True
+      #     force: True
+      #   loop:
+      #     - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA' }
+      #     - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA' }         
+      #     - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATA' }
+      # when: copy_stage_libs
+# --------------------------------------------------------------------------------------------------------------
       - include_role:
           name: send-template
         vars:
@@ -117,22 +209,60 @@
 
       - set_fact:
           eager_role_path: '{{role_path}}'
-
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSPROCB.j2'
-
-      when: create_sample and not provision
-
-    - name: Create additional sample procedures
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSPROCB.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+# ------------------------------------------------------------------------------------------------------ DFSPROCB
+    - name: UPDATE
+      zos_mvs_raw: 
+        program_name: IEBUPDTE
+        parm: "NEW"
+        dds: 
+          - dd_output:
+              dd_name: SYSPRINT
+              return_content:
+                type: text
+          - dd_data_set: 
+              dd_name: SYSUT1
+              data_set_name: "{{ADDTL_SAMP_PROC_LIB}}"
+              disposition: shr
+          - dd_data_set: 
+              dd_name: SYSUT2
+              data_set_name: "{{ADDTL_SAMP_PROC_LIB}}"
+              disposition: shr
+          - dd_input: 
+              dd_name: SYSIN
+              content:
+                - "./        ADD  NAME=CBLTDLI"
+                - "  LIBRARY SDFSRESL(CBLTDLI)     DL/I LANG INTF"
+                - "  LIBRARY SDFSRESL(DFHEI01)     HLPI LANG INTF"
+                - "  LIBRARY SDFSRESL(DFHEI1)      HLPI LANG INTF"
+                - "  ENTRY DLITCBL"
+                - "./        ADD  NAME=PLITDLI"
+                - "  LIBRARY SDFSRESL(PLITDLI)     PL/I LANG INTF"
+                - "  LIBRARY SDFSRESL(DFHEI01)     HLPI LANG INTF"
+                - "  LIBRARY SDFSRESL(DFHEI1)      HLPI LANG INTF"
+                - "  ENTRY PLICALLA"
+                - "./        ADD  NAME=DFSMREC"
+                - "0,MODBLKSA,IMSACBA,FORMATA"
+                - "./        ADD  NAME=REFCPY"
+                - "          COPY INDD=REFOUT,OUTDD=REFOUT"
+                - "./        ADD  NAME=DFSACBCP"
+                - "          COPY INDD=IMSACB,OUTDD=IMSACB"
+                - "./        ADD  NAME=FMTCPY"
+                - "          COPY INDD=FORMAT,OUTDD=FORMAT"
       when: create_sample
 
+    - name: Copy additional sample procedures
+      zos_copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        remote_src: True
+        force: True
+        volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      loop:
+        - { src: '{{ADDTL_SAMP_PROC_LIB}}(DFSDBDGN)', dest: '{{ADDTL_SAMP_PROC_LIB}}(DBDGEN)' }
+        - { src: '{{ADDTL_SAMP_PROC_LIB}}(DFSIMSBT)', dest: '{{ADDTL_SAMP_PROC_LIB}}(IMSBATCH)' }
+        - { src: '{{ADDTL_SAMP_PROC_LIB}}(DFSPSBGN)', dest: '{{ADDTL_SAMP_PROC_LIB}}(PSBGEN)' }
+      when: create_sample
+# ------------------------------------------------------------------------------------------------------
 
     - name: Clean zCloud PROCLIB
       zos_data_set:

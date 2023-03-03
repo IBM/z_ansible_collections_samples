@@ -3,7 +3,7 @@
 - name: RACF Preparation
   collections:
     - ibm.ibm_zos_core
-    - ibm.ibm_zos_ims
+    - ibm.ibm_zos_ims 
 
   block:
 

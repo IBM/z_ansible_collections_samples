@@ -1,0 +1,37 @@
+sh echo '-Djava.class.path=>' > /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/imsudb.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/imsutm.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/samples/OpenDBIVP.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/imsjavaBase.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/imsjavaTM.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/imsJDBC.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/imsDBJCA.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/imsXQuery.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/imsDAS.jar:>'
+                                           >> /tmp/dfsjvmpr.props;
+echo '/u/{{ DFS_IMS_USERID }}/>' >> /tmp/dfsjvmpr.props;
+echo 'usr/lpp/ims/ims13/imsjava/classic/ivp/samples.jar:.'
+                                           >> /tmp/dfsjvmpr.props;
+export X="`sed -e "s/ //g" /tmp/dfsjvmpr.props`";
+echo $X > /tmp/dfsjvmpr.props;
+export X="`sed -e "s/>//g" /tmp/dfsjvmpr.props`";
+echo $X > /tmp/dfsjvmpr.props;
+export X="`sed -e "s/ //g" /tmp/dfsjvmpr.props`";
+echo $X > /tmp/dfsjvmpr.props;
