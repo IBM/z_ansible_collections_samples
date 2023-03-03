@@ -4,7 +4,7 @@
 # This sample playbook demonstrates how to use the role sa_create_dynamic_resource.
 # Example:
 # ansible-playbook -i inventory.yaml create-dynamic-resource.yaml
-- name: create and resume a dynamic resource in SA
+- name: Create and resume a dynamic resource in SA
   hosts: zos_host
   gather_facts: false
   collections:

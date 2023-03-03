@@ -50,7 +50,7 @@
 ###############################################################################
 
 ---
-- name: perform various operations with z/OSMF workflows
+- name: Perform various operations with z/OSMF workflows
   hosts: zos_systems
   gather_facts: false
   collections:

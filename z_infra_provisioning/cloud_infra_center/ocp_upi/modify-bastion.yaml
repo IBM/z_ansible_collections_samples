@@ -26,7 +26,7 @@
 # Change Summary:
 # - Change Ansible playbook name
 ---
-- name: modify dns on bastion
+- name: Modify dns on bastion
   hosts: bastion
 
   tasks:
@@ -40,7 +40,7 @@
       with_lines:
         - cat .new_worker_index
 
-    - name: check .validate_exist_ip exists
+    - name: Check .validate_exist_ip exists
       ansible.builtin.stat:
         path: .validate_exist_ip
       register: validate_ip_result

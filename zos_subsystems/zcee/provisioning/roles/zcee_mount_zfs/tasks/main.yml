@@ -22,7 +22,7 @@
   vars:
     regexp: '[^\s]+\s+\(([^\s]*)\)\s+[0-9]+'
 
-- name: get parent mount
+- name: Get parent mount
   ansible.builtin.shell: expr substr "$(mount -qv {{zcon_zfs_mountpoint}} | grep {{ mount_dataset }})" 5 1
   register: parentmount
 
@@ -49,7 +49,7 @@
 
     # mountvalue: '{{ "yes" if  parentmount.stdout is "A" else "unmount" if parentmount.stdout is "U" else "no" if parentmount.stdout is "-" else "" }}'
 
-- name: mount
+- name: Mount
   ansible.builtin.command: "mount -t ZFS -a {{ mountvalue[0] }} -f {{zcon_file_system_hlq}}.{{softwareServiceInstanceName}} {{ zcon_install_dir }}/wlp/etc"
   register: result
   failed_when: result.rc > 0 and "A problem was found with the mount point specified" not in result.stderr

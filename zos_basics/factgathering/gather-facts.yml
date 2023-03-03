@@ -16,7 +16,7 @@
 #
 ###############################################################################
 
-- name: z/OS Gather Facts Sample Playbook
+- name: z/OS Gather Facts Sample Playbook # noqa: name[casing]
   collections:
     - "ibm.ibm_zos_core"
   hosts: zos_host

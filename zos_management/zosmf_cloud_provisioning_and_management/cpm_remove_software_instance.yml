@@ -30,7 +30,7 @@
 ###############################################################################
 
 ---
-- name: remove a deprovisioned software service instance
+- name: Remove a deprovisioned software service instance
   hosts: cpm_host1
   gather_facts: false
   collections:

@@ -50,7 +50,7 @@
 ###############################################################################
 
 ---
-- name: provision a z/OS software service
+- name: Provision a z/OS software service
   hosts: cpm_host1
   gather_facts: false
   collections:

@@ -42,7 +42,7 @@
         dest: "{{ temp_file_path1.path }}/CRE_MPP.j2"
         output_encoding: "ASCII"
       delegate_to: localhost
-    - name: submit job on remote system
+    - name: Submit job on remote system
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ temp_file_path1.path }}/CRE_MPP.j2"
         location: LOCAL

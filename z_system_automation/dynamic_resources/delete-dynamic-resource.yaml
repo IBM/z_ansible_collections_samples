@@ -4,7 +4,7 @@
 # This sample playbook demonstrates how to use the role sa_delete_dynamic_resource.
 # Example:
 # ansible-playbook -i inventory.yaml delete-dynamic-resource.yaml
-- name: find, stop, and delete an SA resource
+- name: Find, stop, and delete an SA resource
   hosts: zos_host
   gather_facts: false
   collections:

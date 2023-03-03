@@ -51,7 +51,7 @@
 ###############################################################################
 
 ---
-- name: complete a z/OSMF workflow forcibly or idempotently
+- name: Complete a z/OSMF workflow forcibly or idempotently
   hosts: zos_systems
   gather_facts: false
   collections:

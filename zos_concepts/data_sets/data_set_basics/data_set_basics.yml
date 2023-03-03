@@ -101,7 +101,7 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: zos_copy
+    - name: zos_copy # noqa: name[casing]
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"

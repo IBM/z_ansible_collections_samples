@@ -24,7 +24,7 @@
   gather_facts: false
 
   tasks:
-    - name: oc path to configs.imageregistry.operator.openshift.io/cluster
+    - name: oc path to configs.imageregistry.operator.openshift.io/cluster # noqa: name[casing]
       ansible.builtin.command: ./oc patch configs.imageregistry.operator.openshift.io/cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
       environment:
         KUBECONFIG: "./auth/kubeconfig"

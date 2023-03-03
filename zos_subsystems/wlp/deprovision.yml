@@ -38,10 +38,10 @@
     - name: Delete the server directory
       ansible.builtin.shell: 'rm -rf {{liberty_server_path}}'
 
-    - name: unmount zFS file
+    - name: Unmount zFS file
       ansible.builtin.shell: "/usr/sbin/unmount {{environment_vars.WLP_USER_DIR}}"
 
-    - name: delete zFS file
+    - name: Delete zFS file
       ibm.ibm_zos_core.zos_data_set:
         name: "{{data_set_name}}"
         state: absent

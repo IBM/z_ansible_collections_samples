@@ -36,7 +36,7 @@
   ansible.builtin.shell: grep -n 'worker' /var/named/{{ cluster_domain_name  }}.zone |tail -1| cut --delimiter=":" --fields=1
   register: last_worker_ln
 
-- name: show msg new worker
+- name: Show msg new worker
   ansible.builtin.debug:
     msg: "{{last_worker_ln.stdout}}"
 

@@ -49,7 +49,7 @@
 ###############################################################################
 
 ---
-- name: manage a provisioned software service instance
+- name: Manage a provisioned software service instance
   hosts: cpm_host1
   gather_facts: false
   collections:

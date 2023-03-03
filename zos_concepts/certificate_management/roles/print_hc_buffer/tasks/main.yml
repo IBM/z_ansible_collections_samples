@@ -7,7 +7,7 @@
 ###########################################################################
 # skeleton for HZSPRNT
 ###########################################################################
-- name: "send jcl template"
+- name: Send jcl template
   block:
     - ansible.builtin.set_fact:
         eager_role_path: "{{ role_path }}"

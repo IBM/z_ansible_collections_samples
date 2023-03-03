@@ -30,7 +30,6 @@ skip_list:
   - meta-incorrect
   - meta-no-info
   - meta-no-tags
-  - name[casing]
   - name[missing]
   - name[play]
   - name[template]

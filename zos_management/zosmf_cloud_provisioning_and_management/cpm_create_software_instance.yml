@@ -95,7 +95,7 @@
 ###############################################################################
 
 ---
-- name: create instance of z/OS software in software instance registry
+- name: Create instance of z/OS software in software instance registry
   hosts: cpm_host1
   gather_facts: false
   collections:

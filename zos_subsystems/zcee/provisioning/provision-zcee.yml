@@ -41,7 +41,7 @@
             name: zcee_zcon_setup
 
         # Get the zOSConnectServer version and fail if the version is less than 3
-        - name: get the server version  - check server version 3 and up, fail if its less than 3
+        - name: Get the server version  - check server version 3 and up, fail if its less than 3
           ansible.builtin.shell: "iconv -f ISO8859-1 -t IBM-1047 {{zcon_install_dir}}/runtime/lib/versions/zosconnect.version.properties | grep productVersion | sed -En 's/com.ibm.websphere.productVersion=([0-9]+).*/\\1/p'"
           register: result
         - ansible.builtin.debug:

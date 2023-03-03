@@ -45,7 +45,7 @@
           vars:
             hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
-        - name: search for {{cert_label}} in report
+        - name: Search for {{cert_label}} in report
           ansible.builtin.set_fact:
             cert_found: true
           with_items: "{{hc_job_output.jobs.0.ddnames}}"
