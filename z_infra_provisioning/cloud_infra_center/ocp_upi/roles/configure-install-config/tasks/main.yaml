@@ -38,7 +38,7 @@
       sed -i '/httpProxy/a \ \ httpsProxy: {{ https_proxy }}' install-config.yaml
       sed -i '/httpsProxy/a \ \ noProxy: {{ no_proxy }}' install-config.yaml
   when:
-    - use_proxy == true
+    - use_proxy
 
 - name: Add local registry info in install-config.yaml
   ansible.builtin.shell:
@@ -47,7 +47,7 @@
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-v4.0-art-dev ' install-config.yaml
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-release ' install-config.yaml
   when:
-    - use_localreg == true
+    - use_localreg
 
 - name: Update networkType from OpenShiftSDN to OVNKubernetes
   ansible.builtin.shell:

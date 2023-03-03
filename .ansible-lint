@@ -27,7 +27,6 @@ skip_list:
   - jinja[invalid]
   - jinja[spacing]
   - latest[git]
-  - literal-compare
   - meta-incorrect
   - meta-no-info
   - meta-no-tags

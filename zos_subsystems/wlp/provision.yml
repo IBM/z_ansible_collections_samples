@@ -16,7 +16,7 @@
 
         - ansible.builtin.fail:
             msg: Liberty server instance exists
-          when: instance.stat.exists == true
+          when: instance.stat.exists
 
         # invoke role to create zFS
         - ansible.builtin.include_role:

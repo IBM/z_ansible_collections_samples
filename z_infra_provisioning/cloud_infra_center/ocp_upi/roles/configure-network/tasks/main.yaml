@@ -106,7 +106,7 @@
       - subnet_id: "{{ subnet_id.stdout }}"
         ip_address: "{{ os_bootstrap_ip }}"
   when:
-    - auto_allocated_ip == false
+    - not auto_allocated_ip
 
 - name: "Create the control server ports"
   openstack.cloud.port:
@@ -119,7 +119,7 @@
         ip_address: "{{ os_master_ip[item.0] }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
-    - auto_allocated_ip == false
+    - not auto_allocated_ip
 
 - name: "Create the compute server ports"
   openstack.cloud.port:
@@ -132,7 +132,7 @@
         ip_address: "{{ os_infra_ip[item.0]}}"
   with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
-    - auto_allocated_ip == false
+    - not auto_allocated_ip
 
 - name: "Create the bootstrap server port"
   openstack.cloud.port:
@@ -143,7 +143,7 @@
     fixed_ips:
       - subnet_id: "{{ subnet_id.stdout }}"
   when:
-    - auto_allocated_ip == true
+    - auto_allocated_ip
 
 - name: "Create the control server ports"
   openstack.cloud.port:
@@ -155,7 +155,7 @@
       - subnet_id: "{{ subnet_id.stdout }}"
   with_indexed_items: "{{ [os_port_master] * os_control_nodes_number }}"
   when:
-    - auto_allocated_ip == true
+    - auto_allocated_ip
 
 - name: "Create the compute server ports"
   openstack.cloud.port:
@@ -167,7 +167,7 @@
       - subnet_id: "{{ subnet_id.stdout }}"
   with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
-    - auto_allocated_ip == true
+    - auto_allocated_ip
 
 - name: "Set bootstrap port tag"
   ansible.builtin.command:

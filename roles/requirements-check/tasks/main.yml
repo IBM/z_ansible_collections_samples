@@ -71,7 +71,7 @@
 
 - ansible.builtin.fail:
     msg: "{{result_collection_status_msg}}"
-  when: result_collection_status_failed is defined and result_collection_status_failed == True
+  when: result_collection_status_failed is defined and result_collection_status_failed
 
 - ansible.builtin.fail:
     msg: "{{result_ansible_check.msg}}"
