@@ -35,7 +35,6 @@ skip_list:
   - name[play]
   - name[template]
   - no-changed-when
-  - no-free-form
   - no-handler
   - no-jinja-when
   - no-relative-paths

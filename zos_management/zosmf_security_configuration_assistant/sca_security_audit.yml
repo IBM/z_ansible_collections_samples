@@ -71,4 +71,5 @@
         expected_result: "all-failed" # Expect no access to any security resources described in the security requirement file
         target_userid: "{{target_userid}}" # Target user or group id to be validated
       register: result
-    - ansible.builtin.debug: var=result
+    - ansible.builtin.debug:
+        var: result

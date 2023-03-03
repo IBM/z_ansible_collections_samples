@@ -51,7 +51,8 @@
           with_items: "{{hc_job_output.jobs.0.ddnames}}"
           when: item.content is search("{{cert_label}}")
 
-        - ansible.builtin.debug: msg="{{cert_label}} expiring - {{cert_found}}"
+        - ansible.builtin.debug:
+            msg: "{{cert_label}} expiring - {{cert_found}}"
 
         - ansible.builtin.command: "date '+%b%d%y'"
           register: date_result

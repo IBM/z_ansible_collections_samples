@@ -69,4 +69,5 @@
         path_of_security_requirements: "{{path}}" # Path of the security requirement file
         target_userid: "{{target_userid}}" # Target user/group id to be validated
       register: result
-    - ansible.builtin.debug: var=result
+    - ansible.builtin.debug:
+        var: result

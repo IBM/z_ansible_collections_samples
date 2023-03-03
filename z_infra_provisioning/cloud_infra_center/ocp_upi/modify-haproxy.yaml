@@ -46,10 +46,12 @@
   register: exist_new_worker_https
 
 - name: "Increment backend http"
-  ansible.builtin.set_fact: new_worker_http={{ exist_new_worker_http.stdout|int + 2 }}
+  ansible.builtin.set_fact:
+    new_worker_http: "{{ exist_new_worker_http.stdout|int + 2 }}"
 
 - name: "Increment backend https"
-  ansible.builtin.set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
+  ansible.builtin.set_fact:
+    new_worker_https: "{{ exist_new_worker_https.stdout|int + 3 }}"
 
 - name: Add new worker http domain into dns
   ansible.builtin.shell:

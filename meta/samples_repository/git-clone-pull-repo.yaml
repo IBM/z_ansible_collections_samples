@@ -128,11 +128,12 @@
     ############################################################################
     - name: "Clone the repository
         https://github.com/{{ organization }}/{{ repo_name }}.git"
-      ansible.builtin.git: repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
-        dest="{{repo_root_dest}}/{{repo_name}}"
-        accept_hostkey=yes
-        force=yes
-        recursive=no
+      ansible.builtin.git:
+        repo: 'https://github.com/{{ organization }}/{{ repo_name }}.git'
+        dest: "{{repo_root_dest}}/{{repo_name}}"
+        accept_hostkey: true
+        force: true
+        recursive: false
       when: not directory_exists.stat.exists
       register: git_clone_result
 

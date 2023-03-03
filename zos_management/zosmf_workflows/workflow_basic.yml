@@ -94,7 +94,8 @@
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
       delegate_to: localhost
       register: compare_result
-    - ansible.builtin.debug: var=compare_result
+    - ansible.builtin.debug:
+        var: compare_result
 
     - name: Delete the workflow instance if already exists
       ibm.ibm_zosmf.zmf_workflow:
@@ -104,7 +105,8 @@
       delegate_to: localhost
       register: delete_result
       when: compare_result.workflow_key
-    - ansible.builtin.debug: var=delete_result
+    - ansible.builtin.debug:
+        var: delete_result
 
     - name: Create a new workflow instance and start it
       ibm.ibm_zosmf.zmf_workflow:
@@ -116,7 +118,8 @@
         workflow_owner: "{{ zmf_user }}"
       delegate_to: localhost
       register: start_result
-    - ansible.builtin.debug: var=start_result
+    - ansible.builtin.debug:
+        var: start_result
 
     - name: Check the status of the workflow instance
       ibm.ibm_zosmf.zmf_workflow:
@@ -125,4 +128,5 @@
         workflow_name: "ansible_sample_workflow_{{ inventory_hostname }}"
       delegate_to: localhost
       register: check_result
-    - ansible.builtin.debug: var=check_result
+    - ansible.builtin.debug:
+        var: check_result

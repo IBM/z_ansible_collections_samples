@@ -163,13 +163,17 @@
   become: true
   become_user: root
   become_method: sudo
-  ansible.builtin.service: name=haproxy state=restarted
+  ansible.builtin.service:
+    name: haproxy
+    state: restarted
 
 - name: Restart firewalld
   become: true
   become_user: root
   become_method: sudo
-  ansible.builtin.service: name=firewalld state=restarted
+  ansible.builtin.service:
+    name: firewalld
+    state: restarted
 
 - name: Check if haproxy is running
   become: true
