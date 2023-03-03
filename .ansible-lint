@@ -36,7 +36,6 @@ skip_list:
   - name[template]
   - no-changed-when
   - no-handler
-  - no-jinja-when
   - no-relative-paths
   - package-latest
   - risky-file-permissions

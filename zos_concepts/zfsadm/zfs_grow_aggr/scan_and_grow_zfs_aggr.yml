@@ -119,7 +119,7 @@
     - name: Build grow_list
       ansible.builtin.set_fact:
         grow_list: "{{ grow_list | default([]) + [item[0]] }}"
-      when: "{{ item[1] | int }} > {{ threshold_limit }}"
+      when: item[1] | int > threshold_limit
       loop: "{{ dsn_per_util_list }}"
 
     - name: Echo grow_list

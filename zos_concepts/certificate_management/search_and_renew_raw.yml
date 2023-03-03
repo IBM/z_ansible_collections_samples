@@ -49,7 +49,7 @@
           ansible.builtin.set_fact:
             cert_found: true
           with_items: "{{hc_job_output.jobs.0.ddnames}}"
-          when: item.content is search("{{cert_label}}")
+          when: item.content is search(cert_label)
 
         - ansible.builtin.debug:
             msg: "{{cert_label}} expiring - {{cert_found}}"
