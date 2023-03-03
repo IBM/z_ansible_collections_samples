@@ -13,7 +13,8 @@
   register: listuser_response
   failed_when: false
 
-- block:
+- when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
+  block:
     - name: Remove user from groups, assign new owner for group data sets
       ibm.ibm_zos_core.zos_tso_command:
         commands: "{{ lookup('template', '../templates/remove-from-group.j2') }}"
@@ -42,7 +43,6 @@
     - name: Remove the user
       ibm.ibm_zos_core.zos_tso_command:
         commands: "DELUSER ({{ userid | upper }})"
-  when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
 
 - name: Get information about user's home directory
   ansible.builtin.stat:
@@ -64,6 +64,7 @@
     state: absent
 
 - name: Remove persistent mount
+  when: bpxprm_member is defined and bpxprm_member
   block:
     - name: Generate tempfile to hold BPXPRMxx
       ansible.builtin.tempfile:
@@ -125,4 +126,3 @@
         path: "{{ backup.path }}"
         state: absent
       when: backup.path is defined and backup.path
-  when: bpxprm_member is defined and bpxprm_member

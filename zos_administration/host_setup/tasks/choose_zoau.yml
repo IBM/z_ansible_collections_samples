@@ -29,7 +29,8 @@
 ###############################################################################
 
 
-- block:
+- when: chosen_zoau is not defined
+  block:
     - name: Create temporary file
       ansible.builtin.tempfile:
         state: file
@@ -83,4 +84,3 @@
         ansible_python_interpreter: "{{ chosen_python.get('interpreter') }}"
       environment: "{{ environment_vars }}"
       when: zos_data_set_response is defined and zos_data_set_response.get('names', [])|length > 0
-  when: chosen_zoau is not defined

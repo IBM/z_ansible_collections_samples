@@ -6,7 +6,8 @@
     - ibm.ibm_zos_ims
 
   block:
-    - block:
+    - when: catalog == "allocate" and not provision
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
@@ -14,8 +15,6 @@
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSALCAT.j2"
-
-      when: catalog == "allocate" and not provision
 
     - name: Allocate IMS catalog DB
       zos_job_submit:

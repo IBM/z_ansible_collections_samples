@@ -31,7 +31,9 @@
         state: directory
       register: playbook_tmp_dir
 
-    - block:
+    - vars:
+        uss_file_path: '{{ playbook_tmp_dir.path }}'
+      block:
         - ansible.builtin.include_role:
             name: issue_operator_cmd
           vars:
@@ -204,5 +206,3 @@
           ansible.builtin.file:
             path: "{{ playbook_tmp_dir.path }}"
             state: absent
-      vars:
-        uss_file_path: '{{ playbook_tmp_dir.path }}'

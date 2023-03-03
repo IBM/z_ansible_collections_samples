@@ -6,7 +6,8 @@
     - ibm.ibm_zos_ims
 
   block:
-    - block:
+    - when: prep_exits and not provision
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
@@ -14,8 +15,6 @@
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFSE315J.j2"
-
-      when: prep_exits and not provision
 
     - name: Prep exits for IMS security and conn
       zos_job_submit:

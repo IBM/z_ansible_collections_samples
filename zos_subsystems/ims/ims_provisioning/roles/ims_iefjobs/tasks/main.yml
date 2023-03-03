@@ -6,7 +6,8 @@
     - ibm.ibm_zos_ims
 
   block:
-    - block:
+    - when: iefjobs == "delete"
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
@@ -22,9 +23,8 @@
             rexx_name: "IEFJOBSX.j2"
             max_rc: 0
 
-      when: iefjobs == "delete"
-
-    - block:
+    - when: iefjobs == "create" and not provision
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
@@ -32,8 +32,6 @@
             name: send-templates
           vars:
             template_path: "{{ eager_role_path }}/templates/IEFJOBS.j2"
-
-      when: iefjobs == "create" and not provision
 
     - ansible.builtin.include_role:
         name: submit-rexx

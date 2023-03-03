@@ -26,7 +26,6 @@ skip_list:
   - ignore-errors
   - jinja[invalid]
   - jinja[spacing]
-  - key-order[task]
   - latest[git]
   - literal-compare
   - meta-incorrect

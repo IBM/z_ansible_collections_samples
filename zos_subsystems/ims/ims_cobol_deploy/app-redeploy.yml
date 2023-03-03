@@ -12,6 +12,7 @@
   tasks:
     # Rebuild and update ACBLIB (run all gens) if requested.
     - name: Rebuild and update ACBLIB.
+      when: UPDATE_ACB
       block:
         - ansible.builtin.include_role:
             name: ims_cobol_run_gens
@@ -25,7 +26,6 @@
 
         - ansible.builtin.include_role:
             name: ims_cobol_copy_acblib_to_inactive_acb
-      when: UPDATE_ACB
 
     # Compile and link cobol apps
     - ansible.builtin.include_role:
@@ -37,6 +37,7 @@
 
     # Reload the data if requested
     - name: Reload the data.
+      when: UPDATE_DATA
       block:
         - ansible.builtin.include_role:
             name: ims_cobol_stop_ims_databases
@@ -59,7 +60,6 @@
         # Restart IMS databases
         - ansible.builtin.include_role:
             name: ims_cobol_define_ims_databases
-      when: UPDATE_DATA
 
     # Refresh IMS application resources
     - ansible.builtin.include_role:

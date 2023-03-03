@@ -19,7 +19,8 @@
     check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
 
   tasks:
-    - block:
+    - ignore_errors: true
+      block:
         - ansible.builtin.include_role:
             name: issue_tso_cmd
           vars:
@@ -27,7 +28,6 @@
             command:
               - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
               - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
-      ignore_errors: true
 
     - ansible.builtin.include_role:
         name: issue_tso_cmd

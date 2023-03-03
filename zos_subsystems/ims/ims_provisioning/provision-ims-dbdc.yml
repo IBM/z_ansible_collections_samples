@@ -17,7 +17,9 @@
       tags:
         - always
 
-    - block:
+    - vars:
+        uss_file_path: "{{ provision_tmp_dir.path }}"
+      block:
         - ansible.builtin.include_role:
             name: install-bzip2
 
@@ -197,5 +199,3 @@
             state: absent
       # tags:
       #  - always
-      vars:
-        uss_file_path: "{{ provision_tmp_dir.path }}"

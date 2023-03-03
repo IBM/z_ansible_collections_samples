@@ -6,7 +6,8 @@
     - ibm.ibm_zos_ims
 
   block:
-    - block:
+    - when: enable_olc and not provision
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
@@ -16,8 +17,6 @@
           vars:
             path: "{{ eager_role_path }}/templates/DFSENOLC.j2"
 
-      when: enable_olc and not provision
-
     - name: Enable IMS OLC
       zos_job_submit:
         src: "{{ uss_file_path }}/DFSENOLC.j2"
@@ -26,7 +25,8 @@
         wait_time_s: 30
       when: enable_olc
 
-    - block:
+    - when: active_libs and not provision
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: "{{role_path}}"
 
@@ -35,8 +35,6 @@
             name: send-template
           vars:
             path: "{{ eager_role_path }}/templates/DFS4ACTV.j2"
-
-      when: active_libs and not provision
 
       # - name: Enable IMS OLC
       #   zos_copy:
