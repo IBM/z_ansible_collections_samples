@@ -1,5 +1,5 @@
 # =================================================================
-# Copyright 2021 https://github.com/openshift/installer
+# Copyright 2022 https://github.com/openshift/installer
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -38,25 +38,16 @@
 - name: 'Import common yaml'
   import_tasks: common.yaml
 
-- name: 'Create the bootstrap server'
-  os_server:
-    name: "{{ os_bootstrap_server_name }}"
-    image: "icic_rhcos_qcow2"
-    flavor: "{{ os_flavor_bootstrap }}"
-    userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
-    timeout: "{{ create_server_timeout|int * 60 }}" 
-    auto_ip: no
-    availability_zone: "{{ create_server_zone }}"
-    nics:
-    - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+- name: 'Get image name for ZVM'
+  set_fact:
+    image_name: "icic_rhcos_{{ disk_type }}"
   when:
-  - vm_type == "kvm"
+    - vm_type == "zvm"
 
 - name: 'Create the bootstrap server'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -64,7 +55,7 @@
     availability_zone: "{{ create_server_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   when:
   - disk_type == "dasd"
   - vm_type == "zvm"
@@ -75,12 +66,12 @@
   register: bootstrap_flavor_size
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
+
 
 - name: 'Create the bootstrap server with default boot volume'
   os_server:
     name: "{{ os_bootstrap_server_name }}"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}" 
@@ -88,7 +79,7 @@
     availability_zone: "{{ create_server_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
@@ -101,21 +92,19 @@
   os_volume:
     state: present
     name: "{{ os_bootstrap_server_name }}-boot"
-    image: "icic_rhcos_{{ disk_type }}"
+    image: "{{ image_name }}"
     size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
     timeout: "{{ create_server_timeout|int * 60 }} "
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
   when: 
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
 
 - name: 'Create the bootstrap server with boot volume'
@@ -129,9 +118,10 @@
     availability_zone: "{{ create_server_zone }}"
     nics:
     - port-name: "{{ os_port_bootstrap }}"
-    meta: "{{ cluster_id_tag }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   when:
   - disk_type == "scsi"
-  - vm_type == "zvm"
   - volume_type_id is defined
+
+

@@ -46,6 +46,7 @@ often repeated and in need of automation.
 - Administration
   - [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
   - [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user) - \[[Playback](https://mediacenter.ibm.com/media/Managing+z+OS+Users+with+Ansible+/1_bnud4enw)]
+  - [Ansible Fact Gathering for z/OS](zos_basics/factgathering)
   - [Synchronize APF authorized libraries from a configuration cloned from GitHub](zos_concepts/program_authorization/git_apf) - \[[Playback](https://mediacenter.ibm.com/media/Using+Ansible+to+synchronize+z+OS+APF+libraries+from+a+GitHub+configuration+file/1_e6qsiwmg)]
   - [Manage z/OS Certificates](zos_concepts/certificate_management#readme)
 - Basic Operations
@@ -59,6 +60,7 @@ often repeated and in need of automation.
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
+  - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)

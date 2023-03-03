@@ -8,10 +8,10 @@
 # =================================================================
 
 ---
-- name: Create the compute nodes
-  hosts: localhost
-  roles:
-  - configure-compute-nodes
+- import_playbook: configure-compute-nodes-kvm.yaml
+  when: vm_type == "kvm"
+- import_playbook: configure-compute-nodes-zvm.yaml
+  when: vm_type == "zvm"
 
 - import_playbook: approve.yaml
 - import_playbook: wait-for-install-complete.yaml
