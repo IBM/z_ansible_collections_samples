@@ -126,7 +126,7 @@ licensing and instructions on how to configure the playbook. If configuration is
 required, a default configuration will be included with the playbook.
 
 For further reading on how playbook projects are organized in this repository,
-review the following [documentation](./docs/share/contribution-guidelines#playbook-structure).
+review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
 © Copyright IBM Corporation 2020, 2021
