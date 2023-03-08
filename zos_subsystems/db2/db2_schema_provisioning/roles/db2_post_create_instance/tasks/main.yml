@@ -12,9 +12,9 @@
         headers:
           Authorization: "Bearer {{ACCESS_TOKEN}}"
         body:
-          applicationIds:  "[\"{{APP_ID}}\"]"
+          applicationIds: "[\"{{APP_ID}}\"]"
           db2:
-            subsystemIds:  "[\"{{SUBSYSTEM_ID}}\"]"
+            subsystemIds: "[\"{{SUBSYSTEM_ID}}\"]"
           teamId: "{{TEAM_ID}}"
           environmentId: "{{ENV_ID}}"
           dataSeed: "master"
@@ -39,9 +39,9 @@
       headers:
         Authorization: "Bearer {{ACCESS_TOKEN}}"
       body:
-        applicationIds:  "[\"{{APP_ID}}\"]"
+        applicationIds: "[\"{{APP_ID}}\"]"
         db2:
-          subsystemIds:  "[\"{{SUBSYSTEM_ID}}\"]"
+          subsystemIds: "[\"{{SUBSYSTEM_ID}}\"]"
         teamId: "{{TEAM_ID}}"
         environmentId: "{{ENV_ID}}"
         name: "{{inst_name}}"

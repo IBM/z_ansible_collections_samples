@@ -22,7 +22,7 @@
 
 - name: Create install-config.yaml
   template:
-    src:  templates/install-config-yaml.j2
+    src: templates/install-config-yaml.j2
     dest: "install-config.yaml"
 
 - name: Configure machine network in install configuration

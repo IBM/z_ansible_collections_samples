@@ -77,7 +77,7 @@
         #     JAVA_CONF_PATH: '{{ dfsjvmpr_tmp.path }}'
 
         - name: Create dfsjvmpr.props for potential JMP regions
-          shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props #{{ JAVA_CONF_PATH }}
+          shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props # {{ JAVA_CONF_PATH }}
       when: DFS_INIT_JAVA_CONF
 
 

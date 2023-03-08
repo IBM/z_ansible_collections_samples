@@ -78,7 +78,7 @@
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
     - name: Detecting system name
-      #shell: "uname -a |awk '{print $2}'"
+      # shell: "uname -a |awk '{print $2}'"
       command: uname -n
       register: result
 

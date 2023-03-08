@@ -105,7 +105,7 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
-       #remote_src: yes
+       # remote_src: yes
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO

@@ -130,7 +130,7 @@
     fixed_ips:
     - subnet_id: "{{ subnet_id.stdout }}"
       ip_address: "{{ os_infra_ip[item.0]}}"
-  with_indexed_items:  "{{ [os_port_worker] * os_compute_nodes_number }}"
+  with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
   when:
   - auto_allocated_ip == false
 

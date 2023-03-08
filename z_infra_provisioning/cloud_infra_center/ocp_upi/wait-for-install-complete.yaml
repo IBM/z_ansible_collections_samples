@@ -53,4 +53,4 @@
 
   - name: Show openshift web-console and kubeadmin-password
     debug:
-      var:  webconsole.stdout_lines
+      var: webconsole.stdout_lines

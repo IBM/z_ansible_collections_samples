@@ -50,7 +50,7 @@
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Detecting system name
-      #shell: "uname -a |awk '{print $2}'"
+      # shell: "uname -a |awk '{print $2}'"
       command: uname -n
       register: result
 

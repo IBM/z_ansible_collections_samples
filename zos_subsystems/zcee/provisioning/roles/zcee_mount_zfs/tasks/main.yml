@@ -2,7 +2,7 @@
 # tasks file for zcee_mount_zfs
 - name: Delete existing directory if necessary
   file:
-    path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}' #/servers/{{softwareServiceInstanceName}}'
+    path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}' # /servers/{{softwareServiceInstanceName}}'
     state: absent 
   register: dirpath
 

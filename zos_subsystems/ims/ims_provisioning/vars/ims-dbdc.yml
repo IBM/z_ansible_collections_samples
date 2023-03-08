@@ -24,8 +24,8 @@ DXR_IRLM_SSID: XRLM
 CSQ_SSID: CSQ1
 
 ## SVC Values
-zCloud_IMS_SVC_Type2: '203'  #'229'
-zCloud_IMS_SVC_Type4: '202'  #'249'
+zCloud_IMS_SVC_Type2: '203'  # '229'
+zCloud_IMS_SVC_Type4: '202'  # '249'
 
 # the library to send the output of DFSPROCB
 ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
