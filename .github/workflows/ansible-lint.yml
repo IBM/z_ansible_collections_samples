@@ -1,0 +1,19 @@
+name: ansible-lint
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies from Ansible Galaxy
+        uses: ./.github/actions/install-requirements
+        with:
+          requirements: collections/requirements.yml
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint-action@v6

@@ -1,0 +1,66 @@
+exclude_paths:
+  - zos_concepts/certificate_management/roles/*/tests/test.yml
+  - zos_concepts/data_transfer/copy_sort_fetch/roles/*/tests/test.yml
+  - zos_concepts/data_transfer/dump_pack_ftp_unpack_restore/roles/*/tests/test.yml
+  - zos_concepts/program_authorization/git_apf/roles/*/tests/test.yml
+  - zos_concepts/user_management/add_remove_user/roles/*/tests/test.yml
+  - zos_subsystems/ims/ims_cobol_deploy/roles/*/tests/test.yml
+  - zos_subsystems/ims/ims_provisioning/roles/*/tests/test.yml
+  - zos_subsystems/wlp/roles/*/tests/test.yml
+  - zos_subsystems/zcee/provisioning/roles/*/tests/test.yml
+  
+  - z_systems_administration/zhmc/playbooks/vault_example.yml
+  - z_systems_administration/zhmc/playbooks/inventory_example.yml
+
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-bootstrap.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-compute-nodes.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-control-plane.yaml
+
+skip_list:
+  - args[module]
+  - command-instead-of-module
+  - command-instead-of-shell
+  - deprecated-bare-vars
+  - deprecated-command-syntax
+  - deprecated-local-action
+  - fqcn[action-core]
+  - fqcn[action]
+  - fqcn[keyword]
+  - ignore-errors
+  - jinja[invalid]
+  - jinja[spacing]
+  - key-order[task]
+  - latest[git]
+  - literal-compare
+  - meta-incorrect
+  - meta-no-info
+  - meta-no-tags
+  - name[casing]
+  - name[missing]
+  - name[play]
+  - name[template]
+  - no-changed-when
+  - no-free-form
+  - no-handler
+  - no-jinja-when
+  - no-relative-paths
+  - package-latest
+  - risky-file-permissions
+  - risky-shell-pipe
+  - role-name
+  - schema[meta]
+  - schema[playbook]
+  - schema[vars]
+  - var-naming
+  - var-naming[PYZ]
+  - var-naming[ZOAU]
+  - yaml[colons]
+  - yaml[commas]
+  - yaml[comments]
+  - yaml[empty-lines]
+  - yaml[indentation]
+  - yaml[line-length]
+  - yaml[new-line-at-end-of-file]
+  - yaml[octal-values]
+  - yaml[trailing-spaces]
+  - yaml[truthy]
