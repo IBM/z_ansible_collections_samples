@@ -23,4 +23,3 @@
 # variable`ansible_python_interpreter`
 ################################################################################
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
-

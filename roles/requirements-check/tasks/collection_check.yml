@@ -111,6 +111,3 @@
   register: result_collection_status
   ignore_errors: true
   loop: "{{ result_ansible_version_filter.results}}"
-
-
-

@@ -43,7 +43,3 @@ releases:
                 - Renamed `copy-sort-fetch.yaml` to `copy-sort-fetch.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
-
-
-
-

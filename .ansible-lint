@@ -54,7 +54,6 @@ skip_list:
   - var-naming
   - var-naming[PYZ]
   - var-naming[ZOAU]
-  - yaml[empty-lines]
   - yaml[indentation]
   - yaml[line-length]
   - yaml[new-line-at-end-of-file]

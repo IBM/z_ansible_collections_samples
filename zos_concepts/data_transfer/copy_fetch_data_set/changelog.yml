@@ -44,7 +44,3 @@ releases:
                 - Renamed `copy_fetch_data_set.yaml` to `copy_fetch_data_set.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
-
-
-
-

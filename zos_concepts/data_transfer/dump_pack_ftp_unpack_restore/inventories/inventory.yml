@@ -29,4 +29,3 @@ destination_system:
     destination: # do not change host name from "destination"
       ansible_host: zos_target_address
       ansible_user: zos_target_username
-

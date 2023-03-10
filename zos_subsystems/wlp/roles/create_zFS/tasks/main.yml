@@ -16,4 +16,3 @@
     command: zfsadm format -aggregate "{{data_set_name}}"
     register: response
     failed_when: response.rc > 0 and "Aggregate contains file system" not in response.stderr and "Aggregate is attached" not in response.stderr         
-

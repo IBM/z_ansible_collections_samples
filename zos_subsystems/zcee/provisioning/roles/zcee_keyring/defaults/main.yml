@@ -20,4 +20,3 @@ zcon_admin_server: '{{ TARGET_USERNAME }}'
 # Specifies the path to the base zCEE configuration directory. 
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'
-

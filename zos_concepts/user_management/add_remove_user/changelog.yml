@@ -38,7 +38,3 @@ releases:
                 - Site playbook for consistency with playbook design
                 - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
                 - Added runtime-requirements.yml that lists the requirements needed for this playbook to execute
-
-
-
-

@@ -12,5 +12,3 @@
   hosts: localhost
   roles:
   - configure-compute-nodes-kvm
-
-

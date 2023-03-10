@@ -197,4 +197,3 @@
           wait_time_s: 30
           max_rc: 2
         when: stage2
-

@@ -208,4 +208,3 @@
       #  - always
       vars:
         uss_file_path: '{{ provision_tmp_dir.path }}'
-

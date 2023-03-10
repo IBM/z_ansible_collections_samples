@@ -18,4 +18,3 @@ source_system:
     zos_host:
       ansible_host: zos_target_address
       ansible_user: zos_target_username
-

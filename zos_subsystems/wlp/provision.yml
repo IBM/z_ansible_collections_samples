@@ -77,7 +77,3 @@
       # - name: Start the newly created WLP server #z/os operator task 
       #   shell: '{{liberty_bin_path}}/server start {{server_instance_name}}'
       #   tags: start 
-
-  
-      
-

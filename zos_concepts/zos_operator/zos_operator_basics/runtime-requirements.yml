@@ -28,4 +28,3 @@ requires_collection:
     - ibm_zos_core:
         name: "ibm_zos_core"
         version: "1.1.0"
-

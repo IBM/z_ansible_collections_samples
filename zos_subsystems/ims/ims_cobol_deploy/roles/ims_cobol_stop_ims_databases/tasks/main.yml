@@ -135,4 +135,3 @@
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
   ignore_errors: yes
-

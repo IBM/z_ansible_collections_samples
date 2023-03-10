@@ -304,8 +304,6 @@
                   - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
 
-
-
       # - name: Copy System Datasets
       #   zos_copy:
       #     src: "{{ item.src }}"

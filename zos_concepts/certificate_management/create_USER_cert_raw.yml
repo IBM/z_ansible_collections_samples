@@ -106,5 +106,3 @@
       vars:
         task_description: 'Run Health Check for {{check_name}}'
         command: "F HZSPROC,RUN,CHECK=({{check_name}})"
-
-

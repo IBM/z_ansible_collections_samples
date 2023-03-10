@@ -46,4 +46,3 @@
     path: '{{ zcee_config_path }}/resources/imsmobile-config/services'
     state: directory
     mode: '700'
-

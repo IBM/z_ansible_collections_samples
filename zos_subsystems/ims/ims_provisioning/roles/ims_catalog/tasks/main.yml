@@ -334,4 +334,3 @@
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
             state: absent
       when: catalog == "delete"
-

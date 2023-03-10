@@ -51,5 +51,3 @@
     ibm.ibm_zos_core.zos_tso_command:
       commands:
         - SETROPTS RACLIST(STARTED) REFRESH
-
-
