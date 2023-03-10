@@ -56,7 +56,6 @@ skip_list:
   - var-naming[ZOAU]
   - yaml[indentation]
   - yaml[line-length]
-  - yaml[new-line-at-end-of-file]
   - yaml[octal-values]
   - yaml[trailing-spaces]
   - yaml[truthy]
