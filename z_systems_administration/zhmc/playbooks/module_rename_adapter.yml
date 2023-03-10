@@ -12,18 +12,18 @@
     - ibm.ibm_zhmc
   tasks:
 
-  - name: "Ensure adapter with PCHID {{ adapter_id }} has name {{ new_adapter_name }}"
-    delegate_to: localhost
-    zhmc_adapter:
-      hmc_host: "{{ ansible_host }}"
-      hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
-      cpc_name: "{{ cpc_name }}"
-      name: "{{ new_adapter_name }}"
-      match:
-        adapter_id: "{{ adapter_id }}"
-      state: set
-    register: result
+    - name: "Ensure adapter with PCHID {{ adapter_id }} has name {{ new_adapter_name }}"
+      delegate_to: localhost
+      zhmc_adapter:
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ new_adapter_name }}"
+        match:
+          adapter_id: "{{ adapter_id }}"
+        state: set
+      register: result
 
-  - name: Print the result
-    debug:
-      var: result
+    - name: Print the result
+      debug:
+        var: result

@@ -60,19 +60,19 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
+      - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "dasd"
-  - vm_type == "zvm"
+    - disk_type == "dasd"
+    - vm_type == "zvm"
 
 - name: 'Convert compute node flavor from value into number'
   command:
     cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
   register: compute_flavor_size
   when:
-  - disk_type == "scsi"
+    - disk_type == "scsi"
 
 - name: 'Create the compute servers with default boot volume'
   os_server:
@@ -84,16 +84,16 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
+      - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - vm_type == "zvm"
-  - volume_type_id is not defined
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
 
 - name: 'Create compute boot volume'
   os_volume:
@@ -106,15 +106,15 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Set compute volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Create the compute server with boot volume'
   os_server:
@@ -126,10 +126,10 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
+      - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined

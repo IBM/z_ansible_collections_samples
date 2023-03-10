@@ -76,4 +76,4 @@
     name: haproxy
     state: started
   notify:
-  - restart firewalld
+    - restart firewalld

@@ -100,14 +100,14 @@
 
 - name: Ansible collection version check in progress
   assert:
-      that: (
-              item.installed_collection_version != None and
-              item.required_collection_version != None and
-              item.installed_collection_version is version(item.required_collection_version,'>=')
-            )
-      success_msg: "[SUCCESS] Ansible collection {{item.required_collection_name}} version {{item.installed_collection_version}} is installed."
-      fail_msg: "[FAIL] This playbook requires Ansible collection {{item.required_collection_name}} version {{item.required_collection_version}} and {{item.installed_collection_version if item.installed_collection_version != None else 'no version' }} is installed."
-      quiet: true
+    that: (
+            item.installed_collection_version != None and
+            item.required_collection_version != None and
+            item.installed_collection_version is version(item.required_collection_version,'>=')
+          )
+    success_msg: "[SUCCESS] Ansible collection {{item.required_collection_name}} version {{item.installed_collection_version}} is installed."
+    fail_msg: "[FAIL] This playbook requires Ansible collection {{item.required_collection_name}} version {{item.required_collection_version}} and {{item.installed_collection_version if item.installed_collection_version != None else 'no version' }} is installed."
+    quiet: true
   register: result_collection_status
   ignore_errors: true
   loop: "{{ result_ansible_version_filter.results}}"

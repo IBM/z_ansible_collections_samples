@@ -9,5 +9,5 @@
     password: "{{ password }}"
     method: DELETE
     headers:
-        Authorization: "Bearer {{ACCESS_TOKEN}}"
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
     status_code: 200

@@ -11,4 +11,4 @@
 - name: Configure network
   hosts: localhost
   roles:
-  - configure-network
+    - configure-network

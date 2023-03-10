@@ -29,4 +29,4 @@
 - name: configure haproxy on bastion
   hosts: bastion
   roles:
-  - configure-haproxy
+    - configure-haproxy

@@ -11,4 +11,4 @@
 - name: Configure install ignition
   hosts: localhost
   roles:
-  - configure-install-ignition
+    - configure-install-ignition

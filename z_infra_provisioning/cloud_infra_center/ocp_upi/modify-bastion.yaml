@@ -30,36 +30,36 @@
   hosts: bastion
 
   tasks:
-  - name: 'Validation worker ip address exist in named'
-    shell: |
-      rm -rf .validate_exist_ip
-      count=$(grep -Eo '{{ item.split(',')[1] | replace('ip=','') }}' /var/named/lynn.ocp.com.zone  | wc -l)
-      if [ $count != "0" ] ; then
-        echo 1 >> .validate_exist_ip
-      fi
-    with_lines: cat .new_worker_index
+    - name: 'Validation worker ip address exist in named'
+      shell: |
+        rm -rf .validate_exist_ip
+        count=$(grep -Eo '{{ item.split(',')[1] | replace('ip=','') }}' /var/named/lynn.ocp.com.zone  | wc -l)
+        if [ $count != "0" ] ; then
+          echo 1 >> .validate_exist_ip
+        fi
+      with_lines: cat .new_worker_index
 
-  - name: check .validate_exist_ip exists
-    stat:
-      path: .validate_exist_ip
-    register: validate_ip_result
+    - name: check .validate_exist_ip exists
+      stat:
+        path: .validate_exist_ip
+      register: validate_ip_result
 
-  - name: Check if worker ip already exist in named
-    fail:
-      msg: "The assigned worker ip already exists in named file, please use another new ip address."
-    failed_when: validate_ip_result.stat.exists
+    - name: Check if worker ip already exist in named
+      fail:
+        msg: "The assigned worker ip already exists in named file, please use another new ip address."
+      failed_when: validate_ip_result.stat.exists
 
-  - name: 'Modify bastion dns for new worker'
-    include_tasks: modify-dns.yaml
-    vars:
+    - name: 'Modify bastion dns for new worker'
+      include_tasks: modify-dns.yaml
+      vars:
         worker_ip: "{{ item.split(',')[1] | replace('ip=','') }}"
         worker_index: "{{ item.split(',')[0][-4:] }}"
         cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-    with_lines: cat .new_worker_index
+      with_lines: cat .new_worker_index
 
-  - name: 'Modify bastion haproxy for new worker'
-    include_tasks: modify-haproxy.yaml
-    vars:
-      worker_index: "{{ item.split(',')[0][-4:] }}"
-      cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-    with_lines: cat .new_worker_index
+    - name: 'Modify bastion haproxy for new worker'
+      include_tasks: modify-haproxy.yaml
+      vars:
+        worker_index: "{{ item.split(',')[0][-4:] }}"
+        cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
+      with_lines: cat .new_worker_index

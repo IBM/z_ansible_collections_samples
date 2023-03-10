@@ -8,21 +8,21 @@
   block:
 
     - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+        - set_fact:
+            eager_role_path: '{{role_path}}'
 
 # ------------------------------------------------------------------------------------------------------ DFSENOLC
-      - name: Enable IMS OLC
-        zos_copy:
-          src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSMREC)"
-          dest: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT"
-          remote_src: true
-        when: enable_olc
+        - name: Enable IMS OLC
+          zos_copy:
+            src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSMREC)"
+            dest: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT"
+            remote_src: true
+          when: enable_olc
 # ------------------------------------------------------------------------------------------------------
 
     - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+        - set_fact:
+            eager_role_path: '{{role_path}}'
 
       # Send the template over
 # ------------------------------------------------------------------------------------------------------
@@ -30,10 +30,10 @@
 # ------------------------------------------------------------------------------------------------------
 
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFS4ACTV.j2'
+        - include_role:
+            name: send-template
+          vars:
+            path: '{{ eager_role_path }}/templates/DFS4ACTV.j2'
 
       when: active_libs and not provision
 

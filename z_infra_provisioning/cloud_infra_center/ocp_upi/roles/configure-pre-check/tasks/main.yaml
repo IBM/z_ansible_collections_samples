@@ -99,15 +99,15 @@
   shell: openstack --os-volume-api-version=3 volume service list -f csv | grep cinder-volume | wc -l
   register: storage_backend
   when:
-  - volume_type_id is defined
-  - disk_type == "scsi"
+    - volume_type_id is defined
+    - disk_type == "scsi"
 
 - name: Get storage template
   shell: openstack --os-volume-api-version=3 volume type list -c ID -f value | grep {{ volume_type_id }} | wc -l
   register: storage_template
   when:
-  - volume_type_id is defined
-  - disk_type == "scsi"
+    - volume_type_id is defined
+    - disk_type == "scsi"
 
 - name: Check if storage provider is configured
   fail:

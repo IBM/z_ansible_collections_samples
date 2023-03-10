@@ -79,12 +79,12 @@
 
     - name: Obtain Variable Value
       vars:
-           instance_info_json: "{{lookup('file', instance_info_json_path)}}"
+        instance_info_json: "{{lookup('file', instance_info_json_path)}}"
 
       set_fact:
 
-         VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
+        VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
 
     - name: Display VAR1 value
       debug:
-          msg: "VAR1 Value is : {{ VAR1.value }}"
+        msg: "VAR1 Value is : {{ VAR1.value }}"

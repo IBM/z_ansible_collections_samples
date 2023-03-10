@@ -59,12 +59,12 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
+      - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }}"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - vm_type == "kvm"
-  - volume_type_id is not defined
+    - vm_type == "kvm"
+    - volume_type_id is not defined
 
 
 - name: 'Convert compute node flavor from value into number'
@@ -72,7 +72,7 @@
     cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
   register: compute_flavor_size
   when:
-  - disk_type == "scsi"
+    - disk_type == "scsi"
 
 
 - name: 'Create compute boot volume'
@@ -86,15 +86,15 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Set compute volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Create the compute server with boot volume'
   os_server:
@@ -106,11 +106,11 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_worker }}-{{ item.0 }}"
+      - port-name: "{{ os_port_worker }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }}"
     terminate_volume: True
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - vm_type == "kvm"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - vm_type == "kvm"
+    - volume_type_id is defined

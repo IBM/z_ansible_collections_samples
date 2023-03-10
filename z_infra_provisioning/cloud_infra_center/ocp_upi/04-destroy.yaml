@@ -22,6 +22,6 @@
 - import_playbook: destroy-security-groups.yaml
 - import_playbook: destroy-volumes.yaml
   when:
-  - volume_type_id is defined
-  - vm_type == "kvm"
+    - volume_type_id is defined
+    - vm_type == "kvm"
 - import_playbook: destroy-files.yaml

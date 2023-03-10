@@ -31,7 +31,7 @@
 
     - name: Get backup time before
       set_fact:
-         backup_time_before: "{{ display_output_before.content  | map('trim') | select('match','BKUPTIME') }}"
+        backup_time_before: "{{ display_output_before.content  | map('trim') | select('match','BKUPTIME') }}"
 
     - name: Issue the backup
       zos_operator:
@@ -70,7 +70,7 @@
 
     - name: Get backup time after
       set_fact:
-         backup_time_after: "{{ display_output_after.content  | map('trim') | select('match','BKUPTIME') }}"
+        backup_time_after: "{{ display_output_after.content  | map('trim') | select('match','BKUPTIME') }}"
 
     - name: Check that backup_time_after is different to backup_time_before
       fail:

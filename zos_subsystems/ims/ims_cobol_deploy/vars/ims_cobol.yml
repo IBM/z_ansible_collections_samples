@@ -120,15 +120,15 @@ loads:
    block_size: 27800
 
 dbds:
-  - name: ACCOUNT
-  - name: CUSTACCS
-  - name: CUSTOMER
-  - name: HISTORY
-  - name: TSTAT
+ - name: ACCOUNT
+ - name: CUSTACCS
+ - name: CUSTOMER
+ - name: HISTORY
+ - name: TSTAT
 
 psbs:
-  - name: IBACSUM
-  - name: IBLOAD
+ - name: IBACSUM
+ - name: IBLOAD
 
 # DFSMPR proc parameters
 SEND_CUSTOM_DFSMPR: yes
@@ -166,21 +166,21 @@ REPLACE_MEMBERS: yes
 
 # Database names used to copy source from USS to MVS.
 loadData:
-  - name: ACCOUNT
-  - name: CUSTACCS
-  - name: CUSTOMER
-  - name: HISTORY
-  - name: TSTAT
+ - name: ACCOUNT
+ - name: CUSTACCS
+ - name: CUSTOMER
+ - name: HISTORY
+ - name: TSTAT
 
 COBOL_PROGRAMS:
-  - "{{SAMPLE_COBOL_DIR}}/IBACSUM"
-  - "{{SAMPLE_COBOL_DIR}}/LOADACCT"
-  - "{{SAMPLE_COBOL_DIR}}/LOADCUSA"
-  - "{{SAMPLE_COBOL_DIR}}/LOADCUST"
-  - "{{SAMPLE_COBOL_DIR}}/LOADHIST"
-  - "{{SAMPLE_COBOL_DIR}}/LOADTSTA"
-  - "{{SAMPLE_COBOL_DIR}}/IBGCUDAT"
-  - "{{SAMPLE_COBOL_DIR}}/IBSCUDAT"
+ - "{{SAMPLE_COBOL_DIR}}/IBACSUM"
+ - "{{SAMPLE_COBOL_DIR}}/LOADACCT"
+ - "{{SAMPLE_COBOL_DIR}}/LOADCUSA"
+ - "{{SAMPLE_COBOL_DIR}}/LOADCUST"
+ - "{{SAMPLE_COBOL_DIR}}/LOADHIST"
+ - "{{SAMPLE_COBOL_DIR}}/LOADTSTA"
+ - "{{SAMPLE_COBOL_DIR}}/IBGCUDAT"
+ - "{{SAMPLE_COBOL_DIR}}/IBSCUDAT"
 
 # Cobol application related settings
 PGM_NAME: "IBACSUM"

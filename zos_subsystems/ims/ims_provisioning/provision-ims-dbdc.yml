@@ -17,7 +17,7 @@
         state: directory
       register: provision_tmp_dir
       tags:
-       - always
+        - always
 
     - set_fact:
         DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"

@@ -9,29 +9,29 @@
 ################################################################################
 
 ---
-  - name: Ansible version check in progress
-    assert:
-      msg: "This playbook requires Ansible version
-            {{ tmp.split('.')[0]|int }}.{{ tmp.split('.')[1]|int }}.{{ tmp.split('.')[2]| default (0)|int }} -
-            {{ tmp.split('.')[0]|int }}.{{ tmp.split('.')[1]|int }}.n and version
-            {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }}
-            has been detected."
-      that: (
-              ansible_version.major|int == {{tmp.split('.')[0]}}|int and
-              ansible_version.minor|int == {{tmp.split('.')[1]}}|int and
-              ansible_version.revision|int >= {{tmp.split('.')[2]|default (0)}}|int
-            )
-      quiet: true
-    register: result
-    ignore_errors: true
+- name: Ansible version check in progress
+  assert:
+    msg: "This playbook requires Ansible version
+          {{ tmp.split('.')[0]|int }}.{{ tmp.split('.')[1]|int }}.{{ tmp.split('.')[2]| default (0)|int }} -
+          {{ tmp.split('.')[0]|int }}.{{ tmp.split('.')[1]|int }}.n and version
+          {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }}
+          has been detected."
+    that: (
+            ansible_version.major|int == {{tmp.split('.')[0]}}|int and
+            ansible_version.minor|int == {{tmp.split('.')[1]}}|int and
+            ansible_version.revision|int >= {{tmp.split('.')[2]|default (0)}}|int
+          )
+    quiet: true
+  register: result
+  ignore_errors: true
 
-  - name: DEBUG(-v) Display Ansible version check
-    ansible.builtin.debug:
-      var: result
-      verbosity: 1
+- name: DEBUG(-v) Display Ansible version check
+  ansible.builtin.debug:
+    var: result
+    verbosity: 1
 
-  - set_fact:
-      temp_version: "{{ tmp.split('.')[0]}}.{{tmp.split('.')[1]}}.{{tmp.split('.')[2]| default (0)}}"
+- set_fact:
+    temp_version: "{{ tmp.split('.')[0]}}.{{tmp.split('.')[1]}}.{{tmp.split('.')[2]| default (0)}}"
 
-  - set_fact:
-      ansible_version_checks: "{{ ansible_version_checks |combine({temp_version:{'version':temp_version,'failed':result.failed}}) }}"
+- set_fact:
+    ansible_version_checks: "{{ ansible_version_checks |combine({temp_version:{'version':temp_version,'failed':result.failed}}) }}"

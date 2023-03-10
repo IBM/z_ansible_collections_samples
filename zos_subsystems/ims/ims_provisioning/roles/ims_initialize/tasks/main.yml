@@ -41,18 +41,18 @@
     # * Results in wrong paths being sent when passing vars that use role_path var
     - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+        - set_fact:
+            eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-templates
-        vars:
-          template_path: '{{ eager_role_path }}/templates/provision/*'
+        - include_role:
+            name: send-templates
+          vars:
+            template_path: '{{ eager_role_path }}/templates/provision/*'
 
-      - include_role:
-          name: save-templates-to-datasets
-        vars:
-          datasets: '{{ desired_install_job_save_locations.provision }}'
+        - include_role:
+            name: save-templates-to-datasets
+          vars:
+            datasets: '{{ desired_install_job_save_locations.provision }}'
 
       when: provision
 

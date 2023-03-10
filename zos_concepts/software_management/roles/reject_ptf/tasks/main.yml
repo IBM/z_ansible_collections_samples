@@ -17,7 +17,7 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
@@ -38,7 +38,7 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .

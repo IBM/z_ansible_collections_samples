@@ -19,23 +19,23 @@
 
 - name: Copy and extract zconbt
   block:
-  - name: Copy zconbt
-    copy:
-      src: '{{ role_path }}/files/{{ zconbt_compressed_name }}'
-      dest: '{{ install_path }}/{{ zconbt_compressed_name}}' # extracts to bin folder
+    - name: Copy zconbt
+      copy:
+        src: '{{ role_path }}/files/{{ zconbt_compressed_name }}'
+        dest: '{{ install_path }}/{{ zconbt_compressed_name}}' # extracts to bin folder
 
-  - name: Extract extract on target
-    shell: '{{ utility_path }}/bzip2 -df {{ zconbt_compressed_name }}; tar -Co . -xf zconbt.tar; rm zconbt.tar'   # ; mv ./bin/zconbt* . ; rmdir ./bin 2>/dev/null'
-    args:
-      chdir: '{{ install_path }}'
+    - name: Extract extract on target
+      shell: '{{ utility_path }}/bzip2 -df {{ zconbt_compressed_name }}; tar -Co . -xf zconbt.tar; rm zconbt.tar'   # ; mv ./bin/zconbt* . ; rmdir ./bin 2>/dev/null'
+      args:
+        chdir: '{{ install_path }}'
 
   when: zconbt_local_available.stat.exists and not zconbt_installed.stat.exists
 
 - name: Unzip existing zconbt.zip if available
   block:
-  - name: Unzip zconbt.zip into the install_path
-    shell: 'unzip {{ ZOS_CONNECT_HOME }}/zconbt.zip -d {{ install_path }}'
-    args:
-      chdir: '{{ install_path }}'
+    - name: Unzip zconbt.zip into the install_path
+      shell: 'unzip {{ ZOS_CONNECT_HOME }}/zconbt.zip -d {{ install_path }}'
+      args:
+        chdir: '{{ install_path }}'
 
   when: zconbt_zip_available.stat.exists and not zconbt_local_available.stat.exists and not zconbt_installed.stat.exists

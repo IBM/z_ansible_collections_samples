@@ -54,18 +54,18 @@
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
-    - port-name: "{{ os_port_bootstrap }}"
+      - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
   when:
-  - disk_type == "dasd"
-  - vm_type == "zvm"
+    - disk_type == "dasd"
+    - vm_type == "zvm"
 
 - name: 'Convert bootstrap flavor from value into number'
   command:
     cmd: "openstack flavor show {{ os_flavor_bootstrap }} -c disk -f value"
   register: bootstrap_flavor_size
   when:
-  - disk_type == "scsi"
+    - disk_type == "scsi"
 
 
 - name: 'Create the bootstrap server with default boot volume'
@@ -78,15 +78,15 @@
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
-    - port-name: "{{ os_port_bootstrap }}"
+      - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     boot_from_volume: True
     volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
     terminate_volume: True
   when:
-  - disk_type == "scsi"
-  - vm_type == "zvm"
-  - volume_type_id is not defined
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
 
 - name: 'Create bootstrap boot volume'
   os_volume:
@@ -98,14 +98,14 @@
     metadata: "{{ cluster_id_tag }}"
     timeout: "{{ create_server_timeout|int * 60 }} "
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Create the bootstrap server with boot volume'
   os_server:
@@ -117,9 +117,9 @@
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
-    - port-name: "{{ os_port_bootstrap }}"
+      - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined

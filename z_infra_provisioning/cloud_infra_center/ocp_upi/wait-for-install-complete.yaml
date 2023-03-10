@@ -24,33 +24,33 @@
   gather_facts: no
 
   tasks:
-  - name: oc path to configs.imageregistry.operator.openshift.io/cluster
-    command: ./oc patch configs.imageregistry.operator.openshift.io/cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
-    environment:
-      KUBECONFIG: "./auth/kubeconfig"
-    retries: 100
-    delay: 10
-    register: result
-    until: result is not failed
+    - name: oc path to configs.imageregistry.operator.openshift.io/cluster
+      command: ./oc patch configs.imageregistry.operator.openshift.io/cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
+      environment:
+        KUBECONFIG: "./auth/kubeconfig"
+      retries: 100
+      delay: 10
+      register: result
+      until: result is not failed
 
-  - name: Wait-for install-complete
-    command: "./openshift-install wait-for install-complete"
-    async: 3600
-    poll: 0
-    register: install_complete_sleeper
+    - name: Wait-for install-complete
+      command: "./openshift-install wait-for install-complete"
+      async: 3600
+      poll: 0
+      register: install_complete_sleeper
 
-  - name: 'Waiting for install-complete'
-    async_status:
-      jid: "{{ install_complete_sleeper.ansible_job_id }}"
-    register: job_result
-    until: job_result.finished
-    retries: 120
-    delay: 30
+    - name: 'Waiting for install-complete'
+      async_status:
+        jid: "{{ install_complete_sleeper.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 120
+      delay: 30
 
-  - name: Check openshift web-console and kubeadmin-password
-    shell: 'cat .openshift_install.log  | grep -A10 "Install complete"'
-    register: webconsole
+    - name: Check openshift web-console and kubeadmin-password
+      shell: 'cat .openshift_install.log  | grep -A10 "Install complete"'
+      register: webconsole
 
-  - name: Show openshift web-console and kubeadmin-password
-    debug:
-      var: webconsole.stdout_lines
+    - name: Show openshift web-console and kubeadmin-password
+      debug:
+        var: webconsole.stdout_lines

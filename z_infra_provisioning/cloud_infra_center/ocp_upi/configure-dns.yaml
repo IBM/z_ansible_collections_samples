@@ -31,4 +31,4 @@
   hosts: bastion
   serial: 2
   roles:
-  - configure-dns
+    - configure-dns

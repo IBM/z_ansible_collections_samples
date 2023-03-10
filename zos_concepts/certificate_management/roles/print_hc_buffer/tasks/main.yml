@@ -19,12 +19,12 @@
 
     - name: Get expiring certs report for {{ hc_check }}
       ibm.ibm_zos_core.zos_job_submit:
-          # src: USER.PRIVATE.PROCLIB(HZSPRINT)
-          # location: DATA_SET
-          # wait: true
-          src: '{{ uss_file_path }}/HZSPRINT.J2'
-          location: USS
-          wait: true
+        # src: USER.PRIVATE.PROCLIB(HZSPRINT)
+        # location: DATA_SET
+        # wait: true
+        src: '{{ uss_file_path }}/HZSPRINT.J2'
+        location: USS
+        wait: true
       register: hc_job_output
 
 # - name: "{{task_description}}"

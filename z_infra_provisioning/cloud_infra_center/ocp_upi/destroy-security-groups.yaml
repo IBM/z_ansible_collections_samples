@@ -24,15 +24,15 @@
   gather_facts: no
 
   tasks:
-  - name: 'Import common yaml'
-    import_tasks: common.yaml
+    - name: 'Import common yaml'
+      import_tasks: common.yaml
 
-  - name: 'List security groups'
-    command:
-      cmd: "openstack security group list --tags {{ cluster_id_tag }} -f value -c ID"
-    register: security_groups
+    - name: 'List security groups'
+      command:
+        cmd: "openstack security group list --tags {{ cluster_id_tag }} -f value -c ID"
+      register: security_groups
 
-  - name: 'Remove the cluster security groups'
-    command:
-      cmd: "openstack security group delete {{ item.1 }}"
-    with_indexed_items: "{{ security_groups.stdout_lines }}"
+    - name: 'Remove the cluster security groups'
+      command:
+        cmd: "openstack security group delete {{ item.1 }}"
+      with_indexed_items: "{{ security_groups.stdout_lines }}"

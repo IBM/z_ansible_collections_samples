@@ -1,13 +1,13 @@
 ---
-  # sysdef services
-  - name: System Definition Services
-    collections:
-      - ibm.ibm_zos_core
-      - ibm.ibm_zos_ims
+# sysdef services
+- name: System Definition Services
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
 
-    block:
+  block:
 
-      - block:
+    - block:
 
         - set_fact:
             eager_role_path: '{{role_path}}'
@@ -18,87 +18,87 @@
           vars:
             path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
 
-        when: preprocess and not provision
+      when: preprocess and not provision
 
 # ------------------------------------------------------------------------------------------------
-        # - name: IMS SYSTEM DEFINITION PREPROCESSOR - FOR NAME VALIDATION
-        #   zos_mvs_raw:
-        #     program_name: DFSPRE00
-        #     parm: "N,N"
-        #     dds:
-        #       - dd_data_set:
-        #           dd_name: STEPLIB
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
-        #           disposition: shr
-        #       - dd_dummy:
-        #           dd_name: SYSSUMPR
-        #       - dd_dummy:
-        #           dd_name: SYSCYLPR
-        #       - dd_output:
-        #           dd_name: SYSPRINT
-        #           return_content:
-        #             type: text
-        #       - dd_data_set:
-        #           dd_name: SYSLIB
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC"
-        #           disposition: shr
-        #       - dd_data_set:
-        #           dd_name: SYSIN80
-        #           disposition: new
-        #           disposition_normal: delete
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSIN"
-        #           space_type: cyl
-        #           space_primary: 5
-        #           space_secondary: 5
-        #           record_format: fb
-        #           record_length: 80
-        #           block_size: 11440
-        #           type: seq
-        #       - dd_input:
-        #           dd_name: SYSUT1
-        #           content: "UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5,5))"
-        #       - dd_data_set:
-        #           dd_name: SYSLIN
-        #           disposition: new
-        #           disposition_normal: delete
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSLIN"
-        #           space_type: cyl
-        #           space_primary: 1
-        #           space_secondary: 5
-        #           record_format: fb
-        #           record_length: 80
-        #           block_size: 11440
-        #           type: seq
-        #       - dd_data_set:
-        #           dd_name: SYSPRT80
-        #           disposition: new
-        #           disposition_normal: delete
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSPRT"
-        #           space_type: cyl
-        #           space_primary: 5
-        #           space_secondary: 5
-        #           record_format: fb
-        #           record_length: 121
-        #           block_size: 3146
-        #           type: seq
-        #       - dd_input:
-        #           dd_name: SYSCOBJ
-        #           content:
-        #             - "DUMMY,DCB=BLKSIZE=80"
-        #       - dd_input:
-        #           dd_name: SYSIN
-        #           content: "{{ lookup('template', '{{ pre }}') }}"
+      # - name: IMS SYSTEM DEFINITION PREPROCESSOR - FOR NAME VALIDATION
+      #   zos_mvs_raw:
+      #     program_name: DFSPRE00
+      #     parm: "N,N"
+      #     dds:
+      #       - dd_data_set:
+      #           dd_name: STEPLIB
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+      #           disposition: shr
+      #       - dd_dummy:
+      #           dd_name: SYSSUMPR
+      #       - dd_dummy:
+      #           dd_name: SYSCYLPR
+      #       - dd_output:
+      #           dd_name: SYSPRINT
+      #           return_content:
+      #             type: text
+      #       - dd_data_set:
+      #           dd_name: SYSLIB
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC"
+      #           disposition: shr
+      #       - dd_data_set:
+      #           dd_name: SYSIN80
+      #           disposition: new
+      #           disposition_normal: delete
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSIN"
+      #           space_type: cyl
+      #           space_primary: 5
+      #           space_secondary: 5
+      #           record_format: fb
+      #           record_length: 80
+      #           block_size: 11440
+      #           type: seq
+      #       - dd_input:
+      #           dd_name: SYSUT1
+      #           content: "UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5,5))"
+      #       - dd_data_set:
+      #           dd_name: SYSLIN
+      #           disposition: new
+      #           disposition_normal: delete
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSLIN"
+      #           space_type: cyl
+      #           space_primary: 1
+      #           space_secondary: 5
+      #           record_format: fb
+      #           record_length: 80
+      #           block_size: 11440
+      #           type: seq
+      #       - dd_data_set:
+      #           dd_name: SYSPRT80
+      #           disposition: new
+      #           disposition_normal: delete
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSPRT"
+      #           space_type: cyl
+      #           space_primary: 5
+      #           space_secondary: 5
+      #           record_format: fb
+      #           record_length: 121
+      #           block_size: 3146
+      #           type: seq
+      #       - dd_input:
+      #           dd_name: SYSCOBJ
+      #           content:
+      #             - "DUMMY,DCB=BLKSIZE=80"
+      #       - dd_input:
+      #           dd_name: SYSIN
+      #           content: "{{ lookup('template', '{{ pre }}') }}"
 # ------------------------------------------------------------------------------------------------
 
-      - name: IMS system definition preprocessor utility
-        zos_job_submit:
-          src: '{{ uss_file_path }}/DFSGNPRE.j2'
-          location: USS
-          wait: true
-          wait_time_s: 30
-        when: preprocess
+    - name: IMS system definition preprocessor utility
+      zos_job_submit:
+        src: '{{ uss_file_path }}/DFSGNPRE.j2'
+        location: USS
+        wait: true
+        wait_time_s: 30
+      when: preprocess
 
-      - block:
+    - block:
 
         - set_fact:
             eager_role_path: '{{role_path}}'
@@ -109,53 +109,53 @@
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
 
-        when: stage1 and not provision
+      when: stage1 and not provision
 
 # ------------------------------------------------------------------------------------------------
-        # - name: RUN THE IMS SYSTEM DEFINITION STAGE1 # return code 2 - it's normal
-        #   zos_mvs_raw:
-        #     program_name: ASMA90
-        #     parm: "NOOBJ,DECK"
-        #     dds:
-        #       - dd_output:
-        #           dd_name: SYSPRINT
-        #           return_content:
-        #             type: text
-        #       - dd_data_set:
-        #           dd_name: SYSLIB
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC"
-        #           disposition: shr
-        #       - dd_data_set:
-        #           dd_name: SYSPUNCH
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL(IV3C301J)"
-        #           disposition: shr
-        #       - dd_input:
-        #           dd_name: SYSUT1
-        #           content:
-        #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
-        #       - dd_input:
-        #           dd_name: SYSUT2
-        #           content:
-        #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
-        #       - dd_input:
-        #           dd_name: SYSUT3
-        #           content:
-        #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
-        #       - dd_input:
-        #           dd_name: SYSIN
-        #           content: "{{ lookup('template', '{{ stg1 }}') }}"
+      # - name: RUN THE IMS SYSTEM DEFINITION STAGE1 # return code 2 - it's normal
+      #   zos_mvs_raw:
+      #     program_name: ASMA90
+      #     parm: "NOOBJ,DECK"
+      #     dds:
+      #       - dd_output:
+      #           dd_name: SYSPRINT
+      #           return_content:
+      #             type: text
+      #       - dd_data_set:
+      #           dd_name: SYSLIB
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC"
+      #           disposition: shr
+      #       - dd_data_set:
+      #           dd_name: SYSPUNCH
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL(IV3C301J)"
+      #           disposition: shr
+      #       - dd_input:
+      #           dd_name: SYSUT1
+      #           content:
+      #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
+      #       - dd_input:
+      #           dd_name: SYSUT2
+      #           content:
+      #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
+      #       - dd_input:
+      #           dd_name: SYSUT3
+      #           content:
+      #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
+      #       - dd_input:
+      #           dd_name: SYSIN
+      #           content: "{{ lookup('template', '{{ stg1 }}') }}"
 # ------------------------------------------------------------------------------------------------
-      - name: Sysdef stage 1
-        zos_job_submit:
-          src: '{{ uss_file_path }}/DFS4STG1.j2'
-          location: USS
-          wait: true
-          wait_time_s: 30
-          max_rc: 2
-        when: stage1
+    - name: Sysdef stage 1
+      zos_job_submit:
+        src: '{{ uss_file_path }}/DFS4STG1.j2'
+        location: USS
+        wait: true
+        wait_time_s: 30
+        max_rc: 2
+      when: stage1
 
 
-      - block:
+    - block:
 
         - set_fact:
             eager_role_path: '{{role_path}}'
@@ -165,35 +165,35 @@
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
 
-        when: stage2 and not provision
+      when: stage2 and not provision
 
 # ------------------------------------------------------------------------------------------------
-        # - name: RUN THE IMS SYSTEM DEFINITION STAGE2
-        #   zos_mvs_raw:
-        #     program_name: iebgener
-        #     # auth: yes
-        #     dds:
-        #       - dd_output:
-        #           dd_name: SYSPRINT
-        #           return_content:
-        #             type: text
-        #       - dd_input:
-        #           dd_name: SYSUT2
-        #           content:
-        #             - "SYSOUT=(A,INTRDR)"
-        #       - dd_dummy:
-        #           dd_name: SYSIN
-        #       - dd_data_set:
-        #           dd_name: SYSUT1
-        #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL(IV3C301J)"
-        #           disposition: shr
+      # - name: RUN THE IMS SYSTEM DEFINITION STAGE2
+      #   zos_mvs_raw:
+      #     program_name: iebgener
+      #     # auth: yes
+      #     dds:
+      #       - dd_output:
+      #           dd_name: SYSPRINT
+      #           return_content:
+      #             type: text
+      #       - dd_input:
+      #           dd_name: SYSUT2
+      #           content:
+      #             - "SYSOUT=(A,INTRDR)"
+      #       - dd_dummy:
+      #           dd_name: SYSIN
+      #       - dd_data_set:
+      #           dd_name: SYSUT1
+      #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL(IV3C301J)"
+      #           disposition: shr
 # ------------------------------------------------------------------------------------------------
 
-      - name: Sysdef stage 2
-        zos_job_submit:
-          src: '{{ uss_file_path }}/DFS4STG2.j2'
-          location: USS
-          wait: true
-          wait_time_s: 30
-          max_rc: 2
-        when: stage2
+    - name: Sysdef stage 2
+      zos_job_submit:
+        src: '{{ uss_file_path }}/DFS4STG2.j2'
+        location: USS
+        wait: true
+        wait_time_s: 30
+        max_rc: 2
+      when: stage2

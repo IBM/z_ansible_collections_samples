@@ -56,7 +56,7 @@
   vars:
     list_query: "[?Name=='{{ os_cp_server_group_name }}']"
   when:
-  - "os_cp_server_group_name|string in server_group_list.stdout"
+    - "os_cp_server_group_name|string in server_group_list.stdout"
 
 - name: 'Create the control server group'
   command:
@@ -64,13 +64,13 @@
     cmd: "openstack --os-compute-api-version=2.15 server group create -f json -c id --policy=soft-anti-affinity {{ os_cp_server_group_name }}"
   register: server_group_created
   when:
-  - server_group_id is not defined
+    - server_group_id is not defined
 
 - name: 'Parse the server group ID from creation'
   set_fact:
     server_group_id: "{{ (server_group_created.stdout | from_json).id }}"
   when:
-  - server_group_id is not defined
+    - server_group_id is not defined
 
 - name: 'Create the control servers'
   os_server:
@@ -86,7 +86,7 @@
     #    "{{ infraID }}-master-0-ignition.json"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_master }}-{{ item.0 }}"
+      - port-name: "{{ os_port_master }}-{{ item.0 }}"
     scheduler_hints:
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
@@ -94,8 +94,8 @@
   environment:
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
-  - disk_type == "dasd"
-  - vm_type == "zvm"
+    - disk_type == "dasd"
+    - vm_type == "zvm"
   register: create_master
   failed_when:
     - create_master.failed == true
@@ -106,7 +106,7 @@
     cmd: "openstack flavor show {{ os_flavor_master }} -c disk -f value"
   register: master_flavor_size
   when:
-  - disk_type == "scsi"
+    - disk_type == "scsi"
 
 - name: 'Create the control servers with default boot volume'
   os_server:
@@ -122,7 +122,7 @@
     #    "{{ infraID }}-master-0-ignition.json"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_master }}-{{ item.0 }}"
+      - port-name: "{{ os_port_master }}-{{ item.0 }}"
     scheduler_hints:
       group: "{{ server_group_id }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
@@ -133,9 +133,9 @@
   environment:
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
-  - disk_type == "scsi"
-  - vm_type == "zvm"
-  - volume_type_id is not defined
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
   register: create_master
   failed_when:
     - create_master.failed == true
@@ -152,15 +152,15 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Set control volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined
 
 - name: 'Create the controller server with boot volume'
   os_server:
@@ -172,12 +172,12 @@
     timeout: "{{ create_server_timeout|int * 60 }}"
     userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
     nics:
-    - port-name: "{{ os_port_master }}-{{ item.0 }}"
+      - port-name: "{{ os_port_master }}-{{ item.0 }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
     terminate_volume: True
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   environment:
     PYTHONWARNINGS: 'ignore::UserWarning'
   when:
-  - disk_type == "scsi"
-  - volume_type_id is defined
+    - disk_type == "scsi"
+    - volume_type_id is defined

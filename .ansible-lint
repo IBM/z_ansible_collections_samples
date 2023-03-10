@@ -54,7 +54,6 @@ skip_list:
   - var-naming
   - var-naming[PYZ]
   - var-naming[ZOAU]
-  - yaml[indentation]
   - yaml[line-length]
   - yaml[octal-values]
   - yaml[truthy]

@@ -11,4 +11,4 @@
 - name: Configure image registry
   hosts: localhost
   roles:
-  - configure-image-registry
+    - configure-image-registry

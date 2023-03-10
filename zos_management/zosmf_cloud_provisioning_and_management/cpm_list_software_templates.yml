@@ -72,16 +72,16 @@
 
     - name: Gather name of published templates and domains
       vars:
-           template_info_json: "{{lookup('file', template_info_json_path)}}"
+        template_info_json: "{{lookup('file', template_info_json_path)}}"
 
       set_fact:
-           templates: "{{item.name}}:{{item['domain-name']}}, {{templates}}"
+        templates: "{{item.name}}:{{item['domain-name']}}, {{templates}}"
 
       loop: "{{ template_info_json['psc-list'] }}"
 
     - name: Display published templates
       debug:
-            msg: "Published Template:Domain are : {{templates}}"
+        msg: "Published Template:Domain are : {{templates}}"
 
     - name: Clean instance record file
       file:

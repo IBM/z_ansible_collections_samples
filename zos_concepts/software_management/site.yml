@@ -23,9 +23,9 @@
 - hosts: localhost
 
   tasks:
-  - name: Parse the registry for collection entries
-    include_vars: runtime-requirements.yml
+    - name: Parse the registry for collection entries
+      include_vars: runtime-requirements.yml
 
-  - name: Display the registered collections and properites in `registry.yml`.
-    include_role:
-      name: requirements-check
+    - name: Display the registered collections and properites in `registry.yml`.
+      include_role:
+        name: requirements-check

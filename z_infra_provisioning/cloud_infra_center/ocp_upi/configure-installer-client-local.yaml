@@ -11,4 +11,4 @@
 - name: Download openshift installer client from local mirror
   hosts: localhost
   roles:
-  - configure-installer-client-local
+    - configure-installer-client-local
