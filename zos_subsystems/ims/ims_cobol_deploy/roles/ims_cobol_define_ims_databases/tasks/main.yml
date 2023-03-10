@@ -46,7 +46,7 @@
     command: QUERY DB NAME(ACCOUNT) SHOW(STATUS)
     plex: "{{DFS_IMSPlex}}"
     route: "{{ROUTE}}"
-    
+
 - name: Start databases
   ibm.ibm_zos_ims.ims_command:
     batch:

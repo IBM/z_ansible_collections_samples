@@ -1,4 +1,4 @@
-- name: De-provisioning of IMS COBOL Application 
+- name: De-provisioning of IMS COBOL Application
   hosts: zsystem
   collections:
     - ibm.ibm_zos_core

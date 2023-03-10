@@ -1,12 +1,10 @@
 ---
 # tasks file for roles/create_server
 
-  - name: Create server with variables 
-    shell: "{{liberty_bin_path}}/server create {{server_instance_name}}" 
-    register: result 
+  - name: Create server with variables
+    shell: "{{liberty_bin_path}}/server create {{server_instance_name}}"
+    register: result
 
   - name: Result from creating a server
-    debug: 
+    debug:
       msg: "{{result}}"
-    
- 

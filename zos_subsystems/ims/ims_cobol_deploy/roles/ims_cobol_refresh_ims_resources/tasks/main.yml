@@ -7,7 +7,7 @@
       command: STOP PGM {{ PGM_NAME }}
       plex: "{{ IMSPLEX }}"
       route: "{{ ROUTE }}"
-  
+
   - name: stop ims transaction
     ibm.ibm_zos_ims.ims_command:
       command: STOP TRAN {{ TRAN_NAME }}
@@ -29,7 +29,7 @@
       command: START PGM {{ PGM_NAME }}
       plex: "{{ IMSPLEX }}"
       route: "{{ ROUTE }}"
-  
+
   - name: start ims transaction
     ibm.ibm_zos_ims.ims_command:
       command: START TRAN {{ TRAN_NAME }}

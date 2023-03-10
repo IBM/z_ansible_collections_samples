@@ -22,12 +22,12 @@ define_security: false
 zcon_saf_authentication: 'TRUE'
 
 ################################################################################
-# Specifies the value of 'YES' or 'NO' used to specify if zosconnect should accept SSL connections. 
+# Specifies the value of 'YES' or 'NO' used to specify if zosconnect should accept SSL connections.
 ################################################################################
 zcon_tls: 'NO'
 
 ################################################################################
-# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.  
+# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.
 ################################################################################
 zcon_admin_server: '{{ TARGET_USERNAME }}'
 
@@ -52,6 +52,6 @@ zcon_http_port: '1322'
 zcon_https_port: '1321'
 
 ################################################################################
-# Specifies the path to the base zCEE configuration directory. 
+# Specifies the path to the base zCEE configuration directory.
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

@@ -12,11 +12,11 @@ softwareServiceInstanceName: ZC01
 define_keyring: false
 
 ################################################################################
-# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.  
+# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.
 ################################################################################
 zcon_admin_server: '{{ TARGET_USERNAME }}'
 
 ################################################################################
-# Specifies the path to the base zCEE configuration directory. 
+# Specifies the path to the base zCEE configuration directory.
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

@@ -6,11 +6,11 @@
 #   register: response
 #   failed_when: "'JCL ERROR' in response.content | join"
 
-# - name: Get job info 
+# - name: Get job info
 #   ibm.ibm_zos_core.zos_job_query:
 #     job_name: '{{ server_name }}'
 
-# Create server proc - Option to start proc via jcl 
+# Create server proc - Option to start proc via jcl
 - name: Create temporary directory to store provisioning files
   tempfile:
     state: file
@@ -53,7 +53,7 @@
     ibm.ibm_zos_core.zos_copy:
       src: "{{ servertempfile.path }}"
       dest: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
-    when:   
+    when:
       - zcon_zos_stcjobs is defined
       - zcon_stc_job_card != ''
   always:

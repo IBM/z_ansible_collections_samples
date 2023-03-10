@@ -35,7 +35,7 @@
     state: absent
   loop: "{{loads}}"
 
-- name: Delete existing load db datasets  
+- name: Delete existing load db datasets
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}.DB"
     state: absent
@@ -103,7 +103,7 @@
     state: absent
     type: MEMBER
   loop: "{{loads}}"
-  
+
 # - name: Delete existing data sets
 #   ibm.ibm_zos_core.zos_data_set:
 #     name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PLIINCL.*"

@@ -7,7 +7,7 @@
     - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{ environment_vars }}"
-  
+
   tasks:
     - name: Issue display command
       zos_operator:

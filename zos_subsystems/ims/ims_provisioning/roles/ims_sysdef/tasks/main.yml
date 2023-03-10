@@ -22,10 +22,10 @@
 
 # ------------------------------------------------------------------------------------------------
         # - name: IMS SYSTEM DEFINITION PREPROCESSOR - FOR NAME VALIDATION
-        #   zos_mvs_raw: 
+        #   zos_mvs_raw:
         #     program_name: DFSPRE00
         #     parm: "N,N"
-        #     dds: 
+        #     dds:
         #       - dd_data_set:
         #           dd_name: STEPLIB
         #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
@@ -54,7 +54,7 @@
         #           record_length: 80
         #           block_size: 11440
         #           type: seq
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSUT1
         #           content: "UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5,5))"
         #       - dd_data_set:
@@ -83,9 +83,9 @@
         #           type: seq
         #       - dd_input:
         #           dd_name: SYSCOBJ
-        #           content:   
+        #           content:
         #             - "DUMMY,DCB=BLKSIZE=80"
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSIN
         #           content: "{{ lookup('template', '{{ pre }}') }}"
 # ------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@
           src: '{{ uss_file_path }}/DFSGNPRE.j2'
           location: USS
           wait: true
-          wait_time_s: 30 
+          wait_time_s: 30
         when: preprocess
 
       - block:
@@ -113,10 +113,10 @@
 
 # ------------------------------------------------------------------------------------------------
         # - name: RUN THE IMS SYSTEM DEFINITION STAGE1 # return code 2 - it's normal
-        #   zos_mvs_raw: 
+        #   zos_mvs_raw:
         #     program_name: ASMA90
         #     parm: "NOOBJ,DECK"
-        #     dds: 
+        #     dds:
         #       - dd_output:
         #           dd_name: SYSPRINT
         #           return_content:
@@ -129,19 +129,19 @@
         #           dd_name: SYSPUNCH
         #           data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL(IV3C301J)"
         #           disposition: shr
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSUT1
-        #           content: 
+        #           content:
         #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSUT2
-        #           content: 
+        #           content:
         #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSUT3
-        #           content: 
+        #           content:
         #             - "{{ DFS_IMS_UNIT }},SPACE=(CYL,(05,05)),DCB=OPTCD=C"
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSIN
         #           content: "{{ lookup('template', '{{ stg1 }}') }}"
 # ------------------------------------------------------------------------------------------------
@@ -169,17 +169,17 @@
 
 # ------------------------------------------------------------------------------------------------
         # - name: RUN THE IMS SYSTEM DEFINITION STAGE2
-        #   zos_mvs_raw: 
+        #   zos_mvs_raw:
         #     program_name: iebgener
         #     # auth: yes
-        #     dds: 
+        #     dds:
         #       - dd_output:
         #           dd_name: SYSPRINT
         #           return_content:
         #             type: text
-        #       - dd_input: 
+        #       - dd_input:
         #           dd_name: SYSUT2
-        #           content: 
+        #           content:
         #             - "SYSOUT=(A,INTRDR)"
         #       - dd_dummy:
         #           dd_name: SYSIN

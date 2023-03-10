@@ -9,11 +9,11 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to use role 
+# This sample playbook demonstrates how to use role
 # `zmf_cpm_list_software_template` provided by IBM z/OSMF collection
 # included in the Red Hat Ansible Certified Content for IBM Z to obtain list
 # of all the published templates that can be used to provision z/OS middleware
-# such as IBM Customer Information Control System (CICS®), IBM Db2®, IBM MQ, 
+# such as IBM Customer Information Control System (CICS®), IBM Db2®, IBM MQ,
 # and IBM WebSphere Application Server or any other software service from
 # IBM Cloud Provisioning and Management (CP&M) catalog.
 #
@@ -55,7 +55,7 @@
     - name: zmf_password
       prompt: "Enter your z/OSMF password"
       private: yes
-  
+
   tasks:
     # ##########################################################################
     # Role: zmf_cpm_list_software_templates
@@ -72,7 +72,7 @@
 
     - name: Gather name of published templates and domains
       vars:
-           template_info_json: "{{lookup('file', template_info_json_path)}}" 
+           template_info_json: "{{lookup('file', template_info_json_path)}}"
 
       set_fact:
            templates: "{{item.name}}:{{item['domain-name']}}, {{templates}}"
@@ -87,4 +87,4 @@
       file:
         state: absent
         path: "{{ template_info_json_path }}"
-      delegate_to: localhost  
+      delegate_to: localhost

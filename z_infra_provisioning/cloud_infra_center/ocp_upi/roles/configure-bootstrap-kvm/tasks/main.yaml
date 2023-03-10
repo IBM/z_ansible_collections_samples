@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2022 https://github.com/openshift/installer
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 #
-# Change Summary: 
+# Change Summary:
 # - Move port creation to network.yaml
 # - Delete unnecessary Ansible tasks
 # - Add server creation timeout
@@ -39,9 +39,9 @@
   import_tasks: common.yaml
 
 - name: 'Get image name for kvm'
-  set_fact: 
+  set_fact:
     image_name: icic_rhcos_qcow2
-  when: 
+  when:
     - vm_type == "kvm"
 
 - name: 'Create the bootstrap server'
@@ -50,7 +50,7 @@
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
-    timeout: "{{ create_server_timeout|int * 60 }}" 
+    timeout: "{{ create_server_timeout|int * 60 }}"
     auto_ip: no
     availability_zone: "{{ create_server_zone }}"
     nics:
@@ -76,13 +76,13 @@
     volume_type: "{{ volume_type_id }}"
     metadata: "{{ cluster_id_tag }}"
     timeout: "{{ create_server_timeout|int * 60 }} "
-  when: 
+  when:
   - disk_type == "scsi"
   - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
   shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
-  when: 
+  when:
   - disk_type == "scsi"
   - volume_type_id is defined
 

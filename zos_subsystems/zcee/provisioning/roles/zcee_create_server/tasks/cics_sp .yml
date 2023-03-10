@@ -1,5 +1,5 @@
 ---
-# tasks file for cics template that provides a server that is configured with an API and CICS® service provider services for the CICS Catalog Manager sample application. 
+# tasks file for cics template that provides a server that is configured with an API and CICS® service provider services for the CICS Catalog Manager sample application.
 # The server is configured to communicate with CICS over an IPIC connection.
-- name: Create server 
+- name: Create server
   command: '{{zcon_install_dir}}/bin/zzosconnect create {{catalogManager}} --template=zosconnect:sampleCicsIpicCatalogManager'

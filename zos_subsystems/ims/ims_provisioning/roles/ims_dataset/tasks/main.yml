@@ -126,9 +126,9 @@
               volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
 
       - name: temporal copy SDFSRESL
-        zos_mvs_raw: 
+        zos_mvs_raw:
           program_name: iebcopy
-          dds: 
+          dds:
             - dd_output:
                 dd_name: sysprint
                 return_content:
@@ -144,28 +144,28 @@
                 space_secondary: 50
                 record_format: u
                 directory_blocks: 850
-                type: pds 
-            - dd_data_set: 
+                type: pds
+            - dd_data_set:
                 dd_name: INDSN
                 data_set_name: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSRESL'
                 disposition: shr
             - dd_input:
                 dd_name: SYSUT3
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)'
             - dd_input:
                 dd_name: SYSUT4
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)'
             - dd_input:
                 dd_name: SYSIN
-                content: 
+                content:
                   - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
       - name: temporal copy SDFSMAC
-        zos_mvs_raw: 
+        zos_mvs_raw:
           program_name: iebcopy
-          dds: 
+          dds:
             - dd_output:
                 dd_name: sysprint
                 return_content:
@@ -180,27 +180,27 @@
                 space_primary: 2776
                 space_secondary: 4000
                 type: library
-            - dd_data_set: 
+            - dd_data_set:
                 dd_name: INDSN
                 data_set_name: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSMAC'
                 disposition: shr
             - dd_input:
                 dd_name: SYSUT3
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)'
             - dd_input:
                 dd_name: SYSUT4
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)'
             - dd_input:
                 dd_name: SYSIN
-                content: 
+                content:
                   - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
       - name: temporal copy ADFSMAC
-        zos_mvs_raw: 
+        zos_mvs_raw:
           program_name: iebcopy
-          dds: 
+          dds:
             - dd_output:
                 dd_name: sysprint
                 return_content:
@@ -215,27 +215,27 @@
                 space_primary: 1848
                 space_secondary: 270
                 type: library
-            - dd_data_set: 
+            - dd_data_set:
                 dd_name: INDSN
                 data_set_name: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSMAC'
                 disposition: shr
             - dd_input:
                 dd_name: SYSUT3
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)'
             - dd_input:
                 dd_name: SYSUT4
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)'
             - dd_input:
                 dd_name: SYSIN
-                content: 
+                content:
                   - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
       - name: temporal copy ADFSLOAD
-        zos_mvs_raw: 
+        zos_mvs_raw:
           program_name: iebcopy
-          dds: 
+          dds:
             - dd_output:
                 dd_name: sysprint
                 return_content:
@@ -251,27 +251,27 @@
                 space_secondary: 250
                 type: library
                 record_format: u
-            - dd_data_set: 
+            - dd_data_set:
                 dd_name: INDSN
                 data_set_name: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSLOAD'
                 disposition: shr
             - dd_input:
                 dd_name: SYSUT3
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)'
             - dd_input:
                 dd_name: SYSUT4
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)'
             - dd_input:
                 dd_name: SYSIN
-                content: 
+                content:
                   - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
       - name: temporal copy ADFSSRC
-        zos_mvs_raw: 
+        zos_mvs_raw:
           program_name: iebcopy
-          dds: 
+          dds:
             - dd_output:
                 dd_name: sysprint
                 return_content:
@@ -286,21 +286,21 @@
                 space_primary: 3535
                 space_secondary: 500
                 type: library
-            - dd_data_set: 
+            - dd_data_set:
                 dd_name: INDSN
                 data_set_name: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSSRC'
                 disposition: shr
             - dd_input:
                 dd_name: SYSUT3
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)'
             - dd_input:
                 dd_name: SYSUT4
-                content: 
+                content:
                   - 'UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)'
             - dd_input:
                 dd_name: SYSIN
-                content: 
+                content:
                   - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
 
@@ -317,7 +317,7 @@
       #     - { src: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSMAC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC' }
       #     - { src: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSLOAD', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSLOAD' }
       #     - { src: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSSRC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC' }
-      #   loop_control: 
+      #   loop_control:
       #     pause: 25
       when: sysdef_datasets == "allocate"
       # - include_role:
@@ -339,7 +339,7 @@
           eager_role_path: '{{role_path}}'
 
 # ------------------------------------------------------------------------------------------------------------------- DFSALSY1
-      - name: Allocate all IMS datasets 
+      - name: Allocate all IMS datasets
         zos_data_set:
           batch:
             - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB'
@@ -605,7 +605,7 @@
 
       - name: OLD STYLE ALLOCATION FOR DATASETS REQUIRING "CONTIG" ALLOCATION
         zos_data_set:
-          batch: 
+          batch:
             - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP00"
               volumes: "{{ DFS_DS_VOLUME1 }}"
               record_format: vb

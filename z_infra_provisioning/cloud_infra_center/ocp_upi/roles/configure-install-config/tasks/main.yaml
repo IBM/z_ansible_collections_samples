@@ -31,15 +31,15 @@
     executable: python3
 
 - name: Add http proxy and https proxy in install-config.yaml
-  shell: 
+  shell:
     cmd: |
       sed -i '/baseDomain/a proxy:' install-config.yaml
       sed -i '/proxy/a \ \ httpProxy: {{ http_proxy }}' install-config.yaml
       sed -i '/httpProxy/a \ \ httpsProxy: {{ https_proxy }}' install-config.yaml
       sed -i '/httpsProxy/a \ \ noProxy: {{ no_proxy }}' install-config.yaml
   when:
-  - use_proxy == true 
-    
+  - use_proxy == true
+
 - name: Add local registry info in install-config.yaml
   shell:
     cmd: |
@@ -57,12 +57,12 @@
   - openshift_version is version('4.12', '>=')
 
 - name: Update cluster domain name in install-config.yaml
-  shell: 
+  shell:
     cmd: |
       sed -i "s/cluster_basedomain/{{ base_domain }}/g" install-config.yaml
       sed -i "s/cluster_name/{{ cluster_name }}/g" install-config.yaml
       cp -r install-config.yaml .install-config.yaml
-     
+
 - name: Empty compute server pools
   script: tools/empty-compute-node.py
   args:

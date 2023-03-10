@@ -15,7 +15,7 @@
     replace: true
     volume: "{{ DFS_DS_VOLUME1 if DFS_DS_VOLUME1 and not DFS_SMS_ENVIRONMENT | default(false) else omit}}"
   loop: "{{ datasets }}"
-  
+
 - name: Allocate new data sets
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name | upper }}.INPUT"

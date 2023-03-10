@@ -41,7 +41,7 @@ datasets:
    secondary_size: 1
    record_format: fb
    logical_record_length: 80
-   block_size: 32720 
+   block_size: 32720
    dir_blocks: 10
  - name: JCL
    type: pds

@@ -8,8 +8,8 @@
 - name: Create zcee mountpoint in zfs filesystem - '/var/zosconnect'
   file:
     path: /var/zosconnect
-    state: directory 
-    mode: '700'     
+    state: directory
+    mode: '700'
 
 - name: Run zconsetup
   shell: ./zconsetup install

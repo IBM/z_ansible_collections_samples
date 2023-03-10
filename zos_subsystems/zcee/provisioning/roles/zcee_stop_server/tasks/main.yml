@@ -1,9 +1,9 @@
 ---
 # tasks file for zcee_stop_server
 - name: Stop zCEE server job
-  zos_operator: 
+  zos_operator:
     cmd: 'CANCEL ST{{ softwareServiceInstanceName }}'
-- name: Stop zCEE server from USS 
+- name: Stop zCEE server from USS
   shell: ./zosconnect stop {{softwareServiceInstanceName}}
   args:
     chdir: '{{ zcon_install_dir }}/bin'

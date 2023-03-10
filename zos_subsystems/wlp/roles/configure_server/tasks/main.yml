@@ -1,18 +1,18 @@
 ---
 # tasks file for roles/configure_server
-  # handles the server.xml file 
+  # handles the server.xml file
   - name: Check for server.xml file
     local_action: stat path="{{playbook_dir}}/roles/configure_server/templates/server.xml.j2"
     register: server_stat
 
-  # This block only runs when the server.xml file is found in the role's template folder. 
-  - block: 
-    - name: Copy over server.xml template 
-      template: 
+  # This block only runs when the server.xml file is found in the role's template folder.
+  - block:
+    - name: Copy over server.xml template
+      template:
         src: ./templates/server.xml.j2
         dest: '{{liberty_server_path}}/server_ansible.xml'
 
-    - name: Tag the file as text and ISO8559-1 
+    - name: Tag the file as text and ISO8559-1
       command: chtag -tc ISO8859-1 {{liberty_server_path}}/server_ansible.xml
 
     - name: Backup the existing server.xml
@@ -29,9 +29,9 @@
 
   # This task only runs when the bootstrap.properties file is found in the role's template folder.
   - name: Copy over bootstrap.properties file
-    copy: 
+    copy:
       src: ./templates/bootstrap.properties
-      dest: '{{liberty_server_path}}/bootstrap.properties' 
+      dest: '{{liberty_server_path}}/bootstrap.properties'
     when: bootstrap_stat.stat.exists == true
 
   # handles the jvm.options file
@@ -39,9 +39,9 @@
     local_action: stat path="{{playbook_dir}}/roles/configure_server/templates/jvm.options"
     register: jvm_stat
 
-  # This task only runs when the jvm.options file is found in the role's template folder. 
+  # This task only runs when the jvm.options file is found in the role's template folder.
   - name: Copy over jvm.options file
-    copy: 
+    copy:
       src: ./templates/jvm.options
       dest: '{{liberty_server_path}}/jvm.options'
     when: jvm_stat.stat.exists == true

@@ -22,7 +22,7 @@
 
     - name: Check the alter worked
       fail:
-        msg: Alter of queue failed 
+        msg: Alter of queue failed
       when: alter_output.content is not search("CSQ9022I")
 
     - name: Issue display command

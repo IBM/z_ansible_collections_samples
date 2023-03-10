@@ -6,7 +6,7 @@
 - name: Create dirs
   file:
     path: mkdir {{ zcee_config_path }}/resources
-    state: directory 
+    state: directory
 
 - name: Create folder structure - /resources/zosconnect
   file:
@@ -17,7 +17,7 @@
   file:
     path: mkdir {{ zcee_config_path }}/resources/zosconnect/apis
     state: directory
-    mode: '700'  
+    mode: '700'
 
 - name: Create folder structure - /resources/zosconnect/services
   file:
@@ -31,7 +31,7 @@
     state: directory
     mode: '700'
 
-- name: Create dirs 
+- name: Create dirs
   file:
     path: '{{ zcee_config_path }}/resources/imsmobile-config/connections'
     state: directory

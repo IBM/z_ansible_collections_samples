@@ -5,7 +5,7 @@
   - name: Copy the server procedure template to procedure library
     ibm.ibm_zos_core.zos_copy:
       src: "{{liberty_path}}/templates/zos/procs/bbgzsrv.jcl"
-      dest: "{{PROC_LIB}}({{SERVER_PROC}})" 
+      dest: "{{PROC_LIB}}({{SERVER_PROC}})"
       remote_src: true
 
   # Edit template file with custom configuration variables
@@ -31,7 +31,7 @@
       line: "//  SET USERDIR='{{environment_vars.WLP_USER_DIR}}'"
 
   # Add java path to server.env file to run server process as a STARTED task
-  - name: Add environment path to env file 
+  - name: Add environment path to env file
     ibm.ibm_zos_core.zos_lineinfile:
       src: "{{environment_vars.WLP_USER_DIR}}/servers/{{server_instance_name}}/server.env"
       state: present
@@ -39,14 +39,14 @@
       insertbefore: BOF
 
   # Define server started profile
-  - name: Define server started profile 
-    ibm.ibm_zos_core.zos_tso_command: 
-      commands: 
+  - name: Define server started profile
+    ibm.ibm_zos_core.zos_tso_command:
+      commands:
         - rdef started {{SERVER_PROC}}.* uacc(none) stdata(user({{TARGET_USER}}) group({{USER_GROUP}}) privileged(no) trusted(no) trace(yes))
     register: command_result
     failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
     ignore_errors: yes
- 
+
   - name: Refresh
     ibm.ibm_zos_core.zos_tso_command:
       commands:

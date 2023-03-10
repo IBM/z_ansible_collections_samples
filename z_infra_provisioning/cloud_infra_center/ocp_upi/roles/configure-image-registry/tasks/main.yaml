@@ -14,7 +14,7 @@
 # openstacksdk
 # netaddr
 
-# The Image Registry Operator is not initially available for platforms that do not provide default storage. 
+# The Image Registry Operator is not initially available for platforms that do not provide default storage.
 # We set the image registry to an empty directory for non-production clusters.
 
 - name: 'Check the image registry service status'

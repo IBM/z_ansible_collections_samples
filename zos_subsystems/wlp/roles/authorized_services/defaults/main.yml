@@ -7,5 +7,5 @@ ZOSWLM: yes
 TXRSS: yes
 ZOSDUMP: yes
 LOCAL_ADAPTER: no
-PRODMGR: no 
+PRODMGR: no
 ZOSAIO: no

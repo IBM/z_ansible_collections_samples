@@ -5,8 +5,8 @@
 #    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
 # - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
-# - Property `JAVA` is the Java installation home on the z/OS managed node (target), 
-#    e.g, JAVA: "/usr/lpp/java170/J7.0_64" 
+# - Property `JAVA` is the Java installation home on the z/OS managed node (target),
+#    e.g, JAVA: "/usr/lpp/java170/J7.0_64"
 # - property `ansible_python_interpreter` is the z/OS managed node (target) Python
 #    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
 #
@@ -28,7 +28,7 @@ ansible_python_interpreter: "{{PYZ}}/bin/python3"
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
 # the path to the root of Java installation
-JAVA: "path_to_java_installation_on_zos_target" 
+JAVA: "path_to_java_installation_on_zos_target"
 
 environment_vars:
   _BPXK_AUTOCVT: "ON"
@@ -51,7 +51,7 @@ environment_vars:
 # ---------------------------------------------------------------------------- #
 server_instance_name: ansible_sample
 
-liberty_path: '/usr/lpp/zWAS/WAS900/Liberty/V19R00' 
+liberty_path: '/usr/lpp/zWAS/WAS900/Liberty/V19R00'
 liberty_bin_path: '{{liberty_path}}/bin'
 liberty_server_path: '{{environment_vars.WLP_USER_DIR}}/servers/{{server_instance_name}}'
 
@@ -70,7 +70,7 @@ ANGEL_PROC: WLPANGL
 
 # Name for zFS dataset to be mounted to user directory
 data_set_name: targetuser.liberty.zfs
-  
+
 # ---------------------------------------------------------------------------- #
 #                        Playbook customization variables                      #
 # ---------------------------------------------------------------------------- #
@@ -78,7 +78,7 @@ data_set_name: targetuser.liberty.zfs
 CUSTOMIZE: no
 
 # Boolean value to determine if the angel process related roles run --  creates started profiles for angel process and starts angel process
-ANGEL: no 
+ANGEL: no
 
 # Boolean value to determine if the authorized_services role runs -- enables z/OS authorized services
 AUTHORIZED_SERVICES: no

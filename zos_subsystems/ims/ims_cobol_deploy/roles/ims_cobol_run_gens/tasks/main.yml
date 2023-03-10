@@ -14,7 +14,7 @@
           sys_lib:
             - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC'
             - SYS1.MACLIB
-        when: dbd_gen    
+        when: dbd_gen
 
       - name: Run PSBGEN
         ibm.ibm_zos_ims.ims_psb_gen:

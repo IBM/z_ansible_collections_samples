@@ -22,9 +22,9 @@
     import_tasks: common.yaml
 
   - name: 'Get image name for kvm'
-    set_fact: 
+    set_fact:
      image_name: icic_rhcos_qcow2
-    when: 
+    when:
     - vm_type == "kvm"
 
   - name: 'Get image name for ZVM'
@@ -32,27 +32,27 @@
      image_name: "icic_rhcos_{{ disk_type }}"
     when:
     - vm_type == "zvm"
-  
+
 
   - name: 'Export infra ID'
     shell:
       cmd: "jq -r .infraID metadata.json"
     register: infra_id
-  
+
   - name: 'Get worker number'
-    set_fact: 
+    set_fact:
       add_worker_number: "{{ worker_number | default(1) }}"
       add_worker_ip: "{{ ip | default('random') }}"
 
   - name: 'Set worker ip'
-    set_fact: 
+    set_fact:
       add_worker_ip: "{{ ip.split(',') | default('random') }}"
     when: ip is defined
 
   - name: Check if worker number matches worker ip or not
     fail:
       msg: "worker ip does not match the worker number"
-    failed_when: 
+    failed_when:
       - add_worker_ip != "random"
       - "{{ add_worker_ip| length }} != {{ add_worker_number | int }}"
 
@@ -62,7 +62,7 @@
       shuf -i 1000-9999 -n {{ add_worker_number }} -o .new_worker_index
       sed -i -e 's/^/{{ os_compute_server_name }}-/' .new_worker_index
       sed -i -e 's/$/,ip=random/' .new_worker_index
-      
+
   - name: Save worker name into temporary file
     shell: |
       rm -rf .new_worker_name
@@ -122,7 +122,7 @@
     when:
     - vm_type == "kvm"
     - volume_type_id is not defined
-    
+
   - name: 'Create the compute servers'
     os_server:
       name: "{{ item }}"
@@ -139,7 +139,7 @@
     - disk_type == "dasd"
     - vm_type == "zvm"
     - volume_type_id is not defined
-  
+
   - name: 'Convert compute server flavor from value into number'
     command:
       cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
@@ -175,16 +175,16 @@
       size: "{{ compute_flavor_size.stdout_lines[0]}}"
       volume_type: "{{ volume_type_id }}"
       metadata: "{{ cluster_id_tag }}"
-      timeout: "{{ create_server_timeout|int * 60 }}" 
+      timeout: "{{ create_server_timeout|int * 60 }}"
     with_lines: cat .new_worker_name
     when:
     - disk_type == "scsi"
     - volume_type_id is defined
-  
+
   - name: 'Set compute volume bootable'
     shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
     with_lines: cat .new_worker_name
-    when: 
+    when:
     - disk_type == "scsi"
     - volume_type_id is defined
 
@@ -195,7 +195,7 @@
       boot_volume: "{{ item }}-boot"
       auto_ip: no
       availability_zone: "{{ create_server_zone }}"
-      timeout: "{{ create_server_timeout|int * 60 }}" 
+      timeout: "{{ create_server_timeout|int * 60 }}"
       userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
       nics:
         - port-name: "{{ item }}"
@@ -221,6 +221,6 @@
     with_lines: cat .new_worker_name
 
 - import_playbook: modify-bastion.yaml
-  when: 
+  when:
   - update_bastion is defined
   - update_bastion == "true"

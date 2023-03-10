@@ -12,4 +12,3 @@
   hosts: localhost
   roles:
   - configure-control-plane-kvm
-  

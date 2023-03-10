@@ -12,7 +12,7 @@
 
 - name: Check DNS server connection
   shell: ping -c 1 -w 2 {{ os_dns_domain }}
-  
+
 - name: Gather the package facts
   package_facts:
     manager: auto
@@ -61,7 +61,7 @@
   script: tools/check-icic-resources.py {{ nova_url.stdout_lines[0] }} {{ storage_provider_url.stdout_lines[0] }} {{ icic_token.stdout_lines[0] }} {{ os_compute_nodes_number }}
   args:
     executable: python3
-    
+
 - name: Get security group
   shell: openstack --os-volume-api-version=3 quota show -f json | grep "secgroups" | awk -F ':' '{print$2}' | tr -d ','
   register:
@@ -78,7 +78,7 @@
   register:
     security_group_rule
   failed_when: security_group_rule.stdout == ""
-  
+
 - name: Check security group rule
   fail:
     msg: "Security group rules number is not enough, current: {{ security_group_rule.stdout_lines[0] }}, required: 60"
@@ -98,23 +98,23 @@
 - name: Get storage provider
   shell: openstack --os-volume-api-version=3 volume service list -f csv | grep cinder-volume | wc -l
   register: storage_backend
-  when:  
+  when:
   - volume_type_id is defined
   - disk_type == "scsi"
 
 - name: Get storage template
   shell: openstack --os-volume-api-version=3 volume type list -c ID -f value | grep {{ volume_type_id }} | wc -l
   register: storage_template
-  when:  
+  when:
   - volume_type_id is defined
   - disk_type == "scsi"
 
 - name: Check if storage provider is configured
   fail:
     msg: "Storage provider is not enabled and active."
-  failed_when: volume_type_id is defined and storage_backend.stdout |int < 1 
+  failed_when: volume_type_id is defined and storage_backend.stdout |int < 1
 
 - name: Check storage template
   fail:
     msg: "Storage template is not configured correctly."
-  failed_when: volume_type_id is defined and storage_template.stdout |int < 1  
+  failed_when: volume_type_id is defined and storage_template.stdout |int < 1

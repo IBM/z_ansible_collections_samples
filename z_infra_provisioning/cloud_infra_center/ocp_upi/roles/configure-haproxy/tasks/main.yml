@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@
       # - libsemanage-python
       - python3-libsemanage
     state: latest
-  notify: 
+  notify:
   - restart haproxy
   - restart firewalld
 
@@ -37,7 +37,7 @@
   become: yes
   become_user: root
   become_method: sudo
-  file: 
+  file:
     path: /etc/haproxy
     state: directory
 
@@ -48,7 +48,7 @@
   template:
     src: etc/haproxy/haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
-  notify: 
+  notify:
   - restart haproxy
 
 - name: Allow http traffic
@@ -86,7 +86,7 @@
     state: enabled
   notify:
   - restart firewalld
- 
+
 - name: Allow https traffic
   become: yes
   become_user: root
@@ -98,7 +98,7 @@
     state: enabled
   notify:
   - restart firewalld
-  
+
 - name: Allow traffic at port 443
   become: yes
   become_user: root
@@ -194,7 +194,7 @@
 #       Output of `systemctl status haproxy`:
 #       {{ service_haproxy_status.stdout }}
 #       {{ service_haproxy_status.stderr }}
-#   when: services_state.ansible_facts.services['haproxy.service'].state != 'started'  
+#   when: services_state.ansible_facts.services['haproxy.service'].state != 'started'
 
 # - name: Report status of firewalld
 #   fail:
@@ -203,4 +203,4 @@
 #       Output of `systemctl status firewalld`:
 #       {{ service_firewalld_status.stdout }}
 #       {{ service_firewalld_status.stderr }}
-#   when: services_state.ansible_facts.services['firewalld.service'].state != 'started'  
+#   when: services_state.ansible_facts.services['firewalld.service'].state != 'started'

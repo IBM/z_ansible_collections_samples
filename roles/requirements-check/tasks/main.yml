@@ -105,7 +105,7 @@
   #     msg: "{{foo}}"
   #   when: foo is regex("FAIL")
 
-    
+
   # - name: DEBUG(-v) Display collection version check
   #   fail:
   #     msg: "{{item.msg}}"
@@ -113,7 +113,7 @@
   #   loop_control:
   #     label: "{{ item.msg }}"
   #   when: item.msg is regex("FAIL")
-  
+
 
   #############################################
   # - name: Ansible requirement check completed

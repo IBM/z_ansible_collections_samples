@@ -104,7 +104,7 @@
               content:
                 - >-
                   1                       J E S 2  J O B  L O G  --  S Y S T E M  S T
-                  L 1  --  N O D E  S T L 1            
+                  L 1  --  N O D E  S T L 1
                 - '0 '
                 - ' 16.29.01 JOB00260 ---- THURSDAY,  13 MAY 2021 ----'
                 - ' 16.29.01 JOB00260  IRR010I  USERID OMVSADM  IS ASSIGNED TO THIS JOB.'
@@ -180,11 +180,11 @@
               content:
                 - >-
                   1DATA SET UTILITY -
-                  GENERATE                                                                      
-                  PAGE 0001             
+                  GENERATE
+                  PAGE 0001
                 - >-
                   -IEB352I WARNING: ONE OR MORE OF THE OUTPUT DCB PARMS COPIED FROM
-                  INPUT                                                  
+                  INPUT
                 - '                                                                                                                         '
                 - ' PROCESSING ENDED AT EOD                                                                                                 '
               ddname: SYSPRINT

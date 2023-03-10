@@ -49,7 +49,7 @@
       register: job_output
     - debug:
         msg: "{{ job_output.jobs[0].job_id }}"
-    - name: Job output 
+    - name: Job output
       ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ job_output.jobs[0].job_id }}"
   always:

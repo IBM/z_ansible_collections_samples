@@ -12,7 +12,7 @@
       - set_fact:
           eager_role_path: '{{role_path}}'
 # ------------------------------------------------------------------------------------------------ DFSALCAT
-      - name: ALLOCATE CATALOG DATA SETS 
+      - name: ALLOCATE CATALOG DATA SETS
         zos_data_set:
           batch:
             - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF'
@@ -129,14 +129,14 @@
         zos_mvs_raw:
           program_name: idcams
           auth: yes
-          dds: 
-            - dd_output: 
+          dds:
+            - dd_output:
                 dd_name: sysprint
                 return_content:
                   type: text
-            - dd_input: 
+            - dd_input:
                 dd_name: sysin
-                content: 
+                content:
                   - "  DEFINE CLUSTER(                                 -"
                   - "                 NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00001) -"
                   - "                 CYLINDERS(2 1)                   -"
@@ -215,7 +215,7 @@
         zos_mvs_raw:
           program_name: dfs3ucd0
           parm: "REGION=0M"
-          dds: 
+          dds:
             - dd_data_set:
                 dd_name: DFSRESLB
                 data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
@@ -236,9 +236,9 @@
                 dd_name: sysprint
                 return_content:
                   type: text
-            - dd_input: 
+            - dd_input:
                 dd_name: sysin
-                content: 
+                content:
                   - "HALDB=(NAME=DFSCD000)"
                   - "PART=(NAME=DFSCD000,PART=DFSD001,"
                   - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000,"
@@ -246,7 +246,7 @@
                   - "HALDB=(NAME=DFSCX000)"
                   - "PART=(NAME=DFSCX000,PART=DFSX001,"
                   - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000,"
-                  - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"      
+                  - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"
 
       when: catalog == "allocate"
 # ------------------------------------------------------------------------------------------------
