@@ -7,12 +7,12 @@
   gather_facts: no
 
   tasks:
-  - name: Negative test that expects to fail on a missng Ansible version 200.0.0
-    include_vars: test_missing_ansible_version.txt
+    - name: Negative test that expects to fail on a missng Ansible version 200.0.0
+      include_vars: test_missing_ansible_version.txt
 
-  - name: Display the registered collections and properites in `registry.yml`.
-    include_role:
-      name: ../../requirements-check
+    - name: Display the registered collections and properites in `registry.yml`.
+      include_role:
+        name: ../../requirements-check
 
 ################################################################################
 # Run command: `ansible-playbook -i inventory.yml roles/requirements-check/tests/test_missing_ansible.yml`
@@ -20,4 +20,3 @@
 #     TASK [../../requirements-check : fail] **************************************************************************************************************************************************************************
 #     fatal: [localhost]: FAILED! => {"changed": false, "msg": "[FAIL] This playbook requires Ansible versions ['2.9.n', '200.0.0.n'] and has detected 2.11.1. Please review the playbook documentation for the required Ansible version."}
 ################################################################################
-

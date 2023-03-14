@@ -11,16 +11,16 @@
     - ibm.ibm_zhmc
   tasks:
 
-  - name: "Ensure Hipersockets adapter {{ hs_adapter_name }} does not exist"
-    delegate_to: localhost
-    zhmc_adapter:
-      hmc_host: "{{ ansible_host }}"
-      hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
-      cpc_name: "{{ cpc_name }}"
-      name: "{{ hs_adapter_name }}"
-      state: absent
-    register: result
+    - name: "Ensure Hipersockets adapter {{ hs_adapter_name }} does not exist"
+      delegate_to: localhost
+      zhmc_adapter:
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
+        cpc_name: "{{ cpc_name }}"
+        name: "{{ hs_adapter_name }}"
+        state: absent
+      register: result
 
-  - name: Print the result
-    debug:
-      var: result
+    - name: Print the result
+      debug:
+        var: result

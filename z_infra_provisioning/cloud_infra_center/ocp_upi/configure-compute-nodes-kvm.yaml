@@ -11,6 +11,4 @@
 - name: Create the compute nodes in kvm
   hosts: localhost
   roles:
-  - configure-compute-nodes-kvm
-
-
+    - configure-compute-nodes-kvm

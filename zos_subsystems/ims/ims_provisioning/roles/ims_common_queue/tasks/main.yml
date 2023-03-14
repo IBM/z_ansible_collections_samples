@@ -44,7 +44,7 @@
               data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(CQSSL000)"
               disposition: shr
           - dd_dummy:
-              dd_name: sysin     
+              dd_name: sysin
           - dd_input:
               dd_name: sysut1
               content: "{{ lookup('template', '{{ sl_config }}') }}"

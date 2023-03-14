@@ -17,7 +17,7 @@ TSO_USERID: '{{ DFS_IMS_USERID }}'
 ## The system eligible to run our jobs, optional
 DFS_IMS_SYSAFF: ''
 
-## z/OS  related 
+## z/OS  related
 ZOS_CSSLIB: '{{ zCloud_CSSLIB }}'
 ZOS_LERUNLIB: '{{ zCloud_LERuntime }}'
 ZOS_MACLIB: '{{ zCloud_MACLIB }}'
@@ -26,9 +26,9 @@ ZOS_MACLIB: '{{ zCloud_MACLIB }}'
 WITH_DB2: no
 DB2_SSM: ''
 
-USE_PSEUDO_WFI: no 
+USE_PSEUDO_WFI: no
 
-## IMS application variables 	
+## IMS application variables
 DFS_tranclass1: '005' # '008'
 DFS_tranclass2: '000'
 DFS_tranclass3: '000'

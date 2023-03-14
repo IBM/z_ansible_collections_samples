@@ -11,4 +11,4 @@
 - name: Configure security group
   hosts: localhost
   roles:
-  - configure-security-groups
+    - configure-security-groups

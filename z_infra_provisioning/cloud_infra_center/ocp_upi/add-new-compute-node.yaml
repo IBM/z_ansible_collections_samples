@@ -18,209 +18,209 @@
   gather_facts: no
 
   tasks:
-  - name: 'Import common yaml'
-    import_tasks: common.yaml
+    - name: 'Import common yaml'
+      import_tasks: common.yaml
 
-  - name: 'Get image name for kvm'
-    set_fact: 
-     image_name: icic_rhcos_qcow2
-    when: 
-    - vm_type == "kvm"
+    - name: 'Get image name for kvm'
+      set_fact:
+      image_name: icic_rhcos_qcow2
+      when:
+        - vm_type == "kvm"
 
-  - name: 'Get image name for ZVM'
-    set_fact:
-     image_name: "icic_rhcos_{{ disk_type }}"
-    when:
-    - vm_type == "zvm"
-  
+    - name: 'Get image name for ZVM'
+      set_fact:
+      image_name: "icic_rhcos_{{ disk_type }}"
+      when:
+        - vm_type == "zvm"
 
-  - name: 'Export infra ID'
-    shell:
-      cmd: "jq -r .infraID metadata.json"
-    register: infra_id
-  
-  - name: 'Get worker number'
-    set_fact: 
-      add_worker_number: "{{ worker_number | default(1) }}"
-      add_worker_ip: "{{ ip | default('random') }}"
 
-  - name: 'Set worker ip'
-    set_fact: 
-      add_worker_ip: "{{ ip.split(',') | default('random') }}"
-    when: ip is defined
+    - name: 'Export infra ID'
+      shell:
+        cmd: "jq -r .infraID metadata.json"
+      register: infra_id
 
-  - name: Check if worker number matches worker ip or not
-    fail:
-      msg: "worker ip does not match the worker number"
-    failed_when: 
-      - add_worker_ip != "random"
-      - "{{ add_worker_ip| length }} != {{ add_worker_number | int }}"
+    - name: 'Get worker number'
+      set_fact:
+        add_worker_number: "{{ worker_number | default(1) }}"
+        add_worker_ip: "{{ ip | default('random') }}"
 
-  - name: 'Generate worker index'
-    shell: |
-      rm -rf .new_worker_index
-      shuf -i 1000-9999 -n {{ add_worker_number }} -o .new_worker_index
-      sed -i -e 's/^/{{ os_compute_server_name }}-/' .new_worker_index
-      sed -i -e 's/$/,ip=random/' .new_worker_index
-      
-  - name: Save worker name into temporary file
-    shell: |
-      rm -rf .new_worker_name
-      cut -d"," -f1 .new_worker_index >> .new_worker_name
+    - name: 'Set worker ip'
+      set_fact:
+        add_worker_ip: "{{ ip.split(',') | default('random') }}"
+      when: ip is defined
 
-  - name: 'Add worker ip'
-    shell: |
-        sed -i '0,/random/s//{{ item }}/' .new_worker_index
-    with_items:
-      - "{{ add_worker_ip}}"
-    when: add_worker_ip != "random"
+    - name: Check if worker number matches worker ip or not
+      fail:
+        msg: "worker ip does not match the worker number"
+      failed_when:
+        - add_worker_ip != "random"
+        - "{{ add_worker_ip| length }} != {{ add_worker_number | int }}"
 
-  - name: 'Generate worker node json file'
-    script: tools/generate-new-worker-ignition.sh "{{ item }}"
-    with_lines: cat .new_worker_name
+    - name: 'Generate worker index'
+      shell: |
+        rm -rf .new_worker_index
+        shuf -i 1000-9999 -n {{ add_worker_number }} -o .new_worker_index
+        sed -i -e 's/^/{{ os_compute_server_name }}-/' .new_worker_index
+        sed -i -e 's/$/,ip=random/' .new_worker_index
 
-  - name: 'Create the compute server ports'
-    os_port:
-      name: "{{ item.split(',')[0] }}"
-      network: "{{ use_network_name }}"
-      security_groups:
-      - "{{ os_sg_worker }}"
-      fixed_ips:
-        - subnet: "{{ use_network_subnet }}"
-          ip_address: "{{ item.split(',')[1] | replace('ip=','') }}"
-    register: ports
-    with_lines: cat .new_worker_index
-    when: add_worker_ip != "random"
+    - name: Save worker name into temporary file
+      shell: |
+        rm -rf .new_worker_name
+        cut -d"," -f1 .new_worker_index >> .new_worker_name
 
-  - name: 'Create the compute server ports'
-    os_port:
-      name: "{{ item }}"
-      network: "{{ use_network_name }}"
-      security_groups:
-      - "{{ os_sg_worker }}"
-    register: ports
-    with_lines: cat .new_worker_name
-    when: add_worker_ip == "random"
+    - name: 'Add worker ip'
+      shell: |
+          sed -i '0,/random/s//{{ item }}/' .new_worker_index
+      with_items:
+        - "{{ add_worker_ip}}"
+      when: add_worker_ip != "random"
 
-  - name: 'Set compute server ports tag'
-    command:
-      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item }}"
-    with_lines: cat .new_worker_name
+    - name: 'Generate worker node json file'
+      script: tools/generate-new-worker-ignition.sh "{{ item }}"
+      with_lines: cat .new_worker_name
 
-  - name: 'Create the compute servers'
-    os_server:
-      name: "{{ item }}"
-      image: "{{ image_name }}"
-      flavor: "{{ os_flavor_worker }}"
-      auto_ip: no
-      timeout: "{{ create_server_timeout|int * 60 }}"
-      userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
-      availability_zone: "{{ create_server_zone }}"
-      nics:
-        - port-name: "{{ item }}"
-    with_lines: cat .new_worker_name
-    when:
-    - vm_type == "kvm"
-    - volume_type_id is not defined
-    
-  - name: 'Create the compute servers'
-    os_server:
-      name: "{{ item }}"
-      image: "{{ image_name }}"
-      flavor: "{{ os_flavor_worker }}"
-      auto_ip: no
-      timeout: "{{ create_server_timeout|int * 60 }}"
-      userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
-      availability_zone: "{{ create_server_zone }}"
-      nics:
-        - port-name: "{{ item }}"
-    with_lines: cat .new_worker_name
-    when:
-    - disk_type == "dasd"
-    - vm_type == "zvm"
-    - volume_type_id is not defined
-  
-  - name: 'Convert compute server flavor from value into number'
-    command:
-      cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
-    register: compute_flavor_size
-    when:
-    - disk_type == "scsi"
+    - name: 'Create the compute server ports'
+      os_port:
+        name: "{{ item.split(',')[0] }}"
+        network: "{{ use_network_name }}"
+        security_groups:
+          - "{{ os_sg_worker }}"
+        fixed_ips:
+          - subnet: "{{ use_network_subnet }}"
+            ip_address: "{{ item.split(',')[1] | replace('ip=','') }}"
+      register: ports
+      with_lines: cat .new_worker_index
+      when: add_worker_ip != "random"
 
-  - name: 'Create the compute servers with default boot volume'
-    os_server:
-      name: "{{ item }}"
-      image: "i{{ image_name }}"
-      flavor: "{{ os_flavor_worker }}"
-      auto_ip: no
-      timeout: "{{ create_server_timeout|int * 60 }}"
-      userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
-      availability_zone: "{{ create_server_zone }}"
-      nics:
-        - port-name: "{{ item }}"
-      boot_from_volume: True
-      volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
-      terminate_volume: True
-    with_lines: cat .new_worker_name
-    when:
-    - disk_type == "scsi"
-    - vm_type == "zvm"
-    - volume_type_id is not defined
+    - name: 'Create the compute server ports'
+      os_port:
+        name: "{{ item }}"
+        network: "{{ use_network_name }}"
+        security_groups:
+          - "{{ os_sg_worker }}"
+      register: ports
+      with_lines: cat .new_worker_name
+      when: add_worker_ip == "random"
 
-  - name: 'Create compute boot volume'
-    os_volume:
-      state: present
-      name: "{{ item }}-boot"
-      image: "{{ image_name }}"
-      size: "{{ compute_flavor_size.stdout_lines[0]}}"
-      volume_type: "{{ volume_type_id }}"
-      metadata: "{{ cluster_id_tag }}"
-      timeout: "{{ create_server_timeout|int * 60 }}" 
-    with_lines: cat .new_worker_name
-    when:
-    - disk_type == "scsi"
-    - volume_type_id is defined
-  
-  - name: 'Set compute volume bootable'
-    shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
-    with_lines: cat .new_worker_name
-    when: 
-    - disk_type == "scsi"
-    - volume_type_id is defined
+    - name: 'Set compute server ports tag'
+      command:
+        cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item }}"
+      with_lines: cat .new_worker_name
 
-  - name: 'Create the compute server with boot volume'
-    os_server:
-      name: "{{ item }}"
-      flavor: "{{ os_flavor_worker }}"
-      boot_volume: "{{ item }}-boot"
-      auto_ip: no
-      availability_zone: "{{ create_server_zone }}"
-      timeout: "{{ create_server_timeout|int * 60 }}" 
-      userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
-      nics:
-        - port-name: "{{ item }}"
-      meta: "{{ cluster_id_tag }}"
-      terminate_volume: True
-    with_lines: cat .new_worker_name
-    when:
-    - disk_type == "scsi"
-    - volume_type_id is defined
+    - name: 'Create the compute servers'
+      os_server:
+        name: "{{ item }}"
+        image: "{{ image_name }}"
+        flavor: "{{ os_flavor_worker }}"
+        auto_ip: no
+        timeout: "{{ create_server_timeout|int * 60 }}"
+        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        availability_zone: "{{ create_server_zone }}"
+        nics:
+          - port-name: "{{ item }}"
+      with_lines: cat .new_worker_name
+      when:
+        - vm_type == "kvm"
+        - volume_type_id is not defined
 
-  - name: 'Update worker ip into new_worker_index file'
-    shell: |
-      worker_ip=$(openstack server list | grep "{{ item }}" | grep -oP "(?<=)\d+(\.\d+){3}")
-      sed -i -e "/{{ item }}/s/random/$worker_ip/g" .new_worker_index
-    with_lines: cat .new_worker_name
-    when: add_worker_ip == "random"
+    - name: 'Create the compute servers'
+      os_server:
+        name: "{{ item }}"
+        image: "{{ image_name }}"
+        flavor: "{{ os_flavor_worker }}"
+        auto_ip: no
+        timeout: "{{ create_server_timeout|int * 60 }}"
+        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        availability_zone: "{{ create_server_zone }}"
+        nics:
+          - port-name: "{{ item }}"
+      with_lines: cat .new_worker_name
+      when:
+        - disk_type == "dasd"
+        - vm_type == "zvm"
+        - volume_type_id is not defined
 
-  - name: 'Waiting for approve worker CSR'
-    include_tasks: approve_worker.yaml
-    vars:
+    - name: 'Convert compute server flavor from value into number'
+      command:
+        cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
+      register: compute_flavor_size
+      when:
+        - disk_type == "scsi"
+
+    - name: 'Create the compute servers with default boot volume'
+      os_server:
+        name: "{{ item }}"
+        image: "i{{ image_name }}"
+        flavor: "{{ os_flavor_worker }}"
+        auto_ip: no
+        timeout: "{{ create_server_timeout|int * 60 }}"
+        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        availability_zone: "{{ create_server_zone }}"
+        nics:
+          - port-name: "{{ item }}"
+        boot_from_volume: True
+        volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
+        terminate_volume: True
+      with_lines: cat .new_worker_name
+      when:
+        - disk_type == "scsi"
+        - vm_type == "zvm"
+        - volume_type_id is not defined
+
+    - name: 'Create compute boot volume'
+      os_volume:
+        state: present
+        name: "{{ item }}-boot"
+        image: "{{ image_name }}"
+        size: "{{ compute_flavor_size.stdout_lines[0]}}"
+        volume_type: "{{ volume_type_id }}"
+        metadata: "{{ cluster_id_tag }}"
+        timeout: "{{ create_server_timeout|int * 60 }}"
+      with_lines: cat .new_worker_name
+      when:
+        - disk_type == "scsi"
+        - volume_type_id is defined
+
+    - name: 'Set compute volume bootable'
+      shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
+      with_lines: cat .new_worker_name
+      when:
+        - disk_type == "scsi"
+        - volume_type_id is defined
+
+    - name: 'Create the compute server with boot volume'
+      os_server:
+        name: "{{ item }}"
+        flavor: "{{ os_flavor_worker }}"
+        boot_volume: "{{ item }}-boot"
+        auto_ip: no
+        availability_zone: "{{ create_server_zone }}"
+        timeout: "{{ create_server_timeout|int * 60 }}"
+        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        nics:
+          - port-name: "{{ item }}"
+        meta: "{{ cluster_id_tag }}"
+        terminate_volume: True
+      with_lines: cat .new_worker_name
+      when:
+        - disk_type == "scsi"
+        - volume_type_id is defined
+
+    - name: 'Update worker ip into new_worker_index file'
+      shell: |
+        worker_ip=$(openstack server list | grep "{{ item }}" | grep -oP "(?<=)\d+(\.\d+){3}")
+        sed -i -e "/{{ item }}/s/random/$worker_ip/g" .new_worker_index
+      with_lines: cat .new_worker_name
+      when: add_worker_ip == "random"
+
+    - name: 'Waiting for approve worker CSR'
+      include_tasks: approve_worker.yaml
+      vars:
         workerid: "{{ item }}"
-    register: worker_csr_sleeper
-    with_lines: cat .new_worker_name
+      register: worker_csr_sleeper
+      with_lines: cat .new_worker_name
 
 - import_playbook: modify-bastion.yaml
-  when: 
-  - update_bastion is defined
-  - update_bastion == "true"
+  when:
+    - update_bastion is defined
+    - update_bastion == "true"

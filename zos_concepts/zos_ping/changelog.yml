@@ -30,12 +30,11 @@ releases:
         date: 2022-09-07
         changes:
             added:
-                 - zos_ping.yaml
+                - zos_ping.yaml
             removed:
-                 - zos_ping.yml
+                - zos_ping.yml
     2022.07.20:
         date: 2022-07-20
         changes:
             added:
                 - Released initial version
-

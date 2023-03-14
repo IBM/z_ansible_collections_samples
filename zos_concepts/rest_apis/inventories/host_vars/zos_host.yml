@@ -50,4 +50,3 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 # NOTE: This needs not configuration because it uses variable substituion to
 # correctly set the variable`ansible_python_interpreter`
 ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
-

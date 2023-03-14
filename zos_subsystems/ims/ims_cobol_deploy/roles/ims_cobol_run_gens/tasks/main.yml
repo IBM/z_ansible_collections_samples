@@ -1,47 +1,47 @@
 ---
-  # tasks file for ims-cobol-run-gens
-  - name: Run DBDGEN, PSBGEN and ACBGEN.
-    block:
-      - name: Run DBDGEN
-        ibm.ibm_zos_ims.ims_dbd_gen:
-          # src: 'IMSTESTL.ANSIBLE.DBD.SRC'
-          src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBD'
-          # member_list: ['ACCOUNT', 'CUSTACCS', 'CUSTOMER']
-          member_list: ['ACCOUNT', 'ACCTYPE', 'CUSTACCS', 'CUSTOMER', 'CUSTTYPE', 'HISTORY', 'TSTAT', 'TSTATTYP', 'TTYPE']
-          location: DATA_SET
-          replace: true
-          dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
-          sys_lib:
-            - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC'
-            - SYS1.MACLIB
-        when: dbd_gen    
+# tasks file for ims-cobol-run-gens
+- name: Run DBDGEN, PSBGEN and ACBGEN.
+  block:
+    - name: Run DBDGEN
+      ibm.ibm_zos_ims.ims_dbd_gen:
+        # src: 'IMSTESTL.ANSIBLE.DBD.SRC'
+        src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBD'
+        # member_list: ['ACCOUNT', 'CUSTACCS', 'CUSTOMER']
+        member_list: ['ACCOUNT', 'ACCTYPE', 'CUSTACCS', 'CUSTOMER', 'CUSTTYPE', 'HISTORY', 'TSTAT', 'TSTATTYP', 'TTYPE']
+        location: DATA_SET
+        replace: true
+        dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+        sys_lib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC'
+          - SYS1.MACLIB
+      when: dbd_gen
 
-      - name: Run PSBGEN
-        ibm.ibm_zos_ims.ims_psb_gen:
-          src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSB'
-          member_list: ['IBACSUM', 'IBLOAD']
-          location: DATA_SET
-          replace: true
-          dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
-          sys_lib:
-            - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC'
-            - SYS1.MACLIB
-        when: psb_gen
+    - name: Run PSBGEN
+      ibm.ibm_zos_ims.ims_psb_gen:
+        src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSB'
+        member_list: ['IBACSUM', 'IBLOAD']
+        location: DATA_SET
+        replace: true
+        dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+        sys_lib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC'
+          - SYS1.MACLIB
+      when: psb_gen
 
-      - name: Create ACB for specific PSBs.
-        ibm.ibm_zos_ims.ims_acb_gen:
-          command_input: BUILD
-          psb_name: ['IBACSUM', 'IBLOAD']
-          # dbd_name: ['ACCOUNT','CUSTACCS']
-          dbd_name: ['ACCOUNT', 'ACCTYPE', 'CUSTACCS', 'CUSTOMER', 'CUSTTYPE', 'HISTORY', 'TSTAT', 'TSTATTYP', 'TTYPE']
-          # dbd_name: ['ACCOUNT','ACCTYPE',CUSTACCS', 'CUSTOMER','HISTORY','TSTAT']
-          psb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
-          dbd_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
-          acb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
-          reslib:
-            - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
-          steplib:
-            - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
-        register: response
-        failed_when: response.rc > 8
-        when: acb_gen
+    - name: Create ACB for specific PSBs.
+      ibm.ibm_zos_ims.ims_acb_gen:
+        command_input: BUILD
+        psb_name: ['IBACSUM', 'IBLOAD']
+        # dbd_name: ['ACCOUNT','CUSTACCS']
+        dbd_name: ['ACCOUNT', 'ACCTYPE', 'CUSTACCS', 'CUSTOMER', 'CUSTTYPE', 'HISTORY', 'TSTAT', 'TSTATTYP', 'TTYPE']
+        # dbd_name: ['ACCOUNT','ACCTYPE',CUSTACCS', 'CUSTOMER','HISTORY','TSTAT']
+        psb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
+        dbd_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
+        acb_lib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
+        reslib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+        steplib:
+          - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+      register: response
+      failed_when: response.rc > 8
+      when: acb_gen

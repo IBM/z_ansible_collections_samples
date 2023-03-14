@@ -31,12 +31,12 @@ vars_folder_name: vars
 # TCPIP information, including default ports and port reservation behavior
 # Desired port information for IMS 15
 # if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
-DYNAMICALLY_RESERVE_PORTS: no 
-# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt 
+DYNAMICALLY_RESERVE_PORTS: no
+# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
 # to reserve the port numbers provided below. If any are in use the playbook will fail
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
 # port within the default range of the Ansible zport module
-RESERVE_SPECIFIC_PORT: yes 
+RESERVE_SPECIFIC_PORT: yes
 
 DFS_PORTID: 9978
 DFS_SSLPORTID: 9979
@@ -60,7 +60,7 @@ TARGET_USERNAME: omvsadm
 
 # JOB_CARD will be the default job card inserted for dynamically generated JCL
 # ensure MSGCLASS and CLASS are correct for desired environment
-JOB_CARD: |- 
+JOB_CARD: |-
   //ANSIBLE JOB 'testing',
   //  NOTIFY={{ TARGET_USERNAME | upper }},
   //  USER={{ TARGET_USERNAME | upper }},
@@ -73,7 +73,7 @@ JOB_CARD: |-
 uss_utilities_path: /u/{{ TARGET_USERNAME }}
 
 # Where generated JCL files should be saved on target
-# this is a defalult value that should be overwritten 
+# this is a defalult value that should be overwritten
 # with a temporary directory for easier cleanup at the
 # end of a playbook
 uss_file_path: /u/{{ TARGET_USERNAME }}
@@ -89,19 +89,19 @@ DFS_IMS_SSID: IMS1
 
 # ---------------------------------------------------------------------------- #
 # The first HLQ to be used to store IMS related datasets
-# these include procs, OLDS, WADS, PROCLIB, JOBS, and application 
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
 # specific datasets
-DFS_AUTH_LIB_HLQ1: IMSTESTL       
+DFS_AUTH_LIB_HLQ1: IMSTESTL
 # The second HLQ to be used to store IMS related datasets
-# these include procs, OLDS, WADS, PROCLIB, JOBS, and application 
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
 # specific datasets
-DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}' 
+DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}'
 # ---------------------------------------------------------------------------- #
-# The first HLQ for system datasets that will be used 
+# The first HLQ for system datasets that will be used
 # by IMS during provisioning. These should exist prior to
 # running playbooks
 DFS_AUTH_LIB_SYSHLQ1: IMSBLD
-# The second HLQ for system datasets that will be used 
+# The second HLQ for system datasets that will be used
 # by IMS during provisioning. These should exist prior to
 # running playbooks
 DFS_AUTH_LIB_SYSHLQ2: I15RTSMM

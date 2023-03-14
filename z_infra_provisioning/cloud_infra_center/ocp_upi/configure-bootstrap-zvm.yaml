@@ -11,4 +11,4 @@
 - name: Create the bootstrap server in zvm
   hosts: localhost
   roles:
-  - configure-bootstrap-zvm
+    - configure-bootstrap-zvm

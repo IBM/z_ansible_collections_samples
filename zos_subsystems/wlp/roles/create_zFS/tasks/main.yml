@@ -1,19 +1,18 @@
 ---
 # tasks file for roles/create_ZFS
 
-  - name: Create an LDS
-    ibm.ibm_zos_core.zos_data_set:
-      name: "{{ data_set_name }}" 
-      type: lds
-      state: present
-    register: result
-  
-  - name: Response for data set creation
-    debug:
-      msg: "{{ result }}"
-    
-  - name: Format LDS as ZFS
-    command: zfsadm format -aggregate "{{data_set_name}}"
-    register: response
-    failed_when: response.rc > 0 and "Aggregate contains file system" not in response.stderr and "Aggregate is attached" not in response.stderr         
+- name: Create an LDS
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ data_set_name }}"
+    type: lds
+    state: present
+  register: result
 
+- name: Response for data set creation
+  debug:
+    msg: "{{ result }}"
+
+- name: Format LDS as ZFS
+  command: zfsadm format -aggregate "{{data_set_name}}"
+  register: response
+  failed_when: response.rc > 0 and "Aggregate contains file system" not in response.stderr and "Aggregate is attached" not in response.stderr

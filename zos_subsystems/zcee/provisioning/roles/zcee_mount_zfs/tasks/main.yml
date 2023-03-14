@@ -3,24 +3,24 @@
 - name: Delete existing directory if necessary
   file:
     path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}' # /servers/{{softwareServiceInstanceName}}'
-    state: absent 
+    state: absent
   register: dirpath
 
 - name: Create missing directories
   file:
     path: "{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/.tmp_server"
     state: directory
-    recurse: yes 
+    recurse: yes
     mode: '700'
 
 - name: Query information about the main mountpoint
   shell: df {{ zcon_zfs_mountpoint }}
-  register: mountpoint 
+  register: mountpoint
 
-- set_fact: 
+- set_fact:
     mount_dataset: "{{ mountpoint.stdout | regex_search(regexp,'\\1') | first }}"
   vars:
-      regexp: '[^\s]+\s+\(([^\s]*)\)\s+[0-9]+'
+    regexp: '[^\s]+\s+\(([^\s]*)\)\s+[0-9]+'
 
 - name: get parent mount
   shell: expr substr "$(mount -qv {{zcon_zfs_mountpoint}} | grep {{ mount_dataset }})" 5 1
@@ -29,21 +29,21 @@
 - name: Create directories/files - .tmp_server
   file:
     path: '{{ zcon_zfs_mountpoint }}/{{softwareServiceInstanceName}}/.tmp_server'
-    state: directory 
+    state: directory
     mode: '700'
 
-- name: Create directories/files - .tmp_user 
+- name: Create directories/files - .tmp_user
   file:
     path: 'mkdir {{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/.tmp_user'
-    state: directory 
+    state: directory
     mode: '700'
 
 - name: Create directories/files - PROVISION_OK
   file:
     path: 'mkdir {{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/PROVISION_OK'
-    state: directory 
+    state: directory
     mode: '700'
-    
+
 - set_fact:
     mountvalue: '{{ {"A": ["yes"], "U": ["unmount"], "-": ["no"]}[parentmount.stdout] | default("") }}'
 

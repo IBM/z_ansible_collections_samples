@@ -31,15 +31,15 @@
 ###############################################################################
 
 ---
-  - name: "Mirror a Git repository with an Ansible playbook"
-    hosts: localhost
-    gather_facts: no
-    vars:
-      organization: IBM
-      repo_name: z_ansible_collections_samples
-      repo_root_dest: "/tmp"
+- name: "Mirror a Git repository with an Ansible playbook"
+  hosts: localhost
+  gather_facts: no
+  vars:
+    organization: IBM
+    repo_name: z_ansible_collections_samples
+    repo_root_dest: "/tmp"
 
-    tasks:
+  tasks:
     ############################################################################
     # Check if the repository directory exists, if it does then we need only
     # perform a git pull, that is if its a really a git managed repo
@@ -89,9 +89,9 @@
         success_msg: "Determined directory {{repo_root_dest}}/{{repo_name}} is
                       Git managed; continuing on to perform a Git pull."
         fail_msg: "Directory {{repo_root_dest}}/{{repo_name}} exits but is NOT
-                   Git managed or corrupt. Please consider deleting the
-                   directory {{repo_root_dest}}/{{repo_name}} and rerunning the
-                   playbook so that it can Git clone."
+                  Git managed or corrupt. Please consider deleting the
+                  directory {{repo_root_dest}}/{{repo_name}} and rerunning the
+                  playbook so that it can Git clone."
       ignore_errors: no
       when: directory_exists.stat.exists and directory_exists.stat.isdir
 
@@ -125,7 +125,7 @@
     # no locally managed repository exists.
     ############################################################################
     - name: "Clone the repository
-             https://github.com/{{ organization }}/{{ repo_name }}.git"
+            https://github.com/{{ organization }}/{{ repo_name }}.git"
       git: repo='https://github.com/{{ organization }}/{{ repo_name }}.git'
             dest="{{repo_root_dest}}/{{repo_name}}"
             accept_hostkey=yes
@@ -135,7 +135,7 @@
       register: git_clone_result
 
     - name: "Results from cloning the Git repository
-             https://github.com/{{ organization }}/{{ repo_name }}.git"
+            https://github.com/{{ organization }}/{{ repo_name }}.git"
       debug:
         msg: "{{git_clone_result}}"
       when: git_clone_result.changed

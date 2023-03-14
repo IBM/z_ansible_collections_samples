@@ -11,4 +11,4 @@
 - name: Configure install config
   hosts: localhost
   roles:
-  - configure-install-config
+    - configure-install-config

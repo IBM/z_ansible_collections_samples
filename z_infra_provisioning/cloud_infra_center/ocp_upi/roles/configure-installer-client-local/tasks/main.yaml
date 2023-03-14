@@ -28,7 +28,7 @@
 - name: Unzip openshift client archive
   command:
     cmd: tar -zvxf openshift-client-linux.tar.gz
-  
+
 - name: Remove openshift client archive
   file:
     state: absent

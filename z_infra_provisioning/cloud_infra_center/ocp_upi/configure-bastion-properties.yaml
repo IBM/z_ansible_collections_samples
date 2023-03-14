@@ -11,4 +11,4 @@
 - name: configure bastion properties
   hosts: localhost
   roles:
-  - configure-bastion-properties
+    - configure-bastion-properties

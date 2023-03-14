@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,24 +23,24 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 #
-# Change Summary: 
+# Change Summary:
 # - Change Ansible playbook name
 
 - name: 'Get worker node IP'
-  set_fact: 
+  set_fact:
     haproxy_new_worker_index: "{{ worker_index }}"
     cluster_domain_name: "{{ cluster_domain_name }}"
 
 - name: Check new worker-http exist in HAProxy
   shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index }}" | wc -l
   register: exist_worker_count
-  check_mode: no 
+  check_mode: no
   ignore_errors: true
 
 - name: 'Get the line number for backend http'
   shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-http' |awk '{print$1}'
   register: exist_new_worker_http
-  
+
 - name: 'Get the line number for backend https'
   shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-https' |awk '{print$1}'
   register: exist_new_worker_https
@@ -51,13 +51,13 @@
 - name: 'Increment backend https'
   set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
 
-- name: Add new worker http domain into dns 
-  shell: 
+- name: Add new worker http domain into dns
+  shell:
     cmd: sed -i '{{ new_worker_http }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:80 check'  /etc/haproxy/haproxy.cfg
   when: exist_worker_count.stdout == "0"
 
-- name: Add new worker https domain into dns 
-  shell: 
+- name: Add new worker https domain into dns
+  shell:
     cmd: sed -i '{{ new_worker_https }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:443 check'  /etc/haproxy/haproxy.cfg
   when: exist_worker_count.stdout == "0"
 
@@ -76,4 +76,4 @@
     name: haproxy
     state: started
   notify:
-  - restart firewalld
+    - restart firewalld

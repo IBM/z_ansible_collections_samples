@@ -17,7 +17,7 @@
         state: directory
       register: provision_tmp_dir
       tags:
-       - always
+        - always
 
     - set_fact:
         DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"
@@ -128,7 +128,7 @@
 
         # # Run DBD, PSB, and ACB gen
         - include_role: # DONE
-            name: ims_gen 
+            name: ims_gen
           vars:
             dbd_gen: true
             psb_gen: true
@@ -137,7 +137,7 @@
         - include_role: # PARTIALLY DONE
             name: ims_online_change
           vars:
-            enable_olc: true 
+            enable_olc: true
             active_libs: true # need a module for the online change utility
 
         - include_role: # DONE
@@ -208,4 +208,3 @@
       #  - always
       vars:
         uss_file_path: '{{ provision_tmp_dir.path }}'
-

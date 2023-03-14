@@ -11,4 +11,4 @@
 - name: Download openshift RHCOS image from local mirror
   hosts: localhost
   roles:
-  - configure-installer-rhcos-local
+    - configure-installer-rhcos-local

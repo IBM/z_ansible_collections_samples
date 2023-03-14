@@ -45,7 +45,7 @@
     - name: Setting fact `zfs_dsn` for use by this sample
       set_fact:
         zfs_dsn: "{{ tmp_zfs_dsn.stdout }}"
-    
+
     - name: Fact `zfs_dsn` set with value
       debug:
         msg: "{{ zfs_dsn }}"
@@ -87,7 +87,7 @@
 
     - name: Write 1 million bytes to ZFS.
       shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
-    
+
     - name: Get aggregate info BEFORE growth.
       command: zfsadm aggrinfo {{ zfs_dsn | upper }}
       register: aggrinfo_output_before

@@ -5,45 +5,45 @@
   gather_facts: no
   environment: "{{environment_vars}}"
 
-  tasks: 
-  
-    - name: Stop the server 
-      zos_operator:
-        cmd: "STOP {{SERVER_PROC}}" 
-      tags: stop
-      register: stop_result 
+  tasks:
 
-    - name: Response from stopping server process 
-      debug: 
+    - name: Stop the server
+      zos_operator:
+        cmd: "STOP {{SERVER_PROC}}"
+      tags: stop
+      register: stop_result
+
+    - name: Response from stopping server process
+      debug:
         msg: "{{stop_result}}"
 
     # #Stop the server -- USS shell example -- if you start the server in the shell, must also stop the server in the shell
     # - name: Stop the server
     #   shell: '{{liberty_bin_path}}/server stop {{server_instance_name}}'
-    #   tags: stop 
-    
-    # Stop the angel process 
-    - name: Stop angel 
-      zos_operator: 
+    #   tags: stop
+
+    # Stop the angel process
+    - name: Stop angel
+      zos_operator:
         cmd: "STOP {{ANGEL_PROC}}"
       tags: stop_angel # if tags are used while running the playbook, it has precedence over the when conditional
-      when: ANGEL | bool # assumes if you enable authorized services, you would want to stop the angel process 
-      register: angel_stop_result 
+      when: ANGEL | bool # assumes if you enable authorized services, you would want to stop the angel process
+      register: angel_stop_result
 
-    - name: Response from stopping angel process 
-      debug: 
+    - name: Response from stopping angel process
+      debug:
         msg: "{{angel_stop_result}}"
-        
-    # Remove server instance by deleting directory 
+
+    # Remove server instance by deleting directory
     - name: Delete the server directory
       shell: 'rm -rf {{liberty_server_path}}'
 
-    - name: unmount zFS file 
+    - name: unmount zFS file
       shell: "/usr/sbin/unmount {{environment_vars.WLP_USER_DIR}}"
 
     - name: delete zFS file
-      ibm.ibm_zos_core.zos_data_set: 
-        name: "{{data_set_name}}" 
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{data_set_name}}"
         state: absent
 
     # Remove JCL Procedures
@@ -58,4 +58,3 @@
         name: "{{PROC_LIB}}({{ANGEL_PROC}})"
         state: absent
         type: MEMBER
-

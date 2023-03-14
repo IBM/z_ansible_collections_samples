@@ -8,7 +8,7 @@ exclude_paths:
   - zos_subsystems/ims/ims_provisioning/roles/*/tests/test.yml
   - zos_subsystems/wlp/roles/*/tests/test.yml
   - zos_subsystems/zcee/provisioning/roles/*/tests/test.yml
-  
+
   - z_systems_administration/zhmc/playbooks/vault_example.yml
   - z_systems_administration/zhmc/playbooks/inventory_example.yml
 
@@ -54,10 +54,6 @@ skip_list:
   - var-naming
   - var-naming[PYZ]
   - var-naming[ZOAU]
-  - yaml[empty-lines]
-  - yaml[indentation]
   - yaml[line-length]
-  - yaml[new-line-at-end-of-file]
   - yaml[octal-values]
-  - yaml[trailing-spaces]
   - yaml[truthy]

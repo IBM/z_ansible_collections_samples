@@ -7,10 +7,10 @@
   block:
 
     - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+        - set_fact:
+            eager_role_path: '{{role_path}}'
 # ------------------------------------------------------------------------------------------------------------------ DFSSETPG
-    - name: Authorize IMS datasets 
+    - name: Authorize IMS datasets
       zos_apf:
         force_dynamic: true
         batch:

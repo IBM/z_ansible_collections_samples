@@ -41,7 +41,3 @@ releases:
                 - Updated host_vars, group_vars and inventory
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
-
-
-
-

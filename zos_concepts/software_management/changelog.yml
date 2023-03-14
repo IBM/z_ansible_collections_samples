@@ -37,7 +37,3 @@ releases:
             added:
                 - Added runtime-requirements.yml that lists the requirements needed for this playbook to execute
                 - Updated host_vars, group_vars and inventory
-
-
-
-

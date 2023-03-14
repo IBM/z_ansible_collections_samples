@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/openshift/installer
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,72 +24,72 @@
   gather_facts: no
 
   tasks:
-  - name: 'Import common yaml'
-    import_tasks: common.yaml
+    - name: 'Import common yaml'
+      import_tasks: common.yaml
 
-  - find:
-      paths: .
-      patterns: "*.json"
-      excludes: 
-      - "metadata.json"
-    register: find_results
+    - find:
+        paths: .
+        patterns: "*.json"
+        excludes:
+          - "metadata.json"
+      register: find_results
 
-  - file:
-      path: "{{ item['path'] }}"
-      state: absent
-    with_items: "{{ find_results['files'] }}"
+    - file:
+        path: "{{ item['path'] }}"
+        state: absent
+      with_items: "{{ find_results['files'] }}"
 
-  - find:
-      paths: .
-      patterns: "*.ign"
-    register: find_results_ign
+    - find:
+        paths: .
+        patterns: "*.ign"
+      register: find_results_ign
 
-  - file:
-      path: "{{ item['path'] }}"
-      state: absent
-    with_items: "{{ find_results_ign['files'] }}"
-    
-  - name: Remove the auth directory
-    file:
-      path: auth/
-      state: absent
-  
-  - name: 'Remove the file of compute server names'
-    file:
-      state: absent
-      path: .compute-nodes-{{ infra_id.stdout_lines[0] }}.json
+    - file:
+        path: "{{ item['path'] }}"
+        state: absent
+      with_items: "{{ find_results_ign['files'] }}"
 
-  - name: 'Remove the hidden openshift install state json files'
-    file:
-      state: absent
-      path: .openshift_install_state.json
-  
-  - name: 'Remove the hidden openshift_install.log files'
-    file:
-      state: absent
-      path: .openshift_install.log
+    - name: Remove the auth directory
+      file:
+        path: auth/
+        state: absent
 
-  - name: 'Remove the hidden sha256sum_remote.txt files'
-    file:
-      state: absent
-      path: .sha256sum_remote.txt
+    - name: 'Remove the file of compute server names'
+      file:
+        state: absent
+        path: .compute-nodes-{{ infra_id.stdout_lines[0] }}.json
 
-  - name: 'Remove the hidden sha256sum_local.txt files'
-    file:
-      state: absent
-      path: .sha256sum_local.txt
+    - name: 'Remove the hidden openshift install state json files'
+      file:
+        state: absent
+        path: .openshift_install_state.json
 
-  - name: 'Remove the metadata.json files'
-    file:
-      state: absent
-      path: metadata.json
+    - name: 'Remove the hidden openshift_install.log files'
+      file:
+        state: absent
+        path: .openshift_install.log
 
-  - name: 'List bootstrap ignition image'
-    command:
-      cmd: "openstack image list --tag {{ cluster_id_tag }} -f value -c ID"
-    register: bootstrap_images
+    - name: 'Remove the hidden sha256sum_remote.txt files'
+      file:
+        state: absent
+        path: .sha256sum_remote.txt
 
-  - name: 'Remove the bootstrap ignition'
-    shell:
-      cmd: "openstack image delete {{ item.1 }}"
-    with_indexed_items: "{{ bootstrap_images.stdout_lines }}"
+    - name: 'Remove the hidden sha256sum_local.txt files'
+      file:
+        state: absent
+        path: .sha256sum_local.txt
+
+    - name: 'Remove the metadata.json files'
+      file:
+        state: absent
+        path: metadata.json
+
+    - name: 'List bootstrap ignition image'
+      command:
+        cmd: "openstack image list --tag {{ cluster_id_tag }} -f value -c ID"
+      register: bootstrap_images
+
+    - name: 'Remove the bootstrap ignition'
+      shell:
+        cmd: "openstack image delete {{ item.1 }}"
+      with_indexed_items: "{{ bootstrap_images.stdout_lines }}"

@@ -13,4 +13,3 @@
       Authorization: "Bearer {{ACCESS_TOKEN}}"
     status_code: 200
   register: discovery_data
-

@@ -2,8 +2,8 @@
 # tasks file for zcee_keyring
 
 - name: Define Security
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
         # Defining STARTED task for the server
       - RDEF STARTED {{softwareServiceInstanceName}}.* UACC(NONE) STDATA(USER({{zcon_admin_server}}) PRIVILEGED(NO) TRUSTED(NO) TRACE(YES))
         # Setup the APPL class profile
@@ -70,8 +70,8 @@
   failed_when: response.output | map(attribute='rc') | max > 4
 
 # - name: Define Security
-#   ibm.ibm_zos_core.zos_tso_command: 
-#     commands: 
+#   ibm.ibm_zos_core.zos_tso_command:
+#     commands:
 #         # Defining STARTED task for the server
 #       - RDEF STARTED {{softwareServiceInstanceName}}.* UACC(NONE) STDATA(USER({{zcon_admin_server}}) PRIVILEGED(NO) TRUSTED(NO) TRACE(YES))
 #         # Setup the APPL class profile

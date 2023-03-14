@@ -41,27 +41,27 @@
 
         # Stop ICON
         - block:
-          - include_role:
-              name: ims_common
-            vars:
-              icon: stop
-              ctl: ""
-              wait_for_job: false
-              cold_start: false
+            - include_role:
+                name: ims_common
+              vars:
+                icon: stop
+                ctl: ""
+                wait_for_job: false
+                cold_start: false
 
         # Stop OM by calling its role
         - block:
-          - include_role:
-              name: ims_operations_manager
-            vars:
-              om: stop
+            - include_role:
+                name: ims_operations_manager
+              vars:
+                om: stop
 
         # Stop RM by calling its role
         - block:
-          - include_role:
-              name: ims_resource_manager
-            vars:
-              rm: stop
+            - include_role:
+                name: ims_resource_manager
+              vars:
+                rm: stop
 
         # Stop SCI by calling its role
         - block:
@@ -80,19 +80,19 @@
                 system_datasets: ""
 
         - block:
-          - include_role:
-              name: ims_catalog
-            vars:
-              catalog: delete
+            - include_role:
+                name: ims_catalog
+              vars:
+                catalog: delete
 
         - block:
-          - include_role:
-              name: ims_iefjobs
-            vars:
-              iefjobs: delete
+            - include_role:
+                name: ims_iefjobs
+              vars:
+                iefjobs: delete
 
         - block:
-          - include_role:
-              name: ims_proclib
-            vars:
-              delete: true
+            - include_role:
+                name: ims_proclib
+              vars:
+                delete: true

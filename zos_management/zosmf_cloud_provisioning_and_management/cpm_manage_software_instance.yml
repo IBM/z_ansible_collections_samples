@@ -64,7 +64,7 @@
     - name: instance_info_file
       prompt: "Enter instance info file full path"
       private: no
-    - name: action 
+    - name: action
       prompt: "Enter action to perform"
       private: no
   tasks:

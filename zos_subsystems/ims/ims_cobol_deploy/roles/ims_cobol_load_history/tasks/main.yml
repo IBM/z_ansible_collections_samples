@@ -1,7 +1,7 @@
 ---
 # tasks file for ims_cobol_load_history
 
-- name: Create temporary directory for load history 
+- name: Create temporary directory for load history
   tempfile:
     state: directory
   register: temp_file_path
@@ -27,4 +27,3 @@
       register: output
     - debug:
         msg: "{{ output.jobs[0].job_id }}"
-
