@@ -4,7 +4,7 @@
 - name: Authenticate User
   uri:
     url: "{{ doe_server }}:{{ doe_server_port }}/ws/security/login"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: POST

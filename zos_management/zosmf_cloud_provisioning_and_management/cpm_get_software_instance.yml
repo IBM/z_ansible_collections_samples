@@ -52,16 +52,16 @@
 ---
 - name: Sample for retrieving software instance from registry
   hosts: cpm_host1
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.ibm_zosmf
   vars_prompt:
     - name: zmf_user
       prompt: "Enter your z/OSMF username"
-      private: no
+      private: false
     - name: zmf_password
       prompt: "Enter your z/OSMF password"
-      private: yes
+      private: true
   vars:
     - name: instance_info_json_path
 

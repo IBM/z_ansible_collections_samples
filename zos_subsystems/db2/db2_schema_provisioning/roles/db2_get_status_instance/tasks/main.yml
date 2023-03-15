@@ -4,7 +4,7 @@
 - name: Check status of an instance
   uri:
     url: "{{ base_url }}/instances/{{INSTANCE_ID}}/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET

@@ -8,7 +8,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: DBR DB ACCOUNT
   ibm.ibm_zos_ims.ims_command:
@@ -17,7 +17,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Delete DB ACCOUNT
   ibm.ibm_zos_ims.ims_command:
@@ -26,7 +26,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Stop DB CUSTACCS
   ibm.ibm_zos_ims.ims_command:
@@ -35,7 +35,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: DBR DB CUSTACCS
   ibm.ibm_zos_ims.ims_command:
@@ -44,7 +44,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Delete CUSTACCS
   ibm.ibm_zos_ims.ims_command:
@@ -53,7 +53,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Stop DB CUSTOMER
   ibm.ibm_zos_ims.ims_command:
@@ -62,7 +62,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: DBR DB CUSTOMER
   ibm.ibm_zos_ims.ims_command:
@@ -71,7 +71,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Delete DB CUSTOMER
   ibm.ibm_zos_ims.ims_command:
@@ -80,7 +80,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Stop DB HISTORY
   ibm.ibm_zos_ims.ims_command:
@@ -89,7 +89,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: DBR DB HISTORY
   ibm.ibm_zos_ims.ims_command:
@@ -98,7 +98,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Delete Db HISTORY
   ibm.ibm_zos_ims.ims_command:
@@ -107,7 +107,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Stop DB TSTAT
   ibm.ibm_zos_ims.ims_command:
@@ -116,7 +116,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: DBR DB TSTAT
   ibm.ibm_zos_ims.ims_command:
@@ -125,7 +125,7 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Delete DB TSTAT
   ibm.ibm_zos_ims.ims_command:
@@ -134,4 +134,4 @@
     route: "{{ROUTE}}"
   register: response
   failed_when: response.ims_output[0].type_2_response[0].CC > '10'
-  ignore_errors: yes
+  ignore_errors: true

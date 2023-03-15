@@ -4,7 +4,7 @@
 - name: Retrieve application id
   uri:
     url: "{{ base_url }}/applications/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET

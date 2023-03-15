@@ -75,7 +75,7 @@
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ omvs_zfs_data_set_name }}"
     state: present
-    replace: yes
+    replace: true
     type: lds
     space_primary: "{{ omvs_zfs_data_set_size if omvs_zfs_data_set_size else '50' }}"
     space_secondary: "{{ omvs_zfs_data_set_size if omvs_zfs_data_set_size else '50' }}"
@@ -159,7 +159,7 @@
       ibm.ibm_zos_core.zos_operator:
         cmd: "SETOMVS SYNTAXCHECK=({{ bpxprm_member | upper }})"
       register: syntaxcheck_response
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Undo mount changes if bad syntaxcheck
       shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"

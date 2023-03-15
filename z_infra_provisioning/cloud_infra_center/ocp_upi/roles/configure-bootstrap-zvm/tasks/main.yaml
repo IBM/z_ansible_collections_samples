@@ -51,7 +51,7 @@
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
@@ -75,14 +75,14 @@
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-    boot_from_volume: True
+    boot_from_volume: true
     volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
-    terminate_volume: True
+    terminate_volume: true
   when:
     - disk_type == "scsi"
     - vm_type == "zvm"
@@ -114,12 +114,12 @@
     boot_volume: "{{ os_bootstrap_server_name }}-boot"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-    terminate_volume: True
+    terminate_volume: true
   when:
     - disk_type == "scsi"
     - volume_type_id is defined

@@ -2,7 +2,7 @@ temp_dir: /tmp
 
 # Placeholder variable for using the application binary packaged with this sample
 # Future update may include a new role to pull the application from a github repository
-USE_GIT: no
+USE_GIT: false
 
 # Update this or there is default
 
@@ -131,7 +131,7 @@ psbs:
  - name: IBLOAD
 
 # DFSMPR proc parameters
-SEND_CUSTOM_DFSMPR: yes
+SEND_CUSTOM_DFSMPR: true
 DFSMPR_NAME: DFSMPR{{ REGION_NUM | string }}
 
 # this will be appended to the region name, example: IMS1MPP5 where REGION_NUM='5' and DFS_IMS_SSID='IMS1'
@@ -149,10 +149,10 @@ ZOS_LERUNLIB: '{{ zCloud_LERuntime }}'
 ZOS_MACLIB: '{{ zCloud_MACLIB }}'
 
 # DB2 parameters - check to make sure
-WITH_DB2: no
+WITH_DB2: false
 DB2_SSM: ''
 
-USE_PSEUDO_WFI: no
+USE_PSEUDO_WFI: false
 
 ## IMS application variables
 DFS_tranclass1: '005' # '008'
@@ -162,7 +162,7 @@ DFS_tranclass4: '000'
 DFS_appname: 'Y'
 DFS_traname: 'Y'
 
-REPLACE_MEMBERS: yes
+REPLACE_MEMBERS: true
 
 # Database names used to copy source from USS to MVS.
 loadData:

@@ -21,7 +21,7 @@
 # openstacksdk
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
 

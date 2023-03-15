@@ -123,8 +123,8 @@
           zos_copy:
             src: "{{ item.src }}"
             dest: "{{ item.dest }}"
-            remote_src: True
-            force: True
+            remote_src: true
+            force: true
           loop:
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(IMS)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}CTL)' }
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DLISAS)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DLI)' }
@@ -254,8 +254,8 @@
       zos_copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-        remote_src: True
-        force: True
+        remote_src: true
+        force: true
         volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
       loop:
         - { src: '{{ADDTL_SAMP_PROC_LIB}}(DFSDBDGN)', dest: '{{ADDTL_SAMP_PROC_LIB}}(DBDGEN)' }

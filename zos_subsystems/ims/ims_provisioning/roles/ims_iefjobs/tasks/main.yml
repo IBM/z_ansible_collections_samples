@@ -18,7 +18,7 @@
 
         - include_role:
             name: submit-rexx
-            public: yes
+            public: true
           vars:
             rexx_name: 'IEFJOBSX.j2'
             max_rc: 0
@@ -39,7 +39,7 @@
 
     - include_role:
         name: submit-rexx
-        public: yes
+        public: true
       vars:
         rexx_name: 'IEFJOBS.j2'
         max_rc: 0

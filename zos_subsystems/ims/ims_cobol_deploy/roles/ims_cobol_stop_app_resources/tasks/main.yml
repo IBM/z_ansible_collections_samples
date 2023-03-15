@@ -21,4 +21,4 @@
         route: "{{ROUTE}}"
 
   register: response
-  ignore_errors: yes
+  ignore_errors: true

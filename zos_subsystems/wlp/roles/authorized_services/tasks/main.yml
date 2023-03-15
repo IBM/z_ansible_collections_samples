@@ -12,7 +12,7 @@
   when: SAFCRED | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enable WLM services (ZOSWLM)
   ibm.ibm_zos_core.zos_tso_command:
@@ -22,7 +22,7 @@
   when: ZOSWLM | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables RRS Transaction Services (TXRSS)
   ibm.ibm_zos_core.zos_tso_command:
@@ -32,7 +32,7 @@
   when: TXRSS | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables ZOSDUMP
   ibm.ibm_zos_core.zos_tso_command:
@@ -42,7 +42,7 @@
   when: ZOSDUMP | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables optimized local adapter services
   ibm.ibm_zos_core.zos_tso_command:
@@ -54,7 +54,7 @@
   when: LOCAL_ADAPTER | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables the IFAUSAGE services (PRODMGR)
   ibm.ibm_zos_core.zos_tso_command:
@@ -64,7 +64,7 @@
   when: PRODMGR | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables the AsyncIO services (ZOSAIO)
   ibm.ibm_zos_core.zos_tso_command:
@@ -74,7 +74,7 @@
   when: ZOSAIO | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Refresh
   ibm.ibm_zos_core.zos_tso_command:

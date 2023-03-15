@@ -51,7 +51,7 @@
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
@@ -93,12 +93,12 @@
     boot_volume: "{{ os_bootstrap_server_name }}-boot"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }}"
-    terminate_volume: True
+    terminate_volume: true
   when:
     - disk_type == "scsi"
     - vm_type == "kvm"

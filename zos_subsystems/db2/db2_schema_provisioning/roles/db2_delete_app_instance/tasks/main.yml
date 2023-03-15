@@ -4,7 +4,7 @@
 - name: Delete an instance of the application
   uri:
     url: "{{ base_url }}/instances/{{inst_name}}/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: DELETE

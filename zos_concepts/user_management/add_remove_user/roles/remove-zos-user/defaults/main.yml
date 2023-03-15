@@ -54,7 +54,7 @@ bpxprm_member: ""
 # Specifies if the user data sets should be deleted.
 # This job attempts to delete any data sets with the HLQ matching the user ID of the user to be removed.
 ##################################################################################################################
-delete_user_data_sets: yes
+delete_user_data_sets: true
 
 ##################################################################################################################
 # Specifies the character set any copied templates and files should be converted to.

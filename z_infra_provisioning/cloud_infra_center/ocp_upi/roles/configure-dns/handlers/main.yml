@@ -17,17 +17,17 @@
 ---
 # handlers file for configure-dns
 - name: Restart named-chroot.service
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   service:
     name: named-chroot.service
     state: restarted
-    enabled: yes
+    enabled: true
   listen: "restart dns"
 
 - name: Restart firewalld.service
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   service:

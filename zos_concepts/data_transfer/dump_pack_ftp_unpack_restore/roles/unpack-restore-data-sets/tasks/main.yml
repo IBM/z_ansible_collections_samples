@@ -23,7 +23,7 @@
     - name: Create data set for archive
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set if archive_data_set | default(false) else omit }}"
-        replace: yes
+        replace: true
         type: seq
         # space may require manual intervention in certain cases
         space_primary: "{{ size_in_cyls.get('primary') }}"
@@ -62,7 +62,7 @@
         - name: Load a set of data sets from an archive.
           ibm.ibm_zos_core.zos_mvs_raw:
             program_name: adrdssu
-            auth: yes
+            auth: true
             dds:
               - dd_data_set:
                   dd_name: source

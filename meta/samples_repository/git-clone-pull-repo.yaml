@@ -33,7 +33,7 @@
 ---
 - name: "Mirror a Git repository with an Ansible playbook"
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   vars:
     organization: IBM
     repo_name: z_ansible_collections_samples
@@ -73,7 +73,7 @@
         cd {{repo_root_dest}}/{{repo_name}}
         git rev-parse --is-inside-work-tree
       register: is_git_managed
-      ignore_errors: yes
+      ignore_errors: true
       when: directory_exists.stat.exists and directory_exists.stat.isdir
 
       # ------------------------------------------------------------------------
@@ -92,7 +92,7 @@
                   Git managed or corrupt. Please consider deleting the
                   directory {{repo_root_dest}}/{{repo_name}} and rerunning the
                   playbook so that it can Git clone."
-      ignore_errors: no
+      ignore_errors: false
       when: directory_exists.stat.exists and directory_exists.stat.isdir
 
       # ------------------------------------------------------------------------
@@ -104,7 +104,7 @@
       shell: |
         git pull
       register: git_pull_result
-      ignore_errors: no
+      ignore_errors: false
       when: is_git_managed is defined and is_git_managed.stdout is defined and is_git_managed.stdout
 
     - name: Does the directory "{{repo_root_dest}}/{{repo_name}}" already exist?

@@ -20,7 +20,7 @@
 - include_vars: cluster-template.yaml
 
 - name: Install haproxy
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   yum:
@@ -34,7 +34,7 @@
     - restart firewalld
 
 - name: Create /etc/haproxy
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   file:
@@ -42,7 +42,7 @@
     state: directory
 
 - name: Create /etc/haproxy/haproxy.cfg
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   template:
@@ -52,60 +52,60 @@
     - restart haproxy
 
 - name: Allow http traffic
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     service: http
-    permanent: yes
+    permanent: true
     zone: public
     state: enabled
   notify:
     - restart firewalld
 
 - name: Allow http traffic
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     service: http
-    permanent: yes
+    permanent: true
     zone: internal
     state: enabled
   notify:
     - restart firewalld
 
 - name: Allow https traffic
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     service: https
-    permanent: yes
+    permanent: true
     zone: public
     state: enabled
   notify:
     - restart firewalld
 
 - name: Allow https traffic
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     service: https
-    permanent: yes
+    permanent: true
     zone: internal
     state: enabled
   notify:
     - restart firewalld
 
 - name: Allow traffic at port 443
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     port: 443/tcp
-    permanent: yes
+    permanent: true
     zone: "{{ item }}"
     state: enabled
   with_items:
@@ -115,12 +115,12 @@
     - restart firewalld
 
 - name: Allow traffic at port 6443
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     port: 6443/tcp
-    permanent: yes
+    permanent: true
     zone: "{{ item }}"
     state: enabled
   with_items:
@@ -130,12 +130,12 @@
     - restart firewalld
 
 - name: Allow traffic at port 22623
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:
     port: 22623/tcp
-    permanent: yes
+    permanent: true
     zone: "{{ item }}"
     state: enabled
   with_items:
@@ -145,7 +145,7 @@
     - restart firewalld
 
 - name: Allow selinux for haproxy
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   shell: setsebool -P haproxy_connect_any=1
@@ -160,19 +160,19 @@
 #     enabled: yes
 
 - name: Restart haproxy
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   service: name=haproxy state=restarted
 
 - name: Restart firewalld
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   service: name=firewalld state=restarted
 
 - name: Check if haproxy is running
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   service:
@@ -180,7 +180,7 @@
     state: started
 
 - name: Check if firewalld is running
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   service:

@@ -4,7 +4,7 @@
 - name: Retrieve subsystem info
   uri:
     url: "{{ base_url }}/subsystems/db2/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET

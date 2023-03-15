@@ -4,7 +4,7 @@
 
 ---
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
     - name: Negative test that expects to fail on a missng Ansible version 200.0.0

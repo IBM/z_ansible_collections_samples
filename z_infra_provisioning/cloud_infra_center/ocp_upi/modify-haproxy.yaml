@@ -34,7 +34,7 @@
 - name: Check new worker-http exist in HAProxy
   shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index }}" | wc -l
   register: exist_worker_count
-  check_mode: no
+  check_mode: false
   ignore_errors: true
 
 - name: 'Get the line number for backend http'

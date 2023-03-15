@@ -29,12 +29,12 @@ vars_folder_name: vars
 # TCPIP information, including default ports and port reservation behavior
 # Desired port information for IMS 15
 # if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
-DYNAMICALLY_RESERVE_PORTS: no
+DYNAMICALLY_RESERVE_PORTS: false
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
 # to reserve the port numbers provided below. If any are in use the playbook will fail
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
 # port within the default range of the Ansible zport module
-RESERVE_SPECIFIC_PORT: yes
+RESERVE_SPECIFIC_PORT: true
 
 DFS_PORTID: 9978
 DFS_SSLPORTID: 9979

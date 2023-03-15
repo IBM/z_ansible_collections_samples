@@ -56,4 +56,3 @@ skip_list:
   - var-naming[ZOAU]
   - yaml[line-length]
   - yaml[octal-values]
-  - yaml[truthy]

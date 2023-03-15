@@ -11,7 +11,7 @@
 - name: "{{task_description}}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: ikjeft01
-    auth: yes
+    auth: true
     parm: "REGIONS=0K"
     dds:
       - dd_output:

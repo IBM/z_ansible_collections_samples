@@ -19,7 +19,7 @@
 - include_vars: cluster-template.yaml
 
 - name: Install bind-chroot for dns
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   yum:
@@ -27,7 +27,7 @@
     state: latest
 
 - name: Create /var/named directory
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   file:
@@ -43,7 +43,7 @@
     subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
 
 - name: Create dns subnet definition
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   template:
@@ -55,7 +55,7 @@
     - restart dns
 
 - name: Unmanage resolve.conf in NetworkManager
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   lineinfile:
@@ -65,14 +65,14 @@
     regexp: "^dns=.*"
 
 - name: Check if DNS is already defined
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   shell: grep -c "^{{ cluster_domain_name }}" /etc/resolv.conf || true
   register: check
 
 - name: Use local dns in resolv.conf
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   blockinfile:
@@ -88,7 +88,7 @@
     bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
 
 - name: Create dns subnet zone for bastion
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   template:
@@ -100,7 +100,7 @@
     - restart dns
 
 - name: Create /etc/named.conf
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   template:
@@ -110,7 +110,7 @@
     - restart dns
 
 - name: Update cluster_subnet_range
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   shell:
@@ -119,7 +119,7 @@
     - restart dns
 
 - name: Update bastion_subnet_prefix_reverse
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   shell:
@@ -128,7 +128,7 @@
     - restart dns
 
 - name: Add dns to firewall
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
   firewalld:

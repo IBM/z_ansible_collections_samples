@@ -32,4 +32,4 @@ target_user: ""
 target_password: ""
 
 # should terse and archive data sets be deleted upon successful transfer?
-delete: yes
+delete: true

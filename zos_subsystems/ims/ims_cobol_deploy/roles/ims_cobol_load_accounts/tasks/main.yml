@@ -22,7 +22,7 @@
         location: LOCAL
         wait: true
         wait_time_s: 150
-        return_output: True
+        return_output: true
         encoding:
           from: ISO8859-1
           to: IBM-037

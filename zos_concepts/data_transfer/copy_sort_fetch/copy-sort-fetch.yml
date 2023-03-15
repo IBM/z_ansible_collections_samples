@@ -33,7 +33,7 @@
     - ibm.ibm_zos_core
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
@@ -41,7 +41,7 @@
         - name: Copy local file containing data
           include_role:
             name: copy-local-data
-            public: yes
+            public: true
 
 ###############################################################################
 # Removing column headers is necessary due to the fact that, if the column
