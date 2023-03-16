@@ -6,7 +6,7 @@
   register: server_stat
 
 # This block only runs when the server.xml file is found in the role's template folder.
-- when: server_stat.stat.exists == true
+- when: server_stat.stat.exists
   block:
     - name: Copy over server.xml template
       ansible.builtin.template:
@@ -32,7 +32,7 @@
   ansible.builtin.copy:
     src: ./templates/bootstrap.properties
     dest: '{{liberty_server_path}}/bootstrap.properties'
-  when: bootstrap_stat.stat.exists == true
+  when: bootstrap_stat.stat.exists
 
 # handles the jvm.options file
 - name: Check for jvm.options file
@@ -44,4 +44,4 @@
   ansible.builtin.copy:
     src: ./templates/jvm.options
     dest: '{{liberty_server_path}}/jvm.options'
-  when: jvm_stat.stat.exists == true
+  when: jvm_stat.stat.exists
