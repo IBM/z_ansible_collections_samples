@@ -7,6 +7,7 @@
   block:
     # TODO: add option to reserve specific ports
     - name: Reserve ports for ICON
+      when: DYNAMICALLY_RESERVE_PORTS
       block:
 
         - name: When specific ports are desired
@@ -35,11 +36,11 @@
               # DFS_PORTID: '{{ port_alloc_result1.port_id }}'
               DFS_REGION_SSLTCPIPPORT: '{{ port_alloc_result2.port }}'
               # DFS_SSLPORTID: '{{ port_alloc_result2.port_id }}'
-      when: DYNAMICALLY_RESERVE_PORTS
 
     # * Need this because Ansible lazily interprets role_path
     # * Results in wrong paths being sent when passing vars that use role_path var
-    - block:
+    - when: provision
+      block:
 
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -54,9 +55,9 @@
           vars:
             datasets: '{{ desired_install_job_save_locations.provision }}'
 
-      when: provision
 
-    - block:
+    - when: DFS_INIT_JAVA_CONF
+      block:
         - name: Copy imsjava to target
           ansible.builtin.copy:
             src: '{{ role_path }}/files/java/imsjava.tar'
@@ -78,10 +79,10 @@
 
         - name: Create dfsjvmpr.props for potential JMP regions
           ansible.builtin.shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props # {{ JAVA_CONF_PATH }}
-      when: DFS_INIT_JAVA_CONF
 
 
     - name: Send PROCLIB members
+      when: send_procs
       block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -108,4 +109,3 @@
           ansible.builtin.file:
             path: '{{ proclib_tmp_dir.path }}'
             state: absent
-      when: send_procs

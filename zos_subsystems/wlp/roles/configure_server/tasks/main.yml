@@ -6,7 +6,8 @@
   register: server_stat
 
 # This block only runs when the server.xml file is found in the role's template folder.
-- block:
+- when: server_stat.stat.exists == true
+  block:
     - name: Copy over server.xml template
       ansible.builtin.template:
         src: ./templates/server.xml.j2
@@ -20,7 +21,6 @@
 
     - name: Replace the existing server.xml
       ansible.builtin.command: mv {{liberty_server_path}}/server_ansible.xml {{liberty_server_path}}/server.xml
-  when: server_stat.stat.exists == true
 
 # handles the bootstrap properties file
 - name: Check for bootstrap.properties file

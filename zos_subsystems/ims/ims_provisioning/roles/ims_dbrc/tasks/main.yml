@@ -7,7 +7,8 @@
 
   block:
 
-    - block:
+    - when: dbrc_defaults
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # --------------------------------------------------------------------------------------------------- DFSDFDRC
@@ -79,10 +80,10 @@
                   content:
                     - "   INCLUDE SYSPUNCH(DFSIDEF0)"
                     - "   NAME  DFSIDEF0(R)"
-      when: dbrc_defaults
 # ---------------------------------------------------------------------------------------------------
 
-    - block:
+    - when: prep_dbrc
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # --------------------------------------------------------------------------------------------------- DFSE314J
@@ -99,12 +100,12 @@
             recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1"
             recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2"
             recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
-      when: prep_dbrc
 
     - block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
     - name: COPYSKEL SKELETONS
+      when: prep_dbrc
       block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -131,5 +132,4 @@
           ansible.builtin.file:
             path: '{{ skt_tmp_dir.path }}'
             state: absent
-      when: prep_dbrc
 # ---------------------------------------------------------------------------------------------------

@@ -24,7 +24,6 @@ skip_list:
   - deprecated-local-action
   - ignore-errors
   - jinja[spacing]
-  - key-order[task]
   - literal-compare
   - meta-incorrect
   - meta-no-info

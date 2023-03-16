@@ -25,7 +25,8 @@
 #
 ###############################################################################
 
-- block:
+- when: chosen_python is not defined
+  block:
     - name: Create temporary file
       ansible.builtin.tempfile:
         state: file
@@ -76,4 +77,3 @@
         state: absent
       delegate_to: localhost
       when: tempfile_1 is defined
-  when: chosen_python is not defined

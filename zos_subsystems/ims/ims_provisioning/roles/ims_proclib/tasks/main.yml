@@ -12,6 +12,7 @@
             eager_role_path: '{{role_path}}'
 # -------------------------------------------------------------------------------------------------------------- DFSE302J
     - name: Allocating Proclib Members
+      when: add
       block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -38,12 +39,12 @@
           ansible.builtin.file:
             path: '{{ procfiles_tmp_dir.path }}'
             state: absent
-      when: add
 
     - block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
     - name: Allocating TCFSLIB Members
+      when: add
       block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -70,7 +71,6 @@
           ansible.builtin.file:
             path: '{{ tcf_tmp_dir.path }}'
             state: absent
-      when: add
 
 # --------------------------------------------------------------------------------------------------------------
 
@@ -84,6 +84,7 @@
 
 # -------------------------------------------------------------------------------------------------------------- DFSE303J
     - name: Allocating BPECONFG Members
+      when: bpeconfg
       block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -110,10 +111,10 @@
           ansible.builtin.file:
             path: '{{ bpe_tmp_dir.path }}'
             state: absent
-      when: bpeconfg
 # --------------------------------------------------------------------------------------------------------------
 
-    - block:
+    - when: copy
+      block:
 
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -132,7 +133,6 @@
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}OM)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}OM)' }
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}SCI)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SCI)' }
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}RM)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}RM)' }
-      when: copy
 # --------------------------------------------------------------------------------------------------------------
 
     - block:
@@ -142,6 +142,7 @@
 
 # -------------------------------------------------------------------------------------------------------------- DFSE313J
     - name: Allocating JOBS Members
+      when: copy_to_jobs
       block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -168,10 +169,10 @@
           ansible.builtin.file:
             path: '{{ jobs_tmp_dir.path }}'
             state: absent
-      when: copy_to_jobs
 # --------------------------------------------------------------------------------------------------------------
 
-    - block:
+    - when: copy_stage_libs and not provision
+      block:
 
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -193,8 +194,6 @@
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSCPYST.j2'
-
-      when: copy_stage_libs and not provision
 
     - name: Copy staging libs
       zos_job_submit:

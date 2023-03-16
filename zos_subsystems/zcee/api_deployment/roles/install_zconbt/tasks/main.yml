@@ -18,6 +18,7 @@
   register: zconbt_installed
 
 - name: Copy and extract zconbt
+  when: zconbt_local_available.stat.exists and not zconbt_installed.stat.exists
   block:
     - name: Copy zconbt
       ansible.builtin.copy:
@@ -29,13 +30,11 @@
       args:
         chdir: '{{ install_path }}'
 
-  when: zconbt_local_available.stat.exists and not zconbt_installed.stat.exists
 
 - name: Unzip existing zconbt.zip if available
+  when: zconbt_zip_available.stat.exists and not zconbt_local_available.stat.exists and not zconbt_installed.stat.exists
   block:
     - name: Unzip zconbt.zip into the install_path
       ansible.builtin.shell: 'unzip {{ ZOS_CONNECT_HOME }}/zconbt.zip -d {{ install_path }}'
       args:
         chdir: '{{ install_path }}'
-
-  when: zconbt_zip_available.stat.exists and not zconbt_local_available.stat.exists and not zconbt_installed.stat.exists

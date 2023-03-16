@@ -6,6 +6,7 @@
   register: temp_file_path
   delegate_to: localhost
 - name: Interpret templates
+  when: mpp
   block:
     - ansible.builtin.set_fact:
         eager_role_path: '{{role_path}}'
@@ -26,7 +27,6 @@
       register: output
     - ansible.builtin.debug:
         msg: "{{ output.jobs[0].job_id }}"
-  when: mpp
 
 - name: "Create temporary directory"
   ansible.builtin.tempfile:
@@ -34,6 +34,7 @@
   register: temp_file_path1
   delegate_to: localhost
 - name: Interpret templates
+  when: mpp
   block:
     - name: Compile templates and put results in temporary directory
       ansible.builtin.template:
@@ -65,4 +66,3 @@
             path: "{{ temp_file_path1.path }}"
             state: absent
           delegate_to: localhost
-  when: mpp

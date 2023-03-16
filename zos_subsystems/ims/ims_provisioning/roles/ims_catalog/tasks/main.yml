@@ -7,7 +7,8 @@
 
   block:
 
-    - block:
+    - when: catalog == "allocate"
+      block:
 
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -248,7 +249,6 @@
                     - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000,"
                     - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"
 
-      when: catalog == "allocate"
 # ------------------------------------------------------------------------------------------------
 
     - name: Load IMS catalog

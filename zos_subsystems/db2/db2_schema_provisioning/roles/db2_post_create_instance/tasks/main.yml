@@ -1,7 +1,8 @@
 ---
 # tasks file for db2_post_create_instance
 
-- block:
+- when: with_data
+  block:
     - name: Create an instance of the application with data
       ansible.builtin.uri:
         url: "{{ base_url }}/instances/"
@@ -26,9 +27,9 @@
     - name: Register instance id
       ansible.builtin.set_fact:
         INSTANCE_ID: "{{inst_resp_data.json.id}}"
-  when: with_data
 
-- block:
+- when: not with_data
+  block:
     - name: Create an instance of the application with no data
       ansible.builtin.uri:
         url: "{{ base_url }}/instances/"
@@ -52,4 +53,3 @@
     - name: Register the instance id
       ansible.builtin.set_fact:
         INSTANCE_ID: "{{instance_response.json.id}}"
-  when: not with_data

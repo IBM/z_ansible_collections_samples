@@ -23,7 +23,8 @@
         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
       when: work_dataset == "allocate"
 
-    - block:
+    - when: sysdef_datasets == "allocate"
+      block:
 
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -319,7 +320,7 @@
       #     - { src: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSSRC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC' }
       #   loop_control:
       #     pause: 25
-      when: sysdef_datasets == "allocate"
+
       # - include_role:
       #     name: send-template
       #   vars:
@@ -333,7 +334,8 @@
           # wait: true
 # when: sysdef_datasets == "allocate"
 
-    - block:
+    - when: runtime_datasets == "allocate"
+      block:
 
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
@@ -921,10 +923,10 @@
                 state: present
                 replace: true
 
-      when: runtime_datasets == "allocate"
 # -------------------------------------------------------------------------------------------------------------------
 
-    - block:
+    - when: system_datasets == "allocate" and not provision
+      block:
         - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
@@ -937,8 +939,6 @@
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'
-
-      when: system_datasets == "allocate" and not provision
 
     - name: Dynamically allocate IMS system datasets
       zos_job_submit:

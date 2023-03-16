@@ -119,6 +119,7 @@
   when: templates_to_copy is defined and templates_to_copy | length > 0
 
 - name: Make mount persistent
+  when: bpxprm_member is defined and bpxprm_member
   block:
     - name: Generate tempfile to hold BPXPRMxx
       ansible.builtin.tempfile:
@@ -180,7 +181,6 @@
         path: "{{ backup.path }}"
         state: absent
       when: backup.path is defined and backup.path
-  when: bpxprm_member is defined and bpxprm_member
 
 - name: Print password info
   ansible.builtin.debug:

@@ -2,6 +2,7 @@
 # tasks file for zcee_reserve_ports
 # TODO: add option to reserve specific ports
 - name: Reserve ports for zCEE
+  when: DYNAMICALLY_RESERVE_PORTS
   block:
     - name: Allocate HTTPS Port
       zport:
@@ -26,4 +27,3 @@
         data:
           zcon_https_port: '{{ command_result1.port }}'
           zcon_http_port: '{{ command_result2.port }}'
-  when: DYNAMICALLY_RESERVE_PORTS
