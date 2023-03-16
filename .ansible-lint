@@ -38,7 +38,6 @@ skip_list:
   - risky-file-permissions
   - risky-shell-pipe
   - role-name
-  - schema[meta]
   - schema[vars]
   - var-naming
   - yaml[line-length]
