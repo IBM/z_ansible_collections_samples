@@ -2,7 +2,7 @@
 # tasks file for db2_login
 
 - name: Authenticate User
-  uri:
+  ansible.builtin.uri:
     url: "{{ doe_server }}:{{ doe_server_port }}/ws/security/login"
     validate_certs: false
     user: "{{ username }}"
@@ -17,5 +17,5 @@
   register: basic_auth
 
 - name: Register bearer token
-  set_fact:
+  ansible.builtin.set_fact:
     ACCESS_TOKEN: "{{basic_auth.json['accessToken']}}"

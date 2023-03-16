@@ -9,11 +9,11 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
             pre: '{{ role_path }}/templates/pre.txt'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
@@ -100,11 +100,11 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
             stg1: '{{ role_path }}/templates/stg1.txt'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
@@ -157,10 +157,10 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG2.j2'

@@ -9,7 +9,7 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # ------------------------------------------------------------------------------------------------ DFSALCAT
         - name: ALLOCATE CATALOG DATA SETS

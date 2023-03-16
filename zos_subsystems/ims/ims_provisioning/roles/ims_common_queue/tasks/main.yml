@@ -7,7 +7,7 @@
 
   block:
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         ip_config: '{{ role_path }}/templates/ip_config.txt'
         sl_config: '{{ role_path }}/templates/sl_config.txt'
         sg_config: '{{ role_path }}/templates/sg_config.txt'

@@ -36,15 +36,15 @@
 # netaddr
 
 - name: 'Import common yaml'
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: Export infra ID
-  shell:
+  ansible.builtin.shell:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
 
 - name: 'Get image name for kvm'
-  set_fact:
+  ansible.builtin.set_fact:
     image_name: icic_rhcos_qcow2
   when:
     - vm_type == "kvm"
@@ -68,7 +68,7 @@
 
 
 - name: 'Convert compute node flavor from value into number'
-  command:
+  ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
   register: compute_flavor_size
   when:
@@ -90,7 +90,7 @@
     - volume_type_id is defined
 
 - name: 'Set compute volume bootable'
-  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
   when:
     - disk_type == "scsi"

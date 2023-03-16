@@ -11,14 +11,14 @@
 # tasks file for configure-install-manifests
 
 - name: Create install manifests
-  command:
+  ansible.builtin.command:
     cmd: ./openshift-install create manifests
 
 - name: Remove machine and machineset
-  shell:
+  ansible.builtin.shell:
     cmd: rm -f openshift/99_openshift-cluster-api_master-machines-*.yaml openshift/99_openshift-cluster-api_worker-machineset-*.yaml
 
 - name: Make control-plane nodes unschedulable
-  script: tools/make-control-plane-unschedulable.py
+  ansible.builtin.script: tools/make-control-plane-unschedulable.py
   args:
     executable: python3

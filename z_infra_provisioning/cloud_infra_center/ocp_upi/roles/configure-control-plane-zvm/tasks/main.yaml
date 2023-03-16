@@ -36,22 +36,22 @@
 # netaddr
 
 - name: 'Import common yaml'
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: 'Get image name for ZVM'
-  set_fact:
+  ansible.builtin.set_fact:
     image_name: "icic_rhcos_{{ disk_type }}"
   when:
     - vm_type == "zvm"
 
 - name: 'List the server groups'
-  command:
+  ansible.builtin.command:
     # os-compute-api-version 2.15 or higher is required for the 'soft-anti-affinity' policy
     cmd: "openstack --os-compute-api-version=2.15 server group list -f json -c ID -c Name"
   register: server_group_list
 
 - name: 'Parse the server group ID from existing'
-  set_fact:
+  ansible.builtin.set_fact:
     server_group_id: "{{ (server_group_list.stdout | from_json | json_query(list_query) | first).ID }}"
   vars:
     list_query: "[?Name=='{{ os_cp_server_group_name }}']"
@@ -59,7 +59,7 @@
     - "os_cp_server_group_name|string in server_group_list.stdout"
 
 - name: 'Create the control server group'
-  command:
+  ansible.builtin.command:
     # os-compute-api-version 2.15 or higher is required for the 'soft-anti-affinity' policy
     cmd: "openstack --os-compute-api-version=2.15 server group create -f json -c id --policy=soft-anti-affinity {{ os_cp_server_group_name }}"
   register: server_group_created
@@ -67,7 +67,7 @@
     - server_group_id is not defined
 
 - name: 'Parse the server group ID from creation'
-  set_fact:
+  ansible.builtin.set_fact:
     server_group_id: "{{ (server_group_created.stdout | from_json).id }}"
   when:
     - server_group_id is not defined
@@ -102,7 +102,7 @@
     - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master | string'
 
 - name: 'Convert master flavor from value into number'
-  command:
+  ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_master }} -c disk -f value"
   register: master_flavor_size
   when:
@@ -156,7 +156,7 @@
     - volume_type_id is defined
 
 - name: 'Set control volume bootable'
-  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
   with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"
   when:
     - disk_type == "scsi"

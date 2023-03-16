@@ -36,10 +36,10 @@
 # netaddr
 
 - name: 'Import common yaml'
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: 'Get image name for kvm'
-  set_fact:
+  ansible.builtin.set_fact:
     image_name: icic_rhcos_qcow2
   when:
     - vm_type == "kvm"
@@ -61,7 +61,7 @@
     - volume_type_id is not defined
 
 - name: 'Convert bootstrap flavor from value into number'
-  command:
+  ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_bootstrap }} -c disk -f value"
   register: bootstrap_flavor_size
   when:
@@ -81,7 +81,7 @@
     - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
-  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
   when:
     - disk_type == "scsi"
     - volume_type_id is defined

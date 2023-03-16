@@ -2,7 +2,7 @@
 # tasks file for db2_get_subsystem_id
 
 - name: Retrieve subsystem info
-  uri:
+  ansible.builtin.uri:
     url: "{{ base_url }}/subsystems/db2/"
     validate_certs: false
     user: "{{ username }}"
@@ -14,5 +14,5 @@
   register: subsystem_response
 
 - name: Register the subsystem id
-  set_fact:
+  ansible.builtin.set_fact:
     SUBSYSTEM_ID: "{{ subsystem_response.json.subsystems[0].id }}"

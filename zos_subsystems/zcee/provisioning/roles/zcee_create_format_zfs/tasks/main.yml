@@ -17,6 +17,6 @@
   when: not DFS_SMS_ENVIRONMENT
 
 - name: Format LDS as ZFS
-  command: zfsadm format -aggregate "{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}"
+  ansible.builtin.command: zfsadm format -aggregate "{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}"
   register: response
   failed_when: response.rc > 0 and "Aggregate contains file system" not in response.stderr and "Aggregate is attached" not in response.stderr

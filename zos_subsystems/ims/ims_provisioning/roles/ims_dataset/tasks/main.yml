@@ -25,7 +25,7 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
         - name: Allocate IMS system definition data sets
@@ -335,7 +335,7 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # ------------------------------------------------------------------------------------------------------------------- DFSALSY1
@@ -925,7 +925,7 @@
 # -------------------------------------------------------------------------------------------------------------------
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # -------------- DFSDYNAL Cannot convert due to ASMA90 Referback feature
@@ -933,7 +933,7 @@
 # --------------
 
         # Send the template over
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'

@@ -22,7 +22,7 @@
       register: command_result2
 
     - name: Set TCPPORT variables to new port numbers
-      set_stats:
+      ansible.builtin.set_stats:
         data:
           zcon_https_port: '{{ command_result1.port }}'
           zcon_http_port: '{{ command_result2.port }}'

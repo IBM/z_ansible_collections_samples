@@ -18,22 +18,22 @@
 # We set the image registry to an empty directory for non-production clusters.
 
 - name: 'Check the image registry service status'
-  shell:
+  ansible.builtin.shell:
     cmd: "./oc --kubeconfig auth/kubeconfig get service -n openshift-image-registry | grep image-registry | wc -l"
   register: service_status
 
 - name: 'Set the image registry storage to an empty directory'
-  command:
+  ansible.builtin.command:
     cmd: "./oc --kubeconfig auth/kubeconfig patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}'"
   when:
     - service_status.stdout == "2"
 
 - name: 'Set the image registry to managed to enable building and pushing of images'
-  command:
+  ansible.builtin.command:
     cmd: "./oc --kubeconfig auth/kubeconfig patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}'"
   when:
     - service_status.stdout == "2"
 
 - name: 'Expose the image registry'
-  command:
+  ansible.builtin.command:
     cmd: "./oc --kubeconfig auth/kubeconfig patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"defaultRoute\":true}}'"

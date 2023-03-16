@@ -3,7 +3,7 @@
 
 - block:
     - name: Create an instance of the application with data
-      uri:
+      ansible.builtin.uri:
         url: "{{ base_url }}/instances/"
         validate_certs: false
         user: "{{ username }}"
@@ -24,13 +24,13 @@
       register: inst_resp_data
 
     - name: Register instance id
-      set_fact:
+      ansible.builtin.set_fact:
         INSTANCE_ID: "{{inst_resp_data.json.id}}"
   when: with_data
 
 - block:
     - name: Create an instance of the application with no data
-      uri:
+      ansible.builtin.uri:
         url: "{{ base_url }}/instances/"
         validate_certs: false
         user: "{{ username }}"
@@ -50,6 +50,6 @@
       register: instance_response
 
     - name: Register the instance id
-      set_fact:
+      ansible.builtin.set_fact:
         INSTANCE_ID: "{{instance_response.json.id}}"
   when: not with_data

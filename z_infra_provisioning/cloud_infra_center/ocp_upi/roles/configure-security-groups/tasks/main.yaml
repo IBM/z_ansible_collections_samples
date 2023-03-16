@@ -21,10 +21,10 @@
 # openstacksdk
 
 - name: 'Import common yaml'
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: 'Get the subnet range'
-  command:
+  ansible.builtin.command:
     cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
   register: sunbet_range
 
@@ -33,7 +33,7 @@
     name: "{{ os_sg_master }}"
 
 - name: 'Set master security group tag'
-  command:
+  ansible.builtin.command:
     cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_master }} "
 
 - name: 'Create the worker security group'
@@ -41,7 +41,7 @@
     name: "{{ os_sg_worker }}"
 
 - name: 'Set worker security group tag'
-  command:
+  ansible.builtin.command:
     cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_worker }} "
 
 - name: 'Create master-sg rule "ICMP"'

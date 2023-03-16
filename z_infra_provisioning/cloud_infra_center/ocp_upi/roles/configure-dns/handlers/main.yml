@@ -20,7 +20,7 @@
   become: true
   become_user: root
   become_method: sudo
-  service:
+  ansible.builtin.service:
     name: named-chroot.service
     state: restarted
     enabled: true
@@ -30,7 +30,7 @@
   become: true
   become_user: root
   become_method: sudo
-  service:
+  ansible.builtin.service:
     name: firewalld.service
     state: restarted
   listen: "restart firewalld"

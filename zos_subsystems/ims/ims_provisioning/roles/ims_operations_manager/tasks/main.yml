@@ -6,7 +6,7 @@
     - ibm.ibm_zos_ims
 
   block:
-    - set_fact:
+    - ansible.builtin.set_fact:
         bpe_config: '{{ role_path }}/templates/bpe_config.txt'
         oi_config: '{{ role_path }}/templates/oi_config.txt'
         om_config: '{{ role_path }}/templates/om_config.txt'

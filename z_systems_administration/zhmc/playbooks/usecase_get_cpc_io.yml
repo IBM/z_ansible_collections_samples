@@ -58,7 +58,7 @@
     #     var: partitions_out
 
     - name: "Creating output file"
-      template:
+      ansible.builtin.template:
         src: usecase_get_cpc_io.md.j2
         dest: "cpc_io_{{ cpc_name }}_{{ inventory_hostname }}.md"
         mode: '0755'

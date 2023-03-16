@@ -2,46 +2,46 @@
 # tasks file for roles/configure_server
 # handles the server.xml file
 - name: Check for server.xml file
-  local_action: stat path="{{playbook_dir}}/roles/configure_server/templates/server.xml.j2"
+  local_action: ansible.builtin.stat path="{{playbook_dir}}/roles/configure_server/templates/server.xml.j2"
   register: server_stat
 
 # This block only runs when the server.xml file is found in the role's template folder.
 - block:
     - name: Copy over server.xml template
-      template:
+      ansible.builtin.template:
         src: ./templates/server.xml.j2
         dest: '{{liberty_server_path}}/server_ansible.xml'
 
     - name: Tag the file as text and ISO8559-1
-      command: chtag -tc ISO8859-1 {{liberty_server_path}}/server_ansible.xml
+      ansible.builtin.command: chtag -tc ISO8859-1 {{liberty_server_path}}/server_ansible.xml
 
     - name: Backup the existing server.xml
-      command: cp {{liberty_server_path}}/server.xml {{liberty_server_path}}/server.xml.orig
+      ansible.builtin.command: cp {{liberty_server_path}}/server.xml {{liberty_server_path}}/server.xml.orig
 
     - name: Replace the existing server.xml
-      command: mv {{liberty_server_path}}/server_ansible.xml {{liberty_server_path}}/server.xml
+      ansible.builtin.command: mv {{liberty_server_path}}/server_ansible.xml {{liberty_server_path}}/server.xml
   when: server_stat.stat.exists == true
 
 # handles the bootstrap properties file
 - name: Check for bootstrap.properties file
-  local_action: stat path="{{playbook_dir}}/roles/configure_server/templates/bootstrap.properties"
+  local_action: ansible.builtin.stat path="{{playbook_dir}}/roles/configure_server/templates/bootstrap.properties"
   register: bootstrap_stat
 
 # This task only runs when the bootstrap.properties file is found in the role's template folder.
 - name: Copy over bootstrap.properties file
-  copy:
+  ansible.builtin.copy:
     src: ./templates/bootstrap.properties
     dest: '{{liberty_server_path}}/bootstrap.properties'
   when: bootstrap_stat.stat.exists == true
 
 # handles the jvm.options file
 - name: Check for jvm.options file
-  local_action: stat path="{{playbook_dir}}/roles/configure_server/templates/jvm.options"
+  local_action: ansible.builtin.stat path="{{playbook_dir}}/roles/configure_server/templates/jvm.options"
   register: jvm_stat
 
 # This task only runs when the jvm.options file is found in the role's template folder.
 - name: Copy over jvm.options file
-  copy:
+  ansible.builtin.copy:
     src: ./templates/jvm.options
     dest: '{{liberty_server_path}}/jvm.options'
   when: jvm_stat.stat.exists == true

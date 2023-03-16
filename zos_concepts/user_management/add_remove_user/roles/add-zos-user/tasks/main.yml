@@ -4,7 +4,7 @@
 # tasks file for add-zos-user
 
 - name: Set omvs_home_directory if not set
-  set_fact:
+  ansible.builtin.set_fact:
     omvs_home_directory: "/u/{{ userid }}"
   when: omvs_home_directory is not defined or not omvs_home_directory
 
@@ -15,18 +15,18 @@
   failed_when: false
 
 - name: Assert desired userid is not in use
-  fail:
+  ansible.builtin.fail:
     msg: "User ID {{ userid | upper }} is in use."
   when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
 
 - name: Generate password
-  set_fact:
+  ansible.builtin.set_fact:
     password: "{{ '' | generate_password }}"
   when: (password is not defined or not password) and generate_password is defined and generate_password
   no_log: true
 
 - name: Generate passphrase
-  set_fact:
+  ansible.builtin.set_fact:
     passphrase: "{{ '' | generate_passphrase }}"
   when: (passphrase is not defined or not passphrase) and generate_passphrase is defined and generate_passphrase
   no_log: true
@@ -83,20 +83,20 @@
   register: lds_create_response
 
 - name: Format LDS as ZFS
-  command: zfsadm format -aggregate {{ omvs_zfs_data_set_name }}
+  ansible.builtin.command: zfsadm format -aggregate {{ omvs_zfs_data_set_name }}
 
 - name: Create user's omvs directory if it does not exist
-  file:
+  ansible.builtin.file:
     path: "{{ omvs_home_directory }}"
     state: directory
     owner: "{{ userid }}"
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
 
 - name: Mount ZFS to user directory
-  command: mount -t zfs -f {{ omvs_zfs_data_set_name | upper }} {{ omvs_home_directory }}
+  ansible.builtin.command: mount -t zfs -f {{ omvs_zfs_data_set_name | upper }} {{ omvs_home_directory }}
 
 - name: Overwrite permissions to directory if necessary
-  file:
+  ansible.builtin.file:
     path: "{{ omvs_home_directory }}"
     state: directory
     owner: "{{ userid }}"
@@ -113,7 +113,7 @@
   when: files_to_copy is defined and files_to_copy | length > 0
 
 - name: Copy templates
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: copy-template.yml
   with_items: "{{ templates_to_copy }}"
   when: templates_to_copy is defined and templates_to_copy | length > 0
@@ -121,27 +121,27 @@
 - name: Make mount persistent
   block:
     - name: Generate tempfile to hold BPXPRMxx
-      tempfile:
+      ansible.builtin.tempfile:
         state: file
       register: temp
 
     - name: Generate tempfile to hold backup
-      tempfile:
+      ansible.builtin.tempfile:
         state: file
       register: backup
 
     - name: Copy BPXPRMxx member to file
-      shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ temp.path }}
+      ansible.builtin.shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ temp.path }}
 
     - name: Copy BPXPRMxx member to backup
-      shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ backup.path }}
+      ansible.builtin.shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ backup.path }}
 
     - name: Get file contents
-      command: cat {{ temp.path }}
+      ansible.builtin.command: cat {{ temp.path }}
       register: cat_response
 
     - name: Insert mount into contents
-      set_fact:
+      ansible.builtin.set_fact:
         updated_contents: "{{ cat_response.stdout | insert_mount(omvs_zfs_data_set_name, omvs_home_directory) }}"
 
     - name: Insert updated contents back into temp file
@@ -153,7 +153,7 @@
           to: "{{ target_charset }}"
 
     - name: Copy updated BPXPRMxx member back to data set
-      shell: cp {{ temp.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
+      ansible.builtin.shell: cp {{ temp.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
 
     - name: Verify updated contents are valid
       ibm.ibm_zos_core.zos_operator:
@@ -162,28 +162,28 @@
       ignore_errors: true
 
     - name: Undo mount changes if bad syntaxcheck
-      shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
+      ansible.builtin.shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
       when: syntaxcheck_response.get("rc", 4) > 0
 
     - name: Assert persistent mount did not fail
-      fail:
+      ansible.builtin.fail:
         msg: "Persistent mount updated did not pass syntax check."
       when: syntaxcheck_response.get("rc", 4) > 0
   always:
     - name: Remove temporary file
-      file:
+      ansible.builtin.file:
         path: "{{ temp.path }}"
         state: absent
       when: temp.path is defined and temp.path
     - name: Remove backup file
-      file:
+      ansible.builtin.file:
         path: "{{ backup.path }}"
         state: absent
       when: backup.path is defined and backup.path
   when: bpxprm_member is defined and bpxprm_member
 
 - name: Print password info
-  debug:
+  ansible.builtin.debug:
     msg: "UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
   when: print_pass is defined and print_pass
 

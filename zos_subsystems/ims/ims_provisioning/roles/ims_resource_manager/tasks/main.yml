@@ -8,7 +8,7 @@
   block:
 
     # Specify configuration files
-    - set_fact:
+    - ansible.builtin.set_fact:
         bpe_rm_config: '{{ role_path }}/templates/bpe_rm_config.txt'
         ri_config: '{{ role_path }}/templates/ri_config.txt'
         rm_config: '{{ role_path }}/templates/rm_config.txt'

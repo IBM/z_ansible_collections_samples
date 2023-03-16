@@ -16,13 +16,13 @@
 
 ---
 # tasks file for configure-dns
-- include_vars: cluster-template.yaml
+- ansible.builtin.include_vars: cluster-template.yaml
 
 - name: Install bind-chroot for dns
   become: true
   become_user: root
   become_method: sudo
-  yum:
+  ansible.builtin.yum:
     name: bind-chroot
     state: latest
 
@@ -30,23 +30,23 @@
   become: true
   become_user: root
   become_method: sudo
-  file:
+  ansible.builtin.file:
     path: /var/named
     state: directory
 
 - name: Combine cluster name and base domain
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
 
 - name: Get the subnet range from localhost
-  set_fact:
+  ansible.builtin.set_fact:
     subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
 
 - name: Create dns subnet definition
   become: true
   become_user: root
   become_method: sudo
-  template:
+  ansible.builtin.template:
     src: var/named/cluster_domain_name.zone.j2
     dest: /var/named/{{ cluster_domain_name }}.zone
     owner: named
@@ -58,7 +58,7 @@
   become: true
   become_user: root
   become_method: sudo
-  lineinfile:
+  ansible.builtin.lineinfile:
     line: dns=none
     dest: /etc/NetworkManager/NetworkManager.conf
     insertafter: "\\[main\\].*"
@@ -68,14 +68,14 @@
   become: true
   become_user: root
   become_method: sudo
-  shell: grep -c "^{{ cluster_domain_name }}" /etc/resolv.conf || true
+  ansible.builtin.shell: grep -c "^{{ cluster_domain_name }}" /etc/resolv.conf || true
   register: check
 
 - name: Use local dns in resolv.conf
   become: true
   become_user: root
   become_method: sudo
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: /etc/resolv.conf
     insertbefore: BOF
     block: |
@@ -84,14 +84,14 @@
   when: check.stdout == "0"
 
 - name: Reverse the order of the decimals in the specified bastion subnet
-  set_fact:
+  ansible.builtin.set_fact:
     bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
 
 - name: Create dns subnet zone for bastion
   become: true
   become_user: root
   become_method: sudo
-  template:
+  ansible.builtin.template:
     src: var/named/bastion.in-addr.arpa.zone.j2
     dest: /var/named/{{ bastion_reverse }}.in-addr.arpa.zone
     owner: named
@@ -103,7 +103,7 @@
   become: true
   become_user: root
   become_method: sudo
-  template:
+  ansible.builtin.template:
     src: etc/named.conf.j2
     dest: /etc/named.conf
   notify:
@@ -113,7 +113,7 @@
   become: true
   become_user: root
   become_method: sudo
-  shell:
+  ansible.builtin.shell:
     cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
   notify:
     - restart dns
@@ -122,7 +122,7 @@
   become: true
   become_user: root
   become_method: sudo
-  shell:
+  ansible.builtin.shell:
     cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
   notify:
     - restart dns
