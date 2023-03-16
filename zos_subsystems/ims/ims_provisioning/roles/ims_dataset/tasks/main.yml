@@ -126,7 +126,7 @@
                 directory_blocks: 50
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
 
-        - name: temporal copy SDFSRESL
+        - name: Temporal copy SDFSRESL
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -163,7 +163,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy SDFSMAC
+        - name: Temporal copy SDFSMAC
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -198,7 +198,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy ADFSMAC
+        - name: Temporal copy ADFSMAC
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -233,7 +233,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy ADFSLOAD
+        - name: Temporal copy ADFSLOAD
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -269,7 +269,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy ADFSSRC
+        - name: Temporal copy ADFSSRC
           zos_mvs_raw:
             program_name: iebcopy
             dds:

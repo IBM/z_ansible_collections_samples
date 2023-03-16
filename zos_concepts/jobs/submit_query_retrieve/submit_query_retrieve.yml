@@ -195,7 +195,7 @@
     # | zos_job_submit module.
     # +-------------------------------------------------------------------------
 
-    - name: Submit {{ job_name }} jcl located on target
+    - name: Submit {{ job_name }} JCL located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
@@ -203,7 +203,7 @@
         wait: true
       register: result
 
-    - name: Response for submit {{ job_name }} jcl located on target
+    - name: Response for submit {{ job_name }} JCL located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       debug:
         msg:

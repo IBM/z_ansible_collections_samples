@@ -2,13 +2,13 @@
 # tasks file for ims_cobol_refresh_ims_resources
 # Refresh IMS application resources
 
-- name: stop ims program
+- name: Stop IMS program
   ibm.ibm_zos_ims.ims_command:
     command: STOP PGM {{ PGM_NAME }}
     plex: "{{ IMSPLEX }}"
     route: "{{ ROUTE }}"
 
-- name: stop ims transaction
+- name: Stop IMS transaction
   ibm.ibm_zos_ims.ims_command:
     command: STOP TRAN {{ TRAN_NAME }}
     plex: "{{ IMSPLEX }}"
@@ -24,13 +24,13 @@
   vars:
     mpp: true
 
-- name: start ims program
+- name: Start IMS program
   ibm.ibm_zos_ims.ims_command:
     command: START PGM {{ PGM_NAME }}
     plex: "{{ IMSPLEX }}"
     route: "{{ ROUTE }}"
 
-- name: start ims transaction
+- name: Start IMS transaction
   ibm.ibm_zos_ims.ims_command:
     command: START TRAN {{ TRAN_NAME }}
     plex: "{{ IMSPLEX }}"

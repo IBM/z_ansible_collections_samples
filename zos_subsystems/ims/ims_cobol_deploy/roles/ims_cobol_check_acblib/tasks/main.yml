@@ -25,7 +25,7 @@
         str: '{{ res.ims_output[0].type_1_response | selectattr("Mbr name 1", "equalto", "IMS1")  | map(attribute="msg data") | list | first | join("\n")}}'
       register: str
 
-    - name: parse with reg exp
+    - name: Parse with reg exp
       ansible.builtin.set_fact:
         INACTIVE: '{{ res.ims_output[0].type_1_response | selectattr("Mbr name 1", "equalto", "IMS1")  | map(attribute="msg data") | list | first | join("\n") | regex_search(regexp) }}'
       vars:
@@ -37,6 +37,6 @@
       vars:
         regexp: '(?<=\s\s).*'
 
-    - name: output inactive ACBLIB
+    - name: Output inactive ACBLIB
       ansible.builtin.debug:
         msg: "Inactive ACBLIB is: {{ INACTIVE_ACBLIB }}"
