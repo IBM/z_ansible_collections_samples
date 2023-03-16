@@ -73,7 +73,7 @@
     - server_group_id is not defined
 
 - name: 'Create the control servers'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
@@ -109,7 +109,7 @@
     - disk_type == "scsi"
 
 - name: 'Create the control servers with default boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
@@ -142,7 +142,7 @@
     - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master | string'
 
 - name: Create control boot volume
-  os_volume:
+  openstack.cloud.volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
     image: "{{ image_name }}"
@@ -163,7 +163,7 @@
     - volume_type_id is defined
 
 - name: 'Create the controller server with boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_master }}"
     boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"

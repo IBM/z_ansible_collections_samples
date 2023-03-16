@@ -22,7 +22,6 @@ skip_list:
   - command-instead-of-shell
   - deprecated-command-syntax
   - deprecated-local-action
-  - fqcn[action]
   - ignore-errors
   - jinja[spacing]
   - key-order[task]

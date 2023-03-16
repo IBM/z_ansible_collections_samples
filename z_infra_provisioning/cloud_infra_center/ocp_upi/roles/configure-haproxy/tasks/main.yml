@@ -55,7 +55,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: http
     permanent: true
     zone: public
@@ -67,7 +67,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: http
     permanent: true
     zone: internal
@@ -79,7 +79,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: https
     permanent: true
     zone: public
@@ -91,7 +91,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     service: https
     permanent: true
     zone: internal
@@ -103,7 +103,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     port: 443/tcp
     permanent: true
     zone: "{{ item }}"
@@ -118,7 +118,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     port: 6443/tcp
     permanent: true
     zone: "{{ item }}"
@@ -133,7 +133,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     port: 22623/tcp
     permanent: true
     zone: "{{ item }}"

@@ -51,7 +51,7 @@
 
 
 - name: 'Create the compute servers'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
@@ -75,7 +75,7 @@
     - disk_type == "scsi"
 
 - name: 'Create the compute servers with default boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_worker }}"
@@ -96,7 +96,7 @@
     - volume_type_id is not defined
 
 - name: 'Create compute boot volume'
-  os_volume:
+  openstack.cloud.volume:
     state: present
     name: "{{ item.1 }}-{{ item.0 }}-boot"
     image: "{{ image_name }}"
@@ -117,7 +117,7 @@
     - volume_type_id is defined
 
 - name: 'Create the compute server with boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_worker }}"
     boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"

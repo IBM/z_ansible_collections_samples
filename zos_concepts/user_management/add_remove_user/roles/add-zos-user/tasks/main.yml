@@ -188,7 +188,7 @@
   when: print_pass is defined and print_pass
 
 - name: Send email containing login credentials to owner of new user
-  mail:
+  community.general.mail:
     host: "{{ smtp_server }}"
     port: "{{ smtp_port }}"
     username: "{{ smtp_username }}"

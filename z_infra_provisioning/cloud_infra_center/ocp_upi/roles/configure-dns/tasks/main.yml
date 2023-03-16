@@ -131,7 +131,7 @@
   become: true
   become_user: root
   become_method: sudo
-  firewalld:
+  ansible.posix.firewalld:
     permanent: true
     service: dns
     state: enabled
