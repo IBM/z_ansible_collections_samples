@@ -4,9 +4,9 @@
   zos_operator:
     cmd: 'CANCEL ST{{ softwareServiceInstanceName }}'
 - name: Stop zCEE server from USS
-  shell: ./zosconnect stop {{softwareServiceInstanceName}}
+  ansible.builtin.shell: ./zosconnect stop {{softwareServiceInstanceName}}
   args:
     chdir: '{{ zcon_install_dir }}/bin'
   environment:
     WLP_USER_DIR: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
-  ignore_errors: yes
+  ignore_errors: true

@@ -75,10 +75,10 @@ data_set_name: targetuser.liberty.zfs
 #                        Playbook customization variables                      #
 # ---------------------------------------------------------------------------- #
 # Boolean value to determine if configure_server role runs -- transfers optional configuration files
-CUSTOMIZE: no
+CUSTOMIZE: false
 
 # Boolean value to determine if the angel process related roles run --  creates started profiles for angel process and starts angel process
-ANGEL: no
+ANGEL: false
 
 # Boolean value to determine if the authorized_services role runs -- enables z/OS authorized services
-AUTHORIZED_SERVICES: no
+AUTHORIZED_SERVICES: false

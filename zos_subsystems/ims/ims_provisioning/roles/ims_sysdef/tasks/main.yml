@@ -7,18 +7,18 @@
 
   block:
 
-    - block:
+    - when: preprocess and not provision
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
             pre: '{{ role_path }}/templates/pre.txt'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
 
-      when: preprocess and not provision
 
 # ------------------------------------------------------------------------------------------------
       # - name: IMS SYSTEM DEFINITION PREPROCESSOR - FOR NAME VALIDATION
@@ -98,18 +98,18 @@
         wait_time_s: 30
       when: preprocess
 
-    - block:
+    - when: stage1 and not provision
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
             stg1: '{{ role_path }}/templates/stg1.txt'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
 
-      when: stage1 and not provision
 
 # ------------------------------------------------------------------------------------------------
       # - name: RUN THE IMS SYSTEM DEFINITION STAGE1 # return code 2 - it's normal
@@ -155,17 +155,17 @@
       when: stage1
 
 
-    - block:
+    - when: stage2 and not provision
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
 
-      when: stage2 and not provision
 
 # ------------------------------------------------------------------------------------------------
       # - name: RUN THE IMS SYSTEM DEFINITION STAGE2

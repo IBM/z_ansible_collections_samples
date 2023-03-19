@@ -23,9 +23,10 @@
         volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
       when: work_dataset == "allocate"
 
-    - block:
+    - when: sysdef_datasets == "allocate"
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
         - name: Allocate IMS system definition data sets
@@ -33,7 +34,7 @@
             batch:
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 5
                 space_secondary: 2
@@ -45,7 +46,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OBJDSET'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 10
                 space_secondary: 3
@@ -57,7 +58,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENIN'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 8
                 space_secondary: 3
@@ -69,7 +70,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENOUT'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 5
                 space_secondary: 3
@@ -81,7 +82,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 2
                 space_secondary: 2
@@ -92,7 +93,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TFORMAT'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 2
                 space_type: CYL
@@ -102,7 +103,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.REFERAL'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 2
                 space_secondary: 2
@@ -114,7 +115,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS'
                 state: present
-                replace: True
+                replace: true
                 type: PDS
                 space_primary: 22
                 space_secondary: 15
@@ -125,7 +126,7 @@
                 directory_blocks: 50
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
 
-        - name: temporal copy SDFSRESL
+        - name: Temporal copy SDFSRESL
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -162,7 +163,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy SDFSMAC
+        - name: Temporal copy SDFSMAC
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -197,7 +198,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy ADFSMAC
+        - name: Temporal copy ADFSMAC
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -232,7 +233,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy ADFSLOAD
+        - name: Temporal copy ADFSLOAD
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -268,7 +269,7 @@
                   content:
                     - '  COPY  OUTDD=OUTDSN,INDD=INDSN'
 
-        - name: temporal copy ADFSSRC
+        - name: Temporal copy ADFSSRC
           zos_mvs_raw:
             program_name: iebcopy
             dds:
@@ -319,7 +320,7 @@
       #     - { src: '{{ DFS_AUTH_LIB_SYSHLQ1}}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.ADFSSRC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC' }
       #   loop_control:
       #     pause: 25
-      when: sysdef_datasets == "allocate"
+
       # - include_role:
       #     name: send-template
       #   vars:
@@ -333,9 +334,10 @@
           # wait: true
 # when: sysdef_datasets == "allocate"
 
-    - block:
+    - when: runtime_datasets == "allocate"
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # ------------------------------------------------------------------------------------------------------------------- DFSALSY1
@@ -352,7 +354,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -363,7 +365,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -374,7 +376,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.IMSMON'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: VB
@@ -385,7 +387,7 @@
                 space_type: CYL
                 type: SEQ
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -396,7 +398,7 @@
                 space_secondary: 1
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -407,7 +409,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -418,7 +420,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -429,7 +431,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -440,7 +442,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: FB
@@ -450,7 +452,7 @@
                 space_type: TRK
                 type: SEQ
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: FB
@@ -462,7 +464,7 @@
                 space_secondary: 1
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATA'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -473,7 +475,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: U
@@ -484,7 +486,7 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: FB
@@ -496,7 +498,7 @@
                 space_secondary: 1
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCPPARMS'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
                 record_format: FB
@@ -508,12 +510,12 @@
                 space_secondary: 2
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
 
         - name: Allocate IMS RECON and WADS Clusters # Works fine
           zos_mvs_raw:
             program_name: idcams
-            auth: yes
+            auth: true
             dds:
               - dd_output:
                   dd_name: sysprint
@@ -615,7 +617,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS00"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -625,7 +627,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP01"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -635,7 +637,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS01"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -645,7 +647,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP02"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -655,7 +657,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS02"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -665,7 +667,7 @@
                 space_primary: 2
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP03"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -675,7 +677,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS03"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -685,7 +687,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP04"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -695,7 +697,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS04"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -705,7 +707,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP05"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -715,7 +717,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS05"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -725,7 +727,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP99"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -735,7 +737,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS99"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -745,7 +747,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDS"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: seq
@@ -753,7 +755,7 @@
                 space_primary: 10
                 space_type: CYL
                 state: present
-                replace: True
+                replace: true
                 record_length: 0
                 block_size: 0
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSTRA01"
@@ -765,7 +767,7 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSTRA02"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -775,67 +777,67 @@
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.QBLKS"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: seq
                 space_primary: 12
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SHMSG"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: seq
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SHMSG1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: seq
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: seq
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: pds
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 type: pds
                 space_primary: 22
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBCP1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 space_primary: 3
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBCP2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 space_primary: 23
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBDUMP"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 space_primary: 23
                 space_type: cyl
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: u
@@ -845,7 +847,7 @@
                 type: seq
                 space_primary: 12
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: u
@@ -855,7 +857,7 @@
                 type: seq
                 space_primary: 12
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO3"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: u
@@ -865,7 +867,7 @@
                 type: seq
                 space_primary: 12
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO4"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: u
@@ -875,7 +877,7 @@
                 type: seq
                 space_primary: 12
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EXITLIB"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: u
@@ -886,7 +888,7 @@
                 space_primary: 6
                 space_secondary: 2
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -897,7 +899,7 @@
                 space_primary: 5
                 space_secondary: 5
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -908,7 +910,7 @@
                 space_primary: 5
                 space_secondary: 5
                 state: present
-                replace: True
+                replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS3"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 record_format: vb
@@ -919,13 +921,13 @@
                 space_primary: 5
                 space_secondary: 5
                 state: present
-                replace: True
+                replace: true
 
-      when: runtime_datasets == "allocate"
 # -------------------------------------------------------------------------------------------------------------------
 
-    - block:
-        - set_fact:
+    - when: system_datasets == "allocate" and not provision
+      block:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # -------------- DFSDYNAL Cannot convert due to ASMA90 Referback feature
@@ -933,12 +935,10 @@
 # --------------
 
         # Send the template over
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'
-
-      when: system_datasets == "allocate" and not provision
 
     - name: Dynamically allocate IMS system datasets
       zos_job_submit:

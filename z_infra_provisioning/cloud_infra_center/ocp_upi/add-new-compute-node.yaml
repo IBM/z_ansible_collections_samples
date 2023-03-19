@@ -15,7 +15,7 @@
 # netaddr
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
     - name: 'Import common yaml'
@@ -112,7 +112,7 @@
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
-        auto_ip: no
+        auto_ip: false
         timeout: "{{ create_server_timeout|int * 60 }}"
         userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
         availability_zone: "{{ create_server_zone }}"
@@ -128,7 +128,7 @@
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
-        auto_ip: no
+        auto_ip: false
         timeout: "{{ create_server_timeout|int * 60 }}"
         userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
         availability_zone: "{{ create_server_zone }}"
@@ -152,15 +152,15 @@
         name: "{{ item }}"
         image: "i{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
-        auto_ip: no
+        auto_ip: false
         timeout: "{{ create_server_timeout|int * 60 }}"
         userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
           - port-name: "{{ item }}"
-        boot_from_volume: True
+        boot_from_volume: true
         volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
-        terminate_volume: True
+        terminate_volume: true
       with_lines: cat .new_worker_name
       when:
         - disk_type == "scsi"
@@ -193,14 +193,14 @@
         name: "{{ item }}"
         flavor: "{{ os_flavor_worker }}"
         boot_volume: "{{ item }}-boot"
-        auto_ip: no
+        auto_ip: false
         availability_zone: "{{ create_server_zone }}"
         timeout: "{{ create_server_timeout|int * 60 }}"
         userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
         nics:
           - port-name: "{{ item }}"
         meta: "{{ cluster_id_tag }}"
-        terminate_volume: True
+        terminate_volume: true
       with_lines: cat .new_worker_name
       when:
         - disk_type == "scsi"

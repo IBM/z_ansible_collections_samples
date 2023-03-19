@@ -4,7 +4,7 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
-  gather_facts: no
+  gather_facts: false
   vars_files:
     - "{{ vars_folder_name }}/ims_cobol.yml"
   environment: "{{ system_environment }}"

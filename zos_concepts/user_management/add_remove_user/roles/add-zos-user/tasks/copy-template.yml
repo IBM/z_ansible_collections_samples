@@ -4,14 +4,14 @@
 # tasks file for add-zos-user
 
 - name: Create tempfile to hold evaluated template
-  tempfile:
+  ansible.builtin.tempfile:
     state: file
   delegate_to: localhost
   register: temp
 
 - block:
     - name: Evaluate template
-      template:
+      ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ temp.path }}"
       delegate_to: localhost
@@ -25,7 +25,7 @@
           to: "{{ target_charset }}"
   always:
     - name: Delete tempfile
-      file:
+      ansible.builtin.file:
         path: "{{ temp.path }}"
         state: absent
       delegate_to: localhost

@@ -3,16 +3,16 @@
 
 # tasks file for get-estimated-size-of-data-sets
 - name: Raise error is data_sets is not set
-  fail:
+  ansible.builtin.fail:
     msg: Missing required variable 'data_sets'.
   failed_when: data_sets is not defined
 
 - name: Get attributes for data sets
-  command: dls -s {{ data_sets | join(' ') }}
+  ansible.builtin.command: dls -s {{ data_sets | join(' ') }}
   register: response
 
-- debug:
+- ansible.builtin.debug:
     var: response
 
-- set_fact:
+- ansible.builtin.set_fact:
     size_in_cyls: "{{ response | total_size }}"

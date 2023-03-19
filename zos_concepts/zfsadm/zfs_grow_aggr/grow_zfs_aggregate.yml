@@ -27,7 +27,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     mount_point: "/tmp/zfs_aggr"
@@ -60,7 +60,7 @@
         type: zfs
         space_primary: 1
         space_type: M
-        replace: yes
+        replace: true
 
     - name: Create mount dir on z/OS USS.
       file:

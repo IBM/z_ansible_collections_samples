@@ -38,7 +38,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
@@ -75,7 +75,7 @@
           date
         owner: "{{ ansible_user }}"
         mode: "0755"
-        force: yes
+        force: true
 
     - name: Detect character set for locale on target {{ inventory_hostname }}
       command: locale -c charmap
@@ -98,7 +98,7 @@
         dest: "{{ tgt_tmp_dir }}/date.sh"
         from_encoding: ISO8859-1
         to_encoding: "{{ target_charset }}"
-        backup: no
+        backup: false
       register: result
 
     - name: Response for encode script {{ tgt_tmp_dir }}/date.sh encoding from ISO8859-1 to {{ target_charset }}
@@ -132,7 +132,7 @@
       fail:
         msg: "File {{ tgt_tmp_dir }}/date.sh permissions were not equal to 0755"
       when: result.stdout_lines is not defined
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Remove {{ tgt_tmp_dir }}/date.sh on target {{ inventory_hostname }}
       file:

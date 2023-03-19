@@ -51,22 +51,22 @@
 ---
 - name: manage a provisioned software service instance
   hosts: cpm_host1
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.ibm_zosmf
   vars_prompt:
     - name: zmf_user
       prompt: "Enter your z/OSMF username"
-      private: no
+      private: false
     - name: zmf_password
       prompt: "Enter your z/OSMF password"
-      private: yes
+      private: true
     - name: instance_info_file
       prompt: "Enter instance info file full path"
-      private: no
+      private: false
     - name: action
       prompt: "Enter action to perform"
-      private: no
+      private: false
   tasks:
     # ##########################################################################
     # Role: zmf_cpm_manage_software_instance

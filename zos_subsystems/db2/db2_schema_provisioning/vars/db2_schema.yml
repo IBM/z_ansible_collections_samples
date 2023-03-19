@@ -28,4 +28,4 @@ team_name: valid_team_name
 inst_name: valid_inst_name
 
 # Parameter that gives option to user to provision the app instance with or without data
-with_data: yes
+with_data: true

@@ -14,13 +14,13 @@ tcpip_profile: USER.PARMLIB(TCPPROF2)
 # Only used if DYNAMICALLY_RESERVE_PORTS=yes
 # If DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
 ################################################################################
-DYNAMICALLY_RESERVE_PORTS: yes
+DYNAMICALLY_RESERVE_PORTS: true
 
 ################################################################################
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will
 # reserve an open port within the default range of the Ansible zport module.
 ################################################################################
-RESERVE_SPECIFIC_PORT: yes
+RESERVE_SPECIFIC_PORT: true
 
 ################################################################################
 # HTTP port for zCEE, may be determined at runtime.

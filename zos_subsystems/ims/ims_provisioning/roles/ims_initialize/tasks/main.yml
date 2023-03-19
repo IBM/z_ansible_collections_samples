@@ -7,6 +7,7 @@
   block:
     # TODO: add option to reserve specific ports
     - name: Reserve ports for ICON
+      when: DYNAMICALLY_RESERVE_PORTS
       block:
 
         - name: When specific ports are desired
@@ -17,7 +18,7 @@
                 port: '{{ DFS_REGION_TCPIPPORT if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
                 dsname: '{{ TCPIP_PROFILE }}'
                 tmp_dsname: '{{ TCPIP_PROFILE_TMP }}'
-                tcp: yes
+                tcp: true
               register: port_alloc_result1
 
             - name: Reserve ICON SSL Port
@@ -26,46 +27,46 @@
                 port: '{{ DFS_REGION_SSLTCPIPPORT if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
                 dsname: '{{ TCPIP_PROFILE }}'
                 tmp_dsname: '{{ TCPIP_PROFILE_TMP }}'
-                tcp: yes
+                tcp: true
               register: port_alloc_result2
 
-        - set_stats:
+        - ansible.builtin.set_stats:
             data:
               DFS_REGION_TCPIPPORT: '{{ port_alloc_result1.port }}'
               # DFS_PORTID: '{{ port_alloc_result1.port_id }}'
               DFS_REGION_SSLTCPIPPORT: '{{ port_alloc_result2.port }}'
               # DFS_SSLPORTID: '{{ port_alloc_result2.port_id }}'
-      when: DYNAMICALLY_RESERVE_PORTS
 
     # * Need this because Ansible lazily interprets role_path
     # * Results in wrong paths being sent when passing vars that use role_path var
-    - block:
+    - when: provision
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{ eager_role_path }}/templates/provision/*'
 
-        - include_role:
+        - ansible.builtin.include_role:
             name: save-templates-to-datasets
           vars:
             datasets: '{{ desired_install_job_save_locations.provision }}'
 
-      when: provision
 
-    - block:
+    - when: DFS_INIT_JAVA_CONF
+      block:
         - name: Copy imsjava to target
-          copy:
+          ansible.builtin.copy:
             src: '{{ role_path }}/files/java/imsjava.tar'
             dest: '/u/{{ TARGET_USERNAME }}/imsjava.tar'
 
             # dest: '{{ uss_file_path }}/imsjava.tar'
 
         - name: Unarchive templates on target
-          shell: 'tar -Co . -xf imsjava.tar ; rm imsjava.tar'
+          ansible.builtin.shell: 'tar -Co . -xf imsjava.tar ; rm imsjava.tar'
           args:
             chdir: /u/{{ TARGET_USERNAME }}
 
@@ -77,26 +78,26 @@
         #     JAVA_CONF_PATH: '{{ dfsjvmpr_tmp.path }}'
 
         - name: Create dfsjvmpr.props for potential JMP regions
-          shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props # {{ JAVA_CONF_PATH }}
-      when: DFS_INIT_JAVA_CONF
+          ansible.builtin.shell: echo {{ lookup('template', role_path + '/templates/configs/dfsjvmpr.j2') }} > /u/{{ TARGET_USERNAME }}/dfsjvmpr.props # {{ JAVA_CONF_PATH }}
 
 
     - name: Send PROCLIB members
+      when: send_procs
       block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store PROCLIB members
-          tempfile:
+          ansible.builtin.tempfile:
             state: directory
           register: proclib_tmp_dir
         - name: Send PROCLIB member templates to USS directory
-          include_role:
+          ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/procs/*'
             uss_file_path: '{{ proclib_tmp_dir.path }}'
         - name: Remove extensions from filenames
-          shell: >
+          ansible.builtin.shell: >
             for procname in $(ls *.j2); do
             basename="$(echo ${procname} | cut -d'.' -f1)";
             cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
@@ -105,7 +106,6 @@
             chdir: '{{ proclib_tmp_dir.path }}'
       always:
         - name: Delete the temporary PROCLIB files directory
-          file:
+          ansible.builtin.file:
             path: '{{ proclib_tmp_dir.path }}'
             state: absent
-      when: send_procs

@@ -7,8 +7,9 @@
 
   block:
 
-    - block:
-        - set_fact:
+    - when: dbrc_defaults
+      block:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # --------------------------------------------------------------------------------------------------- DFSDFDRC
         - name: Specify DBRC defaults
@@ -79,11 +80,11 @@
                   content:
                     - "   INCLUDE SYSPUNCH(DFSIDEF0)"
                     - "   NAME  DFSIDEF0(R)"
-      when: dbrc_defaults
 # ---------------------------------------------------------------------------------------------------
 
-    - block:
-        - set_fact:
+    - when: prep_dbrc
+      block:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # --------------------------------------------------------------------------------------------------- DFSE314J
         - name: INITIALIZE THE RECON DATA SETS
@@ -99,27 +100,27 @@
             recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1"
             recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2"
             recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
-      when: prep_dbrc
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
     - name: COPYSKEL SKELETONS
+      when: prep_dbrc
       block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store SKELETONS
-          tempfile:
+          ansible.builtin.tempfile:
             state: directory
           register: skt_tmp_dir
         - name: Send SKELETONS member templates to USS directory
-          include_role:
+          ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/Skeletons/*'
             uss_file_path: '{{ skt_tmp_dir.path }}'
         - name: Remove extensions from filenames
-          shell: >
+          ansible.builtin.shell: >
             for procname in $(ls *.j2); do
             basename="$(echo ${procname} | cut -d'.' -f1)";
             cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
@@ -128,8 +129,7 @@
             chdir: '{{ skt_tmp_dir.path }}'
       always:
         - name: Delete the temporary SKELETONS files directory
-          file:
+          ansible.builtin.file:
             path: '{{ skt_tmp_dir.path }}'
             state: absent
-      when: prep_dbrc
 # ---------------------------------------------------------------------------------------------------

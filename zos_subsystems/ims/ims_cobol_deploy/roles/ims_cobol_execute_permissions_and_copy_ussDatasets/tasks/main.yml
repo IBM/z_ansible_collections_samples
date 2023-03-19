@@ -1,29 +1,29 @@
 # ---
 # # tasks file for ims_cobol_execute_permissions_and_copy_ussDatasets
 - name: Copy the file to uss
-  copy:
+  ansible.builtin.copy:
     src: '{{ role_path }}/templates/CPTOMVS.j2'
     dest: '{{ uss_file_path }}/CPTOMVS.j2'
 
-- name: execute permission for copy data
-  file:
+- name: Execute permission for copy data
+  ansible.builtin.file:
     path: '{{ uss_file_path }}/CPTOMVS.j2'
     state: file
     mode: a+x
 
-- name: copy to uss datasets - DBDLIB
+- name: Copy to uss datasets - DBDLIB
   ibm.ibm_zos_core.zos_copy:
     src: '{{ uss_file_path }}/{{PROJECT_NAME}}/DBD'
     dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBD'
     remote_src: true
 
-- name: copy to uss datasets - PSBLIB
+- name: Copy to uss datasets - PSBLIB
   ibm.ibm_zos_core.zos_copy:
     src: '{{ uss_file_path }}/{{PROJECT_NAME}}/PSB'
     dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSB'
     remote_src: true
 
-- name: copy from uss to mvs - PGMSRC
+- name: Copy from uss to mvs - PGMSRC
   ibm.ibm_zos_core.zos_copy:
     src: '{{ uss_file_path }}/{{PROJECT_NAME}}/COBOL'
     dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMSRC'
@@ -37,6 +37,6 @@
 #     volume: DIPTI1
 #   loop: "{{ loadData }}"
 
-- name: copy from uss to mvs - LOADDATA
-  shell: cp "{{ uss_file_path }}/{{PROJECT_NAME}}/LoadData/{{item.name}}.data" "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name}}.INPUT'"
+- name: Copy from uss to mvs - LOADDATA
+  ansible.builtin.shell: cp "{{ uss_file_path }}/{{PROJECT_NAME}}/LoadData/{{item.name}}.data" "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.{{ item.name}}.INPUT'"
   loop: "{{ loadData }}"

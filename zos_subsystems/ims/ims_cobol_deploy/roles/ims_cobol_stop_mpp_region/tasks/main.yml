@@ -1,5 +1,5 @@
 ---
 # tasks file for ims_cobol_stop_mpp_region
 - name: "Stop the Mpp region"
-  shell: "/{{ DFS_IMS_SSID }}STOP REGION JOBNAME {{ DFS_IMS_SSID }}MPP{{ REGION_NUM|string }}"
-  ignore_errors: yes
+  ansible.builtin.shell: "/{{ DFS_IMS_SSID }}STOP REGION JOBNAME {{ DFS_IMS_SSID }}MPP{{ REGION_NUM|string }}"
+  ignore_errors: true

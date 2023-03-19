@@ -38,7 +38,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
@@ -131,7 +131,7 @@
       zos_fetch:
         src: "{{ data_set_name }}"
         dest: "{{ ctl_tmp_dir }}/"
-        flat: yes
+        flat: true
         encoding:
           from: "{{ target_charset }}"
           to: ISO8859-1

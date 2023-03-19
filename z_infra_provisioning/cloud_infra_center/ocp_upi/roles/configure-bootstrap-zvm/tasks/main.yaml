@@ -36,22 +36,22 @@
 # netaddr
 
 - name: 'Import common yaml'
-  import_tasks: common.yaml
+  ansible.builtin.import_tasks: common.yaml
 
 - name: 'Get image name for ZVM'
-  set_fact:
+  ansible.builtin.set_fact:
     image_name: "icic_rhcos_{{ disk_type }}"
   when:
     - vm_type == "zvm"
 
 - name: 'Create the bootstrap server'
-  os_server:
+  openstack.cloud.server:
     name: "{{ os_bootstrap_server_name }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
@@ -61,7 +61,7 @@
     - vm_type == "zvm"
 
 - name: 'Convert bootstrap flavor from value into number'
-  command:
+  ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_bootstrap }} -c disk -f value"
   register: bootstrap_flavor_size
   when:
@@ -69,27 +69,27 @@
 
 
 - name: 'Create the bootstrap server with default boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ os_bootstrap_server_name }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-    boot_from_volume: True
+    boot_from_volume: true
     volume_size: "{{ bootstrap_flavor_size.stdout_lines[0]}}"
-    terminate_volume: True
+    terminate_volume: true
   when:
     - disk_type == "scsi"
     - vm_type == "zvm"
     - volume_type_id is not defined
 
 - name: 'Create bootstrap boot volume'
-  os_volume:
+  openstack.cloud.volume:
     state: present
     name: "{{ os_bootstrap_server_name }}-boot"
     image: "{{ image_name }}"
@@ -102,24 +102,24 @@
     - volume_type_id is defined
 
 - name: 'Set bootstrap volume bootable'
-  shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_bootstrap_server_name }}-boot"
   when:
     - disk_type == "scsi"
     - volume_type_id is defined
 
 - name: 'Create the bootstrap server with boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ os_bootstrap_server_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     boot_volume: "{{ os_bootstrap_server_name }}-boot"
     userdata: "{{ lookup('file', os_bootstrap_ignition) | string }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
-    auto_ip: no
+    auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     nics:
       - port-name: "{{ os_port_bootstrap }}"
     meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-    terminate_volume: True
+    terminate_volume: true
   when:
     - disk_type == "scsi"
     - volume_type_id is defined

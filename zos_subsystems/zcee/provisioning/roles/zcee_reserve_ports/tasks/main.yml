@@ -2,6 +2,7 @@
 # tasks file for zcee_reserve_ports
 # TODO: add option to reserve specific ports
 - name: Reserve ports for zCEE
+  when: DYNAMICALLY_RESERVE_PORTS
   block:
     - name: Allocate HTTPS Port
       zport:
@@ -9,7 +10,7 @@
         port: '{{ zcon_https_port if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
         dsname: '{{ tcpip_profile }}'
         tmp_dsname: '{{ tcpip_profile_tmp }}'
-        tcp: yes
+        tcp: true
       register: command_result1
 
     - name: Allocate HTTP Port
@@ -18,12 +19,11 @@
         port: '{{ zcon_http_port if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
         dsname: '{{ tcpip_profile }}'
         tmp_dsname: '{{ tcpip_profile_tmp }}'
-        tcp: yes
+        tcp: true
       register: command_result2
 
     - name: Set TCPPORT variables to new port numbers
-      set_stats:
+      ansible.builtin.set_stats:
         data:
           zcon_https_port: '{{ command_result1.port }}'
           zcon_http_port: '{{ command_result2.port }}'
-  when: DYNAMICALLY_RESERVE_PORTS

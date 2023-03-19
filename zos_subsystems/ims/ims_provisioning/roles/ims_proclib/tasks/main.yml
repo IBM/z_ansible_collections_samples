@@ -8,25 +8,26 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # -------------------------------------------------------------------------------------------------------------- DFSE302J
     - name: Allocating Proclib Members
+      when: add
       block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store PROCLIB members
-          tempfile:
+          ansible.builtin.tempfile:
             state: directory
           register: procfiles_tmp_dir
         - name: Send PROCLIB member templates to USS directory
-          include_role:
+          ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/ProcFiles/*'
             uss_file_path: '{{ procfiles_tmp_dir.path }}'
         - name: Remove extensions from filenames
-          shell: >
+          ansible.builtin.shell: >
             for procname in $(ls *.j2); do
             basename="$(echo ${procname} | cut -d'.' -f1)";
             cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
@@ -35,30 +36,30 @@
             chdir: '{{ procfiles_tmp_dir.path }}'
       always:
         - name: Delete the temporary PROCLIB files directory
-          file:
+          ansible.builtin.file:
             path: '{{ procfiles_tmp_dir.path }}'
             state: absent
-      when: add
 
     - block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
     - name: Allocating TCFSLIB Members
+      when: add
       block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store TCFSLIB members
-          tempfile:
+          ansible.builtin.tempfile:
             state: directory
           register: tcf_tmp_dir
         - name: Send TCFSLIB member templates to USS directory
-          include_role:
+          ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/TcfFiles/*'
             uss_file_path: '{{ tcf_tmp_dir.path }}'
         - name: Remove extensions from filenames
-          shell: >
+          ansible.builtin.shell: >
             for procname in $(ls *.j2); do
             basename="$(echo ${procname} | cut -d'.' -f1)";
             cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB(${basename})'" ;
@@ -67,10 +68,9 @@
             chdir: '{{ tcf_tmp_dir.path }}'
       always:
         - name: Delete the temporary TCFSLIB files directory
-          file:
+          ansible.builtin.file:
             path: '{{ tcf_tmp_dir.path }}'
             state: absent
-      when: add
 
 # --------------------------------------------------------------------------------------------------------------
 
@@ -79,26 +79,27 @@
     # CQS, OM, RM, SCI.
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # -------------------------------------------------------------------------------------------------------------- DFSE303J
     - name: Allocating BPECONFG Members
+      when: bpeconfg
       block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store BPECONFG members
-          tempfile:
+          ansible.builtin.tempfile:
             state: directory
           register: bpe_tmp_dir
         - name: Send BPECONFG member templates to USS directory
-          include_role:
+          ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/Bpeconfg/*'
             uss_file_path: '{{ bpe_tmp_dir.path }}'
         - name: Remove extensions from filenames
-          shell: >
+          ansible.builtin.shell: >
             for procname in $(ls *.j2); do
             basename="$(echo ${procname} | cut -d'.' -f1)";
             cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
@@ -107,15 +108,15 @@
             chdir: '{{ bpe_tmp_dir.path }}'
       always:
         - name: Delete the temporary BPECONFG files directory
-          file:
+          ansible.builtin.file:
             path: '{{ bpe_tmp_dir.path }}'
             state: absent
-      when: bpeconfg
 # --------------------------------------------------------------------------------------------------------------
 
-    - block:
+    - when: copy
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # -------------------------------------------------------------------------------------------------------------- DFS4CPYP
@@ -123,8 +124,8 @@
           zos_copy:
             src: "{{ item.src }}"
             dest: "{{ item.dest }}"
-            remote_src: True
-            force: True
+            remote_src: true
+            force: true
           loop:
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(IMS)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}CTL)' }
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DLISAS)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DLI)' }
@@ -132,31 +133,31 @@
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}OM)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}OM)' }
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}SCI)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SCI)' }
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}RM)', dest: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}RM)' }
-      when: copy
 # --------------------------------------------------------------------------------------------------------------
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # -------------------------------------------------------------------------------------------------------------- DFSE313J
     - name: Allocating JOBS Members
+      when: copy_to_jobs
       block:
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store JOBS members
-          tempfile:
+          ansible.builtin.tempfile:
             state: directory
           register: jobs_tmp_dir
         - name: Send JOBS member templates to USS directory
-          include_role:
+          ansible.builtin.include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/Jobs/*'
             uss_file_path: '{{ jobs_tmp_dir.path }}'
         - name: Remove extensions from filenames
-          shell: >
+          ansible.builtin.shell: >
             for procname in $(ls *.j2); do
             basename="$(echo ${procname} | cut -d'.' -f1)";
             cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS(${basename})'" ;
@@ -165,15 +166,15 @@
             chdir: '{{ jobs_tmp_dir.path }}'
       always:
         - name: Delete the temporary JOBS files directory
-          file:
+          ansible.builtin.file:
             path: '{{ jobs_tmp_dir.path }}'
             state: absent
-      when: copy_to_jobs
 # --------------------------------------------------------------------------------------------------------------
 
-    - block:
+    - when: copy_stage_libs and not provision
+      block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 
 # -------------------------------------------------------------------------------------------------------------- DFSCPYST
@@ -189,12 +190,10 @@
       #     - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATA' }
       # when: copy_stage_libs
 # --------------------------------------------------------------------------------------------------------------
-        - include_role:
+        - ansible.builtin.include_role:
             name: send-template
           vars:
             path: '{{ eager_role_path }}/templates/DFSCPYST.j2'
-
-      when: copy_stage_libs and not provision
 
     - name: Copy staging libs
       zos_job_submit:
@@ -207,7 +206,7 @@
 
     - block:
 
-        - set_fact:
+        - ansible.builtin.set_fact:
             eager_role_path: '{{role_path}}'
 # ------------------------------------------------------------------------------------------------------ DFSPROCB
     - name: UPDATE
@@ -254,8 +253,8 @@
       zos_copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-        remote_src: True
-        force: True
+        remote_src: true
+        force: true
         volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
       loop:
         - { src: '{{ADDTL_SAMP_PROC_LIB}}(DFSDBDGN)', dest: '{{ADDTL_SAMP_PROC_LIB}}(DBDGEN)' }

@@ -3,9 +3,9 @@
 
 
 - name: Infrastructure Discovery
-  uri:
+  ansible.builtin.uri:
     url: "{{ doe_server }}:{{ doe_server_port }}/ws/infrastructure/discovery/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: PUT

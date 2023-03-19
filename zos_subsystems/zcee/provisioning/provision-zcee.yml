@@ -73,7 +73,7 @@
             path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
             state: directory
             mode: '700'
-            recurse: yes
+            recurse: true
 
         # Invoke a role to create a new server
         - include_role:

@@ -1,6 +1,6 @@
 ---
 # tasks file for zcce_generate_aar
 - name: Generate API archives
-  shell: |
+  ansible.builtin.shell: |
     PATH=$PATH:$JAVA_HOME/bin
     {{ ZCEE_BUILD_TOOLKIT_PATH }}/bin/zconbt.zos -pd={{ project_directory }} -f={{ archive_file_name }}

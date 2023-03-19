@@ -22,7 +22,7 @@
           find:
             paths: ["{{ SERVICE_ROOT_DIR }}"]
             patterns: '*.properties'
-            recurse: yes
+            recurse: true
           register: service_file_list
 
         # Uses the service archive list in the previous step to generate multiple service archives.
@@ -60,7 +60,7 @@
         - name: Get available APIs
           uri:
             url: "{{ ZCEE_SERVER }}:{{ ZCEE_PORT }}/zosConnect/apis/"
-            validate_certs: no
+            validate_certs: false
             user: "{{ USERNAME }}"
             password: "{{ PASSWORD }}"
             force_basic_auth: true

@@ -20,7 +20,7 @@
             chdir: '{{ zcon_install_dir }}/bin'
           environment:
             WLP_USER_DIR: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
-          ignore_errors: yes
+          ignore_errors: true
           register: response
           when: "'Server ZC01 is not running' is not in response.msg"
         - debug:

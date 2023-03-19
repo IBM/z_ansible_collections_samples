@@ -17,30 +17,30 @@
 ---
 # handlers file for configure-haproxy
 - name: Turn on haproxy_connect_any
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
-  seboolean:
+  ansible.posix.seboolean:
     name: haproxy_connect_any
-    state: yes
-    persistent: yes
+    state: true
+    persistent: true
   listen: "restart haproxy"
 
 - name: Restart haproxy
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     state: restarted
-    enabled: yes
+    enabled: true
   listen: "restart haproxy"
 
 - name: Restart firewalld.service
-  become: yes
+  become: true
   become_user: root
   become_method: sudo
-  service:
+  ansible.builtin.service:
     name: firewalld.service
     state: restarted
   listen: "restart firewalld"

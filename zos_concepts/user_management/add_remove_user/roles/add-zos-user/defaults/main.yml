@@ -57,7 +57,7 @@ password: ""
 ##################################################################################################################
 # Specifies if a random password should be generated when no password is provided.
 ##################################################################################################################
-generate_password: yes
+generate_password: true
 
 ##################################################################################################################
 # Specifies the user's initial password phrase.
@@ -81,12 +81,12 @@ passphrase: ""
 ##################################################################################################################
 # Specifies if a random passphrase should be generated when no passphrase is provided.
 ##################################################################################################################
-generate_passphrase: yes
+generate_passphrase: true
 
 ##################################################################################################################
 # Specifies if a password and/or passphrase should be printed to the console upon completion of the playbook.
 ##################################################################################################################
-print_pass: yes
+print_pass: true
 
 ##################################################################################################################
 # Specifies the SMTP server to use for sending email, if sending email is desired.
@@ -116,7 +116,7 @@ email_to: ""
 ##################################################################################################################
 # Specifies if an email should be sent containing new user credentials.
 ##################################################################################################################
-send_email: no
+send_email: false
 
 ##################################################################################################################
 # Specifies the user's default security label, where security-label is an installation-defined

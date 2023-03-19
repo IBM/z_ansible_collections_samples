@@ -11,59 +11,59 @@
 # tasks file for configure-install-config
 
 - name: 'Remove the install_config.yaml'
-  file:
+  ansible.builtin.file:
     state: absent
     path: install-config.yaml
 
 - name: 'Get the subnet range'
-  command:
+  ansible.builtin.command:
     cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
   register: sunbet_range
 
 - name: Create install-config.yaml
-  template:
+  ansible.builtin.template:
     src: templates/install-config-yaml.j2
     dest: "install-config.yaml"
 
 - name: Configure machine network in install configuration
-  script: tools/config-machine-network.py {{ sunbet_range.stdout_lines[0] }}
+  ansible.builtin.script: tools/config-machine-network.py {{ sunbet_range.stdout_lines[0] }}
   args:
     executable: python3
 
 - name: Add http proxy and https proxy in install-config.yaml
-  shell:
+  ansible.builtin.shell:
     cmd: |
       sed -i '/baseDomain/a proxy:' install-config.yaml
       sed -i '/proxy/a \ \ httpProxy: {{ http_proxy }}' install-config.yaml
       sed -i '/httpProxy/a \ \ httpsProxy: {{ https_proxy }}' install-config.yaml
       sed -i '/httpsProxy/a \ \ noProxy: {{ no_proxy }}' install-config.yaml
   when:
-    - use_proxy == true
+    - use_proxy
 
 - name: Add local registry info in install-config.yaml
-  shell:
+  ansible.builtin.shell:
     cmd: |
       sed -i '/baseDomain/a imageContentSources:' install-config.yaml
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-v4.0-art-dev ' install-config.yaml
       sed -i '/imageContentSources/a - mirrors:\n\ \ - {{ localreg_mirror }}\n\ \ source: quay.io/openshift-release-dev/ocp-release ' install-config.yaml
   when:
-    - use_localreg == true
+    - use_localreg
 
 - name: Update networkType from OpenShiftSDN to OVNKubernetes
-  shell:
+  ansible.builtin.shell:
     cmd: |
       sed -i '/networkType/d' install-config.yaml
   when:
     - openshift_version is version('4.12', '>=')
 
 - name: Update cluster domain name in install-config.yaml
-  shell:
+  ansible.builtin.shell:
     cmd: |
       sed -i "s/cluster_basedomain/{{ base_domain }}/g" install-config.yaml
       sed -i "s/cluster_name/{{ cluster_name }}/g" install-config.yaml
       cp -r install-config.yaml .install-config.yaml
 
 - name: Empty compute server pools
-  script: tools/empty-compute-node.py
+  ansible.builtin.script: tools/empty-compute-node.py
   args:
     executable: python3

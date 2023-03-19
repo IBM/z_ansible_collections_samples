@@ -30,7 +30,7 @@
       - PERMIT BBG.AUTHMOD.BBGZSAFM CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Refresh
   ibm.ibm_zos_core.zos_tso_command:

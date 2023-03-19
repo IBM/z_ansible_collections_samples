@@ -16,12 +16,12 @@
 #   include_vars: runtime-requirements.txt
 
 - name: DEBUG(-v) List of supported Ansible versions for this playbook
-  set_fact:
+  ansible.builtin.set_fact:
     runtime_ansible_req: "{{ runtime_ansible_req | default([]) }} +[ '{{ item }}.n' ]"
   loop: "{{requires_ansible_version}}"
 
 - name: Ansible requirement check ensuring the Ansible runtime version meets the playbook requirement
-  include_tasks:
+  ansible.builtin.include_tasks:
     ansible_check.yml
   with_items: "{{requires_ansible_version}}"
   loop_control:
@@ -33,16 +33,16 @@
     verbosity: 1
 
 - name: DEBUG(-v) Display dictionary `ansible_version_checks` version failures counted that did not meet Ansible version requirement
-  debug:
+  ansible.builtin.debug:
     var: ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', True)|list|length
     verbosity: 1
 
 - name: Collection requirement check ensuring if the collection version meets the playbook requirement
-  include_tasks:
+  ansible.builtin.include_tasks:
     collection_check.yml
 
 - name: Ansible engine version for this playbook requirement check completed
-  assert:
+  ansible.builtin.assert:
     that:
       ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', False)|list|length > 0
     success_msg: "[SUCCESS] This playbook has the required dependency Ansible version {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }} installed."
@@ -57,26 +57,26 @@
   when: result_ansible_check is defined and (result_ansible_check | bool)
 
 - name: Display if the Ansible collection version for this playbook requirement succeded or failed
-  debug:
+  ansible.builtin.debug:
     msg: "{{item.msg}}"
   loop: "{{result_collection_status.results}}"
   loop_control:
     label: "{{ item.msg }}"
 
 - name: Evaluating if the collection requirements for this playbook are installed
-  set_fact:
-    result_collection_status_failed: True
+  ansible.builtin.set_fact:
+    result_collection_status_failed: true
     result_collection_status_msg: "{{item.msg}}"
   loop: "{{result_collection_status.results}}"
   loop_control:
     label: "{{ item.msg }}"
   when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
 
-- fail:
+- ansible.builtin.fail:
     msg: "{{result_collection_status_msg}}"
-  when: result_collection_status_failed is defined and result_collection_status_failed == True
+  when: result_collection_status_failed is defined and result_collection_status_failed
 
-- fail:
+- ansible.builtin.fail:
     msg: "{{result_ansible_check.msg}}"
   when: result_ansible_check.msg is regex("FAIL")
 

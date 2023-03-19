@@ -8,15 +8,15 @@
   block:
 
     - name: Send start region rexx script
-      copy:
+      ansible.builtin.copy:
         src: '{{ role_path }}/files/scripts/start-region.rexx'
         dest: '{{ uss_utilities_path }}/start-region.rexx'
 
-    - shell: chtag -t -c ISO8859-1 start-region.rexx
+    - ansible.builtin.shell: chtag -t -c ISO8859-1 start-region.rexx
       args:
         chdir: '{{ uss_utilities_path }}'
 
-    - file:
+    - ansible.builtin.file:
         path: '{{ uss_utilities_path }}/start-region.rexx'
         state: file
         mode: a+x
