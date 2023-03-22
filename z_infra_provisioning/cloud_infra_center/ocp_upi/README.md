@@ -10,7 +10,7 @@ Before you get started with Ansible, familiarize yourself with the basics of Red
 
 # About this playbook
 
-> The current version of this playbook: [version](./version)
+> The current version of this playbook: [version](./version.md)
 
 > The instruction of [checkout to specific version](./checkout-to-version.md#Checkout-to-specific-version)
 
