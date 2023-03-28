@@ -34,6 +34,9 @@ all:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
 
+      icic_management_ip: '<icic-management-ip>'
+      icic_project_name: '<icic-username>'
+      
       use_network_name: '<network-name-from-icic>'
       use_network_subnet: '<subnet-id-from-network-name-in-icic>'
 

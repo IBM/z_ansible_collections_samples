@@ -49,7 +49,6 @@
   when:
     - vm_type == "zvm"
 
-
 - name: 'Create the compute servers'
   openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
