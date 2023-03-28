@@ -38,26 +38,26 @@
 
   tasks:
     - name: 'Import common yaml'
-      import_tasks: common.yaml
+      ansible.builtin.import_tasks: common.yaml
 
     - name: 'Export infra ID'
-      shell:
+      ansible.builtin.shell:
         cmd: "jq -r .infraID metadata.json"
       register: infra_id
 
     - name: 'Remove the compute servers'
-      os_server:
+      openstack.cloud.server:
         name: "{{ item.1 }}-{{ item.0 }}"
         state: absent
       with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
 
     - name: 'Get compute servers from ICIC command line'
-      shell: |
+      ansible.builtin.shell: |
         openstack server list -c Name -f value | awk '/{{ infra_id.stdout_lines[0] }}/ && /worker/'
       register: computes
       ignore_errors: true
 
     - name: 'Remove all computes node'
-      shell:
+      ansible.builtin.shell:
         cmd: "openstack server delete {{ item.1 }}"
       with_indexed_items: "{{ computes.stdout_lines }}"
