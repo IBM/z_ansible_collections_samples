@@ -28,7 +28,7 @@
       ansible.builtin.import_tasks: common.yaml
 
     - name: 'Remove the bootstrap server'
-      openstack.cloud.server:
+      os_server:
         name: "{{ os_bootstrap_server_name }}"
         state: absent
         delete_fip: true

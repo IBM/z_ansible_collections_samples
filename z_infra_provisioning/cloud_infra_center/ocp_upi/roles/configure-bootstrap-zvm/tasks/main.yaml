@@ -45,7 +45,7 @@
     - vm_type == "zvm"
 
 - name: 'Create the bootstrap server'
-  openstack.cloud.server:
+  os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
@@ -69,7 +69,7 @@
 
 
 - name: 'Create the bootstrap server with default boot volume'
-  openstack.cloud.server:
+  os_server:
     name: "{{ os_bootstrap_server_name }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
@@ -108,7 +108,7 @@
     - volume_type_id is defined
 
 - name: 'Create the bootstrap server with boot volume'
-  openstack.cloud.server:
+  os_server:
     name: "{{ os_bootstrap_server_name }}"
     flavor: "{{ os_flavor_bootstrap }}"
     boot_volume: "{{ os_bootstrap_server_name }}-boot"
