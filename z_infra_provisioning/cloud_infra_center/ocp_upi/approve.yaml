@@ -25,5 +25,5 @@
           delay: 10
       rescue:
         - name: Approve CSR failed
-          debug:
+          ansible.builtin.debug:
             msg: 'Please approve all pending CSR manually via: oc get csr -o name | xargs oc adm certificate approve'

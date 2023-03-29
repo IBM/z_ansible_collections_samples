@@ -25,11 +25,16 @@
 #
 # Change Summary:
 # - Change Ansible playbook name
----
-- name: modify dns on bastion
+
+- name: Modify dns on bastion
   hosts: bastion
 
   tasks:
+    - name: 'Get new worker index'
+      ansible.builtin.command:
+        cmd: cat .new_worker_index
+      register: new_worker_index_item
+
     - name: 'Validation worker ip address exist in named'
       ansible.builtin.shell: |
         rm -rf .validate_exist_ip
@@ -37,9 +42,9 @@
         if [ $count != "0" ] ; then
           echo 1 >> .validate_exist_ip
         fi
-      with_lines: cat .new_worker_index
+      with_items: "{{ new_worker_index_item.stdout_lines }}"
 
-    - name: check .validate_exist_ip exists
+    - name: Check .validate_exist_ip exists
       ansible.builtin.stat:
         path: .validate_exist_ip
       register: validate_ip_result
@@ -55,11 +60,11 @@
         worker_ip: "{{ item.split(',')[1] | replace('ip=','') }}"
         worker_index: "{{ item.split(',')[0][-4:] }}"
         cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-      with_lines: cat .new_worker_index
+      with_items: "{{ new_worker_index_item.stdout_lines }}"
 
     - name: 'Modify bastion haproxy for new worker'
       ansible.builtin.include_tasks: modify-haproxy.yaml
       vars:
         worker_index: "{{ item.split(',')[0][-4:] }}"
         cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-      with_lines: cat .new_worker_index
+      with_items: "{{ new_worker_index_item.stdout_lines }}"
