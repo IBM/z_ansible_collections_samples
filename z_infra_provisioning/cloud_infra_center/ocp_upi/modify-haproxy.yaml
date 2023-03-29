@@ -62,7 +62,7 @@
   when: exist_worker_count.stdout == "0"
 
 - name: Check the existing HAProxy configuration
-  fail:
+  ansible.builtin.fail:
     msg: "The new worker configuration exists in haproxy.cfg, skip this playbook."
   failed_when: exist_worker_count.stdout != "0"
 
