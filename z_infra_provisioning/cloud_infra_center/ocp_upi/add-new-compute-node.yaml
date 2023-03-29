@@ -89,7 +89,7 @@
       with_items: "{{ new_worker_name_item.stdout_lines }}"
 
     - name: 'Create the compute server ports'
-      openstack.cloud.port:
+      os_port:
         name: "{{ item.split(',')[0] }}"
         network: "{{ use_network_name }}"
         security_groups:
@@ -102,7 +102,7 @@
       when: add_worker_ip != "random"
 
     - name: 'Create the compute server ports'
-      openstack.cloud.port:
+      os_port:
         name: "{{ item }}"
         network: "{{ use_network_name }}"
         security_groups:
