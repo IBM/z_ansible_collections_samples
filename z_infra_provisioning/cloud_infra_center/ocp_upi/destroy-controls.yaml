@@ -28,7 +28,7 @@
       ansible.builtin.import_tasks: common.yaml
 
     - name: 'Remove the control servers'
-      openstack.cloud.server:
+      os_server:
         name: "{{ item.1 }}-{{ item.0 }}"
         state: absent
       with_indexed_items: "{{ [os_cp_server_name] * os_control_nodes_number }}"

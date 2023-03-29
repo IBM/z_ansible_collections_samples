@@ -42,7 +42,7 @@
   register: validate_url
 
 - name: Get icic token
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: openstack token issue -c id -f value
   register: icic_token
   failed_when: icic_token.stdout == ""
