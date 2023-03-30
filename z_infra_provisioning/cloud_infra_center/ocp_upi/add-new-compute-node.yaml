@@ -89,7 +89,7 @@
       with_items: "{{ new_worker_name_item.stdout_lines }}"
 
     - name: 'Create the compute server ports'
-      os_port:
+      openstack.cloud.port:
         name: "{{ item.split(',')[0] }}"
         network: "{{ use_network_name }}"
         security_groups:
@@ -102,7 +102,7 @@
       when: add_worker_ip != "random"
 
     - name: 'Create the compute server ports'
-      os_port:
+      openstack.cloud.port:
         name: "{{ item }}"
         network: "{{ use_network_name }}"
         security_groups:
@@ -117,7 +117,7 @@
       with_items: "{{ new_worker_name_item.stdout_lines }}"
 
     - name: 'Create the compute servers'
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
@@ -134,7 +134,7 @@
         - volume_type_id is not defined
 
     - name: 'Create the compute servers'
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
@@ -159,7 +159,7 @@
         - disk_type == "scsi"
 
     - name: 'Create the compute servers with default boot volume'
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
@@ -201,7 +201,7 @@
         - volume_type_id is defined
 
     - name: 'Create the compute server with boot volume'
-      os_server:
+      openstack.cloud.server:
         name: "{{ item }}"
         flavor: "{{ os_flavor_worker }}"
         boot_volume: "{{ item }}-boot"

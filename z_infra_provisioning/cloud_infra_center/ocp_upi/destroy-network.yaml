@@ -58,6 +58,6 @@
       with_indexed_items: "{{ ports.stdout_lines }}"
 
     - name: 'Remove the cluster router'
-      os_router:
+      openstack.cloud.router:
         name: "{{ os_router }}"
         state: absent
