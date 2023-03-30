@@ -73,7 +73,7 @@
     - server_group_id is not defined
 
 - name: 'Create the control servers'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     image: "{{ image_name }}"
     flavor: "{{ os_flavor_master }}"
@@ -130,7 +130,7 @@
     - volume_type_id is defined
 
 - name: 'Create the controller server with boot volume'
-  os_server:
+  openstack.cloud.server:
     name: "{{ item.1 }}-{{ item.0 }}"
     flavor: "{{ os_flavor_master }}"
     boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"
