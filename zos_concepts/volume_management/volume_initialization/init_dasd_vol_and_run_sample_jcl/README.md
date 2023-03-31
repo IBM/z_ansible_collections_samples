@@ -10,7 +10,7 @@ These playbook use:
     collection:
         ibm.ibm_zos_core
     modules:
-        zos_ickdsf_init
+        zos_volume_init
         zos_data_set
         zos_copy
         zos_job_submit
