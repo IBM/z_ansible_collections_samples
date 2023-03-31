@@ -154,7 +154,7 @@
     - name: Un-mount data set.
       zos_mount:
         src: "{{ zfs_dsname }}"
-        path: /
+        path: "{{ mount_point }}"
         fs_type: ZFS
         state: absent
 
