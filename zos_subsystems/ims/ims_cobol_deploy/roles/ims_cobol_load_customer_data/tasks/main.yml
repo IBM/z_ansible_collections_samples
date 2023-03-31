@@ -2,16 +2,16 @@
 # tasks file for ims_cobol_load_accounts
 
 - name: Create temporary directory for load customer data
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
   register: temp_file_path
   delegate_to: localhost
 - name: Interpret templates
   block:
-    - set_fact:
+    - ansible.builtin.set_fact:
         eager_role_path: '{{role_path}}'
     - name: Compile templates and put results in temporary directory
-      template:
+      ansible.builtin.template:
         src: "{{ eager_role_path }}/templates/LOADCUST.j2"
         dest: "{{ temp_file_path.path }}/LOADCUST.j2"
         output_encoding: "ASCII"
@@ -25,6 +25,5 @@
           from: ISO8859-1
           to: IBM-037
       register: output
-    - debug:
+    - ansible.builtin.debug:
         msg: "{{ output.jobs[0].job_id }}"
-

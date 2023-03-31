@@ -52,19 +52,19 @@
 ---
 - name: Sample for retrieving software instance from registry
   hosts: cpm_host1
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.ibm_zosmf
   vars_prompt:
     - name: zmf_user
       prompt: "Enter your z/OSMF username"
-      private: no
+      private: false
     - name: zmf_password
       prompt: "Enter your z/OSMF password"
-      private: yes
+      private: true
   vars:
     - name: instance_info_json_path
-    
+
   tasks:
     # ##########################################################################
     # Role: zmf_cpm_get_software_instance
@@ -79,12 +79,12 @@
 
     - name: Obtain Variable Value
       vars:
-           instance_info_json: "{{lookup('file', instance_info_json_path)}}"
+        instance_info_json: "{{lookup('file', instance_info_json_path)}}"
 
       set_fact:
-    
-         VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
+
+        VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
 
     - name: Display VAR1 value
       debug:
-          msg: "VAR1 Value is : {{ VAR1.value }}"
+        msg: "VAR1 Value is : {{ VAR1.value }}"

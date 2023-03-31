@@ -1,16 +1,15 @@
-
 temp_dir: /tmp
 
 # Placeholder variable for using the application binary packaged with this sample
 # Future update may include a new role to pull the application from a github repository
-USE_GIT: no
+USE_GIT: false
 
 # Update this or there is default
 
 # The SSID of the IMS instance used
 ROUTE: '{{ DFS_IMS_SSID }}'
 
-#COBOL compiler library to use
+# COBOL compiler library to use
 COBOL_COMP_LIB_HLQ: IGYV6R20
 COBOL_IGZCJAVA_PATH: /usr/lpp/cobol/cob620/igyv6r2/lib
 
@@ -42,7 +41,7 @@ datasets:
    secondary_size: 1
    record_format: fb
    logical_record_length: 80
-   block_size: 32720 
+   block_size: 32720
    dir_blocks: 10
  - name: JCL
    type: pds
@@ -121,18 +120,18 @@ loads:
    block_size: 27800
 
 dbds:
-  - name: ACCOUNT
-  - name: CUSTACCS
-  - name: CUSTOMER
-  - name: HISTORY
-  - name: TSTAT
+ - name: ACCOUNT
+ - name: CUSTACCS
+ - name: CUSTOMER
+ - name: HISTORY
+ - name: TSTAT
 
 psbs:
-  - name: IBACSUM
-  - name: IBLOAD
+ - name: IBACSUM
+ - name: IBLOAD
 
 # DFSMPR proc parameters
-SEND_CUSTOM_DFSMPR: yes
+SEND_CUSTOM_DFSMPR: true
 DFSMPR_NAME: DFSMPR{{ REGION_NUM | string }}
 
 # this will be appended to the region name, example: IMS1MPP5 where REGION_NUM='5' and DFS_IMS_SSID='IMS1'
@@ -150,42 +149,41 @@ ZOS_LERUNLIB: '{{ zCloud_LERuntime }}'
 ZOS_MACLIB: '{{ zCloud_MACLIB }}'
 
 # DB2 parameters - check to make sure
-WITH_DB2: no
+WITH_DB2: false
 DB2_SSM: ''
 
-USE_PSEUDO_WFI: no
+USE_PSEUDO_WFI: false
 
 ## IMS application variables
-DFS_tranclass1: '005' #'008'
+DFS_tranclass1: '005' # '008'
 DFS_tranclass2: '000'
 DFS_tranclass3: '000'
 DFS_tranclass4: '000'
 DFS_appname: 'Y'
 DFS_traname: 'Y'
 
-REPLACE_MEMBERS: yes
+REPLACE_MEMBERS: true
 
 # Database names used to copy source from USS to MVS.
 loadData:
-  - name: ACCOUNT
-  - name: CUSTACCS
-  - name: CUSTOMER
-  - name: HISTORY
-  - name: TSTAT
+ - name: ACCOUNT
+ - name: CUSTACCS
+ - name: CUSTOMER
+ - name: HISTORY
+ - name: TSTAT
 
 COBOL_PROGRAMS:
-  - "{{SAMPLE_COBOL_DIR}}/IBACSUM"
-  - "{{SAMPLE_COBOL_DIR}}/LOADACCT"
-  - "{{SAMPLE_COBOL_DIR}}/LOADCUSA"
-  - "{{SAMPLE_COBOL_DIR}}/LOADCUST"
-  - "{{SAMPLE_COBOL_DIR}}/LOADHIST"
-  - "{{SAMPLE_COBOL_DIR}}/LOADTSTA"
-  - "{{SAMPLE_COBOL_DIR}}/IBGCUDAT"
-  - "{{SAMPLE_COBOL_DIR}}/IBSCUDAT"
+ - "{{SAMPLE_COBOL_DIR}}/IBACSUM"
+ - "{{SAMPLE_COBOL_DIR}}/LOADACCT"
+ - "{{SAMPLE_COBOL_DIR}}/LOADCUSA"
+ - "{{SAMPLE_COBOL_DIR}}/LOADCUST"
+ - "{{SAMPLE_COBOL_DIR}}/LOADHIST"
+ - "{{SAMPLE_COBOL_DIR}}/LOADTSTA"
+ - "{{SAMPLE_COBOL_DIR}}/IBGCUDAT"
+ - "{{SAMPLE_COBOL_DIR}}/IBSCUDAT"
 
 # Cobol application related settings
 PGM_NAME: "IBACSUM"
 TRAN_NAME: "IBACSUM"
 UPDATE_ACB: true
 UPDATE_DATA: false
-

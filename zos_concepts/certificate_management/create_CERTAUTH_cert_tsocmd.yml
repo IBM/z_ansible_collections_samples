@@ -5,7 +5,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     owner_id: 'OMVSKERN'
@@ -18,37 +18,36 @@
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
   tasks:
-  - block:
+    - block:
+        - include_role:
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Create a new keyring'
+            command:
+              - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
+              - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
+      ignore_errors: true
+
     - include_role:
         name: issue_tso_cmd
       vars:
-        task_description: 'Create a new keyring'
+        task_description: 'Create new CA cert and connect to keyring'
         command:
-            - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
-            - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
-    ignore_errors: True
+          - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}') NOTAFTER(DATE({{expiry_date}}))
+          - RACDCERT ID({{owner_id}}) CONNECT(CERTAUTH LABEL('{{cert_label}}') RING({{keyring}}))
+      when: not expiry_date == ''
 
-  - include_role:
-      name: issue_tso_cmd
-    vars:
-      task_description: 'Create new CA cert and connect to keyring'
-      command:
-        - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}') NOTAFTER(DATE({{expiry_date}}))
-        - RACDCERT ID({{owner_id}}) CONNECT(CERTAUTH LABEL('{{cert_label}}') RING({{keyring}}))
-    when: not expiry_date == ''
+    - include_role:
+        name: issue_tso_cmd
+      vars:
+        task_description: 'Create new CA cert and connect to keyring'
+        command:
+          - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}')
+          - RACDCERT ID({{owner_id}}) CONNECT(CERTAUTH LABEL('{{cert_label}}') RING({{keyring}}))
+      when: expiry_date == ''
 
-  - include_role:
-      name: issue_tso_cmd
-    vars:
-      task_description: 'Create new CA cert and connect to keyring'
-      command:
-        - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}')
-        - RACDCERT ID({{owner_id}}) CONNECT(CERTAUTH LABEL('{{cert_label}}') RING({{keyring}}))
-    when: expiry_date == ''
-
-  - include_role:
-      name: issue_operator_cmd
-    vars:
-      task_description: 'Run Health Checker'
-      command: "F HZSPROC,RUN,CHECK=({{check_name}})"
-
+    - include_role:
+        name: issue_operator_cmd
+      vars:
+        task_description: 'Run Health Checker'
+        command: "F HZSPROC,RUN,CHECK=({{check_name}})"

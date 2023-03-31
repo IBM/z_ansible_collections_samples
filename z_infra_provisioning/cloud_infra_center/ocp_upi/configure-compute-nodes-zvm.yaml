@@ -12,5 +12,4 @@
 - name: Create the compute nodes in zmv
   hosts: localhost
   roles:
-  - configure-compute-nodes-zvm
-
+    - configure-compute-nodes-zvm

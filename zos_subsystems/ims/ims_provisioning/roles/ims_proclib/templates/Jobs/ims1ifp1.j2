@@ -1,0 +1,47 @@
+//{{ DFS_IMS_SSID }}IFP1 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+// NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//*
+//* SKELETON: DFSIXS20
+//*********************************************************************
+//* FUNCTION: IMBED - EXECUTION JOB FOR IFP #1 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//IFP1     EXEC PROC=IMSFP,TIME=(1440),
+//         SOUT='*',              SYSOUT CLASS
+//         MBR=DFSIVA4,           PROGRAM NAME
+//         PSB=DFSIVP4,           PSB     NAME
+//         NBA=06,                INITIAL FAST PATH DB BUFFERS
+//         OBA=05,                SECONDARY FAST PATH DB BUFFERS
+//         TLIM=10,               IFP TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC             PROCLIB DFSINTXX MEMBER
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSSTAT   DD SYSOUT=*
+//*

@@ -24,7 +24,7 @@
 - hosts: all
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
 
   environment: "{{ environment_vars }}"
 

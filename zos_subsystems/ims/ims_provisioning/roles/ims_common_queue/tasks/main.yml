@@ -7,7 +7,7 @@
 
   block:
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         ip_config: '{{ role_path }}/templates/ip_config.txt'
         sl_config: '{{ role_path }}/templates/sl_config.txt'
         sg_config: '{{ role_path }}/templates/sg_config.txt'
@@ -17,7 +17,7 @@
     - name: Copy input to member CQSIP000
       zos_mvs_raw:
         pgm: IEBGENER
-        auth: no
+        auth: false
         dds:
           - dd_data_set:
               dd_name: sysut2
@@ -44,7 +44,7 @@
               data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(CQSSL000)"
               disposition: shr
           - dd_dummy:
-              dd_name: sysin     
+              dd_name: sysin
           - dd_input:
               dd_name: sysut1
               content: "{{ lookup('template', '{{ sl_config }}') }}"
@@ -98,5 +98,5 @@
     - name: Query CQS status
       ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(CQS) SHOW(STATUS)
-        plex:  '{{ DFS_IMSPlex }}'
+        plex: '{{ DFS_IMSPlex }}'
       when: cqs == "query"

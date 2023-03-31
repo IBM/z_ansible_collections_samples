@@ -1,11 +1,11 @@
 ---
 # defaults file for roles/authorized_services
 
-#boolean value variables to define if z/OS authorized services will be enabled
-SAFCRED: yes
-ZOSWLM: yes
-TXRSS: yes
-ZOSDUMP: yes
-LOCAL_ADAPTER: no
-PRODMGR: no 
-ZOSAIO: no
+# boolean value variables to define if z/OS authorized services will be enabled
+SAFCRED: true
+ZOSWLM: true
+TXRSS: true
+ZOSDUMP: true
+LOCAL_ADAPTER: false
+PRODMGR: false
+ZOSAIO: false

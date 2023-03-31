@@ -11,4 +11,4 @@
 - name: Create the bootstrap server in kvm
   hosts: localhost
   roles:
-  - configure-bootstrap-kvm
+    - configure-bootstrap-kvm

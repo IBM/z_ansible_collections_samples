@@ -27,10 +27,10 @@ new_hlq: ""
 
 # Indicates if terse and archive data sets should be deleted upon successful
 # restore?
-delete: yes
+delete: true
 
 # Indicates if existing data sets should be overwritten during restore
-replace: yes
+replace: true
 
 # The python installation home path on the z/OS managed node (target),
 # e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"

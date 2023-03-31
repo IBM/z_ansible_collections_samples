@@ -2,13 +2,13 @@
 # tasks file for ims_cobol_check_acblib
 # Check which ACB library is inactive
 - name: "Create temporary directory for the proc"
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
   register: temp_file_path
   delegate_to: localhost
 - name: Interpret templates
   block:
-    - set_fact:
+    - ansible.builtin.set_fact:
         eager_role_path: '{{role_path}}'
     - name: Check if pgm exists
       ibm.ibm_zos_ims.ims_command:
@@ -17,26 +17,26 @@
         route: "{{ROUTE}}"
       register: res
 
-    - debug:
+    - ansible.builtin.debug:
         msg: '{{res.ims_output[0].type_1_response[0]}}'
     # Grab the inactive acblib
     - name: Parsing the output to get the contents
-      set_fact:
+      ansible.builtin.set_fact:
         str: '{{ res.ims_output[0].type_1_response | selectattr("Mbr name 1", "equalto", "IMS1")  | map(attribute="msg data") | list | first | join("\n")}}'
       register: str
 
-    - name: parse with reg exp
-      set_fact:
+    - name: Parse with reg exp
+      ansible.builtin.set_fact:
         INACTIVE: '{{ res.ims_output[0].type_1_response | selectattr("Mbr name 1", "equalto", "IMS1")  | map(attribute="msg data") | list | first | join("\n") | regex_search(regexp) }}'
       vars:
         regexp: '.I.\s\s({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB(?:A|B))'
 
     - name: Grab the inactive acblib
-      set_fact:
+      ansible.builtin.set_fact:
         INACTIVE_ACBLIB: "{{INACTIVE | regex_search(regexp)}}"
       vars:
         regexp: '(?<=\s\s).*'
 
-    - name: output inactive ACBLIB
-      debug:
+    - name: Output inactive ACBLIB
+      ansible.builtin.debug:
         msg: "Inactive ACBLIB is: {{ INACTIVE_ACBLIB }}"

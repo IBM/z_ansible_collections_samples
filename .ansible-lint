@@ -1,0 +1,42 @@
+exclude_paths:
+  - zos_concepts/certificate_management/roles/*/tests/test.yml
+  - zos_concepts/data_transfer/copy_sort_fetch/roles/*/tests/test.yml
+  - zos_concepts/data_transfer/dump_pack_ftp_unpack_restore/roles/*/tests/test.yml
+  - zos_concepts/program_authorization/git_apf/roles/*/tests/test.yml
+  - zos_concepts/user_management/add_remove_user/roles/*/tests/test.yml
+  - zos_subsystems/ims/ims_cobol_deploy/roles/*/tests/test.yml
+  - zos_subsystems/ims/ims_provisioning/roles/*/tests/test.yml
+  - zos_subsystems/wlp/roles/*/tests/test.yml
+  - zos_subsystems/zcee/provisioning/roles/*/tests/test.yml
+
+  - z_systems_administration/zhmc/playbooks/vault_example.yml
+  - z_systems_administration/zhmc/playbooks/inventory_example.yml
+
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-bootstrap.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-compute-nodes.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-control-plane.yaml
+
+skip_list:
+  - args[module]
+  - command-instead-of-module
+  - command-instead-of-shell
+  - deprecated-command-syntax
+  - deprecated-local-action
+  - ignore-errors
+  - jinja[spacing]
+  - meta-incorrect
+  - meta-no-info
+  - meta-no-tags
+  - name[missing]
+  - name[play]
+  - name[template]
+  - no-changed-when
+  - no-handler
+  - no-relative-paths
+  - package-latest
+  - risky-file-permissions
+  - risky-shell-pipe
+  - role-name
+  - schema[vars]
+  - var-naming
+  - yaml[line-length]

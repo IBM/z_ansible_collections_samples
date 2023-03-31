@@ -94,7 +94,7 @@
 ###############################################################################
 
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   vars:
     # minimum_zoau_version only accepts integers and "."
     minimum_zoau_version: 1.0.3
@@ -164,8 +164,8 @@
       template:
         src: "{{ playbook_dir }}/templates/host_vars.j2"
         dest: "{{ playbook_dir }}/host_vars/{{ inventory_hostname_short }}.yaml"
-        force: yes
-        backup: yes
+        force: true
+        backup: true
       vars:
         python_root: "{{ chosen_python.get('root') }}"
         python_interpreter: "{{ chosen_python.get('interpreter') }}"
@@ -183,8 +183,8 @@
       template:
         src: "{{ playbook_dir }}/templates/inventory.j2"
         dest: "{{ playbook_dir }}/{{ inventory_hostname_short }}"
-        force: yes
-        backup: yes
+        force: true
+        backup: true
       vars:
         python_interpreter: "{{ chosen_python.get('interpreter') }}"
       delegate_to: localhost

@@ -1,0 +1,78 @@
+DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS33
+//*
+//* FUNCTION: IMS SKELETAL JCL FOR DBRC GENJCL.ARCHIVE
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//AR%STPNO  EXEC PGM=DFSUARC0,PARM='%SSID,DBRC=YES'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR ARCHIVE UTILITY
+//*
+//STEPLIB   DD DISP=SHR,DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+%SELECT  OLDS(%SSID,(%DDNAMES))
+//%OLDSDDN  DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+//DFSSLOGP  DD DSN=IMSBLD.SLDSP.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//             DISP=(NEW,CATLG),
+//             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(1,1))
+//*DFSSLOGS  DD DSN=IMSBLD.SLDSS.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//*             DISP=(NEW,CATLG),
+//*             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//*             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//*             SPACE=(CYL,(1,1))
+//RLDSDD1   DD DSN=IMSBLD.RLDSP.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//             DISP=(NEW,CATLG),
+//             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(1,1))
+//*RLDSDD2   DD DSN=IMSBLD.RLDSS.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//*             DISP=(NEW,CATLG),
+//*             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//*             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//*             SPACE=(CYL,(1,1))
+//SYSIN     DD *
+COPY DDNOUT1(RLDSDD1) DBRECOV
+//*
+$$

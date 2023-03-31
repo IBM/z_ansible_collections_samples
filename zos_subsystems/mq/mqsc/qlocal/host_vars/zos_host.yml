@@ -56,7 +56,6 @@ mq_cpf: "!MQ21"
 mq_queue_name: TEST.Q
 
 
-
 # You should not need to change environment_vars
 environment_vars:
   _BPXK_AUTOCVT: "ON"

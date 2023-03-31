@@ -1,18 +1,18 @@
 ---
 # tasks file for zcee_zcon_setup
 - name: Create folders for install
-  file:
+  ansible.builtin.file:
     path: '{{ zcon_install_dir }}/wlp/etc/'
     state: directory
 
 - name: Create zcee mountpoint in zfs filesystem - '/var/zosconnect'
-  file:
+  ansible.builtin.file:
     path: /var/zosconnect
-    state: directory 
-    mode: '700'     
+    state: directory
+    mode: '700'
 
 - name: Run zconsetup
-  shell: ./zconsetup install
+  ansible.builtin.shell: ./zconsetup install
   args:
     chdir: '{{ zcon_install_dir }}/bin/'
     executable: /bin/sh

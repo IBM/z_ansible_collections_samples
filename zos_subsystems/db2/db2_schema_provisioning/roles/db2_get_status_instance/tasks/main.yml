@@ -2,12 +2,12 @@
 # tasks file for db2_get_status_instance
 
 - name: Check status of an instance
-  uri:
+  ansible.builtin.uri:
     url: "{{ base_url }}/instances/{{INSTANCE_ID}}/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET
     headers:
-        Authorization: "Bearer {{ACCESS_TOKEN}}"
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
     status_code: 200

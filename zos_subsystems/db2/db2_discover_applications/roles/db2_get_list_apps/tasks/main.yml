@@ -2,9 +2,9 @@
 # tasks file for db2_get_list_apps
 
 - name: Retrieve application id
-  uri:
+  ansible.builtin.uri:
     url: "{{ base_url }}/applications/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET

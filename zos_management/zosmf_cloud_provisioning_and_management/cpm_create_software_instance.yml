@@ -58,7 +58,7 @@
 #            - The software type of the configured software
 #    product_version:
 #        description:
-#            - The software product version of the configured software 
+#            - The software product version of the configured software
 #    instance_description:
 #        description:
 #            - Description for the configured software
@@ -75,7 +75,7 @@
 #        description:
 #            - Directory path for the JSON file that holds variables associated with
 #              software instance. Specify the file name that includes variables
-#              associated with the configured softare instance e.g. /tmp/myVar.json. 
+#              associated with the configured softare instance e.g. /tmp/myVar.json.
 #              File contains json array of variables with name, value and visibility
 #              format where name identifies variable name, value identifies variable
 #              value and visibility identifies whether variable is "public" or "private".
@@ -91,23 +91,23 @@
 #            - C("value":"VAR2_VALUE",)
 #            - C("visibility":"public")
 #            - C(},)
-#            - C(....]) 
+#            - C(....])
 ###############################################################################
 
 ---
 - name: create instance of z/OS software in software instance registry
   hosts: cpm_host1
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.ibm_zosmf
   vars_prompt:
     - name: zmf_user
       prompt: "Enter your z/OSMF username"
-      private: no
+      private: false
     - name: zmf_password
       prompt: "Enter your z/OSMF password"
-      private: yes
-  
+      private: true
+
   tasks:
     # ##########################################################################
     # Role: zmf_cpm_create_software_instance

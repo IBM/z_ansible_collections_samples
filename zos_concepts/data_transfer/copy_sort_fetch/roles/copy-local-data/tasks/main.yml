@@ -32,10 +32,10 @@
 ###############################################################################
 
 - name: Generate a temporary data set name
-  command: "mvstmp {{ ansible_user | upper }}"
+  ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
   register: tmp_ds
 
-- set_fact:
+- ansible.builtin.set_fact:
     dest_tmp_data_set: "{{ tmp_ds.stdout }}"
 
 - name: Create the temporary data set
@@ -56,7 +56,7 @@
       - "{{ dest_tmp_data_set }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "{{ result.data_sets | valid_list }}"
       - "'{{ result.data_sets[0]['name'] }}' == '{{ dest_tmp_data_set }}'"

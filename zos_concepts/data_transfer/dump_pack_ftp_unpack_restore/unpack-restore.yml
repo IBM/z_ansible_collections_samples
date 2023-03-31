@@ -10,7 +10,7 @@
 - hosts: destination_system
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:

@@ -4,7 +4,7 @@
 ################################################################################
 # Specifies the path to the z/OS Connect EE installation directory on zFS.
 ################################################################################
-zcon_install_dir: /usr/lpp/zosconnect/v3r0 #TrySample/
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 # TrySample/
 
 ################################################################################
 # Specifies the unique name for the instance of zCEE.
@@ -20,5 +20,3 @@ zcon_zos_proclib: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB'
 # Specifies the user private proclib to hold the proc.
 ################################################################################
 user_private_proclib: USER.PRIVATE.PROCLIB
-
-

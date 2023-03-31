@@ -1,5 +1,5 @@
 PYZ: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
-ZOAU: /zoau/v1.0.3-ptf2
+ZOAU: /zoau/v1.1.1-ptf1
 
 system_environment:
   _BPXK_AUTOCVT: "ON"
@@ -29,12 +29,12 @@ vars_folder_name: vars
 # TCPIP information, including default ports and port reservation behavior
 # Desired port information for IMS 15
 # if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
-DYNAMICALLY_RESERVE_PORTS: no
+DYNAMICALLY_RESERVE_PORTS: false
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
 # to reserve the port numbers provided below. If any are in use the playbook will fail
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
 # port within the default range of the Ansible zport module
-RESERVE_SPECIFIC_PORT: yes
+RESERVE_SPECIFIC_PORT: true
 
 DFS_PORTID: 9978
 DFS_SSLPORTID: 9979
@@ -44,7 +44,7 @@ DFS_REGION_TCPIPPORT: 9977
 # HTTPS Port for IMS Connect
 DFS_REGION_SSLTCPIPPORT: 9966
 # location of system tcpip profile
-TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
+TCPIP_PROFILE: SYS1.TCPPARMS(PROFILE)
 # A dataset is needed to store a TCPIP profile containing
 # changes to the default for dynamic port reservation
 # TCPIP_PROFILE_TMP is the name of the temporary dataset
@@ -103,6 +103,12 @@ DFS_AUTH_LIB_SYSHLQ1: IMSBLD
 # by IMS during provisioning. These should exist prior to
 # running playbooks
 DFS_AUTH_LIB_SYSHLQ2: I15RTSMM
+
+# ---------------------------------------------------------------------------- #
+#  Jobs related settings                                                       #
+# ---------------------------------------------------------------------------- #
+JOB_CLASS: K
+MSG_CLASS: E
 # ---------------------------------------------------------------------------- #
 # The fully qualified dataset name for the JOBS PDS
 # this will hold jobs for starting and stoppng IMS resources
@@ -113,6 +119,8 @@ DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
 
 # The fully qualified dataset name for the IMS PROCLIB
 DFS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+
+DFS_IMS_MFS_FORMAT: IMSTESTG.MFS.FORMAT
 
 
 # ---------------------------------------------------------------------------- #

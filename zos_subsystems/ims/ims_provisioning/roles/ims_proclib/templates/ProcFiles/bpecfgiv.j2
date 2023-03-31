@@ -1,0 +1,25 @@
+********************************************************************
+********************************************************************
+* CONFIGURATION FILE FOR BPE
+********************************************************************
+LANG=ENU                             /* LANGUAGE FOR MESSAGES     */
+                                     /* (ENU = U.S. ENGLISH)      */
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+TRCLEV=(*,HIGH,BPE,PAGES=20)         /* DEFAULT TRACES TO HIGH    */
+TRCLEV=(STG,MEDIUM,BPE)              /* STORAGE TRACE             */
+TRCLEV=(CBS,MEDIUM,BPE)              /* CONTROL BLK SRVCS TRACE   */
+TRCLEV=(DISP,HIGH,BPE)               /* DISPATCHER TRACE          */
+TRCLEV=(AWE,HIGH,BPE)                /* AWE SERVER TRACE          */
+TRCLEV=(SSRV,HIGH,BPE)               /* SYSTEM SERVICE TRACE      */
+#
+# DEFINITIONS FOR IMS CONNECT TRACES
+#
+TRCLEV=(*,HIGH,HWS,PAGES=20)         /* DEFAULT TRACES TO HIGH    */
+TRCLEV=(HWSI,HIGH,HWS,PAGES=100)     /* OTMA COMM ACTIVITY TRACE  */
+TRCLEV=(HWSN,HIGH,HWS,PAGES=100)     /* LOCAL OPT DRIVER ACTIVITY */
+TRCLEV=(HWSW,HIGH,HWS,PAGES=100)     /* TCP/IP DRIVER ACTIVITY    */
+TRCLEV=(OTMA,HIGH,HWS,PAGES=100)     /* XCF CALLS TRACE           */
+TRCLEV=(TCPI,HIGH,HWS,PAGES=100)     /* TCP/IP CALLS TRACE        */
+EXITMBR=(HWSEXIT0,HWS)

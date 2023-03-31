@@ -7,5 +7,5 @@
 - name: Add to APF list
   ibm.ibm_zos_core.zos_apf:
     batch: "{{ add_list }}"
-    force_dynamic: True
+    force_dynamic: true
     persistent: "{{ persistent_ds }}"

@@ -10,19 +10,19 @@
 - hosts: source_system
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Dump, pack, and transfer data sets
       include_role:
         name: dump-pack-ftp-data-sets
-        public: yes
+        public: true
 
 - hosts: destination_system
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     PYZ: "{{ hostvars.destination.pyz }}"
     ZOAU: "{{ hostvars.destination.zoau }}"

@@ -5,11 +5,11 @@
   hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   # MQ coupling facility backups are asynchronous, so even though the backup command can succeed the backup
-  # itself can fail. This playbook attempts to detect a failed backup by getting the current backup time (BKUPTIME) for 
+  # itself can fail. This playbook attempts to detect a failed backup by getting the current backup time (BKUPTIME) for
   # the structure before performing the backup and comparing it to the backup time after the command has been run.
   # Because of the asynchrounous nature of the backup the playbook pauses to allow time for the backup  to occur.
 
@@ -31,7 +31,7 @@
 
     - name: Get backup time before
       set_fact:
-         backup_time_before: "{{ display_output_before.content  | map('trim') | select('match','BKUPTIME') }}"
+        backup_time_before: "{{ display_output_before.content  | map('trim') | select('match','BKUPTIME') }}"
 
     - name: Issue the backup
       zos_operator:
@@ -46,11 +46,11 @@
 
     - name: Check the backup started OK
       fail:
-        msg: Backup failed to start 
+        msg: Backup failed to start
       when: backup_output.content is not search("CSQ9022I")
 
     - name: Pause while backup occurs
-      pause: 
+      pause:
         seconds: "{{ mq_pause_time }}"
 
     - name: Issue display command after backup
@@ -70,9 +70,9 @@
 
     - name: Get backup time after
       set_fact:
-         backup_time_after: "{{ display_output_after.content  | map('trim') | select('match','BKUPTIME') }}"
+        backup_time_after: "{{ display_output_after.content  | map('trim') | select('match','BKUPTIME') }}"
 
     - name: Check that backup_time_after is different to backup_time_before
-      fail: 
+      fail:
         msg: "Backup time hasn't changed. Backup time from before backup: {{ backup_time_before }}, backup time after backup: {{ backup_time_after }}"
-      when:  backup_time_after ==  backup_time_before
+      when: backup_time_after ==  backup_time_before

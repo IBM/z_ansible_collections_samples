@@ -17,7 +17,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
@@ -26,6 +26,3 @@
       # global_csi: 'IMSTESTL.ZOAU100.CSI'
       ptf: 'UI74491'
       global_csi: 'IMSTESTL.ZOAU110.CSI'
-
-
-

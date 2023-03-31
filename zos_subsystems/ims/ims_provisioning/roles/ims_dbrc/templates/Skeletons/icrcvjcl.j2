@@ -1,0 +1,60 @@
+//*
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS3A
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.RECEIVE
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//RCV%STPNO EXEC PGM=DFSRRC00,
+//          PARM=(UDR,DFSURDB0,%DBNAME,,,,,,,,,,,,,,,,,,,%GSGNAME'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*           JCL FOR ONLINE IMAGE COPY RECEIVE.
+//*
+//STEPLIB   DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+//%DBDDN    DD DSN=%DBDSN,DCB=BUFNO=10,
+%DELETE  (%DBDSAM EQ 'VSAM')
+//             DISP=SHR
+%ENDDEL
+%DELETE  (%DBDSAM NE 'VSAM')
+//             DISP=OLD
+%ENDDEL
+//DFSUDUMP  DD DSN=%ICDSN,
+//             DISP=(OLD,KEEP),DCB=BUFNO=10
+//DFSUCUM   DD DUMMY
+//DFSULOG   DD DUMMY
+//DFSVSAMP  DD DISP=SHR,
+//             DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSVSMDB)
+//SYSIN     DD *
+%RVSYSIN
+/*

@@ -8,4 +8,3 @@
   ibm.ibm_zos_core.zos_apf:
     operation: "list"
   register: apf_list
-

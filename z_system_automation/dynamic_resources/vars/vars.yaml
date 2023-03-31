@@ -7,7 +7,7 @@ templateName: T_SAMPLE
 subsystem: sample1
 system: host1
 job: sample1
-#procedure: procedureName
-#comment: comment
-#group: group
-#sdesc: "representing a short description"
+# procedure: procedureName
+# comment: comment
+# group: group
+# sdesc: "representing a short description"

@@ -1,4 +1,4 @@
 ---
 # tasks file for mqDefault template that provides a starting point for z/OS Connect EE servers that connect to IBM MQ.
-- name: Create server 
-  command: '{{zcon_install_dir}}/bin/zosconnect create {{softwareServiceInstanceName}} --template=zosconnect:mqDefault'
+- name: Create server
+  ansible.builtin.command: '{{zcon_install_dir}}/bin/zosconnect create {{softwareServiceInstanceName}} --template=zosconnect:mqDefault'
