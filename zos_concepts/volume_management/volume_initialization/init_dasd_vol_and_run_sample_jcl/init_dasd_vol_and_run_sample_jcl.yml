@@ -24,9 +24,11 @@
 # Configure:
 #   vol_unit - this is the unit address (device number) of the target device.
 #   new_volser - this is the volume serial name to init the device as.
+#   mount_point - this is the path at which the ZFS will be accessible from
+#                 Unix Systems Services.
 ###############################################################################
 
-- name: Sample zos_ickdsf_init playbook.
+- name: Sample zos_volume_init playbook.
   hosts: zos_host
   collections:
     - "ibm.ibm_zos_core"
@@ -36,6 +38,7 @@
   vars:
     vol_unit: 'volume_unit_address'
     new_volser: 'volume_serial_name'
+    mount_point: "/tmp/sample"
 
   tasks:
     # ##########################################################################
@@ -48,16 +51,16 @@
     # ##########################################################################
     # Fact setting for use by this playbook
     # ##########################################################################
-    - name: Setting fact `pds_name` for use by this sample.
+    - name: Setting fact `zfs_dsname` for use by this sample.
       set_fact:
-        pds_name: "{{ tmp_ds.stdout }}"
+        zfs_dsname: "{{ tmp_ds.stdout }}"
 
-    - name: Fact `pds_name` set with value.
+    - name: Fact `zfs_dsname` set with value.
       debug:
-        var: pds_name
+        var: zfs_dsname
 
     ############################################################################
-    # Modules zos_ickdsf_init, zos_data_set, zos_copy, zos_job_submit,
+    # Modules zos_volume_init, zos_data_set, zos_copy, zos_job_submit,
     # zos_job_output.
     ############################################################################
     # +-------------------------------------------------------------------------
@@ -75,13 +78,13 @@
     - name: Initialize target volume - skip verify online check, verify no data
             sets currently exist on target volume, create an index, volume will
             not be SMS managed.
-      zos_ickdsf_init:
-        volume_address: "{{ vol_unit }}"
+      zos_volume_init:
+        address: "{{ vol_unit }}"
         verify_offline: False
         volid: "{{ new_volser }}"
-        index: True
-        sms_managed: False
-        verify_no_data_sets_exist: True
+        index: yes
+        sms_managed: no
+        verify_volume_empty: no
       register: output
 
     - name: Response for intialize target volume.
@@ -92,51 +95,70 @@
       zos_operator:
         cmd: 'vary {{ vol_unit }},online'
 
-    - name: Create partioned data set.
+    - name: Create ZFS data set.
       zos_data_set:
-        name: "{{ pds_name }}"
-        type: PDS
+        name: "{{ zfs_dsname }}"
+        type: zfs
+        space_primary: 50
+        space_type: M
+        replace: true
         volumes: "{{ new_volser }}"
 
-    - name: Create a PDS member and replace if member exist.
-      zos_data_set:
-        name: "{{ pds_name }}(HELLO)"
-        type: MEMBER
-        replace: yes
+    - name: Ensure mount dir exists on Unix Systems Services side
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: Mount ZFS data set.
+      zos_mount:
+        src: "{{ zfs_dsname }}"
+        path: "{{ mount_point }}"
+        fs_type: ZFS
+        state: mounted
 
     - name: Copy JCL to data set.
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.JCL"
-        dest: "{{ pds_name }}(HELLO)"
+        dest: "{{ mount_point }}/HELLO.JCL"
 
-    - name: Submit the JCL at {{ pds_name }}(HELLO).
+    - name: Submit the JCL at {{ mount_point}}/HELLO.JCL.
       zos_job_submit:
-        src: "{{ pds_name }}(HELLO)"
-        location: DATA_SET
+        src: "{{ mount_point }}/HELLO.JCL"
+        location: USS
       register: result
 
-    - name: Setting fact `job_id_pds` for id of job submitted above.
+    - name: Setting fact `job_id` for id of job submitted above.
       set_fact:
-        job_id_pds: "{{ result.job_id }}"
+        job_id: "{{ result.jobs[0].job_id }}"
 
-    - name: Get job output for job {{ job_id_pds }} from PDS member.
+    - name: Get job output for {{ job_id }}.
       zos_job_output:
-        job_id: "{{ job_id_pds }}"
+        job_id: "{{ job_id }}"
       register: result
 
-    - name: Response for get job output for job "{{ job_id_pds }}" from PDS
+    - name: Response for get job output for job "{{ job_id }}".
         member.
       debug:
         msg: "{{ result }}"
 
-    - pause:
+    # Un-comment the following line to pause playbook execution before artifcats
+    # are cleaned up in the next tasks.
+    # - pause:
 
     ############################################################################
     # +-------------------------------------------------------------------------
-    # | Clean up - delete PDS and member.
+    # | Clean up - Unmount ZFS, delete data set.
     # +-------------------------------------------------------------------------
     ############################################################################
-    - name: Delete data set {{ pds_name }}.
+
+    - name: Un-mount data set.
+      zos_mount:
+        src: "{{ zfs_dsname }}"
+        path: /
+        fs_type: ZFS
+        state: absent
+
+    - name: Delete ZFS data set {{ zfs_dsname }}.
       zos_data_set:
-        name: "{{ pds_name }}"
+        name: "{{ zfs_dsname }}"
         state: absent
