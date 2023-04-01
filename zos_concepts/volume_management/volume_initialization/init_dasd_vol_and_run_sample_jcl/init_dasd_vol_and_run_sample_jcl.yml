@@ -80,11 +80,11 @@
             not be SMS managed.
       zos_volume_init:
         address: "{{ vol_unit }}"
-        verify_offline: False
+        verify_offline: true
         volid: "{{ new_volser }}"
-        index: yes
-        sms_managed: no
-        verify_volume_empty: no
+        index: true
+        sms_managed: false
+        verify_volume_empty: true
       register: output
 
     - name: Response for intialize target volume.
