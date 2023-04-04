@@ -76,7 +76,7 @@ After you performed the previous steps successfully, you get one ready OpenShift
 
 - **(Required)** A Linux server, the machine that runs Ansible.
     - RHEL8 is the operation system version we tested
-    - Ansible == 2.8 or 2.9
+    - Ansible == 2.9
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
@@ -113,16 +113,17 @@ sudo subscription-manager register --username <username> --password <password> -
 ```
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
-**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.4 and RHEL8.6. 
+**Note:** Our scenario is only tested for Ansible 2.9.20 on RHEL8.6. 
 ```sh
-sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
+sudo subscription-manager repos --enable=ansible-2.9-for-rhel-8-s390x-rpms
+yum install ansible-2.9.20
 ```
 
 **Installation:**
 
 Install the packages from the repository in the Linux server:
 ```sh
-sudo dnf install python3 ansible jq wget git firewalld tar gzip redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
+sudo dnf install python3 jq wget git firewalld tar gzip redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
 ```
 Make sure that `python` points to Python3
 ```sh
@@ -160,6 +161,11 @@ cryptography==3.2.1
 EOF
 
 sudo pip3 install -r requirements.txt --ignore-installed
+``` 
+Install two collections from ansible galax:
+```sh
+ansible-galaxy collection install openstack.cloud:1.10.0
+ansible-galaxy collection install ansible.posix:1.5.1
 ``` 
 
 **Verification:**
@@ -264,7 +270,7 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.10`,`4.11` or `4.12`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
+| `openshift_version` |4.12| The product version of OpenShift Container Platform, <br>such as `4.10`,`4.11` or `4.12`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
 | `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
@@ -301,7 +307,7 @@ Others are **optional**, you can enable them and update value if you need more s
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
 | `use_localreg` |false| (Boolean) true or false, if true then Openshift Container Platform will use local packages to download
-| `localreg_mirror` |\<local-mirror-registry\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
+| `localreg_mirror` |\<local-mirror-registry\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.12/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
 | `local_openshift_install` |\<local-openshift-install-url\>| This is always the latest installer download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz), use an SSH or HTTP client to store the Openshift installation package, and put the link here
 | `local_openshift_client` |\<local-openshift-client-url\>| This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here
 | `local_rhcos_image` |\<local-rhcos-image-url\>| This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here

@@ -211,7 +211,7 @@
         userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
         nics:
           - port-name: "{{ item }}"
-        meta: "{{ cluster_id_tag }}"
+        meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
         terminate_volume: true
       with_items: "{{ new_worker_name_item.stdout_lines }}"
       when:
