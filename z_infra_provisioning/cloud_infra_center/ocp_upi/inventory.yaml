@@ -37,14 +37,14 @@ all:
       use_network_name: '<network-name-from-icic>'
       use_network_subnet: '<subnet-id-from-network-name-in-icic>'
 
-      vm_type: 'kvm' # kvm or zvm
-      disk_type: 'dasd' # dasd or scsi
+      vm_type: 'kvm'
+      disk_type: 'dasd'
       # volume_type_id: '<storage-template-id>'
 
-      openshift_version: '4.11'
-      openshift_minor_version: 'latest' # 9
+      openshift_version: '4.12'
+      openshift_minor_version: 'latest'
 
-      auto_allocated_ip: true  # true or false
+      auto_allocated_ip: true
       # allocation_pool_start: '<ip range start>'
       # allocation_pool_end: '<ip range end>'
       os_flavor_bootstrap: 'medium'
@@ -59,12 +59,12 @@ all:
       # os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
       # os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
 
-      use_proxy: false # true or false
+      use_proxy: false
       # http_proxy: '<http-proxy>'
       # https_proxy: '<https-proxy>'
       # no_proxy: '<no-proxy>'
 
-      use_localreg: false # true or false
+      use_localreg: false
       # localreg_mirror: "<local-mirror-registry>"
 
       # local_openshift_install: '<local-openshift-install-url>'
