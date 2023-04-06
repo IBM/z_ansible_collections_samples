@@ -26,7 +26,7 @@
 # - Change Ansible playbook name
 
 ---
-- name: configure haproxy on bastion
+- name: Configure haproxy on bastion
   hosts: bastion
   roles:
     - configure-haproxy

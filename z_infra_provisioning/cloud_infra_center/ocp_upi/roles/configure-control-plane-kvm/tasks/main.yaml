@@ -101,7 +101,6 @@
     - create_master.failed == true
     - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master | string'
 
-
 - name: 'Convert master flavor from value into number'
   ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_master }} -c disk -f value"

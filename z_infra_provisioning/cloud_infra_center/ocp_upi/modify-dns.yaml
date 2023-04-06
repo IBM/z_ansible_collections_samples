@@ -27,31 +27,31 @@
 # - Change Ansible playbook name
 
 - name: 'Get worker node IP'
-  set_fact:
+  ansible.builtin.set_fact:
     dns_new_worker_ip: "{{ worker_ip }}"
     dns_new_worker_index: "{{ worker_index }}"
     cluster_domain_name: "{{ cluster_domain_name }}"
 
 - name: 'Get the last line number of worker'
-  shell: grep -n 'worker' /var/named/{{ cluster_domain_name  }}.zone |tail -1| cut --delimiter=":" --fields=1
+  ansible.builtin.shell: grep -n 'worker' /var/named/{{ cluster_domain_name  }}.zone |tail -1| cut --delimiter=":" --fields=1
   register: last_worker_ln
 
-- name: show msg new worker
-  debug:
+- name: Show msg new worker
+  ansible.builtin.debug:
     msg: "{{last_worker_ln.stdout}}"
 
 - name: Add new worker dns record into named
-  shell:
+  ansible.builtin.shell:
     cmd: "sed -i '{{ last_worker_ln.stdout }} aworker-{{ dns_new_worker_index }}              IN A {{ dns_new_worker_ip  }}\n' /var/named/{{ cluster_domain_name  }}.zone"
   when:
     - last_worker_ln.stdout != "0"
 
 - name: Restart named-chroot.service
-  service:
+  ansible.builtin.service:
     name: named-chroot.service
     state: restarted
 
 - name: Check if named-chroot is running
-  service:
+  ansible.builtin.service:
     name: named-chroot
     state: started

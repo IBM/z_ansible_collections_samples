@@ -16,7 +16,7 @@
         - name: Approve CSR in loop
           environment:
             KUBECONFIG: "./auth/kubeconfig"
-          shell: |
+          ansible.builtin.shell: |
             ./oc get csr -o name | xargs ./oc adm certificate approve &> /dev/null
             echo $(./oc get nodes |grep 'worker-'|wc -l)
           register: csr_worker
@@ -25,5 +25,5 @@
           delay: 10
       rescue:
         - name: Approve CSR failed
-          debug:
+          ansible.builtin.debug:
             msg: 'Please approve all pending CSR manually via: oc get csr -o name | xargs oc adm certificate approve'

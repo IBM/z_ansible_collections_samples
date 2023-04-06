@@ -25,7 +25,7 @@
   ansible.builtin.get_url:
     url: '{{ local_rhcos_image }}'
     dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
-    mode: 0644
+    mode: '644'
     # group: root
     # owner: root
   when:
@@ -37,7 +37,7 @@
   ansible.builtin.get_url:
     url: '{{ local_rhcos_image }}'
     dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw.gz
-    mode: 0644
+    mode: '644'
     # group: root
     # owner: root
   when:
@@ -69,7 +69,7 @@
   ansible.builtin.get_url:
     url: '{{ local_rhcos_image }}'
     dest: ./rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2.gz
-    mode: 0644
+    mode: '644'
     # group: root
     # owner: root
   when:
