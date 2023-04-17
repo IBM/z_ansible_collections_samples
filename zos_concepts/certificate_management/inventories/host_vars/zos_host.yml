@@ -10,7 +10,7 @@
 # - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
 # - property `ansible_python_interpreter` is the z/OS managed node (target) Python
-#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
 #
 # Note, PYZ and ZOAU environment variables must be configured.
 ################################################################################
