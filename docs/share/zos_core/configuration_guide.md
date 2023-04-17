@@ -139,7 +139,14 @@ execution.
      _TAG_REDIR_OUT: "txt"
      ```
 - Property `LANG` is the name of the default locale; value
-  C specifies the POSIX locale; for example: ``LANG: "C"``.
+  C specifies the POSIX locale; for example: `LANG: "C"`.
+- Property `PYTHONSTDINENCODING` should be set to the encoding Unix System Services
+  is configured as. This environment variable is used to instruct Ansible which
+  encoding it will *pipe* content to Python's STDIN (standard in) when
+  `pipelining=true` is set in `ansible.cfg` . This environment
+  variable will only apply when using IBM Enterprise Python 3.10 or later,
+  otherwise, it is ignored.
+  For example:`PYTHONSTDINENCODING: "cp1047"`
 
 A complete example of `all.yml` is:
 
@@ -155,6 +162,7 @@ environment_vars:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"
 ```
 
 ## Host Variables

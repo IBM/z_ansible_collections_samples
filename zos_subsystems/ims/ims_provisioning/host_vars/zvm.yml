@@ -12,6 +12,7 @@ system_environment:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"
   STEPLIB: IMSBLD.I15RTSMM.COMRESL1
 
 # vars_folder_name is the name of the folder at the root of the project
