@@ -49,6 +49,7 @@ environment_vars:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"
 ```
 
 Some variables specific to user management:
