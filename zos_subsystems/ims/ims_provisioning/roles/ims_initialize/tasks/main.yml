@@ -13,7 +13,7 @@
         - name: When specific ports are desired
           block:
             - name: Reserve ICON HTTP Port
-              zport:
+              zport: # noqa: syntax-check[specific]
                 name: '*'
                 port: '{{ DFS_REGION_TCPIPPORT if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
                 dsname: '{{ TCPIP_PROFILE }}'
@@ -22,7 +22,7 @@
               register: port_alloc_result1
 
             - name: Reserve ICON SSL Port
-              zport:
+              zport: # noqa: syntax-check[specific]
                 name: '*'
                 port: '{{ DFS_REGION_SSLTCPIPPORT if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
                 dsname: '{{ TCPIP_PROFILE }}'

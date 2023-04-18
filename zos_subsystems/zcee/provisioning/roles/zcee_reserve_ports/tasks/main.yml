@@ -5,7 +5,7 @@
   when: DYNAMICALLY_RESERVE_PORTS
   block:
     - name: Allocate HTTPS Port
-      zport:
+      zport: # noqa: syntax-check[specific]
         name: '*'
         port: '{{ zcon_https_port if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
         dsname: '{{ tcpip_profile }}'
@@ -14,7 +14,7 @@
       register: command_result1
 
     - name: Allocate HTTP Port
-      zport:
+      zport: # noqa: syntax-check[specific]
         name: '*'
         port: '{{ zcon_http_port if RESERVE_SPECIFIC_PORT else None | default(omit) }}'
         dsname: '{{ tcpip_profile }}'
