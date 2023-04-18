@@ -11,7 +11,7 @@
 # tasks file for configure-installer-and-image
 
 - name: 'Import common yaml'
-  ansible.builtin.include_tasks: {{ playbook_dir }}/common.yaml
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
 - name: Check if kvm is scsi disk
   ansible.builtin.fail:

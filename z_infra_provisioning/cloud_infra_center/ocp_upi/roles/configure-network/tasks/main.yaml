@@ -35,7 +35,7 @@
 # openstacksdk
 
 - name: 'Import common yaml'
-  ansible.builtin.include_tasks: {{ playbook_dir }}/common.yaml
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
 - name: 'Get the subnet range'
   ansible.builtin.command:

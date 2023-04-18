@@ -38,7 +38,7 @@
 
   tasks:
     - name: 'Import common yaml'
-      ansible.builtin.include_tasks: {{ playbook_dir }}/common.yaml
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
     - name: 'Delete bootstrap boot volumes in KVM'
       openstack.cloud.volume:
