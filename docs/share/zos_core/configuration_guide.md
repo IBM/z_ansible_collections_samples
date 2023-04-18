@@ -181,14 +181,14 @@ complete the configuration.
 - Property `ansible_python_interpreter` is the z/OS managed node (target) Python
     binary installation path which generally does not need configuration because
     it using variable expansion to complete the path,
-    e.g, `ansible_python_interpreter: "{{PYZ}}/bin/python3.8"`
+    e.g, `ansible_python_interpreter: "{{PYZ}}/bin/python3"`
 
 A complete example of `zos_host.yml` is:
 
 ``` {.yaml}
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
-ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 ```
 
 ### Variables for Rocket Python

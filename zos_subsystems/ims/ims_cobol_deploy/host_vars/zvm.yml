@@ -3,7 +3,7 @@
 PYZ: /python3/usr/lpp/IBM/cyp/v3r8/pyz
 ZOAU: /zoau/v1.1.0-spr5
 
-# PYZ: /python3/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+# PYZ: /python3/usr/lpp/IBM/cyp/<version_major>/pyz/bin/python3
 # ZOAU: /zoau/v1.1.0-spr7
 
 system_environment:

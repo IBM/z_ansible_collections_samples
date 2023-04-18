@@ -9,7 +9,7 @@
 # - Property `ansible_user` is the z/OS managed user to connect and run as over SSH,
 #    e.g, ansible_user: "zosadm"
 # - Property `ansible_python_interpreter` is the z/OS managed node (target) Python
-#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
 ################################################################################
 
 ---
