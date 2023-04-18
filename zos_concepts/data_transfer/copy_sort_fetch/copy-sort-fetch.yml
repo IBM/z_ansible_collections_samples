@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2021, 2023
 ###############################################################################
 
 ###############################################################################
@@ -97,7 +97,9 @@
                   disposition: old
               - dd_input:
                   dd_name: sysin
-                  content: "   SORT FIELDS=(57,9,BI,D)"
+                  content:
+                    - "   OPTION VLSHRT "
+                    - "   SORT FIELDS=(57,9,BI,D) "
 
         - name: Fetch the sorted data set back to controller
           zos_fetch:
