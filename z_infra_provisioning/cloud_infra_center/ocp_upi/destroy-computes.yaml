@@ -38,7 +38,7 @@
 
   tasks:
     - name: 'Import common yaml'
-      ansible.builtin.import_tasks: common.yaml
+      ansible.builtin.include_tasks: {{ playbook_dir }}/common.yaml
 
     - name: 'Export infra ID'
       ansible.builtin.shell:
