@@ -10,7 +10,6 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-    - community.general
   gather_facts: false
   environment: "{{ environment_vars }}"
 
