@@ -19,7 +19,7 @@
 
   tasks:
     - name: 'Import common yaml'
-      ansible.builtin.import_tasks: common.yaml
+      ansible.builtin.include_tasks: {{ playbook_dir }}/common.yaml
 
     - name: 'Get image name for kvm'
       ansible.builtin.set_fact:
