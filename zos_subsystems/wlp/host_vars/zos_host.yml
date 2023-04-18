@@ -8,7 +8,7 @@
 # - Property `JAVA` is the Java installation home on the z/OS managed node (target),
 #    e.g, JAVA: "/usr/lpp/java170/J7.0_64"
 # - property `ansible_python_interpreter` is the z/OS managed node (target) Python
-#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
 #
 # Note, PYZ, ZOAU, and JAVA environment variables must be configured.
 ################################################################################
@@ -43,6 +43,7 @@ environment_vars:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"
   WLP_USER_DIR: "/u/oeusr01"
   WLP_OUTPUT_DIR: "u/oeusr01/servers"
 

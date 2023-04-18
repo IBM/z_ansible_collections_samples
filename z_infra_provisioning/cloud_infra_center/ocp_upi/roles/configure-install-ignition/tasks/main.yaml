@@ -24,7 +24,7 @@
     executable: python3
 
 - name: 'Import common yaml'
-  ansible.builtin.import_tasks: common.yaml
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
 - name: Upload boostrap ignition
   ansible.builtin.command:
