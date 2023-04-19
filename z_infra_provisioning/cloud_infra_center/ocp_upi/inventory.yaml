@@ -103,9 +103,6 @@ all:
 
       approve_nodes_csr: 15 # minute
       create_server_timeout: 15 # minute
-      # os_bootstrap_ip: '<bootstrap ip addr>'
-      # os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
-      # os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
 
       use_proxy: false
       # http_proxy: '<http-proxy>'
@@ -118,23 +115,6 @@ all:
       # local_openshift_install: '<local-openshift-install-url>'
       # local_openshift_client: '<local-openshift-client-url>'
       # local_rhcos_image: '<local-rhcos-image-url>'
-      # os_bootstrap_ip: '<bootstrap ip addr>'
-      # os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
-      # os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
-
-      use_proxy: false
-      # http_proxy: '<http-proxy>'
-      # https_proxy: '<https-proxy>'
-      # no_proxy: '<no-proxy>'
-
-      use_localreg: false
-      # localreg_mirror: "<local-mirror-registry>"
-
-      # local_openshift_install: '<local-openshift-install-url>'
-      # local_openshift_client: '<local-openshift-client-url>'
-      # local_rhcos_image: '<local-rhcos-image-url>'
-
-      # additional_certs: "{{ lookup('file', '/opt/registry/certs/domain.crt') | indent (width=2) }}"
 
       # additional_certs: "{{ lookup('file', '/opt/registry/certs/domain.crt') | indent (width=2) }}"
 
