@@ -11,7 +11,7 @@
 # tasks file for configure-installer-and-image
 
 - name: Verify openshift minor version
-  shell: |
+  ansible.builtin.shell: |
     version=$(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
     if [ -z $version ]; then
       echo $(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
@@ -21,36 +21,36 @@
   register: icic_ocp_version
 
 - name: 'Set fact for openshift client'
-  set_fact:
+  ansible.builtin.set_fact:
     openshift_client_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ icic_ocp_version.stdout }}"
     openshift_install_dir: "."
 
 - name: Get checksum for local openshift-install-linux.tar.gz
-  stat:
+  ansible.builtin.stat:
     path: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
     checksum_algorithm: sha256
     get_checksum: true
   register: openshift_local_tar_results
 
 - name: Get checksum for local openshift-client-linux.tar.gz
-  stat:
+  ansible.builtin.stat:
     path: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
     checksum_algorithm: sha256
     get_checksum: true
   register: openshift_client_local_tar_results
 
 - name: Download checksum for the latest openshift-install-linux.tar.gz
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ openshift_client_url }}/sha256sum.txt"
     dest: "{{ openshift_install_dir }}/sha256sum.txt"
 
 - name: Get checksum for the latest openshift-install-linux.tar.gz
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ openshift_install_dir }}/sha256sum.txt"
   register: openshift_install_checksum_results
 
 - name: Download openshift installer
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ openshift_client_url }}/openshift-install-linux.tar.gz"
     dest: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
   register: openshift_install_download_results
@@ -60,12 +60,12 @@
       openshift_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
 
 - name: Unzip openshift installer
-  command:
+  ansible.builtin.command:
     cmd: tar -zvxf "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
   when: openshift_install_download_results.changed
 
 - name: Download openshift client
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ openshift_client_url }}/openshift-client-linux.tar.gz"
     dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
   register: openshift_client_download_results
@@ -75,16 +75,16 @@
       openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
 
 - name: Unzip openshift client
-  command:
+  ansible.builtin.command:
     cmd: tar -zvxf "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
   when: openshift_client_download_results.changed
 
 - name: Remove openshift install archive
-  file:
+  ansible.builtin.file:
     state: absent
     path: openshift-install-linux.tar.gz
 
 - name: Remove openshift client archive
-  file:
+  ansible.builtin.file:
     state: absent
     path: openshift-client-linux.tar.gz

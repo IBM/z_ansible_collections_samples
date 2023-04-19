@@ -1,0 +1,34 @@
+*--------------------------------------------------------------------*
+* CONFIGURATION FILE FOR BPE WITH CQS, OM, RM, SCI - BPECONFG        *
+*--------------------------------------------------------------------*
+
+LANG=ENU                             /* LANGUAGE FOR MESSAGES      */
+                                     /* (ENU = U.S. ENGLISH)       */
+
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+
+TRCLEV=(*,LOW,BPE)                   /* DEFAULT ALL TRACES TO LOW  */
+
+# NOTE: KEEP THE FOLLOWING FOR COMPATIBILITY WITH 6.1 BPE
+
+TRCLEV=(STG,LOW,BPE)                 /* STORAGE TRACE              */
+TRCLEV=(CBS,LOW,BPE)                 /* CONTROL BLK SRVCS TRACE    */
+TRCLEV=(DISP,LOW,BPE)                /* DISPATCHER TRACE           */
+TRCLEV=(AWE,LOW,BPE)                 /* AWE SERVER TRACE           */
+TRCLEV=(LATC,LOW,BPE)                /* LATCH TRACE                */
+TRCLEV=(SSRV,LOW,BPE)                /* SYSTEM SERVICES TRACE      */
+TRCLEV=(USRX,LOW,BPE)                /* USER EXIT SERVICES TRACE   */
+
+# NOTE: KEEP THE FOLLOWING FOR COMPATIBILITY WITH 6.1 BPE
+
+TRCLEV=(CQS,LOW,CQS)                 /* CQS ADDRESS SPACE TRACE    */
+TRCLEV=(STR,LOW,CQS)                 /* STRUCTURE TRACE            */
+TRCLEV=(INTF,LOW,CQS)                /* INTERFACE TRACE            */
+
+*--------------------------------------------------------------------*
+* END OF MEMBER BPECONFG                                             *
+*--------------------------------------------------------------------*
+
+*

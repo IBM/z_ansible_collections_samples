@@ -35,7 +35,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
   environment: "{{ environment_vars }}"
@@ -105,7 +105,7 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
-       #remote_src: yes
+       # remote_src: yes
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
@@ -117,7 +117,7 @@
       zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
-        remote_src: yes
+        remote_src: true
       register: result
 
     - name: Response for copying USS file to data set
@@ -151,7 +151,7 @@
       zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
-        remote_src: yes
+        remote_src: true
       register: result
 
     - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)

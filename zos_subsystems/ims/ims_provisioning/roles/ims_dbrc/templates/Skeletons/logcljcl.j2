@@ -1,0 +1,64 @@
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS37
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.CLOSE
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//CL%STPNO  EXEC PGM=DFSULTR0,PARM='IMSID=%SSID,DBRC=YES'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR LOG RECOVERY UTILITY
+//*
+//STEPLIB   DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+%SELECT  OLDS(%SSID,(%CDDNAME))
+//DFSOL%OLDSTYP DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+%DELETE  (%WADS EQ 'NO')
+//DFSWADS0  DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.WADS0,DISP=OLD
+//DFSWADS1  DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}WADS1,DISP=OLD
+//DFSWADS8  DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.WADS8,DISP=OLD
+//DFSWADS9  DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.WADS9,DISP=OLD
+%ENDDEL
+%DELETE  (%WADS EQ 'YES')
+%SELECT  OLDS(%SSID,(%NDDNAME))
+//DFSNOL%OLDSTYP DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+%ENDDEL
+%DELETE  (%PDDNAME EQ '')
+%SELECT  OLDS(%SSID,(%PDDNAME))
+//DFSPOL%OLDSTYP DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+%ENDDEL
+//SYSIN     DD *
+CLS
+/*

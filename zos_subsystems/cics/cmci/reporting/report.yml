@@ -28,32 +28,30 @@
 #   IBM z/OS CICS collection 1.0.0 or later
 ###############################################################################
 ---
-- name:  CICS CMCI Report
+- name: CICS CMCI Report
 
-  collections:
-      - ibm.ibm_zos_cics
-
-  hosts: 'localhost'
-  gather_facts: 'false'
+  hosts: "localhost"
+  gather_facts: false
 
   vars_prompt:
-   - name: cmci_host
-     prompt: Target CMCI hostname
-     private: no
-   - name: cmci_port
-     prompt: Target CMCI port
-     private: no
-   - name: scheme
-     prompt: CMCI scheme
-     private: no
-     default: 'https'
-   - name: context
-     prompt: Target CPSM context
-     private: no
-   - name: cmci_user
-     prompt: CMCI user name (leave blank for unauthenticated)
-   - name: cmci_password
-     prompt: CMCI password (leave blank for unauthenticated)
+    - name: cmci_host
+      prompt: Target CMCI hostname
+      private: false
+    - name: cmci_port
+      prompt: Target CMCI port
+      private: false
+    - name: scheme
+      prompt: CMCI scheme
+      private: false
+      default: "https"
+    - name: context
+      prompt: Target CPSM context
+      private: false
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+      private: false
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
 
   vars:
     attributes:
@@ -67,7 +65,7 @@
     # Install module dependencies
     ############################################################################
     - name: Make sure CMCI module dependencies are installed
-      pip:
+      ansible.builtin.pip:
         name:
           - requests
           - xmltodict
@@ -77,14 +75,14 @@
     # Get information about CICS regions from the supplied context, using CMCI
     ############################################################################
     - name: Get information about CICS regions
-      cmci_get:
-        context: '{{ context }}'
-        cmci_host: '{{ cmci_host }}'
-        cmci_port: '{{ cmci_port | int }}'
-        cmci_user: '{{ cmci_user | default(omit) }}'
-        cmci_password: '{{ cmci_password | default(omit) }}'
-        scheme: '{{ scheme }}'
-        type: 'CICSRegion'
+      ibm.ibm_zos_cics.cmci_get:
+        context: "{{ context }}"
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        scheme: "{{ scheme }}"
+        type: "CICSRegion"
       register: result
 
     ############################################################################
@@ -97,6 +95,7 @@
     # Write the report csv file using a template
     ############################################################################
     - name: Create CSV report from template
-      template:
+      ansible.builtin.template:
         src: csv.j2
         dest: report.csv
+        mode: u+rw

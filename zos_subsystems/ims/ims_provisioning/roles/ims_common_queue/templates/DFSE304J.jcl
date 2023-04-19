@@ -27,10 +27,10 @@
 *--------------------------------------------------------------------*
 ARMRST=N                /* ARM SHOULD RESTART CQS ON FAILURE        */
 CQSGROUP=GRUP1          /* GROUP NAME (XCF GROUP = GRUP1CQS)        */
-SSN={{DFS_IMS_SSID[-1]}}CQS1                /* CQS SUBSYSTEM NAME (CQSID = CQS1CQS)     */
+SSN={{DFS_IMS_SSID[-1]}}CQS1    /* CQS SUBSYSTEM NAME (CQSID = CQS1CQS)     */
 STRDEFG=000             /* GLOBAL STR DEFINITION MEMBER = CQSSG000  */
 STRDEFL=000             /* LOCAL STR DEFINITION MEMBER  = CQSSL000  */
-IMSPLEX(NAME={{ DFS_IMSPlex }})     /* IMSPLEX NAME (CSLPLEX1)                  */
+IMSPLEX(NAME={{ DFS_IMSPlex }})     /* IMSPLEX NAME (CSLPLEX1)              */
 *--------------------------------------------------------------------*
 * END OF MEMBER CQSIP000                                             *
 *--------------------------------------------------------------------*

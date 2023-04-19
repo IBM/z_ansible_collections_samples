@@ -17,7 +17,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
@@ -25,5 +25,3 @@
       user_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.USER.CERT'
       ca_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.CA.CERT'
       user_cert_pwd: 'smpeansible'
-
-

@@ -6,11 +6,11 @@ Before you get started with Ansible, familiarize yourself with the basics of Red
 
  [Red Hat OpenShift Container Platform installation and update](https://docs.openshift.com/container-platform/4.8/architecture/architecture-installation.html#architecture-installation)
 
-[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.1.5)
+[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.1.6)
 
 # About this playbook
 
-> The current version of this playbook: [version](./version)
+> The current version of this playbook: [version](./version.md)
 
 > The instruction of [checkout to specific version](./checkout-to-version.md#Checkout-to-specific-version)
 
@@ -34,7 +34,7 @@ The playbook contains the following topics:
 
   3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.4, 1.1.5 and RH OpenShift Container Platform version 4.6 and, 4.7, 4.8, 4.9, 4.10, 4.11for z/VM and version 4.7, 4.8, 4.9, 4.10, 4.11for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.5, 1.1.6 and RH OpenShift Container Platform version 4.10 and 4.11, 4.12 for z/VM and version 4.10, 4.11, 4.12 for KVM.
 
 # Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
@@ -76,16 +76,17 @@ After you performed the previous steps successfully, you get one ready OpenShift
 
 - **(Required)** A Linux server, the machine that runs Ansible.
     - RHEL8 is the operation system version we tested
-    - Ansible == 2.8 or 2.9
+    - Ansible == 2.9
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
-- **(Optional)** A Bastion server, a machine that is used to configure DNS and Load Balancer for the Red Hat OpenShift installation
-    - If you use your own existing DNS server and Load Balancer for the Red Hat OpenShift installation, the bastion server **is not** required.
+- **(Optional)** A Bastion server, a machine that is used to configure DNS and Load Balancer for the Red Hat OpenShift installation.
     - If you have external or existing DNS server, but no Load Balancer for the Red Hat Openshift installation, please set `os_dns_domain` property, and then use a separate YAML `configure-haproxy` to configure the HAProxy in bastion server.
     - If you have existing Load Balancer, but no DNS server for the Red Hat Openshift installation, you can use a separate YAML `configure-dns` to configure the DNS server in bastion server.
     - If you don't have any existing DNS server or Load Balancer for the Red Hat Openshift installation, you need to create one Linux server as the bastion server and run playbook to configure DNS server and Load Balancer. You can also use the same Linux server that runs Ansible.
+    - If you want to deploy multiple Red Hat Openshift, please do not use the same bastion server to configure multiple Load Balancer, otherwise you may encounter x509 error.
     - The firewalld service should be enabled and running in bastion server.
+
 
 ### 2. Installation of packages on a Linux server
 
@@ -112,16 +113,17 @@ sudo subscription-manager register --username <username> --password <password> -
 ```
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
-**Note:** Our scenario is only tested for Ansible 2.8.18 on RHEL 8.2, RHEL8.4 and RHEL8.6. 
+**Note:** Our scenario is only tested for Ansible 2.9.20 on RHEL8.6. 
 ```sh
-sudo subscription-manager repos --enable=ansible-2.8-for-rhel-8-s390x-rpms 
+sudo subscription-manager repos --enable=ansible-2.9-for-rhel-8-s390x-rpms
+yum install ansible-2.9.20
 ```
 
 **Installation:**
 
 Install the packages from the repository in the Linux server:
 ```sh
-sudo dnf install python3 ansible jq wget git firewalld tar gzip redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
+sudo dnf install python3 jq wget git firewalld tar gzip redhat-rpm-config gcc libffi-devel python3-devel openssl-devel cargo -y
 ```
 Make sure that `python` points to Python3
 ```sh
@@ -160,6 +162,11 @@ EOF
 
 sudo pip3 install -r requirements.txt --ignore-installed
 ``` 
+Install two collections from ansible galax:
+```sh
+ansible-galaxy collection install openstack.cloud:1.10.0
+ansible-galaxy collection install ansible.posix:1.5.1
+``` 
 
 **Verification:**
 ```sh
@@ -169,7 +176,7 @@ openstack
 
 ### 3. Setting the IBM Cloud Infrastructure Center environment variables on your Linux server
 
-Check’ [setting environment variables](https://www.ibm.com/docs/en/cic/1.1.5?topic=descriptions-setting-environment-variables) for more details.
+Check’ [setting environment variables](https://www.ibm.com/docs/en/cic/1.1.6?topic=descriptions-setting-environment-variables) for more details.
 
 1. If your Linux server does not have SSH key, use the following command-line SSH to generate a key pair: 
 ```sh
@@ -224,8 +231,25 @@ icic-services status
 ```
 - Login to the IBM Cloud Infrastructure Center web console and select Home > Environment Checker, click the Run Environment Checker button to confirm the cluster does not have any failed messages.
 
-If you meet any **not running** service or **failed** message, check the IBM Cloud Infrastructure Center [Troubleshooting](https://www.ibm.com/docs/en/cic/1.1.5?topic=troubleshooting) document to fix before running the ansible playbook.
+If you meet any **not running** service or **failed** message, check the IBM Cloud Infrastructure Center [Troubleshooting](https://www.ibm.com/docs/en/cic/1.1.6?topic=troubleshooting) document to fix before running the ansible playbook.
 
+9. Subnet DNS
+
+**Note**: This step is required for KVM, z/VM is optional.
+
+During deployment, the OpenShift nodes will need to be able to resolve public name records to download the OpenShift images and so on. They will also need to resolve the OpenStack API endpoint.
+
+The default resolvers are often set up by the OpenStack administrator in Neutron. However, some deployments do not have default DNS servers set, meaning the servers are not able to resolve any records when they boot.
+
+If you are in this situation, you can add resolvers to your Neutron subnet. These will be put into /etc/resolv.conf on your servers post-boot.
+
+For example, if you want to use your own or external bastion server: `198.51.100.86`, you can run this command to add resolvers to your specified subnet, but be aware that if your subnet already has one DNS nameserver, please remove the old and reset bastion ip as primary DNS nameserver:
+```sh
+$ openstack subnet set --no-dns-nameservers <use_network_subnet>
+$ openstack subnet set --dns-nameserver 198.51.100.86 <use_network_subnet>
+```
+
+For the multiple Openshift Container Platform, user can create multiple subnets or tenant network to deploy it. 
 
 ### 4. Download this playbook on your Linux server
 
@@ -246,7 +270,7 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
 | `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
 | `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.10| The product version of OpenShift Container Platform, <br>such as `4.8` or `4.9` or `4.10` or `4.11`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
+| `openshift_version` |4.12| The product version of OpenShift Container Platform, <br>such as `4.10`,`4.11` or `4.12`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
 | `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there | 
 | `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
 | `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
@@ -283,7 +307,7 @@ Others are **optional**, you can enable them and update value if you need more s
 | `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
 | `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
 | `use_localreg` |false| (Boolean) true or false, if true then Openshift Container Platform will use local packages to download
-| `localreg_mirror` |\<local-mirror-registry\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
+| `localreg_mirror` |\<local-mirror-registry\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.12/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
 | `local_openshift_install` |\<local-openshift-install-url\>| This is always the latest installer download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz), use an SSH or HTTP client to store the Openshift installation package, and put the link here
 | `local_openshift_client` |\<local-openshift-client-url\>| This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here
 | `local_rhcos_image` |\<local-rhcos-image-url\>| This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here
@@ -300,32 +324,28 @@ ansible-playbook -i inventory.yaml 01-preparation.yaml
 
 2. **Step2**:
 
-**Note**: This step is optional.
+**Note**: This step is optional. You can skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
 
-> Skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
+> Use this playbook to configure the DNS server and HAProxy, please add `-K` parameter if you use the non-root user, and enter the password for your user.
+```sh
+ansible-playbook -i inventory.yaml bastion.yaml
+or
+ansible-playbook -i inventory.yaml bastion.yaml -K
+```
 
 > If you use your external or existing DNS server, but no Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS server part, and use this playbook to configure HAProxy in your bastion server.
 ```sh
 ansible-playbook -i inventory.yaml configure-haproxy.yaml
 ```
 
-> If you don't have any existing DNS server or Load Balancer, please use this playbook to configure DNS server and HAProxy in your bastion server. 
-```sh
-ansible-playbook -i inventory.yaml bastion.yaml
-```
-> If you don't have any existing DNS server or Load Balancer and use the non-root user,run the command as below and enter the password for your user.
-```sh
-ansible-playbook -i inventory.yaml bastion.yaml -K
-```
-
-
-
 3. **Step3**:
+
 ```sh
 ansible-playbook -i inventory.yaml 02-create-cluster-control.yaml
 ```
 
 4. **Step4**:
+
 ```sh
 ansible-playbook -i inventory.yaml 03-create-cluster-compute.yaml
 ```
@@ -380,7 +400,7 @@ And we store the SHA256 value into image properties to verify downloading images
 ```
 
 ## Copyright
-© Copyright IBM Corporation 2021
+© Copyright IBM Corporation 2023
 
 ## License
 Licensed under

@@ -10,7 +10,7 @@
 
 # directory path that the provisioning role uses to capture various information (in JSON format) about the provisioned instance.
 # "/tmp" is used as place holder and should be changed if "/tmp" content is removed frequently.
-instance_record_dir: "/tmp" 
+instance_record_dir: "/tmp"
 
 # total retry attempts allowed before the task exits with failure, waiting on the instance action to complete
 api_polling_retry_count: 50

@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/openshift/installer
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,34 +21,34 @@
 # openstacksdk
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
 
-  - name: Get existing rhcos image from ICIC glance
-    shell: "openstack image list --format value| grep -w 'icic_rhcos_qcow2'| wc -l"
-    register: icic_rhcos_count
-    when:
-    - vm_type == "kvm"
+    - name: Get existing rhcos image from ICIC glance
+      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_qcow2'| wc -l"
+      register: icic_rhcos_count
+      when:
+        - vm_type == "kvm"
 
-  - name: 'Remove the rhcos image'
-    shell:
-      cmd: "openstack image delete icic_rhcos_qcow2"
-    when: 
-    - vm_type == "kvm"
-    - icic_rhcos_count is defined
-    - icic_rhcos_count.stdout | int == 1
+    - name: 'Remove the rhcos image'
+      ansible.builtin.shell:
+        cmd: "openstack image delete icic_rhcos_qcow2"
+      when:
+        - vm_type == "kvm"
+        - icic_rhcos_count is defined
+        - icic_rhcos_count.stdout | int == 1
 
-  - name: Get existing rhcos image from ICIC glance
-    shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ disk_type }}'| wc -l"
-    register: icic_rhcos_count
-    when:
-    - vm_type == "zvm"
+    - name: Get existing rhcos image from ICIC glance
+      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ disk_type }}'| wc -l"
+      register: icic_rhcos_count
+      when:
+        - vm_type == "zvm"
 
-  - name: 'Remove the rhcos image'
-    shell:
-      cmd: "openstack image delete icic_rhcos_{{ disk_type }}"
-    when: 
-    - vm_type == "zvm"
-    - icic_rhcos_count is defined
-    - icic_rhcos_count.stdout | int == 1
+    - name: 'Remove the rhcos image'
+      ansible.builtin.shell:
+        cmd: "openstack image delete icic_rhcos_{{ disk_type }}"
+      when:
+        - vm_type == "zvm"
+        - icic_rhcos_count is defined
+        - icic_rhcos_count.stdout | int == 1

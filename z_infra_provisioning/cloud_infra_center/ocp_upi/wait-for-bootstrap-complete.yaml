@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/openshift/installer
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,27 +21,27 @@
 # openstacksdk
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
-  - name: Wait-for bootstrap-complete
-    command: "./openshift-install wait-for bootstrap-complete"
-    async: 3600
-    poll: 0
-    register: bootstrap_complete_sleeper
+    - name: Wait-for bootstrap-complete
+      ansible.builtin.command: "./openshift-install wait-for bootstrap-complete"
+      async: 3600
+      poll: 0
+      register: bootstrap_complete_sleeper
 
-  - name: 'Waiting for bootstrap-complete'
-    async_status:
-      jid: "{{ bootstrap_complete_sleeper.ansible_job_id }}"
-    register: job_result
-    until: job_result.finished
-    retries: 120
-    delay: 30
-  
-  - name: Check bootstrap log
-    shell: 'cat .openshift_install.log  | grep -A7 "bootstrapping to complete"'
-    register: bootstrap_log
+    - name: 'Waiting for bootstrap-complete'
+      ansible.builtin.async_status:
+        jid: "{{ bootstrap_complete_sleeper.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 120
+      delay: 30
 
-  - name: Show bootstrapping log
-    debug:
-      var:  bootstrap_log.stdout_lines
+    - name: Check bootstrap log
+      ansible.builtin.shell: 'cat .openshift_install.log  | grep -A7 "bootstrapping to complete"'
+      register: bootstrap_log
+
+    - name: Show bootstrapping log
+      ansible.builtin.debug:
+        var: bootstrap_log.stdout_lines

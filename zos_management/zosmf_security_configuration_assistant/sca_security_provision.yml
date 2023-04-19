@@ -16,7 +16,7 @@
 #
 # This playbook performs a security provisioning using module `zmf_sca`, which is provided with the IBM z/OSMF collection.
 # The playbook will succeed if all the requirements described by the SCA security descriptor file
-# are either already satisified or successfully provisioned, otherwise it will fail and return the items that are still not satisfied. 
+# are either already satisified or successfully provisioned, otherwise it will fail and return the items that are still not satisfied.
 #
 # Usage:
 #   ansible-playbook -i <inventory> <playbook>

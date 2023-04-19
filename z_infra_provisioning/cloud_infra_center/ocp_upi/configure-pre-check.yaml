@@ -8,7 +8,7 @@
 # =================================================================
 
 ---
-- name: configure pre check
+- name: Configure pre check
   hosts: localhost
   roles:
-  - configure-pre-check
+    - configure-pre-check

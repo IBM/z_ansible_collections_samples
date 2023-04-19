@@ -7,30 +7,254 @@
 
   block:
 
-    - block:
+    - when: catalog == "allocate"
+      block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+        - ansible.builtin.set_fact:
+            eager_role_path: '{{role_path}}'
+# ------------------------------------------------------------------------------------------------ DFSALCAT
+        - name: ALLOCATE CATALOG DATA SETS
+          zos_data_set:
+            batch:
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 80
+                block_size: 3200
+                type: seq
+                space_type: CYL
+                space_primary: 50
+                space_secondary: 10
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00001'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00001'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00001'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00001'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.BSDS'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1001'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1002'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.STG'
+                state: present
+                replace: true
+                record_format: FB
+                record_length: 4096
+                block_size: 4096
+                type: seq
+                space_type: CYL
+                space_primary: 20
+                space_secondary: 20
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
+              - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
+                state: present
+                replace: true
+                record_format: vb
+                record_length: 22524
+                block_size: 22528
+                space_type: CYL
+                space_primary: 50
+                volumes: "{{ DFS_DS_VOLUME2 if not DFS_SMS_ENVIRONMENT else omit }}"
 
-      when: catalog == "allocate" and not provision
+        - name: Define Catalog Clusters
+          zos_mvs_raw:
+            program_name: idcams
+            auth: true
+            dds:
+              - dd_output:
+                  dd_name: sysprint
+                  return_content:
+                    type: text
+              - dd_input:
+                  dd_name: sysin
+                  content:
+                    - "  DEFINE CLUSTER(                                 -"
+                    - "                 NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00001) -"
+                    - "                 CYLINDERS(2 1)                   -"
+                    - "                 REUSE                            -"
+                    - "                 INDEXED                          -"
+                    - "                 KEYS(16,5)                       -"
+                    - "                 FREESPACE(80 10)                 -"
+                    - "                 RECORDSIZE(22 22)                -"
+                    - "                 SHAREOPTIONS(3 3)                -"
+                    - "                 SPEED                            -"
+                    - "                 VOLUMES({{ DFS_DS_VOLUME2 }})               -"
+                    - "                )                                 -"
+                    - "            DATA(CONTROLINTERVALSIZE(4096))"
+                    - "  DEFINE CLUSTER(                                 -"
+                    - "                 NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001) -"
+                    - "                 CYLINDERS(1 1)                   -"
+                    - "                 REUSE                            -"
+                    - "                 FREESPACE(80 10)                 -"
+                    - "                 SHAREOPTIONS(3 3)                -"
+                    - "                 SPEED                            -"
+                    - "                 VOLUMES({{ DFS_DS_VOLUME2 }})               -"
+                    - "                )                                 -"
+                    - "            DATA(                                   -"
+                    - "                 NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001.D) -"
+                    - "                 CISZ(512)                          -"
+                    - "                 KEY(9,0)                           -"
+                    - "                 RECSZ(50,50)                       -"
+                    - "                )                                   -"
+                    - "           INDEX(                                   -"
+                    - "                 NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001.S) -"
+                    - "                 CISZ(2048)                         -"
+                    - "                )"
+                    - "  DEFINE CLUSTER(                                 -"
+                    - "                 NAME({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000.A00001) -"
+                    - "                 CYLINDERS(2 1)                   -"
+                    - "                 REUSE                            -"
+                    - "                 INDEXED                          -"
+                    - "                 KEYS(37,45)                            -"
+                    - "                 FREESPACE(80 10)                       -"
+                    - "                 RECORDSIZE(82 82)                      -"
+                    - "                 SHAREOPTIONS(3 3)                      -"
+                    - "                 SPEED                                  -"
+                    - "                 VOLUMES({{ DFS_DS_VOLUME2 }})               -"
+                    - "                )                                       -"
+                    - "            DATA(CONTROLINTERVALSIZE(4096))"
 
-    - name: Allocate IMS catalog DB
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSALCAT.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
-      when: catalog == "allocate"
+        - name: COPY DBD FOR THE ZCLOUD IMS CATALOG PSB and DBD
+          zos_copy:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            remote_src: true
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          loop:
+            - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL(DFSCD000)', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB(DFSCD000)' }
+            - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL(DFSCX000)', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB(DFSCX000)' }
+            - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL(DFSCPL00)', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB(DFSCPL00)' }
+            - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL(DFSCP001)', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB(DFSCP001)' }
+            - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL(DFSCP000)', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB(DFSCP000)' }
+
+        - name: PERFORM ACBGEN FOR THE CATALOG DBD AND PSB
+          ims_acb_gen:
+            command_input: BUILD
+            compression: POSTCOMP
+            psb_name: ALL
+            psb_lib:
+              - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB"
+            dbd_lib:
+              - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB"
+            acb_lib: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB"
+            reslib:
+              - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+            steplib:
+              - "{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSRESL"
+
+        - name: Defining the IMS Catalog without DBRC
+          zos_mvs_raw:
+            program_name: dfs3ucd0
+            parm: "REGION=0M"
+            dds:
+              - dd_data_set:
+                  dd_name: DFSRESLB
+                  data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+                  disposition: shr
+              - dd_data_set:
+                  dd_name: STEPLIB
+                  data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+                  disposition: shr
+              - dd_data_set:
+                  dd_name: IMS
+                  data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB"
+                  disposition: shr
+              - dd_data_set:
+                  dd_name: DFSHDBSC
+                  data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CATDEF"
+                  disposition: shr
+              - dd_output:
+                  dd_name: sysprint
+                  return_content:
+                    type: text
+              - dd_input:
+                  dd_name: sysin
+                  content:
+                    - "HALDB=(NAME=DFSCD000)"
+                    - "PART=(NAME=DFSCD000,PART=DFSD001,"
+                    - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000,"
+                    - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"
+                    - "HALDB=(NAME=DFSCX000)"
+                    - "PART=(NAME=DFSCX000,PART=DFSX001,"
+                    - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000,"
+                    - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"
+
+# ------------------------------------------------------------------------------------------------
 
     - name: Load IMS catalog
       ims_catalog_populate:
         mode: LOAD
-        dbrc: False
+        dbrc: false
         modstat: IMSTESTL.IMS1.MODSTAT
         acb_lib: [
           IMSTESTL.IMS1.ACBLIB
@@ -110,4 +334,3 @@
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
             state: absent
       when: catalog == "delete"
-

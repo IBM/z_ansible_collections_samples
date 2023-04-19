@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,43 +23,48 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 #
-# Change Summary: 
+# Change Summary:
 # - Change Ansible playbook name
----
-- name: modify dns on bastion
+
+- name: Modify dns on bastion
   hosts: bastion
-  
+
   tasks:
-  - name: 'Validation worker ip address exist in named'
-    shell: |
-      rm -rf .validate_exist_ip
-      count=$(grep -Eo '{{ item.split(',')[1] | replace('ip=','') }}' /var/named/lynn.ocp.com.zone  | wc -l)
-      if [ $count != "0" ] ; then
-        echo 1 >> .validate_exist_ip
-      fi
-    with_lines: cat .new_worker_index
+    - name: 'Get new worker index'
+      ansible.builtin.command:
+        cmd: cat .new_worker_index
+      register: new_worker_index_item
 
-  - name: check .validate_exist_ip exists
-    stat:
-      path: .validate_exist_ip
-    register: validate_ip_result
+    - name: 'Validation worker ip address exist in named'
+      ansible.builtin.shell: |
+        rm -rf .validate_exist_ip
+        count=$(grep -Eo '{{ item.split(',')[1] | replace('ip=','') }}' /var/named/lynn.ocp.com.zone  | wc -l)
+        if [ $count != "0" ] ; then
+          echo 1 >> .validate_exist_ip
+        fi
+      with_items: "{{ new_worker_index_item.stdout_lines }}"
 
-  - name: Check if worker ip already exist in named
-    fail:
-      msg: "The assigned worker ip already exists in named file, please use another new ip address."
-    failed_when: validate_ip_result.stat.exists
-      
-  - name: 'Modify bastion dns for new worker'
-    include_tasks: modify-dns.yaml
-    vars:
+    - name: Check .validate_exist_ip exists
+      ansible.builtin.stat:
+        path: .validate_exist_ip
+      register: validate_ip_result
+
+    - name: Check if worker ip already exist in named
+      ansible.builtin.fail:
+        msg: "The assigned worker ip already exists in named file, please use another new ip address."
+      failed_when: validate_ip_result.stat.exists
+
+    - name: 'Modify bastion dns for new worker'
+      ansible.builtin.include_tasks: modify-dns.yaml
+      vars:
         worker_ip: "{{ item.split(',')[1] | replace('ip=','') }}"
         worker_index: "{{ item.split(',')[0][-4:] }}"
         cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-    with_lines: cat .new_worker_index
+      with_items: "{{ new_worker_index_item.stdout_lines }}"
 
-  - name: 'Modify bastion haproxy for new worker'
-    include_tasks: modify-haproxy.yaml
-    vars:
-      worker_index: "{{ item.split(',')[0][-4:] }}"
-      cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
-    with_lines: cat .new_worker_index
+    - name: 'Modify bastion haproxy for new worker'
+      ansible.builtin.include_tasks: modify-haproxy.yaml
+      vars:
+        worker_index: "{{ item.split(',')[0][-4:] }}"
+        cluster_domain_name: "{{ cluster_name }}.{{ base_domain }}"
+      with_items: "{{ new_worker_index_item.stdout_lines }}"

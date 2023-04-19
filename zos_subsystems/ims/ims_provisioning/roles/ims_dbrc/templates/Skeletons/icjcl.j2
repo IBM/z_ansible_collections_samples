@@ -1,0 +1,62 @@
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS35
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.IC
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+%DELETE (%IVPCIC NE '')
+//IC%STPNO  EXEC PGM=DFSUDMP0,PARM='DBRC=Y'
+%ENDDEL
+%DELETE (%IVPCIC EQ '')
+//IC%STPNO  EXEC PGM=DFSUDMP0,PARM='DBRC=Y,CIC'
+%ENDDEL
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR IMAGE COPY.
+//*
+//STEPLIB   DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DSN=IMSTESTL.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+%SELECT  DBDS((%DBNAME,%DBDDN))
+%DELETE  (%DBADSAV NE 'AVAIL')
+//%DBADDN   DD DSN=%DBDSN,DISP=SHR
+%ENDDEL
+%DELETE  (%DBADSAV NE '')
+//%DBDDN    DD DSN=%DBDSN,DISP=SHR
+%ENDDEL
+%ENDSEL
+//%ICDDN1   DD DISP=OLD,DSN=%ICDSN1
+%DELETE  (%COPIES EQ '1')
+//%ICDDN2   DD DISP=OLD,DSN=%ICDSN2
+%ENDDEL
+//SYSIN     DD *
+%ICSYSIN
+/*

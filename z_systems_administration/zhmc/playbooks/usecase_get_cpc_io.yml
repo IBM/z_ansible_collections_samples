@@ -18,8 +18,8 @@
         state: facts
       register: cpc_out
 
-    #- debug:
-    #    var: cpc_out
+    # - debug:
+    #     var: cpc_out
 
     - name: "Get facts for all adapters of CPC {{ cpc_name }}"
       delegate_to: localhost
@@ -35,8 +35,8 @@
         label: "{{ ad.name }}"
       register: adapters_out
 
-    #- debug:
-    #    var: adapters_out
+    # - debug:
+    #     var: adapters_out
 
     - name: "Get facts for all partitions of CPC {{ cpc_name }}"
       delegate_to: localhost
@@ -54,11 +54,11 @@
         label: "{{ part.name }}"
       register: partitions_out
 
-    #- debug:
-    #    var: partitions_out
+    # - debug:
+    #     var: partitions_out
 
     - name: "Creating output file"
-      template:
+      ansible.builtin.template:
         src: usecase_get_cpc_io.md.j2
         dest: "cpc_io_{{ cpc_name }}_{{ inventory_hostname }}.md"
         mode: '0755'

@@ -16,7 +16,7 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_unix:
           dd_name: "SMPNTS"
           path: "{{smpe_root}}/smpnts/"
@@ -51,11 +51,11 @@
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
-              type: text
+            type: text
       - dd_output:
           dd_name: "SMPLIST"
           return_content:
-              type: text
+            type: text
       - dd_input:
           dd_name: "SMPCNTL"
           content:

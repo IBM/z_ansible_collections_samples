@@ -9,19 +9,19 @@ softwareServiceInstanceName: ZC01
 ################################################################################
 # Specifies the path to the z/OS Connect EE installation directory on zFS.
 ################################################################################
-zcon_install_dir: /usr/lpp/zosconnect/v3r0 #TrySample/
+zcon_install_dir: /usr/lpp/zosconnect/v3r0 # TrySample/
 
 ################################################################################
-# Specifies the path to the zCEE mount point. 
+# Specifies the path to the zCEE mount point.
 ################################################################################
 zcon_zfs_mountpoint: '/var/zosconnect'
 
 ################################################################################
-# Specifies the high-level qualifier for the zFS data sets that are defined during the provisioning of the z/OS Connect EE instance. 
+# Specifies the high-level qualifier for the zFS data sets that are defined during the provisioning of the z/OS Connect EE instance.
 ################################################################################
 zcon_file_system_hlq: '{{ DFS_AUTH_LIB_HLQ1 }}'
 
 ################################################################################
-# Specifies the path to the base zCEE configuration directory. 
+# Specifies the path to the base zCEE configuration directory.
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

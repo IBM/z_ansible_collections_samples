@@ -27,7 +27,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     mount_point: "/tmp/zfs_aggr"
@@ -45,7 +45,7 @@
     - name: Setting fact `zfs_dsn` for use by this sample
       set_fact:
         zfs_dsn: "{{ tmp_zfs_dsn.stdout }}"
-    
+
     - name: Fact `zfs_dsn` set with value
       debug:
         msg: "{{ zfs_dsn }}"
@@ -60,7 +60,7 @@
         type: zfs
         space_primary: 1
         space_type: M
-        replace: yes
+        replace: true
 
     - name: Create mount dir on z/OS USS.
       file:
@@ -87,7 +87,7 @@
 
     - name: Write 1 million bytes to ZFS.
       shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
-    
+
     - name: Get aggregate info BEFORE growth.
       command: zfsadm aggrinfo {{ zfs_dsn | upper }}
       register: aggrinfo_output_before

@@ -39,7 +39,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
     ctl_tmp_dir: "/tmp"
@@ -50,7 +50,7 @@
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Detecting system name
-      #shell: "uname -a |awk '{print $2}'"
+      # shell: "uname -a |awk '{print $2}'"
       command: uname -n
       register: result
 
@@ -94,7 +94,7 @@
           - bool_zos_operator_action_continue
         success_msg: "Operator demo will continue, no matching 'IEE094D SPECIFY OPERAND' actions were discovered."
         fail_msg: "There are more than one actionable messages that matches 'IEE094D SPECIFY OPERAND' , skipping operator demo. "
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
         system {{ system_name }}
@@ -164,4 +164,4 @@
           - filtered_zos_operator_action_query_verify is defined and  (filtered_zos_operator_action_query_verify | length == 0)
         success_msg: "All actionable messages that match 'IEE094D SPECIFY OPERAND' have been cancelled"
         fail_msg: "There are more than one remaining actionable messages that match 'IEE094D SPECIFY OPERAND' , unable to reply to more than one action. "
-      ignore_errors: yes
+      ignore_errors: true

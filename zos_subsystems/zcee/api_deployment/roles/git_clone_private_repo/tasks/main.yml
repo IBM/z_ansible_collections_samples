@@ -2,20 +2,20 @@
 # tasks file for git_clone_private_repo
 
 - name: Add SSH key for github repo
-  shell: ssh-add {{ secret_key }}
+  ansible.builtin.shell: ssh-add {{ secret_key }}
   delegate_to: localhost
   when: secret_key is defined
 
 - name: Remove old repo
-  file:
+  ansible.builtin.file:
     path: "{{ CLONE_DEST }}"
     state: absent
 
 - name: Clone the repo
-  shell: GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git clone {{ GIT_REPO }} {{ CLONE_DEST }}
+  ansible.builtin.shell: GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git clone {{ GIT_REPO }} {{ CLONE_DEST }}
 
 - name: Checkout correct branch
-  shell: git checkout {{ GIT_BRANCH }}
+  ansible.builtin.shell: git checkout {{ GIT_BRANCH }}
   args:
     chdir: '{{ CLONE_DEST }}'
   when: GIT_BRANCH is defined

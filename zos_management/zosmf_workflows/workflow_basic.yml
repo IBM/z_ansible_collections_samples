@@ -52,16 +52,16 @@
 ---
 - name: perform various operations with z/OSMF workflows
   hosts: zos_systems
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.ibm_zosmf
   vars_prompt:
     - name: zmf_user
       prompt: "Enter your z/OSMF username (skip if zmf_crt and zmf_key are supplied)"
-      private: no
+      private: false
     - name: zmf_password
       prompt: "Enter your z/OSMF password (skip if zmf_crt and zmf_key are supplied)"
-      private: yes
+      private: true
   tasks:
     # ##########################################################################
     # Module: zmf_authenticate
@@ -77,7 +77,7 @@
         zmf_password: "{{ zmf_password }}"
       register: result_auth
       delegate_to: localhost
-    
+
     # ##########################################################################
     # Module: zmf_workflow
     # ##########################################################################

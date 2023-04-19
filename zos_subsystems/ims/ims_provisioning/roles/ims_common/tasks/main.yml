@@ -28,11 +28,11 @@
       retries: 5
       delay: 5
       until: ims_ready_msg.actions
-      ignore_errors: true
+      # ignore_errors: true
       when: ctl == "start"
 
     - name: IMS cold start
-      ims_command: 
+      ims_command:
         command: NRE CHECKPOINT 0 FMT ALL
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'

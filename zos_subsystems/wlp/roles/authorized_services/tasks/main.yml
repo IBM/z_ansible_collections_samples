@@ -5,48 +5,48 @@
 # `failed_when` statement conditionals are used in each task to prevent this role from stopping when the authorized service is already detected
 
 - name: Enables SAF authorized user registry services and SAF authorization services (SAFCRED)
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
-      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.SAFCRED UACC(NONE)      
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.SAFCRED UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.SAFCRED CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
-  when: SAFCRED | bool 
+  when: SAFCRED | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enable WLM services (ZOSWLM)
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
-      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.ZOSWLM UACC(NONE)      
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.ZOSWLM UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.ZOSWLM CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
   when: ZOSWLM | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables RRS Transaction Services (TXRSS)
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
-      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.TXRRS UACC(NONE)      
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.TXRRS UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.TXRRS CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
   when: TXRSS | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables ZOSDUMP
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
-      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.ZOSDUMP UACC(NONE)      
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.ZOSDUMP UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.ZOSDUMP CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
   when: ZOSDUMP | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables optimized local adapter services
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
       - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.LOCALCOM UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.LOCALCOM CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
       - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.WOLA UACC(NONE)
@@ -54,31 +54,30 @@
   when: LOCAL_ADAPTER | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enables the IFAUSAGE services (PRODMGR)
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
-      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.PRODMGR UACC(NONE)      
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.PRODMGR UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.PRODMGR CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
   when: PRODMGR | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
-- name: Enables the AsyncIO services (ZOSAIO) 
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
-      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.ZOSAIO UACC(NONE) 
+- name: Enables the AsyncIO services (ZOSAIO)
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - RDEF SERVER BBG.AUTHMOD.BBGZSAFM.ZOSAIO UACC(NONE)
       - PERMIT BBG.AUTHMOD.BBGZSAFM.ZOSAIO CLASS(SERVER) ACCESS(READ) ID({{TARGET_USER}})
   when: ZOSAIO | bool
   register: command_result
   failed_when: "'ALREADY DEFINED' in command_result.output[0].content"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Refresh
   ibm.ibm_zos_core.zos_tso_command:
     commands:
       - SETROPTS RACLIST(SERVER) GENERIC(SERVER) REFRESH
       - SETROPTS RACLIST(STARTED) REFRESH
-

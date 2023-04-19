@@ -1,0 +1,16 @@
+********************************************************************
+**  CSLDI001 member:                                               *
+**  This PROCLIB member is specified by the ODBMINIT=001           *
+**  value on the ODBM start up procedure:{{ DFS_IMS_SSID }}ODB1.
+**                                                                 *
+**  Parameters specified here are used for ODBM initialization.    *
+**                                                                 *
+**  ODBM configuration parameters are specified in the             *
+**  CSLDC001 PROCLIB member which can be specified by either       *
+**  THE ODBMCFG=001 EXEC parameter or in this PROCLIB member       *
+**  ON THE ODBMCFG=001 parameter.                                  *
+**                                                                **
+********************************************************************
+ODBMNAME={{ DFS_IMS_SSID }}{{DFS_PORTIDSuf}}
+IMSPLEX(NAME={{ DFS_IMSPlex }})
+ODBMCFG=001

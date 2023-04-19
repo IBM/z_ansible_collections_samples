@@ -50,7 +50,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   vars:
     git_repo: "git://github.com/IBM/z_ansible_collections_samples.git"
     git_branch: "playbook/2926/zos_apf"
@@ -63,7 +63,7 @@
   tasks:
     - name: Get home directory
       shell: "echo \"$HOME\" "
-      register:  result
+      register: result
     - name: Set home_dir path
       set_fact:
         home_dir: "{{ result.stdout }}"

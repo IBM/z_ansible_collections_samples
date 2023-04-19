@@ -2,9 +2,9 @@
 # tasks file for db2_post_graphql_discovery
 
 - name: Graphql Discovery
-  uri:
+  ansible.builtin.uri:
     url: "{{ doe_server }}:{{ doe_server_port }}/ws/model/graphql/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: POST

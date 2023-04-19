@@ -2,29 +2,29 @@
 # tasks file for zcee_keyring
 
 - name: Define Security
-  ibm.ibm_zos_core.zos_tso_command: 
-    commands: 
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
         # Defining STARTED task for the server
       - RDEF STARTED {{softwareServiceInstanceName}}.* UACC(NONE) STDATA(USER({{zcon_admin_server}}) PRIVILEGED(NO) TRUSTED(NO) TRACE(YES))
         # Setup the APPL class profile
       - RDEFINE APPL {{softwareServiceInstanceName}} UACC(NONE)
-        #ctivating the APPL class, If not active, the domain is not restricted, which means anyone can authenticate to it
+        # ctivating the APPL class, If not active, the domain is not restricted, which means anyone can authenticate to it
       - SETROPTS CLASSACT(APPL)
-        #Grant the server id READ access to the profile in the APPL class
+        # Grant the server id READ access to the profile in the APPL class
       - PERMIT {{softwareServiceInstanceName}} CLASS(APPL) ACCESS(READ) ID({{zcon_admin_server}})
-        #Grant an unauthenticated {{ zcon_zos_guest_user }} user ID READ access to the profile in the APPL class
+        # Grant an unauthenticated {{ zcon_zos_guest_user }} user ID READ access to the profile in the APPL class
       - PERMIT {{softwareServiceInstanceName}} CLASS(APPL) ACCESS(READ) ID({{ zcon_zos_guest_user }})
-        #Configure a security domain for server auth
+        # Configure a security domain for server auth
       - RDEFINE SERVER BBG.SECPFX.{{softwareServiceInstanceName}} UACC(NONE)
-        #Grant the servers id READ access to the security domain for the server
+        # Grant the servers id READ access to the security domain for the server
       - PERMIT BBG.SECPFX.{{softwareServiceInstanceName}} CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
-        #Grant the server access to the angel process - Define the class for the angel process
+        # Grant the server access to the angel process - Define the class for the angel process
       - RDEFINE SERVER bbg.angel UACC(NONE)
-        #Grant the server access to the angel process - Permitting the server access to the angel process
+        # Grant the server access to the angel process - Permitting the server access to the angel process
       - PERMIT bbg.angel CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
-        #Grant the server access to use the z/OS Authorized services - Create a SERVER profile for the authorized module BBGZSAFM
+        # Grant the server access to use the z/OS Authorized services - Create a SERVER profile for the authorized module BBGZSAFM
       - RDEFINE SERVER bbg.authmod.bbgzsafm UACC(NONE)
-        #Grant the server access to use the z/OS Authorized services - Permit the servers id READ access to the authorized module BBGZSAFM
+        # Grant the server access to use the z/OS Authorized services - Permit the servers id READ access to the authorized module BBGZSAFM
       - PERMIT bbg.authmod.bbgzsafm CLASS(SERVER) ACCESS(READ) ID({{zcon_admin_server}})
         # Create a profile for the SAF authorized user registry services and SAF authorization services
       - RDEFINE SERVER bbg.authmod.bbgzsafm.safcred UACC(NONE)
@@ -70,8 +70,8 @@
   failed_when: response.output | map(attribute='rc') | max > 4
 
 # - name: Define Security
-#   ibm.ibm_zos_core.zos_tso_command: 
-#     commands: 
+#   ibm.ibm_zos_core.zos_tso_command:
+#     commands:
 #         # Defining STARTED task for the server
 #       - RDEF STARTED {{softwareServiceInstanceName}}.* UACC(NONE) STDATA(USER({{zcon_admin_server}}) PRIVILEGED(NO) TRUSTED(NO) TRACE(YES))
 #         # Setup the APPL class profile

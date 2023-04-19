@@ -6,59 +6,59 @@
 #   register: response
 #   failed_when: "'JCL ERROR' in response.content | join"
 
-# - name: Get job info 
+# - name: Get job info
 #   ibm.ibm_zos_core.zos_job_query:
 #     job_name: '{{ server_name }}'
 
-# Create server proc - Option to start proc via jcl 
+# Create server proc - Option to start proc via jcl
 - name: Create temporary directory to store provisioning files
-  tempfile:
+  ansible.builtin.tempfile:
     state: file
   delegate_to: localhost
   register: servertempfile
 
 - block:
-  - name: Write template to the temp file
-    template:
-      src: "{{ playbook_dir }}/files/server-proc1.j2"
-      dest: "{{ servertempfile.path }}"
-    delegate_to: localhost
-  - debug:
-      msg: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
-  - name: Copy the template to a data set member
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ servertempfile.path }}"
-      dest: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
-  - name: Copy the template to User Private Proclib
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ servertempfile.path }}"
-      dest: "{{ user_private_proclib }}({{ softwareServiceInstanceName }})"
+    - name: Write template to the temp file
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/files/server-proc1.j2"
+        dest: "{{ servertempfile.path }}"
+      delegate_to: localhost
+    - ansible.builtin.debug:
+        msg: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
+    - name: Copy the template to a data set member
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ servertempfile.path }}"
+        dest: "{{ zcon_zos_proclib }}({{ softwareServiceInstanceName }})"
+    - name: Copy the template to User Private Proclib
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ servertempfile.path }}"
+        dest: "{{ user_private_proclib }}({{ softwareServiceInstanceName }})"
   always:
     - name: Remove temporary file
-      file:
+      ansible.builtin.file:
         state: absent
         path: "{{ servertempfile.path }}"
       delegate_to: localhost
       when: servertempfile is defined
 
 - block:
-  - name: Write template to the temp file
-    template:
-      src: "{{ playbook_dir }}/files/server-proc2.j2"
-      dest: "{{ servertempfile.path }}"
-    delegate_to: localhost
-  - debug:
-      msg: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
-  - name: Copy the template to a data set member
-    ibm.ibm_zos_core.zos_copy:
-      src: "{{ servertempfile.path }}"
-      dest: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
-    when:   
-      - zcon_zos_stcjobs is defined
-      - zcon_stc_job_card != ''
+    - name: Write template to the temp file
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/files/server-proc2.j2"
+        dest: "{{ servertempfile.path }}"
+      delegate_to: localhost
+    - ansible.builtin.debug:
+        msg: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
+    - name: Copy the template to a data set member
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ servertempfile.path }}"
+        dest: "{{ zcon_zos_stcjobs }}({{ softwareServiceInstanceName }})"
+      when:
+        - zcon_zos_stcjobs is defined
+        - zcon_stc_job_card != ''
   always:
     - name: Remove temporary file
-      file:
+      ansible.builtin.file:
         state: absent
         path: "{{ servertempfile.path }}"
       delegate_to: localhost
@@ -70,7 +70,7 @@
   register: response
   failed_when: "'JCL ERROR' in response.content | join"
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ response }}"
 
 - name: Get job info

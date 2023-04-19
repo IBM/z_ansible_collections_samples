@@ -3,7 +3,7 @@
 
 # tasks file for unpack-restore-data-sets
 - name: Raise error if required variables are not set
-  fail:
+  ansible.builtin.fail:
     msg: Missing at least one required variable.
   failed_when: data_sets_to_restore is not defined or
     data_sets_to_restore|length == 0 or
@@ -11,7 +11,7 @@
     terse_data_set == ""
 
 - name: Estimate the total used size of all provided data sets
-  include_role:
+  ansible.builtin.include_role:
     name: get-estimated-size-of-data-sets
   vars:
     data_sets: "{{ [terse_data_set] }}"
@@ -23,7 +23,7 @@
     - name: Create data set for archive
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set if archive_data_set | default(false) else omit }}"
-        replace: yes
+        replace: true
         type: seq
         # space may require manual intervention in certain cases
         space_primary: "{{ size_in_cyls.get('primary') }}"
@@ -54,7 +54,7 @@
           failed_when: terse_response.ret_code.code > 0
       always:
         - name: Get the output of terse execution
-          debug:
+          ansible.builtin.debug:
             var: terse_response
           when: terse_response is defined
 
@@ -62,7 +62,7 @@
         - name: Load a set of data sets from an archive.
           ibm.ibm_zos_core.zos_mvs_raw:
             program_name: adrdssu
-            auth: yes
+            auth: true
             dds:
               - dd_data_set:
                   dd_name: source
@@ -81,7 +81,7 @@
           failed_when: restore_response.ret_code.code > 0
       always:
         - name: Get the output of restore execution
-          debug:
+          ansible.builtin.debug:
             var: restore_response
           when: restore_response is defined
   always:

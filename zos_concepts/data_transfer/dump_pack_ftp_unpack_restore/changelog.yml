@@ -39,7 +39,3 @@ releases:
                 - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
                 - Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
                 - Updated host_vars, group_vars and inventory
-
-
-
-

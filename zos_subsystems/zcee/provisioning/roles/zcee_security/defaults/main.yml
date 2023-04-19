@@ -22,19 +22,19 @@ define_security: false
 zcon_saf_authentication: 'TRUE'
 
 ################################################################################
-# Specifies the value of 'YES' or 'NO' used to specify if zosconnect should accept SSL connections. 
+# Specifies the value of 'YES' or 'NO' used to specify if zosconnect should accept SSL connections.
 ################################################################################
 zcon_tls: 'NO'
 
 ################################################################################
-# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.  
+# Specifies user ID under which the provisioned instance of z/OS Connect EE runs.
 ################################################################################
 zcon_admin_server: '{{ TARGET_USERNAME }}'
 
 ################################################################################
 # Specifies user ID to get unauthenticated READ access to profile in APPL class.
 ################################################################################
-zcon_zos_guest_user: IBMUSER #WSGUEST
+zcon_zos_guest_user: IBMUSER # WSGUEST
 
 ################################################################################
 # Specifies the hostname for the z/OS system.
@@ -52,6 +52,6 @@ zcon_http_port: '1322'
 zcon_https_port: '1321'
 
 ################################################################################
-# Specifies the path to the base zCEE configuration directory. 
+# Specifies the path to the base zCEE configuration directory.
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

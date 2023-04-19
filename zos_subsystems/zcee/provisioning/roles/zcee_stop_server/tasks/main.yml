@@ -1,12 +1,12 @@
 ---
 # tasks file for zcee_stop_server
 - name: Stop zCEE server job
-  zos_operator: 
+  ibm.ibm_zos_core.zos_operator:
     cmd: 'CANCEL ST{{ softwareServiceInstanceName }}'
-- name: Stop zCEE server from USS 
-  shell: ./zosconnect stop {{softwareServiceInstanceName}}
+- name: Stop zCEE server from USS
+  ansible.builtin.shell: ./zosconnect stop {{softwareServiceInstanceName}}
   args:
     chdir: '{{ zcon_install_dir }}/bin'
   environment:
     WLP_USER_DIR: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}'
-  ignore_errors: yes
+  ignore_errors: true

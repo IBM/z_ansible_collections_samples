@@ -309,7 +309,7 @@ Consider:
     ```
     - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
       system {{ system_name }}
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "DUMP COMM=('test dump')"
     ```
     where as in this snippet we are checking for a specific boolean with the
@@ -317,7 +317,7 @@ Consider:
     ```
     - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
       system {{ system_name }}
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "DUMP COMM=('test dump')"
       register: result_zos_operator
       when: bool_zos_operator_action_continue

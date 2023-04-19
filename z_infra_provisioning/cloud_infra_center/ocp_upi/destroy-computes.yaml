@@ -1,12 +1,12 @@
 # =================================================================
 # Copyright 2021 https://github.com/openshift/installer
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 #
-# Change Summary: 
+# Change Summary:
 # - Delete unnecessary Ansible tasks
 # - Read compute nodes names from json
 
@@ -34,30 +34,30 @@
 # openstacksdk
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   tasks:
-  - name: 'Import common yaml'
-    import_tasks: common.yaml
+    - name: 'Import common yaml'
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
-  - name: 'Export infra ID'
-    shell:
-      cmd: "jq -r .infraID metadata.json"
-    register: infra_id
+    - name: 'Export infra ID'
+      ansible.builtin.shell:
+        cmd: "jq -r .infraID metadata.json"
+      register: infra_id
 
-  - name: 'Remove the compute servers'
-    os_server:
-      name: "{{ item.1 }}-{{ item.0 }}"
-      state: absent
-    with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
+    - name: 'Remove the compute servers'
+      openstack.cloud.server:
+        name: "{{ item.1 }}-{{ item.0 }}"
+        state: absent
+      with_indexed_items: "{{ [os_compute_server_name] * os_compute_nodes_number }}"
 
-  - name: 'Get compute servers from ICIC command line'
-    shell: |
-       openstack server list -c Name -f value | awk '/{{ infra_id.stdout_lines[0] }}/ && /worker/' 
-    register: computes
-    ignore_errors: true
+    - name: 'Get compute servers from ICIC command line'
+      ansible.builtin.shell: |
+        openstack server list -c Name -f value | awk '/{{ infra_id.stdout_lines[0] }}/ && /worker/'
+      register: computes
+      ignore_errors: true
 
-  - name: 'Remove all computes node'
-    shell:
-      cmd: "openstack server delete {{ item.1 }}"
-    with_indexed_items: "{{ computes.stdout_lines }}"
+    - name: 'Remove all computes node'
+      ansible.builtin.shell:
+        cmd: "openstack server delete {{ item.1 }}"
+      with_indexed_items: "{{ computes.stdout_lines }}"

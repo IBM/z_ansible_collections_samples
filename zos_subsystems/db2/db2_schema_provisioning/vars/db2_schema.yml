@@ -1,4 +1,3 @@
-
 # Hostname of the system on which Db2 for z/OS DevOps Experience is running.
 # Server name used to access the DOE rest apis
 doe_server: zos_target_address
@@ -29,4 +28,4 @@ team_name: valid_team_name
 inst_name: valid_inst_name
 
 # Parameter that gives option to user to provision the app instance with or without data
-with_data: yes
+with_data: true

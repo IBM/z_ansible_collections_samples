@@ -25,6 +25,13 @@
 #      _TAG_REDIR_OUT: "txt"
 # - The value for the property LANG is the name of the default locale; value
 #   C specifies the POSIX locale; for example: ``LANG: "C"``.
+# - Property `PYTHONSTDINENCODING` should be set to the encoding Unix System Services
+#   is configured as, supported encodings are ASCII or EBCDIC. This environment
+#   variable is used to instruct Ansible which encoding it will *pipe* content to
+#   Python's STDIN (standard in) when `pipelining=true` is set in `ansible.cfg` .
+#   This environment variable will only apply when using IBM Enterprise Python
+#   3.10 or later, otherwise, it is ignored.
+#   For example:`PYTHONSTDINENCODING: "cp1047"`.
 # - The bash shell is unsupported. If that is the only shell available, you must
 #   control how new and existing files are tagged and encoded. An
 #   example of what is needed in addition to the files environment variables
@@ -56,7 +63,6 @@ mq_cpf: "!MQ21"
 mq_queue_name: TEST.Q
 
 
-
 # You should not need to change environment_vars
 environment_vars:
   _BPXK_AUTOCVT: "ON"
@@ -69,3 +75,4 @@ environment_vars:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"

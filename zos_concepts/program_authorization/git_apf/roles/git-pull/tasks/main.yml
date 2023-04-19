@@ -5,9 +5,8 @@
 ################################################################################
 
 - name: Git pull a repository
-  git:
+  ansible.builtin.git:
     repo: "{{ git_repo }}"
     dest: "{{ checkout_dir }}"
     version: "{{ git_branch }}"
   register: result
-

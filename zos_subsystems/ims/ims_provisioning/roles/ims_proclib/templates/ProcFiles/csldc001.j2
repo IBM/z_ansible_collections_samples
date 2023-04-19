@@ -1,0 +1,59 @@
+********************************************************************
+**  This PROCLIB member is specified by the ODBMCFG=001      **
+**  value on the ODBM start up procedure or from the              **
+**  ODBMCFG=001 parameter in the DFSDI001 PROCLIB member *
+**                                                                **
+**  Parameters specified here are used for ODBM configuration.    **
+**                                                                **
+**  This member is split into 2 sections.                         **
+**                                                                **
+********************************************************************
+**  <SECTION=GLOBAL_DATASTORE_CONFIGURATION>                      **
+**  This section defines configuration parameters that will be    **
+**  used when their corresponding parameters are not present in   **
+**  the local datastore section.                                  **
+**                                                                **
+**  Defaults shown                                                **
+**  IDRETRY=0  (Can only be specified here.)                      **
+**  TIMER=60   (Can only be specified here.)                      **
+**  MAXTHRDS=1                                                    **
+**  FPBUF=000                                                     **
+**  FPBOF=000                                                     **
+**  CNBA=325                                                      **
+**                                                                **
+********************************************************************
+**  <SECTION=LOCAL_DATASTORE_CONFIGURATION>                       **
+**  This section defines ODBM configuration parameters.           **
+**                                                                **
+**  Multiple ODBMs may be appended, each with its unique          **
+**  ODBMNAME=odbmname. Optional parameters that are not           **
+**  specified in an ODBM configuration statement group will       **
+**  take on the corresponding parameter value specified in        **
+**  the global datastore section, if one was specified.           **
+**                                                                **
+**  ODBM(NAME=odbmname,                                           **
+**       DATASTORE(NAME=datastorename),                           **
+**       ALIAS(NAME=aliasname),                                   **
+**       FPBUF=nnn,                                               **
+**       FPBOF=nnn,                                               **
+**       CNBA=nnn,                                                **
+**       MAXTHRDS=nnn                                             **
+**                   )                                            **
+**   AL: fix bug on line 519                   **
+**  MAXTHRDS=                                                     **
+**  FPBUF=                                                        **
+**  FPBOF=                                                        **
+**  CNBA=                                                         **
+** AL: remove all FPBUF, FPBOF, etc.                              **
+********************************************************************
+<SECTION=GLOBAL_DATASTORE_CONFIGURATION>                               
+IDRETRY=2                 /* Retry connection 5 times before quit */
+MAXTHRDS=5              /* 10 threads max to any IMS Datastore  */
+TIMER=30                  /* 30 seconds between ID retry attempts */
+<SECTION=LOCAL_DATASTORE_CONFIGURATION>                               
+ODBM(NAME=ODBM1,                 /* Define parms for ODBM1         */
+     DATASTORE(NAME=IMS1,        /* Setup Datastore using IMSID=IMS1*/
+       ALIAS(NAME=IMS1          /* This alias will be used by the  */
+             )             /* DATASTORE                       */
+     )
+    )

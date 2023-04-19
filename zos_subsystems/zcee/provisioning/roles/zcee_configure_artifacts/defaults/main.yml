@@ -4,12 +4,12 @@
 
 # defaults file for zcee_configure_artifacts
 ################################################################################
-# Specifies the path to the base zCEE configuration directory. 
+# Specifies the path to the base zCEE configuration directory.
 ################################################################################
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'
 
 ################################################################################
-# Specifies the path to the zCEE mount point. 
+# Specifies the path to the zCEE mount point.
 ################################################################################
 zcon_zfs_mountpoint: '/var/zosconnect'
 
@@ -33,7 +33,7 @@ softwareServiceInstanceName: ZC01
 #     - src: "../files/server.xml"
 #       dest: "/u/omvsadm/var/zosconnect/ZC01/servers/ZC01/server.xml"
 ################################################################################
-files_to_copy: 
+files_to_copy:
   - src: "{{ playbook_dir }}/files/bootstrap.properties"
     dest: "{{ zcee_config_path }}/bootstrap.properties"
   - src: "{{ playbook_dir }}/files/server.xml"
@@ -43,7 +43,3 @@ files_to_copy:
 # Specifies the character set any copied templates and files should be converted to.
 ################################################################################
 target_charset: "IBM-1047"
-
-
-
-

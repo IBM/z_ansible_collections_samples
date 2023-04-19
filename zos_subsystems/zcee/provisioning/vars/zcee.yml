@@ -19,7 +19,7 @@ workflowOwner: '{{ TARGET_USERNAME }}'
 softwareServiceInstanceName: ZC01
 
 # Specifies the path to the z/OS Connect EE installation directory on zFS.
-zcon_install_dir: /usr/lpp/zosconnect/v3r0 
+zcon_install_dir: /usr/lpp/zosconnect/v3r0
 
 # Define the z/OS UNIX path up to, but not including, the "bin" directory.
 java_home: /usr/lpp/java/java180/J8.0_64
@@ -51,7 +51,7 @@ zcon_zfs_mountpoint: '/u/omvsadm/var/zosconnect'
 # Specifies the name of a SAF group, which is granted read, write and run authority to the z/OS Connect EE instances data directory.
 zcon_zfs_group: OMVS
 
-# Specifies the high-level qualifier for the zFS data sets that are defined during the provisioning of the z/OS Connect EE instance. 
+# Specifies the high-level qualifier for the zFS data sets that are defined during the provisioning of the z/OS Connect EE instance.
 zcon_file_system_hlq: '{{ DFS_AUTH_LIB_HLQ1 }}'
 
 # Specifies a data class that is used to define a zFS data set for the z/OS Connect EE instance.
@@ -78,13 +78,13 @@ zcon_stc_job_card: ''
 # and multiple concurrent updates to the data set are attempted, z/OS produces a 213-30 abend code, to avoid data corruption.
 zcon_zos_stcjobs: ''
 
-# VOLUME value that is used in the creation of the zFS data sets, for example, SYSDA. 
-# If the value is specified as SMS (Storage Management Subsystem), the VOLUME parameter 
+# VOLUME value that is used in the creation of the zFS data sets, for example, SYSDA.
+# If the value is specified as SMS (Storage Management Subsystem), the VOLUME parameter
 # is omitted from the VSAM creation.
 zcon_zos_vsam_volume: '{{ DFS_DS_VOLUME1 }}'
 
 # User ID to get unauthenticated READ access to profile in APPL class.
-zcon_zos_guest_user: IBMUSER #WSGUEST
+zcon_zos_guest_user: IBMUSER # WSGUEST
 
 # Specifies the path to the base zCEE configuration directory.
 zcee_config_path: '{{zcon_zfs_mountpoint}}/{{softwareServiceInstanceName}}/servers/{{softwareServiceInstanceName}}'

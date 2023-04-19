@@ -2,9 +2,9 @@
 # tasks file for db2_get_team_id
 
 - name: Retrieve team id
-  uri:
+  ansible.builtin.uri:
     url: "{{ base_url }}/teams/{{team_name}}/"
-    validate_certs: no
+    validate_certs: false
     user: "{{ username }}"
     password: "{{ password }}"
     method: GET
@@ -14,6 +14,6 @@
   register: team_response
 
 - name: Register the team id and environment id
-  set_fact:
+  ansible.builtin.set_fact:
     TEAM_ID: "{{team_response.json.id}}"
     ENV_ID: "{{team_response.json.environments[0].environmentId}}"

@@ -79,7 +79,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: no
+  gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     ############################################################################
@@ -104,7 +104,7 @@
               content:
                 - >-
                   1                       J E S 2  J O B  L O G  --  S Y S T E M  S T
-                  L 1  --  N O D E  S T L 1            
+                  L 1  --  N O D E  S T L 1
                 - '0 '
                 - ' 16.29.01 JOB00260 ---- THURSDAY,  13 MAY 2021 ----'
                 - ' 16.29.01 JOB00260  IRR010I  USERID OMVSADM  IS ASSIGNED TO THIS JOB.'
@@ -180,11 +180,11 @@
               content:
                 - >-
                   1DATA SET UTILITY -
-                  GENERATE                                                                      
-                  PAGE 0001             
+                  GENERATE
+                  PAGE 0001
                 - >-
                   -IEB352I WARNING: ONE OR MORE OF THE OUTPUT DCB PARMS COPIED FROM
-                  INPUT                                                  
+                  INPUT
                 - '                                                                                                                         '
                 - ' PROCESSING ENDED AT EOD                                                                                                 '
               ddname: SYSPRINT
@@ -229,151 +229,151 @@
     ############################################################################
     job_sub_result_json:
       {
-      "changed":true,
-      "checksum":"ef07e1151def179cb683351dd0c7122d14c4b7ee",
-      "dest":"/tmp/ansible.al8h8j5g",
-      "duration":0,
-      "failed":false,
-      "gid":1,
-      "group":"OMVSGRP",
-      "jobs":[
+        "changed":true,
+        "checksum":"ef07e1151def179cb683351dd0c7122d14c4b7ee",
+        "dest":"/tmp/ansible.al8h8j5g",
+        "duration":0,
+        "failed":false,
+        "gid":1,
+        "group":"OMVSGRP",
+        "jobs":[
           {
             "class":"A",
             "content_type":"JOB",
             "ddnames":[
-                {
-                  "byte_count":"754",
-                  "content":[
-                      "1                       J E S 2  J O B  L O G  --  S Y S T E M  S T L 1  --  N O D E  S T L 1            ",
-                      "0 ",
-                      " 16.29.01 JOB00260 ---- THURSDAY,  13 MAY 2021 ----",
-                      " 16.29.01 JOB00260  IRR010I  USERID OMVSADM  IS ASSIGNED TO THIS JOB.",
-                      " 16.29.01 JOB00260  $HASP375 JES2     ESTIMATED  LINES EXCEEDED",
-                      " 16.29.01 JOB00260  ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021",
-                      " 16.29.01 JOB00260  $HASP375 HELLO    ESTIMATED  LINES EXCEEDED",
-                      " 16.29.01 JOB00260  $HASP373 HELLO    STARTED - INIT 8    - CLASS A        - SYS STL1",
-                      " 16.29.01 JOB00260  SMF000I  HELLO       STEP0001    IEBGENER    0000",
-                      " 16.29.01 JOB00260  $HASP395 HELLO    ENDED - RC=0000",
-                      "0------ JES2 JOB STATISTICS ------",
-                      "-  13 MAY 2021 JOB EXECUTION DATE",
-                      "-           16 CARDS READ",
-                      "-           62 SYSOUT PRINT RECORDS",
-                      "-            0 SYSOUT PUNCH RECORDS",
-                      "-            7 SYSOUT SPOOL KBYTES",
-                      "-         0.00 MINUTES EXECUTION TIME"
-                  ],
-                  "ddname":"JESMSGLG",
-                  "id":"2",
-                  "procstep":"",
-                  "record_count":"17",
-                  "stepname":"JES2"
-                },
-                {
-                  "byte_count":"696",
-                  "content":[
-                      "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260",
-                      "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             ",
-                      "           //*                                                                             ",
-                      "           //* PRINT \"HELLO WORLD\" ON JOB OUTPUT                                           ",
-                      "           //*                                                                             ",
-                      "           //* NOTE THAT THE EXCLAMATION POINT IS INVALID EBCDIC FOR JCL                   ",
-                      "           //*   AND WILL CAUSE A JCL ERROR                                                ",
-                      "           //*                                                                             ",
-                      "           IEFC653I SUBSTITUTION JCL - (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',MSGCLASS=X,MSGLEVEL=1,NOTIFY=OMVSADM",
-                      "         2 //STEP0001 EXEC PGM=IEBGENER                                                    ",
-                      "         3 //SYSIN    DD DUMMY                                                             ",
-                      "         4 //SYSPRINT DD SYSOUT=*                                                          ",
-                      "         5 //SYSUT1   DD *                                                                 ",
-                      "         6 //SYSUT2   DD SYSOUT=*                                                          ",
-                      "         7 //                                                                              "
-                  ],
-                  "ddname":"JESJCL",
-                  "id":"3",
-                  "procstep":"",
-                  "record_count":"15",
-                  "stepname":"JES2"
-                },
-                {
-                  "byte_count":"1191",
-                  "content":[
-                      " ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021",
-                      " IEFA111I HELLO IS USING THE FOLLOWING JOB RELATED SETTINGS:",
-                      "          SWA=BELOW,TIOT SIZE=32K,DSENQSHR=DISALLOW,GDGBIAS=JOB",
-                      " IEF236I ALLOC. FOR HELLO STEP0001",
-                      " IEF237I DMY  ALLOCATED TO SYSIN",
-                      " IEF237I JES2 ALLOCATED TO SYSPRINT",
-                      " IEF237I JES2 ALLOCATED TO SYSUT1",
-                      " IEF237I JES2 ALLOCATED TO SYSUT2",
-                      " IEF142I HELLO STEP0001 - STEP WAS EXECUTED - COND CODE 0000",
-                      " IEF285I   OMVSADM.HELLO.JOB00260.D0000102.?            SYSOUT        ",
-                      " IEF285I   OMVSADM.HELLO.JOB00260.D0000101.?            SYSIN         ",
-                      " IEF285I   OMVSADM.HELLO.JOB00260.D0000103.?            SYSOUT        ",
-                      " IEF373I STEP/STEP0001/START 2021133.1629",
-                      " IEF032I STEP/STEP0001/STOP  2021133.1629 ",
-                      "         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    ",
-                      "         VIRT:    60K  SYS:   240K  EXT:        0K  SYS:    12088K",
-                      "         ATB- REAL:                  1032K  SLOTS:                     0K",
-                      "              VIRT- ALLOC:      11M SHRD:       0M",
-                      " IEF375I  JOB/HELLO   /START 2021133.1629",
-                      " IEF033I  JOB/HELLO   /STOP  2021133.1629 ",
-                      "         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    "
-                  ],
-                  "ddname":"JESYSMSG",
-                  "id":"4",
-                  "procstep":"",
-                  "record_count":"21",
-                  "stepname":"JES2"
-                },
-                {
-                  "byte_count":"251",
-                  "content":[
-                      "1DATA SET UTILITY - GENERATE                                                                       PAGE 0001             ",
-                      "-IEB352I WARNING: ONE OR MORE OF THE OUTPUT DCB PARMS COPIED FROM INPUT                                                  ",
-                      "                                                                                                                         ",
-                      " PROCESSING ENDED AT EOD                                                                                                 "
-                  ],
-                  "ddname":"SYSPRINT",
-                  "id":"102",
-                  "procstep":"",
-                  "record_count":"4",
-                  "stepname":"STEP0001"
-                },
-                {
-                  "byte_count":"49",
-                  "content":[
-                      " HELLO, WORLD                                                                    "
-                  ],
-                  "ddname":"SYSUT2",
-                  "id":"103",
-                  "procstep":"",
-                  "record_count":"1",
-                  "stepname":"STEP0001"
-                }
+              {
+                "byte_count":"754",
+                "content":[
+                  "1                       J E S 2  J O B  L O G  --  S Y S T E M  S T L 1  --  N O D E  S T L 1            ",
+                  "0 ",
+                  " 16.29.01 JOB00260 ---- THURSDAY,  13 MAY 2021 ----",
+                  " 16.29.01 JOB00260  IRR010I  USERID OMVSADM  IS ASSIGNED TO THIS JOB.",
+                  " 16.29.01 JOB00260  $HASP375 JES2     ESTIMATED  LINES EXCEEDED",
+                  " 16.29.01 JOB00260  ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021",
+                  " 16.29.01 JOB00260  $HASP375 HELLO    ESTIMATED  LINES EXCEEDED",
+                  " 16.29.01 JOB00260  $HASP373 HELLO    STARTED - INIT 8    - CLASS A        - SYS STL1",
+                  " 16.29.01 JOB00260  SMF000I  HELLO       STEP0001    IEBGENER    0000",
+                  " 16.29.01 JOB00260  $HASP395 HELLO    ENDED - RC=0000",
+                  "0------ JES2 JOB STATISTICS ------",
+                  "-  13 MAY 2021 JOB EXECUTION DATE",
+                  "-           16 CARDS READ",
+                  "-           62 SYSOUT PRINT RECORDS",
+                  "-            0 SYSOUT PUNCH RECORDS",
+                  "-            7 SYSOUT SPOOL KBYTES",
+                  "-         0.00 MINUTES EXECUTION TIME"
+                ],
+                "ddname":"JESMSGLG",
+                "id":"2",
+                "procstep":"",
+                "record_count":"17",
+                "stepname":"JES2"
+              },
+              {
+                "byte_count":"696",
+                "content":[
+                  "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260",
+                  "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             ",
+                  "           //*                                                                             ",
+                  "           //* PRINT \"HELLO WORLD\" ON JOB OUTPUT                                           ",
+                  "           //*                                                                             ",
+                  "           //* NOTE THAT THE EXCLAMATION POINT IS INVALID EBCDIC FOR JCL                   ",
+                  "           //*   AND WILL CAUSE A JCL ERROR                                                ",
+                  "           //*                                                                             ",
+                  "           IEFC653I SUBSTITUTION JCL - (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',MSGCLASS=X,MSGLEVEL=1,NOTIFY=OMVSADM",
+                  "         2 //STEP0001 EXEC PGM=IEBGENER                                                    ",
+                  "         3 //SYSIN    DD DUMMY                                                             ",
+                  "         4 //SYSPRINT DD SYSOUT=*                                                          ",
+                  "         5 //SYSUT1   DD *                                                                 ",
+                  "         6 //SYSUT2   DD SYSOUT=*                                                          ",
+                  "         7 //                                                                              "
+                ],
+                "ddname":"JESJCL",
+                "id":"3",
+                "procstep":"",
+                "record_count":"15",
+                "stepname":"JES2"
+              },
+              {
+                "byte_count":"1191",
+                "content":[
+                  " ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021",
+                  " IEFA111I HELLO IS USING THE FOLLOWING JOB RELATED SETTINGS:",
+                  "          SWA=BELOW,TIOT SIZE=32K,DSENQSHR=DISALLOW,GDGBIAS=JOB",
+                  " IEF236I ALLOC. FOR HELLO STEP0001",
+                  " IEF237I DMY  ALLOCATED TO SYSIN",
+                  " IEF237I JES2 ALLOCATED TO SYSPRINT",
+                  " IEF237I JES2 ALLOCATED TO SYSUT1",
+                  " IEF237I JES2 ALLOCATED TO SYSUT2",
+                  " IEF142I HELLO STEP0001 - STEP WAS EXECUTED - COND CODE 0000",
+                  " IEF285I   OMVSADM.HELLO.JOB00260.D0000102.?            SYSOUT        ",
+                  " IEF285I   OMVSADM.HELLO.JOB00260.D0000101.?            SYSIN         ",
+                  " IEF285I   OMVSADM.HELLO.JOB00260.D0000103.?            SYSOUT        ",
+                  " IEF373I STEP/STEP0001/START 2021133.1629",
+                  " IEF032I STEP/STEP0001/STOP  2021133.1629 ",
+                  "         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    ",
+                  "         VIRT:    60K  SYS:   240K  EXT:        0K  SYS:    12088K",
+                  "         ATB- REAL:                  1032K  SLOTS:                     0K",
+                  "              VIRT- ALLOC:      11M SHRD:       0M",
+                  " IEF375I  JOB/HELLO   /START 2021133.1629",
+                  " IEF033I  JOB/HELLO   /STOP  2021133.1629 ",
+                  "         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    "
+                ],
+                "ddname":"JESYSMSG",
+                "id":"4",
+                "procstep":"",
+                "record_count":"21",
+                "stepname":"JES2"
+              },
+              {
+                "byte_count":"251",
+                "content":[
+                  "1DATA SET UTILITY - GENERATE                                                                       PAGE 0001             ",
+                  "-IEB352I WARNING: ONE OR MORE OF THE OUTPUT DCB PARMS COPIED FROM INPUT                                                  ",
+                  "                                                                                                                         ",
+                  " PROCESSING ENDED AT EOD                                                                                                 "
+                ],
+                "ddname":"SYSPRINT",
+                "id":"102",
+                "procstep":"",
+                "record_count":"4",
+                "stepname":"STEP0001"
+              },
+              {
+                "byte_count":"49",
+                "content":[
+                  " HELLO, WORLD                                                                    "
+                ],
+                "ddname":"SYSUT2",
+                "id":"103",
+                "procstep":"",
+                "record_count":"1",
+                "stepname":"STEP0001"
+              }
             ],
             "job_id":"JOB00260",
             "job_name":"HELLO",
             "owner":"",
             "ret_code":{
-                "code":0,
-                "msg": "CC 0000",
-                "msg_code": "0000",
-                "msg_txt":""
+              "code":0,
+              "msg": "CC 0000",
+              "msg_code": "0000",
+              "msg_txt":""
             },
             "subsystem":"STL1",
             "system":"EC33017A"
           }
-      ],
-      "md5sum":"20fc2b12e91816da0d468f50a661be46",
-      "message":{
+        ],
+        "md5sum":"20fc2b12e91816da0d468f50a661be46",
+        "message":{
           "stdout":"Submit JCL operation succeeded."
-      },
-      "mode":"0600",
-      "owner":"BPXROOT",
-      "size":999,
-      "src":"/.ansible/tmp/ansible-tmp-1620948522.73-165550739847134/source",
-      "state":"file",
-      "uid":0
-    }
+        },
+        "mode":"0600",
+        "owner":"BPXROOT",
+        "size":999,
+        "src":"/.ansible/tmp/ansible-tmp-1620948522.73-165550739847134/source",
+        "state":"file",
+        "uid":0
+      }
 
   tasks:
     ############################################################################
@@ -541,7 +541,7 @@
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `job_sub_result`
       debug:
         msg: "{{item}}"
-      #with_items: "{{ job_sub_result | community.general.json_query('jobs[0].ddnames[*].ddname') }}"
+      # with_items: "{{ job_sub_result | community.general.json_query('jobs[0].ddnames[*].ddname') }}"
       loop: "{{ job_sub_result | community.general.json_query('jobs[0].ddnames[*].ddname') }}"
       tags: always
 
