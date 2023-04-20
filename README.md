@@ -86,6 +86,7 @@ often repeated and in need of automation.
     - [Deploy a program to a CICS region](zos_subsystems/cics/cmci/deploy_program)
     - [Customize when a CMCI module should fail](zos_subsystems/cics/cmci/override_failure)
     - [Resource life cycle and CSD](zos_subsystems/cics/cmci/resource_lifecycle_and_csd)
+    - [Using module_defaults](zos_subsystems/cics/cmci/module_defaults)
   - [MQ](zos_subsystems/mq)
     - [Interacting with local queues](zos_subsystems/mq/mqsc/qlocal)
 	- [Backing up an application structure](zos_subsystems/mq/mqsc/cfstruct)
