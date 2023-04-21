@@ -1,20 +1,10 @@
 # Using module_defaults to install a program definition
 
-This sample playbook demonstrates how to use the `cmci_get` module from the
-`ibm_zos_cics` collection to retrieve operational data from running CICS
-regions.
-
-This example retrieves information corresponding to the `CICSRGN`
-resource table, but can be adapted to retrieve information about any of the
-resource tables supported by CICSPlex SM. The retrieved information is written
-to a CSV file, which you can open as a spreadsheet.
-
-This sample additionally shows how to automate installation of pre-requisites
-for the `cmci_*` modules.
+This sample creates and installs a CICS Program Defintion, and then deletes it. It uses module defaults to provide variable information to each of the actions in the cmci_group.
 
 ## Requirements
 
-- Python 3.84+
+- Python 3.8+
 - Ansible-core 2.12+
 
 ## Getting Started
@@ -35,18 +25,18 @@ ansible-galaxy collection install ibm.ibm_zos_cics
 ```
 
 For more information about the CMCI REST API, see the
-[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/5.6?topic=environment-cics-management-client-interface-cmci).
+[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/6.1?topic=fundamentals-cics-management-client-interface-cmci).
 
 Because this playbook only uses the CMCI REST API, it can be run on the control node directly, without having to
 configure an inventory. Generally you'll be able to use this trick with any of the CMCI modules. In this example, we
-run the `cmci_get` module on `localhost`, i.e. the Ansible control node, by setting the target host to localhost.
+run multiple `cmci_` modules on `localhost`, i.e. the Ansible control node, by setting the target host to localhost.
 Running the CMCI modules on the control node can be a good idea, because you don't have to deal with the complexity of
 an unnecessary SSH connection, and you don't have to install the modules' dependencies on the remote host.
 
 The `cmci_*` modules have pre-requisites that need to be installed into the Python environment in which the module
-executes. In this case, the `cmci_get` module will be executed on `localhost`, i.e. the Ansible control
+executes. In this case, all `cmci_` modules will be executed on `localhost`, i.e. the Ansible control
 node. The playbook demonstrates how you can ensure the pre-requisites are installed (wherever the module runs) before
-the `cmci_get` module is executed. More information about the `cmci_*` module pre-requisites can be found in the
+the initial `cmci_get` module is executed. More information about the `cmci_*` module pre-requisites can be found in the
 [documentation](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_cics/docs/source/requirements_managed.html).
 
 ## Run [program_lifecycle.yml](program_lifecycle.yml)
@@ -58,16 +48,16 @@ ansible-playbook program_lifecycle.yml
 ````
 
 The playbook will prompt for required parameters. After parameters have been supplied, the playbook installs the
-CMCI module dependencies to the python environment. The playbook then creates and checks CICS resources before deleting them. Specifically, it creates and updates a program definition, installs it and checks the program is installed,and finally disables the program and deletes it along with the program definition.
+CMCI module dependencies to the python environment. The playbook then creates and checks CICS resources before deleting them. Specifically, it creates and updates a program definition, installs it and checks the program is installed, and finally disables the program and deletes it along with the program definition.
 
-The module_defaults section at the top of the playbook allows some parameters to be passed to a group, in this case the group `group/ibm.ibm_zos_cics.cmci_group` so any tasks that are part of that group inherit those parameters. This means the rest of the playbooks `cmci_group` tasks can omit CMCI connection information as they will get that info from the module_defaults.
+The `module_defaults` section at the top of the playbook allows some parameters to be passed to a group, in this case the group `group/ibm.ibm_zos_cics.cmci_group` so any modules that are part of that group inherit those parameters. This means the rest of the playbooks `cmci_group` tasks can omit CMCI connection information as they will get that info from the module_defaults.
 
 ## What next?
 
 - To avoid being prompted for parameters, you can try supplying the input parameters on the command line directly:
 
   ```bash
-  ansible-playbook -e "context=MYCTXT cmci_host=example.com" report.yml
+  ansible-playbook -e "context=MYCTXT cmci_host=example.com" program_lifecycle.yml
   ```
   
   Parameters specified in this way won't be prompted for. Have a look at the `vars_prompt` section of the playbook to
