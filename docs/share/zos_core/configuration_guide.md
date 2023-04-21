@@ -140,6 +140,13 @@ execution.
      ```
 - Property `LANG` is the name of the default locale; value
   C specifies the POSIX locale; for example: ``LANG: "C"``.
+- Property `PYTHONSTDINENCODING` should be set to the encoding Unix System Services
+  is configured as, supported encodings are ASCII or EBCDIC. This environment
+  variable is used to instruct Ansible which encoding it will *pipe* content to
+  Python's STDIN (standard in) when `pipelining=true` is set in `ansible.cfg` .
+  This environment variable will only apply when using IBM Enterprise Python
+  3.10 or later, otherwise, it is ignored.
+  For example:`PYTHONSTDINENCODING: "cp1047"`.
 
 A complete example of `all.yml` is:
 
@@ -155,6 +162,7 @@ environment_vars:
   _TAG_REDIR_IN: "txt"
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"
 ```
 
 ## Host Variables
@@ -181,14 +189,14 @@ complete the configuration.
 - Property `ansible_python_interpreter` is the z/OS managed node (target) Python
     binary installation path which generally does not need configuration because
     it using variable expansion to complete the path,
-    e.g, `ansible_python_interpreter: "{{PYZ}}/bin/python3.8"`
+    e.g, `ansible_python_interpreter: "{{PYZ}}/bin/python3"`
 
 A complete example of `zos_host.yml` is:
 
 ``` {.yaml}
 PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
-ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 ```
 
 ### Variables for Rocket Python

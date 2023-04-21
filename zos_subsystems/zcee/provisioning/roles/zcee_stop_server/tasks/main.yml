@@ -1,7 +1,7 @@
 ---
 # tasks file for zcee_stop_server
 - name: Stop zCEE server job
-  zos_operator:
+  ibm.ibm_zos_core.zos_operator:
     cmd: 'CANCEL ST{{ softwareServiceInstanceName }}'
 - name: Stop zCEE server from USS
   ansible.builtin.shell: ./zosconnect stop {{softwareServiceInstanceName}}

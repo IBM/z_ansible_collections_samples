@@ -11,7 +11,7 @@ established.
   node (target), e.g, `zoau: "/usr/lpp/IBM/zoautil"`
 * Environment variable `ansible_python_interpreter` is the Python binary
   installation path on the z/OS managed node (target),
-  e.g, `ansible_python_interpreter: "{{pyz}}/bin/python3.8"`
+  e.g, `ansible_python_interpreter: "{{pyz}}/bin/python3"`
 
 Configure `PYZ` and `ZOAU` in the included **group_vars** configuration.
 
@@ -20,7 +20,7 @@ For example:
 ```yaml
 PYZ: "/u/oeusr01/python/pyz_3_8_2/usr/lpp/IBM/cyp/v3r8/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
-ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 ```
 
 **Note**, `ansible_python_interpreter` will not need configuration because it is

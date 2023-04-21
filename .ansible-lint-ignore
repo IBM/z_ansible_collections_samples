@@ -1,0 +1,2 @@
+zos_subsystems/zcee/provisioning/roles/zcee_reserve_ports/tasks/main.yml syntax-check[specific]
+zos_subsystems/ims/ims_provisioning/roles/ims_initialize/tasks/main.yml syntax-check[specific]
