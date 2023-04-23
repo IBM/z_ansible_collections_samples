@@ -162,7 +162,7 @@ EOF
 
 sudo pip3 install -r requirements.txt --ignore-installed
 ``` 
-Install two collections from ansible galax:
+Install two collections from ansible galaxy:
 ```sh
 ansible-galaxy collection install openstack.cloud:1.10.0
 ansible-galaxy collection install ansible.posix:1.5.1
@@ -360,7 +360,7 @@ After above steps, you will get one ready OpenShift Container Platform on the IB
   
   - use: `ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
-+ Failed on `02-create-cluster-compute.yaml`.
++ Failed on `03-create-cluster-compute.yaml`.
 
   - use: `ansible-playbook -i inventory.yaml destroy-computes.yaml`
 
