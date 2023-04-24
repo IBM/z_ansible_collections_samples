@@ -1,11 +1,12 @@
 # Using module_defaults to install a program definition
 
-This sample creates and installs a CICS Program Defintion, and then deletes it. It uses module defaults to provide variable information to each of the actions in the cmci_group.
+This sample demonstrates using Ansible [module defaults](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_module_defaults.html) to provide variable information to each of the tasks that use modules in the `cmci_group`, allowing the playbook to be simplified. The playbook creates and installs a CICS program definition, and then deletes the program and the program definition.
 
 ## Requirements
 
 - Python 3.8+
 - Ansible-core 2.12+
+- IBM z/OS CICS Ansible collection 1.0.4+
 
 ## Getting Started
 
@@ -50,7 +51,7 @@ ansible-playbook program_lifecycle.yml
 The playbook will prompt for required parameters. After parameters have been supplied, the playbook installs the
 CMCI module dependencies to the python environment. The playbook then creates and checks CICS resources before deleting them. Specifically, it creates and updates a program definition, installs it and checks the program is installed, and finally disables the program and deletes it along with the program definition.
 
-The `module_defaults` section at the top of the playbook allows some parameters to be passed to a group, in this case the group `group/ibm.ibm_zos_cics.cmci_group` so any modules that are part of that group inherit those parameters. This means the rest of the playbooks `cmci_group` tasks can omit CMCI connection information as they will get that info from the module_defaults.
+The `module_defaults` section at the top of the playbook allows some parameters to be passed to a group, in this case the group `group/ibm.ibm_zos_cics.cmci_group` so any modules that are part of that group inherit those parameters. This means the rest of the playbook's `cmci_group` tasks can omit CMCI connection information as they will get that info from the module_defaults.
 
 ## What next?
 

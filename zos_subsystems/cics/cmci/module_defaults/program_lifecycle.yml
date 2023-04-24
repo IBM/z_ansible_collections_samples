@@ -87,19 +87,13 @@
     ############################################################################
     - name: Get information about CICS regions
       ibm.ibm_zos_cics.cmci_get:
-        context: "{{ context }}"
-        cmci_host: "{{ cmci_host }}"
-        cmci_port: "{{ cmci_port | int }}"
-        cmci_user: "{{ cmci_user | default(omit) }}"
-        cmci_password: "{{ cmci_password | default(omit) }}"
-        scheme: "{{ scheme }}"
         type: "CICSRegion"
       register: result
 
     ############################################################################
     # Create a program definition
     ############################################################################
-    - name: HTTP Create progdef
+    - name: Create program defintion
       ibm.ibm_zos_cics.cmci_create:
         type: CICSDefinitionProgram
         attributes:
@@ -113,7 +107,7 @@
     ############################################################################
     # Update a program definition
     ############################################################################
-    - name: HTTP Update progdef
+    - name: Update program definition
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_update:
         type: CICSDefinitionProgram
@@ -131,7 +125,7 @@
     ############################################################################
     # Install a program definition
     ############################################################################
-    - name: HTTP Install program
+    - name: Install program definition
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_action:
         type: CICSDefinitionProgram
@@ -148,7 +142,7 @@
     ############################################################################
     # Check a program was installed
     ############################################################################
-    - name: HTTP Check program was installed
+    - name: Check program was installed from installed definition
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_get:
         type: CICSProgram
@@ -163,7 +157,7 @@
     ############################################################################
     # Disable a program
     ############################################################################
-    - name: HTTP Disable program
+    - name: Disable program
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_update:
         type: CICSProgram
@@ -190,7 +184,7 @@
     ############################################################################
     # Delete a program
     ############################################################################
-    - name: HTTP Delete program
+    - name: Delete program
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_delete:
         type: CICSProgram
@@ -203,7 +197,7 @@
     ############################################################################
     # Delete a program definition
     ############################################################################
-    - name: HTTP Delete program defintion
+    - name: Delete program defintion
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_delete:
         type: CICSDefinitionProgram
