@@ -206,5 +206,5 @@
             NAME: "{{ program }}"
           get_parameters:
             - name: CSDGROUP
-              value: "{{ csdgroup }}"I
+              value: "{{ csdgroup }}"
       register: result
