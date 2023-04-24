@@ -93,7 +93,7 @@
     ############################################################################
     # Create a program definition
     ############################################################################
-    - name: Create program defintion
+    - name: Create program definition
       ibm.ibm_zos_cics.cmci_create:
         type: CICSDefinitionProgram
         attributes:
@@ -107,7 +107,7 @@
     ############################################################################
     # Update a program definition
     ############################################################################
-    - name: Update program definition
+    - name: Update the program definition
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_update:
         type: CICSDefinitionProgram
@@ -125,7 +125,7 @@
     ############################################################################
     # Install a program definition
     ############################################################################
-    - name: Install program definition
+    - name: Install the program definition
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_action:
         type: CICSDefinitionProgram
@@ -197,7 +197,7 @@
     ############################################################################
     # Delete a program definition
     ############################################################################
-    - name: Delete program defintion
+    - name: Delete the program definition
       delegate_to: localhost
       ibm.ibm_zos_cics.cmci_delete:
         type: CICSDefinitionProgram
@@ -206,5 +206,5 @@
             NAME: "{{ program }}"
           get_parameters:
             - name: CSDGROUP
-              value: "{{ csdgroup }}"
+              value: "{{ csdgroup }}"I
       register: result
