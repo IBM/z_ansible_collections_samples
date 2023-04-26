@@ -9,7 +9,7 @@ collections:
   - name: ibm.ibm_zhmc
     version: 1.2.1
   - name: ibm.ibm_zos_cics
-    version: 1.0.3
+    version: 1.0.4
   - name: ibm.ibm_zos_core
     version: 1.5.0-beta.1
   - name: ibm.ibm_zos_ims
