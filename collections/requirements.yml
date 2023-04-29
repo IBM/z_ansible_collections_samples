@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2020
+# Copyright (c) IBM Corporation 2020, 2023
 ################################################################################
 # This file is required when using repository directly in AWX/Tower
 # for more info: https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#install-multiple-collections-with-a-requirements-file
@@ -11,7 +11,7 @@ collections:
   - name: ibm.ibm_zos_cics
     version: 1.0.4
   - name: ibm.ibm_zos_core
-    version: 1.5.0-beta.1
+    version: 1.6.0-beta.1
   - name: ibm.ibm_zos_ims
     version: 1.1.0
   - name: ibm.ibm_zosmf
