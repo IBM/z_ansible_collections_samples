@@ -8,7 +8,7 @@
 # =================================================================
 
 ---
-- name: configure bastion properties
+- name: Configure bastion properties
   hosts: localhost
   roles:
     - configure-bastion-properties

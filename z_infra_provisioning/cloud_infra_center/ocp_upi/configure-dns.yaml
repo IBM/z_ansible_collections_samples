@@ -27,7 +27,7 @@
 # - Change Ansible playbook name
 
 ---
-- name: configure dns on bastion
+- name: Configure dns on bastion
   hosts: bastion
   serial: 2
   roles:

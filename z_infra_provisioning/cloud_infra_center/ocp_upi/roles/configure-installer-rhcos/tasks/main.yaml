@@ -9,7 +9,7 @@
 
 ---
 - name: 'Import common yaml'
-  ansible.builtin.import_tasks: common.yaml
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
 - name: Verify openshift minor version
   ansible.builtin.shell: |
@@ -73,7 +73,7 @@
   when: icic_rhcos_id.stdout != "empty"
 
 # - name: Remove the existing RHCOS image without sha256 from ICIC glance
-#   shell: "openstack image delete {{ item }}"
+#   ansible.builtin.shell: "openstack image delete {{ item }}"
 #   with_items: "{{ icic_rhcos_id.stdout_lines }}"
 #   when:
 #   - icic_rhcos_id.stdout != ""

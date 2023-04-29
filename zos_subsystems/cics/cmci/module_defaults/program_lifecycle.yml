@@ -1,0 +1,210 @@
+# (c) Copyright IBM Corporation 2023
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+###############################################################################
+# Contributed by the Ansible Content for IBM Z Team
+#
+# Changelog
+#  All notable changes to this sample will be documented in this playbook
+#
+# 2023-04-21
+#  - Released initial version
+###############################################################################
+# This sample playbook demonstrates potential module_default usage
+# for CMCI connection information
+#
+# Usage:
+#  ansible-playbook program_lifecycle.yml
+#
+# Notes:
+#  This sample playbook demonstrates how using module_defaults can allow
+#  a user to omit details in tasks and use a group to provide applicable
+#  tasks with parameters. The module_defaults block at the top sets some
+#  CMCI connection paramters, and then in the CMCI tasks themselves, these
+#  connection details do not need to be written out again.
+#
+# Requirements:
+#   IBM z/OS CICS collection 1.0.4 or later
+###############################################################################
+---
+- name: CICS CMCI module_defaults
+
+  hosts: "localhost"
+  gather_facts: false
+
+  vars_prompt:
+    - name: cmci_host
+      prompt: Target CMCI hostname
+      private: false
+    - name: cmci_port
+      prompt: Target CMCI port
+      private: false
+    - name: scheme
+      prompt: CMCI scheme (leave blank for http)
+      private: false
+      default: http
+    - name: context
+      prompt: Target CPSM context (CICSPlex)
+      private: false
+    - name: cmci_scope
+      prompt: Target CPSM scope (Region)
+      private: false
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+      private: false
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
+    - name: csdgroup
+      prompt: CSD Group to create resources within
+      private: false
+    - name: program
+      prompt: Program name to create (and then delete)
+      private: false
+
+  module_defaults:
+    group/ibm.ibm_zos_cics.cmci_group:
+      cmci_host: "{{ cmci_host }}"
+      cmci_port: "{{ cmci_port }}"
+      cmci_user: "{{ cmci_user }}"
+      cmci_password: "{{ cmci_password }}"
+      context: "{{ context }}"
+      scope: "{{ cmci_scope }}"
+      scheme: "{{ scheme }}"
+      insecure: true
+
+  tasks:
+    ############################################################################
+    # Install module dependencies
+    ############################################################################
+    - name: Make sure CMCI module dependencies are installed
+      ansible.builtin.pip:
+        name:
+          - requests
+          - xmltodict
+          - typing;python_version<"3.5"
+
+    ############################################################################
+    # Get information about CICS regions from the supplied context, using CMCI
+    ############################################################################
+    - name: Get information about CICS regions
+      ibm.ibm_zos_cics.cmci_get:
+        type: "CICSRegion"
+      register: result
+
+    ############################################################################
+    # Create a program definition
+    ############################################################################
+    - name: Create program definition
+      ibm.ibm_zos_cics.cmci_create:
+        type: CICSDefinitionProgram
+        attributes:
+          name: "{{ program }}"
+          csdgroup: "{{ csdgroup }}"
+        create_parameters:
+          - name: CSD
+      register: result
+      failed_when: false
+
+    ############################################################################
+    # Update a program definition
+    ############################################################################
+    - name: Update the program definition
+      delegate_to: localhost
+      ibm.ibm_zos_cics.cmci_update:
+        type: CICSDefinitionProgram
+        attributes:
+          description: foo
+        resources:
+          filter:
+            NAME: "{{ program }}"
+          get_parameters:
+            - name: CSDGROUP
+              value: "{{ csdgroup }}"
+      register: result
+      failed_when: false
+
+    ############################################################################
+    # Install a program definition
+    ############################################################################
+    - name: Install the program definition
+      delegate_to: localhost
+      ibm.ibm_zos_cics.cmci_action:
+        type: CICSDefinitionProgram
+        action_name: CSDINSTALL
+        resources:
+          filter:
+            NAME: "{{ program }}"
+          get_parameters:
+            - name: CSDGROUP
+              value: "{{ csdgroup }}"
+      register: result
+      failed_when: false
+
+    ############################################################################
+    # Check a program was installed
+    ############################################################################
+    - name: Check program was installed from installed definition
+      delegate_to: localhost
+      ibm.ibm_zos_cics.cmci_get:
+        type: CICSProgram
+        resources:
+          filter:
+            PROGRAM: "{{ program }}"
+      retries: 3 # May take a while to install, so give it a chance!
+      until: result is not failed
+      register: result
+      failed_when: false
+
+    ############################################################################
+    # Disable a program
+    ############################################################################
+    - name: Disable program
+      delegate_to: localhost
+      ibm.ibm_zos_cics.cmci_update:
+        type: CICSProgram
+        attributes:
+          status: disabled
+        resources:
+          filter:
+            PROGRAM: "{{ program }}"
+          complex_filter:
+            and:
+              - attribute: PROGRAM
+                operator: "="
+                value: "{{ program }}"
+              - or:
+                  - attribute: USECOUNT
+                    operator: "!="
+                    value: "0"
+                  - attribute: USECOUNT
+                    operator: LT
+                    value: "1"
+      register: result
+      failed_when: false
+
+    ############################################################################
+    # Delete a program
+    ############################################################################
+    - name: Delete program
+      delegate_to: localhost
+      ibm.ibm_zos_cics.cmci_delete:
+        type: CICSProgram
+        resources:
+          filter:
+            PROGRAM: "{{ program }}"
+      register: result
+      failed_when: false
+
+    ############################################################################
+    # Delete a program definition
+    ############################################################################
+    - name: Delete the program definition
+      delegate_to: localhost
+      ibm.ibm_zos_cics.cmci_delete:
+        type: CICSDefinitionProgram
+        resources:
+          filter:
+            NAME: "{{ program }}"
+          get_parameters:
+            - name: CSDGROUP
+              value: "{{ csdgroup }}"
+      register: result

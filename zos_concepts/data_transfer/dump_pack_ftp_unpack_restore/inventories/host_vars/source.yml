@@ -47,7 +47,7 @@ PYZ: "path_to_python_installation_on_zos_target"
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
 # The z/OS managed node (target) Python binary installation path,
-# e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3.8"
+# e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
 # NOTE: This needs not configuration because it uses variable substituion to
 # correctly set the variable`ansible_python_interpreter`
-ansible_python_interpreter: "{{ PYZ }}/bin/python3.8"
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
