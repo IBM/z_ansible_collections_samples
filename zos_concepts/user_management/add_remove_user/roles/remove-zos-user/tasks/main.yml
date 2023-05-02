@@ -50,7 +50,7 @@
   register: stat_response
 
 - name: Unmount the user's ZFS data set
-  ansible.builtin.command: unmount {{ omvs_home_directory }}
+  ansible.builtin.command: /usr/sbin/unmount {{ omvs_home_directory }}
   when: stat_response.stat.isdir is defined and stat_response.stat.isdir
 
 - name: Remove the user's ZFS data set
