@@ -93,7 +93,7 @@
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
 
 - name: Mount ZFS to user directory
-  ansible.builtin.command: mount -t zfs -f {{ omvs_zfs_data_set_name | upper }} {{ omvs_home_directory }}
+  ansible.builtin.command: /usr/sbin/mount -t zfs -f {{ omvs_zfs_data_set_name | upper }} {{ omvs_home_directory }}
 
 - name: Overwrite permissions to directory if necessary
   ansible.builtin.file:
