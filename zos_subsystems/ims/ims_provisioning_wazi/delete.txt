@@ -1,0 +1,2102 @@
+ansible-playbook [core 2.13.5]
+  config file = None
+  configured module search path = ['/Users/adn/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /Users/adn/workspaces/nazare/venv/lib/python3.9/site-packages/ansible
+  ansible collection location = /Users/adn/.ansible/collections:/usr/share/ansible/collections
+  executable location = /Users/adn/workspaces/nazare/venv/bin/ansible-playbook
+  python version = 3.9.6 (default, Mar 10 2023, 20:16:38) [Clang 14.0.3 (clang-1403.0.22.14.1)]
+  jinja version = 3.1.2
+  libyaml = True
+No config file found; using defaults
+host_list declined parsing /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/inventories/zosendpoint as it did not pass its verify_file() method
+script declined parsing /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/inventories/zosendpoint as it did not pass its verify_file() method
+auto declined parsing /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/inventories/zosendpoint as it did not pass its verify_file() method
+Parsed /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/inventories/zosendpoint inventory source with yaml plugin
+Skipping callback 'default', as we already have a stdout callback.
+Skipping callback 'minimal', as we already have a stdout callback.
+Skipping callback 'oneline', as we already have a stdout callback.
+
+PLAYBOOK: delete-ims-datasets.yml **********************************************
+1 plays in delete-ims-datasets.yml
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+PLAY [IMS TMDB De-Provisioning] ************************************************
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+META: ran handlers
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [Retrieve z/OS proclib dataset] *******************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:21
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'echo ~ibmuser && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'/u/ibmuser\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /u/ibmuser/.ansible/tmp `"&& mkdir "` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633 `" && echo ansible-tmp-1683079497.731195-56583-136632667094633="` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633 `" ) && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'ansible-tmp-1683079497.731195-56583-136632667094633=/u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633\n', b'')
+Using module file /Users/adn/workspaces/nazare/venv/lib/python3.9/site-packages/ansible/modules/command.py
+<ansible-andy-zdt1.fyre.ibm.com> PUT /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmpcc4f6zeo TO /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633/AnsiballZ_command.py
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' '[ansible-andy-zdt1.fyre.ibm.com]'
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'sftp> put /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmpcc4f6zeo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633/AnsiballZ_command.py\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'chmod u+x /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633/ /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633/AnsiballZ_command.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' -tt ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'_BPXK_AUTOCVT=ON ZOAU_HOME=/usr/lpp/IBM/zoautil LIBPATH=/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:. PATH=/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin _CEE_RUNOPTS='"'"'"'"'"'"'"'"'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"'"'"'"'"'"'"'"' _TAG_REDIR_ERR=txt _TAG_REDIR_IN=txt _TAG_REDIR_OUT=txt LANG=C STEPLIB=DFSF10.SDFSRESL /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3 /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633/AnsiballZ_command.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'\r\n{"changed": true, "stdout": "USER.Z25C.PROCLIB\\nFEU.Z25C.PROCLIB\\nADCD.Z25C.PROCLIB\\nSYS1.PROCLIB", "stderr": "", "rc": 0, "cmd": "pproc", "start": "2023-05-03 02:05:37.228505", "end": "2023-05-03 02:05:39.481101", "delta": "0:00:02.252596", "msg": "", "invocation": {"module_args": {"_raw_params": "pproc", "_uses_shell": true, "warn": false, "stdin_add_newline": true, "strip_empty_ends": true, "argv": null, "chdir": null, "executable": null, "creates": null, "removes": null, "stdin": null}}}\r\n', b'Shared connection to ansible-andy-zdt1.fyre.ibm.com closed.\r\n')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'rm -f -r /u/ibmuser/.ansible/tmp/ansible-tmp-1683079497.731195-56583-136632667094633/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+changed: [zosendpoint] => {
+    "changed": true,
+    "cmd": "pproc",
+    "delta": "0:00:02.252596",
+    "end": "2023-05-03 02:05:39.481101",
+    "invocation": {
+        "module_args": {
+            "_raw_params": "pproc",
+            "_uses_shell": true,
+            "argv": null,
+            "chdir": null,
+            "creates": null,
+            "executable": null,
+            "removes": null,
+            "stdin": null,
+            "stdin_add_newline": true,
+            "strip_empty_ends": true,
+            "warn": false
+        }
+    },
+    "msg": "",
+    "rc": 0,
+    "start": "2023-05-03 02:05:37.228505",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "USER.Z25C.PROCLIB\nFEU.Z25C.PROCLIB\nADCD.Z25C.PROCLIB\nSYS1.PROCLIB",
+    "stdout_lines": [
+        "USER.Z25C.PROCLIB",
+        "FEU.Z25C.PROCLIB",
+        "ADCD.Z25C.PROCLIB",
+        "SYS1.PROCLIB"
+    ]
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [set_fact] ****************************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:27
+ok: [zosendpoint] => {
+    "ansible_facts": {
+        "ADDTL_SAMP_PROC_LIB": "IMSTEST.IMWZ.PROCLIB",
+        "DFS_DS_VOLUME1": "C5USR1",
+        "DFS_DS_VOLUME2": "C5USR1",
+        "IST_VTAM_IMSAPPLID": "IMWZ",
+        "JOB_CARD": "//ANSIBLE JOB 'testing',\n//*  NOTIFY=IBMUSER,\n//  USER=IBMUSER,\n//  MSGCLASS=H,\n//  MSGLEVEL=(1,1),\n//  CLASS=A",
+        "ROUTE": "IMWZ",
+        "TCPIP_PROFILE_TMP": "IMSTEST.TEMP",
+        "ZOS_RELEASE": "Z25C"
+    },
+    "changed": false
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [debug] *******************************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:43
+ok: [zosendpoint] => {
+    "<class 'list'>": "VARIABLE IS NOT DEFINED!: "
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [set_fact] ****************************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:48
+ok: [zosendpoint] => (item={'key': '_BPXK_AUTOCVT', 'value': 'ON'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "_BPXK_AUTOCVT",
+        "value": "ON"
+    }
+}
+ok: [zosendpoint] => (item={'key': 'ZOAU_HOME', 'value': '/usr/lpp/IBM/zoautil'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "ZOAU_HOME",
+        "value": "/usr/lpp/IBM/zoautil"
+    }
+}
+ok: [zosendpoint] => (item={'key': 'LIBPATH', 'value': '/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "LIBPATH",
+        "value": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:."
+    }
+}
+ok: [zosendpoint] => (item={'key': 'PATH', 'value': '/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "PATH",
+        "value": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin"
+    }
+}
+ok: [zosendpoint] => (item={'key': '_CEE_RUNOPTS', 'value': 'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "_CEE_RUNOPTS",
+        "value": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+    }
+}
+ok: [zosendpoint] => (item={'key': '_TAG_REDIR_ERR', 'value': 'txt'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "_TAG_REDIR_ERR",
+        "value": "txt"
+    }
+}
+ok: [zosendpoint] => (item={'key': '_TAG_REDIR_IN', 'value': 'txt'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "_TAG_REDIR_IN",
+        "value": "txt"
+    }
+}
+ok: [zosendpoint] => (item={'key': '_TAG_REDIR_OUT', 'value': 'txt'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "_TAG_REDIR_OUT",
+        "value": "txt"
+    }
+}
+ok: [zosendpoint] => (item={'key': 'LANG', 'value': 'C'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "LANG",
+        "value": "C"
+    }
+}
+ok: [zosendpoint] => (item={'key': 'STEPLIB', 'value': 'DFSF10.SDFSRESL'}) => {
+    "ansible_facts": {
+        "system_environment": {
+            "LANG": "C",
+            "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.",
+            "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin",
+            "STEPLIB": "DFSF10.SDFSRESL",
+            "ZOAU_HOME": "/usr/lpp/IBM/zoautil",
+            "_BPXK_AUTOCVT": "ON",
+            "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)",
+            "_TAG_REDIR_ERR": "txt",
+            "_TAG_REDIR_IN": "txt",
+            "_TAG_REDIR_OUT": "txt"
+        }
+    },
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "key": "STEPLIB",
+        "value": "DFSF10.SDFSRESL"
+    }
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [tempfile] ****************************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:56
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'echo ~ibmuser && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'/u/ibmuser\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /u/ibmuser/.ansible/tmp `"&& mkdir "` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729 `" && echo ansible-tmp-1683079512.8781781-56640-27706190725729="` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729 `" ) && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'ansible-tmp-1683079512.8781781-56640-27706190725729=/u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729\n', b'')
+Using module file /Users/adn/workspaces/nazare/venv/lib/python3.9/site-packages/ansible/modules/tempfile.py
+<ansible-andy-zdt1.fyre.ibm.com> PUT /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmp_de9mzd5 TO /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729/AnsiballZ_tempfile.py
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' '[ansible-andy-zdt1.fyre.ibm.com]'
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'sftp> put /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmp_de9mzd5 /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729/AnsiballZ_tempfile.py\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'chmod u+x /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729/ /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729/AnsiballZ_tempfile.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' -tt ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'_BPXK_AUTOCVT=ON ZOAU_HOME=/usr/lpp/IBM/zoautil LIBPATH=/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:. PATH=/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin _CEE_RUNOPTS='"'"'"'"'"'"'"'"'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"'"'"'"'"'"'"'"' _TAG_REDIR_ERR=txt _TAG_REDIR_IN=txt _TAG_REDIR_OUT=txt LANG=C STEPLIB=DFSF10.SDFSRESL /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3 /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729/AnsiballZ_tempfile.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'\r\n{"changed": true, "path": "/tmp/ansible.kneeu17o", "uid": 0, "gid": 0, "owner": "OMVSKERN", "group": "SYS1", "mode": "0700", "state": "directory", "size": 0, "invocation": {"module_args": {"state": "directory", "prefix": "ansible.", "suffix": "", "path": null}}}\r\n', b'Shared connection to ansible-andy-zdt1.fyre.ibm.com closed.\r\n')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'rm -f -r /u/ibmuser/.ansible/tmp/ansible-tmp-1683079512.8781781-56640-27706190725729/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+changed: [zosendpoint] => {
+    "changed": true,
+    "gid": 0,
+    "group": "SYS1",
+    "invocation": {
+        "module_args": {
+            "path": null,
+            "prefix": "ansible.",
+            "state": "directory",
+            "suffix": ""
+        }
+    },
+    "mode": "0700",
+    "owner": "OMVSKERN",
+    "path": "/tmp/ansible.kneeu17o",
+    "size": 0,
+    "state": "directory",
+    "uid": 0
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [set_fact] ****************************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:60
+ok: [zosendpoint] => {
+    "ansible_facts": {
+        "DFS_AUTH_LIB_SYSHLQ": "DFSF10"
+    },
+    "changed": false
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [debug] *******************************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:63
+ok: [zosendpoint] => {
+    "msg": "IMS source location is 'DFSF10'"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [include_role : ims_dataset] **********************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:67
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Allocate work dataset zCloud IMS] **************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:13
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : set_fact] **************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:34
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Allocate IMS system definition data sets] ******************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:44
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Copy System Datasets] **************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:142
+skipping: [zosendpoint] => (item={'src': 'DFSF10.SDFSRESL', 'dest': 'IMSTEST.IMWZ.SDFSRESL'})  => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "dest": "IMSTEST.IMWZ.SDFSRESL",
+        "src": "DFSF10.SDFSRESL"
+    },
+    "skip_reason": "Conditional result was False"
+}
+skipping: [zosendpoint] => (item={'src': 'DFSF10.SDFSMAC', 'dest': 'IMSTEST.IMWZ.SDFSMAC'})  => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "dest": "IMSTEST.IMWZ.SDFSMAC",
+        "src": "DFSF10.SDFSMAC"
+    },
+    "skip_reason": "Conditional result was False"
+}
+skipping: [zosendpoint] => (item={'src': 'DFSF10.ADFSMAC', 'dest': 'IMSTEST.IMWZ.ADFSMAC'})  => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "dest": "IMSTEST.IMWZ.ADFSMAC",
+        "src": "DFSF10.ADFSMAC"
+    },
+    "skip_reason": "Conditional result was False"
+}
+skipping: [zosendpoint] => (item={'src': 'DFSF10.ADFSLOAD', 'dest': 'IMSTEST.IMWZ.ADFSLOAD'})  => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "dest": "IMSTEST.IMWZ.ADFSLOAD",
+        "src": "DFSF10.ADFSLOAD"
+    },
+    "skip_reason": "Conditional result was False"
+}
+skipping: [zosendpoint] => (item={'src': 'DFSF10.ADFSSRC', 'dest': 'IMSTEST.IMWZ.ADFSSRC'})  => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "dest": "IMSTEST.IMWZ.ADFSSRC",
+        "src": "DFSF10.ADFSSRC"
+    },
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : set_fact] **************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:174
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [include_role : send-templates] *******************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:183
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Allocate all IMS data sets] ********************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:365
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : set_fact] **************************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:378
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [include_role : send-templates] *******************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:388
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Dynamically allocate IMS system datasets] ******************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:395
+skipping: [zosendpoint] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Delete Sysdef libs] ****************************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:409
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'echo ~ibmuser && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'/u/ibmuser\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /u/ibmuser/.ansible/tmp `"&& mkdir "` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623 `" && echo ansible-tmp-1683079524.1314921-56671-93953057291623="` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623 `" ) && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'ansible-tmp-1683079524.1314921-56671-93953057291623=/u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623\n', b'')
+Using module file /Users/adn/.ansible/collections/ansible_collections/ibm/ibm_zos_core/plugins/modules/zos_data_set.py
+<ansible-andy-zdt1.fyre.ibm.com> PUT /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmp3wm0oz_z TO /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623/AnsiballZ_zos_data_set.py
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' '[ansible-andy-zdt1.fyre.ibm.com]'
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'sftp> put /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmp3wm0oz_z /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623/AnsiballZ_zos_data_set.py\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'chmod u+x /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623/ /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623/AnsiballZ_zos_data_set.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' -tt ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'_BPXK_AUTOCVT=ON ZOAU_HOME=/usr/lpp/IBM/zoautil LIBPATH=/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:. PATH=/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin _CEE_RUNOPTS='"'"'"'"'"'"'"'"'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"'"'"'"'"'"'"'"' _TAG_REDIR_ERR=txt _TAG_REDIR_IN=txt _TAG_REDIR_OUT=txt LANG=C STEPLIB=DFSF10.SDFSRESL /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3 /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623/AnsiballZ_zos_data_set.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'\r\n{"changed": false, "message": "", "names": ["IMSTEST.IMWZ.PROCLIB", "IMSTEST.IMWZ.OBJDSET", "IMSTEST.IMWZ.LGENIN", "IMSTEST.IMWZ.LGENOUT", "IMSTEST.IMWZ.FORMAT", "IMSTEST.IMWZ.TFORMAT", "IMSTEST.IMWZ.REFERAL", "IMSTEST.IMWZ.SDFSRESL", "IMSTEST.IMWZ.SDFSMAC", "IMSTEST.IMWZ.MODBLKS", "IMSTEST.IMWZ.ADFSMAC", "IMSTEST.IMWZ.ADFSLOAD", "IMSTEST.IMWZ.ADFSSRC"], "invocation": {"module_args": {"batch": [{"name": "IMSTEST.IMWZ.PROCLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OBJDSET", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.LGENIN", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.LGENOUT", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.FORMAT", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.TFORMAT", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.REFERAL", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SDFSRESL", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SDFSMAC", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MODBLKS", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.ADFSMAC", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.ADFSLOAD", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.ADFSSRC", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}], "state": "present", "type": "PDS", "space_type": "M", "replace": false, "name": null, "space_primary": null, "space_secondary": null, "record_format": null, "sms_storage_class": null, "sms_data_class": null, "sms_management_class": null, "record_length": null, "block_size": null, "directory_blocks": null, "key_offset": null, "key_length": null, "volumes": null}}}\r\n', b'Shared connection to ansible-andy-zdt1.fyre.ibm.com closed.\r\n')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'rm -f -r /u/ibmuser/.ansible/tmp/ansible-tmp-1683079524.1314921-56671-93953057291623/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+ok: [zosendpoint] => {
+    "changed": false,
+    "invocation": {
+        "module_args": {
+            "batch": [
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.PROCLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OBJDSET",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.LGENIN",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.LGENOUT",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.FORMAT",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.TFORMAT",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.REFERAL",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SDFSRESL",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SDFSMAC",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MODBLKS",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.ADFSMAC",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.ADFSLOAD",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.ADFSSRC",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                }
+            ],
+            "block_size": null,
+            "directory_blocks": null,
+            "key_length": null,
+            "key_offset": null,
+            "name": null,
+            "record_format": null,
+            "record_length": null,
+            "replace": false,
+            "sms_data_class": null,
+            "sms_management_class": null,
+            "sms_storage_class": null,
+            "space_primary": null,
+            "space_secondary": null,
+            "space_type": "M",
+            "state": "present",
+            "type": "PDS",
+            "volumes": null
+        }
+    },
+    "message": "",
+    "names": [
+        "IMSTEST.IMWZ.PROCLIB",
+        "IMSTEST.IMWZ.OBJDSET",
+        "IMSTEST.IMWZ.LGENIN",
+        "IMSTEST.IMWZ.LGENOUT",
+        "IMSTEST.IMWZ.FORMAT",
+        "IMSTEST.IMWZ.TFORMAT",
+        "IMSTEST.IMWZ.REFERAL",
+        "IMSTEST.IMWZ.SDFSRESL",
+        "IMSTEST.IMWZ.SDFSMAC",
+        "IMSTEST.IMWZ.MODBLKS",
+        "IMSTEST.IMWZ.ADFSMAC",
+        "IMSTEST.IMWZ.ADFSLOAD",
+        "IMSTEST.IMWZ.ADFSSRC"
+    ]
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Delete IMS Runtime Libs] ***********************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:454
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'echo ~ibmuser && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'/u/ibmuser\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /u/ibmuser/.ansible/tmp `"&& mkdir "` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904 `" && echo ansible-tmp-1683079561.798102-56737-214289190562904="` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904 `" ) && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'ansible-tmp-1683079561.798102-56737-214289190562904=/u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904\n', b'')
+Using module file /Users/adn/.ansible/collections/ansible_collections/ibm/ibm_zos_core/plugins/modules/zos_data_set.py
+<ansible-andy-zdt1.fyre.ibm.com> PUT /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmp248586o_ TO /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904/AnsiballZ_zos_data_set.py
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' '[ansible-andy-zdt1.fyre.ibm.com]'
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'sftp> put /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmp248586o_ /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904/AnsiballZ_zos_data_set.py\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'chmod u+x /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904/ /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904/AnsiballZ_zos_data_set.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' -tt ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'_BPXK_AUTOCVT=ON ZOAU_HOME=/usr/lpp/IBM/zoautil LIBPATH=/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:. PATH=/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin _CEE_RUNOPTS='"'"'"'"'"'"'"'"'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"'"'"'"'"'"'"'"' _TAG_REDIR_ERR=txt _TAG_REDIR_IN=txt _TAG_REDIR_OUT=txt LANG=C STEPLIB=DFSF10.SDFSRESL /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3 /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904/AnsiballZ_zos_data_set.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'\r\n{"changed": false, "message": "", "names": ["IMSTEST.IMWZ.INSTALL", "IMSTEST.IMWZ.PGMLIB", "IMSTEST.IMWZ.PSBLIB", "IMSTEST.IMWZ.ACBLIB", "IMSTEST.IMWZ.IMSMON", "IMSTEST.IMWZ.DBDLIB", "IMSTEST.IMWZ.ACBLIBA", "IMSTEST.IMWZ.ACBLIBB", "IMSTEST.IMWZ.MODBLKSA", "IMSTEST.IMWZ.MODBLKSB", "IMSTEST.IMWZ.MODSTAT", "IMSTEST.IMWZ.RDS", "IMSTEST.IMWZ.OLP00", "IMSTEST.IMWZ.OLS00", "IMSTEST.IMWZ.OLP01", "IMSTEST.IMWZ.OLS01", "IMSTEST.IMWZ.OLP02", "IMSTEST.IMWZ.OLS02", "IMSTEST.IMWZ.OLP03", "IMSTEST.IMWZ.OLS03", "IMSTEST.IMWZ.OLP04", "IMSTEST.IMWZ.OLS04", "IMSTEST.IMWZ.OLP05", "IMSTEST.IMWZ.OLS05", "IMSTEST.IMWZ.OLP99", "IMSTEST.IMWZ.OLS99", "IMSTEST.IMWZ.WADS0", "IMSTEST.IMWZ.WADS1", "IMSTEST.IMWZ.WADS8", "IMSTEST.IMWZ.WADS9", "IMSTEST.IMWZ.JOBS", "IMSTEST.IMWZ.DFSTRA01", "IMSTEST.IMWZ.DFSTRA02", "IMSTEST.IMWZ.FORMATA", "IMSTEST.IMWZ.FORMATB", "IMSTEST.IMWZ.TCFSLIB", "IMSTEST.IMWZ.TCPPARMS", "IMSTEST.IMWZ.QBLKS", "IMSTEST.IMWZ.SHMSG", "IMSTEST.IMWZ.SHMSG1", "IMSTEST.IMWZ.LGMSG", "IMSTEST.IMWZ.LGMSG1", "IMSTEST.IMWZ.LGMSG2", "IMSTEST.IMWZ.SYSO1", "IMSTEST.IMWZ.SYSO2", "IMSTEST.IMWZ.SYSO3", "IMSTEST.IMWZ.SYSO4", "IMSTEST.IMWZ.MSDBCP1", "IMSTEST.IMWZ.MSDBCP2", "IMSTEST.IMWZ.MSDBDUMP", "IMSTEST.IMWZ.RDDS1", "IMSTEST.IMWZ.RDDS2", "IMSTEST.IMWZ.RDDS3", "IMSTEST.IMWZ.RECON1", "IMSTEST.IMWZ.RECON2", "IMSTEST.IMWZ.RECON3", "IMSTEST.IMWZ.EXITLIB"], "invocation": {"module_args": {"batch": [{"name": "IMSTEST.IMWZ.INSTALL", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.PGMLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.PSBLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.ACBLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.IMSMON", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.DBDLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.ACBLIBA", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.ACBLIBB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MODBLKSA", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MODBLKSB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MODSTAT", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RDS", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP00", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS00", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP01", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS01", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP02", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS02", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP03", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS03", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP04", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS04", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP05", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS05", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLP99", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.OLS99", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.WADS0", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.WADS1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.WADS8", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.WADS9", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.JOBS", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.DFSTRA01", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.DFSTRA02", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.FORMATA", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.FORMATB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.TCFSLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.TCPPARMS", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.QBLKS", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SHMSG", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SHMSG1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.LGMSG", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.LGMSG1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.LGMSG2", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SYSO1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SYSO2", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SYSO3", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.SYSO4", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MSDBCP1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MSDBCP2", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.MSDBDUMP", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RDDS1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RDDS2", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RDDS3", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RECON1", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RECON2", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.RECON3", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}, {"name": "IMSTEST.IMWZ.EXITLIB", "state": "absent", "type": "PDS", "space_type": "M", "replace": false, "space_primary": null, "space_secondary": null, "record_format": null, "sms_management_class": null, "sms_storage_class": null, "sms_data_class": null, "block_size": null, "directory_blocks": null, "record_length": null, "key_offset": null, "key_length": null, "volumes": null}], "state": "present", "type": "PDS", "space_type": "M", "replace": false, "name": null, "space_primary": null, "space_secondary": null, "record_format": null, "sms_storage_class": null, "sms_data_class": null, "sms_management_class": null, "record_length": null, "block_size": null, "directory_blocks": null, "key_offset": null, "key_length": null, "volumes": null}}}\r\n', b'Shared connection to ansible-andy-zdt1.fyre.ibm.com closed.\r\n')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'rm -f -r /u/ibmuser/.ansible/tmp/ansible-tmp-1683079561.798102-56737-214289190562904/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+ok: [zosendpoint] => {
+    "changed": false,
+    "invocation": {
+        "module_args": {
+            "batch": [
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.INSTALL",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.PGMLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.PSBLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.ACBLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.IMSMON",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.DBDLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.ACBLIBA",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.ACBLIBB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MODBLKSA",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MODBLKSB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MODSTAT",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RDS",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP00",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS00",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP01",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS01",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP02",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS02",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP03",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS03",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP04",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS04",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP05",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS05",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLP99",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.OLS99",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.WADS0",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.WADS1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.WADS8",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.WADS9",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.JOBS",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.DFSTRA01",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.DFSTRA02",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.FORMATA",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.FORMATB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.TCFSLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.TCPPARMS",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.QBLKS",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SHMSG",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SHMSG1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.LGMSG",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.LGMSG1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.LGMSG2",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SYSO1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SYSO2",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SYSO3",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.SYSO4",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MSDBCP1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MSDBCP2",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.MSDBDUMP",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RDDS1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RDDS2",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RDDS3",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RECON1",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RECON2",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.RECON3",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                },
+                {
+                    "block_size": null,
+                    "directory_blocks": null,
+                    "key_length": null,
+                    "key_offset": null,
+                    "name": "IMSTEST.IMWZ.EXITLIB",
+                    "record_format": null,
+                    "record_length": null,
+                    "replace": false,
+                    "sms_data_class": null,
+                    "sms_management_class": null,
+                    "sms_storage_class": null,
+                    "space_primary": null,
+                    "space_secondary": null,
+                    "space_type": "M",
+                    "state": "absent",
+                    "type": "PDS",
+                    "volumes": null
+                }
+            ],
+            "block_size": null,
+            "directory_blocks": null,
+            "key_length": null,
+            "key_offset": null,
+            "name": null,
+            "record_format": null,
+            "record_length": null,
+            "replace": false,
+            "sms_data_class": null,
+            "sms_management_class": null,
+            "sms_storage_class": null,
+            "space_primary": null,
+            "space_secondary": null,
+            "space_type": "M",
+            "state": "present",
+            "type": "PDS",
+            "volumes": null
+        }
+    },
+    "message": "",
+    "names": [
+        "IMSTEST.IMWZ.INSTALL",
+        "IMSTEST.IMWZ.PGMLIB",
+        "IMSTEST.IMWZ.PSBLIB",
+        "IMSTEST.IMWZ.ACBLIB",
+        "IMSTEST.IMWZ.IMSMON",
+        "IMSTEST.IMWZ.DBDLIB",
+        "IMSTEST.IMWZ.ACBLIBA",
+        "IMSTEST.IMWZ.ACBLIBB",
+        "IMSTEST.IMWZ.MODBLKSA",
+        "IMSTEST.IMWZ.MODBLKSB",
+        "IMSTEST.IMWZ.MODSTAT",
+        "IMSTEST.IMWZ.RDS",
+        "IMSTEST.IMWZ.OLP00",
+        "IMSTEST.IMWZ.OLS00",
+        "IMSTEST.IMWZ.OLP01",
+        "IMSTEST.IMWZ.OLS01",
+        "IMSTEST.IMWZ.OLP02",
+        "IMSTEST.IMWZ.OLS02",
+        "IMSTEST.IMWZ.OLP03",
+        "IMSTEST.IMWZ.OLS03",
+        "IMSTEST.IMWZ.OLP04",
+        "IMSTEST.IMWZ.OLS04",
+        "IMSTEST.IMWZ.OLP05",
+        "IMSTEST.IMWZ.OLS05",
+        "IMSTEST.IMWZ.OLP99",
+        "IMSTEST.IMWZ.OLS99",
+        "IMSTEST.IMWZ.WADS0",
+        "IMSTEST.IMWZ.WADS1",
+        "IMSTEST.IMWZ.WADS8",
+        "IMSTEST.IMWZ.WADS9",
+        "IMSTEST.IMWZ.JOBS",
+        "IMSTEST.IMWZ.DFSTRA01",
+        "IMSTEST.IMWZ.DFSTRA02",
+        "IMSTEST.IMWZ.FORMATA",
+        "IMSTEST.IMWZ.FORMATB",
+        "IMSTEST.IMWZ.TCFSLIB",
+        "IMSTEST.IMWZ.TCPPARMS",
+        "IMSTEST.IMWZ.QBLKS",
+        "IMSTEST.IMWZ.SHMSG",
+        "IMSTEST.IMWZ.SHMSG1",
+        "IMSTEST.IMWZ.LGMSG",
+        "IMSTEST.IMWZ.LGMSG1",
+        "IMSTEST.IMWZ.LGMSG2",
+        "IMSTEST.IMWZ.SYSO1",
+        "IMSTEST.IMWZ.SYSO2",
+        "IMSTEST.IMWZ.SYSO3",
+        "IMSTEST.IMWZ.SYSO4",
+        "IMSTEST.IMWZ.MSDBCP1",
+        "IMSTEST.IMWZ.MSDBCP2",
+        "IMSTEST.IMWZ.MSDBDUMP",
+        "IMSTEST.IMWZ.RDDS1",
+        "IMSTEST.IMWZ.RDDS2",
+        "IMSTEST.IMWZ.RDDS3",
+        "IMSTEST.IMWZ.RECON1",
+        "IMSTEST.IMWZ.RECON2",
+        "IMSTEST.IMWZ.RECON3",
+        "IMSTEST.IMWZ.EXITLIB"
+    ]
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [ims_dataset : Delete IMS Java dataset] ***********************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml:630
+fatal: [zosendpoint]: FAILED! => {
+    "msg": "The conditional check 'java_dataset == \"delete\"' failed. The error was: error while evaluating conditional (java_dataset == \"delete\"): 'java_dataset' is undefined\n\nThe error appears to be in '/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_dataset/tasks/main.yml': line 630, column 7, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n    - name: Delete IMS Java dataset\n      ^ here\n"
+}
+Read vars_file 'vars_wazi/ims-dbdc.yml'
+
+TASK [Delete the temporary provision files directory] **************************
+task path: /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/delete-ims-datasets.yml:95
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'echo ~ibmuser && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'/u/ibmuser\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /u/ibmuser/.ansible/tmp `"&& mkdir "` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638 `" && echo ansible-tmp-1683079686.8304331-56869-223199740826638="` echo /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638 `" ) && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'ansible-tmp-1683079686.8304331-56869-223199740826638=/u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638\n', b'')
+Using module file /Users/adn/workspaces/nazare/venv/lib/python3.9/site-packages/ansible/modules/file.py
+<ansible-andy-zdt1.fyre.ibm.com> PUT /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmpilk8oibn TO /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638/AnsiballZ_file.py
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' '[ansible-andy-zdt1.fyre.ibm.com]'
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'sftp> put /Users/adn/.ansible/tmp/ansible-local-56580zfpbw422/tmpilk8oibn /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638/AnsiballZ_file.py\n', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'chmod u+x /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638/ /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638/AnsiballZ_file.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' -tt ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'_BPXK_AUTOCVT=ON ZOAU_HOME=/usr/lpp/IBM/zoautil LIBPATH=/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:. PATH=/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin _CEE_RUNOPTS='"'"'"'"'"'"'"'"'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"'"'"'"'"'"'"'"' _TAG_REDIR_ERR=txt _TAG_REDIR_IN=txt _TAG_REDIR_OUT=txt LANG=C STEPLIB=DFSF10.SDFSRESL /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3 /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638/AnsiballZ_file.py && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'\r\n{"path": "/tmp/ansible.kneeu17o", "changed": true, "diff": {"before": {"path": "/tmp/ansible.kneeu17o", "state": "directory", "path_content": {"directories": [], "files": []}}, "after": {"path": "/tmp/ansible.kneeu17o", "state": "absent"}}, "state": "absent", "invocation": {"module_args": {"path": "/tmp/ansible.kneeu17o", "state": "absent", "recurse": false, "force": false, "follow": true, "modification_time_format": "%Y%m%d%H%M.%S", "access_time_format": "%Y%m%d%H%M.%S", "unsafe_writes": false, "_original_basename": null, "_diff_peek": null, "src": null, "modification_time": null, "access_time": null, "mode": null, "owner": null, "group": null, "seuser": null, "serole": null, "selevel": null, "setype": null, "attributes": null}}}\r\n', b'Shared connection to ansible-andy-zdt1.fyre.ibm.com closed.\r\n')
+<ansible-andy-zdt1.fyre.ibm.com> ESTABLISH SSH CONNECTION FOR USER: ibmuser
+<ansible-andy-zdt1.fyre.ibm.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o Port=2022 -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ibmuser"' -o ConnectTimeout=10 -o 'ControlPath="/Users/adn/.ansible/cp/b5f45023a1"' ansible-andy-zdt1.fyre.ibm.com '/bin/sh -c '"'"'rm -f -r /u/ibmuser/.ansible/tmp/ansible-tmp-1683079686.8304331-56869-223199740826638/ > /dev/null 2>&1 && sleep 0'"'"''
+<ansible-andy-zdt1.fyre.ibm.com> (0, b'', b'')
+changed: [zosendpoint] => {
+    "changed": true,
+    "diff": {
+        "after": {
+            "path": "/tmp/ansible.kneeu17o",
+            "state": "absent"
+        },
+        "before": {
+            "path": "/tmp/ansible.kneeu17o",
+            "path_content": {
+                "directories": [],
+                "files": []
+            },
+            "state": "directory"
+        }
+    },
+    "invocation": {
+        "module_args": {
+            "_diff_peek": null,
+            "_original_basename": null,
+            "access_time": null,
+            "access_time_format": "%Y%m%d%H%M.%S",
+            "attributes": null,
+            "follow": true,
+            "force": false,
+            "group": null,
+            "mode": null,
+            "modification_time": null,
+            "modification_time_format": "%Y%m%d%H%M.%S",
+            "owner": null,
+            "path": "/tmp/ansible.kneeu17o",
+            "recurse": false,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "src": null,
+            "state": "absent",
+            "unsafe_writes": false
+        }
+    },
+    "path": "/tmp/ansible.kneeu17o",
+    "state": "absent"
+}
+
+PLAY RECAP *********************************************************************
+zosendpoint                : ok=10   changed=3    unreachable=0    failed=1    skipped=10   rescued=0    ignored=0   
+
