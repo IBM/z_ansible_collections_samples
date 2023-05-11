@@ -1,0 +1,623 @@
+Using /Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/ansible.cfg as config file
+
+PLAY [IMS TMDB De-provisioning] ************************************************
+
+TASK [include_role : set_up_run_environment] ***********************************
+Wednesday 10 May 2023  16:21:18 -0700 (0:00:00.013)       0:00:00.013 ********* 
+
+TASK [set_up_run_environment : Retrieve z/OS proclib dataset] ******************
+Wednesday 10 May 2023  16:21:18 -0700 (0:00:00.024)       0:00:00.037 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "pproc", "delta": "0:00:01.783985", "end": "2023-05-10 23:22:03.558143", "msg": "", "rc": 0, "start": "2023-05-10 23:22:01.774158", "stderr": "", "stderr_lines": [], "stdout": "USER.Z25C.PROCLIB\nFEU.Z25C.PROCLIB\nADCD.Z25C.PROCLIB\nSYS1.PROCLIB", "stdout_lines": ["USER.Z25C.PROCLIB", "FEU.Z25C.PROCLIB", "ADCD.Z25C.PROCLIB", "SYS1.PROCLIB"]}
+
+TASK [set_up_run_environment : set_fact] ***************************************
+Wednesday 10 May 2023  16:21:36 -0700 (0:00:18.121)       0:00:18.158 ********* 
+ok: [zosendpoint] => {"ansible_facts": {"ADDTL_SAMP_PROC_LIB": "IMSTEST.IMWZ.PROCLIB", "DFS_DS_VOLUME1": "C5USR1", "DFS_DS_VOLUME2": "C5USR1", "IST_VTAM_IMSAPPLID": "IMWZ", "JOB_CARD": "//ANSIBLE JOB 'testing',\n//*  NOTIFY=IBMUSER,\n//  USER=IBMUSER,\n//  MSGCLASS=H,\n//  MSGLEVEL=(1,1),\n//  CLASS=A", "ROUTE": "IMWZ", "TCPIP_PROFILE_TMP": "IMSTEST.TEMP", "ZOS_RELEASE": "Z25C"}, "changed": false}
+
+TASK [set_up_run_environment : debug] ******************************************
+Wednesday 10 May 2023  16:21:36 -0700 (0:00:00.029)       0:00:18.188 ********* 
+ok: [zosendpoint] => {
+    "<class 'list'>": "VARIABLE IS NOT DEFINED!: "
+}
+
+TASK [set_up_run_environment : set_fact] ***************************************
+Wednesday 10 May 2023  16:21:36 -0700 (0:00:00.014)       0:00:18.202 ********* 
+ok: [zosendpoint] => (item={'key': '_BPXK_AUTOCVT', 'value': 'ON'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "_BPXK_AUTOCVT", "value": "ON"}}
+ok: [zosendpoint] => (item={'key': 'ZOAU_HOME', 'value': '/usr/lpp/IBM/zoautil'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "ZOAU_HOME", "value": "/usr/lpp/IBM/zoautil"}}
+ok: [zosendpoint] => (item={'key': 'LIBPATH', 'value': '/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "LIBPATH", "value": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:."}}
+ok: [zosendpoint] => (item={'key': 'PATH', 'value': '/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "PATH", "value": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin"}}
+ok: [zosendpoint] => (item={'key': '_CEE_RUNOPTS', 'value': 'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "_CEE_RUNOPTS", "value": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"}}
+ok: [zosendpoint] => (item={'key': '_TAG_REDIR_ERR', 'value': 'txt'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "_TAG_REDIR_ERR", "value": "txt"}}
+ok: [zosendpoint] => (item={'key': '_TAG_REDIR_IN', 'value': 'txt'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "_TAG_REDIR_IN", "value": "txt"}}
+ok: [zosendpoint] => (item={'key': '_TAG_REDIR_OUT', 'value': 'txt'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "_TAG_REDIR_OUT", "value": "txt"}}
+ok: [zosendpoint] => (item={'key': 'LANG', 'value': 'C'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "LANG", "value": "C"}}
+ok: [zosendpoint] => (item={'key': 'STEPLIB', 'value': 'DFSF10.SDFSRESL'}) => {"ansible_facts": {"system_environment": {"LANG": "C", "LIBPATH": "/usr/lpp/IBM/zoautil/lib:/u/ibmuser/pythonlib:/usr/lpp/IBM/cyp/v3r9/pyz/lib:/lib:/usr/lib:.", "PATH": "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r9/pyz/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin", "STEPLIB": "DFSF10.SDFSRESL", "ZOAU_HOME": "/usr/lpp/IBM/zoautil", "_BPXK_AUTOCVT": "ON", "_CEE_RUNOPTS": "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)", "_TAG_REDIR_ERR": "txt", "_TAG_REDIR_IN": "txt", "_TAG_REDIR_OUT": "txt"}}, "ansible_loop_var": "item", "changed": false, "item": {"key": "STEPLIB", "value": "DFSF10.SDFSRESL"}}
+
+TASK [set_up_run_environment : tempfile] ***************************************
+Wednesday 10 May 2023  16:21:36 -0700 (0:00:00.047)       0:00:18.250 ********* 
+changed: [zosendpoint] => {"changed": true, "gid": 0, "group": "SYS1", "mode": "0700", "owner": "OMVSKERN", "path": "/tmp/ansible.981czjzj", "size": 0, "state": "directory", "uid": 0}
+
+TASK [set_up_run_environment : set_fact] ***************************************
+Wednesday 10 May 2023  16:21:47 -0700 (0:00:10.770)       0:00:29.020 ********* 
+ok: [zosendpoint] => {"ansible_facts": {"DFS_AUTH_LIB_SYSHLQ": "DFSF10"}, "changed": false}
+
+TASK [set_up_run_environment : debug] ******************************************
+Wednesday 10 May 2023  16:21:47 -0700 (0:00:00.021)       0:00:29.042 ********* 
+ok: [zosendpoint] => {
+    "msg": "IMS source location is 'DFSF10'"
+}
+
+TASK [include_role : deprovision_ims] ******************************************
+Wednesday 10 May 2023  16:21:47 -0700 (0:00:00.016)       0:00:29.058 ********* 
+
+TASK [deprovision_ims : Stop all IMS resources] ********************************
+Wednesday 10 May 2023  16:21:47 -0700 (0:00:00.023)       0:00:29.082 ********* 
+changed: [zosendpoint] => {"changed": true, "ims_output": [{"command_return": {"ctl.rc": "00000000", "ctl.rsn": "00000000"}, "spoc_api_return": {"imsrc": "00000000X", "reason": "00000000X"}, "type_1_response": [{"Mbr_name 1": "IMWZ", "msg_data": ["DFS058I 18:22:26 STOP COMMAND COMPLETED"]}]}, {"command_return": {"ctl.rc": "00000000", "ctl.rsn": "00000000"}, "spoc_api_return": {"imsrc": "00000000X", "reason": "00000000X"}, "type_1_response": [{"Mbr_name 1": "IMWZ", "msg_data": ["DFS058I 18:22:27 STOP COMMAND COMPLETED"]}]}, {"command_return": {"ctl.rc": "00000000", "ctl.rsn": "00000000"}, "spoc_api_return": {"imsrc": "00000000X", "reason": "00000000X"}, "type_1_response": [{"Mbr_name 1": "IMWZ", "msg_data": ["DFS0488I  STO COMMAND COMPLETED. KEYWORD ALL"]}]}], "msg": "Success"}
+
+TASK [deprovision_ims : Immediate IMS Shutdown] ********************************
+Wednesday 10 May 2023  16:22:01 -0700 (0:00:14.008)       0:00:43.091 ********* 
+changed: [zosendpoint] => {"changed": true, "ims_output": [{"command_return": {"ctl.rc": "00000000", "ctl.rsn": "00000000"}, "spoc_api_return": {"imsrc": "00000000X", "reason": "00000000X"}, "type_1_response": [{"Mbr_name 1": "IMWZ", "msg_data": ["DFS058I 18:22:40 CHECKPOINT COMMAND IN PROGRESS"]}]}], "msg": "Success"}
+
+TASK [include_role : ims_common] ***********************************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:12.422)       0:00:55.513 ********* 
+
+TASK [ims_common : Start IMS control region] ***********************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:00.025)       0:00:55.539 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_common : Stop IMS control region] ************************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:00.011)       0:00:55.551 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [Wait for IMS ready] ******************************************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:00.011)       0:00:55.562 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_common : IMS cold start] *********************************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:00.010)       0:00:55.573 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_common : ICON start] *************************************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:00.013)       0:00:55.586 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_common : Stop ICON] **************************************************
+Wednesday 10 May 2023  16:22:13 -0700 (0:00:00.012)       0:00:55.599 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "c IMWZHWS", "content": ["S0W1       2023130  18:23:00.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:23:00.00            -C IMWZHWS ", "S0W1       2023130  18:23:00.00             IEE341I IMWZHWS           NOT ACTIVE", "BGYSC0804I Using timeout of 1 seconds.", "BGYSC0801I CONSBUFPGNUM=128 - Console command output buffer memory size to be allocated: 131072 bytes", "BGYSC0802I Console command returned output string size of 37 bytes."], "elapsed": 6.27, "rc": 0, "wait_time_s": 1}
+
+TASK [include_role : ims_odbm] *************************************************
+Wednesday 10 May 2023  16:22:33 -0700 (0:00:19.558)       0:01:15.157 ********* 
+
+TASK [ims_odbm : set_fact] *****************************************************
+Wednesday 10 May 2023  16:22:33 -0700 (0:00:00.034)       0:01:15.191 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:22:33 -0700 (0:00:00.013)       0:01:15.204 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_odbm : Start Open Database Manager (ODBM)] ***************************
+Wednesday 10 May 2023  16:22:33 -0700 (0:00:00.011)       0:01:15.215 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_odbm : Stop Open Database Manager (ODBM)] ****************************
+Wednesday 10 May 2023  16:22:33 -0700 (0:00:00.019)       0:01:15.235 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "c IMWZODBM", "content": ["S0W1       2023130  18:23:18.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:23:18.00            -C IMWZODBM ", "S0W1       2023130  18:23:18.00             IEE301I IMWZODBM          CANCEL COMMAND ACCEPTED", "BGYSC0804I Using timeout of 1 seconds.", "BGYSC0801I CONSBUFPGNUM=128 - Console command output buffer memory size to be allocated: 131072 bytes", "BGYSC0802I Console command returned output string size of 50 bytes."], "elapsed": 5.47, "rc": 0, "wait_time_s": 1}
+
+TASK [include_role : ims_operations_manager] ***********************************
+Wednesday 10 May 2023  16:22:50 -0700 (0:00:17.563)       0:01:32.798 ********* 
+
+TASK [ims_operations_manager : set_fact] ***************************************
+Wednesday 10 May 2023  16:22:50 -0700 (0:00:00.029)       0:01:32.827 ********* 
+ok: [zosendpoint] => {"ansible_facts": {"bpe_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_operations_manager/templates/bpe_config.txt", "oi_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_operations_manager/templates/oi_config.txt", "om_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_operations_manager/templates/om_config.txt", "rom_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_operations_manager/templates/rom_config.txt"}, "changed": false}
+
+TASK [ims_operations_manager : check om value] *********************************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.014)       0:01:32.842 ********* 
+ok: [zosendpoint] => {
+    "om": "stop"
+}
+
+TASK [ims_operations_manager : Define BPECONFG] ********************************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.013)       0:01:32.855 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_operations_manager : Add CSLOI000 member] ****************************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.012)       0:01:32.867 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_operations_manager : Add OM member to PROCLIB] ***********************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.011)       0:01:32.879 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_operations_manager : Add CSLOIROM member] ****************************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.011)       0:01:32.890 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_operations_manager : Start OM] ***************************************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.011)       0:01:32.901 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_operations_manager : Stop OM] ****************************************
+Wednesday 10 May 2023  16:22:51 -0700 (0:00:00.012)       0:01:32.914 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "c IMWZOM", "content": ["S0W1       2023130  18:23:34.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:23:34.00            -C IMWZOM ", "S0W1       2023130  18:23:34.00             IEE301I IMWZOM            CANCEL COMMAND ACCEPTED", "BGYSC0804I Using timeout of 1 seconds.", "BGYSC0801I CONSBUFPGNUM=128 - Console command output buffer memory size to be allocated: 131072 bytes", "BGYSC0802I Console command returned output string size of 50 bytes."], "elapsed": 4.77, "rc": 0, "wait_time_s": 1}
+
+TASK [ims_operations_manager : Query OM status] ********************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:16.377)       0:01:49.292 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : ims_resource_manager] *************************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.019)       0:01:49.312 ********* 
+
+TASK [ims_resource_manager : set_fact] *****************************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.025)       0:01:49.337 ********* 
+ok: [zosendpoint] => {"ansible_facts": {"bpe_rm_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_resource_manager/templates/bpe_rm_config.txt", "ri_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_resource_manager/templates/ri_config.txt", "rm_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_resource_manager/templates/rm_config.txt"}, "changed": false}
+
+TASK [ims_resource_manager : check rm value] ***********************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.015)       0:01:49.353 ********* 
+ok: [zosendpoint] => {
+    "rm": "stop"
+}
+
+TASK [ims_resource_manager : Define BPECONFG] **********************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.014)       0:01:49.367 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_resource_manager : Add CSLRI000 member] ******************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.011)       0:01:49.379 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_resource_manager : Add RM member to PROCLIB] *************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.012)       0:01:49.391 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_resource_manager : Start RM] *****************************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.011)       0:01:49.403 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_resource_manager : Stop RM] ******************************************
+Wednesday 10 May 2023  16:23:07 -0700 (0:00:00.012)       0:01:49.415 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "c IMWZRM", "content": ["S0W1       2023130  18:23:50.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:23:50.00            -C IMWZRM ", "S0W1       2023130  18:23:50.00             IEE301I IMWZRM            CANCEL COMMAND ACCEPTED", "BGYSC0804I Using timeout of 1 seconds.", "BGYSC0801I CONSBUFPGNUM=128 - Console command output buffer memory size to be allocated: 131072 bytes", "BGYSC0802I Console command returned output string size of 50 bytes."], "elapsed": 4.69, "rc": 0, "wait_time_s": 1}
+
+TASK [ims_resource_manager : Query RM status] **********************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:15.729)       0:02:05.145 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : ims_structured_call_interface] ****************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.017)       0:02:05.162 ********* 
+
+TASK [ims_structured_call_interface : set_fact] ********************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.026)       0:02:05.188 ********* 
+ok: [zosendpoint] => {"ansible_facts": {"bpe_sci_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_structured_call_interface/templates/bpe_sci_config.txt", "sci_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_structured_call_interface/templates/sci_config.txt", "si_config": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_structured_call_interface/templates/si_config.txt"}, "changed": false}
+
+TASK [ims_structured_call_interface : check sci value] *************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.016)       0:02:05.204 ********* 
+ok: [zosendpoint] => {
+    "sci": "stop"
+}
+
+TASK [ims_structured_call_interface : Define BPECONFG] *************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.014)       0:02:05.219 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : Add CSLSI000 member to PROCLIB] **********
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.012)       0:02:05.231 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : Add SCI PROC member to PROCLIB] **********
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.010)       0:02:05.242 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : Start SCI] *******************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.010)       0:02:05.253 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : wait_for] ********************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.011)       0:02:05.265 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : zos_job_output] **************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.011)       0:02:05.276 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : set_fact] ********************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.010)       0:02:05.287 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : Start SCI] *******************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.013)       0:02:05.300 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_structured_call_interface : Stop SCI] ********************************
+Wednesday 10 May 2023  16:23:23 -0700 (0:00:00.013)       0:02:05.313 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "c IMWZSCI", "content": ["S0W1       2023130  18:24:06.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:24:06.00            -C IMWZSCI ", "S0W1       2023130  18:24:06.00             IEE301I IMWZSCI           CANCEL COMMAND ACCEPTED", "BGYSC0804I Using timeout of 1 seconds.", "BGYSC0801I CONSBUFPGNUM=128 - Console command output buffer memory size to be allocated: 131072 bytes", "BGYSC0802I Console command returned output string size of 50 bytes."], "elapsed": 5.13, "rc": 0, "wait_time_s": 1}
+
+TASK [ims_structured_call_interface : Query SCI status] ************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:16.023)       0:02:21.336 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : ims_dataset] **********************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.019)       0:02:21.356 ********* 
+
+TASK [ims_dataset : Allocate work dataset zCloud IMS] **************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.039)       0:02:21.395 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : set_fact] **************************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.012)       0:02:21.408 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Allocate IMS system definition data sets] ******************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.011)       0:02:21.419 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Copy SDFSRESL using zos_mvs_raw] ***************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.011)       0:02:21.430 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Temporal copy SDFSMAC] *************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.010)       0:02:21.441 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Temporal copy ADFSMAC] *************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.011)       0:02:21.452 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Temporal copy ADFSLOAD] ************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.012)       0:02:21.465 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Temporal copy ADFSSRC] *************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.013)       0:02:21.479 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : set_fact] **************************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.014)       0:02:21.493 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-templates] *******************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.011)       0:02:21.504 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Submit] ****************************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.010)       0:02:21.515 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : set_fact] **************************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.010)       0:02:21.526 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-templates] *******************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.011)       0:02:21.537 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Dynamically allocate IMS system datasets] ******************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.011)       0:02:21.548 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_dataset : Delete Sysdef libs] ****************************************
+Wednesday 10 May 2023  16:23:39 -0700 (0:00:00.012)       0:02:21.560 ********* 
+changed: [zosendpoint] => {"changed": true, "message": "", "names": ["IMSTEST.IMWZ.PROCLIB", "IMSTEST.IMWZ.OBJDSET", "IMSTEST.IMWZ.LGENIN", "IMSTEST.IMWZ.LGENOUT", "IMSTEST.IMWZ.FORMAT", "IMSTEST.IMWZ.TFORMAT", "IMSTEST.IMWZ.REFERAL", "IMSTEST.IMWZ.SDFSRESL", "IMSTEST.IMWZ.SDFSMAC", "IMSTEST.IMWZ.MODBLKS", "IMSTEST.IMWZ.ADFSMAC", "IMSTEST.IMWZ.ADFSLOAD", "IMSTEST.IMWZ.ADFSSRC"]}
+
+TASK [ims_dataset : Delete IMS Runtime Libs] ***********************************
+Wednesday 10 May 2023  16:24:18 -0700 (0:00:39.202)       0:03:00.763 ********* 
+changed: [zosendpoint] => {"changed": true, "message": "", "names": ["IMSTEST.IMWZ.INSTALL", "IMSTEST.IMWZ.PGMLIB", "IMSTEST.IMWZ.PSBLIB", "IMSTEST.IMWZ.ACBLIB", "IMSTEST.IMWZ.IMSMON", "IMSTEST.IMWZ.DBDLIB", "IMSTEST.IMWZ.ACBLIBA", "IMSTEST.IMWZ.ACBLIBB", "IMSTEST.IMWZ.MODBLKSA", "IMSTEST.IMWZ.MODBLKSB", "IMSTEST.IMWZ.MODSTAT", "IMSTEST.IMWZ.RDS", "IMSTEST.IMWZ.OLP00", "IMSTEST.IMWZ.OLS00", "IMSTEST.IMWZ.OLP01", "IMSTEST.IMWZ.OLS01", "IMSTEST.IMWZ.OLP02", "IMSTEST.IMWZ.OLS02", "IMSTEST.IMWZ.OLP03", "IMSTEST.IMWZ.OLS03", "IMSTEST.IMWZ.OLP04", "IMSTEST.IMWZ.OLS04", "IMSTEST.IMWZ.OLP05", "IMSTEST.IMWZ.OLS05", "IMSTEST.IMWZ.OLP99", "IMSTEST.IMWZ.OLS99", "IMSTEST.IMWZ.WADS0", "IMSTEST.IMWZ.WADS1", "IMSTEST.IMWZ.WADS8", "IMSTEST.IMWZ.WADS9", "IMSTEST.IMWZ.JOBS", "IMSTEST.IMWZ.DFSTRA01", "IMSTEST.IMWZ.DFSTRA02", "IMSTEST.IMWZ.FORMATA", "IMSTEST.IMWZ.FORMATB", "IMSTEST.IMWZ.TCFSLIB", "IMSTEST.IMWZ.TCPPARMS", "IMSTEST.IMWZ.QBLKS", "IMSTEST.IMWZ.SHMSG", "IMSTEST.IMWZ.SHMSG1", "IMSTEST.IMWZ.LGMSG", "IMSTEST.IMWZ.LGMSG1", "IMSTEST.IMWZ.LGMSG2", "IMSTEST.IMWZ.SYSO1", "IMSTEST.IMWZ.SYSO2", "IMSTEST.IMWZ.SYSO3", "IMSTEST.IMWZ.SYSO4", "IMSTEST.IMWZ.MSDBCP1", "IMSTEST.IMWZ.MSDBCP2", "IMSTEST.IMWZ.MSDBDUMP", "IMSTEST.IMWZ.RDDS1", "IMSTEST.IMWZ.RDDS2", "IMSTEST.IMWZ.RDDS3", "IMSTEST.IMWZ.RECON1", "IMSTEST.IMWZ.RECON2", "IMSTEST.IMWZ.RECON3", "IMSTEST.IMWZ.EXITLIB"]}
+
+TASK [ims_dataset : Delete IMS Java dataset] ***********************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:02:07.565)       0:05:08.328 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : ims_catalog] **********************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.020)       0:05:08.349 ********* 
+
+TASK [ims_catalog : set_fact] **************************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.026)       0:05:08.375 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.012)       0:05:08.388 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_catalog : Allocate IMS catalog DB] ***********************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.011)       0:05:08.399 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_catalog : Load Catalog] **********************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.011)       0:05:08.410 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_catalog : Update Catalog] ********************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.011)       0:05:08.422 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_catalog : Create ACBs for catalog setup] *****************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.011)       0:05:08.433 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_catalog : Query Catalog Service] *************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.011)       0:05:08.445 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_catalog : Delete IMS Catalog] ****************************************
+Wednesday 10 May 2023  16:26:26 -0700 (0:00:00.015)       0:05:08.460 ********* 
+changed: [zosendpoint] => {"changed": true, "message": "", "names": ["IMSTEST.IMWZ.CATDEF", "IMSTEST.IMWZ.DFSCD000.A00001", "IMSTEST.IMWZ.DFSCD000.B00001", "IMSTEST.IMWZ.DFSCD000.C00001", "IMSTEST.IMWZ.DFSCD000.D00001", "IMSTEST.IMWZ.DFSCD000.L00001", "IMSTEST.IMWZ.DFSCD000.L00001.D", "IMSTEST.IMWZ.DFSCD000.L00001.S", "IMSTEST.IMWZ.DFSCD000.X00001", "IMSTEST.IMWZ.DFSCX000.A00001", "IMSTEST.IMWZ.DFSCD000.BSDS", "IMSTEST.IMWZ.DFSCD000.DI1001", "IMSTEST.IMWZ.DFSCD000.DI1002", "IMSTEST.IMWZ.DFSCD000.STG", "IMSTEST.IMWZ.HWSRCDR"]}
+
+TASK [include_role : ims_iefjobs] **********************************************
+Wednesday 10 May 2023  16:27:07 -0700 (0:00:40.792)       0:05:49.252 ********* 
+
+TASK [ims_iefjobs : set_fact] **************************************************
+Wednesday 10 May 2023  16:27:07 -0700 (0:00:00.034)       0:05:49.287 ********* 
+ok: [zosendpoint] => {"ansible_facts": {"eager_role_path": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_iefjobs"}, "changed": false}
+
+TASK [include_role : send-templates] *******************************************
+Wednesday 10 May 2023  16:27:07 -0700 (0:00:00.015)       0:05:49.303 ********* 
+
+TASK [send-templates : Create temporary directory] *****************************
+Wednesday 10 May 2023  16:27:07 -0700 (0:00:00.038)       0:05:49.341 ********* 
+changed: [zosendpoint -> localhost] => {"changed": true, "gid": 20, "group": "staff", "mode": "0700", "owner": "adn", "path": "/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_", "size": 64, "state": "directory", "uid": 501}
+
+TASK [send-templates : Compile templates and put results in temporary directory] ***
+Wednesday 10 May 2023  16:27:07 -0700 (0:00:00.250)       0:05:49.592 ********* 
+changed: [zosendpoint -> localhost] => (item=/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_iefjobs/templates/IEFJOBSX.j2) => {"ansible_loop_var": "item", "changed": true, "checksum": "84da6c244e54f0e4104c0470122da7ee56fbe203", "dest": "/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_/IEFJOBSX.j2", "gid": 20, "group": "staff", "item": "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_iefjobs/templates/IEFJOBSX.j2", "md5sum": "2a8598ad324224c244d190e03438c9fe", "mode": "0644", "owner": "adn", "size": 2192, "src": "/Users/adn/.ansible/tmp/ansible-tmp-1683761227.783937-91624-123117503014349/source", "state": "file", "uid": 501}
+
+TASK [send-templates : Compress the template files to send] ********************
+Wednesday 10 May 2023  16:27:08 -0700 (0:00:00.532)       0:05:50.125 ********* 
+changed: [zosendpoint -> localhost] => {"archived": ["/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_/IEFJOBSX.j2"], "arcroot": "/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_/", "changed": true, "dest": "/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_/templates.tar", "dest_state": "archive", "expanded_exclude_paths": [], "expanded_paths": ["/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_/IEFJOBSX.j2"], "gid": 20, "group": "staff", "missing": [], "mode": "0644", "owner": "adn", "size": 10240, "state": "file", "uid": 501}
+
+TASK [send-templates : Copy template archive to target] ************************
+Wednesday 10 May 2023  16:27:08 -0700 (0:00:00.293)       0:05:50.418 ********* 
+changed: [zosendpoint] => {"changed": true, "checksum": "8d67037dd17cb5069390259ef0b726d53042689c", "dest": "/tmp/ansible.981czjzj/templates.tar", "gid": 0, "group": "SYS1", "md5sum": "7e8b6b880bd7de38b21914886e664dc9", "mode": "0644", "owner": "OMVSKERN", "size": 10240, "src": "/u/ibmuser/.ansible/tmp/ansible-tmp-1683761229.0414772-91673-204197117749050/source", "state": "file", "uid": 0}
+
+TASK [send-templates : Unarchive templates on target] **************************
+Wednesday 10 May 2023  16:27:33 -0700 (0:00:24.685)       0:06:15.103 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "tar -Co . -xf templates.tar ; rm templates.tar", "delta": "0:00:01.160024", "end": "2023-05-10 23:28:13.183627", "msg": "", "rc": 0, "start": "2023-05-10 23:28:12.023603", "stderr": "tar: FSUM7147 ././@PaxHeader link to : EDC5129I No such file or directory.\nFSUMF371 Value 1683761228.0299368 is not valid for keyword mtime. Keyword not set.", "stderr_lines": ["tar: FSUM7147 ././@PaxHeader link to : EDC5129I No such file or directory.", "FSUMF371 Value 1683761228.0299368 is not valid for keyword mtime. Keyword not set."], "stdout": "", "stdout_lines": []}
+
+TASK [send-templates : Encode all template files] ******************************
+Wednesday 10 May 2023  16:27:46 -0700 (0:00:12.739)       0:06:27.842 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "for filename in $(find . -name '*.j2'); do; iconv -f ISO8859-1 -t IBM-1047 ${filename} > ${filename}1; chtag -tc IBM-1047 ${filename}1; mv ${filename}1 ${filename}; done", "delta": "0:00:01.219875", "end": "2023-05-10 23:28:25.782992", "msg": "", "rc": 0, "start": "2023-05-10 23:28:24.563117", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+
+TASK [send-templates : Delete the temporary directory (optional)] **************
+Wednesday 10 May 2023  16:27:58 -0700 (0:00:12.764)       0:06:40.606 ********* 
+changed: [zosendpoint -> localhost] => {"changed": true, "path": "/var/folders/vm/c0vhl2xs153_h7q9vq6r0xdr0000gn/T/ansible.j2qmjmp_", "state": "absent"}
+
+TASK [include_role : submit-rexx] **********************************************
+Wednesday 10 May 2023  16:27:59 -0700 (0:00:00.324)       0:06:40.931 ********* 
+
+TASK [submit-rexx : Update file permissions for rexx script] *******************
+Wednesday 10 May 2023  16:27:59 -0700 (0:00:00.029)       0:06:40.960 ********* 
+changed: [zosendpoint] => {"changed": true, "gid": 0, "group": "SYS1", "mode": "0755", "owner": "OMVSKERN", "path": "/tmp/ansible.981czjzj/IEFJOBSX.j2", "size": 2192, "state": "file", "uid": 0}
+
+TASK [submit-rexx : Run REXX script] *******************************************
+Wednesday 10 May 2023  16:28:10 -0700 (0:00:11.078)       0:06:52.038 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "/tmp/ansible.981czjzj/IEFJOBSX.j2 ; echo $?", "delta": "0:00:01.130260", "end": "2023-05-10 23:28:49.438569", "failed_when_result": false, "msg": "", "rc": 0, "start": "2023-05-10 23:28:48.308309", "stderr": "", "stderr_lines": [], "stdout": "0", "stdout_lines": ["0"]}
+
+TASK [ims_iefjobs : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:12.063)       0:07:04.102 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-templates] *******************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.014)       0:07:04.117 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : submit-rexx] **********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.012)       0:07:04.130 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : ims_proclib] **********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.014)       0:07:04.144 ********* 
+
+TASK [ims_proclib : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.026)       0:07:04.170 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.012)       0:07:04.182 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Add IMS procs] *********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.194 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.012)       0:07:04.206 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.218 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Define IMS subcomponents] **********************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.010)       0:07:04.229 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.010)       0:07:04.240 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.252 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Copy procs in IMS PROCLIB] *********************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.263 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.274 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.012)       0:07:04.286 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Copy procs to jobs dataset] ********************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.012)       0:07:04.299 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.013)       0:07:04.312 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.324 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Copy staging libs] *****************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.010)       0:07:04.335 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : set_fact] **************************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.010)       0:07:04.345 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [include_role : send-template] ********************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.011)       0:07:04.357 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Create additional sample procedures] ***********************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.012)       0:07:04.369 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_proclib : Clean zCloud PROCLIB] **************************************
+Wednesday 10 May 2023  16:28:22 -0700 (0:00:00.010)       0:07:04.380 ********* 
+changed: [zosendpoint] => {"changed": true, "message": "", "names": ["SYS1.PROCLIB(IMWZCTL)", "SYS1.PROCLIB(IMWZDLI)", "SYS1.PROCLIB(IMWZDRC)", "SYS1.PROCLIB(IMWZOM)", "SYS1.PROCLIB(IMWZSCI)", "SYS1.PROCLIB(IMWZRM)", "SYS1.PROCLIB(IMWZODBM)"]}
+
+TASK [include_role : ims_tls] **************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:01:08.839)       0:08:13.219 ********* 
+
+TASK [ims_tls : List IMSUSER] **************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.036)       0:08:13.256 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Add IMSUSER] ***************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.012)       0:08:13.269 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : List IMSTLS keyring] *******************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.010)       0:08:13.279 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Add IMSTLS keyring] ********************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.010)       0:08:13.290 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : List CERTAUTH] *************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.010)       0:08:13.300 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Generate CERTAUTH to sign IMS cert] ****************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.010)       0:08:13.311 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : List IMS cert] *************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.010)       0:08:13.322 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Generate IMS cert] *********************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.010)       0:08:13.332 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Refresh RACF] **************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.012)       0:08:13.345 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Update pagttls] ************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.013)       0:08:13.358 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Refresh PAGENT] ************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.012)       0:08:13.370 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Update pagttls] ************************************************
+Wednesday 10 May 2023  16:29:31 -0700 (0:00:00.011)       0:08:13.381 ********* 
+fatal: [zosendpoint]: FAILED! => {"changed": true, "cmd": "dmod -b -f -m \"Begin Ansible Block Insert \\n End Ansible Block Insert\\n## {mark} TLS for 9901 ##\" \"//d\" \"ADCD.Z25C.TCPPARMS(TLSPOLY1)\"\n", "delta": "0:00:01.303148", "end": "2023-05-10 23:30:13.193548", "msg": "non-zero return code", "rc": 1, "start": "2023-05-10 23:30:11.890400", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [ims_tls : Refresh PAGENT] ************************************************
+Wednesday 10 May 2023  16:29:45 -0700 (0:00:14.456)       0:08:27.838 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "f pagent,refresh", "content": ["S0W1       2023130  18:30:24.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:30:24.00            -F PAGENT,REFRESH ", "S0W1       2023130  18:30:24.00             EZZ8443I PAGENT MODIFY COMMAND ACCEPTED"], "elapsed": 0.22, "rc": 0, "wait_time_s": 1}
+
+TASK [include_role : ims_tls] **************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:11.478)       0:08:39.317 ********* 
+
+TASK [ims_tls : List IMSUSER] **************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.038)       0:08:39.356 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Add IMSUSER] ***************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.011)       0:08:39.368 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : List IMSTLS keyring] *******************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.012)       0:08:39.380 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Add IMSTLS keyring] ********************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.012)       0:08:39.392 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : List CERTAUTH] *************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.012)       0:08:39.405 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Generate CERTAUTH to sign IMS cert] ****************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.012)       0:08:39.417 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : List IMS cert] *************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.011)       0:08:39.428 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Generate IMS cert] *********************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.010)       0:08:39.439 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Refresh RACF] **************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.010)       0:08:39.450 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Update pagttls] ************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.011)       0:08:39.462 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Refresh PAGENT] ************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.011)       0:08:39.474 ********* 
+skipping: [zosendpoint] => {"changed": false, "skip_reason": "Conditional result was False"}
+
+TASK [ims_tls : Update pagttls] ************************************************
+Wednesday 10 May 2023  16:29:57 -0700 (0:00:00.011)       0:08:39.485 ********* 
+fatal: [zosendpoint]: FAILED! => {"changed": true, "cmd": "dmod -b -f -m \"Begin Ansible Block Insert \\n End Ansible Block Insert\\n## {mark} TLS for 9801 ##\" \"//d\" \"ADCD.Z25C.TCPPARMS(TLSPOLY1)\"\n", "delta": "0:00:01.340052", "end": "2023-05-10 23:30:37.184004", "msg": "non-zero return code", "rc": 1, "start": "2023-05-10 23:30:35.843952", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [ims_tls : Refresh PAGENT] ************************************************
+Wednesday 10 May 2023  16:30:09 -0700 (0:00:12.306)       0:08:51.792 ********* 
+changed: [zosendpoint] => {"changed": true, "cmd": "f pagent,refresh", "content": ["S0W1       2023130  18:30:48.00             ISF031I CONSOLE IBMU0000 ACTIVATED", "S0W1       2023130  18:30:48.00            -F PAGENT,REFRESH ", "S0W1       2023130  18:30:48.00             EZZ8443I PAGENT MODIFY COMMAND ACCEPTED"], "elapsed": 0.27, "rc": 0, "wait_time_s": 1}
+
+TASK [Delete the temporary provision files directory] **************************
+Wednesday 10 May 2023  16:30:21 -0700 (0:00:11.300)       0:09:03.092 ********* 
+changed: [zosendpoint] => {"changed": true, "path": "/tmp/ansible.981czjzj", "state": "absent"}
+
+PLAY RECAP *********************************************************************
+zosendpoint                : ok=39   changed=27   unreachable=0    failed=0    skipped=93   rescued=0    ignored=2   
+
+Wednesday 10 May 2023  16:30:34 -0700 (0:00:13.552)       0:09:16.645 ********* 
+=============================================================================== 
+ims_dataset : Delete IMS Runtime Libs --------------------------------- 127.57s
+ims_proclib : Clean zCloud PROCLIB ------------------------------------- 68.84s
+ims_catalog : Delete IMS Catalog --------------------------------------- 40.79s
+ims_dataset : Delete Sysdef libs --------------------------------------- 39.20s
+send-templates : Copy template archive to target ----------------------- 24.69s
+ims_common : Stop ICON ------------------------------------------------- 19.56s
+set_up_run_environment : Retrieve z/OS proclib dataset ----------------- 18.12s
+ims_odbm : Stop Open Database Manager (ODBM) --------------------------- 17.56s
+ims_operations_manager : Stop OM --------------------------------------- 16.38s
+ims_structured_call_interface : Stop SCI ------------------------------- 16.02s
+ims_resource_manager : Stop RM ----------------------------------------- 15.73s
+ims_tls : Update pagttls ----------------------------------------------- 14.46s
+deprovision_ims : Stop all IMS resources ------------------------------- 14.01s
+Delete the temporary provision files directory ------------------------- 13.55s
+send-templates : Encode all template files ----------------------------- 12.76s
+send-templates : Unarchive templates on target ------------------------- 12.74s
+deprovision_ims : Immediate IMS Shutdown ------------------------------- 12.42s
+ims_tls : Update pagttls ----------------------------------------------- 12.31s
+submit-rexx : Run REXX script ------------------------------------------ 12.06s
+ims_tls : Refresh PAGENT ----------------------------------------------- 11.48s
