@@ -1,0 +1,96 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSOZ
+//*
+//* FUNCTION: ADD CSL CONTROL STATEMENT MEMBERS TO IMS PROCLIB
+//*********************************************************************
+//*
+//*
+//********************************************************************
+//PROCUPDT PROC MBR=TEMPNAME
+//*
+//P        EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//********************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES THE CONFIGURATION FILE FOR BPE WITH
+//* CQS, OM, RM, SCI.
+//*
+//BPECONFG EXEC PROC=PROCUPDT,MBR=BPECONFG
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* CONFIGURATION FILE FOR BPE WITH CQS, OM, RM, SCI - BPECONFG        *
+*--------------------------------------------------------------------*
+
+LANG=ENU                             /* LANGUAGE FOR MESSAGES      */
+                                     /* (ENU = U.S. ENGLISH)       */
+
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+
+TRCLEV=(*,LOW,RM)                    /* DEFAULT RM TRACES TO LOW   */
+
+//*
+//* THE FOLLOWING STEP ADDS THE CSLRI000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES THE RM INITIALIZATION PROCLIB MEMBER.
+//*
+//CSLRI000 EXEC PROC=PROCUPDT,MBR=CSLRI000
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* RM INITIALIZATION PROCLIB MEMBER.                                  *
+*--------------------------------------------------------------------*
+
+ARMRST=N,                      /* SHOULD ARM RESTART RM ON FAILURE  */
+RMNAME={{ DFS_IMS_SSID[-1] }}RM1,                    /* RM NAME (RMID = RM1RM)            */
+IMSPLEX(NAME={{ DFS_IMSPlex }})            /* IMSPLEX NAME (CSLPLEX1)           */
+
+*--------------------------------------------------------------------*
+* END OF MEMBER CSLRI000                                             *
+*--------------------------------------------------------------------*
+/*
+//*
+//* THE STEP ADDING DFSCG000 MEMBER TO IMS PROCLIB IS OBSOLETE AND
+//* IT HAS BEEN REMOVED. SEE DFSDFxxx FOR THE EQUIVALENT DEFINITIONS
+//*
+//*
+//*
+//* THE STEP THAT ADDS THE DFSCGECE MEMBER TO IMS PROCLIB
+//* HAS BEEN REMOVED. IT IS OBSOLETE AND REPLACED BY DFSDFxxx
+//*
+//*
+//* THE FOLLOWING STEP ADDS THE RM PROC MEMBER TO IMS PROCLIB
+//* THIS MEMBER DEFINES THE IMS RESOURCE MANAGER LAYER PROCLIB
+//* MEMBER
+//* SKELETON: BASED ON DFSIXST9
+//*
+//*********************************************************************
+//{{ DFS_IMS_SSID }}RM EXEC PROC=PROCUPDT,MBR={{ DFS_IMS_SSID }}RM
+//P.SYSUT1 DD DATA,DLM=$$
+//*
+//*------------------------------------------------------------------*
+//*   RM                                                             *
+//*------------------------------------------------------------------*
+//*     PARAMETERS:                                                  *
+//*     BPECFG  - NAME OF BPE MEMBER                                 *
+//*     RMINIT  - SUFFIX FOR YOUR CSLRIXXX MEMBER                    *
+//*     ARMRST  - INDICATES IF ARM SHOULD BE USED                    *
+//*     RMNAME  - NAME OF THE RM BEING STARTED                       *
+//*------------------------------------------------------------------*
+//*
+//IEFPROC  EXEC PGM=BPEINI00,REGION=3000K,
+//  PARM=('BPECFG=BPECONFG','BPEINIT=CSLRINI0','RMINIT=000',
+//        'ARMRST=N','RMNAME={{ DFS_IMS_SSID[-1] }}RM1')
+//*
+//STEPLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//*
+//PROCLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB,DISP=SHR
+//*
+//SYSPRINT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//*
+$$

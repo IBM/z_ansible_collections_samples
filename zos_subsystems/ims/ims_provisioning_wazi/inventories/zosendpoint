@@ -1,0 +1,13 @@
+all:
+  hosts:
+    zosendpoint:
+      ansible_user: ibmuser
+      ansible_host: ansible-andy-zdt1.fyre.ibm.com
+      ansible_port: 2022
+      # ansible_user: ibmuser
+      # ansible_host: your_wazi_sandbox_hostname
+      # ansible_port: 2022
+      ansible_python_interpreter: /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
+
+
+

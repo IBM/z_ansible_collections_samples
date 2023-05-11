@@ -1,0 +1,18 @@
+---
+# Check if IMS already up
+- name: Check for duplicate IMS
+  collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+      
+  block:
+    - name: Check if IMS {{ DFS_IMS_SSID }} already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+      register: ctl_output
+
+    - block:
+        - fail: 
+            msg: 'IMS {{ DFS_IMS_SSID }} already up'
+      when: 
+        - ctl_output.content is defined and "NOT FOUND" not in ctl_output.content | join

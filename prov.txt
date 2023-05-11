@@ -1,0 +1,10 @@
+ansible-playbook [core 2.13.5]
+  config file = None
+  configured module search path = ['/Users/adn/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /Users/adn/workspaces/nazare/venv/lib/python3.9/site-packages/ansible
+  ansible collection location = /Users/adn/.ansible/collections:/usr/share/ansible/collections
+  executable location = /Users/adn/workspaces/nazare/venv/bin/ansible-playbook
+  python version = 3.9.6 (default, Mar 10 2023, 20:16:38) [Clang 14.0.3 (clang-1403.0.22.14.1)]
+  jinja version = 3.1.2
+  libyaml = True
+No config file found; using defaults

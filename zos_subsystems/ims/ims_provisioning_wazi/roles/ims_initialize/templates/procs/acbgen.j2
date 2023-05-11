@@ -1,0 +1,40 @@
+//*********************************************************************
+//*  ACBGEN Procedure
+//*
+//*  This procedure executes the Application Control Blocks
+//*  Maintenance Utility, which maintains the ACB library.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  Licensed Materials - Property of IBM                             *
+//*                                                                   *
+//*  5635-A06                                                         *
+//*                                                                   *
+//*      Copyright IBM Corp. 1974,2016 All Rights Reserved            *
+//*                                                                   *
+//*  US Government Users Restricted Rights - Use, duplication or      *
+//*  disclosure restricted by GSA ADP Schedule contract with          *
+//*  IBM Corp.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//       PROC SOUT=A,COMP=,RGN=4M,SYS2=
+//*
+//G      EXEC PGM=DFSRRC00,PARM='UPB,&COMP',
+//       REGION=&RGN
+//SYSPRINT DD SYSOUT=&SOUT
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//DFSRESLB DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//IMS      DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PSBLIB,DISP=SHR
+//         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.DBDLIB,DISP=SHR
+//IMSACB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.ACBLIB,DISP=OLD
+//SYSUT3   DD UNIT=SYSDA,SPACE=(80,(100,100))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(256,(100,100)),
+//            DCB=KEYLEN=8
+//COMPCTL  DD DISP=SHR,
+//         DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB(DFSACBCP)             

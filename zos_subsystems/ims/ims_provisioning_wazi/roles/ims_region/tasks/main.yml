@@ -1,0 +1,23 @@
+---
+ 
+# tasks file for start region
+- name: Start Region
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - name: Send start region rexx script
+      copy:
+        src: '{{ role_path }}/files/scripts/start-region.rexx'
+        dest: '{{ uss_file_path }}/start-region.rexx'
+
+    - shell: chtag -t -c ISO8859-1 start-region.rexx
+      args:
+        chdir: '{{ uss_file_path }}'
+
+    - file:
+        path: '{{ uss_file_path }}/start-region.rexx'
+        state: file
+        mode: a+x

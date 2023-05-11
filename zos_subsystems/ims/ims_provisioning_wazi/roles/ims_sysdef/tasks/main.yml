@@ -1,0 +1,79 @@
+---
+ 
+  # sysdef services
+  - name: System Definition Services
+    collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+
+    block:
+
+      - block:
+
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+
+        - include_role:
+            name: send-template
+          vars:
+            path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
+
+        when: preprocess and not provision
+
+      - name: IMS system definition preprocessor utility
+        command: 'jsub -f {{ uss_file_path }}/DFSGNPRE.j2'
+        # zos_job_submit:
+        #   src: '{{ uss_file_path }}/DFSGNPRE.j2'
+        #   location: USS
+        #   wait: "{{ zos_job_submit_wait }}"
+        #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+        #   return_output: "{{ zos_job_submit_return_output }}"
+        when: preprocess
+
+      - block:
+
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+
+        - include_role:
+            name: send-template
+          vars:
+            path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
+
+        when: stage1 and not provision
+
+      - name: Sysdef stage 1
+        command: 'jsub -f {{ uss_file_path }}/DFS4STG1.j2'
+        # zos_job_submit:
+        #   src: '{{ uss_file_path }}/DFS4STG1.j2'
+        #   location: USS
+        #   wait: "{{ zos_job_submit_wait }}"
+        #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+        #   max_rc: 2
+        #   return_output: "{{ zos_job_submit_return_output }}"
+        when: stage1
+
+
+      - block:
+
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+
+        - include_role:
+            name: send-template
+          vars:
+            path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
+
+        when: stage2 and not provision
+
+
+      - name: Sysdef stage 2
+        command: 'jsub -f {{ uss_file_path }}/DFS4STG2.j2'
+        # zos_job_submit:
+        #   src: '{{ uss_file_path }}/DFS4STG2.j2'
+        #   location: USS
+        #   wait: "{{ zos_job_submit_wait }}"
+        #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+        #   max_rc: 2
+        #   return_output: "{{ zos_job_submit_return_output }}"
+        when: stage2

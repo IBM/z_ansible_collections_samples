@@ -1,0 +1,117 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSOE
+//*
+//* FUNCTION: ADD CQS CONTROL STATEMENT MEMBERS TO IMS PROCLIB
+//*********************************************************************
+//*
+//*
+//*********************************************************************
+//PROCUPDT PROC MBR=TEMPNAME
+//*
+//P        EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//*******************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE CQSIP000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES PARAMETERS THAT ARE RELATED TO
+//* INITIALIZATION OF THE CQS ADDRESS SPACE.
+//*
+//CQSIP000 EXEC PROC=PROCUPDT,MBR=CQSIP000
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* CQS INITIALIZATION PROCLIB MEMBER.                                 *
+*--------------------------------------------------------------------*
+ARMRST=N                /* ARM SHOULD RESTART CQS ON FAILURE        */
+CQSGROUP=GRUP1          /* GROUP NAME (XCF GROUP = GRUP1CQS)        */
+SSN={{DFS_IMS_SSID[-1]}}CQS1                /* CQS SUBSYSTEM NAME (CQSID = CQS1CQS)     */
+STRDEFG=000             /* GLOBAL STR DEFINITION MEMBER = CQSSG000  */
+STRDEFL=000             /* LOCAL STR DEFINITION MEMBER  = CQSSL000  */
+IMSPLEX(NAME={{ DFS_IMSPlex }})     /* IMSPLEX NAME (CSLPLEX1)                  */
+*--------------------------------------------------------------------*
+* END OF MEMBER CQSIP000                                             *
+*--------------------------------------------------------------------*
+/*
+//*******************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE CQSSL000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES LOCAL CQS PARAMETERS THAT ARE RELATED TO
+//* COUPLING FACILITY STRUCTURES.
+//*
+//CQSSL000 EXEC PROC=PROCUPDT,MBR=CQSSL000
+//P.SYSUT1 DD *
+*--------------------------------------------------------------------*
+* LOCAL STRUCTURE DEFINITION PROCLIB MEMBER                          *
+*--------------------------------------------------------------------*
+
+*-------------------------------------------------*
+* DEFINITION FOR IMS MESSAGE QUEUE STRUCTURE      *
+*-------------------------------------------------*
+STRUCTURE (
+  STRNAME=QMSGIMS01,
+  CHKPTDSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSGQ.CHKPT,
+  SYSCHKPT=50000)
+
+*-------------------------------------------------*
+* DEFINITION FOR IMS EMH QUEUE STRUCTURE          *
+*-------------------------------------------------*
+STRUCTURE (
+  STRNAME=QEMHIMS01,
+  CHKPTDSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EMHQ.CHKPT,
+  SYSCHKPT=50000)
+*--------------------------------------------------------------------*
+* END OF MEMBER CQSSL000                                             *
+*--------------------------------------------------------------------*
+/*
+//*******************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE CQSSG000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES GLOCAL CQS PARAMETERS THAT ARE RELATED TOo
+//* COUPLING FACILITY STRUCTURES.
+//*
+//CQSSG000 EXEC PROC=PROCUPDT,MBR=CQSSG000
+//P.SYSUT1 DD *
+**********************************************************************
+* GLOBAL STRUCTURE DEFINITION PROCLIB MEMBER                         *
+**********************************************************************
+
+*-------------------------------------------------*
+* DEFINITION FOR IMS MESSAGE QUEUE STRUCTURES     *
+*-------------------------------------------------*
+STRUCTURE (
+  STRNAME=QMSGIMS01,
+  OVFLWSTR=QMSGIMS01OFLW,
+  SRDSDSN1={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSGQ.SRDS1,
+  SRDSDSN2={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSGQ.SRDS2,
+  LOGNAME=SYSLOG.MSGQ01.LOG
+  OBJAVGSZ=1024)
+*-------------------------------------------------*
+* DEFINITION FOR IMS EMH QUEUE STRUCTURES         *
+*-------------------------------------------------*
+STRUCTURE (
+  STRNAME=QEMHIMS01,
+  OVFLWSTR=QEMHIMS01OFLW,
+  SRDSDSN1={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EMHQ.SRDS1,
+  SRDSDSN2{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EMHQ.SRDS2,
+  LOGNAME=SYSLOG.EMHQ01.LOG
+  OBJAVGSZ=1024)
+*--------------------------------------------------------------------*
+* END OF MEMBER CQSSG000                                             *
+*--------------------------------------------------------------------*
+/*
+//*******************************************************************
+//*
+//* THE FOLLOWING STEP ADDS THE DFSSQ000 MEMBER TO IMS PROCLIB.
+//* THIS MEMBER DEFINES SHARED QUEUES PROCLIB MEMBER.
+//*
+//DFSSQ000 EXEC PROC=PROCUPDT,MBR=DFSSQ000
+//P.SYSUT1 DD *
+CQS=CQS000,
+CQSSSN={{DFS_IMS_SSID[-1]}}CQS1,
+EMHQ=QEMHIMS01,
+MSGQ=QMSGIMS01,
+SQGROUP=GRUP1
+/*
