@@ -1,0 +1,143 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use local Jinja2 templates to create
+# datasets and files in z/OS using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_copy_template.yml
+#
+#  Additional variables and Jinja2 blocks can be added to the files found
+#  in the files dir and this playbook. For more information about Jinja2,
+#  see its official documentation at:
+#  https://jinja.palletsprojects.com/en/3.0.x/templates/.
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#
+# Configure:
+#   dest_dir - Path to the directory where files will be copied to.
+#   json_file - Name of the first template that will be rendered.
+#   local_name - Name of the controller node.
+#   template_dict - Dictionary that will be put inside json_file.
+#   record - Variable that will be substituted as the first record in datasets.
+#   print_second_record - Whether to print or not the second record in a
+#     dataset.
+#   third_record_value - Number that will be used for a test in Jinja2.
+#   record_array - List of record numbers.
+###############################################################################
+
+- name: Sample zos_copy template playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    dest_dir: "/tmp/templates"
+    json_file: "info.json"
+    json_path: "{{ dest_dir }}/{{ json_file }}"
+
+    local_name: "localhost"
+    template_dict:
+      - key: "a"
+        value: 8
+      - key: "b"
+        value: 2
+
+    record: "First record"
+    print_second_record: true
+    third_record_value: 6
+    record_array:
+      - 4
+      - 5
+      - 6
+
+  # disable trim_blocks and see difference
+  tasks:
+    - name: Get available z/OS facts to use with the templates.
+      ibm.ibm_zos_core.zos_gather_facts:
+
+    # Files.
+    # Templates can have any extension, they just need to be text files.
+    - name: Copy a template to a remote file.
+      ibm.ibm_zos_core.zos_copy:
+        src: ./files/template.j2
+        dest: "{{ json_path }}"
+        use_template: true
+
+    - name: Get the contents of {{ json_path }}
+      ansible.builtin.command: "cat {{ json_path }}"
+      register: output
+
+    - name: See the contents of the rendered template.
+      ansible.builtin.debug:
+        msg: "{{ output.stdout }}"
+
+    - name: Erase remote files.
+      ansible.builtin.file:
+        name: "{{ dest_dir }}"
+        state: absent
+
+    # Dataset using default markers.
+    - name: Create a temporary dataset name.
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_dest_ds
+
+    - name: Set fact `default_dataset_name`.
+      set_fact:
+        default_dataset_name: "{{ tmp_dest_ds.stdout }}"
+
+    - name: Copy a template to a dataset.
+      zos_copy:
+        src: ./files/records.j2
+        dest: "{{ default_dataset_name }}"
+        use_template: true
+
+    - name: Get the contents of {{ default_dataset_name }}.
+      ansible.builtin.command: "cat \"//'{{ default_dataset_name }}'\""
+      register: output
+
+    - name: See the contents of the rendered template.
+      ansible.builtin.debug:
+        msg: "{{ output.stdout }}"
+
+    # Dataset using custom markers.
+    - name: Create a temporary dataset name.
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_dest_ds
+
+    - name: Set fact `custom_dataset_name`.
+      set_fact:
+        custom_dataset_name: "{{ tmp_dest_ds.stdout }}"
+
+    - name: Copy a template to a dataset while changing the markers used.
+      ibm.ibm_zos_core.zos_copy:
+        src: ./files/records_custom_markers.j2
+        dest: "{{ custom_dataset_name }}"
+        use_template: true
+        template_parameters:
+          variable_start_string: "(("
+          variable_end_string: "))"
+
+    - name: Get the contents of {{ custom_dataset_name }}.
+      ansible.builtin.command: "cat \"//'{{ custom_dataset_name }}'\""
+      register: output
+
+    - name: See the contents of the rendered template.
+      ansible.builtin.debug:
+        msg: "{{ output.stdout }}"
+
+    - name: Erase datasets.
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ default_dataset_name }}"
+        - "{{ custom_dataset_name }}"

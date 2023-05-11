@@ -1,0 +1,12 @@
+00000001 {{ record }}
+{% if print_second_record %}
+00000002 This a record
+{% endif %}
+{% if third_record_value is divisibleby 3 %}
+00000003 Value {{ third_record_value }} passed the test
+{% else %}
+00000003 Value {{ third_record_value }} did not pass the test
+{% endif %}
+{% for item in record_array %}
+0000000{{ item }} Record from a loop
+{% endfor %}

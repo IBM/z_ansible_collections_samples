@@ -1,0 +1,20 @@
+{#
+These comments will not be present on the final text file.
+This template uses a mixture of playbook-defined variables,
+Ansible-defined ones and facts from zos_gather_facts.
+#}
+{
+    "from_playbook": {
+        "local_name": "{{ local_name }}",
+        "keys": {{ template_dict }},
+        "remote_dir": "{{ dest_dir }}"
+    },
+    "from_ansible": {
+        "current_playbook_hosts": {{ ansible_play_hosts }},
+        "playbook_dir": "{{ playbook_dir }}"
+    },
+    "from_zos_gather_facts": {
+        "master_catalog": "{{ master_catalog_dsn }}",
+        "vm_name": "{{ vm_name }}"
+    }
+}
