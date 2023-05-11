@@ -59,7 +59,6 @@
       - 5
       - 6
 
-  # disable trim_blocks and see difference
   tasks:
     - name: Get available z/OS facts to use with the templates.
       ibm.ibm_zos_core.zos_gather_facts:
@@ -72,13 +71,8 @@
         dest: "{{ json_path }}"
         use_template: true
 
-    - name: Get the contents of {{ json_path }}
+    - name: See the contents of {{ json_path }}
       ansible.builtin.command: "cat {{ json_path }}"
-      register: output
-
-    - name: See the contents of the rendered template.
-      ansible.builtin.debug:
-        msg: "{{ output.stdout }}"
 
     - name: Erase remote files.
       ansible.builtin.file:
@@ -100,13 +94,8 @@
         dest: "{{ default_dataset_name }}"
         use_template: true
 
-    - name: Get the contents of {{ default_dataset_name }}.
+    - name: See the contents of {{ default_dataset_name }}.
       ansible.builtin.command: "cat \"//'{{ default_dataset_name }}'\""
-      register: output
-
-    - name: See the contents of the rendered template.
-      ansible.builtin.debug:
-        msg: "{{ output.stdout }}"
 
     # Dataset using custom markers.
     - name: Create a temporary dataset name.
@@ -126,13 +115,24 @@
           variable_start_string: "(("
           variable_end_string: "))"
 
-    - name: Get the contents of {{ custom_dataset_name }}.
+    - name: See the contents of {{ custom_dataset_name }}.
       ansible.builtin.command: "cat \"//'{{ custom_dataset_name }}'\""
-      register: output
 
-    - name: See the contents of the rendered template.
-      ansible.builtin.debug:
-        msg: "{{ output.stdout }}"
+    # Rendering records.j2 again, but changing how whitespace is handled.
+    # This task will create empty records due to not trimming newlines
+    # after rendering blocks.
+    - name: Copy a template to a dataset without trimming whitespace.
+      zos_copy:
+        src: ./files/records.j2
+        dest: "{{ default_dataset_name }}"
+        use_template: true
+        force: true
+        template_parameters:
+          trim_blocks: false
+          keep_trailing_newline: true
+
+    - name: See the contents of {{ default_dataset_name }}. Note the blank lines.
+      ansible.builtin.command: "cat \"//'{{ default_dataset_name }}'\""
 
     - name: Erase datasets.
       ibm.ibm_zos_core.zos_data_set:
