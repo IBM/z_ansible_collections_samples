@@ -1,0 +1,36 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use local Jinja2 templates to dynamically
+# create JCL and submit jobs in z/OS using Red Hat Ansible Certified Content
+# for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories submit_templates.yml
+#
+#  Additional variables and Jinja2 blocks can be added to the files found
+#  in the files dir and this playbook. For more information about Jinja2,
+#  see its official documentation at:
+#  https://jinja.palletsprojects.com/en/3.0.x/templates/.
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#
+# Configure:
+###############################################################################
+
+- name: Sample zos_copy template playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+
+  tasks:
