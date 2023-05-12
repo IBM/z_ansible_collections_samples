@@ -65,9 +65,10 @@ Inside each role:
 * `./tasks/main.yml` contains the default tasks performed by the role.
 
 
-## Ansible Collection Requirements
+## Requirements
 * IBM z/OS core collection 1.5.0
 * IBM z/OS IMS collection 1.2.0
+* IBM® Wazi Sandbox 2.4 or IBM® Extended z/OS® ADCD for Z Development and Test Environment built upon the general release of ADCD z/OS® V2R5 December Edition of 2022 or later
 
 ## Getting Started
 
@@ -101,24 +102,18 @@ For more information on python configuration requirements on z/OS, refer to [Ans
           ansible_python_interpreter: /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
 
     ```
-
-2. Update the environment variables for the z/OS system in [host_vars/zosendpoint.yml](host_vars/zosendpoint.yml)
-    ```yaml
-    # the path to the root of IBM python installation
-    PYZ: "/usr/lpp/IBM/cyp/v3r9/pyz"
-
-    # the path to root of ZOAU installation
-    ZOAU: "/usr/lpp/IBM/zoautil"
-    ```
-
-3. Update the playbook specific variables in [host_vars/zosendpoint.yml](host_vars/zosendpoint.yml)based on desired behavior
+2. Update the playbook specific variables in [vars_wazi/ims-dbdc.yml](vars_wazi/ims-dbdc.yml) based on desired behaviors. Some of the commonly changed variables are:
+    1. **DFS_IMS_SSID** for IMSID
+    2. **ODBM_PORTIDPort** and **ODBM_SSLPORTID** for ODBM ports
+    3. **IMS_CONNECT_PORT** and **IMS_CONNECT_SSLPORT** for IMS Connect ports
+    4. **DFS_IMSPlex** for IMSPlex name
 
 
 ## Run the playbook
 
 1. Run provisioning IMS playbook, type the following from the root of this repository:
 
-`ansible-playbook -i inventories/zosendpoint provision-tmdb-wazi.yml `
+`ansible-playbook -i inventories/zosendpoint provision-tmdb-wazi.yml`
 
 1. Run query IMS services, type the following from the root of this repository:
 
@@ -126,7 +121,7 @@ For more information on python configuration requirements on z/OS, refer to [Ans
 
 1. Run de-provisioning IMS playbook, type the following from the root of this repository:
 
-`ansible-playbook -i inventories/zosendpoint deprovision-tmdb-wazi.yml `
+`ansible-playbook -i inventories/zosendpoint deprovision-tmdb-wazi.yml`
 
 ## Copyright
 

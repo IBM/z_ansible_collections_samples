@@ -1,4 +1,18 @@
 ---
+
+# ---------------------------------------------------------------------------- #
+#                               Commonly changed variables                     #
+# ---------------------------------------------------------------------------- #
+# The SSID for the IMS to be provisioned
+DFS_IMS_SSID: IMWZ
+# IMSPlex name
+DFS_IMSPlex: PLXWZ
+# ODBM ports
+ODBM_PORTID: 9800
+ODBM_SSLPORTID: 9801
+# IMS Connect ports
+IMS_CONNECT_PORT: 9900
+IMS_CONNECT_SSLPORT: 9901
 # ---------------------------------------------------------------------------- #
 #                               TCPIP information                              #
 # ---------------------------------------------------------------------------- #
@@ -12,13 +26,6 @@ DYNAMICALLY_RESERVE_PORTS: no
 # port within the default range of the Ansible zport module
 RESERVE_SPECIFIC_PORT: yes
 
-ODBM_PORTID: 9800
-ODBM_SSLPORTID: 9801
-
-# HTTP port for IMS Connect
-IMS_CONNECT_PORT: 9900
-# HTTPS Port for IMS Connect
-IMS_CONNECT_SSLPORT: 9901
 ZOS_RELEASE: ''
 # location of system tcpip profile
 # TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
@@ -39,9 +46,6 @@ api_key: ''
 zos_job_submit_wait: true
 zos_job_submit_wait_s: 60
 zos_job_submit_return_output: False
-
-# The SSID for the IMS to be provisioned
-DFS_IMS_SSID: IMWZ
 
 # The user ID to use for IMS related provisioning steps
 DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
@@ -107,9 +111,6 @@ DFS_DS_VOLUME1: ''
 DFS_DS_VOLUME2:
 
 # ---------------------------------------------------------------------------- #
-
-# IMSPlex name
-DFS_IMSPlex: PLXWZ
 
 # The language environment runtime dataset to use
 zCloud_LERuntime: CEE.SCEERUN
