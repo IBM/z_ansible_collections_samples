@@ -32,5 +32,25 @@
   environment: '{{ environment_vars }}'
 
   vars:
+    program_name: "UPTIME"
+    cmd: "uptime"
 
   tasks:
+    - name: Submit job using a local file.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: template.j2
+        location: LOCAL
+        use_template: true
+      register: job_output
+
+    - name: Extracting ddnames from job output.
+      set_fact:
+        job_ddnames: "{{ job_output.jobs[0].ddnames }}"
+
+    - name: See job's JCL.
+      ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
+
+    - name: See job output.
+      ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'STDOUT') }}"
