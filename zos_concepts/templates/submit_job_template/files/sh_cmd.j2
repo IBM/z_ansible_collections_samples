@@ -7,15 +7,15 @@
 //*           printed in the job's output listing (SYSOUT).
 //* MSGCLASS: assign an output class for your output listing (SYSOUT)
 //******************************************************************************
-//{{ program_name }}    JOB (T043JM,JM00,1,0,0,0),'{{ program_name }} - JRM',
+//{{ sh_program_name }}    JOB (T043JM,JM00,1,0,0,0),'{{ sh_program_name }} - JRM',
 //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID
-//{{ program_name }}  EXEC PGM=BPXBATCH
+//{{ sh_program_name }}  EXEC PGM=BPXBATCH
 //STDPARM DD *
 {#
 By changing the value of cmd inside the playbook, you can change the
 command that will be run.
 #}
-SH {{ cmd }}
+SH {{ sh_cmd }}
 //STDIN  DD DUMMY
 //STDOUT DD SYSOUT=*
 //STDERR DD SYSOUT=*
