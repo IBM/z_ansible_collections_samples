@@ -1,5 +1,5 @@
-# Use Jinja2 templates to submit jobs with zos_job_submit
-This playbook demonstrates how to use local Jinja2 templates to dynamically create
+# Use Jinja templates to submit jobs with zos_job_submit
+This playbook demonstrates how to use local Jinja templates to dynamically create
 JCL and submit jobs in z/OS using Red Hat Ansible Certified Content for IBM Z.
 
 This playbook uses:
@@ -47,7 +47,7 @@ command:
 ansible-playbook -i inventories submit_templates.yml
 ```
 
-More information about Jinja2 templates can be found
+More information about Jinja templates can be found
 [in its official documentation](https://jinja.palletsprojects.com/en/3.0.x/templates/).
 
 # Changelog

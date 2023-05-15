@@ -1,0 +1,10 @@
+//{{ loop_program_name }}    JOB (T043JM,JM00,1,0,0,0),'{{ loop_program_name }} - JRM',CLASS=R,
+//             MSGCLASS=X,MSGLEVEL=1,NOTIFY=S0JM
+//STEP0001 EXEC PGM=IEFBR14
+{% for statement in input_statements %}
+//SYS{{ statement.step_name }}    DD {{ statement.dd }}
+{% endfor %}
+{{ message }}
+/*
+//SYSUT2   DD SYSOUT=*
+//

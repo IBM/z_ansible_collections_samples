@@ -3,7 +3,7 @@
 ###############################################################################
 
 ###############################################################################
-# This playbook demonstrates how to use local Jinja2 templates to dynamically
+# This playbook demonstrates how to use local Jinja templates to dynamically
 # create JCL and submit jobs in z/OS using Red Hat Ansible Certified Content
 # for IBM Z.
 #
@@ -13,8 +13,8 @@
 # Example:
 #  ansible-playbook -i inventories submit_templates.yml
 #
-#  Additional variables and Jinja2 blocks can be added to the files found
-#  in the files dir and this playbook. For more information about Jinja2,
+#  Additional variables and Jinja blocks can be added to the files found
+#  in the files dir and this playbook. For more information about Jinja,
 #  see its official documentation at:
 #  https://jinja.palletsprojects.com/en/3.0.x/templates/.
 #
@@ -32,13 +32,25 @@
   environment: '{{ environment_vars }}'
 
   vars:
-    program_name: "UPTIME"
-    cmd: "uptime"
+    # Variables for first job (Executing a shell command)
+    sh_program_name: "UPTIME"
+    sh_cmd: "uptime"
+
+    # Variables for second job (Checking JCL syntax with IEFBR14)
+    loop_program_name: "HELLO"
+    message: "Job submitted from a template!"
+    input_statements:
+      - step_name: "IN"
+        dd: "DUMMY"
+      - step_name: "PRINT"
+        dd: "SYSOUT=*"
+      - step_name: "UT1"
+        dd: "*"
 
   tasks:
-    - name: Submit job using a local file.
+    - name: Submit shell command job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
-        src: template.j2
+        src: ./files/sh_cmd.j2
         location: LOCAL
         use_template: true
       register: job_output
@@ -47,10 +59,32 @@
       set_fact:
         job_ddnames: "{{ job_output.jobs[0].ddnames }}"
 
-    - name: See job's JCL.
+    - name: See job's submitted JCL.
       ansible.builtin.debug:
         msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
 
     - name: See job output.
       ansible.builtin.debug:
         msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'STDOUT') }}"
+
+    - name: Submit IEFBR14 job using a local template.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: ./files/jcl_jinja_loop.j2
+        location: LOCAL
+        use_template: true
+        template_parameters:
+          trim_blocks: true
+          keep_trailing_newline: true
+      register: job_output
+
+    - name: Extracting ddnames from job output.
+      set_fact:
+        job_ddnames: "{{ job_output.jobs[0].ddnames }}"
+
+    - name: See job's submitted JCL.
+      ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
+
+    - name: See job output.
+      ansible.builtin.debug:
+        msg: "{{ job_output.jobs[0].ret_code }}"
