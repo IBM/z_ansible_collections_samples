@@ -22,9 +22,16 @@
 #   IBM z/OS core collection 1.7.0 or later.
 #
 # Configure:
+#   sh_program_name - Job name for the first example.
+#   sh_cmd - Shell command to run in the managed node in the first example.
+#   loop_program_name - Job name for the second example.
+#   message - Message that will be printed to the console in the second
+#     example, if using another program.
+#   input_statements - List of dictionaries that define the input DD
+#     statements for the second example.
 ###############################################################################
 
-- name: Sample zos_copy template playbook.
+- name: Sample zos_job_submit template playbook.
   hosts: zos_host
   collections:
     - "ibm.ibm_zos_core"
@@ -48,6 +55,9 @@
         dd: "*"
 
   tasks:
+    # For the first example, we'll use JCL that executes a shell
+    # command in the managed node. The template will take the value
+    # from sh_cmd to determine what command gets executed.
     - name: Submit shell command job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: ./files/sh_cmd.j2
@@ -59,6 +69,9 @@
       set_fact:
         job_ddnames: "{{ job_output.jobs[0].ddnames }}"
 
+    # By looking at the submitted JCL, we'll see how Jinja rendered
+    # the template without introducing additional whitespace that
+    # could cause syntax problems.
     - name: See job's submitted JCL.
       ansible.builtin.debug:
         msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
@@ -67,6 +80,12 @@
       ansible.builtin.debug:
         msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'STDOUT') }}"
 
+    # For the second example, some steps of the job will be rendered
+    # using a loop block in the template. Like in the previous example,
+    # Jinja won't introduce additional whitespace that could mess up the
+    # syntax. The options trim_blocks and keep_trailing_newline have
+    # default values (true and false, respectively) that tell Jinja to
+    # behave this way, but we'll specify them to highlight this.
     - name: Submit IEFBR14 job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: ./files/jcl_jinja_loop.j2
@@ -74,7 +93,7 @@
         use_template: true
         template_parameters:
           trim_blocks: true
-          keep_trailing_newline: true
+          keep_trailing_newline: false
       register: job_output
 
     - name: Extracting ddnames from job output.
