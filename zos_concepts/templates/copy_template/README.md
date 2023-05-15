@@ -1,5 +1,5 @@
-# Use Jinja2 templates with zos_copy
-This playbook demonstrates how to use local Jinja2 templates to create
+# Use Jinja templates with zos_copy
+This playbook demonstrates how to use local Jinja templates to copy
 datasets and files in z/OS using Red Hat Ansible Certified Content for IBM Z.
 
 This playbook uses:
@@ -47,7 +47,7 @@ command:
 ansible-playbook -i inventories zos_copy_template.yml
 ```
 
-More information about Jinja2 templates can be found
+More information about Jinja templates can be found
 [in its official documentation](https://jinja.palletsprojects.com/en/3.0.x/templates/).
 
 # Changelog

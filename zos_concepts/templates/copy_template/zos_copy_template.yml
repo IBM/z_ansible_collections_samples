@@ -3,7 +3,7 @@
 ###############################################################################
 
 ###############################################################################
-# This playbook demonstrates how to use local Jinja2 templates to create
+# This playbook demonstrates how to use local Jinja templates to copy
 # datasets and files in z/OS using Red Hat Ansible Certified Content for IBM Z.
 #
 # Usage:
@@ -12,8 +12,8 @@
 # Example:
 #  ansible-playbook -i inventories zos_copy_template.yml
 #
-#  Additional variables and Jinja2 blocks can be added to the files found
-#  in the files dir and this playbook. For more information about Jinja2,
+#  Additional variables and Jinja blocks can be added to the files found
+#  in the files dir and this playbook. For more information about Jinja,
 #  see its official documentation at:
 #  https://jinja.palletsprojects.com/en/3.0.x/templates/.
 #
@@ -21,14 +21,15 @@
 #   IBM z/OS core collection 1.7.0 or later.
 #
 # Configure:
-#   dest_dir - Path to the directory where files will be copied to.
+#   dest_dir - Path to the directory where files from the first example
+#     will be copied to.
 #   json_file - Name of the first template that will be rendered.
 #   local_name - Name of the controller node.
 #   template_dict - Dictionary that will be put inside json_file.
 #   record - Variable that will be substituted as the first record in datasets.
 #   print_second_record - Whether to print or not the second record in a
 #     dataset.
-#   third_record_value - Number that will be used for a test in Jinja2.
+#   third_record_value - Number that will be used for a test in Jinja.
 #   record_array - List of record numbers.
 ###############################################################################
 
@@ -40,10 +41,12 @@
   environment: '{{ environment_vars }}'
 
   vars:
+    # Paths for the first example.
     dest_dir: "/tmp/templates"
     json_file: "info.json"
     json_path: "{{ dest_dir }}/{{ json_file }}"
 
+    # Variables for the first example.
     local_name: "localhost"
     template_dict:
       - key: "a"
@@ -51,6 +54,7 @@
       - key: "b"
         value: 2
 
+    # Variables for the second and third examples.
     record: "First record"
     print_second_record: true
     third_record_value: 6
@@ -60,10 +64,14 @@
       - 6
 
   tasks:
+    # The templates use the variables master_catalog_dsn and vm_name,
+    # both come from z/OS facts.
     - name: Get available z/OS facts to use with the templates.
       ibm.ibm_zos_core.zos_gather_facts:
 
-    # Files.
+    # In the first example, we'll copy over a file containing JSON with
+    # the values of variables from different sources (playbook, Ansible,
+    # z/OS facts).
     # Templates can have any extension, they just need to be text files.
     - name: Copy a template to a remote file.
       ibm.ibm_zos_core.zos_copy:
@@ -79,7 +87,8 @@
         name: "{{ dest_dir }}"
         state: absent
 
-    # Dataset using default markers.
+    # For the second example, we'll copy a file to a dataset.
+    # We'll use a temporary one for this.
     - name: Create a temporary dataset name.
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_dest_ds
@@ -88,6 +97,8 @@
       set_fact:
         default_dataset_name: "{{ tmp_dest_ds.stdout }}"
 
+    # Just as with the file, we only need to specify use_template
+    # to make use of Jinja.
     - name: Copy a template to a dataset.
       zos_copy:
         src: ./files/records.j2
@@ -97,7 +108,9 @@
     - name: See the contents of {{ default_dataset_name }}.
       ansible.builtin.command: "cat \"//'{{ default_dataset_name }}'\""
 
-    # Dataset using custom markers.
+    # For the third example, we'll make use of another temporary dataset,
+    # but this time, we'll specify some options to change the markers Jinja
+    # uses to render templates.
     - name: Create a temporary dataset name.
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_dest_ds
@@ -106,6 +119,8 @@
       set_fact:
         custom_dataset_name: "{{ tmp_dest_ds.stdout }}"
 
+    # We'll change the default markers for a variable substitution, which are
+    # "{{" and "}}", to "((" and "))".
     - name: Copy a template to a dataset while changing the markers used.
       ibm.ibm_zos_core.zos_copy:
         src: ./files/records_custom_markers.j2
@@ -118,7 +133,8 @@
     - name: See the contents of {{ custom_dataset_name }}.
       ansible.builtin.command: "cat \"//'{{ custom_dataset_name }}'\""
 
-    # Rendering records.j2 again, but changing how whitespace is handled.
+    # For the last example, we will be rendering records.j2 again, but
+    # changing how whitespace is handled.
     # This task will create empty records due to not trimming newlines
     # after rendering blocks.
     - name: Copy a template to a dataset without trimming whitespace.
