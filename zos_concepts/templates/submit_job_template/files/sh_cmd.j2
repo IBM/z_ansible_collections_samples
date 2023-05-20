@@ -7,8 +7,8 @@
 //*           printed in the job's output listing (SYSOUT).
 //* MSGCLASS: assign an output class for your output listing (SYSOUT)
 //******************************************************************************
-//{{ sh_program_name }}    JOB (T043JM,JM00,1,0,0,0),'{{ sh_program_name }} - JRM',
-//             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID
+//{{ sh_program_name }} JOB ({{ accounting_info }}),'{{ programmer }}',
+//             CLASS={{ job_class }},MSGCLASS={{ msg_class }},MSGLEVEL=({{ msg_stmt_level }},{{ msg_exc_level }}),NOTIFY={{ notify }}
 //{{ sh_program_name }}  EXEC PGM=BPXBATCH
 //STDPARM DD *
 {#
