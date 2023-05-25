@@ -62,6 +62,8 @@ often repeated and in need of automation.
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
+  - [Copy templates to z/OS](zos_concepts/templates/copy_template)
+  - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
