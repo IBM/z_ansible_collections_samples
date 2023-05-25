@@ -90,7 +90,7 @@
     # For the second example, we'll copy a file to a dataset.
     # We'll use a temporary one for this.
     - name: Create a temporary dataset name.
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_dest_ds
 
     - name: Set fact `default_dataset_name`.
@@ -100,7 +100,7 @@
     # Just as with the file, we only need to specify use_template
     # to make use of Jinja.
     - name: Copy a template to a dataset.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: ./files/records.j2
         dest: "{{ default_dataset_name }}"
         use_template: true
@@ -112,7 +112,7 @@
     # but this time, we'll specify some options to change the markers Jinja
     # uses to render templates.
     - name: Create a temporary dataset name.
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_dest_ds
 
     - name: Set fact `custom_dataset_name`.
@@ -138,7 +138,7 @@
     # This task will create empty records due to not trimming newlines
     # after rendering blocks.
     - name: Copy a template to a dataset without trimming whitespace.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: ./files/records.j2
         dest: "{{ default_dataset_name }}"
         use_template: true

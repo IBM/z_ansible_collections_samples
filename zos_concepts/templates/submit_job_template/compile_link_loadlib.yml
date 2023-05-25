@@ -41,7 +41,7 @@
 
   tasks:
     - name: Create {{ pgm_dataset }} for the COBOL program.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pgm_dataset }}"
         type: PDS
         space_primary: 2
@@ -51,12 +51,12 @@
         block_size: 3120
 
     - name: Copy the COBOL source to {{ pgm_dataset }}({{ pgm_member }}).
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.cbl"
         dest: "{{ pgm_dataset }}({{ pgm_member }})"
 
     - name: Create {{ loadlib_dataset }} where the compiled source will be linked.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ loadlib_dataset }}"
         type: PDSE
         space_primary: 2
@@ -66,7 +66,7 @@
         block_size: 32760
 
     - name: Compile and link the COBOL code.
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/COMPLINK.j2"
         location: LOCAL
         wait_time_s: 60
@@ -74,11 +74,11 @@
       register: comp_result
 
     - name: See compilation and linking output.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ comp_result }}"
 
     - name: Run the compiled COBOL program.
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         program_name: "{{ pgm_member }}"
         auth: false
         verbose: true
@@ -98,7 +98,7 @@
       register: pgm_result
 
     - name: See output from the COBOL program.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ pgm_result }}"
 
     - name: Remove datasets created during the playbook.
