@@ -30,5 +30,8 @@
       include_role:
         name: requirements-check
 
-- name: Executing the z/OS Ansible playbook
+- name: Executing the first z/OS Ansible playbook
   import_playbook: submit_templates.yml
+
+- name: Executing the second z/OS Ansible playbook
+  import_playbook: compile_link_loadlib.yml

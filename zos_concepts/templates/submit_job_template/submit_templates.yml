@@ -74,7 +74,7 @@
     # the job card.
     - name: Submit shell command job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
-        src: ./files/sh_cmd.j2
+        src: ./files/CMD.j2
         location: LOCAL
         use_template: true
       register: job_output
@@ -102,7 +102,7 @@
     # behave this way, but we'll specify them to highlight this fact.
     - name: Submit IEFBR14 job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
-        src: ./files/jcl_jinja_loop.j2
+        src: ./files/LOOP.j2
         location: LOCAL
         use_template: true
         template_parameters:
