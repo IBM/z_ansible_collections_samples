@@ -30,6 +30,11 @@
   hosts: bastion
 
   tasks:
+    - name: copy .new_worker_index into bastion server
+      ansible.builtin.copy:
+        src: .new_worker_index
+        dest: .new_worker_index
+
     - name: 'Get new worker index'
       ansible.builtin.command:
         cmd: cat .new_worker_index
