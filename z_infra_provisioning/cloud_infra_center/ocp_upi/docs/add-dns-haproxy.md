@@ -261,7 +261,7 @@ backend ocp4-router-https-seconds
 2. Restart HAProxy
 
 ```
-systemctl restrat HAProxy
+systemctl restart haproxy
 ```
 
 3. Test if DNS and HAProxy works

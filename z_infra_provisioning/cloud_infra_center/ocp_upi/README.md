@@ -288,6 +288,7 @@ Update your settings based on the samples. The following propeties are **require
 If you need the Ansible playbook to help configure DNS server or HAProxy server on bastion server, you need to configure correct bastion properties.
 | Property| <div style="width:220px">Default</div> | Description                           |
 | --------------------------------------- | ------------------------------------- |:-----|
+| `use_bastion` | true | When false, you need configure DNS or HAproxy manually in step 2.
 | `ansible_ssh_host` | \<linux server ip addr\> | 'x.x.x.x'<br> **required** when use bastion server, give the IP address of bastion server.
 | `bastion_private_ip_address` | \<bastion ip addr\>      |IP address of your bastion node<br>**required** when use bastion server, give the IP address of bastion server.
 | `dns_forwarder` | \<upstream DNS ip addr\> |For nameserver where requests should be forwarded for resolution.<br>**required** when use bastion server
@@ -324,7 +325,9 @@ ansible-playbook -i inventory.yaml 01-preparation.yaml
 
 2. **Step2**:
 
-**Note**: This step is optional. You can skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
+**Note**: This step is optional. 
+You can skip this step if you set use_bastion true.
+You can skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
 
 > Use this playbook to configure the DNS server and HAProxy, please add `-K` parameter if you use the non-root user, and enter the password for your user.
 ```sh
@@ -336,6 +339,10 @@ ansible-playbook -i inventory.yaml bastion.yaml -K
 > If you use your external or existing DNS server, but no Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS server part, and use this playbook to configure HAProxy in your bastion server.
 ```sh
 ansible-playbook -i inventory.yaml configure-haproxy.yaml
+```
+> If you use your external or existing Load Balancer server, but no Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update Load Balancer part, and use this playbook to configure DNS in your bastion server.
+```sh
+ansible-playbook -i inventory.yaml configure-dns.yaml
 ```
 
 3. **Step3**:
