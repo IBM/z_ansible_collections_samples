@@ -28,12 +28,12 @@
 
 - name: 'Get worker node IP'
   ansible.builtin.set_fact:
-    haproxy_new_worker_index: "{{ worker_index }}"
+    new_worker_name: "{{ worker_name | replace('{','') | replace('}','') | replace(\"'\",'') | replace(' ','') }}"
     cluster_domain_name: "{{ cluster_domain_name }}"
 
-- name: Check new worker-http exist in HAProxy
-  ansible.builtin.shell: cat /etc/haproxy/haproxy.cfg | grep "worker-{{ haproxy_new_worker_index }}" | wc -l
-  register: exist_worker_count
+- name: 'Validation worker name exist in haproxy'
+  ansible.builtin.shell: cat /etc/haproxy/haproxy.cfg | grep "{{ new_worker_name }}" | wc -l
+  register: new_worker_count
   check_mode: false
   ignore_errors: true
 
@@ -53,27 +53,10 @@
 
 - name: Add new worker http domain into dns
   ansible.builtin.shell:
-    cmd: sed -i '{{ new_worker_http }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:80 check'  /etc/haproxy/haproxy.cfg
-  when: exist_worker_count.stdout == "0"
+    cmd: sed -i '{{ new_worker_http }} i\         \server {{ new_worker_name }} {{ new_worker_name }}.{{ cluster_domain_name }}:80 check'  /etc/haproxy/haproxy.cfg
+  when: new_worker_count.stdout == "0"
 
 - name: Add new worker https domain into dns
   ansible.builtin.shell:
-    cmd: sed -i '{{ new_worker_https }} i\         \server worker-{{ haproxy_new_worker_index }} worker-{{ haproxy_new_worker_index }}.{{ cluster_domain_name }}:443 check'  /etc/haproxy/haproxy.cfg
-  when: exist_worker_count.stdout == "0"
-
-- name: Check the existing HAProxy configuration
-  ansible.builtin.fail:
-    msg: "The new worker configuration exists in haproxy.cfg, skip this playbook."
-  failed_when: exist_worker_count.stdout != "0"
-
-- name: Restart HAProxy.service
-  ansible.builtin.service:
-    name: haproxy.service
-    state: restarted
-
-- name: Check if HAProxy is running
-  ansible.builtin.service:
-    name: haproxy
-    state: started
-  notify:
-    - restart firewalld
+    cmd: sed -i '{{ new_worker_https }} i\         \server {{ new_worker_name }} {{ new_worker_name }}.{{ cluster_domain_name }}:443 check'  /etc/haproxy/haproxy.cfg
+  when: new_worker_count.stdout == "0"

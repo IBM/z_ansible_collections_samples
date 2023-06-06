@@ -38,114 +38,108 @@
         cmd: "jq -r .infraID metadata.json"
       register: infra_id
 
-    - name: 'Get worker number'
+    - name: 'Set new worker properties'
       ansible.builtin.set_fact:
         add_worker_number: "{{ worker_number | default(1) }}"
         add_worker_ip: "{{ ip | default('random') }}"
+        new_worker_file: "/tmp/{{ infra_id.stdout }}-new-worker"
 
-    - name: 'Set worker ip'
-      ansible.builtin.set_fact:
-        add_worker_ip: "{{ ip.split(',') | default('random') }}"
-      when: ip is defined
-
-    - name: Check if worker number matches worker ip or not
+    - name: Check if worker count is matched the ip address
       ansible.builtin.fail:
         msg: "worker ip does not match the worker number"
       failed_when:
         - add_worker_ip != "random"
-        - "{{ add_worker_ip| length }} != {{ add_worker_number | int }}"
+        - "{{ add_worker_ip.split(',') | length }} != {{ add_worker_number | int }}"
 
-    - name: 'Generate worker index'
+    - name: 'Generate new worker name'
       ansible.builtin.shell: |
-        rm -rf .new_worker_index
-        shuf -i 1000-9999 -n {{ add_worker_number }} -o .new_worker_index
-        sed -i -e 's/^/{{ os_compute_server_name }}-/' .new_worker_index
-        sed -i -e 's/$/,ip=random/' .new_worker_index
+        rm -rf {{ new_worker_file }}
+        shuf -i 1000-9999 -n {{ add_worker_number }} -o {{ new_worker_file }}
+        if [ "{{ add_worker_ip }}" != "random" ];then
+          count=0
+          multi=$(echo "{{ add_worker_ip }}" | tr -cd , | wc -c)
+          if [[ $multi -ge 1 ]];then
+            IFS=',' read -ra ip_ary <<< "{{ add_worker_ip }}"
+            for i in "${!ip_ary[@]}"; do
+                if [ $i == $count ];then
+                    sed -i -e "$((i+1)) s/$/ ${ip_ary[$i]}/" {{ new_worker_file }}
+                fi
+                ((count++))
+            done
+          else
+            sed -i -e 's/$/ {{ add_worker_ip }}/' {{ new_worker_file }}
+          fi
+        else
+          sed -i -e 's/$/ random/' {{ new_worker_file }}
+        fi
 
-    - name: Save worker name into temporary file
-      ansible.builtin.shell: |
-        rm -rf .new_worker_name
-        cut -d"," -f1 .new_worker_index >> .new_worker_name
-
-    - name: 'Add worker ip'
-      ansible.builtin.shell: |
-        sed -i '0,/random/s//{{ item }}/' .new_worker_index
-      with_items:
-        - "{{ add_worker_ip}}"
-      when: add_worker_ip != "random"
-
-    - name: 'Get new worker name'
+    - name: 'Get new worker list'
       ansible.builtin.command:
-        cmd: cat .new_worker_name
-      register: new_worker_name_item
-
-    - name: 'Get new worker index'
-      ansible.builtin.command:
-        cmd: cat .new_worker_index
-      register: new_worker_index_item
+        cmd: cat {{ new_worker_file }}
+      register: new_worker_list
 
     - name: 'Generate worker node json file'
-      ansible.builtin.script: tools/generate-new-worker-ignition.sh "{{ item }}"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      ansible.builtin.script: tools/generate-new-worker-ignition.sh "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
 
     - name: 'Create the compute server ports'
       openstack.cloud.port:
-        name: "{{ item.split(',')[0] }}"
+        name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         network: "{{ use_network_name }}"
         security_groups:
           - "{{ os_sg_worker }}"
         fixed_ips:
           - subnet: "{{ use_network_subnet }}"
-            ip_address: "{{ item.split(',')[1] | replace('ip=','') }}"
+            ip_address: "{{ item.split(' ')[1] }}"
       register: ports
-      with_items: "{{ new_worker_index_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
       when: add_worker_ip != "random"
 
     - name: 'Create the compute server ports'
       openstack.cloud.port:
-        name: "{{ item }}"
+        name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         network: "{{ use_network_name }}"
         security_groups:
           - "{{ os_sg_worker }}"
       register: ports
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
       when: add_worker_ip == "random"
 
     - name: 'Set compute server ports tag'
       ansible.builtin.command:
-        cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item }}"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+        cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ item.split(' ')[0] }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
 
     - name: 'Create the compute servers'
       openstack.cloud.server:
-        name: "{{ item }}"
+        name: "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
         auto_ip: false
         timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0] , 'ignition.json'] | join('-'))  | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
-          - port-name: "{{ item }}"
+          - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         meta: "{{ cluster_id_tag }}"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
       when:
         - vm_type == "kvm"
         - volume_type_id is not defined
 
     - name: 'Create the compute servers'
       openstack.cloud.server:
-        name: "{{ item }}"
+        name: "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
         auto_ip: false
         timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0], 'ignition.json'] | join('-'))  | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
-          - port-name: "{{ item }}"
+          - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
       when:
         - disk_type == "dasd"
         - vm_type == "zvm"
@@ -160,20 +154,20 @@
 
     - name: 'Create the compute servers with default boot volume'
       openstack.cloud.server:
-        name: "{{ item }}"
+        name: "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
         auto_ip: false
         timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0] , 'ignition.json'] | join('-'))  | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
-          - port-name: "{{ item }}"
+          - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         boot_from_volume: true
         volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
         terminate_volume: true
         meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
       when:
         - disk_type == "scsi"
         - vm_type == "zvm"
@@ -188,51 +182,108 @@
         volume_type: "{{ volume_type_id }}"
         metadata: "{{ cluster_id_tag }}"
         timeout: "{{ create_server_timeout|int * 60 }}"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_name_list.stdout_lines }}"
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
 
     - name: 'Set compute volume bootable'
       ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_name_list.stdout_lines }}"
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
 
     - name: 'Create the compute server with boot volume'
       openstack.cloud.server:
-        name: "{{ item }}"
+        name: "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
         flavor: "{{ os_flavor_worker }}"
         boot_volume: "{{ item }}-boot"
         auto_ip: false
         availability_zone: "{{ create_server_zone }}"
         timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ item , 'ignition.json'] | join('-'))  | string }}"
+        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0] , 'ignition.json'] | join('-'))  | string }}"
         nics:
-          - port-name: "{{ item }}"
+          - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
         terminate_volume: true
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
 
-    - name: 'Update worker ip into new_worker_index file'
-      ansible.builtin.shell: |
-        worker_ip=$(openstack server list | grep "{{ item }}" | grep -oP "(?<=)\d+(\.\d+){3}")
-        sed -i -e "/{{ item }}/s/random/$worker_ip/g" .new_worker_index
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
-      when: add_worker_ip == "random"
-
     - name: 'Waiting for approve worker CSR'
       ansible.builtin.include_tasks: approve_worker.yaml
       vars:
-        workerid: "{{ item }}"
+        workerid: "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
       register: worker_csr_sleeper
-      with_items: "{{ new_worker_name_item.stdout_lines }}"
+      with_items: "{{ new_worker_list.stdout_lines }}"
 
-- ansible.builtin.import_playbook: modify-bastion.yaml
-  when:
-    - update_bastion is defined
-    - update_bastion == "true"
+- import_playbook: configure-bastion-properties.yaml
+
+- hosts: localhost
+  tasks:
+    - name: 'Get new worker name list'
+      command: /usr/bin/python3
+      args:
+        stdin: |
+          import yaml
+          with open("cluster-template.yaml", "r") as stream:
+              cluster = yaml.safe_load(stream)
+          workers = cluster["cluster_nodes"]["infra"]
+          print(workers)
+      register: works_list_results
+
+    - set_fact:
+        workers_list: "{{ item.split(',') }}"
+      with_items: "{{ works_list_results.stdout_lines }}"
+
+- hosts: bastion
+  tasks:
+    - name: 'Modify bastion dns for new worker'
+      ansible.builtin.include_tasks: modify-dns.yaml
+      vars:
+        worker_name: "{{ item.split(':')[0] }}"
+        worker_ip: "{{ item.split(':')[-1] }}"
+        cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
+      with_items: "{{ hostvars['localhost']['workers_list'] }}" 
+      when:
+        - update_bastion is defined
+        - update_bastion == "true"
+    
+    - name: 'Modify bastion haproxy for new worker'
+      ansible.builtin.include_tasks: modify-haproxy.yaml
+      vars:
+        worker_name: "{{ item.split(':')[0] }}"
+        cluster_domain_name:  "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
+      with_items: "{{ hostvars['localhost']['workers_list'] }}" 
+      when:
+        - update_bastion is defined
+        - update_bastion == "true"
+    
+    - name: Restart named-chroot.service
+      ansible.builtin.service:
+        name: named-chroot.service
+        state: restarted
+      when:
+        - update_bastion is defined
+        - update_bastion == "true"
+
+    - name: Restart HAProxy.service
+      ansible.builtin.service:
+        name: haproxy.service
+        state: restarted
+      when:
+        - update_bastion is defined
+        - update_bastion == "true"
+
+    - name: Check if named-chroot is running
+      ansible.builtin.service:
+        name: named-chroot
+        state: started
+
+    - name: Check if HAProxy is running
+      ansible.builtin.service:
+        name: haproxy
+        state: started
+
