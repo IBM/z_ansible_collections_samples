@@ -11,6 +11,6 @@
 # tasks file for configure-bastion-properties
 
 - name: Get nodes IP and store into yaml file
-  ansible.builtin.script: tools/modify-bastion.py
+  ansible.builtin.script: tools/modify-bastion.py {{ active | default(0) }}
   args:
     executable: python3

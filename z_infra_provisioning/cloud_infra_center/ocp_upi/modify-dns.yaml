@@ -26,32 +26,31 @@
 # Change Summary:
 # - Change Ansible playbook name
 
-- name: 'Get worker node IP'
+- name: 'Get worker node'
   ansible.builtin.set_fact:
-    dns_new_worker_ip: "{{ worker_ip }}"
-    dns_new_worker_index: "{{ worker_index }}"
+    new_worker_ip: "{{ worker_ip  | replace('{','') | replace('}','') | replace(\"'\",'') | replace(' ','') }}"
+    new_worker_name: "{{ worker_name  | replace('{','') | replace('}','') | replace(\"'\",'') | replace(' ','') }}"
     cluster_domain_name: "{{ cluster_domain_name }}"
+
+- name: 'Validation worker name exist in named'
+  ansible.builtin.shell: |
+    count=$(cat /var/named/{{ cluster_domain_name  }}.zone | grep -w "{{ new_worker_name }}" | wc -l)
+    echo $count
+  register: new_worker_exist
 
 - name: 'Get the last line number of worker'
   ansible.builtin.shell: grep -n 'worker' /var/named/{{ cluster_domain_name  }}.zone |tail -1| cut --delimiter=":" --fields=1
   register: last_worker_ln
+  when: new_worker_exist.stdout | int == 0
 
 - name: Show msg new worker
   ansible.builtin.debug:
     msg: "{{last_worker_ln.stdout}}"
+  when: new_worker_exist.stdout | int == 0
 
 - name: Add new worker dns record into named
   ansible.builtin.shell:
-    cmd: "sed -i '{{ last_worker_ln.stdout }} aworker-{{ dns_new_worker_index }}              IN A {{ dns_new_worker_ip  }}\n' /var/named/{{ cluster_domain_name  }}.zone"
+    cmd: "sed -i '{{ last_worker_ln.stdout }} a{{ new_worker_name }}              IN A {{ new_worker_ip  }}\n' /var/named/{{ cluster_domain_name  }}.zone"
   when:
+    -  new_worker_exist.stdout | int == 0
     - last_worker_ln.stdout != "0"
-
-- name: Restart named-chroot.service
-  ansible.builtin.service:
-    name: named-chroot.service
-    state: restarted
-
-- name: Check if named-chroot is running
-  ansible.builtin.service:
-    name: named-chroot
-    state: started

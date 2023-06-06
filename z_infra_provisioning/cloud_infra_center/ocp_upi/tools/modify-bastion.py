@@ -10,6 +10,7 @@
 
 import yaml
 import os
+import sys
 
 """
 This script will get current cluster nodes IP addresses from Ports, and then rewrite them into cluster-template.yaml. 
@@ -32,7 +33,7 @@ def get_infra_id():
     infra_id = infra_id.replace("\n","")
     return infra_id
 
-def get_nodes_ips(infra_id, node_role):
+def get_nodes_ips(infra_id, node_role, active):
     """
      get nodes' IPs with different role, and return a dict like 
      {"masters": 
@@ -41,9 +42,12 @@ def get_nodes_ips(infra_id, node_role):
      {"master-2": {"ip": "172.26.103.3", "etcd": "etcd-2"}}
      }
     """
-    cmd = "openstack port list | grep %s | awk '{print$4,$8}'" % (infra_id+"-"+node_role)
-    result = os.popen(cmd).read()
+    if active == 1:
+        cmd = "openstack --os-volume-api-version=3 port list | grep %s | grep ACTIVE | awk '{print$4,$8}'" % (infra_id+"-"+node_role)
+    else:
+        cmd = "openstack --os-volume-api-version=3 port list | grep %s | awk '{print$4,$8}'" % (infra_id+"-"+node_role)
 
+    result = os.popen(cmd).read()
     """
     The example output of above command:
     $ openstack port list | grep 4bzs4-worker | awk '{print$4,$8}'
@@ -62,7 +66,7 @@ def get_nodes_ips(infra_id, node_role):
         elif node_role == "bootstrap":
             name = n[1]
         else:
-            name = n[1] + "-" + n[3]
+            name = n[1] + "-" + n[-1]
         ip = node.split(" ")[1]
         ip = ip.split("'")[1]
         if node_role == "master":
@@ -70,17 +74,19 @@ def get_nodes_ips(infra_id, node_role):
         else:
             nodes_dict[name] = {"ip": ip}
     return nodes_dict
-    
+
+active=sys.argv
+
 bastion_dict = get_bastion_template()
 infra_id = get_infra_id()
 
-bootstrap = get_nodes_ips(infra_id, "bootstrap")
+bootstrap = get_nodes_ips(infra_id, "bootstrap", active)
 bastion_dict["cluster_nodes"]["bootstrap"] = bootstrap
 
-master = get_nodes_ips(infra_id, "master")
+master = get_nodes_ips(infra_id, "master", active)
 bastion_dict["cluster_nodes"]["masters"] = master
 
-worker = get_nodes_ips(infra_id, "worker")
+worker = get_nodes_ips(infra_id, "worker", active)
 bastion_dict["cluster_nodes"]["infra"] = worker
 
 with open("cluster-template.yaml", "w") as b:
