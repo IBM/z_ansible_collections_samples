@@ -22,3 +22,4 @@
   ansible.builtin.script: tools/make-control-plane-unschedulable.py
   args:
     executable: python3
+  when: os_compute_nodes_number > 0
