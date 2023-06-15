@@ -94,6 +94,8 @@ often repeated and in need of automation.
     - [Provision a Db2 schema instance](zos_subsystems/db2/db2_schema_provisioning)
     - [Discover registered Db2 applications](zos_subsystems/db2/db2_discover_applications)
     - [Discover registered Db2 subsystems](zos_subsystems/db2/db2_discover_subsystems)
+  - [IMS](zos_subsystems/ims)
+    - [enable IMS catalog and managed ACB](zos_subsystems/ims/ims_catalog_macb)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 - Security
