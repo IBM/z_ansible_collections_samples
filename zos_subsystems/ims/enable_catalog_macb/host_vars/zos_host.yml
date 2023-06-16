@@ -83,9 +83,9 @@ DFS_IMS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
 # -------------------------- volume related settings ------------------------- #
 
 # first volume to use to store IMS datasets
-DFS_DS_VOLUME1: OMAR1
+DFS_DS_VOLUME1: USER01
 # second volume to use to store IMS datasets
-DFS_DS_VOLUME2: OMAR1
+DFS_DS_VOLUME2: USER01
 
 DFS_IMS_UNIT: SYSALLDA
 
