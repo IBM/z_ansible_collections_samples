@@ -1,0 +1,38 @@
+---
+# tasks ansible.builtin.file for roles/catalog/clean_up
+- name: Clean up IMS environment
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+  - name: Delete potential data members 
+    block: 
+    - name: Delete IMS Catalog related datasets and members
+      ibm.ibm_zos_core.zos_data_set:
+        batch:
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.BSDS'
+            state: absent
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1001'
+            state: absent
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.DI1002'
+            state: absent
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.STG'
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.A00001' 
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.B00001'
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.C00001'
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.D00001'
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.A00002' 
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.B00002'
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.C00002'
+            state: absent
+          - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.D00002'
+            state: absent
