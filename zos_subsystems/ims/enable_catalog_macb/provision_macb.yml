@@ -1,0 +1,44 @@
+- name: Provision IMS Managed ACBs
+  hosts: zsystem
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+  gather_facts: false
+  vars_files:
+    - "host_vars/zos_host.yml"
+  environment: "{{ system_environment }}"
+
+  tasks: 
+    - ansible.builtin.include_role: 
+        name: shut_down    
+
+    - ansible.builtin.include_role: 
+        name: roles/mACB/dfsdf_changes 
+      vars: 
+        macb: before   
+
+    - ansible.builtin.include_role: 
+        name: roles/mACB/allocate_datasets
+
+    - ansible.builtin.include_role: 
+        name: roles/mACB/populate_utility
+
+    - ansible.builtin.include_role: 
+        name: roles/mACB/dfsdf_changes
+      vars: 
+        macb: after 
+
+    - ansible.builtin.include_role: 
+        name: restart
+
+    - name: Run QUERY MEMBER command 
+      ibm.ibm_zos_ims.ims_command:
+        command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+        plex: '{{ DFS_IMS_PLEX }}'
+        route: '{{ DFS_IMS_SSID }}'
+      register: result
+    
+    - ansible.builtin.fail: 
+        msg: Managed ACBs was not provisioned properly.
+      when: >
+        "DIRECTORY" not in result.ims_output[0]["type_2_response"][0]["LclAttr"]

@@ -1,0 +1,119 @@
+---
+- name: Allocate datasets necessary for catalog
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+  - name: Allocate directory datasets
+    ibm.ibm_zos_core.zos_data_set: 
+      batch: 
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.STG'
+          type: LIBRARY 
+          space_primary: 5
+          space_secondary: 10
+          space_type: CYL
+          record_format: U
+          block_size: 32760
+          record_length: 0
+          volume: '{{ DFS_DS_VOLUME1 }}'
+          state: present 
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.DI1001'
+          type: LIBRARY 
+          space_primary: 1
+          space_secondary: 1
+          space_type: CYL
+          record_format: U
+          block_size: 32760
+          record_length: 0
+          volume: '{{ DFS_DS_VOLUME1 }}'
+          state: present 
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.DI1002'
+          type: LIBRARY 
+          space_primary: 1
+          space_secondary: 1
+          space_type: CYL
+          record_format: U
+          block_size: 32760
+          record_length: 0
+          volume: '{{ DFS_DS_VOLUME1 }}'
+          state: present 
+          
+  - name: Allocate partition datasets
+    ibm.ibm_zos_core.zos_data_set: 
+      batch: 
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.A00001'
+          type: SEQ
+          space_primary: 20
+          space_secondary: 20
+          space_type: CYL
+          record_format: FB 
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.A00002'
+          type: SEQ
+          space_primary: 20
+          space_secondary: 20
+          space_type: CYL
+          record_format: FB 
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.B00001'
+          type: SEQ 
+          space_primary: 20
+          space_secondary: 20
+          space_type: CYL
+          record_format: FB
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.B00002'
+          type: SEQ 
+          space_primary: 20
+          space_secondary: 20
+          space_type: CYL
+          record_format: FB
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.C00001'
+          type: SEQ 
+          space_primary: 25
+          space_secondary: 25
+          space_type: CYL
+          record_format: FB
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.C00002'
+          type: SEQ 
+          space_primary: 25
+          space_secondary: 25
+          space_type: CYL
+          record_format: FB
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.D00001'
+          type: SEQ
+          space_primary: 20
+          space_secondary: 20
+          space_type: CYL
+          record_format: FB
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        - name: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.D00002'
+          type: SEQ
+          space_primary: 5
+          space_secondary: 10
+          space_type: CYL
+          record_format: FB
+          block_size: 4096
+          record_length: 4096
+          volume: '{{ DFS_DS_VOLUME1 }}'
+        
+        
