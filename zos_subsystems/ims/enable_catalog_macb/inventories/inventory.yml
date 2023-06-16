@@ -1,6 +1,6 @@
 zsystem:
   hosts:
     zvm:
-      ansible_host: ec33016a.vmec.svl.ibm.com
-      ansible_user: omvsadm
+      ansible_host: zos_target_address
+      ansible_user: zos_target_username
       ansible_python_interpreter: /python_new/usr/lpp/IBM/cyp/v3r11/pyz/bin/python3
