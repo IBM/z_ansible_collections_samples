@@ -72,6 +72,7 @@ often repeated and in need of automation.
 - Provisioning
   - [IMS](zos_subsystems/ims)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
+    - [Provision a new IMS TMDB subsystem for Wazi](zos_subsystems/ims/ims_provisioning_wazi)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
   - [WLP](zos_subsystems/wlp)
