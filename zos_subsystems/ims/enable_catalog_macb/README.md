@@ -81,10 +81,11 @@ zsystem:
  
 ```yaml
 # The path to the root where IBM python is installed
-PYZ: "/usr/lpp/IBM/cyp/v3r9/pyz"
+PYZ: "path_to_python_installation_on_zos_target"
+
 
 # The path to root where ZOAU is installed
-ZOAU: "/usr/lpp/IBM/zoautil"
+ZOAU: "path_to_zoau_installation_on_zos_target"
 ```
 
 3. Update the user information for job submissions in [host_vars/zos_host.yml](host_vars/zos_host.yml)
