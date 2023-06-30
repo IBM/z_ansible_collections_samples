@@ -90,7 +90,7 @@ ZOAU: "/usr/lpp/IBM/zoautil"
 3. Update the user information for job submissions in [host_vars/zos_host.yml](host_vars/zos_host.yml)
 
 ```yaml
-TARGET_USER: target_user
+TARGET_USERNAME: target_user
 ```
 
 4. Update the IMS information in [host_vars/zos_host.yml](host_vars/zos_host.yml) 
