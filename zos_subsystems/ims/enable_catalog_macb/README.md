@@ -69,7 +69,7 @@ If you are unfamiliar with playbooks, you can review our
 ```yaml
 zsystem:
   hosts:
-    zos:
+    zos_host:
       ansible_host: zos_target_address
       ansible_user: zos_target_username
       ansible_python_interpreter: /python/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
