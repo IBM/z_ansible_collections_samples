@@ -5,10 +5,10 @@ This project provides a sample playbook and roles, which can be used to set up [
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
-Although samples are written to operate without the need for the user’s
-configuration, flexibility is written into the samples because it is not easy
-to determine if a sample has access to the host’s resources. Review the
-playbook notes sections for additional details and configuration.
+Although samples are generally written to operate with as little of the user's 
+configuration as possible, flexibility is written into the samples because it 
+is not easy to determine if a sample has access to the host’s resources. 
+Review the playbook notes sections for additional details and configuration.
 
 ## Playbook Summary
 
@@ -18,45 +18,45 @@ playbook notes sections for additional details and configuration.
   - Allocating the necessary directory and partitioned data sets for IMS catalog
   - Copying the necessary database descriptions (DBDs) and program specification blocks (PSBs) to the DBDLIB and PSBLIB data sets
   - Running the access control blocks generator (ACBGEN) and activating the ACB library 
-  - Registering IMS catalog to the IMS Database Recovery Control facility (DBRC)
-  - Adding the CATALOG section to the DFSDFxxx member
+  - Registering the IMS catalog to the IMS Database Recovery Control facility (DBRC)
+  - Adding the `CATALOG` section to the `DFSDFxxx` member
   - Loading IMS catalog with the IMS Catalog Populate utility (DFS3PU00)
   - Create [image copies](https://www.ibm.com/docs/en/ims/15.3.0?topic=copies-image-ims-image-copy-utilities) by using the [Database Image Copy utility (DFSUDMP0)](https://www.ibm.com/docs/en/ims/15.3.0?topic=utilities-database-image-copy-utility-dfsudmp0). 
     - This maintains the integrity of IMS catalog if you provision IMS-managed ACBs.
-  - Changing the CATALOG attribute of the DFSDFxxx member from `N` to `Y`
+  - Changing the `CATALOG` attribute of the `DFSDFxxx` member from `N` to `Y`
   - Restarting IMS
-  - Running a test application program to verify the provision of IMS catalog
+  - Running a test application program to verify the provisioning of IMS catalog
 
 - [**provision_macb.yml**](provision_macb.yml) - Handles the following tasks:
   - Shutting down the existing IMS instance
-  - Making necessary changes to the DFSDFxxx member  
+  - Making necessary changes to the `DFSDFxxx` member  
   - Allocating log data sets
   - Updating access through IMS catalog by using the IMS Catalog Populate utility (DFS3PU00)
-  - Changing the ACBMGMT attribute of the DFSDFxxx member from `ACBLIB` to `CATALOG`
+  - Changing the `ACBMGMT` attribute of the `DFSDFxxx` member from `ACBLIB` to `CATALOG`
   - Restarting IMS
   - Verifying the enablement of IMS-managed ACBs through the `QUERY MEMBER` command
 
 ## Role Summary
 - [**shut_down**](roles/shut_down/README.md)- Contains tasks to shut down IMS.
-- [**restart**](roles/restart/README.md)- Contains tasks restart the IMS instance.
+- [**restart**](roles/restart/README.md)- Contains tasks restart IMS.
 
 ### catalog
 - [**clean_up**](roles/catalog/clean_up/README.md)- Contains tasks to:
-  - Clean up the IMS instance from data sets to prepare for the provision of IMS catalog 
+  - Clean up the IMS instance data sets to prepare for the provision of IMS catalog 
   - Clean up the environment after IMS catalog is provisioned.
-- [**allocate_datasets**](roles/catalog/allocate_datasets/README.md)- Contains tasks to allocate necessary data sets for IMS catalog.
-- [**copy_dbd_psb**](roles/catalog/copy_dbd_psb/README.md)- Contains tasks to copy DBDs and PSBs.
-- [**acbgen_activate**](roles/catalog/acbgen_activate/README.md)- Contains tasks to perform ACBGEN and activate the ACB library.
-- [**register_with_dbrc**](roles/catalog/register_with_dbrc/README.md)- Contains tasks to register IMS catalog with DBRC.
-- [**dfsdf_changes**](roles/catalog/dfsdf_changes/README.md)- Contains tasks to make changes to the DFSDFxxx member.
-- [**populate_utility**](roles/catalog/populate/README.md)- Contains tasks to run the IMS Catalog Populate utility (DFS3PU00).
-- [**image_copy**](roles/catalog/image_copy/README.md)- Contains tasks to create image copies of the loaded IMS catalog data sets.
-- [**confirm**](roles/catalog/confirm/README.md)- Contains tasks to verify the provision of IMS catalog through running a test application program.
+- [**allocate_datasets**](roles/catalog/allocate_datasets/README.md)- Allocate necessary data sets for IMS catalog.
+- [**copy_dbd_psb**](roles/catalog/copy_dbd_psb/README.md)- Copy DBDs and PSBs.
+- [**acbgen_activate**](roles/catalog/acbgen_activate/README.md)- Perform ACBGEN and activate the ACB library.
+- [**register_with_dbrc**](roles/catalog/register_with_dbrc/README.md)- Register IMS catalog with DBRC.
+- [**dfsdf_changes**](roles/catalog/dfsdf_changes/README.md)- Make changes to the `DFSDFxxx` member.
+- [**populate_utility**](roles/catalog/populate/README.md)- Run the IMS Catalog Populate utility (DFS3PU00).
+- [**image_copy**](roles/catalog/image_copy/README.md)- Create image copies of the loaded IMS catalog data sets.
+- [**confirm**](roles/catalog/confirm/README.md)- Verify the provision of IMS catalog through running a test application program.
 
 ### mACB
-- [**allocate_datasets**](roles/catalog/allocate_datasets/README.md)- Contains tasks to allocate log data sets for IMS-managed ACBs.
-- [**dfsdf_changes**](roles/mACB/dfsdf_changes/README.md)- Contains tasks to make changes to the DFSDFxxx member.
-- [**populate_utility**](roles/mACB/populate/README.md)- Contains tasks to run the IMS Catalog Populate utility (DFS3PU00).
+- [**allocate_datasets**](roles/catalog/allocate_datasets/README.md)- Allocate log data sets for IMS-managed ACBs.
+- [**dfsdf_changes**](roles/mACB/dfsdf_changes/README.md)- Make changes to the `DFSDFxxx` member.
+- [**populate_utility**](roles/mACB/populate/README.md)- Run the IMS Catalog Populate utility (DFS3PU00).
 
 ## Getting Started
 
@@ -81,7 +81,7 @@ zsystem:
  
 ```yaml
 # The path to the root where IBM python is installed
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
+PYZ: "/usr/lpp/IBM/cyp/v3r9/pyz"
 
 # The path to root where ZOAU is installed
 ZOAU: "/usr/lpp/IBM/zoautil"
@@ -169,19 +169,19 @@ ACB_DFSDF_BACKUP_NAME: DFSDFBAB
 
 9. Run the playbook
 
-To start the **catalog** playbook:
+To run the **catalog** playbook:
 ```bash
 ansible-playbook -i inventories/inventory.yml provision_catalog.yml
 ```
 
-To start the **mACB** playbook:
+To run the **mACB** playbook:
 ```bash
 ansible-playbook -i inventories/inventory.yml provision_macb.yml
 ```
 ## Expected Output 
 
 ### Catalog 
-This playbook uses a [DL/I Test Application Program](https://www.ibm.com/docs/en/ims/15.3.0?topic=reference-dli-test-program-dfsddlt0) to verify the success of the provision of IMS catalog. It uses the [STATUS statement](https://www.ibm.com/docs/en/ims/15.3.0?topic=reference-status-statement) to print the `COMMENTS, CALL, COMPARE, PCB, and SEGMENT DATA` of one call. 
+This playbook uses a [DL/I Test Application Program](https://www.ibm.com/docs/en/ims/15.3.0?topic=reference-dli-test-program-dfsddlt0) to verify the success of the provisioning of IMS catalog. It uses the [STATUS statement](https://www.ibm.com/docs/en/ims/15.3.0?topic=reference-status-statement) to print the `COMMENTS, CALL, COMPARE, PCB, and SEGMENT DATA` of one call. 
 
 A successful playbook invocation is indicated by a return code of `0` from the test application program. This shows that the test application was able to access and query the IMS catalog.
 
