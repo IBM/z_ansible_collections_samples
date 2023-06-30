@@ -1,5 +1,5 @@
-PYZ: /python_new/usr/lpp/IBM/cyp/v3r11/pyz
-ZOAU: /zoau/v1.2.3
+PYZ: "path_to_python_installation_on_zos_target"
+ZOAU: "path_to_zoau_installation_on_zos_target"
 
 system_environment:
   _BPXK_AUTOCVT: "ON"
@@ -18,7 +18,7 @@ system_environment:
 #                               Job Information                                #
 # ---------------------------------------------------------------------------- #
 # The z/OS username to use for job submission
-TARGET_USERNAME: omvsadm
+TARGET_USERNAME: target_user
 
 # JOB_CARD will be the default job card inserted for dynamically generated JCL
 # ensure MSGCLASS and CLASS are correct for desired environment
