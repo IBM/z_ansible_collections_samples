@@ -1,7 +1,7 @@
 acbgen_activate
 =========
 
-Run an access control blocks generator (ACBGEN) by using the `ims_acb_gen` module in the `ibm_zos_ims` Ansible collection and activate the ACB library by submitting the [Online Change Copy utility (DFSUOCU0)](https://www.ibm.com/docs/en/ims/15.3.0?topic=utilities-online-change-copy-utility-dfsuocu0) as a job.
+Run the application control blocks generation utility (ACBGEN) by using the `ims_acb_gen` module in the `ibm_zos_ims` Ansible collection and activate the ACB library by submitting the [Online Change Copy utility (DFSUOCU0)](https://www.ibm.com/docs/en/ims/15.3.0?topic=utilities-online-change-copy-utility-dfsuocu0) as a job.
 
 Requirements
 ------------
