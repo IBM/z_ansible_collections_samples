@@ -1,6 +1,6 @@
 zsystem:
   hosts:
-    zvm:
+    zos_host:
       ansible_host: zos_target_address
       ansible_user: zos_target_username
       ansible_python_interpreter: "{{ PYZ }}/bin/python3"
