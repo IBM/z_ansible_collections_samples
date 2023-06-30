@@ -95,7 +95,7 @@ often repeated and in need of automation.
     - [Discover registered Db2 applications](zos_subsystems/db2/db2_discover_applications)
     - [Discover registered Db2 subsystems](zos_subsystems/db2/db2_discover_subsystems)
   - [IMS](zos_subsystems/ims)
-    - [Enable IMS catalog and managed ACB](zos_subsystems/ims/ims_catalog_macb)
+    - [Enable IMS catalog and managed ACBs](zos_subsystems/ims/ims_catalog_macb)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 - Security
