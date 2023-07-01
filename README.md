@@ -71,7 +71,9 @@ often repeated and in need of automation.
   - [Invoking REST APIs using the URI module](zos_concepts/rest_apis)
 - Provisioning
   - [IMS](zos_subsystems/ims)
+    - [Deploy an IMS Cobol App](zos_subsystems/ims/ims_cobol_deploy)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
+    - [Provision a new IMS TMDB subsystem for Wazi](zos_subsystems/ims/ims_provisioning_wazi)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
   - [WLP](zos_subsystems/wlp)

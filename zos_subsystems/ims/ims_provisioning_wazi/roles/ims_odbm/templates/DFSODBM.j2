@@ -1,0 +1,19 @@
+{{ ODBM_JOB_CARD }}
+//*---------------------------------------------------------------------*/
+//* ODBM Startup Proc                                                      */
+//*------------------------------------------------------------------------*/
+//IMS1ODBM  PROC  RGN=3000K,SOUT=X,
+//                BPECFG=BPEODBM,
+//		          ODBMINIT=001
+//          PEND
+//*
+//IMS1ODBM  EXEC PGM=BPEINI00,REGION=3000K,
+//  PARM=('BPECFG=BPEODBM,BPEINIT=CSLDINI0,ODBMINIT=001')
+//*
+//STEPLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//*
+//*
+//PROCLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.PROCLIB,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+/*
+//*

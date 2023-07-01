@@ -1,0 +1,250 @@
+---
+- name: Test Playbook
+  hosts: all
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+  environment: '{{ system_environment }}'
+
+  vars:
+    eager_role_path: "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_sysdef"
+    JOB_CARD: "//ANSIBLE JOB 'testing',\n//*  NOTIFY=IBMUSER,\n//  USER=IBMUSER,\n//  MSGCLASS=H,\n//  MSGLEVEL=(1,1),\n//  CLASS=A"
+
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  tasks:
+
+    # - include_role:
+    #     name: send-templates
+    #   vars:
+    #     template_path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
+
+    # - name: Submit 
+    #   command: "jsub -f {{ uss_file_path }}/DFS4STG2.j2"
+    #   register: result
+ 
+
+    # - name: Response 
+    #   debug:
+    #     msg: "{{ result }}"
+        
+
+    - name: Allocate all IMS data sets
+      zos_job_submit:
+        src: '{{ uss_file_path }}/DFS4STG2.j2'
+        location: USS
+        wait: "{{ zos_job_submit_wait }}"
+        wait_time_s: "{{ zos_job_submit_wait_s }}"
+        return_output: "{{ zos_job_submit_return_output }}"
+        encoding:
+          from: ISO8859-1
+          to: IBM-1047
+
+        # when: runtime_datasets == "allocate"
+
+      # - name: Copy System Datasets
+      #   zos_copy:
+      #     src: "{{ item.src }}"
+      #     dest: "{{ item.dest }}"
+      #     remote_src: True
+      #     volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+      #   loop:
+          # - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSRESL', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL' }
+          # - { src: 'DFSF10.SDFSMAC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC' }
+          # - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC' }
+          # - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.ADFSMAC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC' }
+          # - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.ADFSLOAD', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSLOAD' }
+          # - { src: '{{ DFS_AUTH_LIB_SYSHLQ }}.ADFSSRC', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC' }
+        # ignore_errors: true
+
+      # when: sysdef_datasets == "allocate"
+
+
+
+
+
+
+      # - name: Get XCF group CSL{{DFS_IMSPlex}} members
+      #   zos_operator:
+      #     cmd: 'D XCF,GROUP,CSL{{DFS_IMSPlex}}'
+      #   register: cmd_output
+
+      # # - debug:
+      # #     var: cmd_output.content[3]
+    
+      # - block:
+      #     - fail: 
+      #         msg: 'IMSPLEX {{DFS_IMSPlex}} already Up'
+      #   when: 
+      #     - cmd_output is defined and "NOT DEFINED" not in cmd_output.content[3]
+
+
+
+
+    # - name: list zos jobs with a jobname
+    #   zos_job_query:
+    #     job_name: "IMWYHWS"
+    #   register: qry_result
+    #     # failed_when: qry_result.msg is not defined
+    # - debug:
+    #     msg: '{{ qry_result }}'
+
+    # - name: get active jobname
+    #   set_fact: 
+    #     active_hws_jobid: '{{item.job_id}}'
+    #   when: item.system
+    #   with_items: '{{qry_result.jobs}}'
+
+    # - debug:
+    #     var: active_hws_jobid
+
+    # - name: JES Job output without ddname
+    #   zos_job_output:
+    #     job_id: '{{active_hws_jobid}}'
+    #     ddname: "JESMSGLG"
+    #   register: hws_job_output
+
+    # # - debug:
+    # #     var: hws_job_output.jobs[0].ddnames[0].content | join
+
+    # - fail:
+    #     msg: duplicate IMSPLEX
+    #   when: 
+    #     - '"IMSPLEX=PLXWZ" in hws_job_output.jobs[0].ddnames[0].content | join'
+
+
+
+
+
+
+    # - name: Check if IMSPLEX PLXAD already Up
+    #   ims_command:
+    #     command: QUERY IMSPLEX
+    #     plex:  PLXAD
+    #   register: qry_result
+
+    # - name: List User
+    #   ibm.ibm_zos_core.zos_tso_command: 
+    #     commands: 
+    #           - LU andy
+    #   # ignore_errors: true
+    #   register: lu_result
+    #   failed_when: lu_result.output[0].rc > 4
+
+    # - name: List User
+    #   ibm.ibm_zos_core.zos_tso_command: 
+    #     commands: 
+    #           - RACDCERT ID(IMSUSER) LISTRING(IMSTLSRING2)
+    #   # ignore_errors: true
+    #   register: lu_result
+    #   failed_when: lu_result.output[0].rc > 4
+
+
+
+
+
+
+    # - name: set product version
+    #   set_fact:
+    #     ODBM_PORTID: 9700
+    #     ODBM_SSLPORTID: 9701
+    #     IMS_CONNECT_PORT: 9600
+    #     IMS_CONNECT_SSLPORT: 9901
+
+    # - name: Check if ports are available
+    #   include_role:
+    #      name: check_port
+    # #   vars:
+    # #     in_reconcile_mode: true
+
+
+
+
+
+    
+
+    #   # JOB_CARD will be the default job card inserted for dynamically generated JCL
+    #   # ensure MSGCLASS and CLASS are correct for desired environment
+    # - set_fact:
+    #     ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
+
+    # Configure TLS port for IMS ODBM
+    # - include_role:
+    #     name: ims_tls
+    #   vars: 
+    #     port_number: '{{IMS_CONNECT_SSLPORT}}'
+    #     function: 'add'
+    #     zos_level: '{{ZOS_RELEASE}}'
+
+    # # Configure TLS port for IMS Connect
+    # - include_role:
+    #     name: ims_tls
+    #   vars: 
+    #     port_number: '{{ODBM_SSLPORTID}}'
+    #     function: 'remove'
+    #     zos_level: '{{ZOS_RELEASE}}'
+
+
+
+
+
+        # - ims_command:
+        #     command: QUERY IMSPLEX
+        #     plex:  PLXWX
+        #   register: qry_result
+        #   failed_when: qry_result.msg is not defined
+        # - debug:
+        #     msg: '{{ qry_result }}'
+        # # - name: Check if IMSPLEX PLXWZ already Up
+        # - fail:
+        #     msg: IMSPLEX PLXWZ already in use
+        #   when: '"Success" in qry_result.msg'
+
+
+
+    # - name: get proclibs
+    #   shell: pproc
+    #   register: proclib_ds
+
+    # - set_fact:
+    #       JOB_CARD: |-
+    #         //ANSIBLE JOB 'testing',
+    #         //*  NOTIFY={{ TARGET_USERNAME | upper }},
+    #         //  USER={{ TARGET_USERNAME | upper }},
+    #         //  MSGCLASS={{ MSG_CLASS }},
+    #         //  MSGLEVEL=(1,1),
+    #         //  CLASS={{ JOB_CLASS }}
+    #         IST_VTAM_IMSAPPLID: '{{ DFS_IMS_SSID }}'
+    #       ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+    #       TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
+    #       ROUTE: '{{ DFS_IMS_SSID }}'
+    #       ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
+    #       DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+    #       DFS_DS_VOLUME2: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+    #       DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"
+
+    # - debug:
+    #     var: 
+    #       - ZOS_RELEASE
+    #       - DFS_DS_VOLUME1
+
+    # - debug:
+    #       msg: IMS source location is '{{ DFS_AUTH_LIB_SYSHLQ }}'
+
+    # - set_fact:
+    #     DFS_DS_VOLUME1: 'USER00'
+        
+    # - include_role:
+    #     name: ims_apf
+    #   vars:
+    #     auth_datasets: true
+
+
+
+    # - include_role:
+    #     name: ims_exit
+    #   vars:
+    #     prep_exits: true

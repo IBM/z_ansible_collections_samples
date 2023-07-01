@@ -1,0 +1,35 @@
+PYZ: /usr/lpp/IBM/cyp/v3r9/pyz
+ZOAU: /usr/lpp/IBM/zoautil
+# Use PY38 to work around ZOAU pythonlib3.8.so requirement
+PY38: '/u/{{ ansible_user }}/pythonlib'
+system_environment:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PY38 }}:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/current/bin:/usr/bin:/usr/sbin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+  STEPLIB: DFSF10.SDFSRESL
+
+# vars_folder_name is the name of the folder at the root of the project
+# which contains variable files to be imported by various playbooks
+# this is done to separate variable values when they may be different between environments
+# for example:
+#  vars_files:
+#    - "{{ vars_folder_name }}/ims-dbdc.yml"
+vars_folder_name: vars_wazi
+
+# The z/OS username to use for job submission
+TARGET_USERNAME: '{{ ansible_user }}'
+
+# Where to install MVSUTILS/MVSCMD and other needed tools/scripts
+uss_utilities_path: /u/{{ TARGET_USERNAME }}
+
+# Where generated JCL files should be saved on target
+# this is a defalult value that should be overwritten
+# with a temporary directory for easier cleanup at the
+# end of a playbook
+uss_file_path: /u/{{ TARGET_USERNAME }}
