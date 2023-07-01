@@ -1,7 +1,7 @@
 restart
 =========
 
-Restart the IMS instance by bringing up the Common Service Layer (CSL) address spaces and issuing the `NRESTART` command. More specifically, the Operations Manager (OM), Structured Call Interface (SCI), and Resouce Manager (RM) address spaces of the CSL will be brought up. This role also attempts to restart IMS Connect, but errors will be ignored if IMS Connect is not configured. 
+Restart the IMS instance by bringing up the Common Service Layer (CSL) address spaces and issuing the `NRESTART` command. More specifically, the Operations Manager (OM), Structured Call Interface (SCI), and Resource Manager (RM) address spaces of the CSL will be brought up. This role also attempts to restart IMS Connect, but errors will be ignored if IMS Connect is not configured. 
 
 Requirements
 ------------
