@@ -17,7 +17,6 @@
       debug:
         var: om
 
-    # AL: This code works, but OM doesn't start
     - name: Define BPECONFG
       zos_mvs_raw:
         pgm: IEBGENER
