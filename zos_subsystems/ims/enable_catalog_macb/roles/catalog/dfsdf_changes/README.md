@@ -51,7 +51,7 @@ Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apa
 Author Information
 ------------------
 
-Stephanie Lieu - @Stephanie-Lieu or @steph-lieu
+Stephanie Lieu - @steph-lieu
 
 Support
 -------

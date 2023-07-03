@@ -31,7 +31,7 @@ Review the playbook notes sections for additional details and configuration.
   - Shutting down the existing IMS instance
   - Making necessary changes to the `DFSDFxxx` member  
   - Allocating log data sets
-  - Updating access through IMS catalog by using the IMS Catalog Populate utility (DFS3PU00)
+  - Updating access to the IMS catalog by using the IMS Catalog Populate utility (DFS3PU00)
   - Changing the `ACBMGMT` attribute of the `DFSDFxxx` member from `ACBLIB` to `CATALOG`
   - Restarting IMS
   - Verifying the enablement of IMS-managed ACBs through the `QUERY MEMBER` command
@@ -57,6 +57,18 @@ Review the playbook notes sections for additional details and configuration.
 - [**allocate_datasets**](roles/catalog/allocate_datasets/README.md)- Allocate log data sets for IMS-managed ACBs.
 - [**dfsdf_changes**](roles/mACB/dfsdf_changes/README.md)- Make changes to the `DFSDFxxx` member.
 - [**populate_utility**](roles/mACB/populate/README.md)- Run the IMS Catalog Populate utility (DFS3PU00).
+
+## Requirements 
+
+Python: 3.9
+
+ansible-core: 2.11.1
+
+[Z Open Automation Utilities](https://www.ibm.com/docs/en/wdfrhcw/1.4.0?topic=components-z-open-automation-utilities): 1.1.1
+
+[IBM&reg; z/OS&reg; core collection 1.4.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+
+[IBM&reg; z/OS&reg; IMS collection 1.2.0](https://galaxy.ansible.com/ibm/ibm_zos_ims)
 
 ## Getting Started
 
@@ -211,7 +223,7 @@ Example of successful output with verbosity set to `-vvv` can be found at [succe
 Licensed under [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 ## Author Information
-Stephanie Lieu - @stephanie-lieu or @steph-lieu
+Stephanie Lieu - @steph-lieu
 
 ## Support
 Refer to the [support section](https://github.com/IBM/z_ansible_collections_samples/blob/master/README.md#support) for more details.
