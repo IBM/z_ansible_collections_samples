@@ -1,0 +1,125 @@
+---
+ 
+# Tasks for Structured Call Interface (SCI)
+- name: SCI
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - set_fact:
+        bpe_sci_config: '{{ role_path }}/templates/bpe_sci_config.txt'
+        si_config: '{{ role_path }}/templates/si_config.txt'
+        sci_config: '{{ role_path }}/templates/sci_config.txt'
+
+    - name: check sci value
+      debug:
+        var: sci
+
+    - name: Define BPECONFG
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECONFG)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ bpe_sci_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: sci == "config"
+
+
+    - name: Add CSLSI000 member to PROCLIB
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(CSLSI000)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ si_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: sci == "config"
+
+
+    - name: Add SCI PROC member to PROCLIB
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}SCI)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ sci_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: sci == "config"
+
+
+    - block:
+
+      # Start SCI
+      - name: Start SCI
+        zos_operator:
+          cmd: 's {{ DFS_IMS_SSID }}SCI'
+          verbose: true
+
+      - wait_for:
+          timeout: 10
+
+      - zos_job_output:
+          job_name: '{{ DFS_IMS_SSID }}SCI'
+        register: output
+
+      - set_fact:
+          sci_output: '{{ output.jobs[0].ret_code.msg }}'
+
+      - block:
+
+        # Start SCI
+        - name: Start SCI
+          zos_operator:
+            cmd: 's {{ DFS_IMS_SSID }}SCI'
+            verbose: true
+
+        when: sci_output != 'AC'
+
+      when: sci == "start"
+
+    # Stop SCI
+    - name: Stop SCI
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}SCI'
+        verbose: true
+      when: sci == "stop"
+
+    # Query SCI status
+    - name: Query SCI status
+      ims_command:
+        command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
+        plex:  '{{ DFS_IMSPlex }}'
+      when: sci == "query"

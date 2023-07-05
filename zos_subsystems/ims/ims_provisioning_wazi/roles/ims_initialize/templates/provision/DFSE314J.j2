@@ -1,0 +1,634 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSEF
+//*
+//* FUNCTION: COPY DBRC SKELETAL JCL TO
+//*           {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//* INITIALIZE THE RECON DATA SETS
+//*
+//DBRC     PROC
+//*
+//D        EXEC PGM=DSPURX00
+//STEPLIB  DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//SYSPRINT DD SYSOUT=*
+//SYSUDUMP DD SYSOUT=*
+//IMS      DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB
+//JCLPDS   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB
+//JCLOUT   DD SYSOUT=(A,INTRDR)
+//        PEND
+//******************************************************************
+//*
+//INITRCON EXEC PROC=DBRC
+//D.SYSIN  DD *
+  INIT.RECON SSID({{ DFS_IMS_SSID }}) CATDS               -
+             NOFORCER CHECK44 NONEW  -
+             DASDUNIT({{ DFS_IMS_UNIT }}) TAPEUNIT()
+//*
+//******************************************************************
+//COPYSKEL PROC MBR=TEMPNAME
+//*
+//CS       EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD DUMMY
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//        PEND
+//*********************************************************************
+//*
+//ARCHJCL  EXEC PROC=COPYSKEL,MBR=ARCHJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS33
+//*
+//* FUNCTION: IMS SKELETAL JCL FOR DBRC GENJCL.ARCHIVE
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//AR%STPNO  EXEC PGM=DFSUARC0,PARM='%SSID,DBRC=YES'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR ARCHIVE UTILITY
+//*
+//STEPLIB   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+%SELECT  OLDS(%SSID,(%DDNAMES))
+//%OLDSDDN  DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+//DFSSLOGP  DD DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.SLDSP.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//             DISP=(NEW,CATLG),
+//             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(1,1))
+//*DFSSLOGS  DD DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.SLDSS.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//*             DISP=(NEW,CATLG),
+//*             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//*             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//*             SPACE=(CYL,(1,1))
+//RLDSDD1   DD DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.RLDSP.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//             DISP=(NEW,CATLG),
+//             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(1,1))
+//*RLDSDD2   DD DSN={{ DFS_AUTH_LIB_SYSHLQ1}}.RLDSS.%SSID.D%ARDATE.T%ARTIME.V%ARVERS,
+//*             DISP=(NEW,CATLG),
+//*             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//*             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//*             SPACE=(CYL,(1,1))
+//SYSIN     DD *
+COPY DDNOUT1(RLDSDD1) DBRECOV
+//*
+$$
+//*
+//CAJCL    EXEC PROC=COPYSKEL,MBR=CAJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS34
+//*
+//* FUNCTION: IMS SKELETAL JCL FOR DBRC GENJCL.CA
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//CA%STPNO  EXEC PGM=DFSUCUM0,PARM='DBRC=Y'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*            JCL FOR CHANGE ACCUMULATION.
+//*
+//STEPLIB   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1  EQ  '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2  EQ  '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3  EQ  '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB
+//SYSOUT    DD SYSOUT=*
+//SORTLIB   DD DSN=SYS1.SORTLIB,DISP=SHR
+//SORTWK01  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK02  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK03  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK04  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK05  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+//SORTWK06  DD UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(5),,CONTIG)
+%DELETE  (%CAODSN EQ '')
+//DFSUCUMO  DD DSN=%CAODSN,
+//             DISP=OLD
+%ENDDEL
+%DELETE (%CAODSN NE '')
+//DFSUCUMO  DD DUMMY,DCB=BLKSIZE=100
+%ENDDEL
+//DFSUCUMN  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.CA.%CAGRP.CA%TIME,
+//             DISP=(NEW,CATLG),
+//             UNIT={{ DFS_IMS_UNIT }},
+{% if not DFS_SMS_ENVIRONMENT %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             SPACE=(CYL,(1,1))
+%SELECT  RLDS((%CAGRP),(FROM(%DSLLGTM)))
+//DFSULOG   DD DSN=%LOGDSN,
+//             DCB=RECFM=VB,
+//             DISP=OLD
+%ENDSEL
+%DELETE  (%LOGSEL EQ 'YES')
+//DFSULOG   DD DUMMY,DCB=BLKSIZE=100
+%ENDDEL
+//DFSUDD1   DD DUMMY
+//SYSIN     DD *
+%CADB0
+/*
+$$
+//*
+//ICJCL    EXEC PROC=COPYSKEL,MBR=ICJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS35
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.IC
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+%DELETE (%IVPCIC NE '')
+//IC%STPNO  EXEC PGM=DFSUDMP0,PARM='DBRC=Y'
+%ENDDEL
+%DELETE (%IVPCIC EQ '')
+//IC%STPNO  EXEC PGM=DFSUDMP0,PARM='DBRC=Y,CIC'
+%ENDDEL
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR IMAGE COPY.
+//*
+//STEPLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+%SELECT  DBDS((%DBNAME,%DBDDN))
+%DELETE  (%DBADSAV NE 'AVAIL')
+//%DBADDN   DD DSN=%DBDSN,DISP=SHR
+%ENDDEL
+%DELETE  (%DBADSAV NE '')
+//%DBDDN    DD DSN=%DBDSN,DISP=SHR
+%ENDDEL
+%ENDSEL
+//%ICDDN1   DD DISP=OLD,DSN=%ICDSN1
+%DELETE  (%COPIES EQ '1')
+//%ICDDN2   DD DISP=OLD,DSN=%ICDSN2
+%ENDDEL
+//SYSIN     DD *
+%ICSYSIN
+/*
+$$
+//*
+//JOBJCL   EXEC PROC=COPYSKEL,MBR=JOBJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//IMSGNJCL JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS=A,
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+$$
+//*
+//JOBJCL2  EXEC PROC=COPYSKEL,MBR=JOBJCL2
+//CS.SYSUT1 DD DATA,DLM=$$
+//%IMSJOB   JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS=A,
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+$$
+//*
+//LOGCLJCL EXEC PROC=COPYSKEL,MBR=LOGCLJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS37
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.CLOSE
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//CL%STPNO  EXEC PGM=DFSULTR0,PARM='IMSID=%SSID,DBRC=YES'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR LOG RECOVERY UTILITY
+//*
+//STEPLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+%SELECT  OLDS(%SSID,(%CDDNAME))
+//DFSOL%OLDSTYP DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+%DELETE  (%WADS EQ 'NO')
+//DFSWADS0  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS0,DISP=OLD
+//DFSWADS1  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}WADS1,DISP=OLD
+//DFSWADS8  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS8,DISP=OLD
+//DFSWADS9  DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.WADS9,DISP=OLD
+%ENDDEL
+%DELETE  (%WADS EQ 'YES')
+%SELECT  OLDS(%SSID,(%NDDNAME))
+//DFSNOL%OLDSTYP DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+%ENDDEL
+%DELETE  (%PDDNAME EQ '')
+%SELECT  OLDS(%SSID,(%PDDNAME))
+//DFSPOL%OLDSTYP DD DSN=%OLDSDSN,DISP=SHR
+%ENDSEL
+%ENDDEL
+//SYSIN     DD *
+CLS
+/*
+$$
+//*
+//OICJCL   EXEC PROC=COPYSKEL,MBR=OICJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS38
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.OIC
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//OIC%STPNO EXEC PGM=DFSRRC00,
+//          PARM=(BMP,DFSUICP0,%PSB,,WTOR,,,,,,,,,%IVPIMID,%IVPAGN)
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*
+//*           JCL FOR ONLINE IMAGE COPY.
+//*
+//STEPLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB,DISP=SHR
+//          DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+//%ICDDN1   DD DISP=OLD,DSN=%ICDSN1
+%DELETE  (%COPIES EQ '1')
+//%ICDDN2   DD DISP=OLD,DSN=%ICDSN2
+%ENDDEL
+//SYSIN     DD *
+%ICSYSIN
+/*
+$$
+//*
+//RECOVJCL EXEC PROC=COPYSKEL,MBR=RECOVJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS39
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.RECOV
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+%DELETE  (%MDBNAME NE '')
+//RCV%STPNO EXEC PGM=DFSRRC00,
+//             PARM='UDR,DFSURDB0,%DBNAME,,,,,,,,,,,Y,,,,,,,,%GSGNAME'
+%ENDDEL
+%DELETE  (%MDBNAME EQ '')
+//RCV%STPNO EXEC PGM=DFSRRC00,
+//             PARM='UDR,DFSURDB0,%MDBNAME,,,,,,,,,,,Y,,,,,,,,%GSGNAME'
+%ENDDEL
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*              JCL FOR RECOVERY.
+//*
+//STEPLIB   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB
+//%DBDDN    DD DSN=%DBDSN,
+%DELETE  (%DBDSAM EQ 'VSAM')
+//             DISP=OLD,
+//             DCB=BUFNO=10
+%ENDDEL
+%DELETE  (%DBDSAM NE 'VSAM')
+//             DISP=OLD
+%ENDDEL
+%DELETE  (%ICDSN EQ '')
+//DFSUDUMP  DD DSN=%ICDSN,
+//             DISP=OLD,DCB=BUFNO=10
+%ENDDEL
+%DELETE  (%ICDSN NE '')
+//DFSUDUMP  DD DUMMY
+%ENDDEL
+//DFSVDUMP  DD DUMMY
+%DELETE  (%CADSN EQ '')
+//DFSUCUM   DD DSN=%CADSN,
+//             DISP=OLD,DCB=BUFNO=10
+%ENDDEL
+%DELETE  (%CADSN NE '')
+//DFSUCUM   DD DUMMY
+%ENDDEL
+%SELECT  RLDS((%DBNAME,%DBDDN),FROM(%DSLLGTM))
+//DFSULOG   DD DSN=%LOGDSN,
+//             DCB=RECFM=VB,
+//             DISP=OLD
+%ENDSEL
+%DELETE  (%LOGSEL EQ 'YES')
+//DFSULOG   DD DUMMY
+%ENDDEL
+%DELETE  (%TRACK EQ 'NO')
+//DFSTRCV   DD DSN=??????,
+//             DISP=OLD
+%ENDDEL
+//DFSVSAMP  DD DISP=SHR,
+//             DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSVSMDB)
+//SYSIN     DD *
+%RCSYSIN
+/*
+$$
+//*
+//ICRCVJCL EXEC PROC=COPYSKEL,MBR=ICRCVJCL
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS3A
+//*
+//* FUNCTION: SKELETAL JCL FOR DBRC GENJCL.RECEIVE
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//RCV%STPNO EXEC PGM=DFSRRC00,
+//          PARM=(UDR,DFSURDB0,%DBNAME,,,,,,,,,,,,,,,,,,,%GSGNAME'
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*           JCL FOR ONLINE IMAGE COPY RECEIVE.
+//*
+//STEPLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+//%DBDDN    DD DSN=%DBDSN,DCB=BUFNO=10,
+%DELETE  (%DBDSAM EQ 'VSAM')
+//             DISP=SHR
+%ENDDEL
+%DELETE  (%DBDSAM NE 'VSAM')
+//             DISP=OLD
+%ENDDEL
+//DFSUDUMP  DD DSN=%ICDSN,
+//             DISP=(OLD,KEEP),DCB=BUFNO=10
+//DFSUCUM   DD DUMMY
+//DFSULOG   DD DUMMY
+//DFSVSAMP  DD DISP=SHR,
+//             DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSVSMDB)
+//SYSIN     DD *
+%RVSYSIN
+/*
+$$
+//ICJCLCAT EXEC PROC=COPYSKEL,MBR=ICJCLCAT
+//CS.SYSUT1 DD DATA,DLM=$$
+//*
+%DELETE (%IVPCIC NE '')
+//IC%STPNO  EXEC PGM=DFSUDMP0,PARM='DBRC=Y'
+%ENDDEL
+%DELETE (%IVPCIC EQ '')
+//IC%STPNO  EXEC PGM=DFSUDMP0,PARM='DBRC=Y,CIC'
+%ENDDEL
+//*
+//*
+//*     THIS JCL ORIGINATES FROM THE USER'S 'JCLPDS' LIBRARY.
+//*     KEYWORDS ARE REPLACED BY THE GENJCL FUNCTION OF
+//*     THE IMS DATA BASE RECOVERY CONTROL FEATURE.
+//*
+//*                 JCL FOR IMAGE COPY.
+//*
+//STEPLIB   DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT  DD SYSOUT=*
+//SYSUDUMP  DD SYSOUT=*
+%DELETE  (%RCNDSN1 EQ '')
+//RECON1    DD DSN=%RCNDSN1,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN2 EQ '')
+//RECON2    DD DSN=%RCNDSN2,DISP=SHR
+%ENDDEL
+%DELETE  (%RCNDSN3 EQ '')
+//RECON3    DD DSN=%RCNDSN3,DISP=SHR
+%ENDDEL
+//IMS       DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB,DISP=SHR
+%SELECT  DBDS((%DBNAME,%DBDDN))
+%DELETE  (%DBADSAV NE 'AVAIL')
+//%DBADDN   DD DSN=%DBDSN,DISP=SHR
+%ENDDEL
+%DELETE  (%DBADSAV NE '')
+//%DBDDN    DD DSN=%DBDSN,DISP=SHR
+%ENDDEL
+%ENDSEL
+//%ICDDN1   DD DISP=(,CATLG),
+// DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.%DBDDN.D%DATE.T%TIME.IC1,
+// UNIT=SYSDA,SPACE=(CYL,(10,5),RLSE)
+%DELETE  (%COPIES EQ '1')
+//%ICDDN2   DD DISP=(,CATLG),
+// DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.%DBDDN.D%DATE.T%TIME.IC1,
+// UNIT=SYSDA,SPACE=(CYL,(10,5),RLSE)
+%ENDDEL
+//SYSIN     DD *
+%ICSYSIN
+/*
+$$
+//*

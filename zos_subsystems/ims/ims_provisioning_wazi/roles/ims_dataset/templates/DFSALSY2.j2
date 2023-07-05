@@ -1,0 +1,298 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSC0                                                *
+//*                                                                   *
+//* FUNCTION: ALLOCATE THE SYSTEM DATA SETS NEEDED BY SYSDEF          *
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//* ALLOCATE NEW DATA SETS
+//*
+//ALLOCATE EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB')  -
+      FILE(PROCLIB)               -
+	  RECFM(F,B)                  -
+      LRECL(80)                   -
+      BLKSIZE(3200)               -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(5,2) CYL              -
+      DIR(200)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OBJDSET')  -
+      FILE(OBJDSET)               -
+      RECFM(F,B)                  -
+      LRECL(80)                   -
+      BLKSIZE(3200)          -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(10,3) CYL             -
+      DIR(120)                    -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENIN')   -
+      FILE(LGENIN)                -
+      RECFM(F,B)                  -
+      LRECL(80)                   -
+      BLKSIZE(11440)              -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(8,3) CYL              -
+      DIR(92)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENOUT')  -
+      FILE(LGENOUT)               -
+      RECFM(F,B)                  -
+      LRECL(80)                   -
+      BLKSIZE(11440)              -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(5,3) CYL              -
+      DIR(92)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+   ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT') -
+      FILE(FORMAT)                -
+      RECFM(U)                    -
+      BLKSIZE(32760)              -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(2,2) CYL              -
+      DIR(92)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TFORMAT') -
+      FILE(TFORMAT)               -
+      RECFM(U)                    -
+      BLKSIZE(32760)              -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(2) CYL                -
+      DIR(46)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.REFERAL')  -
+      FILE(REFERAL)               -
+      RECFM(F,B)                  -
+      LRECL(80)                   -
+      BLKSIZE(0)                  -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(2,2) CYL              -
+      DIR(92)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+  ALLOCATE -
+      DSNAME('{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS')  -
+      FILE(MODBLKS)               -
+      RECFM(U)                    -
+      LRECL(0)                    -
+      BLKSIZE(13030)              -
+      DSORG(PO)                   -
+      DSNTYPE(PDS)                -
+      NEW CATALOG                 -
+      SPACE(22,15) TRACKS         -
+      DIR(50)                     -
+{% if DFS_SMS_ENVIRONMENT %}
+      STORCLAS({{ DFS_SMS_CLASS }})           -
+{% else %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+/*
+//*
+//*
+//STEP1B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.SDFSRESL),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,(200,50,850))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSRESL,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+//*
+//*
+//STEP2B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSMAC,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DSNTYPE=LIBRARY,
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(2776,4000))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSMAC,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(CYL,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+{# //*
+//*
+//STEP3B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OPTIONS,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.OPTIONS),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(1,1,2))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.OPTIONS,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+//* #}
+//*
+{#//STEP4B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.MODBLKS),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(22,15,50))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.MODBLKS,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+//*#}
+//*
+//STEP5B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSMAC,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DSNTYPE=LIBRARY,
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.ADFSMAC),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(1848,270))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.ADFSMAC,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+//*
+//*
+//STEP6B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSLOAD,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DSNTYPE=LIBRARY,
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.ADFSLOAD),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(1840,250))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.ADFSLOAD,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+//*
+//*
+//STEP7B    EXEC PGM=IEBCOPY
+//SYSPRINT DD  SYSOUT=A
+//OUTDSN    DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ADFSSRC,DISP=(NEW,CATLG),
+{% if DFS_SMS_ENVIRONMENT %}
+//             STORCLAS={{DFS_SMS_CLASS}},
+{% endif %}
+{% if not DFS_DS_VOLUME1 == None  %}
+//             VOL=SER={{ DFS_DS_VOLUME1 }},
+{% endif %}
+//             DSNTYPE=LIBRARY,
+//             DCB=({{ DFS_AUTH_LIB_SYSHLQ }}.ADFSSRC),
+//             UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,(3535,500))
+//INDSN    DD  DSN={{ DFS_AUTH_LIB_SYSHLQ }}.ADFSSRC,DISP=SHR
+//SYSUT3   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSUT4   DD  UNIT={{ DFS_IMS_UNIT }},SPACE=(TRK,10)
+//SYSIN    DD  *
+  COPY  OUTDD=OUTDSN,INDD=INDSN
+/*
+//*
+//*

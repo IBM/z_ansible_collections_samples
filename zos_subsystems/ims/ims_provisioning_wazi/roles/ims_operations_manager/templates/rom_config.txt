@@ -1,0 +1,7 @@
+ARMRST=N,                           /* SHOULD ARM RESTART OM ON FAILURE  */
+CMDLANG=ENU,
+CMDSEC=N,                           /* NO COMMAND SECURITY               */
+OMNAME={{ DFS_IMS_SSID[-1] }}OM1,   /* OM NAME (OMID = OM1OM)            */
+IMSPLEX(NAME={{ DFS_IMSPlex }},     /* IMSPLEX NAME (CSLPLEX1)           */
+      AUDITLOG=SYSLOG.OM2Q01.LOG),  /* MVS LOG STREAM                    */
+CMDTEXTDSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSDATA  /* CMD TEXT DATASET */

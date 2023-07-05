@@ -1,0 +1,13 @@
+---
+ 
+# vars file for ims_tls
+port_number: 
+function: ''
+zos_level: ''
+
+
+# RACF Certificate variables
+# racfcert_not_after_date: '2025-01-01'
+racfcert_label: 'IMS_CA_Cert'
+zos_hostname: 'STD1.IBM.COM'
+zos_hostshort: 'STD1'

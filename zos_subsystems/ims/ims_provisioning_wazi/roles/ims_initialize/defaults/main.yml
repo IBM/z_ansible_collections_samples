@@ -1,0 +1,10 @@
+---
+ 
+# defaults file for provision-ims-dbdc
+send_procs: false
+
+
+ODBM_PORTIDSuf: 99
+
+
+ARC: '03'
