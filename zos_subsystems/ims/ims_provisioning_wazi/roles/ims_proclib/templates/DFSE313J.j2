@@ -1,0 +1,486 @@
+{{ JOB_CARD }}
+//* SKELETON: DFSIXSEE
+//*
+//* FUNCTION: COPY IMSRDR JOBS TO IMS JOBS DATA SET(S)
+//*********************************************************************
+//COPYJOBS PROC MBR=TEMPNAME
+//*
+//CM       EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.JOBS(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//*********************************************************************
+//*
+//*-----------------------------------------------
+//* COPY EXECUTION JOB FOR MPP #1 FOR IVP1
+//*-----------------------------------------------
+//MPP1 EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}MPP1
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ DFS_IMS_SSID }}MPP1 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//* SKELETON: DFSIXS19
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR MPP #1 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//MPP1     EXEC PROC=DFSMPR,TIME=(1440),
+//         NBA=6,
+//         OBA=5,
+//         SOUT='*',              SYSOUT CLASS
+//         CL1=001,               TRANSACTION CLASS 1
+//         CL2=002,               TRANSACTION CLASS 2
+//         CL3=003,               TRANSACTION CLASS 3
+//         CL4=004,               TRANSACTION CLASS 4
+//         TLIM=10,               MPR TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC,            PROCLIB DFSINTXX MEMBER
+//         PWFI=Y                 PSEUDO=WFI
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSCTL   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSSBPRM)
+//DFSSTAT  DD SYSOUT=*
+//* REXX EXEC SOURCE LOCATION
+//SYSEXEC  DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALIB
+//         DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSEXEC
+//* REXX INPUT LOCATION WHEN STACK IS EMPTY
+//SYSTSIN  DD *
+/*
+//* REXX OUTPUT LOCATION
+//SYSTSPRT DD SYSOUT=*
+//* COBOL OUTPUT LOCATION
+//SYSOUT   DD SYSOUT=*
+//* COBOL ABEND OUTPUT LOCATION
+//SYSABOUT DD SYSOUT=*
+//*
+ZZ
+//*-----------------------------------------------
+//* COPY EXECUTION JOB FOR IFP #1 FOR {{ DFS_IMS_SSID }}
+//*-----------------------------------------------
+//IFP1 EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}IFP1
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ DFS_IMS_SSID }}IFP1 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//*
+//* SKELETON: DFSIXS20
+//*********************************************************************
+//* FUNCTION: IMBED - EXECUTION JOB FOR IFP #1 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//IFP1     EXEC PROC=IMSFP,TIME=(1440),
+//         SOUT='*',              SYSOUT CLASS
+//         MBR=DFSIVA4,           PROGRAM NAME
+//         PSB=DFSIVP4,           PSB     NAME
+//         NBA=06,                INITIAL FAST PATH DB BUFFERS
+//         OBA=05,                SECONDARY FAST PATH DB BUFFERS
+//         TLIM=10,               IFP TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC             PROCLIB DFSINTXX MEMBER
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSSTAT   DD SYSOUT=*
+//*
+ZZ
+//*-----------------------------------------------
+//* COPY EXECUTION JOB FOR IFP #2 FOR {{ DFS_IMS_SSID }}
+//*-----------------------------------------------
+//{{ DFS_IMS_SSID }}FP2 EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}IFP2
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ DFS_IMS_SSID }}IFP2 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS21
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR IFP #2 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//IFP2     EXEC PROC=IMSFP,TIME=(1440),
+//         SOUT='*',              SYSOUT CLASS
+//         MBR=DFSIVA5,           PROGRAM NAME
+//         PSB=DFSIVP5,           PSB     NAME
+//         NBA=06,                INITIAL FAST PATH DB BUFFERS
+//         OBA=05,                SECONDARY FAST PATH DB BUFFERS
+//         TLIM=10,               IFP TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC             PROCLIB DFSINTXX MEMBER
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSSTAT   DD SYSOUT=*
+//*
+ZZ
+//*
+//* COPY EXECUTION JOB FOR IFP #3 FOR {{ DFS_IMS_SSID }}
+//*
+//FP3     EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}IFP3
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ DFS_IMS_SSID }}IFP3 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS22
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR IFP #3 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//FP3      EXEC PROC=IMSFP,TIME=(1440),
+//         SOUT='*',              SYSOUT CLASS
+//         MBR=DBFSAMA3,          PROGRAM NAME
+//         PSB=DBFSAMP3,          PSB     NAME
+//         NBA=06,                INITIAL FAST PATH DB BUFFERS
+//         OBA=05,                SECONDARY FAST PATH DB BUFFERS
+//         TLIM=10,               IFP TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC             PROCLIB DFSINTXX MEMBER
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSSTAT   DD SYSOUT=*
+//*
+ZZ
+//*
+//* COPY EXECUTION JOB FOR JMP #1 FOR {{ DFS_IMS_SSID }}
+//*
+//JMP1 EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}JMP1
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ DFS_IMS_SSID }}JMP1 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//*
+//*********************************************************************
+//*
+//* SKELETON: DFSIXS04
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR JMP #1 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//JMP1 EXEC PROC=DFSJMP,
+//         TIME=(1440),
+//         RGN=0M,                       REGION SIZE FOR EXECUTION
+//         OPT=W,                        WAIT FOR CNTRL PRGRM TO START
+//         PCB=040,                      DEP RGN INTERREGN COM AREA SIZE
+//         CL1=011,CL2=022,CL3=033,CL4=044,  TRANSACTION CLASS
+//         NBA=5,                        FP DB BUFFER NUMBER
+//         OBA=5,                        FP PAGE-FIXED BUFFER NUMBER
+//         IMSID={{ DFS_IMS_SSID }},              IMSID OF IMS CONTROL REGION
+//         ENVIRON=DFSJVMEV,             JVM ENVIRONMENT SETTINGS
+//         JVMOPMAS=DFSJVMMS             MASTER/STANDALONE JVM OPTIONS
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//JAVAOUT  DD  PATH='{{ DFS_workingdir }}/tmp/JVM.out',
+//             PATHDISP=(KEEP,KEEP),
+//             PATHOPTS=(OWRONLY,OCREAT,OTRUNC),
+//             PATHMODE=SIRWXU
+//JAVAERR  DD  PATH='{{ DFS_workingdir }}/tmp/JVM.err',
+//             PATHDISP=(KEEP,KEEP),
+//             PATHOPTS=(OWRONLY,OCREAT,OTRUNC),
+//             PATHMODE=SIRWXU
+//*
+ZZ
+//*
+//* COPY EXECUTION JOB FOR IMSMSG FOR IVP1
+//*
+//{{ DFS_IMS_SSID }}MPP2 EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}MPP2
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//IVPXXM11 JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+/*JOBPARM PROCLIB=PROC99
+//*
+//*
+//*********************************************************************
+//* IVP IMS 13.1
+//*
+//* SKELETON: DFSIXS19
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR MPP #2 - {{ DFS_IMS_SSID }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*
+//MPP2 EXEC PROC=DFSMPR,TIME=(1440),
+//         NBA=6,
+//         OBA=5,
+//         SOUT='*',              SYSOUT CLASS
+//         CL1=005,               TRANSACTION CLASS 1
+//         CL2=006,               TRANSACTION CLASS 2
+//         CL3=007,               TRANSACTION CLASS 3
+//         CL4=008,               TRANSACTION CLASS 4
+//         TLIM=10,               MPR TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ DFS_IMS_SSID }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC,            PROCLIB DFSINTXX MEMBER
+//         PWFI=Y                 PSEUDO=WFI
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSCTL   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSSBPRM)
+//DFSSTAT  DD SYSOUT=*
+//* REXX EXEC SOURCE LOCATION
+//SYSEXEC  DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALIB
+//         DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_SYSHLQ }}.SDFSEXEC
+//* REXX INPUT LOCATION WHEN STACK IS EMPTY
+//SYSTSIN  DD *
+/*
+//* REXX OUTPUT LOCATION
+//SYSTSPRT DD SYSOUT=*
+//* COBOL OUTPUT LOCATION
+//SYSOUT   DD SYSOUT=*
+//* COBOL ABEND OUTPUT LOCATION
+//SYSABOUT DD SYSOUT=*
+//*
+ZZ
+//*********************************************************************
+//*
+//*-----------------------------------------------
+//* COPY EXECUTION JOB FOR IMS Connect
+//*-----------------------------------------------
+//ICON1 EXEC PROC=COPYJOBS,SYS2=,MBR={{ DFS_IMS_SSID }}HWS1
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ DFS_IMS_SSID }}HWS JOB ACTINFO1,
+// 'PGMRNAME',
+// CLASS={{ JOB_CLASS }},
+// MSGCLASS=H,MSGLEVEL=(1,1),
+//* NOTIFY={{ DFS_IMS_USERID }},
+// REGION=512M
+//*
+//PROCS    JCLLIB ORDER={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB
+//*
+//*********************************************************************
+//* SKELETON: DFSIXSTG
+//*
+//* FUNCTION: START IMS CONNECT
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//*------------------------------------------------------------------*
+//*     Parameters:                                                  *
+//*     BPECFG  - Name of BPE configuration member                   *
+//*     HWSCFG  - Name of HWS configuration member                   *
+//*     CNVTR   - XML Converter dataset                              *
+//*     PARM1   - other override parameters e.g.                     *
+//*               xxxxxxx1 -                                         *
+//*               xxxxxxx2 -                                         *
+//*                                                                  *
+//*               example:                                           *
+//*               PARM1='xxxxxxx1=VALUE1,xxxxxxx2=VALUE2'            *
+//*------------------------------------------------------------------*
+//{{ DFS_IMS_SSID }}HWS          PROC RGN=0M,TME=1440,SOUT=*,
+//             BPECFG=BPECFGIV,
+//             HWSCFG=HWSCFODB
+//*
+//*             DELTA01='IMSTESTG.DELTALIB',
+//*             DELTA02='IMSTESTG.DELTALIB',
+//*             DELTA03='IMSTESTG.DELTALIB',
+//*             NODE=I13RTSMM,
+//*             RESLIB=CRESLIB,
+//*             BPECFG=BPECFGHT,
+//*             HWSCFG=HWSCF13R or HWSCFODB or HWSCFGIV
+//*             CNVTR='IMSTESTG.CNVTRS.XML',
+//*             PARM1=
+//HWSREGN  EXEC PGM=HWSHWS00,REGION=&RGN,TIME=&TME,
+//             PARM='BPECFG=&BPECFG,HWSCFG=&HWSCFG'
+//STEPLIB  DD   DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL
+//*        DD   DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EXITLIB
+//         DD   DSN={{ zCloud_LERuntime }},
+//         UNIT={{ DFS_IMS_UNIT }},DISP=SHR
+//         DD   DSN={{ zCloud_CSSLIB }},
+//         UNIT={{ DFS_IMS_UNIT }},DISP=SHR
+//PROCLIB  DD   DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB
+//         DD   DISP=SHR,DSN={{ zCloud_PROCLIB }}
+//SYSPRINT DD   SYSOUT=&SOUT
+//SYSUDUMP DD   SYSOUT=&SOUT
+//HWSRCORD DD   DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR
+//        PEND
+//*
+//HWS01    EXEC {{ DFS_IMS_SSID }}HWS
+//*
+ZZ
+//CP2PROCL PROC MBR=TEMPNAME
+//*
+//CM       EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1}}.{{ DFS_AUTH_LIB_HLQ2}}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//*********************************************************************
+//*
+//MPP0 EXEC PROC=CP2PROCL,MBR=IMSMSG
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//MESSAGE  JOB 1,IMS,MSGLEVEL=1,PRTY=11,CLASS={{ JOB_CLASS }},MSGCLASS=H,REGION=512K
+//PROCS JCLLIB ORDER={{ DFS_AUTH_LIB_HLQ1}}.{{ DFS_AUTH_LIB_HLQ2}}.PROCLIB
+//       EXEC DFSMPR,
+//            IMSID=
+ZZ

@@ -1,0 +1,40 @@
+---
+ 
+# Open Database Manager (ODBM)
+- name: Open Database Manager
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - block:
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      # Send the template over
+      - include_role:
+          name: send-template
+        vars:
+          path: '{{ eager_role_path }}/templates/DFSODBM.j2'
+
+      when: odbm == "start"
+
+    # Add a role or function to modify JOB_CARD in DFSODBM.j2
+
+
+    - name: Start Open Database Manager (ODBM)
+      command: 'jsub -f {{ uss_file_path }}/DFSODBM.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSODBM.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: odbm == "start"
+
+    - name: Stop Open Database Manager (ODBM)
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}ODBM'
+        verbose: true
+      when: odbm == "stop"

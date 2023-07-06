@@ -1,0 +1,197 @@
+---
+
+# ---------------------------------------------------------------------------- #
+#                               Commonly changed variables                     #
+# ---------------------------------------------------------------------------- #
+# The SSID for the IMS to be provisioned
+DFS_IMS_SSID: IMWZ
+# IMSPlex name
+DFS_IMSPlex: PLXWZ
+# ODBM ports
+ODBM_PORTID: 9800
+ODBM_SSLPORTID: 9801
+# IMS Connect ports
+IMS_CONNECT_PORT: 9900
+IMS_CONNECT_SSLPORT: 9901
+# ---------------------------------------------------------------------------- #
+#                               TCPIP information                              #
+# ---------------------------------------------------------------------------- #
+# TCPIP information, including default ports and port reservation behavior
+# Desired port information for IMS 15
+# if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
+DYNAMICALLY_RESERVE_PORTS: no
+# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
+# to reserve the port numbers provided below. If any are in use the playbook will fail
+# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
+# port within the default range of the Ansible zport module
+RESERVE_SPECIFIC_PORT: yes
+
+ZOS_RELEASE: ''
+# location of system tcpip profile
+# TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
+TCPIP_PROFILE:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(PROFILE)
+TCPIP_PROFILE_TLS:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(TLSPOLY1)
+# TCPIP_PROFILE_TLS:  IBMUSER.TEST(TLSPOLY1)
+# A dataset is needed to store a TCPIP profile containing
+# changes to the default for dynamic port reservation
+# TCPIP_PROFILE_TMP is the name of the temporary dataset
+# or dataset member to store the profile changes
+TCPIP_PROFILE_TMP_MEMBER: IMSPROF
+# ---------------------------------------------------------------------------- #
+STEPLIB: DFSF10.SDFSRESL
+
+# The API key to use for artifactory repositories
+api_key: ''
+
+zos_job_submit_wait: true
+zos_job_submit_wait_s: 60
+zos_job_submit_return_output: False
+
+# The user ID to use for IMS related provisioning steps
+DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
+
+# ---------------------------------------------------------------------------- #
+# The first HLQ to be used to store IMS related datasets
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# specific datasets
+DFS_AUTH_LIB_HLQ1: IMSTEST
+# The second HLQ to be used to store IMS related datasets
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# specific datasets
+DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}'
+# ---------------------------------------------------------------------------- #
+# The first HLQ for system datasets that will be used
+# by IMS during provisioning. These should exist prior to
+# running playbooks
+DFS_AUTH_LIB_SYSHLQ1: DFSF10
+# The second HLQ for system datasets that will be used
+# by IMS during provisioning. These should exist prior to
+# running playbooks
+DFS_AUTH_LIB_SYSHLQ2:
+
+DFS_AUTH_LIB_SYSHLQ:
+# ---------------------------------------------------------------------------- #
+
+# ---------------------------------------------------------------------------- #
+#                            job related settings                           #
+# ---------------------------------------------------------------------------- #
+JOB_CLASS: A
+MSG_CLASS: H
+
+# ---------------------------------------------------------------------------- #
+#  Common Services related settings                                            #
+# ---------------------------------------------------------------------------- #
+OM_CONFIG: false
+
+# ---------------------------------------------------------------------------- #
+#                            storage related settings                           #
+# ---------------------------------------------------------------------------- #
+
+# Are the volumes we want to use managed by the storage management subsystem (SMS)?
+DFS_SMS_ENVIRONMENT: true
+# DFS_SMS_ENVIRONMENT: false
+
+# ------------------- Storage Management Subsystem settings ------------------ #
+# -------------------------- used when SMS is in use ------------------------- #
+
+# If the volumes are managed by SMS, what SMS storage class should be used?
+# DFS_SMS_CLASS: SCNOSMS       # SCNOSMS does not work as expected
+DFS_SMS_CLASS: SCIMS
+# If the volumes are managed by SMS, what SMS management class should be used?
+DFS_SMS_MCLASS: NONE
+
+# -------------------------- volume related settings ------------------------- #
+# ------------------------ for when SMS is not in use ------------------------ #
+
+# first volume to use to store IMS datasets
+DFS_DS_VOLUME1: ''
+# DFS_DS_VOLUME1: USER00
+# second volume to use to store IMS datasets
+# DFS_DS_VOLUME2: C4IMF1
+DFS_DS_VOLUME2:
+
+# ---------------------------------------------------------------------------- #
+
+# The language environment runtime dataset to use
+zCloud_LERuntime: CEE.SCEERUN
+
+zCloud_MACLIB: SYS1.MACLIB
+
+# Dataset containing zos CSS library
+zCloud_CSSLIB: SYS1.CSSLIB
+
+# ---------------------------------------------------------------------------- #
+#                             Java related settings                            #
+# ---------------------------------------------------------------------------- #
+
+# The location to create and reference the profile that has environment settings and JVM options.
+JAVA_CONF_PATH: '{{DFS_workingdir}}/dfsjvmpr.props'
+REGION_NUM: 1
+
+# Working directory for the IMS Java region (JMP)
+DFS_workingdir: /u/{{ TARGET_USERNAME }}
+
+# ---------------------------------------------------------------------------- #
+#                             IMS Discovery Settings                           #
+# ---------------------------------------------------------------------------- #
+HOSTNAME:
+EC_SYSTEM:
+
+
+DFS_INIT_JAVA_CONF: false
+
+DFS_IMS_UNIT: SYSALLDA
+DFS_IMS_UNIT2: 3390
+ODBM_PORTIDSuf: 99
+DFS_IMSXCFGroup: IMSXCFGN
+
+DFS_IMS_CRC: '@'
+DFS_IMS_LINEGRP: SPOOL
+
+# DFS_MOUNTPOINT: /usr/lpp/ims/ims13/imsjava
+# DFS_FSTYPE: HFS
+
+DFS_useRRS: 'N'
+
+# DFS_VTAM_NODE_IMSMTO: PMASTER1
+# DFS_VTAM_NODE_IMSND1: USER0001
+# DFS_VTAM_NODE_IMSND2: USER0002
+
+
+# IST_VTAM_Procedure: VTAM
+# EZB_TCPIP_LoadLib: SYS1.TCPIP.LINKLIB
+# GIM_IMS_TARGETzone: IMSTZ13
+# GIM_IMS_GLOBALzone_CSI: IMSCLOUD
+
+# zCloud_LPALIB: SYS1.LPALIB
+
+zCloud_PROCLIB: SYS1.PROCLIB
+zCloud_MODGEN: SYS1.MODGEN
+
+# zCloud_VTAM_VTAMLIST: SYS3.VTAMLST
+# zCloud_VTAM_VTAMLIB: SYS3.VTAMLIB
+# zCloud_VTAM_VOL: IMSCLS
+# zCloud_VTAM_DEV: SYSALLDA
+# zCloud_IMS_DEV: SYSALLDA
+# zCloud_IMSConnect: HWS1
+
+DFS_useIEFJOBS: 'N'
+zCloud_IEFJOBS: SYS1.IEFJOBS
+DFS_IXUSTIM1: 300
+
+# DFS_IXUSTIM3: 1440
+
+DXR_IRLM_SSID: XRLM
+DXR_IRLM_Procedure: IRLM23D
+
+# cobolcomp: DSNAME
+
+CSQ_SSID: CSQ1
+
+## SVC Values
+zCloud_IMS_SVC_Type2: '203'  #'229'
+zCloud_IMS_SVC_Type4: '202'  #'249'
+
+
+# Optimizes runtime if user is provisioning IMS
+provision: true

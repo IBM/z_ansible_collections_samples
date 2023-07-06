@@ -1,0 +1,26 @@
+{{ JOB_CARD }}
+//**************************************************************@SCPYRT**
+//*                                                                     *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                               *
+//*                                                                     *
+//*  5635-A04                                                           *
+//*                                                                     *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED              *
+//*                                                                     *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR        *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH            *
+//*  IBM CORP.                                                          *
+//*                                                                     *
+//**************************************************************@ECPYRT**
+//* FUNCTION: Authorize IMS Data sets
+//***********************************************************************
+{% set volume =  'VOL=' + DFS_DS_VOLUME1 if DFS_DS_VOLUME1 else 'SMS' %}
+//STEP01   EXEC PGM=IEFBR14
+//SYSPRINT DD SYSOUT=*
+// SETPROG APF,FORMAT=DYNAMIC
+// SETPROG APF,ADD,DSNAME={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDXRRESL,{{ volume }}
+// SETPROG APF,ADD,DSNAME={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL,{{ volume }}
+// SETPROG APF,ADD,DSNAME={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS,{{ volume }}
+// SETPROG APF,ADD,DSNAME={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA,{{ volume }}
+// SETPROG APF,ADD,DSNAME={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSB,{{ volume }}
+// SETPROG APF,ADD,DSNAME={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EXITLIB,{{ volume }}

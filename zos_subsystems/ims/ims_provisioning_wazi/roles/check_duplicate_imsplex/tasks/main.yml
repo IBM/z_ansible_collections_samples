@@ -1,0 +1,54 @@
+---
+ 
+# Check if IMS already up
+- name: Check for duplicate IMS
+  collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+      
+  block:
+    # - name: Check if IMSPLEX {{ DFS_IMSPlex  }} already Up
+    #   zos_job_query:
+    #     job_name: "{{DFS_IMS_SSID}}HWS"
+    #   register: qry_result
+    #   failed_when: qry_result is not defined
+
+    # - block:
+    #   - name: get active jobname
+    #     set_fact: 
+    #       active_hws_jobid: '{{item.job_id}}'
+    #     when: item.system
+    #     with_items: '{{qry_result.jobs}}'
+
+    #   - name: get Job output
+    #     zos_job_output:
+    #       job_id: '{{active_hws_jobid}}'
+    #       ddname: "JESMSGLG"
+    #     register: hws_job_output
+    #     when: active_hws_jobid is defined
+
+      # - ansible.builtin.set_fact:
+      #     search_string: '"IMSPLEX="+{{DFS_IMSPlex}}'
+      # - block:
+      #     - fail: 
+      #         msg: 'IMSPLEX {{DFS_IMSPlex}} already Up'
+      #     # - meta: end_host
+      #   when: 
+      #     - hws_job_output.jobs is defined
+      #     - search_string in hws_job_output.jobs[0].ddnames[0].content | join
+      # when: qry_result.module_stderr is not defined
+
+      - name: Get XCF group CSL{{DFS_IMSPlex}} members
+        zos_operator:
+          cmd: 'D XCF,GROUP,CSL{{DFS_IMSPlex}}'
+        register: cmd_output
+
+      # - debug:
+      #     var: cmd_output.content[3]
+    
+      - block:
+          - fail: 
+              msg: 'IMSPLEX {{DFS_IMSPlex}} already Up'
+        when: 
+          - cmd_output.content[3] is defined
+          - '"NOT DEFINED" not in cmd_output.content[3] | join'

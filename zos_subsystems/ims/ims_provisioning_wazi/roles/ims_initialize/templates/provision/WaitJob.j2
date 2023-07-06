@@ -1,0 +1,50 @@
+/* REXX */
+rc=isfcalls('ON')
+isffind = 'DFS810A'
+isffindlim = 9999999
+isfscrolltype = 'FINDNEXT'
+isflinelim = 1
+ISFCOLS = 'JNAME'
+isfprefix="{{ DFS_IMS_SSID }}*"
+imsname='{{ DFS_IMS_SSID }}CTL'
+
+
+do mainloop = 1 to 30
+    Say "Looking for job"
+    Address SDSF "ISFEXEC DA"
+    if rc<>0 then
+      Exit rc
+
+    fixedField = word(isfcols,1)
+
+    do ix=1 to isfrows
+        if pos(imsname,JNAME.ix) = 1 then
+          do
+            Say "found job " JNAME.ix
+
+            do until isfnextlinetoken=''
+              Address SDSF "ISFBROWSE DA TOKEN('"TOKEN.ix"')"
+
+              lrc=rc
+              if lrc>4 then
+                do
+                  Say "Error reading joblog"
+                  exit 20
+              end
+
+              do kx=1 to isfline.0
+                Say "Line is:" isfline.kx
+                exit 0
+              end
+
+
+              isfstartlinetoken = isfnextlinetoken
+            end
+
+        end
+    end
+    address SYSCALL "SLEEP" 1
+end
+
+rc=isfcalls('OFF')
+exit 20

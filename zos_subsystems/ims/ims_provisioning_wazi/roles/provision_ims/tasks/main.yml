@@ -1,0 +1,214 @@
+---
+ 
+# tasks file for provision_ims
+- name: Provision IMS
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - set_fact:
+        ODBM_JOB_CARD: |-
+          //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
+          //*  NOTIFY={{ TARGET_USERNAME | upper }},
+          //  USER={{ TARGET_USERNAME | upper }},
+          //  MSGCLASS={{ MSG_CLASS }},
+          //  MSGLEVEL=(1,1),
+          //  CLASS={{ JOB_CLASS }}
+
+    # - include_role:
+    #     name: install-bzip2
+
+    - include_role:
+        name: ims_dataset
+      vars:
+        work_dataset: allocate
+        sysdef_datasets: allocate
+        runtime_datasets: allocate
+        java_dataset: ""
+
+    - include_role:
+        name: ims_initialize
+      vars:
+        send_procs: true
+        DFS_INIT_JAVA_CONF: false
+
+    - include_role:
+        name: ims_proclib
+      vars:
+        create_sample: true
+
+    - include_role:
+        name: ims_sysdef
+      vars:
+        preprocess: true
+        stage1: true
+        stage2: true
+
+    - include_role:
+        name: ims_racf
+      vars:
+        prep_racf: true
+
+    - include_role:
+        name: ims_apf
+      vars:
+        auth_datasets: true
+
+    - include_role:
+        name: ims_dataset
+      vars:
+        system_datasets: allocate
+        java_dataset: ""
+
+    - include_role:
+        name: ims_catalog
+      vars:
+        catalog: allocate
+
+    - include_role:
+        name: ims_dbrc
+      vars:
+        prep_dbrc: true
+
+    - include_role:
+        name: ims_proclib
+      vars:
+        add: true
+        bpeconfg: true
+
+    # Call SCI config to copy & config SCI
+    - include_role:
+        name: ims_structured_call_interface
+      vars:
+        sci: config
+
+    # Call OM config to copy & config OM
+    - include_role:
+        name: ims_operations_manager
+      vars:
+        om: config
+
+    # Call RM config to copy & config RM
+    - include_role:
+        name: ims_resource_manager
+      vars:
+        rm: config
+
+    # Call CQS to config
+    - include_role:
+        name: ims_common_queue
+      vars:
+        cqs: config
+
+    - include_role:
+        name: ims_iefjobs
+      vars:
+        iefjobs: create
+
+    - include_role:
+        name: ims_proclib
+      vars:
+        copy: true
+        copy_to_jobs: true
+        copy_stage_libs: true
+        add: true
+
+    # - include_role:
+    #     name: ims_exit
+    #   vars:
+    #     prep_exits: true
+
+    # Run DBD, PSB, and ACB gen
+    # - include_role:
+    #     name: ims_gen
+    #   vars:
+    #     dbd_gen: true
+    #     psb_gen: true
+    #     acb_gen: true
+
+    # Generate catalog file after gen
+    - include_role:
+        name: ims_catalog
+      vars:
+        catalog: 'setup'
+    - include_role:
+        name: ims_online_change
+      vars:
+        enable_olc: true
+        active_libs: true
+
+    - include_role:
+        name: ims_dbrc
+      vars:
+        dbrc_defaults: true
+
+    - include_role:
+        name: ims_catalog
+      vars:
+        catalog: load
+
+    - include_role:
+        name: ims_region
+
+    # Start SCI
+    - include_role:
+        name: ims_structured_call_interface
+      vars:
+        sci: start
+
+    # Start OM
+    - include_role:
+        name: ims_operations_manager
+      vars:
+        om: start
+
+    # Start RM
+    - include_role:
+        name: ims_resource_manager
+      vars:
+        rm: start
+
+    # Start control region (CTL) before starting ODBM
+    - include_role:
+        name: ims_common
+      vars:
+        ctl: start
+        wait_for_job: true
+        cold_start: true
+        icon: ""
+
+    # Start ODBM
+    - include_role:
+        name: ims_odbm
+      vars:
+        odbm: start
+
+    # Start ICONNECT
+    - include_role:
+        name: ims_common
+      vars:
+        icon: start
+        ctl: ""
+        wait_for_job: false
+        cold_start: false
+
+    # Configure TLS port for IMS ODBM
+    - include_role:
+        name: ims_tls
+      vars: 
+        port_number: '{{IMS_CONNECT_SSLPORT}}'
+        zos_level: '{{ZOS_RELEASE}}'
+        function: 'add'
+      when: IMS_CONNECT_SSLPORT
+
+    # Configure TLS port for IMS Connect
+    - include_role:
+        name: ims_tls
+      vars: 
+        port_number: '{{ODBM_SSLPORTID}}'
+        zos_level: '{{ZOS_RELEASE}}'
+        function: 'add'
+      when: ODBM_SSLPORTID
+
