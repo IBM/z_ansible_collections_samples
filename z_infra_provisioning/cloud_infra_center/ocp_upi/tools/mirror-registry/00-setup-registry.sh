@@ -18,8 +18,10 @@ grep -q LOCAL_REGISTRY_HOSTNAME $HOME/.bashrc || echo "export LOCAL_REGISTRY_HOS
 grep -q LOCAL_REGISTRY_PORT $HOME/.bashrc || echo "export LOCAL_REGISTRY_PORT=$LOCAL_REGISTRY_PORT" >> $HOME/.bashrc
 
 echo "Preparing required packages..."
-yum -y install podman httpd-tools wget jq -q
+yum -y install podman httpd-tools wget jq firewalld -q
 mkdir -p /opt/registry/{auth,certs,data}
+systemctl enable firewalld
+systemctl start firewalld
 
 # Self-sign certificate
 if [ "${GENERATE_CRT}" == "true" ];then
