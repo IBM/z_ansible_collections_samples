@@ -1,0 +1,35 @@
+---
+- name: ACBGEN and Activate ACBs
+  block:
+
+    - ansible.builtin.set_fact:
+        eager_role_path: '{{role_path}}'
+
+    - name: Perform ACBGEN for IMS Catalog PSBs 
+      ibm.ibm_zos_ims.ims_acb_gen:
+        command_input: BUILD
+        psb_name:
+          - DFSCPL00
+          - DFSCP000
+          - DFSCP001
+          - DFSCP002
+          - DFSCP003
+        psb_lib:
+          - "{{ DFS_IMS_HLQGROUP }}.PSBLIB"
+        dbd_lib:
+          - "{{ DFS_IMS_HLQGROUP }}.DBDLIB"
+        acb_lib: "{{ DFS_IMS_HLQGROUP }}.ACBLIB"
+
+    - name: Use template to create proper JCL on localhost
+      template: 
+        src: '{{ eager_role_path }}/templates/template_activate_acb.j2'
+        dest: '{{ eager_role_path }}/templates/activate_acb.j2'
+      delegate_to: localhost 
+
+    - name: Submit activate_acb job
+      ibm.ibm_zos_core.zos_job_submit:
+        src: '{{ eager_role_path }}/templates/activate_acb.j2'
+        location: LOCAL
+        wait: true
+        wait_time_s: 30
+    
