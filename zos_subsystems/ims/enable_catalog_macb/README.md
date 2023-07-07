@@ -60,7 +60,7 @@ Review the playbook notes sections for additional details and configuration.
 
 ## Requirements 
 
-IBM Open Enterprise SDK for Python: 3.9
+[IBM Open Enterprise SDK for Python: 3.9](https://www.ibm.com/products/open-enterprise-python-zos)
 
 ansible-core: 2.11.1
 
