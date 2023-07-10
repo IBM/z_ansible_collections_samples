@@ -195,7 +195,7 @@
   ansible.builtin.shell: |
     systemctl daemon-reload
     systemctl restart ocp-registry
-  when: use_localreg == true
+  when: "{{ hostvars['localhost']['use_localreg'] }} == true"
 
 # - name: Report status of haproxy
 #   fail:
