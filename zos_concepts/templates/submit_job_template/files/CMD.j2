@@ -8,7 +8,12 @@
 //* MSGCLASS: assign an output class for your output listing (SYSOUT)
 //******************************************************************************
 //{{ sh_program_name }} JOB ({{ accounting_info }}),'{{ programmer }}',
-//             CLASS={{ job_class }},MSGCLASS={{ msg_class }},MSGLEVEL=({{ msg_stmt_level }},{{ msg_exc_level }}),NOTIFY={{ notify }}
+{#
+The safe filter in NOTIFY will allow '&' to not be escaped as '&amp',
+which can cause problems when the remote host tries to process the
+rendered JCL.
+#}
+//             CLASS={{ job_class }},MSGCLASS={{ msg_class }},MSGLEVEL=({{ msg_stmt_level }},{{ msg_exc_level }}),NOTIFY={{ job_notify|safe }}
 //{{ sh_program_name }}  EXEC PGM=BPXBATCH
 //STDPARM DD *
 {#
