@@ -8,7 +8,7 @@
 # and report when the minimum requirements are not configured and fail playbook
 # execution.
 #
-# Upon successful dependency analyais, the z/OS playbook will be executed.
+# Upon successful dependency analysis, the z/OS playbook will be executed.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -23,12 +23,12 @@
 - hosts: localhost
 
   tasks:
-    - name: Parse the registry for collection entries
+    - name: Parse the registry for collection entries.
       include_vars: runtime-requirements.yml
 
     - name: Display the registered collections and properites in `registry.yml`.
       include_role:
         name: requirements-check
 
-- name: Executing the z/OS Ansible playbook
+- name: Execute the z/OS Ansible playbook to test using templates.
   import_playbook: zos_copy_template.yml

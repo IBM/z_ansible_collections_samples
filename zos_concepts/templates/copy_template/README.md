@@ -7,6 +7,8 @@ This playbook uses:
     - ibm.ibm_zos_core
   - modules:
     - zos_copy
+    - zos_gather_facts
+    - zos_data_set
 
 It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -48,7 +50,7 @@ ansible-playbook -i inventories zos_copy_template.yml
 ```
 
 More information about Jinja templates can be found
-[in its official documentation](https://jinja.palletsprojects.com/en/3.0.x/templates/).
+[in its official documentation](https://jinja.palletsprojects.com/en/latest/templates/).
 
 # Changelog
 All changes are maintained chronologically by date found in the

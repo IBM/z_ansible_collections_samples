@@ -7,6 +7,9 @@ This playbook uses:
     - ibm.ibm_zos_core
   - modules:
     - zos_job_submit
+    - zos_data_set
+    - zos_copy
+    - zos_mvs_raw
 
 It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -47,8 +50,14 @@ command:
 ansible-playbook -i inventories submit_templates.yml
 ```
 
+Or run `compile_link_loadlib.yml` with command:
+
+```bash
+ansible-playbook -i inventories compile_link_loadlib.yml
+```
+
 More information about Jinja templates can be found
-[in its official documentation](https://jinja.palletsprojects.com/en/3.0.x/templates/).
+[in its official documentation](https://jinja.palletsprojects.com/en/latest/templates/).
 
 # Changelog
 All changes are maintained chronologically by date found in the
