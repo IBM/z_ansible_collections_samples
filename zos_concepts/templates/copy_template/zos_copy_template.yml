@@ -73,6 +73,10 @@
     # the values of variables from different sources (playbook, Ansible,
     # z/OS facts).
     # Templates can have any extension, they just need to be text files.
+    # By setting use_template to true, the module will first feed the source
+    # to Jinja, which will treat it as a template and substitute any
+    # markers found inside of the source. The output from Jinja will then
+    # be copied over to the host.
     - name: Copy a template to a remote file.
       ibm.ibm_zos_core.zos_copy:
         src: ./files/template.j2
