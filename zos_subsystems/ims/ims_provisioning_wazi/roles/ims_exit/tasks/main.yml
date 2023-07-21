@@ -1,0 +1,31 @@
+---
+ 
+# User Exit Services
+- name: User Exit Services
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - block:
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+
+      - include_role:
+          name: send-template
+        vars:
+          path: '{{ eager_role_path }}/templates/DFSE315J.j2'
+
+      # when: prep_exits and not provision
+
+    - name: Prep exits for IMS security and conn
+      command: 'jsub -f {{ uss_file_path }}/DFSE315J.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSE315J.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: prep_exits

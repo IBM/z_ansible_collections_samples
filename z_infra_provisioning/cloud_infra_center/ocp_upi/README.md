@@ -233,7 +233,7 @@ icic-services status
 
 If you meet any **not running** service or **failed** message, check the IBM Cloud Infrastructure Center [Troubleshooting](https://www.ibm.com/docs/en/cic/1.1.6?topic=troubleshooting) document to fix before running the ansible playbook.
 
-9. Subnet DNS
+9. Set Subnet DNS
 
 **Note**: This step is required for KVM, z/VM is optional.
 
@@ -249,7 +249,24 @@ $ openstack subnet set --no-dns-nameservers <use_network_subnet>
 $ openstack subnet set --dns-nameserver 198.51.100.86 <use_network_subnet>
 ```
 
-For the multiple Openshift Container Platform, user can create multiple subnets or tenant network to deploy it. 
+
+10. Support to deploy multiple OCPs with multiple networks
+
+Now we support the following scenarios for multiple ocps :
+- Deploy multiple OCPs on ZVM multi-vlan network. You can refer ICIC doc to [create ZVM multiple vlan networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=mfvc-zvm-multiple-vlan-networks-pass-through-different-zvm-vswitchesthe-first-time-configuration) then choose one network and set the network in the related inventory.yaml file section.
+
+- Deploy multiple OCPs on ZVM multi-flat network. You can refer ICIC doc to [create ZVM multiple flat networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=configuration-zvm-multiple-flat-networksthe-first-time) then choose one network and set the network in the related inventory.yaml file section.
+
+- Deploy multiple OCPs on KVM multi-vlan network. You can refer ICIC doc to [create KVM multiple vlan networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=mfvc-kvm-multiple-vlan-networks-that-pass-through-different-osasthe-first-time-configuration) then choose one network and set the network in the related inventory.yaml file section.
+
+- Deploy multiple OCPs on KVM multi-flat network. You can refer ICIC doc to [create KVM multiple flat networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=configuration-kvm-multiple-flat-networksthe-first-time) then choose one network and set the network in the related inventory.yaml file section.
+
+- Deploy multiple OCPs on KVM flat+vlan network. You can refer ICIC doc to [create KVM flat+vlan networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=mfvc-kvm-multiple-flat-vlan-networks-pass-through-different-osasconfigured-already) then choose one network and set the network in the related inventory.yaml file section.
+
+- Deploy multiple OCPs on ZVM in one project use single network by custom DNS
+
+  you can set different custom DNS IP values in the related inventory.yaml file then to deploy multiple OCPs.
+
 
 ### 4. Download this playbook on your Linux server
 

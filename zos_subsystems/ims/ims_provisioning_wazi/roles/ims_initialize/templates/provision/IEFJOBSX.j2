@@ -1,0 +1,65 @@
+/* REXX */
+/*------------------------------------------------------------*/
+/*                                                            */
+/* Delete members of IEFJOBS created by IMS provisioning      */
+/*                                                            */
+/*------------------------------------------------------------*/
+trace o
+
+/*------------------------------------------------------------*/
+/* Set input parameters                                       */
+/*------------------------------------------------------------*/
+todsn = '{{ zCloud_IEFJOBS }}'
+useIEFJOBS = '{{ DFS_useIEFJOBS }}'
+
+/*------------------------------------------------------------*/
+/* If not using IEFJOBS file, just return                     */
+/*------------------------------------------------------------*/
+
+if useIEFJOBS = 'N' then do
+  exit 0
+  end
+
+/*------------------------------------------------------------*/
+/* Check existence of IEFJOBS file                            */
+/*------------------------------------------------------------*/
+if todsn = '' then do
+  exit 0       /* null value indicates no IEFJOBS file, leave */
+  end
+rc_msg = MSG("OFF")
+rc_sysdsn = SYSDSN("'" || todsn || "'")
+rc_msg = MSG(rc_msg)
+If rc_sysdsn = 'OK' then do
+  End
+Else do
+  say rc_sysdsn
+  exit 8
+  End
+
+/*------------------------------------------------------------*/
+/* Build member name list.                                    */
+/*------------------------------------------------------------*/
+procnm.0 = 6
+procnm.1 = {{ DFS_IMS_SSID }}CTL
+procnm.2 = {{ DFS_IMS_SSID }}DLI
+procnm.3 = {{ DFS_IMS_SSID }}DRC
+procnm.4 = {{ DFS_IMS_SSID }}OM
+procnm.5 = {{ DFS_IMS_SSID }}SC
+procnm.6 = {{ DFS_IMS_SSID }}RM
+
+/*------------------------------------------------------------*/
+
+/*------------------------------------------------------------*/
+/* Loop through member names.                                 */
+/*------------------------------------------------------------*/
+Do i = 1 to procnm.0
+
+    /*--------------------------------------------------------*/
+    /* Delete this member                                     */
+    /*--------------------------------------------------------*/
+    rc_msg = MSG("OFF")
+    Address TSO 'DELETE ''' || todsn || '(' || procnm.i || ')'''
+    rc_msg = MSG(rc_msg)
+    End
+
+Exit 0

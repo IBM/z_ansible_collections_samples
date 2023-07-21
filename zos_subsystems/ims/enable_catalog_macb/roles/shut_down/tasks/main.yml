@@ -1,0 +1,35 @@
+---
+- name: Shut down IMS
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block: 
+
+    - name: Stop IMS Connect
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'c {{ DFS_HWS_SSID }}' 
+        verbose: true
+      ignore_errors: true
+
+    - name: Immediate IMS Shutdown
+      ibm.ibm_zos_ims.ims_command:
+        command: CHE FREEZE
+        plex: '{{ DFS_IMS_PLEX }}'
+        route: '{{ DFS_IMS_SSID }}'
+
+    - name: Stop OM
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'c {{DFS_IMS_OM_PROC}}' 
+        verbose: true
+
+    - name: Stop RM
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'c {{DFS_IMS_RM_PROC}}'
+        verbose: true
+
+    - name: Stop SCI
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'c {{DFS_IMS_SCI_PROC}}'
+        verbose: true
+    

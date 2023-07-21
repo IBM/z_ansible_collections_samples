@@ -1,0 +1,95 @@
+---
+ 
+# VARIABLE VALIDATION CHECKS
+# Checks for invalid characters in user defined variables
+
+- name: Create a dictionary for user defined input variables
+  set_fact:
+    spbd_vars: {
+      DFS_IMS_SSID: '{{DFS_IMS_SSID}}',
+      ODBM_PORTID: '{{ODBM_PORTID}}',
+      ODBM_SSLPORTID: '{{ODBM_SSLPORTID}}',
+      IMS_CONNECT_PORT: '{{IMS_CONNECT_PORT}}',
+      IMS_CONNECT_SSLPORT: '{{IMS_CONNECT_SSLPORT}}',
+      DFS_IMSPlex: '{{DFS_IMSPlex}}',
+      DFS_workingdir: '{{DFS_workingdir}}'
+    }
+    # regex pattern for the following rules:
+    #  - contains any of these: ';', '&' or '|'
+    #  - contains '$('
+    #  - contains '..'
+    #  - contains ' -' 
+    spbd_regex: '[;&|]|\.\.|\$\(| -'
+    spbd_fails: []
+
+- name: Print each user input value
+  debug:
+    msg: key {{ item.key }} and lookup {{ lookup('vars', item.key) }}
+  loop: "{{ spbd_vars | dict2items }}"
+
+- name: Check each user input for invalid characters
+  set_fact:
+    spbd_fails: "{{ spbd_fails|default([]) + [ item.value ] }}"
+  loop: "{{ spbd_vars | dict2items }}"
+  when:
+    - lookup('vars', item.key) is defined
+    - lookup('vars', item.key) | string | regex_search(spbd_regex)
+
+- name: End the play early if fail_task is set to False and user defined input variable(s) contain invalid characters
+  block:
+    # Needed for uninstall scenario. End play if invalid inputs were found during uninstall so the product instance in OCP can be deleted.
+    - fail:
+        msg: "Found invalid user defined input(s). Ending the play early."
+    # - meta: end_host
+  when: 
+    - spbd_fails.0 is defined
+    - not fail_task
+
+- name: Fail if one or more user defined input variables contain invalid characters
+  fail:
+    msg: "Following input variable(s) contain invalid characters: {{ spbd_fails }}"
+  when:
+    - spbd_fails.0 is defined
+    - fail_task
+
+- name: Fail if IMSID is longer than 4 characters
+  fail:
+    msg: "IMS ID is longer than 4 characters"
+  when:
+    - DFS_IMS_SSID | length > 4
+    - fail_task
+
+- name: Fail if IMSPLEX is longer than 5 characters
+  fail:
+    msg: "IMSPlex name is longer than 5 characters"
+  when:
+    - DFS_IMSPlex | length > 5
+    - fail_task
+
+- name: Fail if ODBM_PORTID is valid
+  fail:
+    msg: "ODBM port should be between 1 and 65535"
+  when:
+    - ODBM_PORTID <= 0 or ODBM_PORTID > 65535
+    - fail_task
+
+- name: Fail if IMS_CONNECT_PORT is valid
+  fail:
+    msg: "IMS Connect port should be between 1 and 65535"
+  when:
+    - IMS_CONNECT_PORT <= 0 or IMS_CONNECT_PORT > 65535
+    - fail_task
+
+- name: Fail if ODBM_SSLPORTID is valid
+  fail:
+    msg: "ODBM SSL port should be between 1 and 65535"
+  when:
+    - ODBM_SSLPORTID <= 0 or ODBM_SSLPORTID > 65535
+    - fail_task
+
+- name: Fail if IMS_CONNECT_SSLPORT is valid
+  fail:
+    msg: "IMS Connct SSL port should be between 1 and 65535"
+  when:
+    - IMS_CONNECT_SSLPORT <= 0 or IMS_CONNECT_SSLPORT > 65535
+    - fail_task

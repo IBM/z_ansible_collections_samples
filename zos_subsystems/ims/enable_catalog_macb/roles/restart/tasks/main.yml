@@ -1,0 +1,49 @@
+---
+# tasks file for roles/restart
+- name: Restart IMS
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block: 
+    - name: Start SCI
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 's {{DFS_IMS_SCI_PROC}}'
+        verbose: true
+        wait: true
+        wait_time_s: 30 
+
+    - name: Start RM
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 's {{DFS_IMS_RM_PROC}}'
+        verbose: true
+        wait: true
+        wait_time_s: 30
+
+    - name: Start OM
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 's {{DFS_IMS_OM_PROC}}' 
+        verbose: true
+        wait: true
+        wait_time_s: 30
+
+    - name: Start CTL
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'S {{DFS_IMS_CTL_PROC}}'
+        wait: true
+        wait_time_s: 30
+
+    - name: RESTART IMS
+      ibm.ibm_zos_ims.ims_command:
+        command: NRESTART
+        plex: '{{ DFS_IMS_PLEX }}'
+        route: '{{ DFS_IMS_SSID }}'
+
+    - name: ICON start
+      ibm.ibm_zos_core.zos_job_submit:
+        src: '{{DFS_IMS_HLQGROUP}}.JOBS({{ DFS_HWS_PROC }})' 
+        location: DATA_SET
+        volume: "{{ DFS_DS_VOLUME1 }}"
+        wait: true
+        wait_time_s: 30
+      ignore_errors: true

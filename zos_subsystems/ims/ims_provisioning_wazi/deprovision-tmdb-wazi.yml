@@ -1,0 +1,30 @@
+---
+- name: IMS TMDB De-provisioning
+  hosts: all
+  gather_facts: false
+  # Variable file for Wazi environment
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+  environment: '{{ system_environment }}'
+
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  tasks:
+
+    - block:
+
+        - include_role:
+            name: set_up_run_environment
+
+        - include_role:
+            name: deprovision_ims
+
+      always:
+        - name: Delete the temporary provision files directory
+          file:
+            path: "{{ tmdb_tmp_dir.path }}"
+            state: absent
+      vars:
+        uss_file_path: '{{ tmdb_tmp_dir.path }}'

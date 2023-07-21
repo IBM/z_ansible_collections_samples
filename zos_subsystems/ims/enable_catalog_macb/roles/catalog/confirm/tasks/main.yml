@@ -1,0 +1,28 @@
+---
+- name: Confirm the provision using DL/I Test Program
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    - ansible.builtin.set_fact:
+        eager_role_path: '{{role_path}}'
+
+    - name: Use template to create proper JCL on localhost
+      template: 
+        src: '{{ eager_role_path }}/templates/template_test_program.j2'
+        dest: '{{ eager_role_path }}/templates/test_program.j2'
+      delegate_to: localhost 
+
+    - name: Submit test_program job
+      ibm.ibm_zos_core.zos_job_submit:
+        src: '{{ eager_role_path }}/templates/test_program.j2'
+        location: LOCAL
+        wait: true
+        wait_time_s: 30
+      register: result
+
+    - ansible.builtin.fail: 
+        msg: IMS Catalog provisioning was not successful. Please try running the playbook again. 
+      when: result.jobs[0]["ret_code"]["code"] != 0

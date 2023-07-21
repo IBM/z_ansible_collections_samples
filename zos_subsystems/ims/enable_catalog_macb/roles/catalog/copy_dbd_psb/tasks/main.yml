@@ -1,0 +1,21 @@
+---
+- name: Copy DBDs and PSBs
+  block: 
+    - name: Copy pre-compiled IMS Catalog DBDs
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ DFS_IMS_HLQGROUP }}.SDFSRESL({{ item }})"
+        dest: "{{ DFS_IMS_HLQGROUP }}.DBDLIB({{ item }})" 
+        remote_src: yes
+        volume: "{{ DFS_DS_VOLUME1 }}"
+        force: true 
+      loop: [DFSCD000,DFSCX000]    
+
+    - name: Copy pre-compiled IMS Catalog PSBs
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ DFS_IMS_HLQGROUP }}.SDFSRESL({{ item }})"
+        dest: "{{ DFS_IMS_HLQGROUP }}.PSBLIB({{ item }})"
+        remote_src: yes
+        volume: "{{ DFS_DS_VOLUME1 }}"
+        force: true
+      loop: [DFSCPL00,DFSCP000,DFSCP001,DFSCP002,DFSCP003]
+

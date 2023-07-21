@@ -1,0 +1,92 @@
+---
+ 
+# Common services for provision-ims-dbdc
+- name: Provision IMS
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+
+    # Start IMS control region if start_ctl is true
+    - name: Start IMS control region
+      zos_operator:
+        cmd: 's {{ DFS_IMS_SSID }}CTL'
+        verbose: true
+      when: ctl == "start"
+
+    # Stop IMS control region
+    - name: Stop IMS control region
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}CTL'
+        verbose: true
+      when: ctl == "stop"
+      ignore_errors: yes
+
+    - name: Wait for IMS ready
+      include_role:
+        name: submit-rexx
+        public: yes
+      vars:
+        rexx_name: 'WaitJob.j2'
+        max_rc: 0
+      ignore_errors: true
+      when: wait_for_job
+
+    - name: IMS cold start
+      ims_command:
+        command:  NRE CHECKPOINT 0 FMT ALL
+        plex:  '{{ DFS_IMSPlex }}'
+        route: '{{ DFS_IMS_SSID }}'
+      when: cold_start
+      register: cold_start_result
+
+    # - debug:
+    #     var:
+    #       - cold_start
+    #       - cold_start_result
+
+    # - name: Try ERE if cold start didn't work
+    #   ims_command:
+    #     command:  ERE OVERRIDE.
+    #     plex:  '{{ DFS_IMSPlex }}'
+    #     route: '{{ DFS_IMS_SSID }}'
+    #   when: cold_start and cold_start_result.stdout.failed
+
+    - name: ICON start
+      command: 'jsub "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"'
+      # zos_job_submit:
+      #   src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
+      #   location: DATA_SET
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: icon == "start"
+
+    # Start IMS Connect, for some reason, it doesn't work
+    # - name: Start ICON
+    #   zos_operator:
+    #     cmd: 's {{ DFS_IMS_SSID }}HWS1'
+    #     verbose: true
+    #   when: icon == "start"
+
+    # Stop ICON
+    - name: Stop ICON
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}HWS'
+        verbose: true
+      when: icon == "stop"
+
+  # always:
+  #   - name: Delete the temporary submit_jcl script path
+  #     file:
+  #         path: "{{ response.script_path }}"
+  #         state: absent
+  #     when: response
+  #     ignore_errors: yes
+
+
+
+# - debug:
+#     var: response
+#     verbosity: 0

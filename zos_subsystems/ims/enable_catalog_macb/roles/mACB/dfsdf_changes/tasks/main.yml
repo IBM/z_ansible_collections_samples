@@ -1,0 +1,57 @@
+---
+# tasks file for roles/mACB/dfsdf_check
+- name: Check for DFSDF
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:          
+    - name: Check for necessary resources 
+      block: 
+        - name: Create a backup of DFSDF member before any changes are made
+          ibm.ibm_zos_core.zos_copy: 
+            src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+            dest: "{{ DFS_IMS_PROCLIB }}({{ACB_DFSDF_BACKUP_NAME}})"
+            volume: "{{DFS_DS_VOLUME1}}"
+            remote_src: true 
+          when: BACKUP
+
+        - name: Find all members starting with characters 'DFS' in a given list of PDS patterns
+          ibm.ibm_zos_core.zos_find:
+            patterns: '^DFS.*'
+            pds_patterns:
+              - "{{ DFS_IMS_HLQGROUP }}.ACBLIB"
+          register: result
+             
+        - ansible.builtin.fail: 
+            msg: Necessary resources for catalog are not present. Please provision catalog first. 
+          when: >
+            ("DFSCD000" not in result.data_sets[0].members) or 
+            ("DFSCP000" not in result.data_sets[0].members) or 
+            ("DFSCP001" not in result.data_sets[0].members) or 
+            ("DFSCX000" not in result.data_sets[0].members) or 
+            ("DFSCPL00" not in result.data_sets[0].members)
+        
+        - name: Ensure ACBMGMT has the correct value
+          ibm.ibm_zos_core.zos_lineinfile:
+            src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+            state: present
+            regexp: '^ACBMGMT='
+            line: ACBMGMT=ACBLIB
+      when: macb == "before" 
+  
+    - name: Ensure comments are added to the partitioned data set member
+      ibm.ibm_zos_core.zos_lineinfile:
+        src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+        state: present
+        regexp: '^ACBMGMT='
+        line: ACBMGMT=CATALOG
+      when: macb == "after"
+
+    - name: Ensure we have our own comment added to the partitioned data set member
+      ibm.ibm_zos_core.zos_lineinfile:
+        src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+        state: present
+        regexp: '^ACCESS='
+        line: ACCESS=UPDATE
+      when: macb == "after"
