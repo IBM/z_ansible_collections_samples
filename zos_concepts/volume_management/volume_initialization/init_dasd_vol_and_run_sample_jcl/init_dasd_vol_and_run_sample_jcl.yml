@@ -80,7 +80,7 @@
             not be SMS managed.
       zos_volume_init:
         address: "{{ vol_unit }}"
-        verify_offline: true
+        verify_offline: false
         volid: "{{ new_volser }}"
         index: true
         sms_managed: false
