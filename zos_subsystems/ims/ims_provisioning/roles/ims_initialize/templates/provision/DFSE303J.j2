@@ -75,6 +75,15 @@ IMSPLEX={{ DFS_IMSPlex }}                    /* IMSPLEX NAME                    
 MODBLKS=DYN                      /* DRD ENABLED;MODBLKS OLC DISABLE */
 *
 *--------------------------------------------------------------------*
+* CATALOG SECTION                               *
+*--------------------------------------------------------------------*
+<SECTION=CATALOG>
+CATALOG=Y
+ALIAS=DFSC
+RETENTION=(DAYS=40,VERSIONS=55)
+ACBMGMT=CATALOG
+*
+*--------------------------------------------------------------------*
 * DYNAMIC RESOURCES SECTION                                          *
 *--------------------------------------------------------------------*
 <SECTION=DYNAMIC_RESOURCES>

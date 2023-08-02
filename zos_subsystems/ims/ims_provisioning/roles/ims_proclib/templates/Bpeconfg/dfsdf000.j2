@@ -26,12 +26,14 @@ OLDSDEF=(OLDS=(00,01,02,03,04,05,99),BUFNO=005,MODE=DUAL)
 WADSDEF=(WADS=(0,1,8,9))
 ARC={{ARC}}
 *
-*-----------------------------------------------------------------*
-* IMS Catalog Section                                             *
-*-----------------------------------------------------------------*
+*--------------------------------------------------------------------*
+* CATALOG SECTION                               *
+*--------------------------------------------------------------------*
 <SECTION=CATALOG>
-CATALOG=Y                                     /*Enable IMS catalog*/
-ALIAS=DFSC                      /*Use standard catalog prefix DFSC*/
+CATALOG=Y
+ALIAS=DFSC
+RETENTION=(DAYS=40,VERSIONS=55)
+ACBMGMT=CATALOG
 *
 *-----------------------------------------------------------------*
 * Database Section                                                *

@@ -201,7 +201,10 @@
           ims_acb_gen:
             command_input: BUILD
             compression: POSTCOMP
-            psb_name: ALL
+            psb_name: 
+              - DFSCPL00
+              - DFSCP000
+              - DFSCP001
             psb_lib:
               - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB"
             dbd_lib:
