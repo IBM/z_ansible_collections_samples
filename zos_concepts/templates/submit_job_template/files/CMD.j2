@@ -13,7 +13,7 @@
 //******************************************************************************
 //{{ sh_program_name }} JOB ({{ accounting_info }}),'{{ programmer }}',
 {#
-The safe filter in NOTIFY will allow '&' to not be escaped as '&amp',
+The safe filter in NOTIFY ({{ job_notify|safe }}) will allow '&' to not be escaped as '&amp',
 which can cause problems when the remote host tries to process the
 rendered JCL.
 #}
@@ -21,7 +21,7 @@ rendered JCL.
 //{{ sh_program_name }}  EXEC PGM=BPXBATCH
 //STDPARM DD *
 {#
-By changing the value of cmd inside the playbook, you can change the
+By changing the value of sh_cmd inside the playbook, you can change the
 command that will be run.
 #}
 SH {{ sh_cmd }}

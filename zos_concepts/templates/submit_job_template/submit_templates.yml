@@ -70,8 +70,8 @@
 
   tasks:
     # For the first example, we'll use JCL that executes a shell
-    # command in the managed node. The template primarily allows to template
-    # the job card.
+    # command in the managed node. The template primarily enables dynamically
+    # filling out the job card.
     - name: Submit shell command job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/CMD.j2"
