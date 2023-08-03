@@ -1,0 +1,25 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2023
+################################################################################
+
+################################################################################
+# Description of the properties used in this configuration:
+# - Property `PYZ` is the python installation home path on the z/OS managed node (target),
+#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+# - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
+#    e.g, zoau: "/usr/lpp/IBM/zoautil"
+# - property `ansible_python_interpreter` is the z/OS managed node (target) Python
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
+#
+# Note, PYZ and ZOAU environment variables must be configured.
+################################################################################
+
+PYZ: "path_to_python_installation_on_zos_target"
+ZOAU: "path_to_zoau_installation_on_zos_target"
+
+################################################################################
+# Do not configure, variable substitution will correctly set the
+# variable`ansible_python_interpreter`
+################################################################################
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"

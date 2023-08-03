@@ -64,6 +64,7 @@ often repeated and in need of automation.
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
   - [Copy templates to z/OS](zos_concepts/templates/copy_template)
   - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
+  - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)

@@ -30,5 +30,5 @@
       include_role:
         name: requirements-check
 
-- name: Execute the z/OS Ansible playbook, using templates for job cards.
-  import_playbook: submit_templates.yml
+- name: Execute the z/OS Ansible playbook, using a template for compilation.
+  import_playbook: compile_link_loadlib.yml

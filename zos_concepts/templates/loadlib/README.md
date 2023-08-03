@@ -1,12 +1,16 @@
-# Use Jinja templates to submit jobs with zos_job_submit
+# Use Jinja templates to compile and link a library with ibm_zos_core
 This playbook demonstrates how to use local Jinja templates to dynamically create
-JCL and submit jobs in z/OS using Red Hat Ansible Certified Content for IBM Z.
+JCL to compile and link a library in z/OS using Red Hat Ansible Certified Content
+for IBM Z.
 
 This playbook uses:
   - collection:
     - ibm.ibm_zos_core
   - modules:
     - zos_job_submit
+    - zos_data_set
+    - zos_copy
+    - zos_mvs_raw
 
 It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -29,7 +33,7 @@ This playbook requires:
 
 ## Run the playbook
 This project has included a `site.yml` playbook that serves as the primary playbook
-that provides additional prerequisite checks then it invokes the `submit_templates.yml`
+that provides additional prerequisite checks then it invokes the `compile_link_loadlib.yml`
 playbook.
 
 If you want to run the primary playbook `site.yml` it will check that your environment
@@ -40,11 +44,10 @@ correctly. To run the primary playbook, use command:
 ansible-playbook -i inventories site.yml
 ```
 
-You can skip the prerequisite check and run `submit_templates.yml` with
-command:
+You can skip the prerequisite check and run `compile_link_loadlib.yml` with command:
 
 ```bash
-ansible-playbook -i inventories submit_templates.yml
+ansible-playbook -i inventories compile_link_loadlib.yml
 ```
 
 More information about Jinja templates can be found
