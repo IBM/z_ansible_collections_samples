@@ -2,7 +2,7 @@
 # © Copyright IBM Corporation 2023
 ###############################################################################}
 {#
-These comments will not be present on the final text file.
+These comments will not be present on text file rendered by this template.
 This template uses a mixture of playbook-defined variables,
 Ansible-defined ones and facts from zos_gather_facts.
 #}
@@ -18,6 +18,6 @@ Ansible-defined ones and facts from zos_gather_facts.
     },
     "from_zos_gather_facts": {
         "master_catalog": "{{ master_catalog_dsn }}",
-        "vm_name": "{{ vm_name }}"
+        "primary_jes": "{{ primary_jes }}"
     }
 }

@@ -12,6 +12,8 @@
 # Example:
 #  ansible-playbook -i inventories zos_copy_template.yml
 #
+#  This playbook relies heavily on the files contained in the files
+#  directory, as these are the templates rendered by the tasks.
 #  Additional variables and Jinja blocks can be added to the files found
 #  in the files dir and this playbook. For more information about Jinja,
 #  see its official documentation at:
@@ -25,7 +27,8 @@
 #     will be copied to.
 #   json_file - Name of the first template that will be rendered.
 #   local_name - Name of the controller node.
-#   template_dict - Dictionary that will be put inside json_file.
+#   template_dict - Dictionary that will be put inside json_file (by
+#     default this file is ./files/template.j2).
 #   record - Variable that will be substituted as the first record in datasets.
 #   print_second_record - Whether to print or not the second record in a
 #     dataset.
@@ -46,7 +49,8 @@
     json_file: "info.json"
     json_path: "{{ dest_dir }}/{{ json_file }}"
 
-    # Variables for the first example.
+    # Variables for the first example. These variables will be rendered in
+    # the template used, which by default is ./files/template.j2.
     local_name: "localhost"
     template_dict:
       - key: "a"
@@ -54,7 +58,8 @@
       - key: "b"
         value: 2
 
-    # Variables for the second and third examples.
+    # Variables for the second and third examples. The templates for these
+    # examples are ./files/records.j2 and ./files/records_custom_markers.j2.
     record: "First record"
     print_second_record: true
     third_record_value: 6
@@ -139,14 +144,15 @@
 
     # For the last example, we will be rendering records.j2 again, but
     # changing how whitespace is handled.
-    # This task will create empty records due to not trimming newlines
+    # By setting trim_blocks to false and keep_trailing_newline to true,
+    # this task will create empty records due to not trimming newlines
     # after rendering blocks.
     - name: Copy a template to a dataset without trimming whitespace.
       ibm.ibm_zos_core.zos_copy:
         src: ./files/records.j2
         dest: "{{ default_dataset_name }}"
-        use_template: true
         force: true
+        use_template: true
         template_parameters:
           trim_blocks: false
           keep_trailing_newline: true
@@ -158,6 +164,6 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ item }}"
         state: absent
-      with_items:
+      loop:
         - "{{ default_dataset_name }}"
         - "{{ custom_dataset_name }}"
