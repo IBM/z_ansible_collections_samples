@@ -13,7 +13,7 @@ master_end=$(($2 - 1))
 
 for index in $( seq 0 $master_end); do
     MASTER_HOSTNAME="$infra_id-master-$index\n"
-    python -c "import base64, json, sys
+    python3 -c "import base64, json, sys
 ignition = json.load(sys.stdin)
 storage = ignition.get('storage', {})
 files = storage.get('files', [])

@@ -9,7 +9,7 @@
 # =================================================================
 WORKER_NAME=$1
 WORKER_HOSTNAME="$WORKER_NAME\n"
-python -c "import base64, json, sys
+python3 -c "import base64, json, sys
 ignition = json.load(sys.stdin)
 storage = ignition.get('storage', {})
 files = storage.get('files', [])
