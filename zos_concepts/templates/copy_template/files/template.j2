@@ -9,11 +9,11 @@ Ansible-defined ones and facts from zos_gather_facts.
 {
     "from_playbook": {
         "local_name": "{{ local_name }}",
-        "keys": {{ template_dict }},
+        "keys": {{ template_dict|tojson }},
         "remote_dir": "{{ dest_dir }}"
     },
     "from_ansible": {
-        "current_playbook_hosts": {{ ansible_play_hosts }},
+        "current_playbook_hosts": {{ ansible_play_hosts|tojson }},
         "playbook_dir": "{{ playbook_dir }}"
     },
     "from_zos_gather_facts": {
