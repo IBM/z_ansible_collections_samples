@@ -5,6 +5,9 @@
 These comments will not be present on text file rendered by this template.
 This template uses a mixture of playbook-defined variables,
 Ansible-defined ones and facts from zos_gather_facts.
+The use of the filter tojson when substituting template_dict
+and ansible_play_hosts tells Jinja to quote the values of the
+variables in double quotes to create valid JSON.
 #}
 {
     "from_playbook": {
