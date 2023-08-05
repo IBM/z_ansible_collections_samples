@@ -21,6 +21,13 @@
 #
 # Requirements:
 #   IBM z/OS core collection 1.7.0 or later.
+#   Ansible Community General Collection
+#
+#   The ansible.cfg file for this playbook contains the setting stdout_callback = unixy
+#   which changes the format of the playbook output. It has been set to better demonstrate
+#   the effects of whitespace (as compared to the default output formatting).
+#   The unixy callback is part of the community.general package (which is maintained
+#   by the Ansible community).
 #
 # Configure:
 #   dest_dir - Path to the directory where files from the first example

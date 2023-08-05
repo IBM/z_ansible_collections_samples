@@ -19,6 +19,21 @@ This playbook requires:
 
 - [IBM® z/OS® core collection 1.7.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [Ansible® 2.13 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [Ansible Community General Collection](https://github.com/ansible-collections/community.general)
+
+The `ansible.cfg` file here contains the setting `stdout_callback = unixy` which changes the format
+of the playbook output. It has been set to better demonstrate the effects of whitespace
+(as compared to the default output formatting). The unixy callback is part of the
+`community.general` package (which is maintained by the Ansible community). The callback can
+be installed from Ansible Galaxy with the command:
+
+```bash
+ansible-galaxy collection install community.general
+```
+
+Alternatively, the `stdout_callback = unixy` line can be removed (or commented out) from the
+`ansible.cfg` file. The playbook will run the same, only the formatting of the playbook output,
+especially of whitespace, will be less apparent.
 
 ## Configuration
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
