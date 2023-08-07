@@ -1,0 +1,123 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use local Jinja templates to dynamically
+# create JCL and submit jobs in z/OS using Red Hat Ansible Certified Content
+# for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories submit_templates.yml
+#
+#  Additional variables and Jinja blocks can be added to the files found
+#  in the files dir and this playbook. For more information about Jinja,
+#  see its official documentation at:
+#  https://jinja.palletsprojects.com/en/latest/templates/.
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#
+# Configure:
+#   sh_program_name - Job name for the first example.
+#   sh_cmd - Shell command to run in the managed node in the first example.
+#   accounting_info - Accounting information for the first example.
+#   programmer - Programmer attached to the first example.
+#   job_class - Job class of the first example.
+#   msg_class - Messaging class for the first example.
+#   msg_stmt_level - Message level for statements.
+#   msg_exc_level - Message level for system messages.
+#   job_notify - Request for the system to notify job completion.
+#   loop_program_name - Job name for the second example.
+#   message - Message that will be printed to the console in the second
+#     example, if using another program.
+#   input_statements - List of dictionaries that define the input DD
+#     statements for the second example.
+###############################################################################
+
+- name: Sample zos_job_submit template playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    # Variables for first job (Executing a shell command)
+    sh_program_name: "UPTIME"
+    sh_cmd: "uptime"
+    accounting_info: "T043JM,JM00,1,0,0,0"
+    programmer: "IBMUSER"
+    job_class: "A"
+    msg_class: "X"
+    msg_stmt_level: 1
+    msg_exc_level: 1
+    job_notify: "&SYSUID"
+
+    # Variables for second job (Checking JCL syntax with IEFBR14)
+    loop_program_name: "HELLO"
+    message: "Job submitted from a template!"
+    input_statements:
+      - step_name: "IN"
+        dd: "DUMMY"
+      - step_name: "PRINT"
+        dd: "SYSOUT=*"
+      - step_name: "UT1"
+        dd: "*"
+
+  tasks:
+    # For the first example, we'll use JCL that executes a shell
+    # command in the managed node. The template primarily enables dynamically
+    # filling out the job card.
+    - name: Submit shell command job using a local template.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ playbook_dir }}/files/CMD.j2"
+        location: LOCAL
+        use_template: true
+      register: job_output
+
+    - name: Extracting ddnames from job output.
+      set_fact:
+        job_ddnames: "{{ job_output.jobs[0].ddnames }}"
+
+    # By looking at the submitted JCL, we'll see how Jinja rendered
+    # the template without introducing additional whitespace that
+    # could cause syntax problems.
+    - name: See job's submitted JCL.
+      ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
+
+    - name: See job output.
+      ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'STDOUT') }}"
+
+    # For the second example, some steps of the job will be rendered
+    # using a loop block in the template. Like in the previous example,
+    # Jinja won't introduce additional whitespace that could mess up the
+    # syntax. The options trim_blocks and keep_trailing_newline have
+    # default values (true and false, respectively) that tell Jinja to
+    # behave this way, but we'll specify them to highlight this fact.
+    - name: Submit IEFBR14 job using a local template.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ playbook_dir }}/files/LOOP.j2"
+        location: LOCAL
+        use_template: true
+        template_parameters:
+          trim_blocks: true
+          keep_trailing_newline: false
+      register: job_output
+
+    - name: Extracting ddnames from job output.
+      set_fact:
+        job_ddnames: "{{ job_output.jobs[0].ddnames }}"
+
+    - name: See job's submitted JCL.
+      ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
+
+    - name: See job output.
+      ansible.builtin.debug:
+        msg: "{{ job_output.jobs[0].ret_code }}"

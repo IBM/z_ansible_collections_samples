@@ -1,0 +1,88 @@
+// *****************************************************************************
+//* Copyright (c) IBM Corporation 2023
+//* ****************************************************************************
+//*
+//* ****************************************************************************
+//* Configure the job card as needed, most common keyword parameters often
+//* needing editing are:
+//* CLASS:      Used to achieve a balance between different types of jobs and
+//*             avoid contention between jobs that use the same resources.
+//* MSGLEVEL:   Controls how the allocation and termination messages are
+//*             printed in the job's output listing (SYSOUT).
+//* MSGCLASS:   Assign an output class for your output listing (SYSOUT)
+//*
+//* COBOL pattern for this compile and link
+//* COBOL SRC
+//*         '-> COMPILE
+//*                   '-> OBJ CODE
+//*                              '-> LINK EDIT
+//*                                          '->LOAD MODULE
+//*                                                        '->GO
+//*                                                            '-> HELLOPGM.jcl
+//*
+//* SYSIN:      The COBOL source in DSN {{ pgm_dataset }}({{ pgm_member }})
+//* SYSPRINT:   The output
+//* SYSLIN:     Where the COBOL binary is written, using &&LOADSET and parms to
+//*             manage this but you could create a PDS such as
+//*             DSN={{ pgm_dataset }},UNIT=SYSDA,
+//*             DISP=(MOD,KEEP),SPACE=(TRK,(3,3))
+//* SYSUT:      Statements define the utility data sets that the compiler
+//*             will use to process the source program
+//*
+//* SYSMDECK:   Required for all compilations, it will contain a copy
+//*             of the updated input source after library processing
+//* ****************************************************************************
+//*
+//* ****************************************************************************
+//* COMPILE A COBOL PROGRAM
+//* ****************************************************************************
+//*
+//COMPLINK  JOB MSGCLASS=H,MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M
+//STEP1     EXEC PGM=IGYCRCTL
+//STEPLIB   DD DSN=IGYV5R10.SIGYCOMP,DISP=SHR
+//          DD DSN=IGYV5R10.SIGYMAC,DISP=SHR
+//SYSIN     DD DISP=SHR,DSN={{ pgm_dataset }}({{ pgm_member }})
+//SYSPRINT  DD SYSOUT=*
+//SYSLIN   DD  UNIT=SYSDA,DISP=(MOD,PASS),
+//             SPACE=(CYL,(1,1)),
+//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=27920),
+//             DSN=&&LOADSET
+//SYSUT1    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT2    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT3    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT4    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT5    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT6    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT7    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT8    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT9    DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT10   DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT11   DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT12   DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT13   DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT14   DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSUT15   DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//SYSMDECK  DD SPACE=(80,(10,10),,,ROUND),UNIT=SYSDA
+//*
+//* ****************************************************************************
+//* LINKEDIT A COBOL PROGRAM
+//* SYSLMOD: The PDSE where the link editor will create a module, don't create
+//*          the member, let the link editor do this else you will get an OF4
+//* SYSLIN: The binder reads the object deck in this DD which is created in the
+//*         compile step. If you had not used &&LOADSET you would need to pass
+//*         your DSN such as DSN=ANSIBLE.COBOL.OBJ,DISP=(OLD,KEEP)
+//* ****************************************************************************
+//*
+//LKED     EXEC PGM=IEWL,REGION=0M
+//SYSPRINT DD  SYSOUT=*
+//SYSLIB   DD  DSN=CEE.SCEELKED,DISP=SHR
+//         DD  DSN=CEE.SCEELKEX,DISP=SHR
+//SYSLMOD  DD  DSN={{ loadlib_dataset }}({{ pgm_member }}),
+//             DISP=SHR
+//SYSUT1   DD  UNIT=SYSDA,DCB=BLKSIZE=1024,
+//             SPACE=(TRK,(3,3))
+//SYSTERM  DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SYSLIN   DD  DSN=&&LOADSET,DISP=(OLD,KEEP)
+//SYSIN    DD  DUMMY
+//*

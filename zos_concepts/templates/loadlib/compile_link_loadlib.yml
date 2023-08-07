@@ -1,0 +1,110 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use local Jinja templates to dynamically
+# create JCL to compile and link a library in z/OS using Red Hat Ansible
+# Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories compile_link_loadlib.yml
+#
+#  Additional variables and Jinja blocks can be added to the files found
+#  in the files dir and this playbook. For more information about Jinja,
+#  see its official documentation at:
+#  https://jinja.palletsprojects.com/en/latest/templates/.
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#
+# Configure:
+#   pgm_dataset - Dataset for the COBOL source used in this playbook.
+#   pgm_member - Member where the COBOL source will be copied to.
+#   loadlib_dataset - Name of the dataset for the library.
+###############################################################################
+
+- name: Sample zos_job_submit template playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    pgm_dataset: "ANSIBLE.COBOL.SRC"
+    pgm_member: "HELLOSRC"
+    loadlib_dataset: "ANSIBLE.COBOL.LOADLIB"
+
+  tasks:
+    - name: Create {{ pgm_dataset }} for the COBOL program.
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ pgm_dataset }}"
+        type: PDS
+        space_primary: 2
+        space_type: M
+        record_format: FB
+        record_length: 80
+        block_size: 3120
+
+    - name: Copy the COBOL source to {{ pgm_dataset }}({{ pgm_member }}).
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ playbook_dir }}/files/HELLO.cbl"
+        dest: "{{ pgm_dataset }}({{ pgm_member }})"
+
+    - name: Create {{ loadlib_dataset }} where the compiled source will be linked.
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ loadlib_dataset }}"
+        type: PDSE
+        space_primary: 2
+        space_type: M
+        record_format: U
+        record_length: 0
+        block_size: 32760
+
+    - name: Compile and link the COBOL code.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{playbook_dir}}/files/COMPLINK.j2"
+        location: LOCAL
+        wait_time_s: 60
+        use_template: true
+      register: comp_result
+
+    - name: See compilation and linking output.
+      ansible.builtin.debug:
+        msg: "{{ comp_result }}"
+
+    - name: Run the compiled COBOL program.
+      ibm.ibm_zos_core.zos_mvs_raw:
+        program_name: "{{ pgm_member }}"
+        auth: false
+        verbose: true
+        dds:
+          - dd_data_set:
+              dd_name: steplib
+              data_set_name: "{{ loadlib_dataset }}"
+              disposition: shr
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+          - dd_output:
+              dd_name: sysout
+              return_content:
+                type: text
+      register: pgm_result
+
+    - name: See output from the COBOL program.
+      ansible.builtin.debug:
+        msg: "{{ pgm_result }}"
+
+    - name: Remove datasets created during the playbook.
+      ibm.ibm_zos_core.zos_data_set:
+        batch:
+          - name: "{{ pgm_dataset }}"
+            state: absent
+          - name: "{{ loadlib_dataset }}"
+            state: absent

@@ -1,0 +1,17 @@
+################################################################################
+# © Copyright IBM Corporation 2023
+################################################################################
+
+################################################################################
+# Description of the properties used in this configuration:
+# - Property `ansible_host` is the z/OS managed node (target),
+#    e.g, ansible_host: "zvm1.vmec.svl.ibm.com"
+# - Property `ansible_user` is the z/OS managed user to connect and run as over SSH,
+#    e.g, ansible_user: "zosadm"
+################################################################################
+
+source_system:
+  hosts:
+    zos_host:
+      ansible_host: zos_target_address
+      ansible_user: zos_target_username
