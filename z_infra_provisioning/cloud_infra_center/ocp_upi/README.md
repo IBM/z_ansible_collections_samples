@@ -331,6 +331,8 @@ Others are **optional**, you can enable them and update value if you need more s
 | `additional_certs` |`{{ lookup('file', '/opt/registry/certs/domain.crt') \| indent (width=2) }}`| The local mirror registry repo additionally need SSL certificated to be accessed, those can be added cert file via the `additional_certs` variable.
 | `create_server_timeout` |10| Default is 10 minutes that used to create instances and volumes from backend storage provider
 
+**Note**: Check [OpenShift on a single node](./SNO.md) for how to define single node cluster.
+
 ## Creation of the cluster
 
 1. **Step1**:
