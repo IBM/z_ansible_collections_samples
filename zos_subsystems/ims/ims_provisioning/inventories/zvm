@@ -1,6 +1,6 @@
 zvm:
   hosts:
     zvm:
-      ansible_host: ec33016a.vmec.svl.ibm.com
+      ansible_host: ec00000a.vmec.svl.ibm.com
       ansible_user: omvsadm
       ansible_python_interpreter: /allpython/3.9/usr/lpp/IBM/cyp/v3r9/pyz/bin/python3.9

@@ -148,10 +148,10 @@ DFS_SMS_MCLASS: NONE
 # ------------------------ for when SMS is not in use ------------------------ #
 
 # first volume to use to store IMS datasets
-DFS_DS_VOLUME1: OMAR1
+DFS_DS_VOLUME1: USRV01
 # DFS_DS_VOLUME1: JERRYL
 # second volume to use to store IMS datasets
-DFS_DS_VOLUME2: OMAR1
+DFS_DS_VOLUME2: USRV01
 # DFS_DS_VOLUME2: JERRYL
 
 # ---------------------------------------------------------------------------- #
