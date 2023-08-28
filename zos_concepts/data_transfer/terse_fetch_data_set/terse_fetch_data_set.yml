@@ -16,7 +16,7 @@
 #  This sample demonstrates ways to create a temporary data set, terse the
 #  temporary data set and fetch the tersed data set back to the local machine.
 #
-#  When running this playbook, review the comments on how ths sample will
+#  When running this playbook, review the comments on how the sample will
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
 #
@@ -28,6 +28,8 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
+  vars:
+    dest_archive : "USER.PRIVATE.ARCHIVE.TRS"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -55,61 +57,39 @@
         tmp_data_set: "{{ tmp_ds.get('names')[0] }}"
 
     # ##########################################################################
-    # Modules: zos_mvs_raw, zos_fetch, zos_data_set
+    # Modules: zos_lineinfile, zos_archive, zos_fetch, zos_data_set
     # ##########################################################################
     # +-------------------------------------------------------------------------
-    # | - Using zos_data_set, create a temporary data set
-    # | - Using zos_mvs_raw, call utility to terse the temporary data set
+    # | - Using zos_lineinfile to insert a line into the temporary data set
+    # | - Using zos_archive terse the temporary data set
     # | - Using zos_fetch, fetch both the tersed archive and the data set
     # | - Tear down by cleaning up files.
     # +-------------------------------------------------------------------------
-    - block:
-        - name: Create a temporary data set
-          zos_data_set:
-            type: seq
-            space_primary: 5
-            space_secondary: 1
-            space_type: cyl
-            record_length: 1024
-          register: temp_data_set
-          failed_when: temp_data_set is not defined or temp_data_set.get('names', [])|length == 0
+    - name: Insert text into the data set
+      zos_lineinfile:
+        src: "{{ tmp_data_set }}"
+        insertbefore: BOF
+        line: this is a test line to avoid errors trying to archive an empty data set
+
+    - name: Create an archive with terse
+      zos_archive:
+        src: "{{ tmp_data_set }}"
+        dest: "{{ dest_archive }}"
+        format:
+          name: terse
+      register: terse_response
 
     - name: Get the result of temp data set creation
       debug:
         var: temp_data_set
 
-    - name: "Terse data set {{ tmp_data_set }} to {{ temp_data_set.get('names')[0] }}"
-      zos_mvs_raw:
-        program_name: amaterse
-        parm: "SPACK"
-        dds:
-          - dd_data_set:
-              dd_name: sysut1
-              data_set_name: "{{ tmp_data_set }}"
-              disposition: shr
-          - dd_data_set:
-              dd_name: sysut2
-              data_set_name: "{{ temp_data_set.get('names')[0] }}"
-              disposition: new
-              replace: true
-              type: seq
-              space_primary: 5
-              space_secondary: 1
-              space_type: cyl
-              record_length: 1024
-          - dd_output:
-              dd_name: sysprint
-              return_content:
-                type: text
-      register: terse_response
-
     - name: Get the output of terse execution
       debug:
         var: terse_response
 
-    - name: "Fetch the tersed data set {{ temp_data_set.get('names')[0] }} to the local machine"
+    - name: "Fetch the tersed data set {{ dest_archive }} to the local machine"
       zos_fetch:
-        src: "{{ temp_data_set.get('names')[0] }}"
+        src: "{{ dest_archive }}"
         dest: "{{ playbook_dir }}/"
         flat: true
         is_binary: true
@@ -119,9 +99,9 @@
       debug:
         var: result
 
-    - name: "Remove the temporary data set {{ temp_data_set.get('names')[0] }}"
+    - name: "Remove the temporary data set {{ dest_archive }}"
       zos_data_set:
-        name: "{{ temp_data_set.get('names')[0] }}"
+        name: "{{ dest_archive }}"
         state: absent
       when: temp_data_set is defined and temp_data_set.names|length > 0
 
