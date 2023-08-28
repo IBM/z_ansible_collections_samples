@@ -15,7 +15,7 @@ The collections can be found on
 and [Automation Hub](https://www.ansible.com/products/automation-hub).
 For additional content, review our [community page](http://ibm.biz/BdfsTR).
 
-This repository is frequently updated to refresh content. We recommend that you clone the
+This repository is frequently updated to refresh content. We recommend that you clone 
 the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
