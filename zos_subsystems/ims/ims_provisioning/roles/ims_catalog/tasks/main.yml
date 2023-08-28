@@ -189,6 +189,7 @@
             src: "{{ item.src }}"
             dest: "{{ item.dest }}"
             remote_src: true
+            force: true 
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           loop:
             - { src: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL(DFSCD000)', dest: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB(DFSCD000)' }
@@ -213,7 +214,7 @@
             reslib:
               - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
             steplib:
-              - "{{ DFS_AUTH_LIB_SYSHLQ1 }}.{{ DFS_AUTH_LIB_SYSHLQ2 }}.SDFSRESL"
+              - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
 
         - name: Defining the IMS Catalog without DBRC
           zos_mvs_raw:
@@ -251,8 +252,79 @@
                     - "PART=(NAME=DFSCX000,PART=DFSX001,"
                     - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000,"
                     - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"
+          when: not dbrc_enabled
 
 # ------------------------------------------------------------------------------------------------
+    - name: Defining Catalog with DBRC 
+      ibm.ibm_zos_ims.ims_dbrc:
+        command: 
+          - INIT.DB   DBD(DFSCD000) TYPHALDB SHARELVL(3)
+          - INIT.PART DBD(DFSCD000) PART(DFSCD01) DSNPREFX({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000) BLOCKSZE(8192,8192,8192,8192) KEYSTRNG('DBD     ZZZZZZZZ') GENMAX(5)
+          - INIT.PART DBD(DFSCD000) PART(DFSCP01) DSNPREFX({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000) BLOCKSZE(8192,8192,8192,8192) KEYSTRNG('PSB     ZZZZZZZZ') GENMAX(5)
+          - INIT.DB DBD(DFSCX000) TYPHALDB SHARELVL(3)
+          - INIT.PART DBD(DFSCX000) PART(DFSCX01) DSNPREFX({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000)   GENMAX(3) KEYSTRNG(X'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+          - LIST.DB DBD(DFSCD000) DBDS
+          - LIST.DB DBD(DFSCX000) DBDS
+        steplib:
+          - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL"
+        dbd_lib: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB"
+        recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1"
+        recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2"
+        recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
+      when: catalog == "load" and dbrc_enabled
+
+    - name: Load IMS catalog
+      ims_catalog_populate:
+        mode: LOAD
+        dbrc: true
+        modstat: IMSTESTL.IMS1.MODSTAT
+        acb_lib: [
+          IMSTESTL.IMS1.ACBLIB
+        ]
+        reslib: [
+          IMSTESTL.IMS1.SDFSRESL
+        ]
+        steplib: [
+          IMSTESTL.IMS1.SDFSRESL
+        ]
+        proclib: [
+          IMSTESTL.IMS1.PROCLIB
+        ]
+        dbd_lib: [
+          IMSTESTL.IMS1.DBDLIB
+        ]
+        psb_lib: [
+          IMSTESTL.IMS1.PSBLIB
+        ]
+        buffer_pool_param_dataset: "IMSTESTL.IMS1.PROCLIB(DFSVSMHP)"
+        primary_log_dataset:
+          dataset_name: IMSTESTL.IMS1.IMSLOG1
+          disposition: NEW
+          normal_disposition: DELETE
+          record_format: FB
+          record_length: 4092
+          block_size: 4096
+          primary: 100
+          primary_unit: CYL
+          secondary: 75
+          secondary_unit: CYL
+          type: SEQ
+        secondary_log_dataset:
+          dataset_name: IMSTESTL.IMS1.IMSLOG2
+          disposition: NEW
+          normal_disposition: DELETE
+          record_format: FB
+          record_length: 4092
+          block_size: 4096
+          primary: 100
+          primary_unit: CYL
+          secondary: 75
+          secondary_unit: CYL
+          type: SEQ
+        control_statements:
+          managed_acbs:
+            setup: true
+      when: catalog == "load" and dbrc_enabled
 
     - name: Load IMS catalog
       ims_catalog_populate:
@@ -305,7 +377,7 @@
         control_statements:
           managed_acbs:
             setup: true
-      when: catalog == "load"
+      when: catalog == "load" and not dbrc_enabled
 
     - name: Delete IMS Catalog
       zos_data_set:

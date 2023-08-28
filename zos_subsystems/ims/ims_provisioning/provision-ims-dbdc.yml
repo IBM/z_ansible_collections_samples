@@ -24,133 +24,135 @@
 
 
     - block:
-
+    
         - include_role:
             name: install-bzip2
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_dataset
           vars:
             work_dataset: allocate
             sysdef_datasets: allocate
             runtime_datasets: allocate
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_initialize
           vars:
             DYNAMICALLY_RESERVE_PORTS: false
             send_procs: true
             DFS_INIT_JAVA_CONF: false
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_proclib
           vars:
             create_sample: true
 
-        - include_role: # --- Try to convert later
+        - include_role: 
             name: ims_sysdef
           vars:
-            preprocess: true # can this be converted?
-            stage1: true # ASMA PROGRAM CANNOT BE CONVERTED USING ANY ZOS_CORE FUNCTION
-            stage2: true # can this be converted?
+            preprocess: true 
+            stage1: true 
+            stage2: true 
 
-        - include_role: # PARTIALLY DONE, ASMA PROGRAM CANNOT BE CONVERTED USING ANY ZOS_CORE FUNCTION
+        - include_role: 
             name: ims_racf
           vars:
             prep_racf: true
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_apf
           vars:
             auth_datasets: true
 
-        - include_role: # DONE / ASMA90 Referback
+        - include_role: 
             name: ims_dataset
           vars:
             system_datasets: allocate
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_catalog
           vars:
             catalog: allocate
+            dbrc_enabled: "{{ CATALOG_DBRC_ENABLED }}"
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_dbrc
           vars:
             prep_dbrc: true
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_proclib
           vars:
             add: true
             bpeconfg: true
 
         # # Call SCI config to copy & config SCI
-        - include_role: # DONE
+        - include_role: 
             name: ims_structured_call_interface
           vars:
             sci: config
 
         # # Call OM config to copy & config OM
-        - include_role: # DONE
+        - include_role: 
             name: ims_operations_manager
           vars:
             om: config
 
         # # Call RM config to copy & config RM
-        - include_role: # DONE
+        - include_role: 
             name: ims_resource_manager
           vars:
             rm: config
 
         # # Call CQS to config
-        - include_role: # DONE
+        - include_role: 
             name: ims_common_queue
           vars:
             cqs: config
 
-        - include_role: # DONE / Complex JCL code
+        - include_role: 
             name: ims_iefjobs
           vars:
             iefjobs: create
 
-        - include_role: # PARTIALLY DONE
+        - include_role:
             name: ims_proclib
           vars:
-            copy: true # DONE
-            copy_to_jobs: true # DONE
-            copy_stage_libs: true # Convert
+            copy: true 
+            copy_to_jobs: true 
+            copy_stage_libs: true 
 
-        - include_role: # DONE / ASMA90 Referback
+        - include_role: 
             name: ims_exit
           vars:
             prep_exits: true
 
         # # Run DBD, PSB, and ACB gen
-        - include_role: # DONE
+        - include_role: 
             name: ims_gen
           vars:
             dbd_gen: true
             psb_gen: true
             acb_gen: true
 
-        - include_role: # PARTIALLY DONE
+        - include_role: 
             name: ims_online_change
           vars:
             enable_olc: true
-            active_libs: true # need a module for the online change utility
+            active_libs: true 
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_dbrc
           vars:
             dbrc_defaults: true
 
-        - include_role: # DONE
+        - include_role:
             name: ims_catalog
           vars:
             catalog: 'load'
+            dbrc_enabled: "{{ CATALOG_DBRC_ENABLED }}"
 
-        - include_role: # DONE
+        - include_role: 
             name: ims_region
 
 # ------------ IMS SPACE ADDRESS INITIALIZATION

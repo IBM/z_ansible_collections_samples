@@ -34,6 +34,8 @@ CATALOG=Y
 ALIAS=DFSC
 RETENTION=(DAYS=40,VERSIONS=55)
 ACBMGMT=CATALOG
+IXVOLSER={{ DFS_DS_VOLUME1 }}
+{% if not CATALOG_DBRC_ENABLED %}
 *
 *-----------------------------------------------------------------*
 * Database Section                                                *
@@ -41,6 +43,7 @@ ACBMGMT=CATALOG
 <SECTION=DATABASE>
 UNREGCATLG=(DFSCX000,DFSCD000) /*Unregistered IMS catalog DB names*/
 *
+{% endif %}
 *--------------------------------------------------------------------*
 * END OF MEMBER DFSDF000                                             *
 *--------------------------------------------------------------------*

@@ -176,3 +176,8 @@ JAVA_CONF_PATH: /u/dfsjvmpr.props
 
 # Working directory for the IMS Java region (JMP)
 DFS_workingdir: /u/{{ TARGET_USERNAME }}
+
+# ---------------------------------------------------------------------------- #
+#                             Catalog related settings                            #
+# ---------------------------------------------------------------------------- #
+CATALOG_DBRC_ENABLED: true
