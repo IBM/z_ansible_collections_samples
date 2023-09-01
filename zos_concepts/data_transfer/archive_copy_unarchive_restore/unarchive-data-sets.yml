@@ -1,0 +1,56 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_archive to archive a set of data sets  in z/OS
+# and zos_fetch to get the archive to the controller using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories archive-fetch.yml
+#
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#   Ansible Community General Collection
+#
+#   The ansible.cfg file for this playbook contains the setting stdout_callback = unixy
+#   which changes the format of the playbook output. It has been set to better demonstrate
+#   the effects of whitespace (as compared to the default output formatting).
+#   The unixy callback is part of the community.general package (which is maintained
+#   by the Ansible community).#
+#
+#
+###############################################################################
+
+- hosts: destination
+  collections :
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  tasks:
+    - block:
+        - name: Unarchive the dump using terse and restore the data sets.
+          ibm.ibm_zos_core.zos_unarchive:
+            src: "{{ playbook_dir }}/{{ dest_archive }}"
+            force: True
+            format:
+              name: terse
+              format_options:
+                use_adrdssu: True
+            force: "{{ replace }}"
+          register: unarchive_result
+
+        - debug:
+            msg: "{{ unarchive_result }}"
+
+      always:
+        - name: Clean up archive data set
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ dest_archive }}"
+            state: absent
+          when: delete and dest_archive is defined

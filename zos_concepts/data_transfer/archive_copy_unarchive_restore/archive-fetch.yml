@@ -1,0 +1,99 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_archive to archive a set of data sets  in z/OS
+# and zos_fetch to get the archive to the controller using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories archive-fetch.yml
+#
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#   Ansible Community General Collection
+#
+#   The ansible.cfg file for this playbook contains the setting stdout_callback = unixy
+#   which changes the format of the playbook output. It has been set to better demonstrate
+#   the effects of whitespace (as compared to the default output formatting).
+#   The unixy callback is part of the community.general package (which is maintained
+#   by the Ansible community).#
+#
+###############################################################################
+
+- hosts: source
+  collections :
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  tasks:
+    - name: Raise error is data_sets_to_archive is not set
+      ansible.builtin.fail:
+        msg: Missing required variable 'data_sets_to_archive'.
+      failed_when: data_sets_to_archive is not defined
+
+    #########################################################################
+    # This first section uses dls -s to get the space attributes of the data
+    # set list, then executes filter_plugins/total_size.py to filter the
+    # response and convert into cyl space type size.
+    #########################################################################
+    - name: Get attributes for data sets
+      ansible.builtin.command: dls -s {{ data_sets_to_archive | join(' ') }}
+      register: response
+
+    - ansible.builtin.set_fact:
+        size_in_cyls: "{{ response | total_size }}"
+
+    #########################################################################
+    # This section executes a DUMP using ADRDSSU and then archives it using terse
+    # format in one task using zos_archive.
+    # Options explanation:
+    # - format object contains the format type in name and the options inside
+    #   format_options, where we can specify to use either SPACK or PACK for
+    #   terse_pack option and use_adrdssu to execute a previous step that will
+    #   create a dump data set and then archive it.
+    # - remove option will remove the archive data sets from the system after a
+    #   successful archive operation.
+    # - dest_data_set option is used to specify the desired size of the archive.
+    #########################################################################
+    - name: Create a dump with adrdssu of the data sets and archive using terse.
+      ibm.ibm_zos_core.zos_archive:
+        src: "{{ data_sets_to_archive }}"
+        dest: "{{ dest_archive }}"
+        force: True
+        format:
+          name: terse
+          format_options:
+            terse_pack: SPACK
+            use_adrdssu: True
+        remove: "{{ delete }}"
+        dest_data_set:
+          space_primary: "{{ size_in_cyls.primary }}"
+          space_secondary: "{{ size_in_cyls.secondary }}"
+          space_type: CYL
+      register: archive_result
+
+    - debug:
+        msg: "{{ archive_result }}"
+
+    #########################################################################
+    # Fetches the data set from the source host to our controller machine.
+    # is_binary is always set as true when dealing with zos archives, we don't
+    # wan't to encode/decode that file.
+    #########################################################################
+    - name: Fetch the data set into the controller
+      ibm.ibm_zos_core.zos_fetch:
+        src: "{{ dest_archive }}"
+        dest: "{{ playbook_dir }}/"
+        is_binary: True
+        flat: True
+      register: result
+
+    - name: "Result of fetching {{ dest_archive }} to local machine"
+      debug:
+        msg: "{{ result }}"

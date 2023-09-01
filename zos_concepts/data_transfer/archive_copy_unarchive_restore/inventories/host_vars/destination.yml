@@ -1,0 +1,32 @@
+################################################################################
+# Copyright (c) IBM Corporation 2023
+################################################################################
+
+################################################################################
+# Variables used and needing configuration for this playbook
+################################################################################
+
+# The name to use for the data set archive, if not provided, module-generated
+# name will be used
+archive_data_set: ""
+
+# Indicates if terse and archive data sets should be deleted upon successful
+# restore?
+delete: true
+
+# Indicates if existing data sets should be overwritten during restore
+replace: true
+
+# The python installation home path on the z/OS managed node (target),
+# e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+PYZ: "path_to_python_installation_on_zos_target"
+
+# The ZOAU installation home on the z/OS managed node (target),
+# e.g, zoau: "/usr/lpp/IBM/zoautil"
+ZOAU: "path_to_zoau_installation_on_zos_target"
+
+# The z/OS managed node (target) Python binary installation path,
+# e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
+# NOTE: This needs not configuration because it uses variable substituion to
+# correctly set the variable`ansible_python_interpreter`
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
