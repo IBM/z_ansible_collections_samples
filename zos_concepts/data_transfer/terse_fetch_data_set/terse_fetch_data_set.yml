@@ -28,8 +28,6 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  vars:
-    dest_archive : "USER.PRIVATE.ARCHIVE.TRS"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -74,7 +72,7 @@
     - name: Create an archive with terse
       zos_archive:
         src: "{{ tmp_data_set }}"
-        dest: "{{ dest_archive }}"
+        dest: "{{ archive_data_set }}"
         format:
           name: terse
       register: terse_response
@@ -87,9 +85,9 @@
       debug:
         var: terse_response
 
-    - name: "Fetch the tersed data set {{ dest_archive }} to the local machine"
+    - name: "Fetch the tersed data set {{ archive_data_set }} to the local machine"
       zos_fetch:
-        src: "{{ dest_archive }}"
+        src: "{{ archive_data_set }}"
         dest: "{{ playbook_dir }}/"
         flat: true
         is_binary: true
@@ -99,9 +97,9 @@
       debug:
         var: result
 
-    - name: "Remove the temporary data set {{ dest_archive }}"
+    - name: "Remove the temporary data set {{ archive_data_set }}"
       zos_data_set:
-        name: "{{ dest_archive }}"
+        name: "{{ archive_data_set }}"
         state: absent
       when: temp_data_set is defined and temp_data_set.names|length > 0
 
