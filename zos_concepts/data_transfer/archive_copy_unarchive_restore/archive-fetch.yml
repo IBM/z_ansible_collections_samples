@@ -32,7 +32,7 @@
   environment: '{{ environment_vars }}'
 
   tasks:
-    - name: Raise error is data_sets_to_archive is not set
+    - name: Raise error if data_sets_to_archive is not set
       ansible.builtin.fail:
         msg: Missing required variable 'data_sets_to_archive'.
       failed_when: data_sets_to_archive is not defined
