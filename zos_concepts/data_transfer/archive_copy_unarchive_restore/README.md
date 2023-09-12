@@ -17,7 +17,7 @@ It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
 
-## Playbook Summary
+## Playbooks Summary
 - [**archive_fetch_data_sets.yml**](archive_fetch_data_sets.yml) - Dumps and archive of data sets.
 - [**unarchive_data_sets.yml**](unarchive_data_sets.yml) - Transfers, unarchives, and restores the target data set archive.
 
