@@ -3,25 +3,26 @@
 ###############################################################################
 
 ###############################################################################
-# This playbook demonstrates how to use zos_archive to archive a set of data sets  in z/OS
-# and zos_fetch to get the archive to the controller using Red Hat Ansible Certified Content for IBM Z.
+# This playbook demonstrates how to archive one or more z/OS data sets and
+# fetch the archive to the controller using Red Hat Ansible Certified Content
+# for IBM Z.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventories archive-fetch.yml
+#  ansible-playbook -i inventories archive_fetch_data_sets.yml
 #
 #
 # Requirements:
 #   IBM z/OS core collection 1.7.0 or later.
 #   Ansible Community General Collection
 #
-#   The ansible.cfg file for this playbook contains the setting stdout_callback = unixy
-#   which changes the format of the playbook output. It has been set to better demonstrate
-#   the effects of whitespace (as compared to the default output formatting).
-#   The unixy callback is part of the community.general package (which is maintained
-#   by the Ansible community).#
+# Configure:
+#   data_sets_to_archive - A list of data sets contained in an archive you wish to include in dump.
+#   archive_data_set - The name to use for the data set archive,
+#                       if not provided, module-generated name will be used.
+#   delete - Indicates if terse and archive data sets should be deleted upon successful transfer.
 #
 ###############################################################################
 
@@ -29,6 +30,10 @@
   collections :
     - "ibm.ibm_zos_core"
   gather_facts: false
+  vars:
+    data_sets_to_archive: ["USER.PRIVATE.TEST"]
+    archive_data_set: ""
+    delete: true
   environment: '{{ environment_vars }}'
 
   tasks:
@@ -37,10 +42,21 @@
         msg: Missing required variable 'data_sets_to_archive'.
       failed_when: data_sets_to_archive is not defined
 
+    - name: Create a temporary data set
+      zos_data_set:
+        type: seq
+        space_primary: 5
+        space_secondary: 1
+        space_type: cyl
+        name: "{{ item }}"
+      loop: "{{ data_sets_to_archive }}"
+
     #########################################################################
-    # This first section uses dls -s to get the space attributes of the data
-    # set list, then executes filter_plugins/total_size.py to filter the
-    # response and convert into cyl space type size.
+    # This first section computes the total size of all the data sets in the
+    # list. The 'dls' command (from ZOAU) returns space attributes for each
+    # data set which are passed into a custom filter plugin called
+    # 'total_size' (see filter_plugins/total_size.py) and combined and
+    # converted into space type CYL (cylinders).
     #########################################################################
     - name: Get attributes for data sets
       ansible.builtin.command: dls -s {{ data_sets_to_archive | join(' ') }}
@@ -53,13 +69,14 @@
     # This section executes a DUMP using ADRDSSU and then archives it using terse
     # format in one task using zos_archive.
     # Options explanation:
-    # - format object contains the format type in name and the options inside
-    #   format_options, where we can specify to use either SPACK or PACK for
-    #   terse_pack option and use_adrdssu to execute a previous step that will
-    #   create a dump data set and then archive it.
-    # - remove option will remove the archive data sets from the system after a
-    #   successful archive operation.
-    # - dest_data_set option is used to specify the desired size of the archive.
+    # - The format option contains a number of sub-options including 'name' to
+    # specify the format type, 'format_options' which contains two sub-options
+    # terse_pack to specify SPACK or PACK and 'use_adrdsu' to specify whether
+    # to execute a previous step to create and archive a dump data set.
+    # - The 'remove' option which removes data sets from the systems upon a
+    # successful archive operation.
+    # - The dest_data_set option is used to specify the desired size attributes
+    # of the archive.
     #########################################################################
     - name: Create a dump with adrdssu of the data sets and archive using terse.
       ibm.ibm_zos_core.zos_archive:
@@ -82,9 +99,12 @@
         msg: "{{ archive_result }}"
 
     #########################################################################
-    # Fetches the data set from the source host to our controller machine.
-    # is_binary is always set as true when dealing with zos archives, we don't
-    # wan't to encode/decode that file.
+    # This section fetches the data set from the source host to our controller
+    # node.
+    # To avoid encoding/decoding the archive file, is_binary is set to True
+    # when dealing with data set archives.
+    # The 'is_binary' option should always be set to 'True' when dealing with
+    # z/OS archives.
     #########################################################################
     - name: Fetch the data set into the controller
       ibm.ibm_zos_core.zos_fetch:
@@ -94,6 +114,6 @@
         flat: True
       register: result
 
-    - name: "Result of fetching {{ dest_archive }} to local machine"
+    - name: "Result of fetching {{ dest_archive }} to controller node"
       debug:
         msg: "{{ result }}"

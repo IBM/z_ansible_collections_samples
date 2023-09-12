@@ -139,7 +139,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020, 2021
+© Copyright IBM Corporation 2020 - 2023
 
 ## License
 Licensed under

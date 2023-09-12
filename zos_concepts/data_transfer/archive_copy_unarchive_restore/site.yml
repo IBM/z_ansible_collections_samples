@@ -31,7 +31,7 @@
         name: requirements-check
 
 - name: Executing the z/OS Ansible playbook
-  import_playbook: archive-fetch.yml
+  import_playbook: archive_fetch_data_sets.yml
 
 - name: Executing the z/OS Ansible playbook
-  import_playbook: unarchive-data-sets.yml
+  import_playbook: unarchive_data_sets.yml

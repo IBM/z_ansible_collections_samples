@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2021, 2023
 ###############################################################################
 
 ###############################################################################
@@ -34,6 +34,16 @@
 
   tasks:
     # ##########################################################################
+    # Modules: zos_lineinfile, zos_archive, zos_fetch, zos_data_set
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create a temporary data set.
+    # | - Using zos_lineinfile to insert a line into the temporary data set
+    # | - Using zos_archive terse the temporary data set
+    # | - Using zos_fetch, fetch both the tersed archive and the data set
+    # | - Tear down by cleaning up files.
+    # +-------------------------------------------------------------------------
+    # ##########################################################################
     # Generate a temporary data set name
     # ##########################################################################
     - block:
@@ -54,15 +64,6 @@
     - set_fact:
         tmp_data_set: "{{ tmp_ds.get('names')[0] }}"
 
-    # ##########################################################################
-    # Modules: zos_lineinfile, zos_archive, zos_fetch, zos_data_set
-    # ##########################################################################
-    # +-------------------------------------------------------------------------
-    # | - Using zos_lineinfile to insert a line into the temporary data set
-    # | - Using zos_archive terse the temporary data set
-    # | - Using zos_fetch, fetch both the tersed archive and the data set
-    # | - Tear down by cleaning up files.
-    # +-------------------------------------------------------------------------
     - name: Insert text into the data set
       zos_lineinfile:
         src: "{{ tmp_data_set }}"

@@ -3,7 +3,7 @@
 ################################################################################
 
 ################################################################################
-# Enviroment variables for all z/OS managed nodes (target) that do not need
+# Environment variables for all z/OS managed nodes (target) that do not need
 # further configuration.
 ################################################################################
 environment_vars:

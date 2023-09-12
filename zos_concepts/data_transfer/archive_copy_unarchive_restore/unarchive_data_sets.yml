@@ -3,26 +3,26 @@
 ###############################################################################
 
 ###############################################################################
-# This playbook demonstrates how to use zos_archive to archive a set of data sets  in z/OS
-# and zos_fetch to get the archive to the controller using Red Hat Ansible Certified Content for IBM Z.
+# This playbook demonstrates how to archive one or more z/OS data sets and
+# fetch the archive to the controller using Red Hat Ansible Certified Content
+# for IBM Z.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventories archive-fetch.yml
+#  ansible-playbook -i inventories unarchive_data_sets.yml
 #
 #
 # Requirements:
 #   IBM z/OS core collection 1.7.0 or later.
 #   Ansible Community General Collection
 #
-#   The ansible.cfg file for this playbook contains the setting stdout_callback = unixy
-#   which changes the format of the playbook output. It has been set to better demonstrate
-#   the effects of whitespace (as compared to the default output formatting).
-#   The unixy callback is part of the community.general package (which is maintained
-#   by the Ansible community).#
-#
+# Configure:
+#   archive_data_set - The name to use for the data set archive.
+#   delete - Indicates if terse and archive data sets should be deleted upon
+#           successful restore.
+#   replace - Indicates if existing data sets should be overwritten during restore.
 #
 ###############################################################################
 
@@ -30,6 +30,10 @@
   collections :
     - "ibm.ibm_zos_core"
   gather_facts: false
+  vars:
+    archive_data_set: ""
+    delete: False
+    replace: True
   environment: '{{ environment_vars }}'
 
   tasks:

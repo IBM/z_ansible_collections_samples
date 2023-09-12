@@ -3,7 +3,7 @@
 This project provides sample playbooks and roles which can be used to transfer
 data sets between z/OS systems using Red Hat Ansible Certified Content for IBM Z.
 
-following core modules are used to accomplish these set of tasks:
+The following core modules are used to accomplish this set of tasks:
 
 This playbook uses:
   - collection:
@@ -18,8 +18,8 @@ them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
 
 ## Playbook Summary
-- [**archive-fetch.yml**](archive-fetch.yml) - Handles dump and archive of data sets.
-- [**unarchive-data-sets.yml**](unarchive-data-sets.yml) - Handles transfer of the archive dataset, unarchive and restore.
+- [**archive_fetch_data_sets.yml**](archive_fetch_data_sets.yml) - Dumps and archive of data sets.
+- [**unarchive_data_sets.yml**](unarchive_data_sets.yml) - Transfers, unarchives, and restores the target data set archive.
 
 ## Playbook Requirements
 This playbook requires:
@@ -39,8 +39,8 @@ This playbook requires:
 
 ## Run the playbook
 This project has included a `site.yml` playbook that serves as the primary playbook
-that provides additional prerequisite checks then it invokes `archive-fetch.yml`
-playbook and then `unarchive-data-sets.yml`.
+that provides additional prerequisite checks then it invokes `archive_fetch_data_sets.yml`
+playbook and then `unarchive_data_sets.yml`.
 
 If you want to run the primary playbook `site.yml` it will check that your environment
 has the correct version of Ansible as well as the collection needed to execute
@@ -50,13 +50,13 @@ correctly. To run the primary playbook, use command:
 ansible-playbook -i inventories site.yml
 ```
 
-You can skip the prerequisite check and run the `archive-fetch.yml` or
-`unarchive-data-sets.yml` with
+You can skip the prerequisite check and run the `archive_fetch_data_sets.yml` or
+`unarchive_data_sets.yml` with
 command:
 
 ```bash
-ansible-playbook -i inventories archive-fetch.yml
-ansible-playbook -i inventories unarchive-data-sets.yml
+ansible-playbook -i inventories archive_fetch_data_sets.yml
+ansible-playbook -i inventories unarchive_data_sets.yml
 ```
 
 # Changelog
