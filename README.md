@@ -60,6 +60,7 @@ often repeated and in need of automation.
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
+  - [Dump, Archive, Fetch, Copy and Unarchive Data Sets](zos_concepts/data_transfer/archive_copy_unarchive_restore)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
   - [Copy templates to z/OS](zos_concepts/templates/copy_template)
@@ -138,7 +139,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020, 2021
+© Copyright IBM Corporation 2020 - 2023
 
 ## License
 Licensed under

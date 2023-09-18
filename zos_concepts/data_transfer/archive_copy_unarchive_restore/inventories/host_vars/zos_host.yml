@@ -1,20 +1,11 @@
----
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2023
 ################################################################################
-
-################################################################################
-# Variables used and needing configuration for this playbook
-################################################################################
-
-# The name to use for the data set archive,
-# if not provided, module-generated name will be used
-archive_data_set: ""
 
 ################################################################################
 # Description of the properties used in this configuration:
 # - Property `PYZ` is the python installation home path on the z/OS managed node (target),
-#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r11/pyz"
 # - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
 # - property `ansible_python_interpreter` is the z/OS managed node (target) Python
