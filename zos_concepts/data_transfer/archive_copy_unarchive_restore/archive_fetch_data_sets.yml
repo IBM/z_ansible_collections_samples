@@ -37,11 +37,6 @@
   environment: '{{ environment_vars }}'
 
   tasks:
-    - name: Raise error if data_sets_to_archive is not set
-      ansible.builtin.fail:
-        msg: Missing required variable 'data_sets_to_archive'.
-      failed_when: data_sets_to_archive is not defined
-
     - name: Create a temporary data set
       zos_data_set:
         type: seq

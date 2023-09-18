@@ -3,9 +3,8 @@
 ###############################################################################
 
 ###############################################################################
-# This playbook demonstrates how to archive one or more z/OS data sets and
-# fetch the archive to the controller using Red Hat Ansible Certified Content
-# for IBM Z.
+# This playbook demonstrates how restore a z/OS data sets archive to the
+# controller using Red Hat Ansible Certified Content for IBM Z.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>

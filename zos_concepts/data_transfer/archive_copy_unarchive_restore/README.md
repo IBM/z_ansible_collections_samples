@@ -24,7 +24,7 @@ names, authority, and the artifacts that will be created and cleaned up.
 ## Playbook Requirements
 This playbook requires:
 
-- [IBM® z/OS® core collection 1.2.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+- [IBM® z/OS® core collection 1.7.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [Ansible® 2.9 to 2.15](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Configuration
