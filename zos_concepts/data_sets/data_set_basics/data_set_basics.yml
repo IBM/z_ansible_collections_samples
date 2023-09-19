@@ -32,6 +32,7 @@
 ###############################################################################
 
 ---
+
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
@@ -64,7 +65,7 @@
           - "pds name - {{ pds_name }}"
 
     ############################################################################
-    # Modules zos_data_set, zos_fetch
+    # Modules zos_copy, zos_data_set, zos_fetch
     ############################################################################
     # +-------------------------------------------------------------------------
     # | 1. Create a sequential data set
@@ -91,17 +92,17 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Create a USS file
+    - name: Remove old {{ tgt_tmp_dir }}/HELLO if it exists, for idempotency
       file:
         path: "{{ tgt_tmp_dir }}/HELLO"
-        state: touch
+        state: absent
       register: result
 
-    - name: Response for USS file creation
+    - name: Response for USS file deletion
       debug:
         msg: "{{ result }}"
 
-    - name: zos_copy
+    - name: Copy HELLO.jcl from project to USS file
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
@@ -137,13 +138,14 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Create a PDS member
+    - name: Remove the target PDS member if it exists, for idempotency.
       zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: MEMBER
+        state: absent
       register: result
 
-    - name: Response for creating the PDS member
+    - name: Response for removing the PDS member
       debug:
         msg: "{{ result }}"
 
