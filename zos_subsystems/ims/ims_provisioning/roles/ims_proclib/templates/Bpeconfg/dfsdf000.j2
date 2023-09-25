@@ -33,9 +33,13 @@ ARC={{ARC}}
 CATALOG=Y
 ALIAS=DFSC
 RETENTION=(DAYS=40,VERSIONS=55)
-ACBMGMT=CATALOG
-IXVOLSER={{ DFS_DS_VOLUME1 }}
+{% if MANAGED_ACB_ENABLED %}
+ACBMGMT=CATALOG 
 ACCESS=UPDATE
+{% else %}ACBMGMT=ACBLIB
+ACCESS=READ
+{% endif %}
+IXVOLSER={{ DFS_DS_VOLUME1 }}
 {% if not CATALOG_DBRC_ENABLED %}
 *
 *-----------------------------------------------------------------*

@@ -323,61 +323,8 @@
           type: SEQ
         control_statements:
           managed_acbs:
-            setup: true
+            setup: '{{ MANAGED_ACB_ENABLED }}'
       when: catalog == "load"
-
-    # - name: Load IMS catalog
-    #   ims_catalog_populate:
-    #     mode: LOAD
-    #     dbrc: false
-    #     modstat: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT'
-    #     acb_lib: [
-    #       '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
-    #     ]
-    #     reslib: [
-    #       '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
-    #     ]
-    #     steplib: [
-    #       '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
-    #     ]
-    #     proclib: [
-    #       '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
-    #     ]
-    #     dbd_lib: [
-    #       '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
-    #     ]
-    #     psb_lib: [
-    #       '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
-    #     ]
-    #     buffer_pool_param_dataset: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSVSMHP)"
-    #     primary_log_dataset:
-    #       dataset_name: {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.IMSLOG1
-    #       disposition: NEW
-    #       normal_disposition: DELETE
-    #       record_format: FB
-    #       record_length: 4092
-    #       block_size: 4096
-    #       primary: 100
-    #       primary_unit: CYL
-    #       secondary: 75
-    #       secondary_unit: CYL
-    #       type: SEQ
-    #     secondary_log_dataset:
-    #       dataset_name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.IMSLOG2'
-    #       disposition: NEW
-    #       normal_disposition: DELETE
-    #       record_format: FB
-    #       record_length: 4092
-    #       block_size: 4096
-    #       primary: 100
-    #       primary_unit: CYL
-    #       secondary: 75
-    #       secondary_unit: CYL
-    #       type: SEQ
-    #     control_statements:
-    #       managed_acbs:
-    #         setup: true
-    #   when: catalog == "load" and not dbrc_enabled
 
     - name: Delete IMS Catalog
       zos_data_set:
