@@ -22,6 +22,8 @@ playbook notes sections for additional details and configuration.
 
 This project uses roles to provide an object-oriented model to provision IMS.  Each role is responsible for a specific area.  These roles can be re-used in different playbooks.
 
+- [**image_copy**](roles/image_copy/README.md) - creates and deletes image copies of IMS catalog
+
 - [**ims_apf**](roles/ims_apf/README.md) - adds authorization of IMS datasets to zOS
 
 - [**ims_catalog**](roles/ims_catalog/README.md) - allocates, loads, and deletes IMS catalog

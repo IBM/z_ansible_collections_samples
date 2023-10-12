@@ -24,6 +24,12 @@
 
 
     - block:
+        # - name: Run QUERY MEMBER command 
+        #   ibm.ibm_zos_ims.ims_command:
+        #     command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+        #     plex: PLEX1
+        #     route: IMS1
+        #   register: result
     
         - include_role:
             name: install-bzip2
@@ -151,6 +157,15 @@
           vars:
             catalog: 'load'
             dbrc_enabled: "{{ CATALOG_DBRC_ENABLED }}"
+            macb_enabled: "{{ MANAGED_ACB_ENABLED }}"
+        
+        - ansible.builtin.include_role:
+            name: image_copy 
+          with_items:
+            - "{{ to_image_copy }}" 
+          vars: 
+            image: 'copy'
+          when: "{{ CATALOG_DBRC_ENABLED }}"
 
         - include_role: 
             name: ims_region

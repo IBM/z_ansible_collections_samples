@@ -30,15 +30,11 @@ ARC={{ARC}}
 * CATALOG SECTION                               *
 *--------------------------------------------------------------------*
 <SECTION=CATALOG>
-CATALOG=Y
+CATALOG=N
 ALIAS=DFSC
 RETENTION=(DAYS=40,VERSIONS=55)
-{% if MANAGED_ACB_ENABLED %}
-ACBMGMT=CATALOG 
-ACCESS=UPDATE
-{% else %}ACBMGMT=ACBLIB
+ACBMGMT=ACBLIB
 ACCESS=READ
-{% endif %}
 IXVOLSER={{ DFS_DS_VOLUME1 }}
 {% if not CATALOG_DBRC_ENABLED %}
 *

@@ -78,12 +78,12 @@ MODBLKS=DYN                      /* DRD ENABLED;MODBLKS OLC DISABLE */
 * CATALOG SECTION                               *
 *--------------------------------------------------------------------*
 <SECTION=CATALOG>
-CATALOG=Y
+CATALOG=N
 ALIAS=DFSC
 RETENTION=(DAYS=40,VERSIONS=55)
-ACBMGMT=CATALOG
+ACBMGMT=ACBLIB
 IXVOLSER={{ DFS_DS_VOLUME1 }}
-ACCESS=UPDATE
+ACCESS=READ
 *
 *--------------------------------------------------------------------*
 * DYNAMIC RESOURCES SECTION                                          *
