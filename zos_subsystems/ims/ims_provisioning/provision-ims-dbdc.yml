@@ -24,13 +24,6 @@
 
 
     - block:
-        # - name: Run QUERY MEMBER command 
-        #   ibm.ibm_zos_ims.ims_command:
-        #     command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
-        #     plex: PLEX1
-        #     route: IMS1
-        #   register: result
-    
         - include_role:
             name: install-bzip2
 
