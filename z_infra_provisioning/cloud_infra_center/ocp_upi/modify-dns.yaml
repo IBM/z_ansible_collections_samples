@@ -26,6 +26,7 @@
 # Change Summary:
 # - Change Ansible playbook name
 
+
 - name: 'Get worker node and ip'
   ansible.builtin.set_fact:
     new_worker_ip: "{{ worker_ip  | replace('{','') | replace('}','') | replace(\"'\",'') | replace(' ','') }}"
