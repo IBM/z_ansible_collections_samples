@@ -4,19 +4,19 @@
 ******************************************************************************/
 
 {% if show_header %}
-SAY "{{ rexx_header }}"
+say "{{ rexx_header }}"
 {% endif %}
 
 {% if show_current_time %}
 address tso 'time'
 {% endif %}
 
-X = OUTTRAP("OUTPUT.")
-ADDRESS TSO "LISTC"
+X = outtrap("OUTPUT.")
+address tso "listc"
 
-Do I = 1 To OUTPUT.0
-  SAY OUTPUT.I
-End
-X = OUTTRAP("OFF")
+do I = 1 to OUTPUT.0
+  say OUTPUT.I
+end
+X = outtrap("OFF")
 
-RETURN 0
+return 0
