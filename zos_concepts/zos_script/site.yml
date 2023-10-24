@@ -26,7 +26,7 @@
     - name: Parse the registry for collection entries
       include_vars: runtime-requirements.yml
 
-    - name: Display the registered collections and properites in `registry.yml`.
+    - name: Display the registered collections and properties in `registry.yml`.
       include_role:
         name: requirements-check
 
