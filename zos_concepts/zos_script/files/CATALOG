@@ -1,0 +1,22 @@
+/* REXX */
+/******************************************************************************
+* © Copyright IBM Corporation 2023
+******************************************************************************/
+
+{% if show_header %}
+SAY "{{ rexx_header }}"
+{% endif %}
+
+{% if show_current_time %}
+address tso 'time'
+{% endif %}
+
+X = OUTTRAP("OUTPUT.")
+ADDRESS TSO "LISTC"
+
+Do I = 1 To OUTPUT.0
+  SAY OUTPUT.I
+End
+X = OUTTRAP("OFF")
+
+RETURN 0

@@ -1,0 +1,70 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_script to run local and remote
+# scripts in z/OS using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_script.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.8.0 or later.
+#
+# Configure:
+#   var - description.
+###############################################################################
+
+- name: Sample zos_script playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    python_script_dir: "/u/omvsadm"
+
+    show_current_time: true
+    show_header: true
+    rexx_header: "#--- Current catalog information ---#"
+
+  tasks:
+    - name: Run REXX script to get a job's information.
+      ibm.ibm_zos_core.zos_script:
+        cmd: ./files/JOB_INFO JOBID=STC00299 OWNER=USRT001 JOBNAME=BPXAS
+        remote_src: false
+      register: job_output
+
+    - name: See Job information.
+      ansible.builtin.debug:
+        msg: "{{ job_output }}"
+
+    - name: Run Python script in a given directory.
+      ibm.ibm_zos_core.zos_script:
+        cmd: ./files/list_dir.py
+        chdir: "{{ python_script_dir }}"
+        executable: "{{ ansible_python_interpreter }}"
+        remote_src: false
+      register: python_output
+
+    - name: See Python output.
+      ansible.builtin.debug:
+        msg: "{{ python_output }}"
+
+    - name: Run template of a REXX script.
+      ibm.ibm_zos_core.zos_script:
+        cmd: ./files/CATALOG
+        remote_src: false
+        use_template: true
+        template_parameters:
+          keep_trailing_newline: true
+      register: template_output
+
+    - name: See script's output.
+      ansible.builtin.debug:
+        msg: "{{ template_output }}"
