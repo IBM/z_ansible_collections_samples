@@ -1,0 +1,84 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_tso_command to run remote
+# scripts and CLISTs inside a TSO environment in z/OS using Red Hat Ansible
+# Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories run_rexx_and_clist.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#
+# Configure:
+#   script_data_set - Data set where the playbook will copy the REXX script to.
+#   rexx_args - Data set that will be listed inside the REXX script.
+#   clist_data_set - Data set where the playbook will copy the CLIST to.
+###############################################################################
+
+- name: Sample playbook for running REXX and CLISTs inside TSO.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    script_data_set: "HLQ.USER.REXX"
+    rexx_args: "HLQ.USER.DATASET"
+
+    clist_data_set: "HLQ.USER.CLIST"
+
+  tasks:
+    - name: Running a REXX script from a data set.
+      block:
+        - name: Copy file to a new data set.
+          ibm.ibm_zos_core.zos_copy:
+            src: ./files/DSINFO
+            dest: "{{ script_data_set }}"
+            remote_src: false
+
+        - name: Run REXX script from MVS.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - EXEC '{{ script_data_set }}' '{{ rexx_args }}' exec
+          register: script_output
+
+        - name: See script's output.
+          ansible.builtin.debug:
+            msg: "{{ script_output }}"
+
+    - name: Running a CLIST from a data set.
+      block:
+        - name: Copy file to a new data set.
+          ibm.ibm_zos_core.zos_copy:
+            src: ./files/CLIST
+            dest: "{{ clist_data_set }}"
+            remote_src: false
+
+        - name: Run CLIST from MVS.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - EXEC '{{ clist_data_set }}' exec
+          register: clist_output
+
+        - name: See CLIST's output.
+          ansible.builtin.debug:
+            msg: "{{ clist_output }}"
+
+      always:
+        - name: Removing data sets from the managed nodes.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ script_data_set }}"
+            state: absent
+
+        - name: Removing data sets from the managed nodes.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ clist_data_set }}"
+            state: absent
