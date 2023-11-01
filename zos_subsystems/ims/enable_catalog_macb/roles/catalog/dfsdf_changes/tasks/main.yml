@@ -1,0 +1,65 @@
+---
+# tasks file for roles/dfsdf_check
+- name: Check DFSDF member
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+
+  block:
+    - name: Changes for before populate utility is ran 
+      block: 
+        - name: Create a backup of DFSDF member before any changes are made
+          ibm.ibm_zos_core.zos_copy: 
+            src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+            dest: "{{ DFS_IMS_PROCLIB }}({{DFSDF_BACKUP_NAME}})"
+            volume: "{{DFS_DS_VOLUME1}}"
+            remote_src: true 
+          when: BACKUP
+
+        - name: Looking for a member in the PROCLIB that contains CATALOG section
+          ibm.ibm_zos_core.zos_find:
+            patterns: "DFSDF{{DFS_MEMBER_SUFFIX}}"
+            pds_patterns:
+              - "{{ DFS_IMS_PROCLIB }}"
+            contains: "<SECTION=CATALOG>"
+          register: result 
+        
+        - name: Add CATALOG section to DFSDF member if it does not exist
+          ibm.ibm_zos_core.zos_lineinfile:
+            src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+            insertbefore: BOF
+            line: '<SECTION=CATALOG>
+                \nCATALOG=N
+                \nALIAS=DFSC
+                \nACBMGMT=ACBLIB
+                \nACCESS=READ
+                \nIXVOLSER={{ DFS_DS_VOLUME1 }}'
+          when: result.matched == 0 
+
+        - name: Check if member has catalog attribute
+          ibm.ibm_zos_core.zos_find:
+            patterns: "DFSDF{{DFS_MEMBER_SUFFIX}}"
+            pds_patterns:
+              - "{{ DFS_IMS_PROCLIB }}"
+            contains: "CATALOG=N"
+          register: ctlg 
+          when: result.matched == 1 #<section=catalog> exists
+
+        - name: Ensure that attribute CATALOG=N for the populate utility 
+          ibm.ibm_zos_core.zos_lineinfile:
+            src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+            state: present
+            regexp: '^CATALOG='
+            line: CATALOG=N
+          when: result.matched==1 and ctlg.matched == 0 #<section=catalog> exists and "CATALOG=N" does not exist
+      when: catalog == "before"
+  
+    - name: Changes after populate utility is ran
+      block: 
+        - name: Change the catalog attribute from N to Y
+          ibm.ibm_zos_core.zos_lineinfile:
+            src: "{{ DFS_IMS_PROCLIB }}(DFSDF{{DFS_MEMBER_SUFFIX}})"
+            state: present
+            regexp: '^CATALOG='
+            line: CATALOG=Y
+      when: catalog == "after"

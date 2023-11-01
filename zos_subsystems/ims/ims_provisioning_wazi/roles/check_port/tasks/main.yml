@@ -1,0 +1,82 @@
+---
+ 
+# tasks file for check_port
+- name: Check if ports are available to use
+  collections:
+    - ibm.ibm_zos_core
+
+  block:
+
+    - name: Get reserved port list
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+          - netstat portl
+      register: reserved_port_list
+
+    - name: Get in-use port list
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+          - netstat conn  
+      register: inuse_port_list
+
+    - block:
+        - name: Is port {{ODBM_PORTID}} already reserved?
+          fail:
+            msg: port {{ ODBM_PORTID }} is reserved
+      when: ODBM_PORTID | string in reserved_port_list.output[0].content  | join
+
+    - ansible.builtin.set_fact: 
+        port_to_check: '..{{ODBM_PORTID}}'
+    - block:
+        - name: Is port {{ ODBM_PORTID }} is in use?
+          fail:
+            msg: port {{ ODBM_PORTID }} is in use
+      when: port_to_check in inuse_port_list.output[0].content  | join
+
+
+    - block:
+        - name: Is port {{ ODBM_SSLPORTID }} reserved?
+          fail:
+            msg: port {{ ODBM_SSLPORTID }} is reserved
+      when: ODBM_SSLPORTID | string in reserved_port_list.output[0].content  | join
+
+    - ansible.builtin.set_fact: 
+        port_to_check: '..{{ODBM_SSLPORTID}}'
+    - block:
+        - name: Is port {{ ODBM_SSLPORTID }} in use?
+          fail:
+            msg: port {{ ODBM_SSLPORTID }} is in use
+      when: port_to_check in inuse_port_list.output[0].content  | join
+
+
+    - block:
+        - name: Is port {{ IMS_CONNECT_PORT }} reserved?
+          fail:
+            msg: port {{ IMS_CONNECT_PORT }} is reserved
+      when: IMS_CONNECT_PORT | string in reserved_port_list.output[0].content  | join
+
+
+    - ansible.builtin.set_fact: 
+        port_to_check: '..{{IMS_CONNECT_PORT}}'
+    - block:
+        - name: Is port {{ IMS_CONNECT_PORT }} in use?
+          fail:
+            msg: port {{ IMS_CONNECT_PORT }} is in use
+      when: port_to_check in inuse_port_list.output[0].content  | join
+
+
+    - block:
+        - name: port {{ IMS_CONNECT_SSLPORT }} reserved?
+          fail:
+            msg: port {{ IMS_CONNECT_SSLPORT }} is reserved
+      when: IMS_CONNECT_SSLPORT | string in reserved_port_list.output[0].content  | join
+
+
+    - ansible.builtin.set_fact: 
+        port_to_check: '..{{IMS_CONNECT_SSLPORT}}'
+    - block:
+        - name: Is port {{ IMS_CONNECT_SSLPORT }} in use?
+          fail:
+            msg: port {{ IMS_CONNECT_SSLPORT }} is in use
+      when: port_to_check in inuse_port_list.output[0].content  | join
+

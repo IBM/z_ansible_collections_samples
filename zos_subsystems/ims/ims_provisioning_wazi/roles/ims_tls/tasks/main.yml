@@ -1,0 +1,134 @@
+---
+ 
+# tasks file for ims_tls
+- block: 
+    - name: List IMSUSER
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+              - LU IMSUSER
+      register: lu_result
+      failed_when: lu_result.output[0].rc > 4
+
+    - name: Add IMSUSER
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+              - AU IMSUSER NAME('DEFAULT IMS USER') OWNER(SYS1) DFLTGRP(SYS1)
+              - ALU IMSUSER OMVS(HOME('/u/imsuser') PROGRAM('/bin/sh') UID(99997))
+      ignore_errors: true
+      when: lu_result.output[0].rc > 0
+
+    - name: List IMSTLS keyring
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+              - RACDCERT ID(IMSUSER) LISTRING(IMSTLSRING)
+      register: listring_result
+      failed_when: listring_result.output[0].rc > 4
+
+    - name: Add IMSTLS keyring
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+              - RACDCERT ID(IMSUSER) ADDRING(IMSTLSRING)
+      ignore_errors: true
+      when: listring_result.output[0].rc > 0
+
+    - name: List CERTAUTH
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+              - RACDCERT LISTCHAIN(LABEL('{{racfcert_label}}')) CERTAUTH
+      register: list_ca_result
+      failed_when: list_ca_result.output[0].rc > 4
+
+    - name: Generate CERTAUTH to sign IMS cert
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+              - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{racfcert_label}}') OU('IMS') O('IBM') C('US')) WITHLABEL('{{racfcert_label}}')
+              - RACDCERT ID(IMSUSER) CONNECT(CERTAUTH LABEL('{{racfcert_label}}') RING(IMSTLSRING) USAGE(PERSONAL))
+      ignore_errors: true
+      when: list_ca_result.output[0].rc > 0
+
+    - name: List IMS cert 
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: RACDCERT LISTCHAIN(LABEL('IMS_Server')) ID(IMSUSER)
+      register: list_ims_cert_result
+      failed_when: list_ims_cert_result.output[0].rc > 4
+
+    - name: Generate IMS cert 
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: 
+          - RACDCERT ID(IMSUSER)  GENCERT SUBJECTSDN(CN('IMS_Server') OU('IMS') O('IBM') C('US')) WITHLABEL('IMS_Server') SIZE(2048) ALTNAME(DOMAIN('{{zos_hostname}}')) SIGNWITH(CERTAUTH LABEL('{{racfcert_label}}'))
+          - RACDCERT ALTER(LABEL('IMS_Server')) ID(IMSUSER) TRUST
+          - RACDCERT ID(IMSUSER) CONNECT(RING(IMSTLSRING) LABEL('IMS_Server') DEFAULT)
+      ignore_errors: true
+      when: list_ims_cert_result.output[0].rc > 0
+
+
+    - name: Refresh RACF
+      ibm.ibm_zos_core.zos_tso_command: 
+        commands: 
+          - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+          - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
+      ignore_errors: true
+
+    - name: Update pagttls 
+      shell: | 
+              dmod -b -d -c IBM-1047 -f -m  "Begin Ansible Block Insert \n End Ansible Block Insert\n## {mark} TLS for {{port_number}} ##" "$ a\\##\n## TCP/IP Policy Agent AT-TLS configuration for IMS.\n##\n##-----------------------------\nTTLSRule zOS_IMS_{{port_number}}\n{\n    LocalPortRange {{port_number}}\n    Direction Inbound\n    TTLSGroupActionRef grp_Production\n    TTLSEnvironmentActionRef act_zOS_IMS\n}\nTTLSEnvironmentAction  act_zOS_IMS\n{\n    HandshakeRole Server\n    TTLSKeyRingParms\n        {\n        Keyring IMSTLSRING\n        }\n    TTLSEnvironmentAdvancedParms\n        {\n        TLSv1.2                         On\n        SSLV3 Off\n        }\n}\nTTLSGroupAction grp_Production\n{\n    TTLSEnabled On\n    Trace 2\n}" "ADCD.{{zos_level}}.TCPPARMS(TLSPOLY1)"
+      # ibm.ibm_zos_core.zos_blockinfile:
+      #         src: '{{ TCPIP_PROFILE_TLS }}'
+      #         state: present
+      #         marker: "## {mark} TLS for {{ port_number}} ##"
+      #         marker_begin: " Begin Ansible Block Insert "
+      #         marker_end: " End Ansible Block Insert"
+      #         block:  |
+      #                 ##
+      #                 ## TCP/IP Policy Agent AT-TLS configuration for IMS.
+      #                 ##
+      #                 ##-----------------------------
+      #                 TTLSRule zOS_IMS
+      #                 {
+      #                     LocalPortRange {{ port_number }}
+      #                     Direction Inbound
+      #                     TTLSGroupActionRef grp_Production
+      #                     TTLSEnvironmentActionRef act_zOS_IMS
+      #                 }
+      #                 TTLSEnvironmentAction  act_zOS_IMS
+      #                 {
+      #                     HandshakeRole Server
+      #                     TTLSKeyRingParms
+      #                         {
+      #                         Keyring IMSTLSRING
+      #                         }
+      #                     TTLSEnvironmentAdvancedParms
+      #                         {
+      #                         TLSv1.2                         On
+      #                         SSLV3 Off
+      #                         }
+      #                 }
+      #                 TTLSGroupAction grp_Production
+      #                 {
+      #                     TTLSEnabled On
+      #                     Trace 2
+      #                 }              
+      ignore_errors: true
+
+    - name: Refresh PAGENT 
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'f pagent,refresh'
+  when: function == 'add'
+
+- block:
+    - name: Update pagttls 
+      shell: |
+              dmod -b -f -m "Begin Ansible Block Insert \n End Ansible Block Insert\n## {mark} TLS for {{port_number}} ##" "//d" "ADCD.{{zos_level}}.TCPPARMS(TLSPOLY1)"
+      # ibm.ibm_zos_core.zos_blockinfile:
+      #         src: '{{ TCPIP_PROFILE_TLS }}'
+      #         state: absent
+      #         marker: "## {mark} TLS for {{ port_number}} ##"
+      #         marker_begin: " Begin Ansible Block Insert "
+      #         marker_end: " End Ansible Block Insert"
+      ignore_errors: true
+
+    - name: Refresh PAGENT 
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'f pagent,refresh'
+
+  when: function == 'remove'

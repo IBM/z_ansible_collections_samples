@@ -1,0 +1,129 @@
+PYZ: "path_to_python_installation_on_zos_target"
+ZOAU: "path_to_zoau_installation_on_zos_target"
+
+system_environment:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+  STEPLIB: IMSBLD.I15RTSMM.COMRESL1
+
+# ---------------------------------------------------------------------------- #
+#                               Job Information                                #
+# ---------------------------------------------------------------------------- #
+# The z/OS username to use for job submission
+TARGET_USERNAME: target_user
+
+# JOB_CARD will be the default job card inserted for dynamically generated JCL
+# ensure MSGCLASS and CLASS are correct for desired environment
+JOB_CARD_CLASS: K
+JOB_CARD_MSGCLASS: E
+
+# First line containing jobname directly coded in JCL files
+JOB_CARD_PARMS: |- 
+  //  MSGLEVEL=1,MSGCLASS={{ JOB_CARD_MSGCLASS }},CLASS={{ JOB_CARD_CLASS }},LINES=999999,
+  //  TIME=1440,REGION=0M,MEMLIMIT=NOLIMIT
+
+JOB_CARD: |-
+  //ANSIBLE JOB 'testing',
+  //  NOTIFY={{ TARGET_USERNAME | upper }},
+  //  USER={{ TARGET_USERNAME | upper }},
+  //  MSGCLASS={{JOB_CARD_MSGCLASS}},
+  //  MSGLEVEL=(1,1),
+  //  CLASS={{JOB_CARD_CLASS}}
+
+
+# Where generated JCL files should be saved on target
+# this is a defalult value that should be overwritten
+# with a temporary directory for easier cleanup at the
+# end of a playbook
+uss_file_path: /u/{{ TARGET_USERNAME }}
+
+
+# The user ID to use for IMS related provisioning steps
+DFS_workingdir: /u/{{ TARGET_USERNAME }}
+DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
+
+# ---------------------------------------------------------------------------- #
+#                               IMS Information                                #
+# ---------------------------------------------------------------------------- #
+
+# The SSID for the IMS to be provisioned
+DFS_IMS_SSID: IMS1
+
+# IMSPlex name
+DFS_IMS_PLEX: PLEX1
+
+# ---------------------------------------------------------------------------- #
+# The first HLQ to be used to store IMS related datasets
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# specific datasets
+DFS_AUTH_LIB_HLQ1: IMSTESTL
+# The second HLQ to be used to store IMS related datasets
+# these include procs, OLDS, WADS, PROCLIB, JOBS, and application
+# specific datasets
+DFS_AUTH_LIB_HLQ2: '{{ DFS_IMS_SSID }}'
+
+DFS_IMS_HLQGROUP: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}"
+
+# ---------------------------------------------------------------------------- #
+
+# The fully qualified dataset name for the IMS RESLIB
+DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+
+# The fully qualified dataset name for the IMS PROCLIB
+DFS_IMS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+
+# -------------------------- volume related settings ------------------------- #
+
+# first volume to use to store IMS datasets
+DFS_DS_VOLUME1: USER01
+
+DFS_IMS_UNIT: SYSALLDA
+
+# ---------------------------------------------------------------------------- #
+
+# IMS address spaces
+DFS_IMS_SCI_PROC: IMS1SCI
+DFS_IMS_OM_PROC: IMS1OM
+DFS_IMS_RM_PROC: IMS1RM
+DFS_IMS_CTL_PROC: IMS1CTL
+DFS_HWS_PROC: IMS1HWS1
+# HWS ID for the IMS Connect to be provisioned
+DFS_HWS_SSID: IMS1HWS
+
+# For the DFSDFxxx member that the IMSPB points to
+DFS_MEMBER_SUFFIX: '000'
+
+#Buffer pool member
+BUFFER_POOL_PARAMETER: DFSVSMHP
+
+
+# ---------------------------------------------------------------------------- #
+#                        Variables for Image Copy                              #
+# ---------------------------------------------------------------------------- #
+GENJCL_INPUT: ICJCL
+
+to_image_copy: 
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.A00001', ddn: DFSCD01A, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01A.IC.CD01A' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.B00001', ddn: DFSCD01B, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01B.IC.CD01B' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.C00001', ddn: DFSCD01C, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01C.IC.CD01C' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.D00001', ddn: DFSCD01D, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01D.IC.CD01D' }
+  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.A00002', ddn: DFSCP01A, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01A.IC.CP01A' }
+  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.B00002', ddn: DFSCP01B, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01B.IC.CP01B' }
+  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.C00002', ddn: DFSCP01C, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01C.IC.CP01C' }
+  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCD000.D00002', ddn: DFSCP01D, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01D.IC.CP01D' }
+  - { dataset: DFSCX000, dbd: DFSCX01, dsn: '{{ DFS_IMS_HLQGROUP }}.DFSCX000.A00001', ddn: DFSCX01A, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCX01.DFSCX01A.IC.CX01A' }
+
+# ---------------------------------------------------------------------------- #
+#                                  DFSDF Varaibles                             #
+# ---------------------------------------------------------------------------- #
+BACKUP: true 
+DFSDF_BACKUP_NAME: DFSDFBAC
+ACB_DFSDF_BACKUP_NAME: DFSDFBAB

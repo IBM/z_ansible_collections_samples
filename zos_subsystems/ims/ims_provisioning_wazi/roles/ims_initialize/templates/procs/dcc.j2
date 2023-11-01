@@ -1,0 +1,575 @@
+//******************************************************************
+//*  DCC Procedure
+//*
+//*  This procedure is an online execution procedure to
+//*  initialize the DCCTL environment.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//************* C O N D I T I O N A L   C H A N G E ******************
+//*  IMPORTANT: This procedure needs to be modified if
+//*  any of the following are true:
+//*  - Monitor logging is used
+//*  - XRF is active
+//*  - MFSTEST is included
+//*  - You have static definitions in sysgen of the following types:
+//*    SPOOL, DISK, PRINTER, READER, TAPE, CTC
+//*  Look for the 'Conditional Change' comment lines.
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//*
+//***********************************************************@SCPYRT**
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//***********************************************************@ECPYRT**
+//*
+//       PROC  RGN=64M,SOUT=A,DPTY='(14,15)',
+//             SYS=,SYS1=,SYS2=,
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF MONITOR LOGGING IS ENABLED,
+//* THEN UN-COMMENT THE FOLLOWING LINE:
+//*            LOGT=2400,
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//             RGSUF=DCC,PARM1=,PARM2=
+//IEFPROC EXEC PGM=DFSMVRC0,DPRTY=&DPTY,REGION=&RGN,
+//             PARM='DCC,&RGSUF,&PARM1,&PARM2'
+//*
+//****************************************************
+//*                                                  *
+//*  THE DESCRIPTION AND CHARACTERISTICS OF EACH     *
+//*  PARAMETER IS DEFINED AS FOLLOWS:                *
+//*                                                  *
+//****************************************************
+//*
+//********** CONTROL REGION SPECIFICATIONS ***********
+//*
+//*   RGSUF   XXX   EXEC PARM DEFAULT BLOCK SUFFIX FOR
+//*                 MEMBER DFSPBXXX.
+//****************************************************
+//*
+//*  PARM1 , PARM2 PARAMETERS BOTH ARE USED TO SPECIFY
+//*  CHARACTER STRINGS THAT CONTAIN IMS KEYWORD
+//*  PARAMETERS. I.E. PARM1='AUTO=Y,PST=222,RES=Y'
+//*
+//*  ALL OF THE VALID DCCTL KEYWORD PARAMETERS
+//*  ARE DESCRIBED BELOW
+//****************************************************
+//*   APPLID1 XXXXXXXX VTAM APPLID OF ACTIVE IMS SYSTEM
+//*   APPLID2 XXXXXXXX VTAM APPLID OF XRF ALTERNATE SYSTEM
+//*   APPLID3 XXXXXXXX VTAM APPLID OF RSR TRACKING SYSTEM
+//*   RES     X     BLOCK RESIDENT (N = NO, Y = YES)
+//*   FRE     XXXXX NUMBER OF FORMAT REQUEST ELEMENTS
+//*   PST     XXX   NUMBER OF PST'S PERMANENTLY ALLOC
+//*   MAXPST  XXX   MAXIMUM NUMBER OF PST'S
+//*   SAV     XXX   NUMBER OF DYNAMIC SAVE AREA SETS
+//*   SRCH    X     IMODULE LOAD LIBRARY SEARCH INDICATOR
+//*                 0 = SEARCH JPA AND LIBS BEFORE LPA
+//*                 1 = SEARCH JPA AND LPA BEFORE LIBS
+//*   SOD     X     SPIN OFF DUMP SYSOUT CLASS
+//*   VAUT    X     VTAM AUTH PATH OPTION (1=YES,0=NO)
+//*   FMTO          T = ONLINE FORMATTED DUMP WITH
+//*                     STORAGE IMAGE DELETIONS.
+//*                     OFFLINE SDUMPS PERMITTED FOR
+//*                     NON-IMS TERMINATING ERRORS.
+//*                 P = FULL ONLINE FORMATTED DUMP.
+//*                     OFFLINE SDUMPS PERMITTED FOR
+//*                     NON-IMS TERMINATING ERRORS.
+//*                 F = FULL ONLINE FORMATTED DUMP.
+//*                     OFFLINE SDUMPS SUPPRESSED FOR
+//*                     NON-IMS TERMINATING ERRORS.
+//*                 N = NO FORMATTED DUMP, NO OFFLINE
+//*                     DUMP. OFFLINE SDUMPS PERMITTED
+//*                     FOR NON-IMS TERMINATING ERRORS
+//*                 Z = NO FORMATTED DUMP, NO OFFLINE
+//*                     DUMP. OFFLINE SDUMPS
+//*                     SUPPRESSED FOR NON-IMS
+//*                     TERMINATING ERRORS.
+//*   (DEFAULT)     D = OFFLINE DUMP, OR ONLINE FOR-
+//*                     MATTED DUMP WITH STORAGE IMAGE
+//*                     DELETIONS IF OFFLINE DUMPING
+//*                     FAILS.  OFFLINE SDUMPS
+//*                     PERMITTED FOR NON-IMS
+//*                     TERMINATING ERRORS.
+//*                 X = OFFLINE DUMP, OR ONLINE FOR-
+//*                     MATTED DUMP WITH STORAGE IMAGE
+//*                     DELETIONS IF OFFLINE DUMPING
+//*                     FAILS. OFFLINE SDUMPS
+//*                     SUPPRESSED FOR NON-IMS
+//*                     TERMINATING ERRORS.
+//*                 M = OFFLINE DUMP, ONLINE IMS DUMP
+//*                     FORMATTING NOT PERMITTED.
+//*                     OFFLINE SDUMPS PERMITTED FOR
+//*                     NON-IMS TERMINATING ERRORS.
+//*                 R = OFFLINE DUMP, ONLINE IMS DUMP
+//*                     FORMATTING NOT PERMITTED.
+//*                     OFFLINE SDUMPS SUPPRESSED FOR
+//*                     NON-IMS TERMINATING ERRORS.
+//*   AUTO    X     AUTOMATIC RESTART OPTION
+//*                 Y = AUTOMATIC RESTART DESIRED
+//*                 N = NO AUTOMATIC RESTART
+//*   IMSID   XXXX  IMS DCCTL SUBSYSTEM ID
+//*   NLXB    XXX   NUMBER OF PARALLEL VTAM SESSIONS
+//*   APPC    X     Y = ACTIVATE APPC/IMS
+//*                 N = DO NOT ACTIVATE APPC/IMS
+//*   LTERM   X     Y = LTERM USED IN DFSAPPC PROCESS
+//*                 N = LTERM NOT USED IN DFSAPPC
+//*                     PROCESS
+//*   ARMRST  X     Y = ALLOW MVS ARM TO RESTART
+//*                 N = ARM NOT RESTART IMS
+//*   RRS     X     Y = ENABLE PROT CONV SUPPORT
+//*                 N = DISABLE PROT CONV SUPPORT
+//*   DBRCNM  XXXXXXXX DBRC PROCLIB MEMBER NAME
+//*   PRDR    XXXXXXXX IMSRDR PROCLIB MEMBER NAME
+//*   SSM     XXXX  EXT SUBSYSTEM PROCLIB MEMBER ID
+//*   WADS    X     SINGLE OR DUAL WRITE AHEAD OPTION
+//*                 S=SINGLE, D=DUAL
+//*   ARC     XX    AUTOMATIC ARCHIVING OPTION
+//*                 0 = NOT AUTOMATIC
+//*                 1-99 = AUTOMATIC
+//*   RECA    XXX   RECEIVE ANY BUFFERS
+//*   FESTIM  XXXX  FRONTENDSWITCH TIMEOUT
+//*   RECASZ  XXXXX RECEIVE ANY BUFFER SIZE
+//*   CRC     X     COMMAND RECOGNITION CHARACTER
+//*   TSR     X     U = UTC TIME
+//*                 L = LOCAL TIME (DEFAULT)
+//*   YEAR4   X     N = 2-DIGIT DATE (DEFAULT)
+//*                 Y = 4-DIGIT DATE
+//*   DC      XXX   DC PROC MEMBER SUFFIX IN
+//*                 {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB
+//*                 DEFAULT VALUE IS 000
+//*   CPLOG   XXXXXK CHECKPOINT LOG INTERVAL
+//*           OR
+//*   CPLOG   XXM    CHECKPOINT LOG INTERVAL
+//*   PASSWD1 XXXXXXXX VTAM ACB PASSWORD
+//*   ORSMBR  XX    SUFFIX FOR ORS MEMBER
+//*   IMSGROUP XXXX  4 CHAR USER SPEC NAME
+//*   DESC    XX    MSG DESC CODE
+//*   MCS     (XX,XX) MSG ROUTE CODES
+//*   SVC2    XXX   TYPE 2 SVC NUMBER
+//*
+//******** OTMA PARAMETERS ***************************
+//*
+//*   OTMA    X     Y = OTMA ENABLED
+//*                 N = OTMA NOT ENABLED
+//*                 M = OTMA NOT ENABLED AND
+//*                     OTMA CMD NOT RECOVERED
+//*                 DEFAULT VALUE IS N
+//*   OTMANM  XXXXXXXX IMS OTMA XCF MEMBER NAME
+//*   GRNAME  XXXXXXXX OTMA XCF GROUP NAME
+//*                    NO DEFAULT VALUE
+//*   GRSNAME XXXXXXXX GENERIC RESOURCE GROUP
+//*                    NAME
+//*                    NO DEFAULT VALUE
+//*   OTMAASY X     Y = SCHEDULE NON-RESPONSE TRAN
+//*                     ASYNCHRONOUSLY
+//*                 N = DO NOT SCHEDULE NON-RESPONSE
+//*                     TRAN ASYNCHRONOUSLY
+//*                 DEFAULT VALUE IS N
+//*
+//******** SECURITY PARAMETERS ***********************
+//*
+//*   AOIS    X     ICMD SECURITY OPTION
+//*   AOI1    X     CMD SECURITY OPTION
+//*                 A = ALL
+//*                 N = NONE
+//*                 C = DFSCCMD0 EXIT
+//*                 R = RACF
+//*   TCORACF X     TCO RACF SECURITY OPTION
+//*                 Y = YES
+//*                 N = NO
+//*   APPCSE  X     C = APPC RACF SECURITY IS CHECK
+//*                 F = APPC RACF SECURITY IS FULL
+//*                 N = APPC RACF SECURITY IS NONE
+//*                 P = APPC RACF SECURITY IS PROFILE
+//*   CMDMCS  X     MCS/EMCS COMMAND OPTION
+//*                 N=COMMANDS NOT ALLOWED WITH CRC
+//*                 Y=ALL COMMANDS ALLOWED WITH CRC
+//*                 R=RACF COMMAND SECURITY
+//*                 C=DFSCCMD0 COMMAND SECURITY
+//*                 B=RACF AND DFSCCMD0 CMD SEC
+//*   ISIS    X     RAS AND AGN SECURITY OPTION
+//*                 N = NO RESOURCE ACCESS SECURITY
+//*                 R = RACF RESOURCE ACCESS SECURITY
+//*                 C = RACF RESOURCE ACCESS SECURITY
+//*                 A = RACF RESOURCE ACCESS SECURITY
+//*   RCF     X     RACF TRAN/CMD AUTHORIZATION
+//*                 N = NO TRAN/CMD AUTHORIZATION
+//*                 C = ETO CMD AUTHORIZATION
+//*                 T = TRAN AUTHORIZATION
+//*                 S = STATIC LTERM CMD AUTH
+//*                 Y = C AND T
+//*                 A = C AND T AND S
+//*   RVFY    X     RACF REVERIFY OPTION
+//*                 Y = YES, N = NO
+//*   SGN     X     SIGNON AUTHORIZATION CHECKING
+//*                 F = MTO CANNOT NEGATE ACTIVATION
+//*                     OF SIGNON VERIFICATION
+//*                     SECURITY
+//*                 Y = SIGNON VERIFICATION SECURITY
+//*                     WILL BE ACTIVATED
+//*                 N = SIGNON VERIFICATION SECURITY
+//*                     WILL NOT BE ACTIVATED
+//*                 M = SINGLE USERID CAN SIGNON
+//*                     TO MULTIPLE STATIC TERMINALS
+//*                 G = 'F' + 'M'
+//*                 Z = 'Y' + 'M'
+//*   TRN     X     TRANSACTION AUTHORIZATION CHECKING
+//*                 F = FORCED, Y = YES, N = NO
+//*   RCFTCB  XX    NUMBER OF RCF TCB'S
+//*   PSWDC   X     PASSWORD CASE
+//*                 R=RACF (DEFAULT)
+//*                 U=UPPER CASE
+//*                 M=MIXED CASE
+//*
+//******** MESSAGE QUEUE PARAMETERS ******************
+//*
+//*   EXVR    X     PAGEFIX QMGR BUFFER POOLS
+//*                 (1=YES, 0=NO)
+//*   QBUF    XXXX  NUMBER OF MESSAGE QUEUE BUFFERS
+//*   QTU     XXX   MSG QUEUE UPPER THRESHOLD (%)
+//*   QTL     XXX   MSG QUEUE LOWER THRESHOLD (%)
+//*
+//******** SHARED QUEUES PARAMETERS ******************
+//*
+//*   LGMSGSZ XXXXX LONG MESSAGE SIZE
+//*   QBUFHITH XXX  MSG QBUF HIGH THESHOLD %
+//*   QBUFLWTH XXX  MSG QBUF LOW THESHOLD %
+//*   QBUFMAX  XXXX MAX NUMBER OF MSG QUEUE BUFFERS
+//*   QBUFPCTX XXX  % MSG QBUF DYNAMIC EXPAND
+//*                 WHEN QBUFHITH EXCEEDED
+//*                 DEFAULT IS 20%
+//*   QBUFSZ  XXXXX SIZE OF MESSAGE QUEUE BUFFERS
+//*   SHMSGSZ XXXXX SHORT MESSAGE SIZE
+//*   SHAREDQ XXX   SQ PROC MEMBER SUFFIX IN
+//*                 {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB
+//*                 NO DEFAULT VALUE
+//*
+//******** ETO PARAMETERS ****************************
+//*
+//*   ETO     X     Y = EXTENDED TERMINAL OPTION
+//*                 N = NO EXTENDED TERMINAL OPTION
+//*                 M = NO EXTENDED TERMINAL OPTION
+//*                     BUT LOGON USERDATA SUPPORTED
+//*                     FOR STATIC TERMINALS
+//*   ASOT    XXXX  ETO AUTO SIGNOFF TIME
+//*   ALOT    XXXX  ETO AUTO LOGNOFF TIME
+//*   DLQT    XXX   ETO DEAD LETTER QUEUE SIZE
+//*
+//******** RSR PARAMETERS ****************************
+//*
+//*   RSRMBR  XX    SUFFIX FOR RSR MEMBER
+//*   TRACK   XXX   NO = NO RECOVERY TRACKING DONE
+//*                 RLT = RECOVERY TRACKING DONE
+//*   USERVAR XXXXXXXX USER NAME OF ACTIVE IMS SYSTEM FOR RSR
+//*
+//******* HASH TABLE PARAMETERS **********************
+//*
+//*   LHTS    XXXXX # OF CNT HASH TABLE SLOTS
+//*   NHTS    XXXXX # OF VTCB HASH TABLE SLOTS
+//*   UHTS    XXXXX # OF SPQB HASH TABLE SLOTS
+//*
+//************ FAST PATH PARAMETERS ******************
+//*
+//*   EPCB    XXXX  EPCB POOL SIZE (1K BLOCKS)
+//*   EMHL    XXXXX SIZE OF EMH BUFFER IN BYTES
+//*   FP      X     INCLUDE FASTPATH IN THIS IMS
+//*                 N: THE DEFAULT.  THIS IMS DOES
+//*                    NOT INCLUDE FASTPATH
+//*                 Y: THIS IMS INCLUDES FASTPATH
+//*
+//********** STORAGE POOL VALUES IN K, M OR G ********
+//*
+//*   FBP     XXXXXX MESSAGE FORMAT BLOCK POOL SIZE
+//*   PSB     XXXXXX DCCTL PSB POOL SIZE
+//*   CIOP    XXXXXX TP DEVICE I/O POOL UPPER LIMIT
+//*   WKAP    XXXXXX WORKING STORAGE POOL SIZE
+//*   PSBW    XXXXXX PSB WORK POOL SIZE
+//*   HIOP    XXXXXX HIGH I/O POOL UPPER LIMIT
+//*   EMHB    XXXXXX EMHB POOL UPPER LIMIT
+//*   LUMP    XXXXXX LUMP POOL UPPER LIMIT
+//*   LUMC    XXXXXX LUMC POOL UPPER LIMIT
+//*   AOIP    XXXXXX AOI POOL UPPER LIMIT
+//*   CMDP    XXXXXX CMDP POOL UPPER LIMIT
+//*   DYNP    XXXXXX DYNP POOL UPPER LIMIT
+//*
+//******* MEMBER SUFFIXES ****************************
+//*
+//*   SUF     X     CONTROL PGM NAME (DCCTL NUCLEUS)
+//*   FIX     XX    PAGE FIX NAME (DFSFIX..)
+//*   PRLD    XX    MODULE PRELOAD NAME (DFSMPL..)
+//*   VSPEC   XX    TRACE/LOG DEF (DFSVSM..)
+//*   SPM     XX    STORAGE POOL OPTIONS (DFSSPM..)
+//*   CSLG    XXX   CSL GLOBAL MEMBER (DFSCGXXX)
+//*   DSCT    X     ETO USER DESCRIPTOR TABLE(DFSDSCTX)
+//*  DFSDF    XXX   DRD, CSL, AND SQ MEMBER (DFSDFXXX)
+//*
+//******* XRF PARAMETERS *****************************
+//*
+//*   HSBID   X     XRF SYSTEM IDENTIFICATION
+//*                 1 FOR FIRST SYSTEM
+//*                 2 FOR SECOND SYSTEM
+//*   HSBMBR  XX    XRF OPTIONS (DFSHSB..)
+//*
+//*   MNPS    XXXXXXXX NAME OF MNPS ACB
+//*                    USERVAR WILL BE IGNORED
+//*   MNPSPW  XXXXXXXX MNPS ACB PASSWORD
+//*
+//****************************************************
+//*                                                  *
+//*        XRF SYSTEM DATA SET INFORMATION           *
+//*                                                  *
+//****************************************************
+//*
+//* THE FOLLOWING DATA SETS MUST RESIDE ON SHARED
+//* VOLUMES:
+//*
+//*     DDNAMES:   DFSOLPXX, DFSOLSXX
+//*                DFSWADSX
+//*                IMSRDS   - FIRST RDS
+//*                IMSRDS2  - SECOND RDS (MANDATORY)
+//*                MODSTAT  - FIRST MODSTAT
+//*                MODSTAT2 - 2ND MODSTAT (MANDATORY)
+//*                RECON1, RECON2, RECON3
+//*
+//* THE FOLLOWING DATA SETS MUST BE REPLICATED AND
+//* SHOULD BE ON NON-SHARED VOLUMES.  IF YOUR XRF
+//* CONFIGURATION REQUIRES THAT BOTH IMS SUBSYSTEMS
+//* BE EXECUTABLE ON EITHER CEC, THEN THESE DATA
+//* SETS MUST BE ON SHARED VOLUMES.
+//*
+//*     DDNAMES:   IMSSPA
+//*                LGMSG, LGMSGL
+//*                QBLKS, QBLKSL
+//*                SHMSG, SHMSGL
+//*
+//*                SYSABEND, SYSUDUMP
+//*                IMSMON
+//*
+//* THE FOLLOWING DATA SETS MAY BE REPLICATED.  IF
+//* REPLICATED, THESE DATA SETS SHOULD BE ON
+//* NON-SHARED VOLUMES.  IF THESE DATA SETS ARE NOT
+//* REPLICATED, THEY MUST BE ON SHARED VOLUMES.  IF
+//* YOUR XRF CONFIGURATION REQUIRES THAT BOTH IMS
+//* SUBSYSTEMS BE EXECUTABLE ON EITHER CEC,
+//* THESE DATA SETS MUST BE ON SHARED VOLUMES.
+//*
+//*     DDNAMES:   FORMATA, FORMATB
+//*                IMSACBA, IMSACBB
+//*                IMSTFMTA, IMSTFMTB
+//*                MODBLKSA, MODBLKSB
+//*                PROCLIB, RESLIB
+//*                OTHER STEPLIB DATA SETS
+//*
+//* THE FOLLOWING DATA SETS SHOULD ALSO BE CONSIDERED
+//* FOR REPLICATION ON EITHER SHARED OR NON-SHARED
+//* VOLUMES (AS APPROPRIATE).
+//*
+//*     DATA SET:  JOBS   USED IN THE IMSRDR PROCEDURE
+//*                PGMLIB
+//*                PSBLIB USED BY GSAM
+//*                DBDLIB USED BY GSAM
+//*
+//* THE FOLLOWING IMS DATA SETS MAY ALSO BE IMPACTED
+//* BY THE CONFIGURATION OF YOUR XRF COMPLEX.
+//*
+//* INSTALIB -  USED DURING INSTALLATION/IVP
+//* RESLIB   -  CREATED BY SYSDEF - MANAGED BY SMP
+//* PROCLIB  -  CREATED BY SYSDEF
+//* MACLIB   -  CREATED BY SYSDEF - MANAGED BY SMP
+//* OPTIONS  -  CREATED BY SYSDEF - USED BY SMP
+//* OBJDSET  -  CREATED BY SYSDEF
+//* MODBLKS  -  CREATED BY SYSDEF - MANAGED BY SMP
+//* ACBLIB   -  ONLINE CHANGE STAGING LIBRARY
+//* FORMAT   -  ONLINE CHANGE STAGING LIBRARY
+//* TFORMAT  -  ONLINE CHANGE STAGING LIBRARY
+//* REFERAL  -  USED IN CONJUNCTION WITH FORMAT
+//* DBSOURCE -  USED BY SYSDEF - MANAGED BY SMP
+//* DCSOURCE -  USED BY SYSDEF - MANAGED BY SMP
+//* SRSOURCE -  USED BY SYSDEF - MANAGED BY SMP
+//* ADFSMAC  -  USED BY SYSDEF - MANAGED BY SMP
+//* LOAD     -  USED BY SYSDEF - MANAGED BY SMP
+//* JCLLIB   -  MANAGED BY SMP
+//* SMP DATA SETS
+//*
+//****************************************************
+//*                                                  *
+//*       DATA DEFINITION STATEMENTS FOLLOW          *
+//*                                                  *
+//****************************************************
+//*
+//******** LIBRARY STATEMENTS ************************
+//*
+//STEPLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.SDFSRESL,DISP=SHR
+//PROCLIB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.PROCLIB,DISP=SHR
+//*
+//****************************************************
+//*
+//* IN ORDER TO START A DEPENDENT REGION, MODIFIED
+//* START-UP JCL IS WRITTEN FROM INTERNAL STORAGE TO
+//* THE INTERNAL READER.
+//*
+//IMSIRD   DD SYSOUT=(A,INTRDR)
+//*
+//******** DASD LOGGING STATEMENTS *******************
+//*
+//* THE FOLLOWING DD CARDS DESCRIBE THE DASD LOGGING
+//* OLDS AND WADS. THESE CARDS ARE FOR EXAMPLE ONLY.
+//* ALL OLDS AND WADS DATA SETS MAY BE DYNAMICALLY
+//* ALLOCATED.  DD CARDS ARE NOT REQUIRED.
+//* THE OLDS AND WADS TO BE USED DURING STARTUP MUST
+//* BE SPECIFIED VIA OLDSDEF AND WADSDEF CONTROL
+//* STATEMENTS IN THE DFSVSMXX MEMBER OF IMS PROCLIB.
+//* THE ACTUAL SELECTION OF OLDS AND WADS MUST BE
+//* TAILORED TO INSTALLATION REQUIREMENTS.  THE OLDS
+//* AND WADS MUST BE PREDEFINED BY A SET UP JOB.
+//* THE BLOCK SIZE OF ALL OLDS MUST BE THE SAME.
+//* THE BLOCK SIZE AND DEVICE TYPE OF ALL WADS MUST
+//* BE THE SAME.  AT LEAST 3 PRIMARY OLDS AND 1 WADS
+//* MUST BE AVAILABLE FOR STARTUP.  THE BLOCK SIZE
+//* SHOULD NOT BE SPECIFIED IN THIS JCL.  THE LOGGER
+//* WILL GET THE BLOCK SIZE FROM THE VTOC.
+//*
+//DFSOLP00 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLP00,DISP=SHR
+//DFSOLP01 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLP01,DISP=SHR
+//DFSOLP02 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLP02,DISP=SHR
+//DFSOLP03 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLP03,DISP=SHR
+//DFSOLP04 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLP04,DISP=SHR
+//DFSOLP05 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLP05,DISP=SHR
+//*
+//DFSOLS00 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLS00,DISP=SHR
+//DFSOLS01 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLS01,DISP=SHR
+//DFSOLS02 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLS02,DISP=SHR
+//DFSOLS03 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLS03,DISP=SHR
+//DFSOLS04 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLS04,DISP=SHR
+//DFSOLS05 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.OLS05,DISP=SHR
+//*
+//DFSWADS0 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.WADS0,DISP=SHR
+//DFSWADS1 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.WADS1,DISP=SHR
+//*
+//******** MONITOR LOGGING STATEMENTS ****************
+//*
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF MONITOR LOGGING IS ENABLED,
+//* THEN UN-COMMENT THE IMSMON DD STATEMENT.
+//* HOWEVER:
+//* THE IMSMON DD STATEMENT MUST BE REMOVED IF
+//* THIS DATA SET IS TO BE DYNAMICALLY ALLOCATED.
+//*
+//*IMSMON   DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.IMSMON,DISP=(,KEEP),
+//* VOL=(,,,99),UNIT=(&LOGT,,DEFER)
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//******** MESSAGE QUEUE STATEMENTS ******************
+//*
+//QBLKS    DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.QBLKS,DISP=OLD
+//SHMSG    DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.SHMSG,DISP=OLD
+//LGMSG    DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.LGMSG,DISP=OLD
+//*
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF XRF IS ENABLED, THEN UN-COMMENT THE FOLLOWING
+//* QBLKSL, SHMSGL, AND LGMSGL STATEMENTS:
+//*QBLKSL   DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.QBLKSL,DISP=OLD
+//*SHMSGL   DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.SHMSGL,DISP=OLD
+//*LGMSGL   DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.LGMSGL,DISP=OLD
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//******** ONLINE CHANGE STATEMENTS ******************
+//*
+//IMSACBA  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.ACBLIBA,DISP=SHR
+//IMSACBB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.ACBLIBB,DISP=SHR
+//MODBLKSA DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.MODBLKSA,DISP=SHR
+//MODBLKSB DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.MODBLKSB,DISP=SHR
+//MODSTAT  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.MODSTAT,DISP=SHR
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF XRF IS ENABLED, THEN UN-COMMENT THE FOLLOWING STATEMENT:
+//*MODSTAT2 DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.MODSTAT2,DISP=SHR
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//******** MFS STATEMENTS ****************************
+//*
+//FORMATA  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.FORMATA,DISP=SHR
+//FORMATB  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.FORMATB,DISP=SHR
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF MFSTEST IS ENABLED, THEN UN-COMMENT THE FOLLOWING LINES:
+//*IMSTFMTA DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.TFORMAT,DISP=SHR
+//*         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.FORMATA,DISP=SHR
+//*IMSTFMTB DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.TFORMAT,DISP=SHR
+//*         DD DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS2.FORMATB,DISP=SHR
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//******** DCCTL SYSTEM STATEMENTS *******************
+//*
+//IMSRDS   DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.RDS,DISP=SHR
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* IF XRF IS ENABLED, THEN UN-COMMENT THE FOLLOWING IMSRDS2 LINE:
+//*IMSRDS2  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS.RDS2,DISP=SHR
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*DFSTCF  DD  DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB,DISP=SHR
+//PRINTDD  DD  SYSOUT=&SOUT
+//SYSUDUMP DD  SYSOUT=&SOUT,
+// DCB=(LRECL=125,RECFM=FBA,BLKSIZE=3129),
+// SPACE=(6050,300,,,ROUND)
+//*
+//******** TELEPROCESSING LINE STATEMENTS ***********
+//******** GENERATED FROM DCCTL DEFINITION **********
+//*
+//************* C O N D I T I O N A L   C H A N G E ******************
+//* ADD DD STATEMENTS FOR EACH OF THE FOLLOWING DEVICE TYPES
+//* THAT ARE STATICALLY DEFINED IN IMS STAGE 1:
+//* SPOOL, DISK, PRINTER, READER, TAPE, PUNCH, MSC CTC
+//*
+//* EXAMPLES USING DEFINITIONS FROM GEN:
+//*
+//*
+//*   LINEGRP  UNITYPE=PRINTER,DDNAME=LCLPTR1
+//*   LINE  ADDR=B01
+//*LCLPTR1  DD    UNIT=/0B01
+//*
+//*
+//*   LINEGRP UNITYPE=READER,DDNAME=LCLRDR1
+//*   LINE  ADDR=A01
+//*LCLRDR1  DD    UNIT=/0A01
+//*
+//*
+//*   LINEGRP   DDNAME=LCLTAPE,UNITYPE=TAPE
+//*   LINE      ADDR=C01,BUFSIZE=220
+//*LCLTAPE  DD    VOL=(PRIVATE,,,99),UNIT=/0C01
+//*
+//*   LINEGRP  DDNAME=(SPOOL1,SPOOL2,SPOOL3),UNITYPE=SPOOL
+//*SPOOL1   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.SYSO1
+//*SPOOL2   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.SYSO2
+//*SPOOL3   DD DISP=SHR,DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.&SYS1.SYSO3
+//*
+//*
+//*   LINEGRP DDNAME=LCLDISK1,UNITYPE=DISK
+//*   LINE ADDR=230,BUFSIZE=3200
+//*LCLDISK1 DD    SYSOUT=&SOUT  *** UNIT=/0230
+//*
+//*
+//*   LINEGRP  DDNAME=LCLPUNCH,UNITYPE=PUNCH
+//*   LINE   ADDR=007
+//*//LCLPUNCH DD    UNIT=/0007
+//*
+//*
+//*   PLNK23C  MSPLINK  DDNAME=MSC23ASS,ADDR=0CA,TYPE=CTC,BUFSIZE=1024
+//*MSC23ASS DD    UNIT=/00CA
+//*
+//************* E N D   C O N D I T I O N A L   C H A N G E **********
+//*
+//******** EXTERNAL SUBSYSTEM STATEMENTS *************
+//*
+//*  INCLUDE THE DFSESL DD STATEMENT IF AN EXTERNAL
+//*  SUBSYSTEM CONNECTION TO DB2 IS DESIRED.
+//*

@@ -11,24 +11,19 @@
 # tasks file for configure-installer-and-image
 
 - name: Download openshift installer
-  ansible.builtin.get_url:
-    url: '{{ local_openshift_install }}'
-    dest: ./openshift-install-linux.tar.gz
+  ansible.builtin.shell: |
+    if [  -f {{ local_openshift_install }} ]; then
+        tar -zvxf {{ local_openshift_install }}
+    else
+        curl -Lf {{ local_openshift_install }} > openshift-install-linux.tar.gz
+        tar -zvxf ./openshift-install-linux.tar.gz
+    fi
 
 - name: Download openshift client
-  ansible.builtin.get_url:
-    url: '{{ local_openshift_client }}'
-    dest: ./openshift-client-linux.tar.gz
-
-- name: Unzip openshift client archive
-  ansible.builtin.command:
-    cmd: tar -zvxf openshift-install-linux.tar.gz
-
-- name: Unzip openshift client archive
-  ansible.builtin.command:
-    cmd: tar -zvxf openshift-client-linux.tar.gz
-
-- name: Remove openshift client archive
-  ansible.builtin.file:
-    state: absent
-    path: openshift-client-linux.tar.gz
+  ansible.builtin.shell: |
+    if [ -f {{ local_openshift_client }} ]; then
+        tar -zvxf {{ local_openshift_client }}
+    else
+        curl -Lf {{ local_openshift_client }} > openshift-client-linux.tar.gz
+        tar -zxvf ./openshift-client-linux.tar.gz
+    fi

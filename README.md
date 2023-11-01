@@ -15,7 +15,7 @@ The collections can be found on
 and [Automation Hub](https://www.ansible.com/products/automation-hub).
 For additional content, review our [community page](http://ibm.biz/BdfsTR).
 
-This repository is frequently updated to refresh content. We recommend that you clone the
+This repository is frequently updated to refresh content. We recommend that you clone 
 the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
@@ -60,8 +60,12 @@ often repeated and in need of automation.
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
+  - [Dump, Archive, Fetch, Copy and Unarchive Data Sets](zos_concepts/data_transfer/archive_copy_unarchive_restore)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
+  - [Copy templates to z/OS](zos_concepts/templates/copy_template)
+  - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
+  - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
@@ -71,7 +75,9 @@ often repeated and in need of automation.
   - [Invoking REST APIs using the URI module](zos_concepts/rest_apis)
 - Provisioning
   - [IMS](zos_subsystems/ims)
+    - [Deploy an IMS Cobol App](zos_subsystems/ims/ims_cobol_deploy)
     - [Provision a new IMS TMDB subsystem](zos_subsystems/ims/ims_provisioning)
+    - [Provision a new IMS TMDB subsystem for Wazi](zos_subsystems/ims/ims_provisioning_wazi)
   - [ZCEE](zos_subsystems/zcee)
     - [Provision a new z/OS Connect EE subsystem](zos_subsystems/zcee/provisioning)
   - [WLP](zos_subsystems/wlp)
@@ -94,6 +100,8 @@ often repeated and in need of automation.
     - [Provision a Db2 schema instance](zos_subsystems/db2/db2_schema_provisioning)
     - [Discover registered Db2 applications](zos_subsystems/db2/db2_discover_applications)
     - [Discover registered Db2 subsystems](zos_subsystems/db2/db2_discover_subsystems)
+  - [IMS](zos_subsystems/ims)
+    - [Enable IMS catalog and managed ACBs](zos_subsystems/ims/enable_catalog_macb)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
 - Security
@@ -131,7 +139,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020, 2021
+© Copyright IBM Corporation 2020 - 2023
 
 ## License
 Licensed under

@@ -1,0 +1,45 @@
+---
+- name: Retrieve z/OS proclib dataset
+  shell: pproc
+  register: proclib_ds
+
+# JOB_CARD will be the default job card inserted for dynamically generated JCL
+# ensure MSGCLASS and CLASS are correct for desired environment
+- set_fact:
+    JOB_CARD: |-
+      //ANSIBLE JOB 'testing',
+      //*  NOTIFY={{ TARGET_USERNAME | upper }},
+      //  USER={{ TARGET_USERNAME | upper }},
+      //  MSGCLASS={{ MSG_CLASS }},
+      //  MSGLEVEL=(1,1),
+      //  CLASS={{ JOB_CLASS }}
+    IST_VTAM_IMSAPPLID: '{{ DFS_IMS_SSID }}'
+    ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+    TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
+    ROUTE: '{{ DFS_IMS_SSID }}'
+    ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
+    DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+    DFS_DS_VOLUME2: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+
+- debug:
+    var: 
+      - ZOS_RELEASE
+      - DFS_DS_VOLUME1
+
+- set_fact:
+    system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'
+  vars:
+    new_item: { STEPLIB: '{{ STEPLIB }}' }
+  with_dict: '{{ system_environment }}'
+
+- block:
+
+  - tempfile:
+      state: directory
+    register: tmdb_tmp_dir
+
+  - set_fact:
+      DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"
+
+  - debug:
+      msg: IMS source location is '{{ DFS_AUTH_LIB_SYSHLQ }}'

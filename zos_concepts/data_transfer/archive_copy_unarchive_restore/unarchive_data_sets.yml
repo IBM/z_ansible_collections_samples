@@ -1,0 +1,59 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how restore a z/OS data sets archive to the
+# controller using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories unarchive_data_sets.yml
+#
+#
+# Requirements:
+#   IBM z/OS core collection 1.7.0 or later.
+#   Ansible Community General Collection
+#
+# Configure:
+#   archive_data_set - The name to use for the data set archive.
+#   delete - Indicates if terse and archive data sets should be deleted upon
+#           successful restore.
+#   replace - Indicates if existing data sets should be overwritten during restore.
+#
+###############################################################################
+
+- hosts: destination
+  collections :
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  vars:
+    archive_data_set: ""
+    delete: False
+    replace: True
+  environment: '{{ environment_vars }}'
+
+  tasks:
+    - block:
+        - name: Unarchive the dump using terse and restore the data sets.
+          ibm.ibm_zos_core.zos_unarchive:
+            src: "{{ playbook_dir }}/{{ dest_archive }}"
+            force: True
+            format:
+              name: terse
+              format_options:
+                use_adrdssu: True
+            force: "{{ replace }}"
+          register: unarchive_result
+
+        - debug:
+            msg: "{{ unarchive_result }}"
+
+      always:
+        - name: Clean up archive data set
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ dest_archive }}"
+            state: absent
+          when: delete and dest_archive is defined

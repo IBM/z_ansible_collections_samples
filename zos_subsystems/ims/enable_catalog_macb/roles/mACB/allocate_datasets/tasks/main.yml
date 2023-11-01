@@ -1,0 +1,29 @@
+---
+- name: Allocate necessary data sets for Managed ACBs
+
+  block: 
+    - name: Create a sequential log data set
+      ibm.ibm_zos_core.zos_data_set:
+        name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LOG1'
+        type: SEQ
+        state: present
+        volumes: '{{DFS_DS_VOLUME1}}'
+        record_format: FB
+        record_length: 4092
+        block_size: 4096
+        space_primary: 100
+        space_secondary: 75
+        space_type: CYL
+
+    - name: Create a sequential log data set
+      ibm.ibm_zos_core.zos_data_set:
+        name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LOG2'
+        type: SEQ
+        state: present
+        volumes: '{{DFS_DS_VOLUME1}}'
+        record_format: FB
+        record_length: 4092
+        block_size: 4096
+        space_primary: 100
+        space_secondary: 75
+        space_type: CYL

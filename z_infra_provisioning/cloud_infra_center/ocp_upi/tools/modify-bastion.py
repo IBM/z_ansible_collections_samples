@@ -41,9 +41,9 @@ def get_nodes_ips(infra_id, node_role):
      {"master-2": {"ip": "172.26.103.3", "etcd": "etcd-2"}}
      }
     """
-    cmd = "openstack port list | grep %s | awk '{print$4,$8}'" % (infra_id+"-"+node_role)
-    result = os.popen(cmd).read()
+    cmd = "openstack --os-volume-api-version=3 port list | grep %s | awk '{print$4,$8}'" % (infra_id+"-"+node_role)
 
+    result = os.popen(cmd).read()
     """
     The example output of above command:
     $ openstack port list | grep 4bzs4-worker | awk '{print$4,$8}'
@@ -62,7 +62,7 @@ def get_nodes_ips(infra_id, node_role):
         elif node_role == "bootstrap":
             name = n[1]
         else:
-            name = n[1] + "-" + n[3]
+            name = n[1] + "-" + n[-1]
         ip = node.split(" ")[1]
         ip = ip.split("'")[1]
         if node_role == "master":
@@ -70,7 +70,7 @@ def get_nodes_ips(infra_id, node_role):
         else:
             nodes_dict[name] = {"ip": ip}
     return nodes_dict
-    
+
 bastion_dict = get_bastion_template()
 infra_id = get_infra_id()
 
