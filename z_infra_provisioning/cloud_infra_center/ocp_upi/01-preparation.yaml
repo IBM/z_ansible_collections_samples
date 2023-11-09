@@ -40,5 +40,9 @@
 - import_playbook: configure-installer-rhcos-local.yaml
   when: use_localreg == true
 - import_playbook: configure-security-groups.yaml
-- import_playbook: configure-network.yaml
+  when: vm_type == "kvm"
+- import_playbook: configure-network-kvm.yaml
+  when: vm_type == "kvm"
+- import_playbook: configure-network-zvm.yaml
+  when: vm_type == "zvm"
 - import_playbook: configure-bastion-properties.yaml
