@@ -76,6 +76,7 @@ all:
       create_server_timeout: 10 # minute
 
     bastion:
+      use_bastion: true
       ansible_ssh_host: '<linux-server-ip-addr>'
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
       bastion_private_ip_address: '<bastion-ip-addr>'

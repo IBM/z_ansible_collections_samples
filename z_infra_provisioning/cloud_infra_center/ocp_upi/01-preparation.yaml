@@ -42,3 +42,7 @@
 - import_playbook: configure-security-groups.yaml
 - import_playbook: configure-network.yaml
 - import_playbook: configure-bastion-properties.yaml
+- import_playbook: configure-dns.yaml
+  when: use_bastion == true
+- import_playbook: configure-haproxy.yaml
+  when: use_bastion == true

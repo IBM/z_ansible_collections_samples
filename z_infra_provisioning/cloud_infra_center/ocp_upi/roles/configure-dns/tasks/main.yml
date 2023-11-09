@@ -18,6 +18,10 @@
 # tasks file for configure-dns
 - ansible.builtin.include_vars: cluster-template.yaml
 
+- name: Get Service Status
+  ansible.builtin.shell: systemctl is-active named-chroot
+  register: named_status
+
 - name: Install bind-chroot for dns
   become: true
   become_user: root
@@ -25,6 +29,7 @@
   ansible.builtin.yum:
     name: bind-chroot
     state: latest
+  when: named_status == "inactive"
 
 - name: Create /var/named directory
   become: true
@@ -33,6 +38,7 @@
   ansible.builtin.file:
     path: /var/named
     state: directory
+  when: named_status == "inactive"
 
 - name: Combine cluster name and base domain
   ansible.builtin.set_fact:
@@ -42,7 +48,7 @@
   ansible.builtin.set_fact:
     subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
 
-- name: Create dns subnet definition
+- name: Create name resolution for cluster
   become: true
   become_user: root
   become_method: sudo
@@ -87,17 +93,69 @@
   ansible.builtin.set_fact:
     bastion_reverse: "{{ os_dns_domain.split('.')[:-1][::-1]|join('.') }}"
 
-- name: Create dns subnet zone for bastion
+- name: Create reverse name resolution for cluster
   become: true
   become_user: root
   become_method: sudo
   ansible.builtin.template:
     src: var/named/bastion.in-addr.arpa.zone.j2
-    dest: /var/named/{{ bastion_reverse }}.in-addr.arpa.zone
+    dest: /var/named/{{ bastion_reverse }}.in-addr.arpa.{{ cluster_domain_name }}.zone
     owner: named
     group: named
   notify:
     - restart dns
+
+# if named-chroot is running, use insert.
+- name: Check if DNS is already defined in /etc/named.conf
+  become: true
+  become_user: root
+  become_method: sudo
+  ansible.builtin.shell: grep -c "^{{ cluster_domain_name }}" /etc/named.conf || true
+  register: checknamed
+
+- name: Add name resolution to /etc/named.conf
+  become: true
+  become_user: root
+  become_method: sudo
+  ansible.builtin.blockinfile:
+    dest: /etc/named.conf
+    insertafter: EOF
+    block: |
+      zone "{{ cluster_name }}.{{ base_domain }}" {
+              type master;
+              file "{{ cluster_name }}.{{ base_domain }}.zone";
+              allow-query { any; };
+              allow-transfer { none; };
+              allow-update { none; };
+      };
+  notify:
+    - restart dns
+  when: 
+    - named_status == "active"
+    - checknamed.stdout == "0"
+
+- name: Add reverse name resolution to /etc/named.conf
+  become: true
+  become_user: root
+  become_method: sudo
+  ansible.builtin.blockinfile:
+    dest: /etc/named.conf
+    insertafter: EOF
+    block: |
+      zone "{{ bastion_reverse }}.in-addr.arpa.{{ cluster_domain_name }}" {
+              type master;
+              file "{{ bastion_reverse }}.in-addr.arpa.{{ cluster_domain_name }}.zone";
+              allow-query { any; };
+              allow-transfer { none; };
+              allow-update { none; };
+      };
+  notify:
+    - restart dns
+  when: 
+    - named_status == "active"
+    - checknamed.stdout == "0"
+
+# if named-chroot is not running, use replace.
 
 - name: Create /etc/named.conf
   become: true
@@ -108,6 +166,7 @@
     dest: /etc/named.conf
   notify:
     - restart dns
+  when: named_status == "inactive"
 
 - name: Update cluster_subnet_range
   become: true
@@ -117,6 +176,7 @@
     cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
   notify:
     - restart dns
+  when: named_status == "inactive"
 
 - name: Update bastion_subnet_prefix_reverse
   become: true
@@ -126,6 +186,7 @@
     cmd: sed -i "s/bastion_subnet_prefix_reverse/{{ bastion_reverse }}/g" /etc/named.conf
   notify:
     - restart dns
+  when: named_status == "inactive"
 
 - name: Add dns to firewall
   become: true
