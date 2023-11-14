@@ -9,6 +9,8 @@ The playbooks exploit DBaaS services delivered by IBM Db2 Automation Expert. The
 in IBM Unified Management Server. For more details on the available APIs see the Swagger documentation
 hosted by the UMS server: `https://<ums server hostname>:<ums server port>/ws/swagger-ui.html`.
 
+The userid and password to be used for API calls are read from environment variables `UMS_USERNAME` and `UMS_PASSWORD`.
+
 For more information about installation and configuration of the IBM Db2 Automation Expert APIs, please see the documentation for:
 * [IBM Db2 Automation Expert 1.1.0](https://www.ibm.com/docs/daefz/1.1.0)
 * [IBM Unified Management Server 1.2.0](https://www.ibm.com/docs/umsfz/1.2.0)
