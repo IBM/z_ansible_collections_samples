@@ -1,11 +1,17 @@
 # IBM Db2 Automation Expert
 
-The following playbooks demonstrate how to run an ad-hoc utility on one or more Db2 objects.
-For example, you want to provide self-service Db2 utilities for developers in non-production environments.
+The following playbooks demonstrate how to run an ad-hoc utility on a Db2 object. Use cases:
+* Provide self-service Db2 utility execution for developers
+* Ad-hoc utilities from CI/CD pipelines
+* Run non-production Db2 housekeeping, e.g., for provisioned schemas or subsystems
 
 The playbooks exploit DBaaS services delivered by IBM Db2 Automation Expert. The APIs are hosted
 in IBM Unified Management Server. For more details on the available APIs see the Swagger documentation
 hosted by the UMS server: `https://<ums server hostname>:<ums server port>/ws/swagger-ui.html`.
+
+For more information about installation and configuration of the IBM Db2 Automation Expert APIs, please see the documentation for:
+* [IBM Db2 Automation Expert 1.1.0](https://www.ibm.com/docs/daefz/1.1.0)
+* [IBM Unified Management Server 1.2.0](https://www.ibm.com/docs/umsfz/1.2.0)
 
 ## Playbooks summary
 
