@@ -100,6 +100,7 @@ often repeated and in need of automation.
     - [Provision a Db2 schema instance](zos_subsystems/db2/db2_schema_provisioning)
     - [Discover registered Db2 applications](zos_subsystems/db2/db2_discover_applications)
     - [Discover registered Db2 subsystems](zos_subsystems/db2/db2_discover_subsystems)
+    - [Run Db2 utilities](zos_subsystems/db2/db2_automation_expert)
   - [IMS](zos_subsystems/ims)
     - [Enable IMS catalog and managed ACBs](zos_subsystems/ims/enable_catalog_macb)
 - Software Installation
