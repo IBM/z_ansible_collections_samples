@@ -15,7 +15,7 @@ The collections can be found on
 and [Automation Hub](https://www.ansible.com/products/automation-hub).
 For additional content, review our [community page](http://ibm.biz/BdfsTR).
 
-This repository is frequently updated to refresh content. We recommend that you clone the
+This repository is frequently updated to refresh content. We recommend that you clone 
 the repository and configure your GitHub
 [notifications and subscriptions](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/about-notifications#notifications-and-subscriptions)
 to receive ongoing updates about specific activity on GitHub.
@@ -60,8 +60,12 @@ often repeated and in need of automation.
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
+  - [Dump, Archive, Fetch, Copy and Unarchive Data Sets](zos_concepts/data_transfer/archive_copy_unarchive_restore)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
+  - [Copy templates to z/OS](zos_concepts/templates/copy_template)
+  - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
+  - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
@@ -135,7 +139,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020, 2021
+© Copyright IBM Corporation 2020 - 2023
 
 ## License
 Licensed under

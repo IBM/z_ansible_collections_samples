@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2023
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -40,7 +40,13 @@ releases:
                 - Added runtime-requirements.txt that lists the requirements needed for this playbook to execute
                 - Updated host_vars, group_vars and inventory
             fixed:
-                - Fixed the bug where the first temporarly data set was not created
+                - Fixed the bug where the first temporary data set was not created
                 - Renamed `terse_fetch_data_set.yaml` to `terse_fetch_data_set.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+    2023.08.29:
+        date: 2023.08.29
+        changes:
+            minor:
+                - Included zos_lineinfile to insert data into the temporary data set to avoid errors when archiving.
+                - Swap the use of zos_mvs_raw for a better suited module zos_archive.

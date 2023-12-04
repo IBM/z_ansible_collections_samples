@@ -1,0 +1,26 @@
+{###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################}
+{#
+These comments will not be present on text file rendered by this template.
+This template uses a mixture of playbook-defined variables,
+Ansible-defined ones and facts from zos_gather_facts.
+The use of the filter tojson when substituting template_dict
+and ansible_play_hosts tells Jinja to quote the values of the
+variables in double quotes to create valid JSON.
+#}
+{
+    "from_playbook": {
+        "local_name": "{{ local_name }}",
+        "keys": {{ template_dict|tojson }},
+        "remote_dir": "{{ dest_dir }}"
+    },
+    "from_ansible": {
+        "current_playbook_hosts": {{ ansible_play_hosts|tojson }},
+        "playbook_dir": "{{ playbook_dir }}"
+    },
+    "from_zos_gather_facts": {
+        "master_catalog": "{{ master_catalog_dsn }}",
+        "primary_jes": "{{ primary_jes }}"
+    }
+}
