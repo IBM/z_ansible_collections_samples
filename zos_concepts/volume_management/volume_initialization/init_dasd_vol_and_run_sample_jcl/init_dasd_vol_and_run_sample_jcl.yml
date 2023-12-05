@@ -118,12 +118,12 @@
 
     - name: Copy JCL to data set.
       zos_copy:
-        src: "{{ playbook_dir }}/files/HELLO.JCL"
-        dest: "{{ mount_point }}/HELLO.JCL"
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
+        dest: "{{ mount_point }}/HELLO.jcl"
 
-    - name: Submit the JCL at {{ mount_point}}/HELLO.JCL.
+    - name: Submit the JCL at {{ mount_point}}/HELLO.jcl.
       zos_job_submit:
-        src: "{{ mount_point }}/HELLO.JCL"
+        src: "{{ mount_point }}/HELLO.jcl"
         location: USS
       register: result
 
