@@ -4,9 +4,9 @@ IBM® Cloud Infrastructure Center is an advanced infrastructure management produ
 
 Before you get started with Ansible, familiarize yourself with the basics of Red Hat® OpenShift® and IBM Cloud Infrastructure Center. The following links provide basic information and an overview. 
 
- [Red Hat OpenShift Container Platform installation and update](https://docs.openshift.com/container-platform/4.8/architecture/architecture-installation.html#architecture-installation)
+ [Red Hat OpenShift Container Platform installation and update](https://docs.openshift.com/container-platform/4.14/architecture/architecture-installation.html#architecture-installation)
 
-[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.1.6)
+[IBM Cloud Infrastructure Center](https://www.ibm.com/docs/en/cic/1.2.1)
 
 # About this playbook
 
@@ -34,7 +34,7 @@ The playbook contains the following topics:
 
   3. Requirements pre-check before the installation
 
-**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.1.5, 1.1.6 and RH OpenShift Container Platform version 4.10 and 4.11, 4.12 for z/VM and version 4.10, 4.11, 4.12 for KVM.
+**Note**: This playbook supports IBM® Cloud Infrastructure Center version 1.2.0, 1.2.1 and RH OpenShift Container Platform version 4.12, 4.13 and 4.14 for z/VM and version 4.12, 4.13 and 4.14 for KVM.
 
 # Installing Red Hat OpenShift on the IBM Cloud Infrastructure Center via user-provisioned infrastructure (UPI)
 
@@ -58,8 +58,8 @@ of this method of installation.
 
 This is the overall workflow running Ansible playbook, mainly has the following steps:
 - [Prepare](#prepare)
-- [Create Cluster](#create-cluster)
-  - [Something is Wrong](#something-is-wrong)
+- [Create Cluster](#creation-of-the-cluster)
+  - [Something is Wrong](#something-is-wrongtrouble-shooting)
 
 After you performed the previous steps successfully, you get one ready OpenShift Container Platform on the IBM Cloud Infrastructure Center. 
 - [Day2 Operation](#day2-operation)
@@ -235,7 +235,10 @@ If you meet any **not running** service or **failed** message, check the IBM Clo
 
 9. Set Subnet DNS
 
-**Note**: This step is required for KVM, z/VM is optional.
+**Note**:
+>1.Network type `DHCP` is mandatory for KVM.
+> 
+>2.This step is required for KVM, z/VM is optional.
 
 During deployment, the OpenShift nodes will need to be able to resolve public name records to download the OpenShift images and so on. They will also need to resolve the OpenStack API endpoint.
 
@@ -253,15 +256,15 @@ $ openstack subnet set --dns-nameserver 198.51.100.86 <use_network_subnet>
 10. Support to deploy multiple OCPs with multiple networks
 
 Now we support the following scenarios for multiple ocps :
-- Deploy multiple OCPs on ZVM multi-vlan network. You can refer ICIC doc to [create ZVM multiple vlan networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=mfvc-zvm-multiple-vlan-networks-pass-through-different-zvm-vswitchesthe-first-time-configuration) then choose one network and set the network in the related inventory.yaml file section.
+- Deploy multiple OCPs on ZVM multi-vlan network. You can refer ICIC doc to [create ZVM multiple vlan networks](https://www.ibm.com/docs/en/cic/1.2.1?topic=mfvc-zvm-multiple-vlan-networks-pass-through-different-zvm-vswitchesthe-first-time-configuration) then choose one network and set the network in the related inventory.yaml file section.
 
-- Deploy multiple OCPs on ZVM multi-flat network. You can refer ICIC doc to [create ZVM multiple flat networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=configuration-zvm-multiple-flat-networksthe-first-time) then choose one network and set the network in the related inventory.yaml file section.
+- Deploy multiple OCPs on ZVM multi-flat network. You can refer ICIC doc to [create ZVM multiple flat networks](https://www.ibm.com/docs/en/cic/1.2.1?topic=configuration-zvm-multiple-flat-networksthe-first-time) then choose one network and set the network in the related inventory.yaml file section.
 
-- Deploy multiple OCPs on KVM multi-vlan network. You can refer ICIC doc to [create KVM multiple vlan networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=mfvc-kvm-multiple-vlan-networks-that-pass-through-different-osasthe-first-time-configuration) then choose one network and set the network in the related inventory.yaml file section.
+- Deploy multiple OCPs on KVM multi-vlan network. You can refer ICIC doc to [create KVM multiple vlan networks](https://www.ibm.com/docs/en/cic/1.2.1?topic=mfvc-kvm-multiple-vlan-networks-that-pass-through-different-osasthe-first-time-configuration) then choose one network and set the network in the related inventory.yaml file section.
 
-- Deploy multiple OCPs on KVM multi-flat network. You can refer ICIC doc to [create KVM multiple flat networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=configuration-kvm-multiple-flat-networksthe-first-time) then choose one network and set the network in the related inventory.yaml file section.
+- Deploy multiple OCPs on KVM multi-flat network. You can refer ICIC doc to [create KVM multiple flat networks](https://www.ibm.com/docs/en/cic/1.2.1?topic=configuration-kvm-multiple-flat-networksthe-first-time) then choose one network and set the network in the related inventory.yaml file section.
 
-- Deploy multiple OCPs on KVM flat+vlan network. You can refer ICIC doc to [create KVM flat+vlan networks](https://www.ibm.com/docs/en/cic/1.2.0?topic=mfvc-kvm-multiple-flat-vlan-networks-pass-through-different-osasconfigured-already) then choose one network and set the network in the related inventory.yaml file section.
+- Deploy multiple OCPs on KVM flat+vlan network. You can refer ICIC doc to [create KVM flat+vlan networks](https://www.ibm.com/docs/en/cic/1.2.1?topic=mfvc-kvm-multiple-flat-vlan-networks-pass-through-different-osasconfigured-already) then choose one network and set the network in the related inventory.yaml file section.
 
 - Deploy multiple OCPs on ZVM in one project use single network by custom DNS
 
@@ -281,55 +284,58 @@ cd ocp_upi
 
 Update your settings based on the samples. The following propeties are **required**:
 
-| Property | Default | Description | 
-| ------ | ------ | ------ |
-| `use_network_name` | \<network name from icic\> |`openstack network list -c Name -f value`|
-| `use_network_subnet` | \<subnet id from network name in icic\> |`openstack network list -c Subnets -f value`|
-| `vm_type` | kvm| The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`| |
-| `disk_type` | dasd|The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi` | |
-| `openshift_version` |4.12| The product version of OpenShift Container Platform, <br>such as `4.10`,`4.11` or `4.12`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)| |
-| `openshift_minor_version` |3| The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there | 
-| `auto_allocated_ip` |true|(Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end` |
-| `os_flavor_bootstrap` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
-| `os_flavor_master` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB | |
-| `os_flavor_worker` | medium| `openstack flavor list`, Minimum flavor disk size >= 35 GiB  | |
-| `os_control_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned control server nodes| |
-| `os_compute_nodes_number` |3| (Integer) Number of Red Hat Openshift provisioned compute server nodes| |
-| `create_server_zone` |''| The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>Default value is '', which means to use the default availability zone. <br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`]|
-| `pullsecret` | \<pull-secret\> |  Get from [cloud.redhat.com](https://console.redhat.com/openshift/install/ibmz/user-provisioned)|
-| `sshkey` | \<ssh-key\>| The SSH public key for the core user in RHEL CoreOS |
-| `os_dns_domain` | \<external DNS ip addr\> or \<bastion ip addr\>|If you want to use your external or existing DNS server set `os_dns_domain` to use it, others set bastion machine ip address|
-| `cluster_name` | \<cluster-name\> |The name of the cluster, such as `openshift`.| 
-| `base_domain` | \<cluster-base-domain\> |The base domain of the cluster, the base domain is used to create routes to your OpenShift Container Platform cluster components, such as `example.com`| 
+| Property                  | Default                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 
+|---------------------------|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `use_network_name`        | \<network name from icic\>                      | `openstack network list -c Name -f value`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `use_network_subnet`      | \<subnet id from network name in icic\>         | `openstack network list -c Subnets -f value`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `vm_type`                 | kvm                                             | The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | |
+| `disk_type`               | dasd                                            | The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi`                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | |
+| `openshift_version`       | 4.12                                            | The product version of OpenShift Container Platform, <br>such as `4.12`,`4.13` or `4.14`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)                                                                                                                                                                                                                                                             | |
+| `openshift_minor_version` | 3                                               | The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there                                                                                                                                                                                                                       | 
+| `auto_allocated_ip`       | true                                            | (Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `os_flavor_bootstrap`     | medium                                          | `openstack flavor list`, Minimum flavor disk size >= 35 GiB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | |
+| `os_flavor_master`        | medium                                          | `openstack flavor list`, Minimum flavor disk size >= 35 GiB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | |
+| `os_flavor_worker`        | medium                                          | `openstack flavor list`, Minimum flavor disk size >= 35 GiB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | |
+| `os_control_nodes_number` | 3                                               | (Integer) Number of Red Hat Openshift provisioned control server nodes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | |
+| `os_compute_nodes_number` | 3                                               | (Integer) Number of Red Hat Openshift provisioned compute server nodes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | |
+| `create_server_zone`      | ''                                              | The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>Default value is '', which means to use the default availability zone. <br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`] |
+| `pullsecret`              | \<pull-secret\>                                 | Get from [cloud.redhat.com](https://console.redhat.com/openshift/install/ibmz/user-provisioned)                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `sshkey`                  | \<ssh-key\>                                     | The SSH public key for the core user in RHEL CoreOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `os_dns_domain`           | \<external DNS ip addr\> or \<bastion ip addr\> | If you want to use your external or existing DNS server set `os_dns_domain` to use it, others set bastion machine ip address                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `cluster_name`            | \<cluster-name\>                                | The name of the cluster, such as `openshift`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | 
+| `base_domain`             | \<cluster-base-domain\>                         | The base domain of the cluster, the base domain is used to create routes to your OpenShift Container Platform cluster components, such as `example.com`      <br/>                                                                                                                                                                                                                                                                                                                                                                                    | 
+ | `use_internal_bastion`    | true                                            | (Boolean) true or false, if true then nodes information under /var/named/\<clustername>\.zone and /etc/haproxy/haproxy.cfg will update and remove automatically                                                                                                                                                                                                                                                                                                                                                                                       | 
 
-If you need the Ansible playbook to help configure DNS server or HAProxy server on bastion server, you need to configure correct bastion properties.
-| Property| <div style="width:220px">Default</div> | Description                           |
-| --------------------------------------- | ------------------------------------- |:-----|
-| `ansible_ssh_host` | \<linux server ip addr\> | 'x.x.x.x'<br> **required** when use bastion server, give the IP address of bastion server.
-| `bastion_private_ip_address` | \<bastion ip addr\>      |IP address of your bastion node<br>**required** when use bastion server, give the IP address of bastion server.
-| `dns_forwarder` | \<upstream DNS ip addr\> |For nameserver where requests should be forwarded for resolution.<br>**required** when use bastion server
+If you need the Ansible playbook to help configure DNS server or HAProxy server on bastion server, you need to configure correct bastion properties:
+
+| Property                     | Default                  | Description                                                                                                     |
+|------------------------------|--------------------------|:----------------------------------------------------------------------------------------------------------------|
+| `ansible_ssh_host`           | \<linux server ip addr\> | 'x.x.x.x'<br> **required** when use bastion server, give the IP address of bastion server.                      |
+| `bastion_private_ip_address` | \<bastion ip addr\>      | IP address of your bastion node<br>**required** when use bastion server, give the IP address of bastion server. |
+| `dns_forwarder`              | \<upstream DNS ip addr\> | For nameserver where requests should be forwarded for resolution.<br>**required** when use bastion server       |
 
 Others are **optional**, you can enable them and update value if you need more specified settings.
 
-| Property| <div style="width:220px">Default</div> | Description                           |
-| --------------------------------------- | ------------------------------------- |:-----|
-| `allocation_pool_start` |\<ip range start\> |'x.x.x.x'
-| `allocation_pool_end` |\<ip range end\> |'x.x.x.x'
-| `os_bootstrap_ip` | \<bootstrap ip addr\> |'x.x.x.x, <br>**required** when `auto_allocated_ip` is false
-| `os_master_ip` | \<master ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
-| `os_infra_ip` |\<infra ip list\>|'[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false
-| `volume_type_id` |\<storage template id\>|The bootable volume type from backend storage provider. Get it from `openstack volume type list -c ID -f value`
-| `use_proxy` |false|(Boolean) true or false, if true then Openshft Container Platform will use the proxy setting, get detail from [doc.openshift.com](https://docs.openshift.com/container-platform/4.9/installing/installing_bare_metal/installing-bare-metal.html#installation-configure-proxy_installing-bare-metal)
-| `http_proxy` |\<http-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true
-| `https_proxy` |\<https-proxy\>| `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true
-| `no_proxy` |\<https-proxy\>| A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`
-| `use_localreg` |false| (Boolean) true or false, if true then Openshift Container Platform will use local packages to download
-| `localreg_mirror` |\<local-mirror-registry\>| The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.12/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it.
-| `local_openshift_install` |\<local-openshift-install-url\>| This is always the latest installer download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz), use an SSH or HTTP client to store the Openshift installation package, and put the link here
-| `local_openshift_client` |\<local-openshift-client-url\>| This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here
-| `local_rhcos_image` |\<local-rhcos-image-url\>| This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here
-| `additional_certs` |`{{ lookup('file', '/opt/registry/certs/domain.crt') \| indent (width=2) }}`| The local mirror registry repo additionally need SSL certificated to be accessed, those can be added cert file via the `additional_certs` variable.
-| `create_server_timeout` |10| Default is 10 minutes that used to create instances and volumes from backend storage provider
+| Property                  | <div style="width:220px">Default</div>                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|---------------------------|---------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `allocation_pool_start`   | \<ip range start\>                                      | 'x.x.x.x'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `allocation_pool_end`     | \<ip range end\>                                        | 'x.x.x.x'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `os_bootstrap_ip`         | \<bootstrap ip addr\>                                   | 'x.x.x.x, <br>**required** when `auto_allocated_ip` is false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `os_master_ip`            | \<master ip list\>                                      | '[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `os_infra_ip`             | \<infra ip list\>                                       | '[x.x.x.x, x.x.x.x, x.x.x.x], <br>**required** when `auto_allocated_ip` is false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `volume_type_id`          | \<storage template id\>                                 | The bootable volume type from backend storage provider. Get it from `openstack volume type list -c ID -f value`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `use_proxy`               | false                                                   | (Boolean) true or false, if true then Openshft Container Platform will use the proxy setting, get detail from [doc.openshift.com](https://docs.openshift.com/container-platform/4.9/installing/installing_bare_metal/installing-bare-metal.html#installation-configure-proxy_installing-bare-metal)                                                                                                                                                                                                                                                                              |
+| `http_proxy`              | \<http-proxy\>                                          | `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTP connections outside the cluster. <br>**required** when `use_proxy` is true                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `https_proxy`             | \<https-proxy\>                                         | `http://<username>:<pswd>@<ip>:<port>`, a proxy URL to use for creating HTTPS connections outside the cluster <br>**required** when `use_proxy` is true                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `no_proxy`                | \<https-proxy\>                                         | A comma-separated list of destination domain names, domains, IP addresses, or other network CIDRs to exclude proxying. Preface a domain with . to include all subdomains of that domain. Use * to bypass proxy for all destinations. <br>Such as: `'127.0.0.1,169.254.169.254,172.26.0.0/17,172.30.0.0/16,10.0.0.0/16,10.128.0.0/14,localhost,.api-int.,.example.com.'`                                                                                                                                                                                                          |
+| `use_localreg`            | false                                                   | (Boolean) true or false, if true then Openshift Container Platform will use local packages to download                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `localreg_mirror`         | \<local-mirror-registry\>                               | The name of local mirror registry to use for mirroring the required container images of OpenShift Container Platform for disconnected installations. Following [guide](https://docs.openshift.com/container-platform/4.12/installing/disconnected_install/installing-mirroring-installation-images.html) to setup mirror registry, and we offer temporary script to setup registry and mirror images, you can get scripts from [mirror-registry](tools/mirror-registry/), please update the correct `PULL_SECRET` and `VERSION` in `01-mirror-registry.sh` script before use it. |
+| `local_openshift_install` | \<local-openshift-install-url\>                         | This is always the latest installer download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz), use an SSH or HTTP client to store the Openshift installation package, and put the link here                                                                                                                                                                                                                                                                                                                               |
+| `local_openshift_client`  | \<local-openshift-client-url\>                          | This is always the latest client download [link](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz), use an SSH or HTTP client to store the Openshift client package, and put the link here                                                                                                                                                                                                                                                                                                                                         |
+| `local_rhcos_image`       | \<local-rhcos-image-url\>                               | This is all rhcos images download [link](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/latest/), download the name that corresponds with KVM or z/VM images, and use an SSH or HTTP client to store it, put the link here                                                                                                                                                                                                                                                                                                                               |
+| `additional_certs`        | `{{ lookup('file', '/opt/registry/certs/domain.crt')}}` | The local mirror registry repo additionally need SSL certificated to be accessed, those can be added cert file via the `additional_certs` variable.                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | indent (width=2) }}`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | The local mirror registry repo additionally need SSL certificated to be accessed, those can be added cert file via the `additional_certs` variable.
+| `create_server_timeout`   | 10                                                      | Default is 10 minutes that used to create instances and volumes from backend storage provider                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+
 
 **Note**: Check [OpenShift on a single node](./SNO.md) for how to define single node cluster.
 
@@ -341,29 +347,17 @@ Others are **optional**, you can enable them and update value if you need more s
 ansible-playbook -i inventory.yaml 01-preparation.yaml
 ```
 
+**Please notice:**: 
+>1. We will default treat bastion server and localhost server as a same one.
+>2. If you want to use your external or existing DNS and Load Balancer, please change `use_internal_bastion: true` to `use_internal_bastion: false` in inventory.yaml. Also refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS and Load Balancer records manually.
+
 2. **Step2**:
-
-**Note**: This step is optional. You can skip this step if you want to use your external or existing DNS and Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update it.
-
-> Use this playbook to configure the DNS server and HAProxy, please add `-K` parameter if you use the non-root user, and enter the password for your user.
-```sh
-ansible-playbook -i inventory.yaml bastion.yaml
-or
-ansible-playbook -i inventory.yaml bastion.yaml -K
-```
-
-> If you use your external or existing DNS server, but no Load Balancer, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update DNS server part, and use this playbook to configure HAProxy in your bastion server.
-```sh
-ansible-playbook -i inventory.yaml configure-haproxy.yaml
-```
-
-3. **Step3**:
 
 ```sh
 ansible-playbook -i inventory.yaml 02-create-cluster-control.yaml
 ```
 
-4. **Step4**:
+3. **Step3**:
 
 ```sh
 ansible-playbook -i inventory.yaml 03-create-cluster-compute.yaml
@@ -375,7 +369,7 @@ After above steps, you will get one ready OpenShift Container Platform on the IB
 
 #### Any above steps failed, clean up environment and then rerun the installation steps.
 
-+ Failed on `01-preparation.yaml` ,`bastion.yaml` and `02-create-cluster-control.yaml`.
++ Failed on `01-preparation.yaml` and `02-create-cluster-control.yaml`.
   
   - use: `ansible-playbook -i inventory.yaml 04-destroy.yaml`
 
@@ -394,16 +388,15 @@ Use this playbook to add a new compute node as fixed IP:
 ```sh
 ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x
 ```
-Use this playbook to add multiple compute nodes as allocated IP, and update bastion info automatically:
+Use this playbook to add multiple compute nodes as allocated IP:
 ```sh
-ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e worker_number=3 -e update_bastion=true
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e worker_number=3 
 ```
-Use this playbook to add multiple compute nodes as fixed IP, separate the IP list with commas, and update bastion info automatically:
+Use this playbook to add multiple compute nodes as fixed IP, separate the IP list with commas:
 ```sh
-ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x,x.x.x.x -e worker_number=2 -e update_bastion=true
+ansible-playbook -i inventory.yaml add-new-compute-node.yaml -e ip=x.x.x.x,x.x.x.x -e worker_number=2
 ```
-**Please notice:**
-> If you use your own bastion server, you can refer [Add-DNS-HAProxy](docs/add-dns-haproxy.md) to update bastion info.
+
 
 ## Uninstall Red Hat OpenShift Container Platform
 `ansible-playbook -i inventory.yaml 04-destroy.yaml`

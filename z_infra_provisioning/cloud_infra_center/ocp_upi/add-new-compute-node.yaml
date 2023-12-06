@@ -1,7 +1,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2023 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -240,6 +240,10 @@
 
 - hosts: bastion
   tasks:
+    - name: 'Check whether use internal bastion'
+      set_fact:
+        use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
+
     - name: 'Modify bastion dns for new worker'
       ansible.builtin.include_tasks: modify-dns.yaml
       vars:
@@ -248,9 +252,8 @@
         cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
       with_items: "{{ hostvars['localhost']['workers_list'] }}" 
       when:
-        - update_bastion is defined
-        - update_bastion == "true"
-    
+        - use_internal_bastion == true
+
     - name: 'Modify bastion haproxy for new worker'
       ansible.builtin.include_tasks: modify-haproxy.yaml
       vars:
@@ -258,24 +261,21 @@
         cluster_domain_name:  "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
       with_items: "{{ hostvars['localhost']['workers_list'] }}" 
       when:
-        - update_bastion is defined
-        - update_bastion == "true"
-    
+        - use_internal_bastion == true
+
     - name: Restart named-chroot.service
       ansible.builtin.service:
         name: named-chroot.service
         state: restarted
       when:
-        - update_bastion is defined
-        - update_bastion == "true"
+        - use_internal_bastion == true
 
     - name: Restart HAProxy.service
       ansible.builtin.service:
         name: haproxy.service
         state: restarted
       when:
-        - update_bastion is defined
-        - update_bastion == "true"
+        - use_internal_bastion == true
 
     - name: Check if named-chroot is running
       ansible.builtin.service:

@@ -17,7 +17,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2023 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -83,6 +83,7 @@ all:
       dns_forwarder: '<upstream-dns-ip-addr>'
 
   vars:
+    use_internal_bastion: true
     os_dns_domain: '<external-dns-ip-addr>'
     cluster_name: '<cluster-name>'
     base_domain: '<cluster-base-domain>'
