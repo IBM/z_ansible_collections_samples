@@ -12,7 +12,7 @@ worker_end=$(($2 - 1))
 
 for index in $( seq 0 $worker_end); do
     WORKER_HOSTNAME="$infra_id-worker-$index\n"
-    python -c "import base64, json, sys
+    python3 -c "import base64, json, sys
 ignition = json.load(sys.stdin)
 storage = ignition.get('storage', {})
 files = storage.get('files', [])
