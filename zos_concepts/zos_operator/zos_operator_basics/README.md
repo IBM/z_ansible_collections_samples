@@ -25,7 +25,7 @@ This playbook requires:
 
 ## Getting Started
 If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../docs/share/configuration_guide.md) or
+[detailed configuration guide](../../../docs/share/zos_core/configuration_guide.md) or
 continue with getting started below.
 
 ## Configuration
