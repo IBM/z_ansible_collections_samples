@@ -25,7 +25,7 @@ This playbook requires:
   - Review [inventory documentation](../../../docs/share/zos_core/configure_inventory.md)
 - Configure the included **host_vars** [zos_host.yml](inventories/host_vars/zos_host.yml)
   with the information from your z/OS system.
-  - Review [host_vars documentation](../../../docs/share/zos_core/configure_host_vars.md)
+  - Review [host_vars documentation](../../docs/share/zos_core/configure_host_vars.md)
     and any additional noted variables in the configuration.
 - If using ibm.ibm_zos_core prior to 1.4.0-beta.1, you will need to add a line into the playbook
   - at the top, in the 'hosts' section, there must be a line:
@@ -65,5 +65,5 @@ Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
-Please refer to the [support section](../../../README.md#support) for more
+Please refer to the [support section](../../README.md#support) for more
 details.

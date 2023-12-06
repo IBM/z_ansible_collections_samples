@@ -77,5 +77,5 @@ Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0)
 
 # Support
-Please refer to the [support section](../../../README.md#support) for more
+Please refer to the [support section](../../README.md#support) for more
 details.

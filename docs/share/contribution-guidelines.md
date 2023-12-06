@@ -17,7 +17,7 @@ the [Apache 2 license](../../LICENSE)
 
 ## Developer Certificate of Origin
 The **Ansible for IBM Z playbook repository** requires the use of the
-[Developer’s Certificate of Origin 1.1 (DCO)](https://developercertificate.orgx`)
+[Developer’s Certificate of Origin 1.1 (DCO)](https://developercertificate.org)
 which is the same mechanism that the Linux® Kernel and many other communities
 use to manage code contributions.
 
@@ -162,7 +162,7 @@ The purpose of this section is to provide some helpful reference that you can
 follow up that may aid you in developing Ansible playbooks.
 - [Ansible Concepts](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#ansible-concepts)
 - [Introduction to playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#intro-to-playbooks)
-- [Writing tasks, plays, and playbooks](https://docs.ansible.com/ansible/latest/user_guide/index.html#writing-tasks-plays-and-playbooks)
+- [Working with playbooks](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks.html#working-with-playbooks)
 - [Complete Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/index.html#user-guide)
 
 ### Roles
@@ -248,9 +248,9 @@ to assist with formatting and syntax highlighting. Since there are so many
 IDEs available, brief mention that many use VSCode.
 
 - Some popular plugins for VSCode for YAML an Ansible are:
-  - [Ansible Language](https://marketplace.visualstudio.com/items?itemName=zbr.vscode-ansible)
+  - [Ansible Language](https://marketplace.visualstudio.com/items?itemName=redhat.ansible)
     from Red Hat® which supports displaying violations identified by
-    ansible-ling and yaml-lint
+    ansible-lint and yaml-lint
   - [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
     from Red Hat which offers YAML validation, outlining, auto completion, hover
     text and formatting.
@@ -333,12 +333,9 @@ Consider:
     [documentation](https://docs.ansible.com/ansible/latest/collections/index_module.html)
 
 #### Linting
-At this time, linting is not required by this community but in the near future
-as the repository begins to mature, you can expect bots or a pipeline to be in
-place that will require playbook standards be enforced such linting that could
-come from
-[ansible-lint](https://ansible-lint.readthedocs.io/en/latest/usage.html#linting-playbooks-and-roles)
-and [yamllint](https://yamllint.readthedocs.io/en/stable/index.html)
+A bot is currently in place to enforce syntax and style guidelines for
+playbooks, roles, and collections as defined by [ansible-lint](https://ansible.readthedocs.io/projects/lint/)
+
 
 #### Indentation, breaking long lines, comments, etc
 Ansible Playbooks are written in YAML and therefore playbooks inherit
