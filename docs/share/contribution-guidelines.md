@@ -162,7 +162,7 @@ The purpose of this section is to provide some helpful reference that you can
 follow up that may aid you in developing Ansible playbooks.
 - [Ansible Concepts](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#ansible-concepts)
 - [Introduction to playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#intro-to-playbooks)
-- [Writing tasks, plays, and playbooks](https://docs.ansible.com/ansible/latest/user_guide/index.html#writing-tasks-plays-and-playbooks)
+- [Working with playbooks](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks.html#working-with-playbooks)
 - [Complete Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/index.html#user-guide)
 
 ### Roles
