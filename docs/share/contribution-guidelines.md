@@ -248,9 +248,9 @@ to assist with formatting and syntax highlighting. Since there are so many
 IDEs available, brief mention that many use VSCode.
 
 - Some popular plugins for VSCode for YAML an Ansible are:
-  - [Ansible Language](https://marketplace.visualstudio.com/items?itemName=zbr.vscode-ansible)
+  - [Ansible Language](https://marketplace.visualstudio.com/items?itemName=redhat.ansible)
     from Red Hat® which supports displaying violations identified by
-    ansible-ling and yaml-lint
+    ansible-lint and yaml-lint
   - [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
     from Red Hat which offers YAML validation, outlining, auto completion, hover
     text and formatting.
