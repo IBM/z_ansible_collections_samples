@@ -333,12 +333,9 @@ Consider:
     [documentation](https://docs.ansible.com/ansible/latest/collections/index_module.html)
 
 #### Linting
-At this time, linting is not required by this community but in the near future
-as the repository begins to mature, you can expect bots or a pipeline to be in
-place that will require playbook standards be enforced such linting that could
-come from
-[ansible-lint](https://ansible-lint.readthedocs.io/en/latest/usage.html#linting-playbooks-and-roles)
-and [yamllint](https://yamllint.readthedocs.io/en/stable/index.html)
+A bot is currently in place to enforce syntax and style guidelines for
+playbooks, roles, and collections as defined by [ansible-lint](https://ansible.readthedocs.io/projects/lint/)
+
 
 #### Indentation, breaking long lines, comments, etc
 Ansible Playbooks are written in YAML and therefore playbooks inherit
