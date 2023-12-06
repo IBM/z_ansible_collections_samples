@@ -1,0 +1,34 @@
+/* REXX */
+/******************************************************************************
+* © Copyright IBM Corporation 2023
+******************************************************************************/
+
+parse arg file_name
+say 'Data set that will be accessed:' file_name
+
+file_name = "'" || file_name || "'"
+dsinfo = LISTDSI(FILE_NAME)
+
+if dsinfo == 0 then
+do
+  say 'Data Set Name..............:' SYSDSNAME
+  say 'Volume Serial ID...........:' SYSVOLUME
+  say 'Device Type................:' SYSUNIT
+  say 'Data Set Type..............:' SYSDSORG
+  say 'Record Format..............:' SYSRECFM
+  say 'Record Length..............:' SYSLRECL
+  say 'Record Block Size..........:' SYSBLKSIZE
+  say 'Key Length.................:' SYSKEYLEN
+  say 'Data Set Created...........:' SYSCREATE
+  say 'Data Set Last Referenced...:' SYSREFDATE
+  say 'Data Set Updated...........:' SYSUPDATED
+  say 'Data Set Type(PS/PDS)......:' SYSDSSMS
+  say dsinfo
+end
+else
+do
+  say dsinfo
+  say 'Data set not found'
+end
+
+return 0

@@ -1,0 +1,61 @@
+/* REXX */
+/******************************************************************************
+* © Copyright IBM Corporation 2023
+******************************************************************************/
+arg options
+parse var options param
+upper param
+parse var param 'JOBID=' jobid ' OWNER=' owner,
+' JOBNAME=' jobname
+
+rc=isfcalls('ON')
+
+jobid = strip(jobid,'L')
+if (jobid <> '') then
+do
+    ISFFILTER='JobID EQ '||jobid
+end
+
+owner = strip(owner,'L')
+if (owner <> '') then
+do
+    ISFOWNER=owner
+end
+
+jobname = strip(jobname,'L')
+if (jobname <> '') then
+do
+    ISFPREFIX=jobname
+end
+
+address SDSF "ISFEXEC ST (ALTERNATE DELAYED)"
+if rc<>0 then
+do
+    say '[]'
+    exit 0
+end
+
+if isfrows == 0 then
+do
+    say '-----NO JOBS FOUND-----'
+end
+else
+do
+    do ix=1 to isfrows
+        say '-----START OF JOB-----'
+        say 'position:'||ix
+        say 'job_id'||':'||value('JOBID'||"."||ix)||'..JOBID.'||ix
+        say 'job_name'||':'||value('JNAME'||"."||ix)
+        say 'subsystem'||':'||value('ESYSID'||"."||ix)
+        say 'system'||':'||value('SYSNAME'||"."||ix)
+        say 'owner'||':'||value('OWNERID'||"."||ix)
+        say 'ret_code_msg'||':'||value('RETCODE'||"."||ix)
+        say 'class'||':'||value('JCLASS'||"."||ix)
+        say 'content_type'||':'||value('JTYPE'||"."||ix)
+        say '-----END OF JOB-----'
+    end
+end
+
+rc=isfcalls('OFF')
+
+return 0

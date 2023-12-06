@@ -1,0 +1,30 @@
+################################################################################
+# Copyright (c) IBM Corporation 2023
+################################################################################
+
+################################################################################
+# List `requires_ansible_version` contains Ansible version entries that this
+# playbook requires. It can be one more then one Ansible version
+# e.g, `- 2.9` would be interpreted as 2.9 - 2.9.n where n is >= 0. Where `- 2.9.0`
+# would be require an exact match, just like 2.9.12 would be an exact match.
+#
+# Dictionary `requires_collection` can include more than one collection such as
+# in the case a playbook depends on other IBM z collections.
+# e.g,
+# requires_collection:
+#    - ibm_zos_core:
+#        name: "ibm_zos_core"
+#        version: "1.4.0-beta.1"
+#    - ibm_zos_ims:
+#        name: "ibm_zos_ims"
+#        version: "1.4.0-beta.1"
+################################################################################
+
+requires_ansible_version:
+    - "2.14"
+    - "2.15"
+
+requires_collection:
+    - ibm_zos_core:
+          name: "ibm_zos_core"
+          version: "1.8.0"
