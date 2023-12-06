@@ -17,7 +17,7 @@ the [Apache 2 license](../../LICENSE)
 
 ## Developer Certificate of Origin
 The **Ansible for IBM Z playbook repository** requires the use of the
-[Developer’s Certificate of Origin 1.1 (DCO)](https://developercertificate.orgx`)
+[Developer’s Certificate of Origin 1.1 (DCO)](https://developercertificate.org)
 which is the same mechanism that the Linux® Kernel and many other communities
 use to manage code contributions.
 
