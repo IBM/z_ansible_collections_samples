@@ -32,7 +32,6 @@
 - name: Show utility id
   ansible.builtin.debug:
     msg: "Db2 Automation Expert evaluation id: {{ daj_util_evaluation_id }}"
-  when: daj_util_verbose
 
 - name: Get generated utility
   ansible.builtin.uri:
@@ -56,8 +55,24 @@
 
 - name: Show utility control cards
   ansible.builtin.debug:
-    msg: "{{ daj_util_output.json.actionList.actions[0].controlCardBufferRaw.split('\n') }}"
+    msg: "{{ item.controlCardBufferRaw.split('\n') }}"
   when: daj_util_verbose
+  loop: "{{ daj_util_output.json.actionList.actions }}"
+  loop_control:
+    label: "{{ item.targetType + ': ' + item.targetQualifier + '.' + item.targetObject }}"
+
+- name: Extract action ids
+  ansible.builtin.set_fact:
+    daj_util_action_ids: "{{ daj_util_output.json.actionList.actions | map(attribute='actionIdentifier') }}"
+
+- name: List action ids
+  ansible.builtin.debug:
+    msg: "{{ daj_util_action_ids }}"
+  when: daj_util_verbose
+
+
+#- name: Artificial pause
+#  ansible.builtin.pause:
 
 - name: Run generated utility
   ansible.builtin.uri:
@@ -76,10 +91,10 @@
       Authorization: "Bearer {{ ums_access_token }}"
   register: daj_util_output
 
-- name: Get utility status
+- name: Get utility status for action 
   ansible.builtin.uri:
     url: "https://{{ ums_server }}:{{ ums_port }}/ws/plugin/db2/automation-expert/utility/\
-      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/evaluation/{{ daj_util_evaluation_id }}"
+      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/action/{{ item }}"
     ca_path: "{{ ums_ca_path }}"
     validate_certs: "{{ ums_validate_certs }}"
     method: GET
@@ -89,11 +104,15 @@
       Authorization: "Bearer {{ ums_access_token }}"
   register: daj_util_output
   retries: "{{ daj_util_ums_retries }}"
-  until: daj_util_output.json.actionList.actions[0].status in [ "COMPLETED", "ERROR" ]
+  until: daj_util_output.json.actionList and daj_util_output.json.actionList.actions[0].status in [ "COMPLETED", "ERROR" ]
   delay: "{{ daj_util_ums_delay }}"
   failed_when: daj_util_output.json.actionList.actions[0].status != "COMPLETED"
+  loop: "{{ daj_util_action_ids }}"
 
 - name: Show utility output
   ansible.builtin.debug:
-    msg: "{{ daj_util_output.json.actionList.actions[0].executionOutputRaw.split('\n') }}"
+    msg: "{{ item.executionOutputRaw.split('\n') }}"
   when: daj_util_verbose
+  loop: "{{ daj_util_output.results | map(attribute='json') | map(attribute='actionList') | flatten(1) | map(attribute='actions') |flatten(1) }}"
+  loop_control:
+   label: "{{ item.targetObject }}"
