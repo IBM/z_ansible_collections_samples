@@ -17,7 +17,7 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2023 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -61,3 +61,38 @@
       ansible.builtin.shell:
         cmd: "openstack server delete {{ item.1 }}"
       with_indexed_items: "{{ computes.stdout_lines }}"
+
+- hosts: bastion
+  tasks:
+    - name: 'Check whether use internal bastion'
+      set_fact:
+        use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
+
+    - name: 'Set fact of domain info'
+      set_fact:
+        cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
+
+    - name: 'Validate worker exits'
+      ansible.builtin.shell: | 
+        count=$(grep -c 'worker' /var/named/{{ cluster_domain_name  }}.zone)
+        echo $count
+      register: worker_exist_count
+
+    - name: 'Get the line number of the worker'
+      ansible.builtin.shell: grep 'worker' /var/named/{{ cluster_domain_name  }}.zone
+      register: worker_ln
+      when: worker_exist_count.stdout | int > 0
+
+    - name: Remove /etc/haproxy/haproxy.cfg info with workers
+      ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /etc/haproxy/haproxy.cfg
+      with_items: "{{ worker_ln.stdout_lines }}"
+      when:
+        - worker_exist_count.stdout | int > 0
+        - use_internal_bastion == true
+
+    - name: Remove bastion dns info with workers
+      ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /var/named/{{ cluster_domain_name  }}.zone
+      with_items: "{{ worker_ln.stdout_lines }}"
+      when:
+        - worker_exist_count.stdout | int > 0
+        - use_internal_bastion ==  true

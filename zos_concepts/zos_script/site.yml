@@ -1,0 +1,34 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook (`site.yml`) is the master playbook for this project. Based on
+# the playbooks requirments, `site.yml` playbook will evalute the requirements
+# and report when the minimum requirements are not configured and fail playbook
+# execution.
+#
+# Upon successful dependency analyais, the z/OS playbook will be executed.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories site.yml
+#  ansible-playbook -i inventories site.yml -v
+###############################################################################
+
+
+---
+- hosts: localhost
+
+  tasks:
+    - name: Parse the registry for collection entries
+      include_vars: runtime-requirements.yml
+
+    - name: Display the registered collections and properties in `registry.yml`.
+      include_role:
+        name: requirements-check
+
+- name: Execute the z/OS Ansible playbook, running a variety of scripts on a managed node.
+  import_playbook: zos_script.yml
