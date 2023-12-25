@@ -1,0 +1,118 @@
+- name: Verify input
+  ansible.builtin.debug:
+    msg: "Please authenticate with UMS first"
+  when: ums_access_token == ''
+  failed_when: ums_access_token == ''
+
+- name: Generate utility
+  ansible.builtin.uri:
+    url: "https://{{ ums_server }}:{{ ums_port }}/ws/plugin/db2/automation-expert/utility/\
+      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/generate-utility"
+    ca_path: "{{ ums_ca_path }}"
+    validate_certs: "{{ ums_validate_certs }}"
+    method: POST
+    body: '{
+      "utilityName": "{{ daj_util_name }}",
+      {% if daj_util_profile_creator %} "profileCreator": "{{ daj_util_profile_creator }}", {% endif %}
+      {% if daj_util_profile_name %} "profileName": "{{ daj_util_profile_name }}", {% endif %}
+      "objects": {{ daj_util_objects }}
+      }'
+    body_format: json
+    status_code: 200
+    headers:
+      Accept: "application/json"
+      Authorization: "Bearer {{ ums_access_token }}"
+  register: daj_util_output
+  failed_when: daj_util_output.json.error or (daj_util_output.json.evaluationId | int) < 0
+
+- name: Register utility id
+  ansible.builtin.set_fact:
+    daj_util_evaluation_id: "{{ daj_util_output.json.evaluationId }}"
+
+- name: Show utility id
+  ansible.builtin.debug:
+    msg: "Db2 Automation Expert evaluation id: {{ daj_util_evaluation_id }}"
+
+- name: Get generated utility
+  ansible.builtin.uri:
+    url: "https://{{ ums_server }}:{{ ums_port }}/ws/plugin/db2/automation-expert/utility/\
+      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/evaluation/{{ daj_util_evaluation_id }}"
+    ca_path: "{{ ums_ca_path }}"
+    validate_certs: "{{ ums_validate_certs }}"
+    method: GET
+    status_code: 200
+    headers:
+      Accept: "application/json"
+      Authorization: "Bearer {{ ums_access_token }}"
+  register: daj_util_output
+  retries: "{{ daj_util_ums_retries }}"
+  until: daj_util_output.json.error is none
+  delay: "{{ daj_util_ums_delay }}"
+  failed_when: >
+    ( daj_util_output.json.error and
+    not (daj_util_output.json.error.aeError.returnCode == 4 and daj_util_output.json.error.aeError.reasonCode == 4) ) or
+    ( daj_util_output.json.actionList is defined and daj_util_output.json.actionList is none )
+
+- name: Show utility control cards
+  ansible.builtin.debug:
+    msg: "{{ item.controlCardBufferRaw.split('\n') }}"
+  when: daj_util_verbose
+  loop: "{{ daj_util_output.json.actionList.actions }}"
+  loop_control:
+    label: "{{ item.targetType + ': ' + item.targetQualifier + '.' + item.targetObject }}"
+
+- name: Extract action ids
+  ansible.builtin.set_fact:
+    daj_util_action_ids: "{{ daj_util_output.json.actionList.actions | map(attribute='actionIdentifier') }}"
+
+- name: List action ids
+  ansible.builtin.debug:
+    msg: "{{ daj_util_action_ids }}"
+  when: daj_util_verbose
+
+
+#- name: Artificial pause
+#  ansible.builtin.pause:
+
+- name: Run generated utility
+  ansible.builtin.uri:
+    url: "https://{{ ums_server }}:{{ ums_port }}/ws/plugin/db2/automation-expert/utility/\
+      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/execute/evaluation"
+    ca_path: "{{ ums_ca_path }}"
+    validate_certs: "{{ ums_validate_certs }}"
+    method: PUT
+    body: '{
+      "evaluationId": "{{ daj_util_evaluation_id }}"
+      }'
+    body_format: json
+    status_code: 200
+    headers:
+      Accept: "application/json"
+      Authorization: "Bearer {{ ums_access_token }}"
+  register: daj_util_output
+
+- name: Get utility status for action 
+  ansible.builtin.uri:
+    url: "https://{{ ums_server }}:{{ ums_port }}/ws/plugin/db2/automation-expert/utility/\
+      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/action/{{ item }}"
+    ca_path: "{{ ums_ca_path }}"
+    validate_certs: "{{ ums_validate_certs }}"
+    method: GET
+    status_code: 200
+    headers:
+      Accept: "application/json"
+      Authorization: "Bearer {{ ums_access_token }}"
+  register: daj_util_output
+  retries: "{{ daj_util_ums_retries }}"
+  until: daj_util_output.json.actionList and daj_util_output.json.actionList.actions[0].status in [ "COMPLETED", "ERROR" ]
+  delay: "{{ daj_util_ums_delay }}"
+  failed_when: daj_util_output.json.actionList.actions[0].status != "COMPLETED"
+  loop: "{{ daj_util_action_ids }}"
+
+- name: Show utility output
+  ansible.builtin.debug:
+    msg: "{{ item.executionOutputRaw.split('\n') }}"
+  when: daj_util_verbose
+  loop: "{{ daj_util_output.results | map(attribute='json') | map(attribute='actionList') | flatten(1) | map(attribute='actions') |flatten(1) }}"
+  loop_control:
+   label: "{{ item.targetObject }}"

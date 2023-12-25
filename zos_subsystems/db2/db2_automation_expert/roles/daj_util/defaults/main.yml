@@ -1,0 +1,28 @@
+# Db2 subsystem name where the utility will be run
+daj_util_ssid: DSN
+
+# The sysname (LPAR) where the utility will be run
+daj_util_sysname: SYS1
+
+# The name of the utility.
+# currently supported: COPY, REORG, and RUNSTATS
+daj_util_name: REORG
+
+# Db2 Automation Expert utility profile to be used
+# If you leave the parameter empty, the default profile will be used.
+#
+daj_util_profile_creator: 
+daj_util_profile_name: 
+
+# List of one or more objects
+daj_util_objects: [
+  {
+    "objectType": "TS",
+    "databaseName": "DSN8D13A",
+    "objectName": "DSN8S13E"
+  }
+]
+
+# Number of retries and delay (in seconds) for synchronous operations
+daj_util_ums_retries: 5
+daj_util_ums_delay: 5

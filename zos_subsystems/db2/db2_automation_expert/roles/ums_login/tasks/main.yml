@@ -1,0 +1,33 @@
+- name: Verify input
+  ansible.builtin.debug:
+    msg: "Please set environment variables UMS_USERNAME and UMS_PASSWORD"
+  when: ums_username == '' or ums_password == ''
+  failed_when: ums_username == '' or ums_password == ''
+
+- name: Authenticate User
+  ansible.builtin.uri:
+    url: "https://{{ ums_server }}:{{ ums_port }}/ws/security/login"
+    ca_path: "{{ ums_ca_path }}"
+    validate_certs: "{{ ums_validate_certs }}"
+    method: POST
+    body: '{
+      "id": "{{ ums_username }}",
+      "password": "{{ ums_password }}"
+      }'
+    body_format: json
+    status_code: 200
+    headers:
+      Accept: "application/json"
+  register: output
+
+- name: Register bearer token
+  ansible.builtin.set_fact:
+    ums_access_token: "{{ output.json['accessToken'] }}"
+    ums_refresh_token: "{{ output.json['refreshToken'] }}"
+
+- name: Show tokens
+  ansible.builtin.debug:
+    msg:
+      - "UMS access token: {{ ums_access_token }}"
+      - "UMS refresh token: {{ ums_access_token }}"
+    verbosity: 1
