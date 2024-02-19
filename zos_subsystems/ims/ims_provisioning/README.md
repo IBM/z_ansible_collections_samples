@@ -58,8 +58,8 @@ Inside each role:
 
 
 ## Ansible Collection Requirements
-* IBM z/OS core collection 1.2.1
-* IBM z/OS IMS collection 1.1.0
+* IBM z/OS core collection 1.6.0
+* IBM z/OS IMS collection 1.3.0-beta.1
 
 ## Getting Started
 
