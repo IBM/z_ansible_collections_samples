@@ -153,7 +153,7 @@
             macb_enabled: "{{ MANAGED_ACB_ENABLED }}"
         
         - ansible.builtin.include_role:
-            name: image_copy 
+            name: ims_catalog_image_copy 
           with_items:
             - "{{ to_image_copy }}" 
           vars: 

@@ -6,9 +6,9 @@ Create [image copies](https://www.ibm.com/docs/en/ims/15.3.0?topic=copies-image-
 Requirements
 ------------
 
-[IBM&reg; z/OS&reg; core collection 1.6.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+[IBM&reg; z/OS&reg; core collection 1.5.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 
-[IBM&reg; z/OS&reg; IMS collection 1.3.0-beta.1](https://galaxy.ansible.com/ibm/ibm_zos_ims)
+[IBM&reg; z/OS&reg; IMS collection 1.3.0-beta.1 or later](https://galaxy.ansible.com/ibm/ibm_zos_ims)
 
 Role Variables
 --------------
@@ -40,7 +40,7 @@ Example Playbook
 Copyright
 ---------
 
-© Copyright IBM Corporation 2023
+© Copyright IBM Corporation 2024
 
 License
 -------
