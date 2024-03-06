@@ -107,7 +107,8 @@
         type: pds
         format: fba
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: M
       register: result
 
     - name: Response for creating the PDS
@@ -160,7 +161,7 @@
         encoding:
           from: ISO8859-1
           to: "{{ target_charset }}"
-        force: True
+        force: True #  overwrite file from previous copy operation.
       register: result
 
     - name: Response for copying
