@@ -151,7 +151,7 @@
 
     - name: Setting fact `job_id_pds` for id of job submitted above
       set_fact:
-        job_id_pds: "{{ result.results[0].job_id }}"
+        job_id_pds: "{{ result.results[0].jobs[0].job_id }}"
 
     - name: Fact `job_id_pds` set with value
       debug:
@@ -197,7 +197,7 @@
 
     - name: Setting fact `job_id_uss` for id of job submitted above
       set_fact:
-        job_id_uss: "{{ result.job_id }}"
+        job_id_uss: "{{ result.jobs[0].job_id }}"
 
     - name: Fact `job_id_uss` set with value
       debug:
