@@ -94,7 +94,6 @@
       zos_job_submit:
         src: "{{ tmp_data_set }}(PSA)"
         location: DATA_SET
-        wait: true
       register: result_submit_psa
 
     - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
@@ -105,7 +104,6 @@
       zos_job_submit:
         src: "{{ tmp_data_set }}(UPTIME)"
         location: DATA_SET
-        wait: true
       register: result_submit_uptime
 
     - name: "Response for submitting JCL {{ tmp_data_set }}(UPTIME)"
