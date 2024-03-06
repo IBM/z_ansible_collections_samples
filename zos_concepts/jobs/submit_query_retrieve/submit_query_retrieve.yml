@@ -84,21 +84,6 @@
       debug:
         msg: "{{ result }}"
 
-    # +-------------------------------------------------------------------------
-    # | "with_sequence" is a type of conditional Ansible loop. The loop here
-    # | only runs for a single iteration and is included solely to demonstrate
-    # | how easy it is to perform the operation for multiple members. The result
-    # | is that single member 'MEM1' is created.
-    # +-------------------------------------------------------------------------
-
-    - name: Create a PDS member and replace if member exist
-      zos_data_set:
-        name: "{{ data_set_name }}(MEM{{ item }})"
-        type: MEMBER
-        replace: true
-      with_sequence: count=1
-      register: result
-
     - name: Response for create a PDS member and replace if member exist
       debug:
         msg: "{{ result }}"
@@ -139,9 +124,10 @@
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
-    # | Similar to how the PDS member was created earlier, this is another
-    # | Ansible loop with a single iteration designed to showcase how multiple
-    # | jobs could be submitted under a single task for members of a single PDS
+    # | "with_sequence" is a type of conditional Ansible loop. The loop here
+    # | only runs for a single iteration and is included solely to demonstrate
+    # | how multiple jobs could be submitted under a single task for members of
+    # | a single PDS.
     # +-------------------------------------------------------------------------
 
     - name: Submit the JCL {{ data_set_name }}(MEM1)
