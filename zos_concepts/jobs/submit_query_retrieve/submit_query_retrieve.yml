@@ -74,7 +74,8 @@
       zos_data_set:
         name: "{{ data_set_name }}"
         type: pds
-        size: 5M
+        space_primary: 5
+        space_type: M
         format: fb
         record_length: 80
         replace: true
