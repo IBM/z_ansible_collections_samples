@@ -610,147 +610,147 @@
             batch:
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP00"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS00"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP01"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS01"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP02"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS02"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 2
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP03"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS03"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP04"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS04"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP05"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS05"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLP99"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OLS99"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDS"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: seq
+                type: SEQ
                 space_secondary: 0
                 space_primary: 10
                 space_type: CYL
@@ -760,164 +760,164 @@
                 block_size: 0
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSTRA01"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 20080
                 block_size: 20084
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSTRA02"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 record_length: 20080
                 block_size: 20084
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.QBLKS"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: seq
+                type: SEQ
                 space_primary: 12
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SHMSG"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SHMSG1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: seq
+                type: SEQ
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: pds
+                type: PDS
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGMSG2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                type: pds
+                type: PDS
                 space_primary: 22
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBCP1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 space_primary: 3
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBCP2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 space_primary: 23
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MSDBDUMP"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
                 space_primary: 23
-                space_type: cyl
+                space_type: CYL
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: u
+                record_format: U
                 record_length: 140
                 block_size: 150
-                space_type: cyl
-                type: seq
+                space_type: CYL
+                type: SEQ
                 space_primary: 12
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: u
+                record_format: U
                 record_length: 140
                 block_size: 150
-                space_type: cyl
-                type: seq
+                space_type: CYL
+                type: SEQ
                 space_primary: 12
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO3"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: u
+                record_format: U
                 record_length: 140
                 block_size: 150
-                space_type: cyl
-                type: seq
+                space_type: CYL
+                type: SEQ
                 space_primary: 12
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SYSO4"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: u
+                record_format: U
                 record_length: 140
                 block_size: 150
-                space_type: cyl
-                type: seq
+                space_type: CYL
+                type: SEQ
                 space_primary: 12
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.EXITLIB"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: u
+                record_format: U
                 block_size: 32760
                 directory_blocks: 92
-                space_type: cyl
-                type: pds
+                space_type: CYL
+                type: PDS
                 space_primary: 6
                 space_secondary: 2
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS1"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 block_size: 32760
                 record_length: 32756
-                type: seq
-                space_type: cyl
+                type: SEQ
+                space_type: CYL
                 space_primary: 5
                 space_secondary: 5
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS2"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 block_size: 32760
                 record_length: 32756
-                space_type: cyl
-                type: seq
+                space_type: CYL
+                type: SEQ
                 space_primary: 5
                 space_secondary: 5
                 state: present
                 replace: true
               - name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RDDS3"
                 volumes: "{{ DFS_DS_VOLUME1 }}"
-                record_format: vb
+                record_format: VB
                 block_size: 32760
                 record_length: 32756
-                space_type: cyl
-                type: seq
+                space_type: CYL
+                type: SEQ
                 space_primary: 5
                 space_secondary: 5
                 state: present

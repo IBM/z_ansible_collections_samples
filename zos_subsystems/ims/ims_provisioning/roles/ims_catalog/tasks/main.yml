@@ -20,7 +20,7 @@
                 record_format: FB
                 record_length: 80
                 block_size: 3200
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 50
                 space_secondary: 10
@@ -31,7 +31,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -42,7 +42,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -53,7 +53,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -64,7 +64,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -76,7 +76,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -87,7 +87,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -98,7 +98,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -109,7 +109,7 @@
                 record_format: FB
                 record_length: 4096
                 block_size: 4096
-                type: seq
+                type: SEQ
                 space_type: CYL
                 space_primary: 20
                 space_secondary: 20
@@ -117,7 +117,7 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
                 state: present
                 replace: true
-                record_format: vb
+                record_format: VB
                 record_length: 22524
                 block_size: 22528
                 space_type: CYL

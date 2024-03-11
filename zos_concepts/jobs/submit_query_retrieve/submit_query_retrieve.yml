@@ -73,10 +73,10 @@
     - name: Create a PDS data set {{ data_set_name }}
       zos_data_set:
         name: "{{ data_set_name }}"
-        type: pds
+        type: PDS
         space_primary: 5
         space_type: M
-        format: fb
+        format: FB
         record_length: 80
         replace: true
       register: result

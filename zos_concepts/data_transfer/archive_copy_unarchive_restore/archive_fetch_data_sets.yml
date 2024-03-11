@@ -39,10 +39,10 @@
   tasks:
     - name: Create a temporary data set
       zos_data_set:
-        type: seq
+        type: SEQ
         space_primary: 5
         space_secondary: 1
-        space_type: cyl
+        space_type: CYL
         name: "{{ item }}"
       loop: "{{ data_sets_to_archive }}"
 

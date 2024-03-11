@@ -80,10 +80,10 @@
     - name: Create a sequential data set
       zos_data_set:
         name: "{{ data_set_name }}"
-        type: seq
+        type: SEQ
         state: present
         replace: true
-        format: fb
+        format: FB
         record_length: 100
         space_primary: 5
         space_type: M
@@ -128,10 +128,10 @@
     - name: Create a PDS
       zos_data_set:
         name: "{{ pds_name }}"
-        type: pds
+        type: PDS
         space_primary: 5
         space_type: M
-        format: fba
+        format: FBA
         record_length: 100
       register: result
 

@@ -98,7 +98,7 @@
     - name: Create ZFS data set.
       zos_data_set:
         name: "{{ zfs_dsname }}"
-        type: zfs
+        type: ZFS
         space_primary: 50
         space_type: M
         replace: true

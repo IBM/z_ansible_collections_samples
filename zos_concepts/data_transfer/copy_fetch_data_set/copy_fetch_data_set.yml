@@ -104,8 +104,8 @@
     - name: Create a PDS on remote host
       zos_data_set:
         name: "{{ data_set_name }}"
-        type: pds
-        format: fba
+        type: PDS
+        format: FBA
         record_length: 100
         space_primary: 5
         space_type: M

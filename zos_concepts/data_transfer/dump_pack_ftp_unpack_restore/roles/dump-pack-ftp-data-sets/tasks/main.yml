@@ -25,10 +25,10 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set if archive_data_set | default(false) else omit }}"
         replace: true
-        type: seq
+        type: SEQ
         space_primary: "{{ size_in_cyls.get('primary') }}"
         space_secondary: "{{ size_in_cyls.get('secondary') }}"
-        space_type: cyl
+        space_type: CYL
       register: archive_data_set_final
 
     - block:
@@ -62,10 +62,10 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ terse_data_set if terse_data_set | default(false) else omit }}"
         replace: true
-        type: seq
+        type: SEQ
         space_primary: "{{ size_in_cyls.get('primary') }}"
         space_secondary: "{{ size_in_cyls.get('secondary') }}"
-        space_type: cyl
+        space_type: CYL
         record_length: 1024
       register: terse_data_set_final
 
