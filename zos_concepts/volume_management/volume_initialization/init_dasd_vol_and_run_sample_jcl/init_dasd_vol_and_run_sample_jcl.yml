@@ -98,7 +98,7 @@
     - name: Create ZFS data set.
       zos_data_set:
         name: "{{ zfs_dsname }}"
-        type: zfs
+        type: ZFS
         space_primary: 50
         space_type: M
         replace: true
@@ -152,6 +152,7 @@
     ############################################################################
 
     - name: Un-mount data set.
+      tags: cleanup
       zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
@@ -159,6 +160,7 @@
         state: absent
 
     - name: Delete ZFS data set {{ zfs_dsname }}.
+      tags: cleanup
       zos_data_set:
         name: "{{ zfs_dsname }}"
         state: absent
