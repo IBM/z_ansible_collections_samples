@@ -11,7 +11,7 @@ collections:
   - name: ibm.ibm_zos_cics
     version: 1.0.4
   - name: ibm.ibm_zos_core
-    version: 1.7.0-beta.2
+    version: 1.8.0-beta.1
   - name: ibm.ibm_zos_ims
     version: 1.1.0
   - name: ibm.ibm_zosmf

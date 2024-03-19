@@ -196,11 +196,12 @@
             path: '{{ eager_role_path }}/templates/DFSCPYST.j2'
 
     - name: Copy staging libs
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSCPYST.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+      command: 'jsub -f {{ uss_file_path }}/DFSCPYST.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSCPYST.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
       when: copy_stage_libs
 
 
@@ -278,7 +279,7 @@
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}OM)'
             state: absent
             type: MEMBER
-          - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SC)'
+          - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SCI)'
             state: absent
             type: MEMBER
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}RM)'

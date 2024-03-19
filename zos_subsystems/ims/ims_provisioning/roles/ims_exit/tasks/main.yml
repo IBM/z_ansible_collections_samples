@@ -18,9 +18,10 @@
             path: '{{ eager_role_path }}/templates/DFSE315J.j2'
 
     - name: Prep exits for IMS security and conn
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE315J.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+      command: 'jsub -f {{ uss_file_path }}/DFSE315J.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSE315J.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
       when: prep_exits
