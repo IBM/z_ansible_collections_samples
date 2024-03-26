@@ -59,7 +59,7 @@
     - name: Create ZFS data sets
       zos_data_set:
         name: "{{ item | upper }}"
-        type: zfs
+        type: ZFS
         space_primary: 1
         space_type: M
         replace: true

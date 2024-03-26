@@ -4,7 +4,7 @@
 - name: Create an LDS
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ data_set_name }}"
-    type: lds
+    type: LDS
     state: present
   register: result
 

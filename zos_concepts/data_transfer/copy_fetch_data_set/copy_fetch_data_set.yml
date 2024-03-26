@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2024
 ###############################################################################
 
 ###############################################################################
@@ -104,10 +104,11 @@
     - name: Create a PDS on remote host
       zos_data_set:
         name: "{{ data_set_name }}"
-        type: pds
-        format: fba
+        type: PDS
+        format: FBA
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: M
       register: result
 
     - name: Response for creating the PDS
@@ -160,6 +161,7 @@
         encoding:
           from: ISO8859-1
           to: "{{ target_charset }}"
+        force: True #  overwrite file from previous copy operation.
       register: result
 
     - name: Response for copying

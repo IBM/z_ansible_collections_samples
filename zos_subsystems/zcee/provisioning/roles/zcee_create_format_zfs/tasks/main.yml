@@ -3,7 +3,7 @@
 - name: Create an LDS
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}"
-    type: lds
+    type: LDS
     sms_data_class: "{{ zcon_zfs_dataclass }}"
   when:
     - zcon_zfs_dataclass is defined
@@ -12,7 +12,7 @@
 - name: Create an LDS
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ zcon_file_system_hlq }}.{{softwareServiceInstanceName}}"
-    type: lds
+    type: LDS
     volume: "{{ zcon_zos_vsam_volume }}"
   when: not DFS_SMS_ENVIRONMENT
 

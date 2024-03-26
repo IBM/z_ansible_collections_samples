@@ -49,10 +49,10 @@
     - block:
         - name: Create a temporary data set
           zos_data_set:
-            type: seq
+            type: SEQ
             space_primary: 5
             space_secondary: 1
-            space_type: cyl
+            space_type: CYL
             record_length: 1024
           register: tmp_ds
           failed_when: tmp_ds is not defined or tmp_ds.get('names', [])|length == 0

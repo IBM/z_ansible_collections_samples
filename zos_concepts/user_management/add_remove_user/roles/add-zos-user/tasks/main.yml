@@ -64,10 +64,10 @@
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ userid }}.SPF.ISPPROF"
     state: present
-    type: pds
+    type: PDS
     space_primary: 2
     space_secondary: 1
-    space_type: trk
+    space_type: TRK
     block_size: 3120
     record_length: 80
 
@@ -76,10 +76,10 @@
     name: "{{ omvs_zfs_data_set_name }}"
     state: present
     replace: true
-    type: lds
+    type: LDS
     space_primary: "{{ omvs_zfs_data_set_size if omvs_zfs_data_set_size else '50' }}"
     space_secondary: "{{ omvs_zfs_data_set_size if omvs_zfs_data_set_size else '50' }}"
-    space_type: cyl
+    space_type: CYL
   register: lds_create_response
 
 - name: Format LDS as ZFS
