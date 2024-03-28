@@ -1,0 +1,14 @@
+pyz: "/python/v3r9/usr/lpp/IBM/cyp/v3r9/pyz"
+zoau: "/usr/lpp/IBM/zoautil"
+
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ zoau }}"
+  PYTHONPATH: "{{ zoau }}/lib"
+  LIBPATH: "{{ zoau }}/lib:{{ pyz }}/lib:/lib:/usr/lib:."
+  PATH: "{{ zoau }}/bin:{{ pyz }}/bin:/bin:/var/bin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
