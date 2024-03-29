@@ -49,12 +49,13 @@ ansible-playbook -i inventories <playbook-name>
 ```
 
 ## Playbook
-- [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions.
-- [**create_cert.yml**](create_CERTAUTH_cert.yml) - Create a SITE, CERTAUTH, or USER certificate.
-- [**delete_cert.yml**](delete_cert.yml) - Delete a certificate.
-- [**delete_keyring.yml**](delete_keyring.yml) - Delete a keyring.
-- [**list_cert.yml**](list_cert.yml) - Display a certificate details.
-- [**search_and_renew.yml**](search_and_renew.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report.
+1. [**create_cert.yml**](create_CERTAUTH_cert.yml) - Create a SITE, CERTAUTH, or USER certificate.
+2. [**delete_cert.yml**](delete_cert.yml) - Delete a certificate.
+3. [**create_keyring.yml**](create_keyring.yml) - Create a keyring.
+4. [**delete_keyring.yml**](delete_keyring.yml) - Delete a keyring.
+5. [**list_cert.yml**](list_cert.yml) - Display a certificate details.
+6. [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions. This must be run before search_and_renew.yml will work.
+7. [**search_and_renew.yml**](search_and_renew.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report.
 
 # Changelog
 All changes are maintained chronologically by date found in the
