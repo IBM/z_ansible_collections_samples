@@ -2,7 +2,7 @@
 - name: Provision CICS Data sets and start the region
   hosts: all
   gather_facts: false
-  vars_files: "{{ playbook_dir }}/variables.yml"
+  vars_files: "{{ playbook_dir }}/host_vars/variables.yml"
   environment: "{{ environment_vars }}"
 
   vars:
@@ -42,7 +42,7 @@
 
     - name: Create a CSDUP script on z/OS Unix
       ibm.ibm_zos_core.zos_copy:
-        src: "{{ playbook_dir }}/CSDUP_script"
+        src: "{{ playbook_dir }}/files/CSDUP_script"
         dest: "/u/{{ ansible_user | lower }}/csdup_script/script"
         use_template: true
 

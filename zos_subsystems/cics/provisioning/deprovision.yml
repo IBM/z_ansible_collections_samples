@@ -2,7 +2,7 @@
 - name: Stop CICS and deprovision CICS Data sets
   hosts: all
   gather_facts: false
-  vars_files: "{{ playbook_dir }}/variables.yml"
+  vars_files: "{{ playbook_dir }}/host_vars/variables.yml"
   environment: "{{ environment_vars }}"
 
   vars:
@@ -24,7 +24,6 @@
     - name: Stop CICS Region
       ibm.ibm_zos_cics.stop_cics:
         job_id: "{{ job_id }}"
-        mode: "{{ mode }}"
       register: result
     
     - name: Log output of stop
