@@ -1,5 +1,5 @@
 ---
-- name: Provision CICS Data sets
+- name: Provision CICS Data sets and start the region
   hosts: all
   gather_facts: false
   vars_files: "{{ playbook_dir }}/variables.yml"
