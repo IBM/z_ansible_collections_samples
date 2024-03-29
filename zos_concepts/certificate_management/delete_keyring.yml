@@ -1,0 +1,29 @@
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+- name: Delete z/OS keyring via TSO commands.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    keyring: "{{ keyring | default('SharedRing1') }}"
+
+  tasks:
+
+    - name: Check if keyring is already absent and delete it only if it isn't.
+      block:
+        - name: Check if keyring to be deleted is already absent.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+          register: keyring_check
+          failed_when: false
+          changed_when: false
+
+        - name: 'Deleting keyring {{ keyring }} if it exists.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT ID({{ owner_id }}) DELRING({{ keyring }})
+          when: "'IRRD114I Ring ' + keyring + ' does not exist.' not in keyring_check.output[0].content[0]"

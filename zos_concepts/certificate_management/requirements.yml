@@ -1,0 +1,3 @@
+collections:
+  - name: ibm.ibm_zos_core
+  - name: community.crypto

@@ -26,6 +26,27 @@
 ################################################################################
 
 releases:
+    2024.03.29:
+        date: 2024-03-29
+        changes:
+            added:
+                - task descriptions to individual TSO commands for clarity
+                - playbook descriptions
+                - handlers for setropts refresh only when needed
+                - checks for idempotency (i.e. check if cert exists before trying to create it)
+            removed:
+                - roles (issue_racf_cmd, issue_operator_cmd, issue_tso_cmd, print_hc_buffer, send_template)
+                - mvs raw versions of playbooks
+                - create certauth, site and user cert playbooks in favor of one unified playbook to cover all three
+            fixed:
+                - syntax errors / best practices suggestions
+                - various other quality of life fixes
+                - HZSPRINT print job priority causing playbook to fail
+            minor:
+                - changed default variable values
+                - use racdcert rollover command in search_and_renew playbook
+            summary:
+                - fixed, simplified and tested playbooks for current version of collections
     2021.09.03:
         date: 2020-10-01
         changes:
