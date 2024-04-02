@@ -58,7 +58,7 @@
 
     - name: Create new SITE certificate if it doesn't exist already.
       vars:
-        cert_not_found: "{{ true if 'Digital certificate information' not in list_cert.output[0].content[0] }}"
+        cert_not_found: "{{ true if list_cert.output[0].rc == 4 }}"
         format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
       when: cert_not_found
       block:
@@ -69,7 +69,8 @@
               {{ " SIGNWITH(" + sign_with + " LABEL('" + sign_label + "')) " if sign_with != "Self" else " " }}
             format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ format_sign_with }}{{ format_expiration }}
+            commands: RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}')
+              OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ format_sign_with }}{{ format_expiration }}
           notify: Setropts refresh
 
         - name: List chain for new certificate.
@@ -82,7 +83,8 @@
           vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}')
+              RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
           notify: Setropts refresh
 
         - name: List keyring.
