@@ -31,7 +31,7 @@
       changed_when: false
       register: sysname
 
-    - name: Submit job to run health check.
+    - name: - name: Submit job to pull health check report.
       tags: search_and_renew, search, search_hc
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
