@@ -34,7 +34,7 @@
         - name: Define HZS.<sysname>.*.*.MESSAGES profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
-          when: "'NOT FOUND' in messages_check.output[0].content[0]"
+          when: "'NOT FOUND' in messages_check.output[0].content[0:]"
           notify: Setropts refresh
 
     - name: Check if HZS.<sysname>.*.*.RUN is already defined in RACF. Define it if not.
@@ -48,7 +48,7 @@
         - name: Define HZS.<sysname>.*.*.RUN profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
-          when: "'NOT FOUND' in run_check.output[0].content[0]"
+          when: "'NOT FOUND' in run_check.output[0].content[0:]"
           notify: Setropts refresh
 
     - name: Check if HZS.<sysname>.*.*.QUERY is already defined in RACF. Define it if not.
@@ -62,39 +62,54 @@
         - name: Define HZS.<sysname>.*.*.QUERY profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
-          when: "'NOT FOUND' in query_check.output[0].content[0]"
+          when: "'NOT FOUND' in query_check.output[0].content[0:]"
           notify: Setropts refresh
 
     - name: Check if the given user has correct permissions, set them correctly if they don't.
       block:
-        - name: 'Search for existing permissions for {{ owner_id }}.'
+        - name: 'Search for existing permissions for the given user. Fail out to rescue if not set correctly.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
           register: search_perms
           changed_when: false
           failed_when:
-            - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0]"
-            - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0]"
-            - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0]"
+            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
+            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
+            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
 
       rescue:
+        - name: Print the given user's current permissions.
+          ansible.builtin.debug:
+            msg: "{{ search_perms.output[0].content }}"
+
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
-          when: "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.stdout"
+          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
           notify: Setropts refresh
 
         - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(UPDATE)"
-          when: "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.stdout"
+          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
           notify: Setropts refresh
 
         - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
-          when: "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.stdout"
+          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
           notify: Setropts refresh
+
+        - name: 'Search again for permissions for the given user. For visual confirmation.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
+          register: search_perms
+          changed_when: false
+
+      always:
+        - name: Print the given user's permissions.
+          ansible.builtin.debug:
+            msg: "{{ search_perms.output[0].content }}"
 
   handlers:
     - name: Setropts refresh
