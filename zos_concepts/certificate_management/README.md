@@ -49,7 +49,7 @@ ansible-playbook -i inventories <playbook-name>
 ```
 
 ## Playbook
-1. [**create_cert.yml**](create_CERTAUTH_cert.yml) - Create a SITE, CERTAUTH, or USER certificate.
+1. [**create_cert.yml**](create_cert.yml) - Create a SITE, CERTAUTH, or USER certificate.
 2. [**delete_cert.yml**](delete_cert.yml) - Delete a certificate.
 3. [**create_keyring.yml**](create_keyring.yml) - Create a keyring.
 4. [**delete_keyring.yml**](delete_keyring.yml) - Delete a keyring.
