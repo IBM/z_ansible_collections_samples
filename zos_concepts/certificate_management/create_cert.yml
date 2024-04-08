@@ -2,7 +2,7 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
-- name: Check if SITE cert and keyring already exist. If not, create them and then run health check via TSO and operator commands.
+- name: Check if cert and keyring already exist. If not, create them and then run health check via TSO and operator commands.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
@@ -56,7 +56,7 @@
       failed_when: false
       changed_when: false
 
-    - name: Create new SITE certificate if it doesn't exist already.
+    - name: Create new certificate if it doesn't exist already.
       vars:
         cert_not_found: "{{ true if list_cert.output[0].rc == 4 }}"
         format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
@@ -92,17 +92,17 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
 
-        - name: Stop TN3270 server.
-          tags: create_cert, restart_tn3270
-          ibm.ibm_zos_core.zos_operator:
-            cmd: 'p TN3270'
-          when: cert_type == 'SITE'
+        # - name: Stop TN3270 server.
+        #   tags: create_cert, restart_tn3270
+        #   ibm.ibm_zos_core.zos_operator:
+        #     cmd: 'p TN3270'
+        #   when: cert_type == 'SITE'
 
-        - name: Start TN3270 server
-          tags: create_cert, restart_tn3270
-          ibm.ibm_zos_core.zos_operator:
-            cmd: 's TN3270'
-          when: cert_type == 'SITE'
+        # - name: Start TN3270 server
+        #   tags: create_cert, restart_tn3270
+        #   ibm.ibm_zos_core.zos_operator:
+        #     cmd: 's TN3270'
+        #   when: cert_type == 'SITE'
 
         - name: Run Health Checker via operator command.
           tags: create_cert, run_hc
