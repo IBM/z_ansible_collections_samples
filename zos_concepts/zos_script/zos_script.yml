@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -45,7 +45,7 @@
     # node. Make sure to replace the values of the arguments.
     - name: Run REXX script to get a job's information.
       ibm.ibm_zos_core.zos_script:
-        cmd: ./files/JOB_INFO JOBID=ID OWNER=OWNER JOBNAME=NAME
+        cmd: "{{ playbook_dir }}/files/JOB_INFO JOBID=ID OWNER=OWNER JOBNAME=NAME"
         remote_src: false
       register: job_output
 
@@ -57,7 +57,7 @@
     # control over the way a script is run.
     - name: Run Python script in a given directory.
       ibm.ibm_zos_core.zos_script:
-        cmd: ./files/list_dir.py
+        cmd: "{{ playbook_dir }}/files/list_dir.py"
         chdir: "{{ python_script_dir }}"
         executable: "{{ ansible_python_interpreter }}"
         remote_src: false
@@ -71,7 +71,7 @@
     # the variables defined above.
     - name: Run template of a REXX script.
       ibm.ibm_zos_core.zos_script:
-        cmd: ./files/CATALOG
+        cmd: "{{ playbook_dir }}/files/CATALOG"
         remote_src: false
         use_template: true
         template_parameters:
