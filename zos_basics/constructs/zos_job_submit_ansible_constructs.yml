@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2024
 ###############################################################################
 
 ###############################################################################
@@ -382,8 +382,7 @@
     - name: Convert a local JCL file to IBM-037 and submit the job
       zos_job_submit:
         src: "{{playbook_dir}}/files/HELLO.jcl"
-        location: LOCAL
-        wait: false
+        location: local
         encoding:
           from: ISO8859-1
           to: IBM-037
