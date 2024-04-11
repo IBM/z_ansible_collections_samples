@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -89,7 +89,7 @@
     # be copied over to the host.
     - name: Copy a template to a remote file.
       ibm.ibm_zos_core.zos_copy:
-        src: ./files/template.j2
+        src: "{{ playbook_dir }}/files/template.j2"
         dest: "{{ json_path }}"
         use_template: true
 
@@ -115,7 +115,7 @@
     # to make use of Jinja.
     - name: Copy a template to a dataset.
       ibm.ibm_zos_core.zos_copy:
-        src: ./files/records.j2
+        src: "{{ playbook_dir }}/files/records.j2"
         dest: "{{ default_dataset_name }}"
         use_template: true
 
@@ -137,7 +137,7 @@
     # "{{" and "}}", to "((" and "))".
     - name: Copy a template to a dataset while changing the markers used.
       ibm.ibm_zos_core.zos_copy:
-        src: ./files/records_custom_markers.j2
+        src: "{{ playbook_dir }}/files/records_custom_markers.j2"
         dest: "{{ custom_dataset_name }}"
         use_template: true
         template_parameters:
@@ -154,7 +154,7 @@
     # after rendering blocks.
     - name: Copy a template to a dataset without trimming whitespace.
       ibm.ibm_zos_core.zos_copy:
-        src: ./files/records.j2
+        src: "{{ playbook_dir }}/files/records.j2"
         dest: "{{ default_dataset_name }}"
         force: true
         use_template: true

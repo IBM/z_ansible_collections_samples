@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -75,7 +75,7 @@
     - name: Submit shell command job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/CMD.j2"
-        location: LOCAL
+        location: local
         use_template: true
       register: job_output
 
@@ -103,7 +103,7 @@
     - name: Submit IEFBR14 job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/LOOP.j2"
-        location: LOCAL
+        location: local
         use_template: true
         template_parameters:
           trim_blocks: true
