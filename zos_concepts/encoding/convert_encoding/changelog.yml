@@ -48,3 +48,8 @@ releases:
                 - Renamed `convert_encoding.yaml` to `convert_encoding.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+    2024.04.11:
+        date: 2024-04-11
+        changes:
+            fixed:
+                - Updated deprecated module options 'from_encoding' and 'to_encoding'. New option is a dict 'encoding' with sub-items 'to' and 'from'.
