@@ -92,18 +92,6 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
 
-        # - name: Stop TN3270 server.
-        #   tags: create_cert, restart_tn3270
-        #   ibm.ibm_zos_core.zos_operator:
-        #     cmd: 'p TN3270'
-        #   when: cert_type == 'SITE'
-
-        # - name: Start TN3270 server
-        #   tags: create_cert, restart_tn3270
-        #   ibm.ibm_zos_core.zos_operator:
-        #     cmd: 's TN3270'
-        #   when: cert_type == 'SITE'
-
         - name: Run Health Checker via operator command.
           tags: create_cert, run_hc
           ibm.ibm_zos_core.zos_operator:
