@@ -1,0 +1,27 @@
+- name: Verify input
+  ansible.builtin.debug:
+    msg: "Please authenticate with UMS first"
+  when: ums_access_token == ''
+  failed_when: ums_access_token == ''
+
+- name: Get list of profiles for utiliuty {{ daj_util_name }}
+  ansible.builtin.uri:
+    url: "https://{{ ums_server }}:{{ ums_port }}/ws/plugin/db2/automation-expert/utility/\
+      {{ daj_util_sysname }}/subsystem/{{ daj_util_ssid }}/utilities/{{ daj_util_name }}/profiles"
+    ca_path: "{{ ums_ca_path }}"
+    validate_certs: "{{ ums_validate_certs }}"
+    method: GET
+    status_code: 200
+    headers:
+      Accept: "application/json"
+      Authorization: "Bearer {{ ums_access_token }}"
+  register: daj_util_output
+  failed_when: daj_util_output.json.error
+
+- name: Register list
+  ansible.builtin.set_fact:
+    daj_profile_list: "{{ daj_util_output.json.profileList.profiles }}"
+
+- name: Show list of profiles
+  ansible.builtin.debug:
+    msg: "{{ daj_profile_list }}"
