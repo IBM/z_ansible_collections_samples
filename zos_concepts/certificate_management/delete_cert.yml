@@ -25,7 +25,7 @@
         - name: 'Deleting cert {{ cert_label }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))"
-          when: "'Digital certificate information for' in list_cert.output[0].content[0]"
+          when: list_cert.output[0].rc == 0
 
     - name: Run Health Checker.
       ibm.ibm_zos_core.zos_operator:
