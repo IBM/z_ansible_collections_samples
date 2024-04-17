@@ -1,5 +1,5 @@
 - name: Run Db2 utility
-  hosts: localhost
+  hosts: all
   gather_facts: false
   tasks:
     - name: Run Db2 utility

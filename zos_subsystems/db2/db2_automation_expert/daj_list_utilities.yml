@@ -1,5 +1,5 @@
 - name: Get list of supported utilities
-  hosts: localhost
+  hosts: all
   gather_facts: false
   vars:
     ums_server: umsserver.company.com
