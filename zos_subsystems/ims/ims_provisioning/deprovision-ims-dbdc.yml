@@ -85,6 +85,13 @@
               vars:
                 catalog: delete
 
+        - block: 
+            - include_role:
+                name: ims_catalog_image_copy
+              vars: 
+                image: delete
+                dbrc_enabled: "{{ CATALOG_DBRC_ENABLED }}"
+
         - block:
             - include_role:
                 name: ims_iefjobs

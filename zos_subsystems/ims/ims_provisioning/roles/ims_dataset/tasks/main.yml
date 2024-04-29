@@ -941,12 +941,13 @@
             path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'
 
     - name: Dynamically allocate IMS system datasets
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSDYNAL.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
-      register: response
+      command: 'jsub -f {{ uss_file_path }}/DFSDYNAL.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSDYNAL.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
+      # register: response
       when: system_datasets == "allocate"
 
     - name: Delete Sysdef libs

@@ -1,0 +1,103 @@
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+- name: Check if cert and keyring already exist. If not, create them and then run health check via TSO and operator commands.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    cert_label: "{{ cert_label | default('TESTSITE') }}"
+    cert_type: "{{ cert_type }}" # CERTAUTH, SITE, or USER
+    sign_with: "{{ sign_with | default('Self') }}" # CERTAUTH, SITE, or Self
+    sign_label: "{{ sign_label | default('') }}" # Only required if sign_with is not 'Self'
+    ou: "{{ ou | default('ANSIBLE CORE') }}"
+    cn: "{{ cn }}" # Will default to FQDN, if undefined.
+    country: "{{ country | default('US') }}"
+    expiry_date: "{{ expiry_date | default('2030-01-01') }}"
+    keyring: "{{ keyring | default('SharedRing1') }}"
+    check_name: "{{ check_name | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
+
+  tasks:
+    - name: Check if keyring to be created already exists.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+      register: keyring_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create a new keyring via TSO commands, skip if it already exists.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
+          - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+      when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"
+
+    - name: Get hostname to use as common name variable, if undefined.
+      when: cn is undefined
+      block:
+        - name: Get FQDN of this z/OS server from USS.
+          ansible.builtin.command: hostname
+          changed_when: false
+          register: get_hostname
+
+        - name: Set cn fact from previous task.
+          ansible.builtin.set_fact:
+            cn: "{{ get_hostname.stdout }}"
+
+    - name: Check if certificate to be created already exists.
+      vars:
+        format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}'))"
+      register: list_cert
+      failed_when: false
+      changed_when: false
+
+    - name: Create new certificate if it doesn't exist already.
+      vars:
+        cert_not_found: "{{ true if list_cert.output[0].rc == 4 }}"
+        format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
+      when: cert_not_found
+      block:
+        - name: Generate new certificate.
+          tags: create_cert, gencert
+          vars:
+            format_sign_with: |-
+              {{ " SIGNWITH(" + sign_with + " LABEL('" + sign_label + "')) " if sign_with != "Self" else " " }}
+            format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}')
+              OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ format_sign_with }}{{ format_expiration }}
+          notify: Setropts refresh
+
+        - name: List chain for new certificate.
+          tags: create_cert, listchain
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) {{ format_cert_type }}
+
+        - name: Connect new certificate to keyring.
+          tags: create_cert, connect
+          vars:
+            format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}')
+              RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+          notify: Setropts refresh
+
+        - name: List keyring.
+          tags: create_cert, listring
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+
+        - name: Run Health Checker via operator command.
+          tags: create_cert, run_hc
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
+
+  handlers:
+    - name: Setropts refresh
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: SETROPTS RACLIST(DIGTCERT) REFRESH
