@@ -30,34 +30,34 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Create the auxiliary temporary storage data set (DFHTEMP)
+    - name: Delete the auxiliary temporary storage data set (DFHTEMP)
       ibm.ibm_zos_cics.auxiliary_temp:
 
-    - name: Create the auxiliary trace data set (DFHAUXT)
+    - name: Delete the auxiliary trace data set (DFHAUXT)
       ibm.ibm_zos_cics.trace:
 
-    - name: Create the second auxiliary trace data set (DFHBUXT)
+    - name: Delete the second auxiliary trace data set (DFHBUXT)
       ibm.ibm_zos_cics.trace:
         destination: B
 
-    - name: Create the transaction dump data set (DFHDMPA)
+    - name: Delete the transaction dump data set (DFHDMPA)
       ibm.ibm_zos_cics.transaction_dump:
 
-    - name: Create the second transaction dump data set (DFHDMPB)
+    - name: Delete the second transaction dump data set (DFHDMPB)
       ibm.ibm_zos_cics.transaction_dump:
         destination: B
 
-    - name: Create the CSD data set (DFHCSD)
+    - name: Delete the CSD data set (DFHCSD)
       ibm.ibm_zos_cics.csd:
 
-    - name: Create the transient data intrapartition data set (DFHINTRA)
+    - name: Delete the transient data intrapartition data set (DFHINTRA)
       ibm.ibm_zos_cics.intrapartition:
 
-    - name: Create the local request queue data set (DFHLRQ)
+    - name: Delete the local request queue data set (DFHLRQ)
       ibm.ibm_zos_cics.local_request_queue:
 
-    - name: Create the global catalog data set (DFHGCD)
+    - name: Delete the global catalog data set (DFHGCD)
       ibm.ibm_zos_cics.global_catalog:
 
-    - name: Create the local catalog data set (DFHLCD)
+    - name: Delete the local catalog data set (DFHLCD)
       ibm.ibm_zos_cics.local_catalog:
