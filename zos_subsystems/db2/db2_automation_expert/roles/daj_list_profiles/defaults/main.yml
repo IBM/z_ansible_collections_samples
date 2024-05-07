@@ -1,0 +1,9 @@
+# Db2 subsystem name where the utility will be run
+daj_util_ssid: DSN1
+
+# The sysname (LPAR) where the utility will be run
+daj_util_sysname: SYS1
+
+# The name of the utility.
+# currently supported: COPY, REORG, and RUNSTATS
+daj_util_name: REORG

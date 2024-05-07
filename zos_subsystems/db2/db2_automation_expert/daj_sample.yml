@@ -1,0 +1,19 @@
+- name: Run Db2 utility
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Run Db2 utility
+      ansible.builtin.include_role:
+        name: daj_util
+      vars:
+        daj_util_ssid: DSN
+        daj_util_sysname: lpar
+        daj_util_utilityname: COPY
+        daj_util_objects: [
+          {
+            "objectType": "TS",
+            "databaseName": "DSN8D13A",
+            "objectName": "DSN8S13E"
+          }
+        ]
+        daj_util_verbose: false

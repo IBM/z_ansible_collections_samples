@@ -1,0 +1,20 @@
+# UMS server information
+ums_server: umsserver.company.com
+ums_port: 12023
+
+# Username and password to use with UMS
+# Read from environment variables
+ums_username: '{{ lookup("env", "UMS_USERNAME") }}'
+ums_password: '{{ lookup("env", "UMS_PASSWORD") }}'
+
+# Path to PEM file for UMS Root CA
+# Example 1: Turn on validation and pass Root CA
+# ums_ca_path: "ca/rootca.pem"
+# ums_validate_certs: true
+#
+# Example 2: turn off validation
+# ums_ca_path:
+# ums_validate_certs: false
+#
+ums_ca_path: "path/to/rootca.pem"
+ums_validate_certs: true

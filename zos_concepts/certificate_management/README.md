@@ -8,27 +8,15 @@ scenario managing z/OS certificates beginning with monitoring certificates using
 Health Checker, creating an authority and certificates, deleting certificates
 and even renewing them.
 
-ALthough this is an end to end scenario, you can choose to run the individual
+Although this is an end to end scenario, you can choose to run the individual
 playbooks if you are interested in one particular operation. Review the individual
 playbook for more details.
-
-In addition to providing the various operations, this project goes further and
-demonstrates how some of the same operations can be run various ways. For example,
-you will notice that the two modules `zos_mvs_raw` and `zos_tso_command` are
-heavily used to perform the same operation. You can choose to create a certificate
-authority using the playbook based on `zos_mvs_raw` which is
-[**create_CERTAUTH_cert_raw.yml**](create_CERTAUTH_cert_raw.yml) or you could
-choose the playbook leveraging TSO commands to do the same thing
-[**create_CERTAUTH_cert_tsocmd.yml**](create_CERTAUTH_cert_tsocmd.yml). Either
-playbook will yield the same results and this offers you the opportunity to
-explore multiple ways to do the same operation.
 
 These playbook use:
 
     collection:
         ibm.ibm_zos_core
     modules:
-        zos_mvs_raw
         zos_tso_command
         zos_operator
         zos_job_submit
@@ -46,7 +34,7 @@ This playbook requires:
 ## Configuration
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
   information from the managed z/OS host.
-  - Review [inventory documentation](../docs/share/zos_core/configure_inventory.md)
+  - Review [inventory documentation](../../docs/share/zos_core/configure_inventory.md)
 - Configure the included **host_vars** [zos_host.yml](inventories/host_vars/zos_host.yml)
   with the information from your z/OS system.
   - Review [host_vars documentation](../../docs/share/zos_core/configure_host_vars.md)
@@ -61,32 +49,13 @@ ansible-playbook -i inventories <playbook-name>
 ```
 
 ## Playbook
-- [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions.
-
-## Playbooks Using module `zos_mvs_raw` (operationally the same as playbooks using `zos_tso_command`)
-- [**create_CERTAUTH_cert_raw.yml**](create_CERTAUTH_cert_raw.yml) - Create a CERTAUTH certificate using zos_mvs_raw module.
-- [**create_SITE_cert_raw.yml**](create_SITE_cert_raw.yml) - Create a SITE certificate using zos_mvs_raw module.
-- [**create_USER_cert_raw.yml**](create_USER_cert_raw.yml) - Create a USER certificate using zos_mvs_raw module.
-- [**delete_cert_raw.yml**](delete_cert_raw.yml) - Delete a certificate using zos_mvs_raw module.
-- [**delete_keyring_raw.yml**](delete_keyring_raw.yml) - Delete a keyring using zos_mvs_raw module.
-- [**list_cert_raw.yml**](list_cert_raw.yml) - Display a certificate's details using zos_mvs_raw module.
-- [**search_and_renew_raw.yml**](search_and_renew_raw.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report using zos_mvs_raw module.
-
-## Playbooks Using module `zos_tso_command` (operationally the same as playbooks using `zos_mvs_raw`)
-- [**create_CERTAUTH_cert_tsocmd.yml**](create_CERTAUTH_cert_tsocmd.yml) - Create a CERTAUTH certificate using zos_tso_command module.
-- [**create_SITE_cert_tsocmd.yml**](create_SITE_cert_tsocmd.yml) - Create a SITE certificate using zos_tso_command module.
-- [**create_USER_cert_tsocmd.yml**](create_USER_cert_tsocmd.yml) - Create a USER certificate using zos_tso_command module.
-- [**delete_cert_tsocmd.yml**](delete_cert_tsocmd.yml) - Delete a certificate using zos_tso_command module.
-- [**delete_keyring_tsocmd.yml**](delete_keyring_tsocmd.yml) - Delete a keyring using zos_tso_command module.
-- [**list_cert_tsocmd.yml**](list_cert_tsocmd.yml) - Display a certificate details using zos_tso_command module.
-- [**search_and_renew_tsocmd.yml**](search_and_renew_tsocmd.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report using zos_tso_command module.
-
-## Role Summary
-- [**issue_operator_cmd**](roles/issue_operator_cmd/README.md) - Issue an operator command
-- [**issue_racf_cmd**](roles/issue_racf_cmd/README.md) - Isuue RACF command(s)
-- [**issue_tso_cmd**](roles/issue_tso_cmd/README.md) - Issue TSO command(s)
-- [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
-- [**send-template**](roles/send-template/README.md) - send template to a zOS host
+1. [**create_cert.yml**](create_cert.yml) - Create a SITE, CERTAUTH, or USER certificate.
+2. [**delete_cert.yml**](delete_cert.yml) - Delete a certificate.
+3. [**create_keyring.yml**](create_keyring.yml) - Create a keyring.
+4. [**delete_keyring.yml**](delete_keyring.yml) - Delete a keyring.
+5. [**list_cert.yml**](list_cert.yml) - Display a certificate details.
+6. [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions. This must be run before search_and_renew.yml will work.
+7. [**search_and_renew.yml**](search_and_renew.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report.
 
 # Changelog
 All changes are maintained chronologically by date found in the
@@ -100,5 +69,5 @@ Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
-Please refer to the [support section](../../../README.md#support) for more
+Please refer to the [support section](../../README.md#support) for more
 details.
