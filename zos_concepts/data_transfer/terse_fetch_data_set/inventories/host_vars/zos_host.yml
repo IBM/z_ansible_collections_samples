@@ -41,7 +41,7 @@ PYZ_VERSION: "3.xx"
 
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
-# if ZOAU installed by wheel with the --target option, uncomment the follwing line:
+# if ZOAU installed by wheel with the --target or --user option, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ path_to_wheel_installation_directory }}"
 
 # if ZOAU v1.3.x, uncomment the following line:
