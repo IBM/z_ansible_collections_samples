@@ -10,3 +10,4 @@
 ---
 - import_playbook: configure-dns.yaml
 - import_playbook: configure-haproxy.yaml
+- import_playbook: configure-dhcp.yaml
