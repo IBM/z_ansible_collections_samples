@@ -45,6 +45,7 @@
         location: DATA_SET
         wait: true
         wait_time_s: 30
+      ignore_errors: true #ICON successfully starts, but the job itself exceeds the wait time
       when: icon == "start"
 
     # Stop ICON

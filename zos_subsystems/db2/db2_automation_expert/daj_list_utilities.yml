@@ -1,0 +1,19 @@
+- name: Get list of supported utilities
+  hosts: all
+  gather_facts: false
+  vars:
+    ums_server: umsserver.company.com
+    ums_port: 12023
+    ums_ca_path: "path/to/rootca.pem"
+    ums_validate_certs: true
+  tasks:
+    - name: Authenticate with UMS
+      ansible.builtin.include_role:
+        name: ums_login
+
+    - name: Get list of supported utilities
+      ansible.builtin.include_role:
+        name: daj_list_utilities
+      vars:
+        daj_util_ssid: DSN1
+        daj_util_sysname: SYS1

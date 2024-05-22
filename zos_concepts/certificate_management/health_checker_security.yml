@@ -2,51 +2,120 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Setup Health Checker security.
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    system_name: 'EC01129A'
-    user_id: 'OMVSADM OMVSKERN'
-
+    user_id: "{{ user_id | default('IBMUSER') }}"
   tasks:
-    - block:
-        - include_role:
-            name: issue_operator_cmd
-          vars:
-            task_description: 'Start Health Check'
-            command: "S HZSPROC"
+    - name: Get sysname.
+      ansible.builtin.command:
+        cmd: "sysvar SYSNAME"
+      changed_when: false
+      register: sysname
 
-        - include_role:
-            name: issue_racf_cmd
-          vars:
-            task_description: 'Set up profiles'
-            command:
-              - RDEFINE XFACILIT HZS.{{system_name}}.*.*.MESSAGES UACC(NONE)
-              - RDEFINE XFACILIT HZS.{{system_name}}.*.*.RUN UACC(NONE)
-              - RDEFINE XFACILIT HZS.{{system_name}}.*.*.QUERY UACC(NONE)
+    - name: Start Health Check
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "S HZSPROC"
 
-        - include_role:
-            name: issue_racf_cmd
-          vars:
-            task_description: 'Permit access to {{ user_id }}'
-            command:
-              - >
-                  PERMIT HZS.{{system_name}}.*.*.MESSAGES CLASS(XFACILIT) +
-                    ID({{ user_id }}) ACCESS(READ)
-              - >
-                  PERMIT HZS.{{system_name}}.*.*.RUN CLASS(XFACILIT) +
-                    ID({{ user_id }}) ACCESS(UPDATE)
-              - >
-                  PERMIT HZS.{{system_name}}.*.*.QUERY CLASS(XFACILIT) +
-                    ID({{ user_id }}) ACCESS(READ)
+    - name: Print sysname.
+      ansible.builtin.debug:
+        var: sysname.stdout
 
-        - include_role:
-            name: issue_racf_cmd
-          vars:
-            task_description: 'Activate and refresh RACF profile '
-            command:
-              - SETROPTS CLASSACT(XFACILIT)
-              - SETROPTS RACLIST(XFACILIT) REFRESH
+    - name: Check if HZS.<sysname>.*.*.MESSAGES is already defined in RACF. Define it if not.
+      block:
+        - name: Check if HZS.<sysname>.*.*.MESSAGES profile is already defined in RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES"
+          register: messages_check
+          changed_when: false
+      rescue:
+        - name: Define HZS.<sysname>.*.*.MESSAGES profile in RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
+          when: messages_check.output[0].rc == 4
+          notify: Setropts refresh
+
+    - name: Check if HZS.<sysname>.*.*.RUN is already defined in RACF. Define it if not.
+      block:
+        - name: Check if HZS.<sysname>.*.*.RUN profile is already defined in RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN"
+          register: run_check
+          changed_when: false
+      rescue:
+        - name: Define HZS.<sysname>.*.*.RUN profile in RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
+          when: run_check.output[0].rc == 4
+          notify: Setropts refresh
+
+    - name: Check if HZS.<sysname>.*.*.QUERY is already defined in RACF. Define it if not.
+      block:
+        - name: Check if HZS.<sysname>.*.*.QUERY profile is already defined in RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY"
+          register: query_check
+          changed_when: false
+      rescue:
+        - name: Define HZS.<sysname>.*.*.QUERY profile in RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
+          when: query_check.output[0].rc == 4
+          notify: Setropts refresh
+
+    - name: Check if the given user has correct permissions, set them correctly if they don't.
+      block:
+        - name: 'Search for existing permissions for the given user. Fail out to rescue if not set correctly.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "SEARCH USER({{ user_id }}) CLASS(XFACILIT)"
+          register: search_perms
+          changed_when: false
+          failed_when:
+            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
+            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
+            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
+
+      rescue:
+
+        - name: Print the given user's current permissions.
+          ansible.builtin.debug:
+            msg: "{{ search_perms.output[0].content }}"
+
+        - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ user_id }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) ID({{ user_id }}) ACCESS(READ)"
+          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
+          notify: Setropts refresh
+
+        - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ user_id }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ user_id }}) ACCESS(UPDATE)"
+          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
+          notify: Setropts refresh
+
+        - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ user_id }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ user_id }}) ACCESS(READ)"
+          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
+          notify: Setropts refresh
+
+  handlers:
+    - name: Setropts refresh
+      block:
+        - name: Setropts refresh
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - "SETROPTS CLASSACT(XFACILIT)"
+              - "SETROPTS RACLIST(XFACILIT) REFRESH"
+
+        - name: Search again for permissions for the given user.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "SEARCH USER({{ user_id }}) CLASS(XFACILIT)"
+          register: search_perms
+          changed_when: false
+
+        - name: Print the given user's permissions afterwards for visual confirmation.
+          ansible.builtin.debug:
+            msg: "{{ search_perms.output[0].content }}"

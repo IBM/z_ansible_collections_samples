@@ -20,9 +20,10 @@
 
 
     - name: RACF security exits for IMS
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSC105J.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+      command: 'jsub -f {{ uss_file_path }}/DFSC105J.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSC105J.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
       when: prep_racf

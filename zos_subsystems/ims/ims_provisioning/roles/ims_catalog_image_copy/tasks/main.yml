@@ -1,0 +1,49 @@
+---
+- name: Create image copies 
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+  
+  block: 
+
+    - block:
+      - name: Executing necessary DBRC commands to create an image copy 
+        ibm.ibm_zos_ims.ims_dbrc: 
+          command: 
+            - "CHANGE.DBDS DBD({{item.dbd}}) DDN({{item.ddn}}) REUSE "
+            - "INIT.IC DBD({{item.dbd}}) DDN({{item.ddn}}) ICDSN({{item.icdsn}})"
+          steplib:
+              - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}}.SDFSRESL"
+          dbd_lib: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB"
+          recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON1"
+          recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON2"
+          recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.RECON3"
+
+      - ansible.builtin.set_fact:
+          eager_role_path: '{{role_path}}'
+      
+      - name: Use template to create proper JCL on localhost
+        template: 
+          src: '{{ eager_role_path }}/templates/template_image_copy.j2'
+          dest: '{{ eager_role_path }}/templates/image_copy.j2'
+          force: true
+        delegate_to: localhost 
+
+      - name: Submit image copy job
+        ibm.ibm_zos_core.zos_job_submit:
+          src: '{{ eager_role_path }}/templates/image_copy.j2'
+          location: LOCAL
+          wait: true
+          wait_time_s: 30
+      when: image == "copy"
+
+    - block: 
+      - name: Delete image copies
+        ibm.ibm_zos_core.zos_data_set:
+          batch: 
+            - name: "{{ item.icdsn }}"
+              volumes: "{{ DFS_DS_VOLUME1 }}"
+              state: absent
+        with_items: 
+          - "{{ to_image_copy }}" 
+      when: image == "delete" and dbrc_enabled
