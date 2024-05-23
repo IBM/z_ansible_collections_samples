@@ -76,10 +76,10 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 # does not need to be configured for the ZOAU python module to be found. Uncomment the following line:
 # ZOAU_PYTHONPATH: ""
 
-# If ZOAU v1.3.x, uncomment the following line:
+# If using pre-compiled binaries for ZOAU v1.3.x, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ ZOAU }}/lib/{{ PYZ_VERSION }}"
 
-# If ZOAU v1.2.x, uncomment the following line:
+# If using pre-compiled binaries for ZOAU v1.2.x, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ ZOAU }}/lib"
 
 ################################################################################
