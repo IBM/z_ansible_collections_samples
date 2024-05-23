@@ -47,7 +47,7 @@ ZOSMF_SYSTEM: zosmf_system
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
 # - Property `ZOAU_PYTHONPATH` is the path to the ZOA Utilities python library.
 #    Specifically, the path points to the directory containing `zoautil_py`.
-#    If the wheel installation method is used with the `--target` option,
+#    If the wheel installation method is used with the `--target` or `--user` option,
 #   `ZOAU_PYTHONPATH` should point to the directory the wheel file was installed to.
 #    e.g ("/usr/zoau-wheel/")
 #    Else `ZOAU_PYTHONPATH` should point to the directory containing the pre-compiled binary.
@@ -67,13 +67,19 @@ PYZ_VERSION: "3.xx"
 
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
-# if ZOAU installed by wheel with the --target or --user option, uncomment the following line:
+# Configuring the `ZOAU_PYTHONPATH` property is required.
+
+# If ZOAU installed by wheel with the --target or --user option, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ path_to_wheel_installation_directory }}"
 
-# if ZOAU v1.3.x, uncomment the following line:
+# If ZOAU is installed to the default location used by pip, the PYTHONPATH environment variable
+# does not need to be configured for the ZOAU python module to be found. Uncomment the following line:
+# ZOAU_PYTHONPATH: ""
+
+# If ZOAU v1.3.x, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ ZOAU }}/lib/{{ PYZ_VERSION }}"
 
-# if ZOAU v1.2.x, uncomment the following line:
+# If ZOAU v1.2.x, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ ZOAU }}/lib"
 
 ################################################################################
