@@ -1,0 +1,60 @@
+# =================================================================
+# Copyright 2024 https://github.com/multi-arch/multiarch-ci-playbooks
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==================================================================
+
+---
+# tasks file for configure-dhcp
+- ansible.builtin.include_vars: dhcp_template.yaml
+
+- name: 'Remove the /etc/dhcp/dhcpd.conf'
+  ansible.builtin.file:
+    state: absent
+    path: /etc/dhcp/dhcpd.conf
+
+- name: Install DHCP server package
+  package:
+    name: dhcp-server.s390x
+    state: present
+  become: true
+
+- name: Configure dhcpd.conf file
+  template:
+    src: etc/dhcp/dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+
+- name: Get the subnet range from localhost
+  ansible.builtin.set_fact:
+    subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
+
+- name: Set_fact for the the subnet range
+  ansible.builtin.set_fact:
+    cluster_subnet_range: "{{ subnet_range | regex_replace('/.*', '') }}"
+
+- name: Convert CIDR to netmask
+  ansible.builtin.set_fact:
+    netmask_result: "{{ subnet_range | ipaddr('netmask') }}"
+
+- name: Update cluster_subnet_range
+  ansible.builtin.shell:
+    cmd: sed -i "s|dhcp_subnet| {{ cluster_subnet_range }} |g" /etc/dhcp/dhcpd.conf
+
+- name: Update cic_subnet_mask
+  ansible.builtin.shell:
+    cmd: sed -i "s|cic_subnet_mask|{{ netmask_result }}|g" /etc/dhcp/dhcpd.conf
+
+- name: restart dhcpd
+  service:
+    name: dhcpd
+    state: restarted

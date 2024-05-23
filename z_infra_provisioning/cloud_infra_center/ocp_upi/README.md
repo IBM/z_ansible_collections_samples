@@ -244,9 +244,9 @@ If you meet any **not running** service or **failed** message, check the IBM Clo
 9. Set Subnet DNS
 
 **Note**:
->1.Network type `DHCP` is mandatory for KVM.
+>1.Network type `DHCP` is mandatory for KVM, but when deploying OCP with RoCE networking, DHCP is not a requirement.
 > 
->2.This step is required for KVM, z/VM is optional.
+>2.This step is required for KVM (not required for RoCE networking), z/VM is optional.
 
 During deployment, the OpenShift nodes will need to be able to resolve public name records to download the OpenShift images and so on. They will also need to resolve the OpenStack API endpoint.
 
