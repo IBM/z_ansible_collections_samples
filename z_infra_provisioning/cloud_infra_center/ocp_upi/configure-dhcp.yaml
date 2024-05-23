@@ -22,17 +22,12 @@
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
+#
 # Change Summary:
 # - Change Ansible playbook name
 
 ---
-- name: 'Get Network physical_network'
-  ansible.buildin.command:
-    cmd: "openstack network show -c provider:physical_network -f value {{ use_network_name }}"
-  register: physical_network
-
-- name: Configure dhcp on bastion
+- name: Configure dns on bastion
   hosts: bastion
   roles:
     - configure-dhcp
-  when: physical_network == "macvtap0"

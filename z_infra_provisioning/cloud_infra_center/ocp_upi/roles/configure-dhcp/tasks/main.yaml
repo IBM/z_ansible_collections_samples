@@ -18,31 +18,44 @@
 # tasks file for configure-dns
 - ansible.builtin.include_vars: dhcp_template.yaml
 
+- name: 'Remove the /etc/dhcp/dhcpd.conf'
+  ansible.builtin.file:
+    state: absent
+    path: /etc/dhcp/dhcpd.conf
+
 - name: Install DHCP server package
   package:
-    name: isc-dhcp-server
+    name: dhcp-server.s390x
     state: present
   become: true
 
 - name: Configure dhcpd.conf file
   template:
-    src: dhcpd.conf.j2
+    src: etc/dhcp/dhcpd.conf.j2
     dest: /etc/dhcp/dhcpd.conf
-  notify: restart dhcpd
     
 - name: Get the subnet range from localhost
   ansible.builtin.set_fact:
     subnet_range: "{{ lookup('file', '.subnet_range.yml') }}"
 
+- name: Set_fact for the the subnet range
+  ansible.builtin.set_fact:
+    cluster_subnet_range: "{{ subnet_range | regex_replace('/.*', '') }}"
+
+- name: Convert CIDR to netmask
+  ansible.builtin.set_fact:
+    netmask_result: "{{ subnet_range | ipaddr('netmask') }}"
+
 - name: Update cluster_subnet_range
-  become: true
-  become_user: root
-  become_method: sudo
   ansible.builtin.shell:
-    cmd: sed -i "s|cluster_subnet_range|{{ subnet_range }}|g" /etc/named.conf
+    cmd: sed -i "s|dhcp_subnet| {{ cluster_subnet_range }} |g" /etc/dhcp/dhcpd.conf
+
+- name: Update cic_subnet_mask
+  ansible.builtin.shell:
+    cmd: sed -i "s|cic_subnet_mask|{{ netmask_result }}|g" /etc/dhcp/dhcpd.conf
 
 - name: restart dhcpd
   service:
-    name: isc-dhcp-server
+    name: dhcpd
     state: restarted
 
