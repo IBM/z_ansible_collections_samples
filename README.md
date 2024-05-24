@@ -34,7 +34,6 @@ Playbooks are organized by topics that align to tasks and use cases that are
 often repeated and in need of automation.
 
 > [!IMPORTANT]
-
 > The latest 1.10.0 beta (and upcoming GA) release version of the ibm_zos_core collection introduces some breaking
 > changes to certain modules, specifically that module options are now case-sensitive. See the porting guide in the
 > release notes ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
