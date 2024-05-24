@@ -1,0 +1,26 @@
+- name: Create z/OS keyring via TSO commands.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    keyring: "{{ keyring | default('SharedRing1') }}"
+
+  tasks:
+
+    - name: Check if keyring already exists and create it if it doesn't.
+      block:
+        - name: Check if keyring to be created already exists.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+          register: keyring_check
+          failed_when: false
+          changed_when: false
+
+        - name: Create a new keyring via TSO commands, skip if it already exists.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
+              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+          when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"

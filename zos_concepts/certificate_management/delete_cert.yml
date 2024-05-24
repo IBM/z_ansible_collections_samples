@@ -1,0 +1,33 @@
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+- name: Delete z/OS certificate via TSO commands.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    cert_type: "{{ cert_type | default('USER') }}" # CERTAUTH, SITE, or USER
+    cert_label: "{{ cert_label | default('TESTUSER') }}"
+    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+  tasks:
+    - name: Check if certificate is already absent and delete it only if it isn't.
+      block:
+        - name: Check if cert to be deleted is already absent.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}'))"
+          register: list_cert
+          changed_when: false
+          failed_when: false
+
+        - name: 'Deleting cert {{ cert_label }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))"
+          when: list_cert.output[0].rc == 0
+
+    - name: Run Health Checker.
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
+      changed_when: false

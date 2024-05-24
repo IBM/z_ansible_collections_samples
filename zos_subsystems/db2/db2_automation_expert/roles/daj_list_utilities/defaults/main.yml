@@ -1,0 +1,5 @@
+# Db2 subsystem name where the utility will be run
+daj_util_ssid: DSN1
+
+# The sysname (LPAR) where the utility will be run
+daj_util_sysname: SYS1

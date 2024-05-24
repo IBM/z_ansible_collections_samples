@@ -136,13 +136,16 @@ sudo -H pip3 install --upgrade pip
 
 Then create the requirements file and use pip3 to install the python modules:
 
-**Note**: The requirements.txt are tested for python-openstackclient=5.5.0.
+**Note**: 
+1. The requirements.txt are tested for python 3.6.8.
+2. You can use openstacksdk==0.46.0 and corresponding openstack.cloud collection version 1.10.0. Also you can use openstacksdk==1.0.1 and corresponding openstack.cloud collection version 2.0.0.
+
 ```sh
 cat <<'EOF' >> requirements.txt 
 # The order of packages is significant, because pip processes them in the order
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
-pbr==5.4.5
+pbr
 cliff==3.1.0
 iso8601==0.1.12
 openstacksdk==0.46.0
@@ -154,7 +157,6 @@ python-cinderclient==7.0.0
 python-novaclient==17.0.0
 stevedore==1.32.0
 dogpile-cache
-stevedore==1.32.0
 netaddr==0.7.19
 python-openstackclient==5.2.2
 cryptography==3.2.1
@@ -163,10 +165,16 @@ EOF
 sudo pip3 install -r requirements.txt --ignore-installed
 ``` 
 Install two collections from ansible galaxy:
+With openstacksdk==0.46.0 installed:
 ```sh
 ansible-galaxy collection install openstack.cloud:1.10.0
 ansible-galaxy collection install ansible.posix:1.5.1
 ``` 
+With openstacksdk==1.0.1 installed:
+```sh
+ansible-galaxy collection install openstack.cloud:2.0.0
+ansible-galaxy collection install ansible.posix:1.5.1
+```
 
 **Verification:**
 ```sh
@@ -298,7 +306,7 @@ Update your settings based on the samples. The following propeties are **require
 | `os_flavor_worker`        | medium                                          | `openstack flavor list`, Minimum flavor disk size >= 35 GiB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | |
 | `os_control_nodes_number` | 3                                               | (Integer) Number of Red Hat Openshift provisioned control server nodes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | |
 | `os_compute_nodes_number` | 3                                               | (Integer) Number of Red Hat Openshift provisioned compute server nodes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | |
-| `create_server_zone`      | ''                                              | The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>Default value is '', which means to use the default availability zone. <br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`] |
+| `create_server_zone`      | ''                                              | The zone you can select which host instances are launched on and which roles can boot instances on this host, the value format is `ZONE:HOST:NODE`, HOST and NODE are optional parameters, in such cases, use the `ZONE::NODE`, `ZONE:HOST` or `ZONE`. <br>With openstacksdk==0.46.0 installed, the default value is '', which means to use the default availability zone. With openstacksdk==1.0.1 installed, the value must be set.<br>[ **ZONE** is `Zone Name` column from `openstack availability zone list`; **HOST** is `Host Name` column from `openstack host list`; **NODE** is `Hypervisor Hostname` column from `openstack hypervisor list`] |
 | `pullsecret`              | \<pull-secret\>                                 | Get from [cloud.redhat.com](https://console.redhat.com/openshift/install/ibmz/user-provisioned)                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `sshkey`                  | \<ssh-key\>                                     | The SSH public key for the core user in RHEL CoreOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `os_dns_domain`           | \<external DNS ip addr\> or \<bastion ip addr\> | If you want to use your external or existing DNS server set `os_dns_domain` to use it, others set bastion machine ip address                                                                                                                                                                                                                                                                                                                                                                                                                          |
