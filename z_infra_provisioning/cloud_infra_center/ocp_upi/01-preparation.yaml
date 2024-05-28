@@ -42,3 +42,5 @@
 - import_playbook: configure-security-groups.yaml
 - import_playbook: configure-network.yaml
 - import_playbook: configure-bastion-properties.yaml
+- import_playbook: bastion.yaml
+  when: use_internal_bastion == true

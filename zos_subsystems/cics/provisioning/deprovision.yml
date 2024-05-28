@@ -1,0 +1,63 @@
+---
+- name: Stop CICS and deprovision CICS Data sets
+  hosts: all
+  gather_facts: false
+  vars_files: "{{ playbook_dir }}/host_vars/variables.yml"
+  environment: "{{ environment_vars }}"
+
+  vars:
+    applid: APPLID
+    job_id: JOB12345
+
+  module_defaults:
+    group/ibm.ibm_zos_cics.region_group:
+      state: absent
+      cics_data_sets:
+        template: "CTS610.CICS740.<< lib_name >>"
+        sdfhlic: "CTS610.CICS740.LIC.SDFHLIC"
+      region_data_sets:
+        template: "{{ ansible_user }}.REGIONS.{{ applid }}.<< data_set_name >>"
+      le_data_sets:
+        template: "CEE.<< lib_name >>"
+
+  tasks:
+    - name: Stop CICS Region
+      ibm.ibm_zos_cics.stop_cics:
+        job_id: "{{ job_id }}"
+      register: result
+    
+    - name: Log output of stop
+      ansible.builtin.debug:
+        msg: "{{ result }}"
+
+    - name: Delete the auxiliary temporary storage data set (DFHTEMP)
+      ibm.ibm_zos_cics.auxiliary_temp:
+
+    - name: Delete the auxiliary trace data set (DFHAUXT)
+      ibm.ibm_zos_cics.trace:
+
+    - name: Delete the second auxiliary trace data set (DFHBUXT)
+      ibm.ibm_zos_cics.trace:
+        destination: B
+
+    - name: Delete the transaction dump data set (DFHDMPA)
+      ibm.ibm_zos_cics.transaction_dump:
+
+    - name: Delete the second transaction dump data set (DFHDMPB)
+      ibm.ibm_zos_cics.transaction_dump:
+        destination: B
+
+    - name: Delete the CSD data set (DFHCSD)
+      ibm.ibm_zos_cics.csd:
+
+    - name: Delete the transient data intrapartition data set (DFHINTRA)
+      ibm.ibm_zos_cics.intrapartition:
+
+    - name: Delete the local request queue data set (DFHLRQ)
+      ibm.ibm_zos_cics.local_request_queue:
+
+    - name: Delete the global catalog data set (DFHGCD)
+      ibm.ibm_zos_cics.global_catalog:
+
+    - name: Delete the local catalog data set (DFHLCD)
+      ibm.ibm_zos_cics.local_catalog:

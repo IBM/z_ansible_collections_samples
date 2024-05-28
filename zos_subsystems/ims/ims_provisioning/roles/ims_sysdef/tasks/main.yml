@@ -91,11 +91,12 @@
 # ------------------------------------------------------------------------------------------------
 
     - name: IMS system definition preprocessor utility
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSGNPRE.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+      command: 'jsub -f {{ uss_file_path }}/DFSGNPRE.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFSGNPRE.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
       when: preprocess
 
     - when: stage1 and not provision
@@ -146,12 +147,13 @@
       #           content: "{{ lookup('template', '{{ stg1 }}') }}"
 # ------------------------------------------------------------------------------------------------
     - name: Sysdef stage 1
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFS4STG1.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
-        max_rc: 2
+      command: 'jsub -f {{ uss_file_path }}/DFS4STG1.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFS4STG1.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
+      #   max_rc: 2
       when: stage1
 
 
@@ -190,10 +192,11 @@
 # ------------------------------------------------------------------------------------------------
 
     - name: Sysdef stage 2
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFS4STG2.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
-        max_rc: 2
+      command: 'jsub -f {{ uss_file_path }}/DFS4STG2.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFS4STG2.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
+      #   max_rc: 2
       when: stage2

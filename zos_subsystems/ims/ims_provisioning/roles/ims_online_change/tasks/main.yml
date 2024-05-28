@@ -17,6 +17,7 @@
             src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(DFSMREC)"
             dest: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT"
             remote_src: true
+            force: true
           when: enable_olc
 # ------------------------------------------------------------------------------------------------------
 
@@ -39,9 +40,10 @@
 
     # We need a module for the online change utility, no way around it
     - name: Establish active libs
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFS4ACTV.j2'
-        location: USS
-        wait: true
-        wait_time_s: 30
+      command: 'jsub -f {{ uss_file_path }}/DFS4ACTV.j2'
+      # zos_job_submit:
+      #   src: '{{ uss_file_path }}/DFS4ACTV.j2'
+      #   location: USS
+      #   wait: true
+      #   wait_time_s: 30
       when: active_libs

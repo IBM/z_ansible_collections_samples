@@ -1,0 +1,83 @@
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_script to run local and remote
+# scripts in z/OS using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_script.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.8.0 or later.
+#
+# Configure:
+#   python_script_dir - Directory where the Python script will be run (mostly
+#     to test the chdir option in zos_script).
+#   show_current_time - Whether to print the current time on the managed node
+#     when running the CATALOG script.
+#   show_header - Whether to print a header when running the CATALOG script.
+#   rexx_header - Content of the header that will be used in the CATALOG
+#     script.
+###############################################################################
+
+- name: Sample zos_script playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+
+  vars:
+    python_script_dir: "/u/user_name"
+
+    show_current_time: true
+    show_header: true
+    rexx_header: "#--- Current catalog information ---#"
+
+  tasks:
+    # For this task, we can give arguments directly to the script by writing
+    # them after the command that we're interested in running on the managed
+    # node. Make sure to replace the values of the arguments.
+    - name: Run REXX script to get a job's information.
+      ibm.ibm_zos_core.zos_script:
+        cmd: ./files/JOB_INFO JOBID=ID OWNER=OWNER JOBNAME=NAME
+        remote_src: false
+      register: job_output
+
+    - name: See Job information.
+      ansible.builtin.debug:
+        msg: "{{ job_output }}"
+
+    # For this task, we're trying out 'executable' and 'chdir' to have more
+    # control over the way a script is run.
+    - name: Run Python script in a given directory.
+      ibm.ibm_zos_core.zos_script:
+        cmd: ./files/list_dir.py
+        chdir: "{{ python_script_dir }}"
+        executable: "{{ ansible_python_interpreter }}"
+        remote_src: false
+      register: python_output
+
+    - name: See Python output.
+      ansible.builtin.debug:
+        msg: "{{ python_output }}"
+
+    # For the last task, we're trying out a template of a REXX script. See
+    # the variables defined above.
+    - name: Run template of a REXX script.
+      ibm.ibm_zos_core.zos_script:
+        cmd: ./files/CATALOG
+        remote_src: false
+        use_template: true
+        template_parameters:
+          keep_trailing_newline: true
+      register: template_output
+
+    - name: See script's output.
+      ansible.builtin.debug:
+        msg: "{{ template_output }}"
