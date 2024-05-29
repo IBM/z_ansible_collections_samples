@@ -1,0 +1,29 @@
+# Global options
+option domain-name "{{ cluster_name }}.{{ base_domain }}";
+option domain-name-servers {{ os_dns_domain }},{{ dns_forwarder }};
+
+default-lease-time 600;
+max-lease-time 7200;
+
+ddns-update-style interim;
+ignore client-updates;
+allow booting;
+allow bootp;
+log-facility local7;
+
+# Subnet configuration
+subnet dhcp_subnet netmask cic_subnet_mask {    
+    # Default gateway
+    option routers {{ dns_forwarder }};
+    option subnet-mask cic_subnet_mask;
+    option time-offset -18000;
+}
+
+# Static IP assignments
+{% for host, info in static_hosts.items() %}
+host {{ host }} {
+    hardware ethernet {{ info.mac }};
+    fixed-address {{ info.ip }};
+    option domain-name-servers {{ os_dns_domain }},{{ dns_forwarder }};
+}
+{% endfor %}
