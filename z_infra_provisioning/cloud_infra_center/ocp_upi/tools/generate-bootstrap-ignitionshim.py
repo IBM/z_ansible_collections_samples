@@ -54,6 +54,22 @@ if ca_cert_path:
       }
     })
 
+name_prefix = sys.argv[4]
+if name_prefix:
+    name_prefix_byte = name_prefix.encode()
+    bootstrap_hostname = base64.standard_b64encode(name_prefix_byte).decode().strip()
+    files.update(
+    {
+      "storage": {
+        "files": {
+          "path": "/etc/hostname", 
+          "mode": 420, 
+          "contents": {
+              "source": "data:text/plain;charset=utf-8;base64," + bootstrap_hostname
+          }
+        }    
+      }
+    })
 infra_id = sys.argv[3]
 if infra_id:
     with open(infra_id+'-bootstrap-ignition.json', 'a') as f:
