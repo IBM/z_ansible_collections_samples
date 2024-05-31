@@ -26,28 +26,28 @@
   tasks:
 
     - name: Get existing rhcos image from ICIC glance
-      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_qcow2'| wc -l"
+      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}'| wc -l"
       register: icic_rhcos_count
       when:
         - vm_type == "kvm"
 
     - name: 'Remove the rhcos image'
       ansible.builtin.shell:
-        cmd: "openstack image delete icic_rhcos_qcow2"
+        cmd: "openstack image delete icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
       when:
         - vm_type == "kvm"
         - icic_rhcos_count is defined
         - icic_rhcos_count.stdout | int == 1
 
     - name: Get existing rhcos image from ICIC glance
-      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ disk_type }}'| wc -l"
+      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}'| wc -l"
       register: icic_rhcos_count
       when:
         - vm_type == "zvm"
 
     - name: 'Remove the rhcos image'
       ansible.builtin.shell:
-        cmd: "openstack image delete icic_rhcos_{{ disk_type }}"
+        cmd: "openstack image delete icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
       when:
         - vm_type == "zvm"
         - icic_rhcos_count is defined
