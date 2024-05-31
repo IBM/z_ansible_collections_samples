@@ -35,14 +35,43 @@
     # Security groups names
     os_sg_master: "{{ infra_id.stdout_lines[0] }}-master"
     os_sg_worker: "{{ infra_id.stdout_lines[0] }}-worker"
-    # Server names
-    os_bootstrap_server_name: "{{ infra_id.stdout_lines[0] }}-bootstrap"
-    os_cp_server_name: "{{ infra_id.stdout_lines[0] }}-master"
-    os_cp_server_group_name: "{{ infra_id.stdout_lines[0] }}-master"
-    os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-worker"
     # Ignition files
     os_bootstrap_ignition: "{{ infra_id.stdout_lines[0] }}-bootstrap-ignition.json"
-    # BFV volume names
-    os_bootstrap_bfv_name: "{{ infra_id.stdout_lines[0] }}-bootstrap-boot"
-    os_master_bfv_name: "{{ infra_id.stdout_lines[0] }}-master-boot"
-    os_worker_bfv_name: "{{ infra_id.stdout_lines[0] }}-worker-boot"
+
+- name: 'Bootstrap server names with prefix'
+  ansible.builtin.set_fact:
+    os_bootstrap_server_name: "{{ bootstrap_name_prefix }}"
+  when:
+    - bootstrap_name_prefix is defined
+
+- name: 'Bootstrap server names without prefix'
+  ansible.builtin.set_fact:
+    os_bootstrap_server_name: "{{ infra_id.stdout_lines[0] }}-bootstrap"
+  when:
+    - bootstrap_name_prefix is not defined
+
+- name: 'Master server names with prefix'
+  ansible.builtin.set_fact:
+    os_cp_server_name: "{{ master_name_prefix }}"
+    os_cp_server_group_name: "{{ master_name_prefix }}"
+  when:
+    - master_name_prefix is defined
+
+- name: 'Master server names without prefix'
+  ansible.builtin.set_fact:
+    os_cp_server_name: "{{ infra_id.stdout_lines[0] }}-master"
+    os_cp_server_group_name: "{{ infra_id.stdout_lines[0] }}-master"
+  when:
+    - master_name_prefix is not defined
+
+- name: 'Worker server names without prefix'
+  ansible.builtin.set_fact:
+    os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-worker"
+  when:
+    - worker_name_prefix is not defined
+
+- name: 'Worker server names without prefix'
+  ansible.builtin.set_fact:
+    os_compute_server_name: "{{ worker_name_prefix }}"
+  when:
+    - worker_name_prefix is defined
