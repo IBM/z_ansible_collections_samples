@@ -40,7 +40,7 @@
 
 - name: 'Get image name for ZVM'
   ansible.builtin.set_fact:
-    image_name: "icic_rhcos_{{ disk_type }}"
+    image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
   when:
     - vm_type == "zvm"
 
