@@ -7,10 +7,9 @@
 
   vars:
     applid: APPLID
-    job_id: JOB12345
 
   module_defaults:
-    group/ibm.ibm_zos_cics.region_group:
+    group/ibm.ibm_zos_cics.region:
       state: absent
       cics_data_sets:
         template: "CTS610.CICS740.<< lib_name >>"
@@ -22,22 +21,22 @@
 
   tasks:
     - name: Stop CICS Region
-      ibm.ibm_zos_cics.stop_cics:
-        job_id: "{{ job_id }}"
+      ibm.ibm_zos_cics.stop_region:
+        job_name: "{{ applid }}"
       register: result
-    
+
     - name: Log output of stop
       ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Delete the auxiliary temporary storage data set (DFHTEMP)
-      ibm.ibm_zos_cics.auxiliary_temp:
+      ibm.ibm_zos_cics.aux_temp_storage:
 
     - name: Delete the auxiliary trace data set (DFHAUXT)
-      ibm.ibm_zos_cics.trace:
+      ibm.ibm_zos_cics.aux_trace:
 
     - name: Delete the second auxiliary trace data set (DFHBUXT)
-      ibm.ibm_zos_cics.trace:
+      ibm.ibm_zos_cics.aux_trace:
         destination: B
 
     - name: Delete the transaction dump data set (DFHDMPA)
@@ -51,7 +50,7 @@
       ibm.ibm_zos_cics.csd:
 
     - name: Delete the transient data intrapartition data set (DFHINTRA)
-      ibm.ibm_zos_cics.intrapartition:
+      ibm.ibm_zos_cics.td_intrapartition:
 
     - name: Delete the local request queue data set (DFHLRQ)
       ibm.ibm_zos_cics.local_request_queue:
@@ -61,3 +60,7 @@
 
     - name: Delete the local catalog data set (DFHLCD)
       ibm.ibm_zos_cics.local_catalog:
+
+    - name: Delete the CICS startup JCL data set (DFHSTART)
+      ibm.ibm_zos_cics.region_jcl:
+        applid: "{{ applid }}"
