@@ -54,7 +54,11 @@ if ca_cert_path:
       }
     })
 
-name_prefix = sys.argv[4]
+if len(sys.argv) > 4:
+    name_prefix = sys.argv[4]
+else:
+    name_prefix = ''
+
 if name_prefix:
     name_prefix_byte = name_prefix.encode()
     bootstrap_hostname = base64.standard_b64encode(name_prefix_byte).decode().strip()

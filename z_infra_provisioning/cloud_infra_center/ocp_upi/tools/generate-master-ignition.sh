@@ -10,12 +10,11 @@
 
 infra_id=$1
 master_end=$(($2 - 1))
-name_prefix=$3
 
 for index in $( seq 0 $master_end); do
-    if [ -n "$name_prefix" ]; then
-        MASTER_HOSTNAME="$name_prefix-$index\n"
-        IGNITION_NAME="$name_prefix-$index"
+    if [ -n "$3" ]; then
+        MASTER_HOSTNAME="$3-$index\n"
+        IGNITION_NAME="$3-$index"
     else
         MASTER_HOSTNAME="$infra_id-master-$index\n"
         IGNITION_NAME="$infra_id-master-$index"
