@@ -9,12 +9,11 @@
 # =================================================================
 infra_id=$1
 worker_end=$(($2 - 1))
-name_prefix=$3
 
 for index in $( seq 0 $worker_end); do
-    if [ -n "$name_prefix" ]; then
-        WORKER_HOSTNAME="$name_prefix-$index\n"
-        IGNITION_NAME="$name_prefix-$index"
+    if [ -n "$3" ]; then
+        WORKER_HOSTNAME="$3-$index\n"
+        IGNITION_NAME="$3-$index"
     else
         WORKER_HOSTNAME="$infra_id-worker-$index\n"
         IGNITION_NAME="$infra_id-worker-$index"
