@@ -47,12 +47,22 @@
   register: icic_token
   failed_when: icic_token.stdout == ""
 
+- name: 'Get Network physical_network'
+  ansible.builtin.shell:
+    cmd: "openstack network show -c provider:physical_network -f value {{ use_network_name }}"
+  register: physical_network_out
+
+- name: Set fact physical_network
+  ansible.builtin.set_fact:
+    physical_network: "{{ physical_network_out.stdout }}"
+
 - name: Get validate subnet DNS
   ansible.builtin.shell: openstack subnet show -f shell {{ use_network_subnet }} | grep 'dns_nameservers' | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | head -n 1
   register: icic_subnet_dns
   failed_when:
     - icic_subnet_dns.stdout == ""
     - vm_type == "kvm"
+    - physical_network != "macvtap0"
 
 - name: Check subnet DNS is required for KVM, z/VM is optional
   ansible.builtin.fail:
@@ -60,6 +70,7 @@
   failed_when:
     - vm_type == "kvm"
     - icic_subnet_dns.stdout != os_dns_domain
+    - physical_network != "macvtap0"
 
 - name: Get nova api url
   ansible.builtin.shell: openstack catalog show -f json nova | jq -r '.endpoints[] | "\(.url)"' | head -n 1

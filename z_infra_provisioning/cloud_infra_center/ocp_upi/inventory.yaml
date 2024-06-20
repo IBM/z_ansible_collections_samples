@@ -87,5 +87,8 @@ all:
     os_dns_domain: '<external-dns-ip-addr>'
     cluster_name: '<cluster-name>'
     base_domain: '<cluster-base-domain>'
+    # bootstrap_name_prefix: '<bootstrap-node-name>'
+    # master_name_prefix: '<master-node-name>'
+    # worker_name_prefix: '<worker-node-name>'
     pullsecret: '<pull-secret>'
     sshkey: '<ssh-key>'

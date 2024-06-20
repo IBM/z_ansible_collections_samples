@@ -40,12 +40,35 @@
   register: glance_token
 
 - name: Generate bootstrap ignition shim
+  ansible.builtin.script: tools/generate-bootstrap-ignitionshim.py {{ image_url.stdout_lines[0] }} {{ glance_token.stdout }} {{ infra_id.stdout_lines[0] }} {{ bootstrap_name_prefix }}
+  args:
+    executable: python3
+  when:
+    - bootstrap_name_prefix is defined
+
+- name: Generate bootstrap ignition shim
   ansible.builtin.script: tools/generate-bootstrap-ignitionshim.py {{ image_url.stdout_lines[0] }} {{ glance_token.stdout }} {{ infra_id.stdout_lines[0] }}
   args:
     executable: python3
+  when:
+    - bootstrap_name_prefix is not defined
+
+- name: Generate master ignition
+  ansible.builtin.script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_control_nodes_number }} {{ master_name_prefix }}
+  when:
+    - master_name_prefix is defined
 
 - name: Generate master ignition
   ansible.builtin.script: tools/generate-master-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_control_nodes_number }}
+  when:
+    - master_name_prefix is not defined
+
+- name: Generate worker ignition
+  ansible.builtin.script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }} {{ worker_name_prefix }}
+  when:
+    - worker_name_prefix is defined
 
 - name: Generate worker ignition
   ansible.builtin.script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_compute_nodes_number }}
+  when:
+    - worker_name_prefix is not defined
