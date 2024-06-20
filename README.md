@@ -34,22 +34,19 @@ Playbooks are organized by topics that align to tasks and use cases that are
 often repeated and in need of automation.
 
 > [!IMPORTANT]
-> The latest 1.10.0 beta (and upcoming GA) release version of the ibm_zos_core collection introduces some breaking
-> changes to certain modules, specifically that module options are now case-sensitive. See the porting guide in the
+> The 1.10.0 release version of the ibm_zos_core collection introduces some breaking changes to
+> certain modules, specifically that module options are now case-sensitive. See the porting guide in the
 > release notes ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
 > to understand the full impact of these changes.
 >
 > With breaking changes comes a need to update sample playbooks. However, these breaking changes are not
-> necessarily backwards compatible, so a playbook updated to reflect changes from 1.10.0-beta.1 may not
+> necessarily backwards compatible, so a playbook updated to reflect changes from GA release version 1.10.0 may not
 > work with GA release version 1.9.1 even though the older GA version remains under support until May 2025.
 >
-> Since 1.10.0-beta.1 is still not GA, the ``main`` branch will continue to reflect playbooks compatible
-> with 1.9.1.  Newly updated playbooks supported by v1.10.0 will be available in the
-> ``params-update-for-ibm_zos_core-1.10`` branch. 
+> The ``main`` branch will reflect playbooks compatible with the latest GA version, which is now 1.10.0.
 >
-> Once 1.10.0 GAs, the ``main`` branch of this repo will get updated playbooks supported by 1.10.0.
->
-> The older playbooks will be preserved in a separate branch until 1.9.1 goes out of support. 
+> Sample playbooks compatible with the older GA version 1.9.1 will be available in the
+> ``TODO-give-me-name`` branch until the older version goes out of support. 
 
 
 ### Z Topics
