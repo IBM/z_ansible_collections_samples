@@ -22,6 +22,21 @@ configuration, flexibility is written into the samples because it can't always
 be determined if a sample has access to the host’s resources. Review the
 playbook for additional details and configuration.
 
+> [!IMPORTANT]
+> The release of `ibm_zos_core` collection version 1.10.0 introduces case-sensitive
+> changes to modules, specifically that module choices must be lower case. See the porting
+> guide in the release notes (here) to understand the full scope of these changes.
+>
+> These changes require sample playbook updates that are not compatible with earlier
+> versions of the `ibm_zos_core` collection.
+>
+> To support both the latest and prior versions of the collection:
+> 
+> * The `main` branch will reflect playbooks compatible with `ibm_zos_core` version 1.10.0 or later.
+> * The ` ibm-z-playbooks-2024` branch will reflect playbooks compatible with `ibm_zos_core` version 1.9.x or earlier. See the compatible version of the playbook here <link to this playbook in branch>.???
+> 
+> The ` ibm-z-playbooks-2024` branch will remain available until April 2025 but will no longer receive updates.
+
 ## Playbook Requirements
 - [IBM® z/OS® core collection 1.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [Ansible® 2.11 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
