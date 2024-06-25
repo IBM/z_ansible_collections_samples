@@ -55,7 +55,7 @@ You can run the playbook without modification:
 
 ```bash
 ansible-playbook report.yml
-````
+```
 
 The playbook will prompt for required parameters. After parameters have been supplied, the playbook installs the
 CMCI module dependencies to the python environment. The playbook makes a CMCI GET request to regions in the supplied
