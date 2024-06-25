@@ -29,15 +29,15 @@ playbook for additional details and configuration.
 > ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
 > to understand the full scope of these changes.
 >
-> These changes require sample playbook updates that are not compatible with earlier
-> versions of the `ibm_zos_core` collection.
+> These changes are not compatible with earlier versions of the `ibm_zos_core` collection, 
+> and since the earlier versions do not reach their end of life until April 2025, 
+> the sample playbook compatible with the older versions will remain available.
 >
-> To support both the latest and prior versions of the collection:
-> 
+> To support both the latest and prior versions of the collection: 
 > * The `main` branch will reflect playbooks compatible with `ibm_zos_core` version 1.10.0 or later.
-> * The `ibm-z-playbooks-2024` branch will reflect playbooks compatible with `ibm_zos_core` version 1.9.x or earlier.
+> * The `ibm_zos_core-v1.9.x-samples` branch will reflect playbooks compatible with `ibm_zos_core` version 1.9.x or earlier.
 > 
-> The `ibm-z-playbooks-2024` branch will remain available until April 2025 but will not receive updates.
+> The `ibm_zos_core-v1.9.x-samples` branch will remain available until April 2025 but will not receive updates.
 >
 >
 
