@@ -113,7 +113,7 @@
       zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
-        fs_type: zfs
+        fs_type: ZFS
         state: mounted
 
     - name: Copy JCL to data set.
@@ -124,7 +124,7 @@
     - name: Submit the JCL at {{ mount_point}}/HELLO.jcl.
       zos_job_submit:
         src: "{{ mount_point }}/HELLO.jcl"
-        location: uss
+        location: USS
       register: result
 
     - name: Setting fact `job_id` for id of job submitted above.
@@ -155,7 +155,7 @@
       zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
-        fs_type: zfs
+        fs_type: ZFS
         state: absent
 
     - name: Delete ZFS data set {{ zfs_dsname }}.

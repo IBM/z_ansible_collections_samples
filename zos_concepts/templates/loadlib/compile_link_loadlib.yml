@@ -68,7 +68,7 @@
     - name: Compile and link the COBOL code.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/COMPLINK.j2"
-        location: local
+        location: LOCAL
         wait_time_s: 60
         use_template: true
       register: comp_result

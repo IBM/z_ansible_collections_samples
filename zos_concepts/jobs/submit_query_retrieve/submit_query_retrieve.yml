@@ -130,7 +130,7 @@
     - name: Submit the JCL {{ data_set_name }}(MEM1)
       zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
-        location: data_set
+        location: DATA_SET
       register: result
       with_sequence: count=1
 
@@ -180,7 +180,7 @@
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
-        location: uss
+        location: USS
       register: result
 
     - name: Response for submit {{ job_name }} JCL located on target

@@ -45,10 +45,10 @@
         content: "HELLO WORLD - {{ item }}"
         dest: "{{ item }}"
         dest_data_set:
-          type: seq
+          type: SEQ
           space_primary: 5
           space_secondary: 1
-          space_type: cyl
+          space_type: CYL
       loop: "{{ data_sets_to_archive }}"
 
     #########################################################################
@@ -86,13 +86,13 @@
         format:
           name: terse
           format_options:
-            terse_pack: spack
+            terse_pack: SPACK
             use_adrdssu: True
         remove: "{{ remove_data_sets }}"
         dest_data_set:
           space_primary: "{{ size_in_cyls.primary }}"
           space_secondary: "{{ size_in_cyls.secondary }}"
-          space_type: cyl
+          space_type: CYL
       register: archive_result
 
     - debug:
