@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2024
 ###############################################################################
 
 ###############################################################################
@@ -107,7 +107,8 @@
         type: pds
         format: fba
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: m
       register: result
 
     - name: Response for creating the PDS
@@ -153,13 +154,14 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Copy the updated directory back to the remote host
+    - name: Copy the updated directory back to the remote host overwriting previous content.
       zos_copy:
         src: "{{ ctl_tmp_dir }}/{{ data_set_name }}"
         dest: "{{ data_set_name }}"
         encoding:
           from: ISO8859-1
           to: "{{ target_charset }}"
+        force: true  
       register: result
 
     - name: Response for copying

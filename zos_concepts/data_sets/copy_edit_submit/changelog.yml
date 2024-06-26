@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2024
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -43,3 +43,10 @@ releases:
                 - Renamed `copy_edit_submit.yaml` to `copy_edit_submit.yml` to standardize all playbooks with the same extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+    2024.04.09:
+        date: 2024-04-09
+        changes:
+            fixed:
+                - Lower case zos_job_submit module option 'location' per ibm.ibm_zos_core:1.10.0 requirements.
+            removed:
+                - Remove deprecated zos_job_submit module option 'wait'.

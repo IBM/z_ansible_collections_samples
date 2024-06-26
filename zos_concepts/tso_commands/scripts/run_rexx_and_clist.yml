@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -40,7 +40,7 @@
       block:
         - name: Copy file to a new data set.
           ibm.ibm_zos_core.zos_copy:
-            src: ./files/DSINFO
+            src: "{{ playbook_dir }}/files/DSINFO"
             dest: "{{ script_data_set }}"
             remote_src: false
 
@@ -58,7 +58,7 @@
       block:
         - name: Copy file to a new data set.
           ibm.ibm_zos_core.zos_copy:
-            src: ./files/CLIST
+            src: "{{ playbook_dir }}/files/CLIST"
             dest: "{{ clist_data_set }}"
             remote_src: false
 

@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2023
+# Copyright (c) IBM Corporation 2023, 2024
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -31,3 +31,8 @@ releases:
         changes:
             added:
                 - Released initial version
+    2024.04.11:
+        date: 2024-04-11
+        changes:
+            fixed:
+                - Prefix paths with 'playbook_dir' Ansible global variable.
