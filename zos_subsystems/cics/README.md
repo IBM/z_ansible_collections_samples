@@ -40,7 +40,7 @@ This repository provides several CICS Ansible playbooks that show how to use the
     the appropriate parameters for the `cmci_action` module for the action
     you're trying to run.
 
-1. CICS region provisioning playbooks
+1. CICS region provisioning samples
 
     Detailed instructions are provided in this [documentation](provisioning/), including the requirements and prerequisites you must satisfy. These samples show how to use the modules in the CICS collection to provision a CICS region from scratch:
 
