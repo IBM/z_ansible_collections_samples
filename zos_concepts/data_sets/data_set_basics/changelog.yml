@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2024
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -44,3 +44,9 @@ releases:
                 - Renamed `data_set_basics.yaml` to `data_set_basics.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+    2024.04.09:
+        date: 2024-04-09
+        changes:
+            fixed:
+                - Replace deprecated zos_data_set module option 'size' with new module options 'space_primary' and 'space_type'.
+                - Lower case zos_data_set module option 'type' per ibm.ibm_zos_core:1.10.0 requirements.

@@ -9,7 +9,7 @@
     applid: APPLID
 
   module_defaults:
-    group/ibm.ibm_zos_cics.region_group:
+    group/ibm.ibm_zos_cics.region:
       state: initial
       cics_data_sets:
         template: "CTS610.CICS740.<< lib_name >>"
@@ -21,13 +21,13 @@
 
   tasks:
     - name: Create the auxiliary temporary storage data set (DFHTEMP)
-      ibm.ibm_zos_cics.auxiliary_temp:
+      ibm.ibm_zos_cics.aux_temp_storage:
 
     - name: Create the auxiliary trace data set (DFHAUXT)
-      ibm.ibm_zos_cics.trace:
+      ibm.ibm_zos_cics.aux_trace:
 
     - name: Create the second auxiliary trace data set (DFHBUXT)
-      ibm.ibm_zos_cics.trace:
+      ibm.ibm_zos_cics.aux_trace:
         destination: B
 
     - name: Create the transaction dump data set (DFHDMPA)
@@ -40,25 +40,14 @@
     - name: Create the CSD data set (DFHCSD)
       ibm.ibm_zos_cics.csd:
 
-    - name: Create a CSDUP script on z/OS Unix
-      ibm.ibm_zos_core.zos_copy:
-        src: "{{ playbook_dir }}/files/CSDUP_script"
-        dest: "/u/{{ ansible_user | lower }}/csdup_script/script"
-        use_template: true
-
     - name: Update the CSD data set with the CSDUP script
       ibm.ibm_zos_cics.csd:
-        state: script
-        script_location: USS
-        script_src: "/u/{{ ansible_user | lower }}/csdup_script/script"
-
-    - name: Remove CSDUP script directory and file
-      ansible.builtin.file:
-        path: "/u/{{ ansible_user | lower }}/csdup_script"
-        state: absent
+        state: changed
+        input_location: INLINE
+        input_content: ADD GROUP(DFHTERMC) LIST(DFHLIST1)
 
     - name: Create the transient data intrapartition data set (DFHINTRA)
-      ibm.ibm_zos_cics.intrapartition:
+      ibm.ibm_zos_cics.td_intrapartition:
 
     - name: Create the local request queue data set (DFHLRQ)
       ibm.ibm_zos_cics.local_request_queue:
@@ -69,9 +58,8 @@
     - name: Create the local catalog data set (DFHLCD)
       ibm.ibm_zos_cics.local_catalog:
 
-    - name: Start CICS Region
-      ibm.ibm_zos_cics.start_cics:
-        submit_jcl: true
+    - name: Create CICS startup JCL data set (DFHSTART)
+      ibm.ibm_zos_cics.region_jcl:
         applid: "{{ applid }}"
         job_parameters:
           region: 0M
@@ -82,13 +70,14 @@
           cicssvc: 217
           edsalim: 500M
           grplist: (DFHLIST*)
-          gmtext: '''Region provisioned with Ansible'''
+          gmtext: Region provisioned with Ansible
           srbsvc: 218
           tcpip: "NO"
           usshome: /cics/cics740
           sysidnt: ZPY1
       register: result
 
-    - name: Output start CICS JCL
-      ansible.builtin.debug:
-        msg: "{{ result }}"
+    - name: Submit region JCL
+      ansible.builtin.command:
+        cmd: jsub "{{ ansible_user }}.REGIONS.{{ applid }}.DFHSTART"
+      changed_when: true

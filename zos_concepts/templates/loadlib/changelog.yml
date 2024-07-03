@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2023
+# Copyright (c) IBM Corporation 2023, 2024
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -31,3 +31,11 @@ releases:
         changes:
             added:
                 - Released initial version
+    2024.04.11:
+        date: 2024-04-11
+        changes:
+            fixed:
+                - Lower case zos_data_set module option 'type' per ibm.ibm_zos_core:1.10.0 requirements.
+                - Lower case zos_data_set module option 'space_type' per ibm.ibm_zos_core:1.10.0 requirements.
+                - Lower case zos_data_set module option 'record_format' per ibm.ibm_zos_core:1.10.0 requirements.
+                - Lower case zos_job_submit module option 'location' per ibm.ibm_zos_core:1.10.0 requirements.

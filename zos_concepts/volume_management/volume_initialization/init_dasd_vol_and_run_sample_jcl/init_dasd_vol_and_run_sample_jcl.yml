@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -80,11 +80,11 @@
             not be SMS managed.
       zos_volume_init:
         address: "{{ vol_unit }}"
-        verify_offline: true
+        verify_offline: no
         volid: "{{ new_volser }}"
         index: true
         sms_managed: false
-        verify_volume_empty: true
+        verify_volume_empty: no
       register: output
 
     - name: Response for intialize target volume.
@@ -100,7 +100,7 @@
         name: "{{ zfs_dsname }}"
         type: zfs
         space_primary: 50
-        space_type: M
+        space_type: m
         replace: true
         volumes: "{{ new_volser }}"
 
@@ -113,7 +113,7 @@
       zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
-        fs_type: ZFS
+        fs_type: zfs
         state: mounted
 
     - name: Copy JCL to data set.
@@ -124,7 +124,7 @@
     - name: Submit the JCL at {{ mount_point}}/HELLO.jcl.
       zos_job_submit:
         src: "{{ mount_point }}/HELLO.jcl"
-        location: USS
+        location: uss
       register: result
 
     - name: Setting fact `job_id` for id of job submitted above.
@@ -155,7 +155,7 @@
       zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
-        fs_type: ZFS
+        fs_type: zfs
         state: absent
 
     - name: Delete ZFS data set {{ zfs_dsname }}.

@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2022
+# Copyright (c) IBM Corporation 2022, 2024
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -31,3 +31,8 @@ releases:
         changes:
             added:
                 - Released initial version (pending)
+    2024.04.10:
+        date: 2024-04-10
+        changes:
+            fixed:
+                - Update data set space configurations for clearer threshold variations in output.

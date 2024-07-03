@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2024
 ###############################################################################
 
 ###############################################################################
@@ -93,8 +93,7 @@
     - name: "Submit the JCL {{ tmp_data_set }}(PSA)"
       zos_job_submit:
         src: "{{ tmp_data_set }}(PSA)"
-        location: DATA_SET
-        wait: true
+        location: data_set
       register: result_submit_psa
 
     - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
@@ -104,8 +103,7 @@
     - name: "Submit the JCL {{ tmp_data_set }}(UPTIME)"
       zos_job_submit:
         src: "{{ tmp_data_set }}(UPTIME)"
-        location: DATA_SET
-        wait: true
+        location: data_set
       register: result_submit_uptime
 
     - name: "Response for submitting JCL {{ tmp_data_set }}(UPTIME)"

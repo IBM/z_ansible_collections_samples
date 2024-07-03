@@ -19,6 +19,27 @@ It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
 
+> [!IMPORTANT]
+> The release of `ibm_zos_core` collection version 1.10.0 introduced case-sensitive
+> changes to modules, specifically that module choices must be lower case. See the porting
+> guide in the release notes
+> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
+> to understand the full scope of these changes.
+>
+> These changes are not compatible with earlier versions of the `ibm_zos_core` collection, 
+> and since the earlier versions do not reach their end of life until April 2025, 
+> the sample playbook compatible with the older versions will remain available.
+>
+> To support both the latest and prior versions of the collection: 
+> * The `main` branch will reflect playbooks compatible with `ibm_zos_core` version 1.10.0 or later.
+>   * Find this playbook on the `main` branch: [here](https://github.com/IBM/z_ansible_collections_samples/tree/main/zos_concepts/jobs/submit_query_retrieve).
+> * The `ibm_zos_core-v1.9.x-samples` branch will reflect playbooks compatible with `ibm_zos_core` version 1.9.x or earlier.
+>   * Find this playbook on the `ibm_zos_core-v1.9.x-samples` branch: [here](https://github.com/IBM/z_ansible_collections_samples/tree/ibm_zos_core-v1.9.x-samples/zos_concepts/jobs/submit_query_retrieve).
+> 
+> The `ibm_zos_core-v1.9.x-samples` branch will remain available until April 2025 but will not receive updates.
+>
+>
+
 ## Playbook Requirements
 This playbook requires:
 

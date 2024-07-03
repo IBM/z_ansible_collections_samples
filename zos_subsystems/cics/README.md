@@ -32,6 +32,19 @@ This repository provides a number of samples that show how to use the CICS colle
 
     The `set_ca` sample shows how to use the CMCI modules with a custom CA bundle, typically useful when you have an internal CA.
 
+1. [Refresh tags](cmci/refresh_tags)
+
+    The `refresh_tags` sample shows how to instruct a CICS region to refresh
+    its tags by re-reading the tags file on USS.  This is achieved by using
+    the `cmci_action` module.  This sample also documents how to determine
+    the appropriate parameters for the `cmci_action` module for the action
+    you're trying to run.
+
+1. [Provisioning](provisioning/)
+
+    The `provisioning` sample shows how use the modules in the CICS collection
+    to provision a CICS region from scratch.
+
 ---
 
 These CICS samples are just some of the samples available for the Red Hat Ansible Certified Content for IBM Z. You can find samples covering other aspects at the [root of the repository](https://github.com/IBM/z_ansible_collections_samples).
