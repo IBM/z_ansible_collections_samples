@@ -18,6 +18,8 @@
 - import_playbook: destroy-controls.yaml
 - import_playbook: destroy-bootstrap.yaml
 - import_playbook: destroy-computes.yaml
+- import_playbook: cleanup-bastion.yaml
+  when: use_internal_bastion == true
 - import_playbook: destroy-network.yaml
 - import_playbook: destroy-security-groups.yaml
 - import_playbook: destroy-volumes.yaml
