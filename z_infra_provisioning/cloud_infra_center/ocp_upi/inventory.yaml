@@ -33,45 +33,31 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
-      
-      use_network_name: 'VLAN1287'
-      use_network_subnet: '22c2cf48-7412-4d28-88ec-6d7ef7143626'
 
-      vm_type: 'kvm' # kvm or zvm
-      disk_type: 'dasd' # dasd or scsi
-      #volume_type_id: '<storage-template-id>'
-      
-      openshift_version: '4.10'
-      openshift_minor_version: '16'
-      
-      auto_allocated_ip: false  # true or false
-      #allocation_pool_start: '<ip range start>'
-      #allocation_pool_end: '<ip range end>'
-      os_flavor_bootstrap: 'm1.medium'
-      os_flavor_master: 'm1.medium'
-      os_flavor_worker: 'm1.medium' 
+      use_network_name: '<network-name-from-icic>'
+      use_network_subnet: '<subnet-id-from-network-name-in-icic>'
 
-      create_server_zone: 'z15_AZ'
+      vm_type: 'kvm'
+      disk_type: 'dasd'
+      # volume_type_id: '<storage-template-id>'
+
+      openshift_version: '4.12'
+      openshift_minor_version: 'latest'
+
+      auto_allocated_ip: true
+      # allocation_pool_start: '<ip range start>'
+      # allocation_pool_end: '<ip range end>'
+      os_flavor_bootstrap: 'medium'
+      os_flavor_master: 'medium'
+      os_flavor_worker: 'medium'
+
+      create_server_zone: ''
       os_control_nodes_number: 3
-      os_compute_nodes_number: 2
+      os_compute_nodes_number: 3
 
-      os_bootstrap_ip: '10.20.84.40'
-      os_master_ip: ['10.20.84.41', '10.20.84.42', '10.20.84.43']
-      os_infra_ip: ['10.20.84.38', '10.20.84.39']
-      
-      use_proxy: false # true or false
-      #http_proxy: '<http-proxy>'
-      #https_proxy: '<https-proxy>'
-      #no_proxy: '<no-proxy>'
-
-      use_localreg: true # true or false
-      localreg_mirror: "intreg0.fpet.pokprv.stglabs.ibm.com:5000/ocp4/openshift4"
-      localreg_source1: "quay.io/openshift-release-dev/ocp-release"
-      localreg_source2: "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
-      localreg_media: "http://fpetutil.fpet.pokprv.stglabs.ibm.com/lzocpc"
-
-      approve_nodes_csr: 15 # minute
-      create_server_timeout: 15 # minute
+      # os_bootstrap_ip: '<bootstrap ip addr>'
+      # os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
+      # os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
 
       use_proxy: false
       # http_proxy: '<http-proxy>'
@@ -86,6 +72,8 @@ all:
       # local_rhcos_image: '<local-rhcos-image-url>'
 
       # additional_certs: "{{ lookup('file', '/opt/registry/certs/domain.crt') | indent (width=2) }}"
+
+      create_server_timeout: 10 # minute
 
     bastion:
       ansible_ssh_host: '<linux-server-ip-addr>'
