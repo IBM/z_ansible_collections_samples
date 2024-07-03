@@ -240,4 +240,3 @@
 
 - import_playbook: update-bastion-new-compute.yaml
   when: use_internal_bastion == true
-  
