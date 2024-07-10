@@ -56,7 +56,7 @@
         input_location: LOCAL
         input_src: "{{ playbook_dir }}/files/CSDUP_script_templated"
 
-    - name: Delete the templated CSDUP script
+    - name: Delete the local templated CSDUP script
       ansible.builtin.file:
         path: "{{ playbook_dir }}/files/CSDUP_script_templated"
         state: absent
