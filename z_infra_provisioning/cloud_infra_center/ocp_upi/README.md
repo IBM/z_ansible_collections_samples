@@ -348,6 +348,8 @@ Others are **optional**, you can enable them and update value if you need more s
 | `create_server_timeout`   | 10                                                      | Default is 10 minutes that used to create instances and volumes from backend storage provider                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 
+**Note**: Check [Disconnected installation](./Disconnected_Installation.md) for setting up a disconnected installation of the OpenShift Container Platform (OCP).
+
 **Note**: Check [OpenShift on a single node](./SNO.md) for how to define single node cluster.
 
 ## Creation of the cluster
