@@ -43,7 +43,7 @@ sed -i "s/HOSTPORT/${HOSTPORT}/g" pull-secret.json
 sed -i "s/you@example.com/$REGISTRY_EMAIL/g" pull-secret.json
 
 BUILDNAME="ocp"
-BUILDNUMBER="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${IMAGE_ARCH}/clients/${BUILDNAME}/${VERSION}/release.txt" | grep 'Name:' | awk '{print $NF}')"
+BUILDNUMBER="$(wget -q -O - "https://mirror.openshift.com/pub/openshift-v4/${IMAGE_ARCH}/clients/${BUILDNAME}/${VERSION}/release.txt" | grep 'Name:' | awk '{print $NF}')"
 
 if [ "$(echo "${BUILDNUMBER}" | cut -d '.' -f1-2)" == "4.2" ] && [ "$(echo "${BUILDNUMBER}" | cut -d '.' -f3)" -lt "14" ];then
   OCP_RELEASE="${BUILDNUMBER}"
@@ -53,9 +53,9 @@ fi
 
 LOCAL_REGISTRY="${LOCAL_REGISTRY_HOSTNAME}:${LOCAL_REGISTRY_PORT}"
 LOCAL_REPOSITORY='icic/openshift4'
-PRODUCT_REPO="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${IMAGE_ARCH}/clients/${BUILDNAME}/${VERSION}/release.txt" | grep "Pull From:" | cut -d '/' -f2)"
+PRODUCT_REPO="$(wget -q -O - "https://mirror.openshift.com/pub/openshift-v4/${IMAGE_ARCH}/clients/${BUILDNAME}/${VERSION}/release.txt" | grep "Pull From:" | cut -d '/' -f2)"
 LOCAL_SECRET_JSON="./pull-secret.json"
-RELEASE_NAME="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${IMAGE_ARCH}/clients/${BUILDNAME}/${VERSION}/release.txt" | grep "Pull From:" | cut -d '/' -f3 | cut -d '@' -f1)"
+RELEASE_NAME="$(wget -q -O - "https://mirror.openshift.com/pub/openshift-v4/${IMAGE_ARCH}/clients/${BUILDNAME}/${VERSION}/release.txt" | grep "Pull From:" | cut -d '/' -f3 | cut -d '@' -f1)"
 
 # Download openshift client
 wget https://mirror.openshift.com/pub/openshift-v4/${CLIENT_ARCH}/clients/ocp/${VERSION}/openshift-client-linux.tar.gz
