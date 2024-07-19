@@ -12,9 +12,9 @@
 
 - name: Verify openshift minor version
   ansible.builtin.shell: |
-    version=$(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    version=$(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
     if [ -z $version ]; then
-      echo $(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+      echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
     else
       echo $version
     fi
