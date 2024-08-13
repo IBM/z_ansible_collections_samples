@@ -44,14 +44,14 @@ This repository provides several CICS Ansible playbooks that show how to use the
 
     Detailed instructions are provided in this [documentation](provisioning/), including the requirements and prerequisites you must satisfy. These samples show how to use the modules in the CICS collection to provision a CICS region from scratch:
 
-   * [full_provision.yml](./full_provision.yml) is an Ansible playbook that can create all the required data sets and start a stand-alone CICS region. 
-   * [full_provision_smss.yml](./full_provision_smss.yml) is an Ansible playbook that can create all the required data sets and start a CICS region that has the CMCI feature.
-   * [deprovision.yml](./deprovision.yml) is an Ansible playbook that stops a running CICS region and removes all its data sets. 
+   * [full_provision.yml](provisioning/full_provision.yml) is an Ansible playbook that can create all the required data sets and start a stand-alone CICS region. 
+   * [full_provision_smss.yml](provisioning/full_provision_smss.yml) is an Ansible playbook that can create all the required data sets and start a CICS region that has the CMCI feature.
+   * [deprovision.yml](provisioning/deprovision.yml) is an Ansible playbook that stops a running CICS region and removes all its data sets. 
 
    In addition, the following artifacts are supplied in support for these samples: 
 
-   * [inventory.yml](./inventories/inventory.yml) contains an Ansible inventory for your provisioning. 
-   * [variables.yml](./host_vars/variables.yml) contains the required environment variables needed by the z/OS Ansible collections (including the CICS collection) to execute the Ansible payload on z/OS UNIX. They also include the path to the Python and ZOAU installations on z/OS UNIX.
+   * [inventory.yml](provisioning/inventories/inventory.yml) contains an Ansible inventory for your provisioning. 
+   * [variables.yml](provisioning/host_vars/variables.yml) contains the required environment variables needed by the z/OS Ansible collections (including the CICS collection) to execute the Ansible payload on z/OS UNIX. They also include the path to the Python and ZOAU installations on z/OS UNIX.
 
 ---
 
