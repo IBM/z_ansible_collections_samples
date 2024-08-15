@@ -19,13 +19,10 @@ cluster_nodes:
       ip: 172.26.105.211
   masters:
     master-0:
-      etcd: etcd-0
       ip: 172.26.105.200
     master-1:
-      etcd: etcd-1
       ip: 172.26.105.207
     master-2:
-      etcd: etcd-2
       ip: 172.26.105.202
 ```
 
@@ -58,14 +55,6 @@ master-2              IN A 172.26.105.202
 worker-0              IN A 172.26.105.208
 worker-1              IN A 172.26.105.209
 worker-2              IN A 172.26.105.211
-
-etcd-0              IN A 172.26.105.200
-etcd-1              IN A 172.26.105.207
-etcd-2              IN A 172.26.105.202
-
-_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.openshift.second.com.
-                      IN SRV 0 10 2380 etcd-1.openshift.second.com.
-                      IN SRV 0 10 2380 etcd-2.openshift.second.com.
 ```
 
 required DNS records

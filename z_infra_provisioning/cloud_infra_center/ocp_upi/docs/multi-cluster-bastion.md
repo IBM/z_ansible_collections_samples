@@ -30,14 +30,6 @@ master-2              IN A 172.26.105.202
 
 worker-0              IN A 172.26.105.208
 worker-1              IN A 172.26.105.209
-
-etcd-0              IN A 172.26.105.200
-etcd-1              IN A 172.26.105.207
-etcd-2              IN A 172.26.105.202
-
-_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.openshift.second.com.
-                      IN SRV 0 10 2380 etcd-1.openshift.second.com.
-                      IN SRV 0 10 2380 etcd-2.openshift.second.com.
 ```
 
 You need to change the `openshift.second.com` to the second cluster domain name, and change servers' IPs and worker nodes' names.

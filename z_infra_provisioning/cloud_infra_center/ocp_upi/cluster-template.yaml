@@ -14,13 +14,10 @@ cluster_nodes:
   masters:
     master-0:
       ip: '172.26.103.231'
-      etcd: etcd-0
     master-1:
       ip: '172.26.103.232'
-      etcd: etcd-1
     master-2:
       ip: '172.26.103.233'
-      etcd: etcd-2
   infra:
     worker-0:
       ip: '172.26.103.234'

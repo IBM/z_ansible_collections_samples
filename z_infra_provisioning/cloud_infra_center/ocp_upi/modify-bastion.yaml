@@ -38,14 +38,6 @@
     - new_worker_exists.stdout | int == 0
     - last_worker_ln.stdout != ""
 
-# modify dns file when there are no workers present
-- name: Add new worker dns record into named when no workers present
-  ansible.builtin.shell:
-    cmd: "sed -i '/etcd-0 /i{{ new_worker_name }}              IN A {{ new_worker_ip  }}\n' /var/named/{{ cluster_domain_name  }}.zone"
-  when:
-    - new_worker_exists.stdout | int == 0
-    - last_worker_ln.stdout == ""
-
 # modify haproxy file
 - name: 'Validation worker name exist in haproxy'
   ansible.builtin.shell: cat /etc/haproxy/haproxy.cfg | grep "{{ new_worker_name }}" | wc -l
