@@ -27,17 +27,3 @@ apps                  IN A {{ bastion_public_ip_address }}
 {{ item }}              IN A {{ infra[item].ip }}
 {% endfor %}
 {% endif %}
-
-{% for item in masters.keys() %}
-{% set key = master-{{ (loop.index - 1) }} %}
-{{ key }}
-#{% set ip = master[{{ key }}].ip %}
-#etcd-{{ (loop.index - 1) }}                IN A {{ ip }}
-{% endfor %}
-
-_etcd-server-ssl._tcp IN SRV 0 10 2380 etcd-0.{{ cluster_name }}.{{ base_domain }}.
-{% for item in masters.keys() %}
-  {% if loop.index != 1 %}
-                  IN SRV 0 10 2380 etcd-{{(loop.index - 1) }}.{{ cluster_name }}.{{ base_domain }}.
-  {% endif %}
-{% endfor %}
