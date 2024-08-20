@@ -1,0 +1,125 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to copy a directory to a PDS, edit a
+# member within the PDS and submit PDS member containing JCL.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_edit_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.11.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set name and get last two minutes of logs.
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    - name: Check content of last four minutes of console log
+      command: "pcon -t 4"
+      register: tmp_text
+
+    - set_fact:
+        tmp_data_set: "{{ tmp_ds.stdout }}"
+
+    - set_fact:
+        tmp_text: "{{ tmp_text.stdout }}"
+    # ##########################################################################
+    # Modules: zos_dataset, zos_blockinfile, zos_copy,
+    # zos_lineinfile, zos_fetch
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create the generation data group with name
+    # |   {{ tmp_data_set }}
+    # | - Using zos_data_set, create first generation of the GDG.
+    # | - Using zos_data_set, create second generation of the GDG.
+    # | - Using zos_blockinfile, to add the logs to the last creation of the GDG.
+    # | - Using zos_copy, to copy content of last creation to first creation of GDG.
+    # | - Using zos_lineinfile, add comment to first creation of GDG with relative
+    # |   notation {{ tmp_data_set }}(-1).
+    # | - Using zos_fetch, to fetch the first creation of the GDG.
+    # +-------------------------------------------------------------------------
+    - name: "Create the GDG {{tmp_data_set}} with limit of 2"
+      zos_data_set:
+        name: "{{ tmp_data_set }}"
+        type: gdg
+        limit: 2
+      register: result_create_gdg
+
+    - name: "Response the creation of the GDG {{ tmp_data_set }} with limit of 2"
+      debug:
+        msg:
+          - "{{ result_create_gdg }}"
+
+    - name: "Create the GDS with record length of 200"
+      zos_data_set:
+        name: "{{ tmp_data_set }}(+1)"
+        type: seq
+        record_length: 200
+        state: "present"
+
+    - name: "Create the GDS with record length of 200"
+      zos_data_set:
+        name: "{{ tmp_data_set }}(+1)"
+        type: seq
+        record_length: 200
+        state: "present"
+      register: result_create_gds_relative
+
+    - name: "Response of the creation of the GDS {{ tmp_data_set }}(+1)"
+      debug:
+        msg:
+          - "{{ result_create_gds_relative }}"
+
+    - name: "Add the last 4 minutes of console log of to {{ tmp_data_set }}(0)"
+      zos_blockinfile:
+        src: "{{ tmp_data_set }}(0)"
+        marker: "//* {mark} *//"
+        insertbefore: BOF
+        state: present
+        block: "{{ tmp_text }}"
+
+    - name: "Copy from the last creation to the first of the GDS {{ tmp_data_set }}"
+      zos_copy:
+        src: "{{ tmp_data_set }}(0)"
+        dest: "{{ tmp_data_set }}(-1)"
+        remote_src: true
+
+    - name: "Edit first creation of GDG to add a comment"
+      zos_lineinfile:
+        src: "{{ tmp_data_set }}(-1)"
+        insertbefore: BOF
+        state: present
+        line: "#### Last 4 minutes of console log"
+
+    - name: "Fetch {{ tmp_data_set }}(-1) to the local machine"
+      zos_fetch:
+        src: "{{ tmp_data_set }}(-1)"
+        dest: "{{ playbook_dir }}/"
+      register: result_of_fetch
+
+    - name: "Result of Fetch {{ tmp_data_set }}(0) to the local machine"
+      debug:
+        msg:
+          - "{{ result_of_fetch }}"
