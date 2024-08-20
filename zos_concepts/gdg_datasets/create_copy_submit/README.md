@@ -1,4 +1,4 @@
-# Copy Directory to PDS, Edit member and Submit Job
+# Create GDG, copy delete and submit of Generation Data Group
 This playbook demonstrates how to create a GDG create copy delete and submit
 creations of GDS.
 
