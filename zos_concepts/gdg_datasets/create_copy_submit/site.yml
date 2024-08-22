@@ -31,4 +31,4 @@
         name: requirements-check
 
 - name: Executing the z/OS Ansible playbook
-  import_playbook: copy_edit_submit.yml
+  import_playbook: create_copy_submit.yml
