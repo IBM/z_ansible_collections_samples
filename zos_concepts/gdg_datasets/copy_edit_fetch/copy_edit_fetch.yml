@@ -3,8 +3,8 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to copy a directory to a PDS, edit a
-# member within the PDS and submit PDS member containing JCL.
+# This sample playbook demonstrates how to add text content to a GDS copy to
+# another generation, edit the copy and fetch the content.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -54,11 +54,11 @@
     # |   {{ tmp_data_set }}
     # | - Using zos_data_set, create first generation of the GDG.
     # | - Using zos_data_set, create second generation of the GDG.
-    # | - Using zos_blockinfile, to add the logs to the last creation of the GDG.
-    # | - Using zos_copy, to copy content of last creation to first creation of GDG.
-    # | - Using zos_lineinfile, add comment to first creation of GDG with relative
-    # |   notation {{ tmp_data_set }}(-1).
-    # | - Using zos_fetch, to fetch the first creation of the GDG.
+    # | - Using zos_blockinfile, add the logs to the latest generation of GDG.
+    # | - Using zos_copy, copy the content from the latest generation to a previous one.
+    # | - Using zos_lineinfile, add a comment to a previous generation of
+    # |   the GDG using relative notation notation {{ tmp_data_set }}(-1).
+    # | - Using zos_fetch, to fetch the previous generation of the GDG.
     # +-------------------------------------------------------------------------
     - name: "Create the GDG {{tmp_data_set}} with limit of 2"
       zos_data_set:

@@ -1,6 +1,6 @@
-# Create add edit copy and fetch with Generation data group
-This playbook demonstrates how to create a GDG edit copy and fetch
-creations of GDS.
+# Create, add, edit, copy and fetch with Generation data group
+This playbook demonstrates how to create, edit, copy and fetch
+Generation Data Groups (GDG) and Generation Datasets (GDS).
 
 This playbook uses:
   - collection:

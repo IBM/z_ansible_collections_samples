@@ -11,11 +11,23 @@
 #         changes:
 #             added:
 #                 - new features are added
+#             deprecated:
+#                 - features being removed in the future
+#             fixed:
+#                 - bug fixes
+#             minor:
+#                 - changes in existing functionality
+#             removed:
+#                 - features removed no longer available
+#             security:
+#                 - vulnerabilities fixed
+#             summary:
+#                 - summary of changes or link to Git issue, pull request
 ################################################################################
 
 releases:
     2024.08.26:
-        date: 2024-09-26
+        date: 2024-08-26
         changes:
             added:
                 - Released initial version
