@@ -23,7 +23,7 @@ echo "{{ i }} - $msg"
 
 
 echo ""
-echo "My favorite programming languagess in reverse alphabetical order are:"
+echo "My favorite programming languages in reverse alphabetical order are:"
 
 # Jinja template can loop over a list.
 {% for lang in fav_programming_languages | sort(reverse=True) %}
