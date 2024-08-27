@@ -7,7 +7,7 @@ This playbook uses:
     - ibm.ibm_zos_core
   - modules:
     - zos_copy
-    - zos_dataset
+    - zos_data_set
     - zos_fetch
     - zos_blockinfile
     - zos_lineinfile
@@ -41,7 +41,7 @@ names, authority, and the artifacts that will be created and cleaned up.
 
 This playbook requires:
 - [IBM® z/OS® core collection 1.11.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
-- [Ansible® 2.5 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [Ansible® 2.15 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Configuration
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
