@@ -5,6 +5,10 @@
 ###############################################################################
 # This playbook demonstrates how to use zos_script to run local and remote
 # scripts in z/OS using Red Hat Ansible Certified Content for IBM Z.
+# This playbook is divided up into three independent sections. The tasks in each
+# section are grouped into 'blocks' that are tagged. The example below shows how
+# the playbook can be run so that only the tasks in the block tagged as
+# 'rexx_script' are run.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -76,16 +80,16 @@
   ##############################################################################
   # This next block explores module options: 'executable' and 'chdir'.
   # The default behavior of the zos_script module is to run a script as Rexx.
-  # The task also passes in a command line arg like the previous one did.
   # The 'executable' module option enables running other types of scripts by
   # passing in a path to the appropriate executable. The Ansible inventory
-  # variable 'ansible_python_interpreter' is typically used to specify the
-  # remote path to the python interpreter used by Ansible to run modules. The
-  # task below reuses this variable in the 'executable' module option since a
-  # working version of python is guaranteed to be at that location (given that
-  # the rest of this playbook ran).
+  # variable 'ansible_python_interpreter' is used to specify the remote path
+  # to the python interpreter used by Ansible to run modules. The task below
+  # reuses this variable in the 'executable' module option since a working
+  # version of python is guaranteed to be at that location (given that the rest
+  # of this playbook ran).
   # The value set in the module option 'chdir' is set to the value defined above
   # in the vars section of this playbook.
+  # The task also passes in a command line arg just like the previous script.
   # Notice in the output that the value of 'current working directory' matches
   # what was specified in module option 'chdir'. Compare this to the output from
   # the previous block where the 'chdir' module option was not specified.
