@@ -4,11 +4,11 @@
 
 ###############################################################################
 # This playbook (`site.yml`) is the master playbook for this project. Based on
-# the playbooks requirments, `site.yml` playbook will evalute the requirements
+# the playbooks requirements, `site.yml` playbook will evaluate the requirements
 # and report when the minimum requirements are not configured and fail playbook
 # execution.
 #
-# Upon successful dependency analyais, the z/OS playbook will be executed.
+# Upon successful dependency analysis, the z/OS playbook will be executed.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>

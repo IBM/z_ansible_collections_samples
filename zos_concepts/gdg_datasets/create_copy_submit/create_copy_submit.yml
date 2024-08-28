@@ -3,14 +3,14 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to copy a directory to a PDS, edit a
-# member within the PDS and submit PDS member containing JCL.
+# This sample playbook demonstrates how to create gds, copy a local JCL, copy
+# to a new generation, delete a previous generation and execute the JCL.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventories copy_edit_submit.yml
+#  ansible-playbook -i inventories create_copy_submit.yml
 #
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
@@ -42,9 +42,9 @@
     # Modules: zos_dataset, zos_copy, zos_job_submit
     # ##########################################################################
     # +-------------------------------------------------------------------------
-    # | - Using zos_dataset, create GDG with {{ tmp_data_set }} name with a limit
-    # |   of 3 creations.
-    # | - Using zos_dataset, create GDS with relative notation.
+    # | - Using zos_data_set, create Generation Data Group with {{ tmp_data_set }}
+    # |   name with a limit of 3 creations.
+    # | - Using zos_data_set, create Generation Data Set with relative notation.
     # | - Using zos_copy, copy {{ playbook_dir }}/UPTIME file to last creation of
     # |   GDS with relative notation {{ tmp_data_set }}(0).
     # | - Using zos_copy, copy {{ tmp_data_set }}(0) to a new generation GDS with

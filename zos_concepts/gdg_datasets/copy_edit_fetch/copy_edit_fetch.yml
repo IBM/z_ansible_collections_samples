@@ -77,7 +77,7 @@
     # | - Using zos_copy, copy the content from the latest generation of {{ tmp_data_set1 }}
     # | - latest generation of {{ tmp_data_set2 }}.
     # | - Using zos_lineinfile, add a comment to a latest generation of {{ tmp_data_set2 }}
-    # |   using relative notation notation {{ tmp_data_set2 }}(-1).
+    # |   using relative notation notation {{ tmp_data_set2 }}(0).
     # | - Using zos_fetch, to fetch the latest generation of the GDG {{ tmp_data_set2 }}.
     # +-------------------------------------------------------------------------
     - name: "Create the Generation Data Group(GDG) {{tmp_data_set1}} with a limit of 2 generations"
