@@ -11,18 +11,22 @@
 #
 # Example:
 #  ansible-playbook -i inventories zos_script.yml
+#  ansible-playbook -i inventories zos_script.yml --tags rexx_script
 #
 # Requirements:
 #   IBM z/OS core collection 1.8.0 or later.
 #
 # Configure:
 #   python_script_dir - Directory where the Python script will be run (mostly
-#     to test the chdir option in zos_script).
-#   show_current_time - Whether to print the current time on the managed node
-#     when running the CATALOG script.
-#   show_header - Whether to print a header when running the CATALOG script.
-#   rexx_header - Content of the header that will be used in the CATALOG
-#     script.
+#     to test the chdir module option).
+# Optional:
+#   use_custom_msg - Whether to print the custom message or use the default one
+#                    when running the templated shell script.
+#   custom_msg - Content of the message printed in the templated shell script.
+#   some_num - A number used as a range to loop over in the templated shell
+#              script.
+#   fav_programming_languages - A list of strs which are sorted and then printed
+#                               out in the templated shell script.
 ###############################################################################
 
 - name: Sample zos_script playbook.
@@ -33,51 +37,116 @@
   environment: '{{ environment_vars }}'
 
   vars:
-    python_script_dir: "/u/user_name"
+    python_script_dir: "/u/ibmuser"
 
-    show_current_time: true
-    show_header: true
-    rexx_header: "#--- Current catalog information ---#"
+    use_custom_msg: True
+    custom_msg: "This is a custom Hello World message!!"
+    some_num: 3
+    fav_programming_languages:
+      - C
+      - rexx
+      - python
+      - cobol
 
   tasks:
-    # For this task, we can give arguments directly to the script by writing
-    # them after the command that we're interested in running on the managed
-    # node. Make sure to replace the values of the arguments.
-    - name: Run REXX script to get a job's information.
+
+  ##############################################################################
+  # This first block shows how a value can be passed directly to a script as a
+  # command line arg by using the 'cmd' module option.
+  # Notice in the output that the value of 'ansible_user' is present.
+  ##############################################################################
+
+  - name: Pass a value to a script in-line as a command line arg with the 'cmd'
+          module option and print the output.
+    tags: rexx_script
+    block:
+
+    - name: Run a Rexx script which prints a greeting to the user and prints the
+            current working directory on the remote system.
       ibm.ibm_zos_core.zos_script:
-        cmd: "{{ playbook_dir }}/files/JOB_INFO JOBID=ID OWNER=OWNER JOBNAME=NAME"
+        cmd: "{{ playbook_dir }}/files/HELLO_USER_PRINT_CWD.rexx name={{ ansible_user }}"
         remote_src: false
-      register: job_output
+      register: hello_user_output
 
-    - name: See Job information.
+    - name: Print the Rexx script output.
       ansible.builtin.debug:
-        msg: "{{ job_output }}"
+        msg: "{{ hello_user_output.stdout_lines }}"
 
-    # For this task, we're trying out 'executable' and 'chdir' to have more
-    # control over the way a script is run.
-    - name: Run Python script in a given directory.
+
+  ##############################################################################
+  # This next block explores module options: 'executable' and 'chdir'.
+  # The default behavior of the zos_script module is to run a script as Rexx.
+  # The task also passes in a command line arg like the previous one did.
+  # The 'executable' module option enables running other types of scripts by
+  # passing in a path to the appropriate executable. The Ansible inventory
+  # variable 'ansible_python_interpreter' is typically used to specify the
+  # remote path to the python interpreter used by Ansible to run modules. The
+  # task below reuses this variable in the 'executable' module option since a
+  # working version of python is guaranteed to be at that location (given that
+  # the rest of this playbook ran).
+  # The value set in the module option 'chdir' is set to the value defined above
+  # in the vars section of this playbook.
+  # Notice in the output that the value of 'current working directory' matches
+  # what was specified in module option 'chdir'. Compare this to the output from
+  # the previous block where the 'chdir' module option was not specified.
+  ##############################################################################
+
+  - name: Specify a remote directory to run a script in and specify which
+          program to use to run the script, then print the output.
+    tags: python_script
+    block:
+
+    - name: Run a Python script, with a specified python executable, in a
+            specified remote directory, which prints a greeting to the user and
+            prints the current working directory on the remote system.
       ibm.ibm_zos_core.zos_script:
-        cmd: "{{ playbook_dir }}/files/list_dir.py"
+        cmd: "{{ playbook_dir }}/files/hello_user_print_cwd.py --name={{ ansible_user }}"
         chdir: "{{ python_script_dir }}"
         executable: "{{ ansible_python_interpreter }}"
         remote_src: false
       register: python_output
 
-    - name: See Python output.
+    - name: Print the Python script output.
       ansible.builtin.debug:
-        msg: "{{ python_output }}"
+        msg: "{{ python_output.stdout_lines }}"
 
-    # For the last task, we're trying out a template of a REXX script. See
-    # the variables defined above.
-    - name: Run template of a REXX script.
+
+  ##############################################################################
+  # This last block runs a templated shell script.
+  # First, the script greets the user, prints the directory the playbook was run
+  # from and prints a number all for which the values are rendered in jinja and
+  # substitued in. The user and playbook directory values are populated by
+  # accessing the Ansible magic variables 'ansible_user' and 'playbook_dir'. The
+  # number is defined above as 'some_num' in the vars section of this playbook.
+  # Next the script assigns a string value to a variable '$msg' based on a
+  # jinja-templated conditional block. The value of the conditional is based on
+  # the boolean value 'use_custom_msg' defined above in the vars section of this
+  # playbook.
+  # Then the script uses a jinja-templated loop to iterate over a range from 1
+  # up to and including the number defined in 'some_num'. Each iteration prints
+  # out the value of the loop variable as well as the determined value of
+  # '$msg'.
+  # Lastly, the script uses another jinja-templated loop to iterate through the
+  # 'fav_programming_languages' list, sorts it in reverse alphabetical order,
+  # and prints the sorted list.
+  ##############################################################################
+
+  - name: Run a templated shell script which leverages jinja templating to
+          substitute values in a string, to set up and evaluate a conditional
+          block, and to loop through both a range and a list.
+    tags: shell_script
+    block:
+
+    - name: Run a templated shell script.
       ibm.ibm_zos_core.zos_script:
-        cmd: "{{ playbook_dir }}/files/CATALOG"
+        cmd: "{{ playbook_dir }}/files/templated_loops_and_conditional_sample.sh"
+        executable: /bin/sh
         remote_src: false
         use_template: true
         template_parameters:
           keep_trailing_newline: true
-      register: template_output
+      register: output
 
-    - name: See script's output.
+    - name: Print shell script output.
       ansible.builtin.debug:
-        msg: "{{ template_output }}"
+        msg: "{{ output.stdout_lines }}"
