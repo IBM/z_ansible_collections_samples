@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2024
+# © Copyright IBM Corporation 2020, 2021, 2022
 ###############################################################################
 
 ###############################################################################
@@ -18,7 +18,7 @@
 #  `data_set_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0 or later # FIXME - update to correct version.
+#   IBM z/OS core collection 1.3.0 or later.
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -34,7 +34,7 @@
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
-  gather_facts: false
+  gather_facts: no
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "HELLO"
@@ -78,10 +78,29 @@
         space_type: m
         format: fb
         record_length: 80
-        replace: true
+        replace: yes
       register: result
 
     - name: Response for create a PDS data set {{ data_set_name }}
+      debug:
+        msg: "{{ result }}"
+
+    # +-------------------------------------------------------------------------
+    # | "with_sequence" is a type of conditional Ansible loop. The loop here 
+    # | only runs for a single iteration and is included solely to demonstrate
+    # | how easy it is to perform the operation for multiple members. The result
+    # | is that single member 'MEM1' is created.
+    # +-------------------------------------------------------------------------
+
+    - name: Create a PDS member and replace if member exist
+      zos_data_set:
+        name: "{{ data_set_name }}(MEM{{ item }})"
+        type: member
+        replace: yes
+      with_sequence: count=1
+      register: result
+
+    - name: Response for create a PDS member and replace if member exist
       debug:
         msg: "{{ result }}"
 
@@ -99,6 +118,7 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
+        force: true 
       register: result
 
     - name: Response for write HELLO JCL to USS
@@ -111,8 +131,9 @@
         in {{ tgt_tmp_dir }}/ansible/jcl
       zos_copy:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
-        remote_src: true
+        remote_src: True
         dest: "{{ data_set_name }}(MEM1)"
+        force: true
       register: result
 
     - name: Response for populate {{ data_set_name }} member with data from
@@ -121,16 +142,16 @@
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
-    # | "with_sequence" is a type of conditional Ansible loop. The loop here
-    # | only runs for a single iteration and is included solely to demonstrate
-    # | how multiple jobs could be submitted under a single task for members of
-    # | a single PDS.
+    # | Similar to how the PDS member was created earlier, this is another
+    # | Ansible loop with a single iteration designed to showcase how multiple
+    # | jobs could be submitted under a single task for members of a single PDS
     # +-------------------------------------------------------------------------
 
     - name: Submit the JCL {{ data_set_name }}(MEM1)
       zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
         location: data_set
+        wait_time_s: 155
       register: result
       with_sequence: count=1
 
@@ -139,15 +160,16 @@
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
-    # | There is a list of results returned by the zos_job_submit module. Each
-    # | result contains attributes from the job it refers to including job_id,
+    # | There is a list of results returned by the zos_job_submit module. Each 
+    # | result contains attributes from the job it refers to including job_id, 
     # | job_name, owner, content, and return codes. Since only one job was
-    # | submitted, it will be the first (and only) job in the results list.
+    # | submitted, it will be the first (and only) job in the results list.  
     # +-------------------------------------------------------------------------
 
     - name: Setting fact `job_id_pds` for id of job submitted above
       set_fact:
-        job_id_pds: "{{ result.results[0].jobs[0].job_id }}"
+         job_id_pds: "{{ result.results[0].jobs[0].job_id }}"
+    
     - name: Fact `job_id_pds` set with value
       debug:
         msg: "{{ job_id_pds }}"
@@ -172,18 +194,19 @@
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
-    # | JCL from a USS file can also be submitted as a job by leveraging the
+    # | JCL from a USS file can also be submitted as a job by leveraging the 
     # | zos_job_submit module.
     # +-------------------------------------------------------------------------
 
-    - name: Submit {{ job_name }} JCL located on target
+    - name: Submit {{ job_name }} jcl located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
         location: uss
+        wait_time_s: 40
       register: result
-
-    - name: Response for submit {{ job_name }} JCL located on target
+        
+    - name: Response for submit {{ job_name }} jcl located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       debug:
         msg:
@@ -193,6 +216,8 @@
       set_fact:
         job_id_uss: "{{ result.jobs[0].job_id }}"
 
+          # job_id_uss: "{{ result.job_id }}"
+    
     - name: Fact `job_id_uss` set with value
       debug:
         msg: "{{ job_id_uss }}"
@@ -206,10 +231,10 @@
             on USS target
       debug:
         msg: "{{ result }}"
-
+    
     # +-------------------------------------------------------------------------
-    # | The following section is commented out because it creates identical
-    # | output to when the same job was submited earlier in the playbook
+    # | The following section is commented out because it creates identical 
+    # | output to when the same job was submited earlier in the playbook 
     # | from the PDS member. Feel free to uncomment the following section to
     # | view the full job output.
     # +-------------------------------------------------------------------------

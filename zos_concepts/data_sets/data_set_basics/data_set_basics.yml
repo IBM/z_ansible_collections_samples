@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2024
+# © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 # This sample playbook demonstrates basic data set operations using modules
 # included in the Red Hat Ansible Certified  Content for IBM Z core collection.
@@ -32,11 +32,10 @@
 ###############################################################################
 
 ---
-
-- hosts: zos_host
+- hosts: all
   collections:
     - ibm.ibm_zos_core
-  gather_facts: false
+  gather_facts: no
   vars:
     tgt_tmp_dir: "/tmp"
   environment: "{{ environment_vars }}"
@@ -49,7 +48,7 @@
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_seq
 
-    - name: Create temp PDS name
+    - name: Create temp sequential data set name
       command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_pds
 
@@ -65,7 +64,7 @@
           - "pds name - {{ pds_name }}"
 
     ############################################################################
-    # Modules zos_copy, zos_data_set, zos_fetch
+    # Modules zos_data_set, zos_fetch
     ############################################################################
     # +-------------------------------------------------------------------------
     # | 1. Create a sequential data set
@@ -93,20 +92,22 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Remove old {{ tgt_tmp_dir }}/HELLO if it exists, for idempotency
+    - name: Create a USS file
       file:
         path: "{{ tgt_tmp_dir }}/HELLO"
-        state: absent
+        state: touch
       register: result
 
-    - name: Response for USS file deletion
+    - name: Response for USS file creation
       debug:
         msg: "{{ result }}"
 
-    - name: Copy HELLO.jcl from project to USS file
+    - name: zos_copy
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
+        # remote_src: yes
+        force: true  
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
@@ -118,7 +119,7 @@
       zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
-        remote_src: true
+        remote_src: yes
       register: result
 
     - name: Response for copying USS file to data set
@@ -139,14 +140,13 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Remove the target PDS member if it exists, for idempotency.
+    - name: Create a PDS member
       zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: member
-        state: absent
       register: result
 
-    - name: Response for removing the PDS member
+    - name: Response for creating the PDS member
       debug:
         msg: "{{ result }}"
 
@@ -154,7 +154,8 @@
       zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
-        remote_src: true
+        remote_src: yes
+        force: true 
       register: result
 
     - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
