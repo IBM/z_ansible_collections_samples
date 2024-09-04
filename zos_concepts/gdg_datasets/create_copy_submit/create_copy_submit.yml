@@ -39,7 +39,7 @@
     - set_fact:
         tmp_data_set: "{{ tmp_ds.stdout }}"
     # ##########################################################################
-    # Modules: zos_dataset, zos_copy, zos_job_submit
+    # Modules: zos_data_set, zos_copy, zos_job_submit
     # ##########################################################################
     # +-------------------------------------------------------------------------
     # | - Using zos_data_set, create Generation Data Group with {{ tmp_data_set }}
@@ -60,7 +60,7 @@
         limit: 3
       register: result_create_gdg
 
-    - name: "Response the creation of the GDG {{ tmp_data_set }} with limit of 3"
+    - name: "Response from creating GDG {{ tmp_data_set }} with limit of 3"
       debug:
         msg:
           - result_create_gdg
@@ -86,7 +86,7 @@
           to: IBM-1047
       register: result_copy_dir
 
-    - name: "Response for copy local file {{ playbook_dir }}/UPTIME to latest creation of GDS {{ tmp_data_set }}."
+    - name: "Response from copying local file {{ playbook_dir }}/UPTIME to latest creation of GDS {{ tmp_data_set }}."
       debug:
         var: result_copy_dir
 
@@ -107,7 +107,7 @@
         location: data_set
       register: result_submit
 
-    - name: "Response for submitting JCL {{ tmp_data_set }}(0)"
+    - name: "Response from submitting JCL {{ tmp_data_set }}(0)"
       debug:
         var: result_submit
 

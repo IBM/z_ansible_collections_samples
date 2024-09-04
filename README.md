@@ -58,7 +58,7 @@ often repeated and in need of automation.
   - [Initialize DASD volume, Copy JCL to PDS, and Submit Job](zos_concepts/volume_management/volume_initialization/init_dasd_vol_and_run_sample_jcl)
 - Concepts
   - [Copy and Fetch Data sets](zos_concepts/data_transfer/copy_fetch_data_set)
-  - [Copy Edti and Fetch](zos_concepts/gdg_datasets/copy_edit_fetch)
+  - [Copy Edit and Fetch](zos_concepts/gdg_datasets/copy_edit_fetch)
   - [Copy, Sort and Fetch Data Sets on z/OS using Ansible](zos_concepts/data_transfer/copy_sort_fetch)- \[[Playback](https://mediacenter.ibm.com/media/Copy%2C+sort%2C+and+fetch+data+on+z+OS+using+Ansible/1_ah4qhyvu)]
   - [Create Copy and Submit](zos_concepts/gdg_datasets/create_copy_submit)
   - [Terse Data Set and Fetch](zos_concepts/data_transfer/terse_fetch_data_set)
