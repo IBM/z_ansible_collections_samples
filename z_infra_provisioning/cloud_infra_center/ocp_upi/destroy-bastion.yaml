@@ -1,0 +1,90 @@
+# =================================================================
+# Copyright 2021 https://github.com/openshift/installer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =================================================================
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- hosts: bastion
+  gather_facts: false
+  tasks:
+    - name: 'Check whether use internal bastion'
+      set_fact:
+        use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
+
+    - name: 'Set fact of domain info'
+      set_fact:
+        cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
+
+    - name: 'Validate master exits'
+      ansible.builtin.shell: | 
+        count=$(grep -c 'master' /var/named/{{ cluster_domain_name  }}.zone)
+        echo $count
+      register: master_exists_count
+
+    - name: 'Get the line number of the master'
+      ansible.builtin.shell: grep 'master' /var/named/{{ cluster_domain_name  }}.zone
+      register: master_ln
+      when: master_exists_count.stdout | int > 0
+
+    - name: Remove /etc/haproxy/haproxy.cfg info with masters
+      ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /etc/haproxy/haproxy.cfg
+      with_items: "{{ master_ln.stdout_lines }}"
+      when:
+        - master_exists_count.stdout | int > 0
+        - use_internal_bastion == true
+
+    - name: Remove bastion dns info with masters
+      ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /var/named/{{ cluster_domain_name  }}.zone
+      with_items: "{{ master_ln.stdout_lines }}"
+      when:
+        - master_exists_count.stdout | int > 0
+        - use_internal_bastion == true
+
+    - name: 'Check whether use internal bastion'
+      set_fact:
+        use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
+
+    - name: 'Set fact of domain info'
+      set_fact:
+        cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
+
+    - name: 'Validate worker exits'
+      ansible.builtin.shell: | 
+        count=$(grep -c 'worker' /var/named/{{ cluster_domain_name  }}.zone)
+        echo $count
+      register: worker_exist_count
+
+    - name: 'Get the line number of the worker'
+      ansible.builtin.shell: grep 'worker' /var/named/{{ cluster_domain_name  }}.zone
+      register: worker_ln
+      when: worker_exist_count.stdout | int > 0
+
+    - name: Remove /etc/haproxy/haproxy.cfg info with workers
+      ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /etc/haproxy/haproxy.cfg
+      with_items: "{{ worker_ln.stdout_lines }}"
+      when:
+        - worker_exist_count.stdout | int > 0
+        - use_internal_bastion == true
+
+    - name: Remove bastion dns info with workers
+      ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /var/named/{{ cluster_domain_name  }}.zone
+      with_items: "{{ worker_ln.stdout_lines }}"
+      when:
+        - worker_exist_count.stdout | int > 0
+        - use_internal_bastion ==  true

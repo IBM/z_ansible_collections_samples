@@ -23,13 +23,13 @@
 
     - name: 'Get image name for kvm'
       ansible.builtin.set_fact:
-        image_name: icic_rhcos_qcow2
+        image_name: icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
       when:
         - vm_type == "kvm"
 
     - name: 'Get image name for ZVM'
       ansible.builtin.set_fact:
-        image_name: "icic_rhcos_{{ disk_type }}"
+        image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
       when:
         - vm_type == "zvm"
 
@@ -237,15 +237,11 @@
     - set_fact:
         workers_list: "{{ item.split(',') }}"
       with_items: "{{ works_list_results.stdout_lines }}"
-
+  
 - hosts: bastion
   tasks:
-    - name: 'Check whether use internal bastion'
-      set_fact:
-        use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
-
-    - name: 'Modify bastion dns for new worker'
-      ansible.builtin.include_tasks: modify-dns.yaml
+    - name: Modify dns & haproxy on bastion
+      include_tasks: modify-bastion.yaml
       vars:
         worker_name: "{{ item.split(':')[0] }}"
         worker_ip: "{{ item.split(':')[-1] }}"
@@ -253,37 +249,4 @@
       with_items: "{{ hostvars['localhost']['workers_list'] }}" 
       when:
         - use_internal_bastion == true
-
-    - name: 'Modify bastion haproxy for new worker'
-      ansible.builtin.include_tasks: modify-haproxy.yaml
-      vars:
-        worker_name: "{{ item.split(':')[0] }}"
-        cluster_domain_name:  "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
-      with_items: "{{ hostvars['localhost']['workers_list'] }}" 
-      when:
-        - use_internal_bastion == true
-
-    - name: Restart named-chroot.service
-      ansible.builtin.service:
-        name: named-chroot.service
-        state: restarted
-      when:
-        - use_internal_bastion == true
-
-    - name: Restart HAProxy.service
-      ansible.builtin.service:
-        name: haproxy.service
-        state: restarted
-      when:
-        - use_internal_bastion == true
-
-    - name: Check if named-chroot is running
-      ansible.builtin.service:
-        name: named-chroot
-        state: started
-
-    - name: Check if HAProxy is running
-      ansible.builtin.service:
-        name: haproxy
-        state: started
 

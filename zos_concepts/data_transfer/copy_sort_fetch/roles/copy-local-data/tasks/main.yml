@@ -1,6 +1,6 @@
 ---
 ################################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2024
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ################################################################################
 
@@ -41,8 +41,8 @@
 - name: Create the temporary data set
   ibm.ibm_zos_core.zos_data_set:
     name: "{{ dest_tmp_data_set }}"
-    type: "SEQ"
-    record_format: "FB"
+    type: seq
+    record_format: fb
 
 - name: Copy local data file to remote z/OS temporary data set
   ibm.ibm_zos_core.zos_copy:
@@ -58,6 +58,6 @@
 
 - ansible.builtin.assert:
     that:
-      - "{{ result.data_sets | valid_list }}"
-      - "'{{ result.data_sets[0]['name'] }}' == '{{ dest_tmp_data_set }}'"
+      - "result.data_sets | valid_list"
+      - "result.data_sets[0]['name'] == dest_tmp_data_set"
     fail_msg: "The destination data set does not exist"

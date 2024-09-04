@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2024
 ###############################################################################
 
 ###############################################################################
@@ -96,8 +96,9 @@
       zos_encode:
         src: "{{ tgt_tmp_dir }}/date.sh"
         dest: "{{ tgt_tmp_dir }}/date.sh"
-        from_encoding: ISO8859-1
-        to_encoding: "{{ target_charset }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
         backup: false
       register: result
 
@@ -196,8 +197,9 @@
       zos_encode:
         src: "{{ tgt_tmp_dir }}/encode/"
         dest: "{{ tgt_tmp_dir }}/encode/"
-        from_encoding: ISO8859-1
-        to_encoding: "{{ target_charset }}"
+        encoding:
+          from: ISO8859-1
+          to: "{{ target_charset }}"
       register: result
 
     - name: Response for encode files in {{ tgt_tmp_dir }}/encode/` from

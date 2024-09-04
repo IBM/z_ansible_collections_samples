@@ -36,9 +36,9 @@ def get_nodes_ips(infra_id, node_role):
     """
      get nodes' IPs with different role, and return a dict like 
      {"masters": 
-     {"master-0": {"ip": "172.26.103.1", "etcd": "etcd-0"}}, 
-     {"master-1": {"ip": "172.26.103.2", "etcd": "etcd-1"}},
-     {"master-2": {"ip": "172.26.103.3", "etcd": "etcd-2"}}
+     {"master-0": {"ip": "172.26.103.1"}}, 
+     {"master-1": {"ip": "172.26.103.2"}},
+     {"master-2": {"ip": "172.26.103.3"}}
      }
     """
     cmd = "openstack --os-volume-api-version=3 port list | grep %s | awk '{print$4,$8}'" % (infra_id+"-"+node_role)
@@ -65,10 +65,7 @@ def get_nodes_ips(infra_id, node_role):
             name = n[1] + "-" + n[-1]
         ip = node.split(" ")[1]
         ip = ip.split("'")[1]
-        if node_role == "master":
-            nodes_dict[name] = {"ip": ip, "etcd": name.replace("master", "etcd")}
-        else:
-            nodes_dict[name] = {"ip": ip}
+        nodes_dict[name] = {"ip": ip}
     return nodes_dict
 
 bastion_dict = get_bastion_template()

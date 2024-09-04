@@ -25,3 +25,5 @@
     - volume_type_id is defined
     - vm_type == "kvm"
 - import_playbook: destroy-files.yaml
+- import_playbook: destroy-bastion.yaml
+  when: use_internal_bastion == true

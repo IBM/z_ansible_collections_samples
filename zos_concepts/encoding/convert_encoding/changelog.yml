@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2024
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -48,3 +48,9 @@ releases:
                 - Renamed `convert_encoding.yaml` to `convert_encoding.yml` with a `yml` extenstion to follow standardize on the extension
             removed:
                 - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+    2024.04.09:
+        date: 2024-04-09
+        changes:
+            fixed:
+                - Replace deprecated zos_encode module options 'from_encoding' and 'to_encoding' with new module option
+                    'encoding' with sub-options 'to' and from'

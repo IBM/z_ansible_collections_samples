@@ -29,7 +29,7 @@
           - typing;python_version<"3.5"
 
     ############################################################################
-    # Install module dependencies
+    # NEWCOPY PROGRAM in CICS
     ############################################################################
     - name: NEWCOPY PROGRAM in CICS
       delegate_to: localhost

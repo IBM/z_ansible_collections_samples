@@ -1,5 +1,5 @@
 # =================================================================
-# Copyright 2021 https://github.com/multi-arch/multiarch-ci-playbooks
+# Copyright 2024 https://github.com/multi-arch/multiarch-ci-playbooks
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,46 +17,72 @@
 # =================================================================
 # Licensed Materials - Property of IBM
 #
-# (c) Copyright IBM Corp. 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2024 All Rights Reserved
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 # =================================================================
 #
-# Change Summary:
-# - Change Ansible playbook name
+---
+- name: Copy cluster-template.yaml file to bastion
+  hosts: bastion
+  gather_facts: no
+  vars:
+    local_yaml_file: ./cluster-template.yaml
+    remote_yaml_file: /tmp/cluster-template.yaml
+    haproxy_cfg_path: /etc/haproxy/haproxy.cfg
+    cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
 
-- name: 'Get worker node IP'
-  ansible.builtin.set_fact:
-    new_worker_name: "{{ worker_name | replace('{','') | replace('}','') | replace(\"'\",'') | replace(' ','') }}"
-    cluster_domain_name: "{{ cluster_domain_name }}"
+  tasks:
+    - name: Copy the YAML file from localhost to hostA
+      copy:
+        src: "{{ local_yaml_file }}"
+        dest: "{{ remote_yaml_file }}"
+      delegate_to: localhost
+      
+    - name: Read the YAML file on hostA
+      slurp:
+        src: "{{ remote_yaml_file }}"
+      register: yaml_file_content
 
-- name: 'Validation worker name exist in haproxy'
-  ansible.builtin.shell: cat /etc/haproxy/haproxy.cfg | grep "{{ new_worker_name }}" | wc -l
-  register: new_worker_count
-  check_mode: false
-  ignore_errors: true
+    - name: Parse YAML content
+      set_fact:
+        yaml_data: "{{ yaml_file_content.content | b64decode | from_yaml }}"
 
-- name: 'Get the line number for backend http'
-  ansible.builtin.shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-http' |awk '{print$1}'
-  register: exist_new_worker_http
+    - name: Extract worker names under infra
+      set_fact:
+        worker_names: "{{ yaml_data.cluster_nodes.infra.keys() | list }}"
 
-- name: 'Get the line number for backend https'
-  ansible.builtin.shell: cat -n /etc/haproxy/haproxy.cfg | grep -w 'backend ocp4-router-https' |awk '{print$1}'
-  register: exist_new_worker_https
+    - name: Print worker names
+      debug:
+        msg: "Worker names: {{ worker_names }}"
 
-- name: 'Increment backend http'
-  ansible.builtin.set_fact: new_worker_http={{ exist_new_worker_http.stdout|int + 2 }}
+    - name: 'Add new worker to ocp4-router-http'
+      ansible.builtin.shell: |
+        line_number_http=$(cat -n {{ haproxy_cfg_path }} | grep -w 'backend ocp4-router-http' |awk '{print$1}')
+        line_count_http=$((line_number_http + 2))
+        worker_line_http=$(grep 'server {{ item }} {{ item }}.{{ cluster_domain_name }}:80' {{ haproxy_cfg_path }} || true)
+        if [ -z "$worker_line_http" ]; then
+          sed -i "${line_count_http}a\         \server {{ item }} {{ item }}.{{ cluster_domain_name }}:80 check" {{ haproxy_cfg_path }}
+        fi
+        line_number_https=$(cat -n {{ haproxy_cfg_path }} | grep -w 'backend ocp4-router-https' |awk '{print$1}')
+        line_count_https=$((line_number_https + 2))
+        worker_line_https=$(grep 'server {{ item }} {{ item }}.{{ cluster_domain_name }}:443' {{ haproxy_cfg_path }} || true)
+        if [ -z "$worker_line_https" ]; then
+          sed -i "${line_count_https}a\         \server {{ item }} {{ item }}.{{ cluster_domain_name }}:443 check" {{ haproxy_cfg_path }}
+        fi
+      check_mode: false
+      ignore_errors: true
+      loop: "{{ worker_names }}"
 
-- name: 'Increment backend https'
-  ansible.builtin.set_fact: new_worker_https={{ exist_new_worker_https.stdout|int + 3 }}
+    - name: Restart HAProxy.service
+      ansible.builtin.service:
+        name: haproxy.service
+        state: restarted
 
-- name: Add new worker http domain into dns
-  ansible.builtin.shell:
-    cmd: sed -i '{{ new_worker_http }} i\         \server {{ new_worker_name }} {{ new_worker_name }}.{{ cluster_domain_name }}:80 check'  /etc/haproxy/haproxy.cfg
-  when: new_worker_count.stdout == "0"
+    - name: Check if HAProxy is running
+      ansible.builtin.service:
+        name: haproxy
+        state: started
 
-- name: Add new worker https domain into dns
-  ansible.builtin.shell:
-    cmd: sed -i '{{ new_worker_https }} i\         \server {{ new_worker_name }} {{ new_worker_name }}.{{ cluster_domain_name }}:443 check'  /etc/haproxy/haproxy.cfg
-  when: new_worker_count.stdout == "0"
+  

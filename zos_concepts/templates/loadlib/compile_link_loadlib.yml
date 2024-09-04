@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -43,10 +43,10 @@
     - name: Create {{ pgm_dataset }} for the COBOL program.
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ pgm_dataset }}"
-        type: PDS
+        type: pds
         space_primary: 2
-        space_type: M
-        record_format: FB
+        space_type: m
+        record_format: fb
         record_length: 80
         block_size: 3120
 
@@ -58,17 +58,17 @@
     - name: Create {{ loadlib_dataset }} where the compiled source will be linked.
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ loadlib_dataset }}"
-        type: PDSE
+        type: pdse
         space_primary: 2
-        space_type: M
-        record_format: U
+        space_type: m
+        record_format: u
         record_length: 0
         block_size: 32760
 
     - name: Compile and link the COBOL code.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/COMPLINK.j2"
-        location: LOCAL
+        location: local
         wait_time_s: 60
         use_template: true
       register: comp_result

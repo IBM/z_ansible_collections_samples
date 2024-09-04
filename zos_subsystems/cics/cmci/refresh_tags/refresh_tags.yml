@@ -1,0 +1,40 @@
+# (c) Copyright IBM Corporation 2024
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: Refresh region tags
+
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: cmci_user
+      prompt: CMCI user name (leave blank for unauthenticated)
+      private: false
+    - name: cmci_password
+      prompt: CMCI password (leave blank for unauthenticated)
+
+  tasks:
+    ############################################################################
+    # Install cmci_action module dependencies
+    ############################################################################
+    - name: Make sure CMCI module dependencies are installed
+      ansible.builtin.pip:
+        name:
+          - requests
+          - xmltodict
+          - typing;python_version<"3.5"
+
+    ############################################################################
+    # Use cmci_action to tell region to refresh tags
+    ############################################################################
+    - name: Refresh tags from tag file on USS
+      ibm.ibm_zos_cics.cmci_action:
+        context: "{{ context }}"
+        scope: "{{ scope }}"
+        cmci_host: "{{ cmci_host }}"
+        cmci_port: "{{ cmci_port | int }}"
+        cmci_user: "{{ cmci_user | default(omit) }}"
+        cmci_password: "{{ cmci_password | default(omit) }}"
+        scheme: "{{ scheme }}"
+        action_name: TAGSREFR
+        type: CICSRegion

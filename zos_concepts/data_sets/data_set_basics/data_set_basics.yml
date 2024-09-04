@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2024
 ###############################################################################
 # This sample playbook demonstrates basic data set operations using modules
 # included in the Red Hat Ansible Certified  Content for IBM Z core collection.
@@ -85,7 +85,8 @@
         replace: true
         format: fb
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: m
       register: result
 
     - name: Response for data set creation
@@ -106,7 +107,6 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
-       # remote_src: yes
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
@@ -129,7 +129,8 @@
       zos_data_set:
         name: "{{ pds_name }}"
         type: pds
-        size: 5M
+        space_primary: 5
+        space_type: m
         format: fba
         record_length: 100
       register: result
@@ -141,7 +142,7 @@
     - name: Remove the target PDS member if it exists, for idempotency.
       zos_data_set:
         name: "{{ pds_name }}(HELLO)"
-        type: MEMBER
+        type: member
         state: absent
       register: result
 

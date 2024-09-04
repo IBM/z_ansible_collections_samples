@@ -13,9 +13,9 @@
 
 - name: Verify openshift minor version
   ansible.builtin.shell: |
-    version=$(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/sha256sum.txt | grep rhcos | wc -l)
+    version=$(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/sha256sum.txt | grep rhcos | wc -l)
     if [ $version -eq "0" ] || [ "{{ openshift_minor_version }}" -eq "latest" ]; then
-      echo $(curl -s https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
+      echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
     else
       echo "{{ openshift_version }}.{{ openshift_minor_version }}"
     fi
@@ -40,9 +40,9 @@
 - name: Get existing RHCOS image from ICIC glance
   ansible.builtin.shell: |
     if [ {{ vm_type }} == "kvm" ]; then
-      a=$(openstack image list --format value| grep -w 'icic_rhcos_qcow2'| awk '{print$1}')
+      a=$(openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}'| awk '{print$1}')
     else
-      a=$(openstack image list --format value| grep -w 'icic_rhcos_{{ disk_type }}'| awk '{print$1}')
+      a=$(openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}'| awk '{print$1}')
     fi
     if [ -z $a ]; then echo empty; else echo $a; fi
   register: icic_rhcos_id
@@ -79,20 +79,17 @@
 #   - icic_rhcos_id.stdout != ""
 #   - icic_rhcos_sha256_value.stdout == ""
 
-- name: Remove the existing RHCOS image with unmatch sha256 from ICIC glance
-  ansible.builtin.shell: "openstack image delete {{ item }}"
-  with_items: "{{ icic_rhcos_id.stdout_lines }}"
-  when:
-    - icic_rhcos_id.stdout != "empty"
-    - use_local_rhcos.stdout | int != 1
+# Don't remove the existing RHCOS image with unmatch sha256 for Day2 operation
+#- name: Remove the existing RHCOS image with unmatch sha256 from ICIC glance
+#  ansible.builtin.shell: "openstack image delete {{ item }}"
+#  with_items: "{{ icic_rhcos_id.stdout_lines }}"
+#  when:
+#    - icic_rhcos_id.stdout != "empty"
+#    - use_local_rhcos.stdout | int != 1
 
 - name: Get new RHCOS image from ICIC glance
   ansible.builtin.shell: |
-    if [ {{ vm_type }} == "kvm" ]; then
-      out=$(openstack image list | grep -w 'icic_rhcos_qcow2' | wc -l)
-    else
-      out=$(openstack image list | grep -w 'icic_rhcos_{{ disk_type }}' | wc -l)
-    fi
+    out=$(openstack image list | grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}' | wc -l)
     echo $out
   register: icic_rhcos_count
 
@@ -141,7 +138,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   ansible.builtin.command:
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ disk_type }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout}} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
   when:
     - vm_type == "zvm"
     - disk_type == "scsi"
@@ -149,7 +146,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   ansible.builtin.command:
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ disk_type }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
   when:
     - vm_type == "zvm"
     - disk_type == "dasd"
@@ -157,7 +154,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   ansible.builtin.command:
-    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_qcow2
+    cmd: openstack image create --disk-format=qcow2 --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
   when:
     - vm_type == "kvm"
     - disk_type == "dasd"
@@ -167,7 +164,7 @@
 
 - name: Upload RHCOS image to ICIC glance
   ansible.builtin.command:
-    cmd: openstack image create --disk-format=qcow2 --property disk_type=SCSI --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property disk_type=SCSI --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_qcow2
+    cmd: openstack image create --disk-format=qcow2 --property disk_type=SCSI --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property disk_type=SCSI --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
   when:
     - vm_type == "kvm"
     - icic_rhcos_count.stdout | int != 1

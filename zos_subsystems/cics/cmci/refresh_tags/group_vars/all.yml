@@ -1,0 +1,14 @@
+# Target CMCI hostname
+cmci_host: example.com
+
+# Target CMCI port
+cmci_port: 12345
+
+# CMCI scheme (http or https)
+scheme: https
+
+# Target CICSplex SM context
+context: MYPLEX
+
+# Target CICSplex SM scope
+scope: MYRGN

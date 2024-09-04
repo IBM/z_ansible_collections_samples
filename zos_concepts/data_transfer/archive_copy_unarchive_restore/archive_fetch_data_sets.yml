@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2024
 ###############################################################################
 
 ###############################################################################
@@ -18,11 +18,10 @@
 #   IBM z/OS core collection 1.7.0 or later.
 #   Ansible Community General Collection
 #
-# Configure:
+# Configure (optional):
 #   data_sets_to_archive - A list of data sets contained in an archive you wish to include in dump.
-#   archive_data_set - The name to use for the data set archive,
-#                       if not provided, module-generated name will be used.
-#   delete - Indicates if terse and archive data sets should be deleted upon successful transfer.
+#   archive_data_set - The name to use for the data set archive.
+#   remove_data_sets - Indicates if terse and archive data sets should be deleted upon successful transfer.
 #
 ###############################################################################
 
@@ -30,20 +29,26 @@
   collections :
     - "ibm.ibm_zos_core"
   gather_facts: false
+
   vars:
-    data_sets_to_archive: ["USER.PRIVATE.TEST"]
-    archive_data_set: ""
-    delete: true
+    data_sets_to_archive:
+      - "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.ONE"
+      - "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.TWO"
+    archive_data_set: "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.ARCHIVE"
+    remove_data_sets: true
+
   environment: '{{ environment_vars }}'
 
   tasks:
-    - name: Create a temporary data set
-      zos_data_set:
-        type: seq
-        space_primary: 5
-        space_secondary: 1
-        space_type: cyl
-        name: "{{ item }}"
+    - name: Create and copy content into data sets to archive.
+      zos_copy:
+        content: "HELLO WORLD - {{ item }}"
+        dest: "{{ item }}"
+        dest_data_set:
+          type: seq
+          space_primary: 5
+          space_secondary: 1
+          space_type: cyl
       loop: "{{ data_sets_to_archive }}"
 
     #########################################################################
@@ -76,18 +81,18 @@
     - name: Create a dump with adrdssu of the data sets and archive using terse.
       ibm.ibm_zos_core.zos_archive:
         src: "{{ data_sets_to_archive }}"
-        dest: "{{ dest_archive }}"
+        dest: "{{ archive_data_set }}"
         force: True
         format:
           name: terse
           format_options:
-            terse_pack: SPACK
+            terse_pack: spack
             use_adrdssu: True
-        remove: "{{ delete }}"
+        remove: "{{ remove_data_sets }}"
         dest_data_set:
           space_primary: "{{ size_in_cyls.primary }}"
           space_secondary: "{{ size_in_cyls.secondary }}"
-          space_type: CYL
+          space_type: cyl
       register: archive_result
 
     - debug:
@@ -103,12 +108,20 @@
     #########################################################################
     - name: Fetch the data set into the controller
       ibm.ibm_zos_core.zos_fetch:
-        src: "{{ dest_archive }}"
+        src: "{{ archive_data_set }}"
         dest: "{{ playbook_dir }}/"
         is_binary: True
         flat: True
       register: result
 
-    - name: "Result of fetching {{ dest_archive }} to controller node"
+    - name: "Result of fetching {{ archive_data_set }} to controller node"
       debug:
         msg: "{{ result }}"
+
+    #########################################################################
+    # Remove archive data set from remote system.
+    #########################################################################
+    - name: Delete archive data set from remote system.
+      zos_data_set:
+        name: "{{ archive_data_set }}"
+        state: absent

@@ -191,12 +191,6 @@
     name: firewalld
     state: started
 
-- name: Restart the mirror registry
-  ansible.builtin.shell: |
-    systemctl daemon-reload
-    systemctl restart ocp-registry
-  when: "{{ hostvars['localhost']['use_localreg'] }} == true"
-
 # - name: Report status of haproxy
 #   fail:
 #     msg: |
