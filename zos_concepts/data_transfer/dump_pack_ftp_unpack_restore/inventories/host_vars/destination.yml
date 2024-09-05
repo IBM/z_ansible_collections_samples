@@ -63,7 +63,8 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 
 # Configuring the `ZOAU_PYTHONPATH` property is required.
 
-# If ZOAU installed by wheel with the --target or --user option, uncomment the following line:
+# If the ZOAU python package, zoautil_py, has been installed as a wheel (*.whl)
+# with the --target or --user option, uncomment the following line:
 # ZOAU_PYTHONPATH: "{{ path_to_wheel_installation_directory }}"
 
 # If ZOAU is installed to the default location used by pip, the PYTHONPATH environment variable
