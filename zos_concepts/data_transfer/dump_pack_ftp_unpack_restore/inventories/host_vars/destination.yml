@@ -40,7 +40,7 @@ replace: true
 #    e.g, pyz_version: "3.12"
 # - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
-# - Property `ZOAU_PYTHONPATH` is the path to the ZOA Utilities python library.
+# - Property `ZOAU_PYTHONPATH` is the path to the Z Open Automation Utilities (ZOAU) python library.
 #    Specifically, the path points to the directory containing `zoautil_py`.
 #    If the wheel installation method is used with the `--target` or `--user` option,
 #   `ZOAU_PYTHONPATH` should point to the directory the wheel file was installed to.

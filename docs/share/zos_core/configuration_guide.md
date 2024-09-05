@@ -121,10 +121,12 @@ execution.
 `group_vars` environment variables:
 
 - Property `BPXK_AUTOCVT` must be configured to `"ON"`; e.g., `_BPXK_AUTOCVT: "ON"`
-- Property `ZOAU_HOME` is the **ZOA Utilities** install root path; e.g., `ZOAU_HOME: "/usr/lpp/IBM/zoautil"`
-- Property `PYTHONPATH` is the **ZOA Utilities** Python library path; e.g., `PYTHONPATH: "/usr/zoau-wheel/"`
+- Property `ZOAU_HOME` is the **Z Open Automation Utilities (ZOAU)** install root path;
+  e.g., `ZOAU_HOME: "/usr/lpp/IBM/zoautil"`
+- Property `PYTHONPATH` is the **Z Open Automation Utilities (ZOAU)** Python library path;
+  e.g., `PYTHONPATH: "/usr/zoau-wheel/"`
 - Property `LIBPATH` is **both** the path to the **Python libraries** on the target
-  and the **ZOA Utilities Python library path** separated by semi-colons; e.g.,
+  and the **Z Open Automation Utilities (ZOAU) Python library path** separated by semi-colons; e.g.,
   `LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r12/pyz/lib:/usr/lib:/lib:."`
 - Property `PATH` is the ZOA utilities **BIN** path and **Python interpreter** path, e.g.,
   `PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r12/pyz/bin:/bin"`
