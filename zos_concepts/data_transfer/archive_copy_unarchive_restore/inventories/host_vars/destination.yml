@@ -10,12 +10,12 @@
 #    e.g, pyz_version: "3.12"
 # - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
-# - Property `ZOAU_PYTHONPATH` is the path to the Z Open Automation Utilities (ZOAU) python library.
+# - Property `ZOAU_PYTHON_LIBRARY_PATH` is the path to the Z Open Automation Utilities (ZOAU) python library.
 #    Specifically, the path points to the directory containing `zoautil_py`.
 #    If the wheel installation method is used with the `--target` or `--user` option,
-#   `ZOAU_PYTHONPATH` should point to the directory the wheel file was installed to.
+#   `ZOAU_PYTHON_LIBRARY_PATH` should point to the directory the wheel file was installed to.
 #    e.g ("/usr/zoau-wheel/")
-#    Else `ZOAU_PYTHONPATH` should point to the directory containing the pre-compiled binary.
+#    Else `ZOAU_PYTHON_LIBRARY_PATH` should point to the directory containing the pre-compiled binary.
 #    For ZOAU v1.2.x, the pre-compiled binary is located in the `lib` directory.
 #    e.g ("/usr/lpp/IBM/zoautil/lib" or "{{ ZOAU }}/lib")
 #    For ZOAU v1.3.x, the pre-compiled binary is located in a sub-directory
@@ -32,21 +32,21 @@ PYZ_VERSION: "3.xx"
 
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
-# Configuring the `ZOAU_PYTHONPATH` property is required.
+# Configuring the `ZOAU_PYTHON_LIBRARY_PATH` property is required.
 
 # If the ZOAU python package, zoautil_py, has been installed as a wheel (*.whl)
 # with the --target or --user option, uncomment the following line:
-# ZOAU_PYTHONPATH: "{{ path_to_wheel_installation_directory }}"
+# ZOAU_PYTHON_LIBRARY_PATH: "{{ path_to_wheel_installation_directory }}"
 
 # If ZOAU is installed to the default location used by pip, the PYTHONPATH environment variable
 # does not need to be configured for the ZOAU python module to be found. Uncomment the following line:
-# ZOAU_PYTHONPATH: ""
+# ZOAU_PYTHON_LIBRARY_PATH: ""
 
 # If using pre-compiled binaries for ZOAU v1.3.x, uncomment the following line:
-# ZOAU_PYTHONPATH: "{{ ZOAU }}/lib/{{ PYZ_VERSION }}"
+# ZOAU_PYTHON_LIBRARY_PATH: "{{ ZOAU }}/lib/{{ PYZ_VERSION }}"
 
 # If using pre-compiled binaries for ZOAU v1.2.x, uncomment the following line:
-# ZOAU_PYTHONPATH: "{{ ZOAU }}/lib"
+# ZOAU_PYTHON_LIBRARY_PATH: "{{ ZOAU }}/lib"
 
 ################################################################################
 # Do not configure, variable substituion will correctly set the

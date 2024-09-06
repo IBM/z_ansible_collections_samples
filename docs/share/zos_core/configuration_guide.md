@@ -156,7 +156,7 @@ A complete example of `all.yml` is:
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
-  PYTHONPATH: "{{ ZOAU_PYTHONPATH }}"
+  PYTHONPATH: "{{ ZOAU_PYTHON_LIBRARY_PATH }}"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/sbin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
@@ -198,7 +198,7 @@ A complete example of `zos_host.yml` is:
 ``` {.yaml}
 PYZ: "/usr/lpp/IBM/cyp/v3r12/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
-ZOAU_PYTHONPATH: "{{ path_to_wheel_installation_directory }}"
+ZOAU_PYTHON_LIBRARY_PATH: "{{ path_to_wheel_installation_directory }}"
 
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 ```
