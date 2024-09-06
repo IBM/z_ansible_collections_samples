@@ -47,6 +47,10 @@ ZOSMF_SYSTEM: zosmf_system
 #    e.g, zoau: "/usr/lpp/IBM/zoautil"
 # - Property `ZOAU_PYTHON_LIBRARY_PATH` is the path to the Z Open Automation Utilities (ZOAU) python library.
 #    Specifically, the path points to the directory containing `zoautil_py`.
+#    Packages installed using 'pip' generally default to the 'site-packages' directory within the
+#    Python installation, eg "/usr/lpp/IBM/cyp/v3r12/pyz/lib/python3.12/site-packages/".
+#    If the installation uses options such as `--user` or `--target`, the module is installed
+#    to a non-default location which must be configured to `ZOAU_PYTHON_LIBRARY_PATH`.
 #    If the wheel installation method is used with the `--target` or `--user` option,
 #   `ZOAU_PYTHON_LIBRARY_PATH` should point to the directory the wheel file was installed to.
 #    e.g ("/usr/zoau-wheel/")
@@ -70,11 +74,12 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 # Configuring the `ZOAU_PYTHON_LIBRARY_PATH` property is required.
 
 # If the ZOAU python package, zoautil_py, has been installed as a wheel (*.whl)
-# with the --target or --user option, uncomment the following line:
+# with the '--target' or '--user' option, uncomment the following line:
 # ZOAU_PYTHON_LIBRARY_PATH: "{{ path_to_wheel_installation_directory }}"
 
-# If ZOAU is installed to the default location used by pip, the PYTHONPATH environment variable
-# does not need to be configured for the ZOAU python module to be found. Uncomment the following line:
+# If the ZOAU python zoautil_py package has been installed in the default location
+# that is part of Python's search path, the `ZOAU_PYTHON_LIBRARY_PATH` environment
+# variable must be set as an empty string. Uncomment the following line:
 # ZOAU_PYTHON_LIBRARY_PATH: ""
 
 # If using pre-compiled binaries for ZOAU v1.3.x, uncomment the following line:
@@ -84,7 +89,7 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 # ZOAU_PYTHON_LIBRARY_PATH: "{{ ZOAU }}/lib"
 
 ################################################################################
-# Do not configure, variable substituion will correctly set the
+# Do not configure, variable substitution will correctly set the
 # variable`ansible_python_interpreter`
 ################################################################################
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
