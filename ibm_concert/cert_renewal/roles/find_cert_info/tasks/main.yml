@@ -1,0 +1,41 @@
+---
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+# tasks file for find_cert_info
+- name: Find certificate info using app port number and cert serial number
+  block:
+    - block:
+      - ansible.builtin.include_role:
+          name: issue_tso_cmd
+        vars:
+          task_description: 'Issue netstat'
+          command:
+            - netstat
+        when: not cert_serial == '' and not app_port == ''
+        register: netstat_output
+
+      - ansible.builtin.set_fact:
+          jobname: '{{item[9:17]}}'
+        with_items: "{{ tso_cmd_output.output[0].content }}"
+        when: app_port in item
+
+      # - debug:
+      #     var: jobname
+
+      - ansible.builtin.include_role:
+            name: issue_operator_cmd
+        vars:
+          task_description: 'Search for {{jobname}}'
+          command: 'd a,{{ jobname }}'
+      # - debug:
+      #     var: zos_operator_output
+
+      - ansible.builtin.set_fact:
+          owner_id: '{{item[101:109]}}'
+        with_items: "{{ zos_operator_output.content }}"
+        when: '"USERID" in item'
+
+      # - debug:
+      #     var: owner_id
