@@ -16,7 +16,7 @@
     # cert_label: 'ANDY CA'
 
     cert_type: 'USER'
-    cert_label: 'zosConnectServerCert'
+    cert_label: 'zosConnectServerCert2'
 
 
   tasks:
