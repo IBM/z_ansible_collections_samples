@@ -16,7 +16,7 @@
 ################################################################################
 
 PYZ: "/usr/lpp/IBM/cyp/v3r11/pyz"
-ZOAU: "/usr/lpp/IBM/zoautil"
+ZOAU: "/usr/lpp/IBM/zoau/v1r3/"
 # PYZ: "/allpython/3.11-3/usr/lpp/IBM/cyp/v3r11/pyz"
 # ZOAU: "/zoau/v1.2.5"
 
