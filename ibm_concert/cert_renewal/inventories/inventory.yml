@@ -13,5 +13,5 @@
 source_system:
   hosts:
     zos_host:
-      ansible_host: your_zos_host
-      ansible_user: tso_user_id
+      ansible_host: share.centers.ihost.com
+      ansible_user: alicia
