@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2023
+# Copyright (c) IBM Corporation 2023, 2024
 ################################################################################
 
 ################################################################################
@@ -10,7 +10,7 @@
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
-  PYTHONPATH: "{{ ZOAU }}/lib"
+  PYTHONPATH: "{{ ZOAU_PYTHON_LIBRARY_PATH }}"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
@@ -24,10 +24,12 @@ environment_vars:
 # Description of the properties used in this configuration:
 ################################################################################
 # - Property BPXK_AUTOCVT must be configured to "ON"; e.g., _BPXK_AUTOCVT: "ON"
-# - Property ZOAU_HOME is the ZOA Utilities install root path; e.g., ZOAU_HOME: "/usr/lpp/IBM/zoautil"
-# - Property PYTHONPATH is the ZOA Utilities Python library path; e.g., PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
+# - Property ZOAU_HOME is the Z Open Automation Utilities (ZOAU) install root path;
+#   e.g., ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+# - Property PYTHONPATH is the Z Open Automation Utilities (ZOAU) Python library path;
+#   e.g., PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
 # - Property LIBPATH is both the path to the Python libraries on the target
-#   and the ZOA Utilities Python library path separated by semi-colons; e.g.,
+#   and the Z Open Automation Utilities (ZOAU) Python library path separated by semi-colons; e.g.,
 #   LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."
 # - Property PATH is the ZOA utilities BIN path and Python interpreter path, e.g.,
 #   PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin"
