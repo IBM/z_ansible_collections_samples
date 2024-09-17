@@ -65,6 +65,8 @@
           ansible.builtin.set_fact:
             today: "{{ date_result.stdout }}"
             format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
+            format_check_cert: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}"
+            format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
 
         - name: Back up current certificate.
           tags: search_and_renew, renew, backup
@@ -73,18 +75,13 @@
 
         - name: Check backup certificate.
           tags: search_and_renew, renew, backup
-          vars:
-            format_check_cert: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ format_check_cert }}
 
         - name: Rekey certificate with new temporary label.
           tags: search_and_renew, renew, rekey
-          vars:
-            format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW') {{ format_expiration }}
-          notify: Setropts refresh
+            commands: "RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW') {{ format_expiration }}"
 
         - name: List new certificate with temporary label.
           tags: search_and_renew, renew, list_new
@@ -100,28 +97,31 @@
         - name: Sign new certificate, if not self-signed.
           tags: search_and_renew, renew, gencert
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
+            commands:
+              - RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}')) {{ format_expiration }}
           when: sign_with != 'Self'
-          notify: Setropts refresh
 
         - name: Rollover certificate.
           tags: search_and_renew, renew, rollover
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} ROLLOVER(LABEL('{{ cert_label }}')) NEWLABEL('{{ cert_label }}-NEW')
-          notify: Setropts refresh
 
         - name: Delete old certificate.
           tags: search_and_renew, renew, delete
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
-          notify: Setropts refresh
 
         - name: Relabel new certificate to old name.
           tags: search_and_renew, renew, relabel
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
 
-  handlers:
-    - name: Setropts refresh
-      ibm.ibm_zos_core.zos_tso_command:
-        commands: SETROPTS RACLIST(DIGTCERT) REFRESH
+        - name: Issue setropts refresh
+          tags: refresh
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: SETROPTS RACLIST(DIGTCERT) REFRESH
+
+        - name: List renewed certificate with old label.
+          tags: search_and_renew, renew, list_old_label
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}'))
