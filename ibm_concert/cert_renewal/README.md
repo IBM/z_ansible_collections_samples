@@ -93,7 +93,7 @@ All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
-© Copyright IBM Corporation 2020, 2021
+© Copyright IBM Corporation 2024
 
 # License
 Licensed under [Apache License,

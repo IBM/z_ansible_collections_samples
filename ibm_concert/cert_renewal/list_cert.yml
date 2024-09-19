@@ -8,32 +8,156 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
+    json_file: "sbom.json"
     owner_id: 'STCUSR'
     cert_type: 'USER'
     cert_label: 'zosConnectServerCert2'
+    cert_list: []
+    cert_detail: {}
+    expiring_certs: []
+    expiring_cert_data: {}
+    report_lines: []
+    sysout_lines: []
+    cert_found: false
 
+    uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Displaying cert {{cert_label}}'
-        command:
-          - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
-      when: cert_type == 'USER'
+    - name: Create temporary directory to store bank files
+      ansible.builtin.tempfile:
+        state: directory
+        path: /tmp
+      register: playbook_tmp_dir
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Displaying cert {{cert_label}}'
-        command:
-          - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
-      when: cert_type == 'CERTAUTH'
+    - block: 
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Displaying cert {{cert_label}}'
-        command:
-          - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
-      when: cert_type == 'SITE'
+      - ansible.builtin.include_role:
+          name: issue_operator_cmd
+        vars:
+          task_description: 'Run Health Checker'
+          command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+        
+      - ansible.builtin.include_role:
+          name: print_hc_buffer
+        vars:
+          hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+      - name: Get report lines
+        ansible.builtin.set_fact:
+          sysout_lines: '{{item.content}}'
+        with_items: "{{hc_job_output.jobs.0.ddnames}}"
+        when: item.ddname == 'SYSOUT'
+
+
+      - name: Search for YES in report
+        ansible.builtin.set_fact:
+          cert_found: true
+          report_lines: '{{ report_lines | default([]) + [item] }}'
+        loop: '{{sysout_lines}}'
+        when: 
+          - item is search('Yes')
+
+      - ansible.builtin.debug:
+          msg: "Num of YES lines: {{report_lines | length}}"
+
+      - name: Search for ID in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': item[6:14] | regex_replace('\\)', ''),
+              'cert_type': 'USER',
+              'cert_label': item[16:48] }] }}"
+        loop: "{{report_lines}}"
+        when: 
+          - item is search('E ID')
+
+      - name: Search for CERTAUTH in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': '',
+              'cert_type': 'CERTAUTH',
+              'cert_label': item[16:48] }] }}"
+        loop: "{{report_lines}}"
+        when: 
+          - item is search('CERTAUTH')
+      
+      - name: Search for SITE in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': '',
+              'cert_type': 'SITE',
+              'cert_label': item[16:48] }] }}"
+        loop: '{{report_lines}}'
+        when: 
+          - item is search('SITE')
+
+      - ansible.builtin.debug:
+          msg: "Num of expiring certs: {{expiring_certs | length}}"
+
+      - command: "date '+%b%d%y'"
+        register: date_result
+        when: cert_found
+
+      - ansible.builtin.set_fact:
+          today: "{{ date_result.stdout }}"
+        when: cert_found
+
+      - ansible.builtin.include_role:
+          name: get_cert_detail
+        vars:
+          task_description: 'Displaying cert {{item.cert_label}}'
+          role_cert: "{{item}}"
+          tso_command:
+            - RACDCERT ID({{ item.owner_id}}) LIST(LABEL('{{item.cert_label}}'))
+        loop: "{{expiring_certs}}"
+        when: item.cert_type is defined and item.cert_type == 'USER'
+
+      - ansible.builtin.include_role:
+          name: get_cert_detail
+        vars:
+          task_description: 'Displaying cert {{item.cert_label}}'
+          role_cert: "{{item}}"
+          tso_command:
+            - RACDCERT CERTAUTH LIST(LABEL('{{item.cert_label}}'))
+        loop: "{{expiring_certs}}"
+        when: item.cert_type is defined and item.cert_type == 'CERTAUTH'
+
+      - ansible.builtin.include_role:
+          name: get_cert_detail
+        vars:
+          task_description: 'Querying cert {{item.cert_label}}'
+          role_cert: "{{item}}"
+          tso_command:
+            - RACDCERT SITE LIST(LABEL('{{item.cert_label}}'))
+        loop: "{{expiring_certs}}"
+        when: item.cert_type is defined and item.cert_type == 'SITE'
+
+
+      - ansible.builtin.debug:    
+          msg: "Num of certs in JSON file: {{cert_list | length}}"
+
+      - ansible.builtin.copy:
+          dest: /tmp/{{json_file}}
+          content: "{{ cert_list | to_nice_json }}"
+
+      - ansible.builtin.shell: chtag -t -c ISO8859-1 {{json_file}}
+        args:
+          chdir: '/tmp'
+
+      - name: Fetch SBOM to local
+        ibm.ibm_zos_core.zos_fetch:
+          src: "/tmp/{{json_file}}"
+          dest: "{{ playbook_dir }}/{{json_file}}"
+          encoding:
+            from: ISO8859-1
+            to: ISO8859-1
+          flat: true
+
+      always:
+        - name: Delete the temporary directory
+          ansible.builtin.file:
+            path: "{{ playbook_tmp_dir.path }}"
+            state: absent
+        - name: Delete the sbom on z/os
+          ansible.builtin.file:
+            path: /tmp/{{json_file}}
+            state: absent

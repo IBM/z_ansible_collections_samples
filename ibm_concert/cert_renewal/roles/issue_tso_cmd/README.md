@@ -40,7 +40,7 @@ Example Playbook
 License
 -------
 
-Copyright (c) IBM Corporation 2021 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+Copyright (c) IBM Corporation 2024 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
 Author Information
 ------------------
@@ -50,4 +50,4 @@ Author Information
 Copyright
 ---------
 
-© Copyright IBM Corporation 2021
+© Copyright IBM Corporation 2024

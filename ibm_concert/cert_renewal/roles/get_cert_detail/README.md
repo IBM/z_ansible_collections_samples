@@ -1,7 +1,7 @@
-find_cert_info
+get_cert_detail
 =========
 
-Extract certificate details
+List a RACF certificate, extract certificate data and store it a dictionary, and add the dictionary into a list
 
 Requirements
 ------------
@@ -11,13 +11,16 @@ Requirements
 Role Variables
 --------------
 
-- ### **cert_serial**
+- ### **role_cert**
 
-  Specifies the cert serial number
+  The certificate atrributes to be issued
+- ### **tso_command**
 
-- ### **app_port**
+  Specifies RACF command to be issued
+- ### **task_description**
 
-  Specifies the application port number
+  Specifies a description related to the command to be issued
+
 
 Example Playbook
 ----------------
@@ -31,10 +34,11 @@ Example Playbook
   vars:
 
   - include_role:
-      name: find_cert_info
+      name: get_cert_detail
     vars:
-      cert_serial: '56'
-      app_port: '19080'
+      role_cert: '{{cert_detail}}
+      tso_command: 'RACDCERT SITE LIST(LABEL('{{cert_label}}'))'
+      task_description: 'List a SITE certificate'
 ```
 
 License
