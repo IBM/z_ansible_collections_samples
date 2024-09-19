@@ -1,8 +1,0 @@
----
-# Copyright (c) IBM Corporation 2021
-
-# defaults file for find_cert_info
-JOB_CARD: |-
-  //HZSPRINT JOB 'IMS SYSTEM',
-  //         MSGCLASS=H,MSGLEVEL=(1,1),CLASS=A,
-  //         NOTIFY=&SYSUID

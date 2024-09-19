@@ -15,14 +15,14 @@
     altname: 'IP(192.148.8.225)'
     ou: 'ANSIBLE CORE'
     country: 'US'
-    expiry_date: '2024-03-22'
+    expiry_date: '2024-10-17'
     expiry_time: '10:06:00' # UTC time
     keyring: 'Keyring.ZOSCONN'
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
   tasks:
     - block:
-        - include_role:
+        - ansible.builtin.include_role:
             name: issue_tso_cmd
           vars:
             task_description: 'Clean up certs and keyring'
@@ -31,7 +31,7 @@
               - RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
       ignore_errors: true
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: 'Create new self-signed USER cert and connect to keyring'
@@ -43,7 +43,7 @@
           - RACDCERT LISTCHAIN(LABEL('{{cert_label}}')) ID({{owner_id}})
       when: sign_label == ' ' and not expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: 'Create new local-CA-signed USER cert and connect to keyring'
@@ -55,7 +55,7 @@
           - RACDCERT LISTCHAIN(LABEL('{{cert_label}}')) ID({{owner_id}})
       when: not sign_label == ' ' and not expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: 'Create new self-signed USER cert and connect to keyring'
@@ -67,7 +67,7 @@
           - RACDCERT LISTCHAIN(LABEL('{{cert_label}}')) ID({{owner_id}})
       when: sign_label == ' ' and expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         task_description: 'Create new local-CA-signed USER cert and connect to keyring'
@@ -79,7 +79,7 @@
           - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
       when: not sign_label == ' ' and expiry_date == ''
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: issue_operator_cmd
       vars:
         task_description: 'Run Health Check for {{check_name}}'
