@@ -8,6 +8,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
+    ansible_ssh_pipelining: true
     json_file: "zos-cert-data.json"
     csv_file: "zos-cert-data.csv"
     owner_id: 'STCUSR'
