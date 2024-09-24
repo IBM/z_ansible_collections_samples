@@ -8,7 +8,8 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    json_file: "sbom.json"
+    json_file: "zos-cert-data.json"
+    csv_file: "zos-cert-data.csv"
     owner_id: 'STCUSR'
     cert_type: 'USER'
     cert_label: 'zosConnectServerCert2'
@@ -101,6 +102,14 @@
           today: "{{ date_result.stdout }}"
         when: cert_found
 
+      - name: CSV - Create file and set the header
+        lineinfile:
+          dest: "/tmp/{{ csv_file }}"
+          line:
+            Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
+          create: yes
+          state: present
+
       - ansible.builtin.include_role:
           name: get_cert_detail
         vars:
@@ -152,6 +161,52 @@
             to: ISO8859-1
           flat: true
 
+      - name: CSV - Blank lines removal
+        ansible.builtin.lineinfile:
+            path: "/tmp/{{ csv_file }}"
+            state: absent
+            regex: '^\s*$'
+      
+      - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ csv_file }}
+        args:
+          chdir: '/tmp'
+
+      - name: Fetch SBOM to local
+        ibm.ibm_zos_core.zos_fetch:
+          src: "/tmp/{{ csv_file }}"
+          dest: "{{ playbook_dir }}/{{ csv_file }}"
+          encoding:
+            from: ISO8859-1
+            to: ISO8859-1
+          flat: true
+
+      # - name: Send cert data to IBM Concert
+      #   ansible.builtin.uri:
+      #     url: https://ansibleconcert1.fyre.ibm.com:12443/ingestion/api/v1/upload_files
+      #     method: POST
+      #     headers:
+      #       Content_Type: "multipart/form-data"
+      #       InstanceId: "0000-0000-0000-0000"
+      #       Accept: "application/json"
+      #       Authorization: "C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk="
+      #     validate_certs: false
+      #     body:
+      #       data_type: "certificate"
+      #       filename: "zos-cert-data.csv"
+      #       metadata: '{"env_name" : "prod"}'
+
+      - name: Send cert data to IBM Concert
+        ansible.builtin.shell: |
+            /usr/bin/curl -k -X POST https://ansibleconcert1.fyre.ibm.com:12443/ingestion/api/v1/upload_files \
+                -H 'Content-Type: multipart/form-data' \
+                -H 'InstanceId: 0000-0000-0000-0000' \
+                -H 'Accept: application/json' \
+                -H 'Authorization: C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk=' \
+                -F 'data_type=certificate' \
+                -F 'filename=@zos-cert-data.csv' \
+                -F 'metadata={"env_name" : "prod"}'
+        delegate_to: localhost
+
       always:
         - name: Delete the temporary directory
           ansible.builtin.file:
@@ -160,4 +215,8 @@
         - name: Delete the sbom on z/os
           ansible.builtin.file:
             path: /tmp/{{json_file}}
+            state: absent
+        - name: Delete the CSV on z/os
+          ansible.builtin.file:
+            path: /tmp/{{ csv_file }}
             state: absent
