@@ -25,6 +25,9 @@
     uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
+    - name: Check installed Ansible collections
+      ansible.builtin.shell: ansible-galaxy collection list
+        
     - name: Create temporary directory to store bank files
       ansible.builtin.tempfile:
         state: directory
