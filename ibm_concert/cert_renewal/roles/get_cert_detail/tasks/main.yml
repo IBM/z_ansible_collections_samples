@@ -14,14 +14,10 @@
     commands: "{{tso_command}}"
   register: tso_cmd_output
 
-
 - ansible.builtin.set_fact:
     buffer: "{{tso_cmd_output.output[0].content}}"
     subject_string: "Subject's Name:"
     cert_sn: ''
-
-# - ansible.builtin.debug:
-#     var: buffer
 
 - ansible.builtin.set_fact:
     sn_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Serial Number') }}"
@@ -47,7 +43,6 @@
   when: role_cert.cert_type == 'USER'
 
 - ansible.builtin.set_fact:
-    # cert_sn: "{{buffer[sn_index | int + 1]}}"
     cert_name: "{{ role_cert.cert_label }}"
     cert_subject: ""
     cert_cn: "{{ buffer[sb_index | int + 1] }}"
@@ -75,14 +70,14 @@
       'Serial Number': cert_sn,
       'Name': role_cert.cert_label,
       'Subject': '',
-      'CN': buffer[sb_index | int + 1],
-      'Issuer': buffer[is_index | int + 1],
-      'Key Algorithm': buffer[ka_index | int][21:],
-      'Key Size': buffer[ks_index | int][12:],
+      'CN': cert_cn,
+      'Issuer': cert_issuer,
+      'Key Algorithm': cert_algo,
+      'Key Size': cert_key_size,
       'SANS': '',
-      'ValidFrom': buffer[vf_index | int][14:],
-      'ValidTo': buffer[vt_index | int][14:],
-      'Thumbprint': buffer[tp_index | int + 1],
+      'ValidFrom': cert_valid_from[14:],
+      'ValidTo': cert_valid_to[14:],
+      'Thumbprint': cert_thumb,
       'Certificate Hosts': '',
       'System Reference id': '',
       'DN': '',
@@ -93,37 +88,6 @@
       'Secondary Owner': '',
       'Namespace': ''
       }) }}"
-
-# - ansible.builtin.set_fact:
-#     json_record: {
-#       'Serial Number': ,
-#       'Name': '{{cert_name}}',
-#       'Subject': '{{cert_subject}}',
-#       'CN': '{{cert_cn}}',
-#       'Issuer': '{{cert_issuer}}',
-#       'Key Algorithm': '{{cert_algo}}',
-#       'Key Size': '{{cert_key_size}}',
-#       'SANS': '{{cert_sans}}',
-#       'ValidFrom': '{{cert_valid_from}}',
-#       'ValidTo': '{{cert_valid_to}}',
-#       'Thumbprint': '{{cert_thumb}}',
-#       'Certificate Hosts': '{{cert_hosts}}',
-#       'System Reference id': '{{cert_sysref_id}}',
-#       'DN': '{{cert_dn}}',
-#       'ParentDN': '{{cert_parent_dn}}',
-#       'Certificate Type': '{{cert_type}}',
-#       'CreatedOn': '{{cert_created_on}}',
-#       'Primary Owner': '{{cert_pri_owner}}',
-#       'Secondary Owner': '{{cert_sec_owner}}',
-#       'Namespace': '{{cert_ns}}'
-#     }
-
-# - ansible.builtin.debug:
-#     var: json_record
-
-# - name: Build JSON record for {{role_cert.cert_label}}
-#   ansible.builtin.set_fact:
-#     cert_detail: " {{ cert_detail | default({}) | combine (json_record) }} "
 
 - name: Add JSON record into list
   ansible.builtin.set_fact:
