@@ -18,6 +18,7 @@ environment_vars:
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
   PYTHONSTDINENCODING: "cp1047"
+  ANSIBLE_SSH_PIPELINING: true
 
 ################################################################################
 # Description of the properties used in this configuration:
