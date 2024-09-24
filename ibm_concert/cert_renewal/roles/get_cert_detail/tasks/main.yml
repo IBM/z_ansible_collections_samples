@@ -18,9 +18,10 @@
 - ansible.builtin.set_fact:
     buffer: "{{tso_cmd_output.output[0].content}}"
     subject_string: "Subject's Name:"
+    cert_sn: ''
 
-- ansible.builtin.debug:
-    var: buffer
+# - ansible.builtin.debug:
+#     var: buffer
 
 - ansible.builtin.set_fact:
     sn_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Serial Number') }}"
@@ -33,10 +34,45 @@
     vt_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'End Date') }}"
     tp_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Fingerprint') }}"
 
+- ansible.builtin.set_fact:
+    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* +{{ role_cert.cert_type }}+"
+  when: role_cert.cert_type == 'SITE'
+
+- ansible.builtin.set_fact:
+    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* +{{ role_cert.cert_type }}+"
+  when: role_cert.cert_type == 'CERTAUTH'
+
+- ansible.builtin.set_fact:
+    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* +{{ role_cert.owner_id }}+"
+  when: role_cert.cert_type == 'USER'
+
+- ansible.builtin.set_fact:
+    # cert_sn: "{{buffer[sn_index | int + 1]}}"
+    cert_name: "{{ role_cert.cert_label }}"
+    cert_subject: ""
+    cert_cn: "{{ buffer[sb_index | int + 1] }}"
+    cert_issuer: "{{ buffer[is_index | int + 1] }}"
+    cert_algo: "{{ buffer[ka_index | int][21:] }}"
+    cert_key_size: " {{ buffer[ks_index | int][12:] }}"
+    cert_sans: ""
+    cert_valid_from: "{{ buffer[vf_index | int][14:] }}"
+    cert_valid_to: "{{ buffer[vt_index | int][14:] }}"
+    cert_thumb: "{{ buffer[tp_index | int + 1] }}"
+    cert_hosts: ""
+    cert_sysref_id: ""
+    cert_dn: ""
+    cert_parent_dn: ""
+    cert_type: "{{ role_cert.cert_type }}"
+    cert_created_on: ""
+    cert_pri_owner: "{{ role_cert.owner_id }}"
+    cert_sec_owner: ""
+    cert_ns: ""
+
+
 - name: Build cert details for {{role_cert.cert_label}}
   ansible.builtin.set_fact:
     cert_detail: "{{ cert_detail | default({}) | combine ({
-      'Serial Number': buffer[sn_index | int + 1],
+      'Serial Number': cert_sn,
       'Name': role_cert.cert_label,
       'Subject': '',
       'CN': buffer[sb_index | int + 1],
@@ -58,6 +94,49 @@
       'Namespace': ''
       }) }}"
 
-- name: Add cert into list
+# - ansible.builtin.set_fact:
+#     json_record: {
+#       'Serial Number': ,
+#       'Name': '{{cert_name}}',
+#       'Subject': '{{cert_subject}}',
+#       'CN': '{{cert_cn}}',
+#       'Issuer': '{{cert_issuer}}',
+#       'Key Algorithm': '{{cert_algo}}',
+#       'Key Size': '{{cert_key_size}}',
+#       'SANS': '{{cert_sans}}',
+#       'ValidFrom': '{{cert_valid_from}}',
+#       'ValidTo': '{{cert_valid_to}}',
+#       'Thumbprint': '{{cert_thumb}}',
+#       'Certificate Hosts': '{{cert_hosts}}',
+#       'System Reference id': '{{cert_sysref_id}}',
+#       'DN': '{{cert_dn}}',
+#       'ParentDN': '{{cert_parent_dn}}',
+#       'Certificate Type': '{{cert_type}}',
+#       'CreatedOn': '{{cert_created_on}}',
+#       'Primary Owner': '{{cert_pri_owner}}',
+#       'Secondary Owner': '{{cert_sec_owner}}',
+#       'Namespace': '{{cert_ns}}'
+#     }
+
+# - ansible.builtin.debug:
+#     var: json_record
+
+# - name: Build JSON record for {{role_cert.cert_label}}
+#   ansible.builtin.set_fact:
+#     cert_detail: " {{ cert_detail | default({}) | combine (json_record) }} "
+
+- name: Add JSON record into list
   ansible.builtin.set_fact:
     cert_list: '{{ cert_list | default([]) + [cert_detail] }}'
+
+# Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
+- name: Build CSV record for {{role_cert.cert_label}}
+  ansible.builtin.set_fact:
+    csv_line: >
+      {{cert_sn}},{{cert_name}},{{cert_subject}},{{cert_cn}},{{cert_issuer}},{{cert_algo}},{{cert_key_size}},{{cert_sans}},{{cert_valid_from}},{{cert_valid_to}},{{cert_thumb}},{{cert_hosts}},{{cert_sysref_id}},{{cert_dn}},{{cert_parent_dn}},{{cert_type}},{{cert_created_on}},{{cert_pri_owner}},{{cert_sec_owner}},{{cert_ns}}
+
+- name: Write cert data into .csv file
+  ansible.builtin.lineinfile:
+    insertafter: EOF
+    dest: "/tmp/{{ csv_file }}"
+    line: "{{ csv_line }}"
