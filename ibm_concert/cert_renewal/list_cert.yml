@@ -186,7 +186,7 @@
 
       # - name: Send cert data to IBM Concert
       #   ansible.builtin.uri:
-      #     url: https://ansibleconcert1.fyre.ibm.com:12443/ingestion/api/v1/upload_files
+      #     url: https://9.30.45.195:12443/ingestion/api/v1/upload_files
       #     method: POST
       #     headers:
       #       Content_Type: "multipart/form-data"
@@ -201,7 +201,7 @@
 
       - name: Send cert data to IBM Concert
         ansible.builtin.shell: |
-            /usr/bin/curl -k -X POST https://ansibleconcert1.fyre.ibm.com:12443/ingestion/api/v1/upload_files \
+            /usr/bin/curl -k -X POST https://9.30.45.195:12443/ingestion/api/v1/upload_files \
                 -H 'Content-Type: multipart/form-data' \
                 -H 'InstanceId: 0000-0000-0000-0000' \
                 -H 'Accept: application/json' \
