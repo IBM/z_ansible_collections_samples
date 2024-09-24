@@ -31,11 +31,6 @@
       register: playbook_tmp_dir
 
     - block: 
-      - ansible.builtin.shell: ansible-galaxy collection list
-        delegate_to: localhost
-
-      - ansible.builtin.meta: end_host
-
       - ansible.builtin.include_role:
           name: issue_operator_cmd
         vars:
