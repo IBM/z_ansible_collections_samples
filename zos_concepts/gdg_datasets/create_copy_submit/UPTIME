@@ -1,4 +1,7 @@
 //******************************************************************************
+//* Copyright (c) IBM Corporation 2020
+//******************************************************************************
+//******************************************************************************
 //* Configure the job card as needed, most common keyword parameters often
 //* needing editing are:
 //* CLASS: Used to achieve a balance between different types of jobs and avoid

@@ -14,7 +14,7 @@
 #
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
-#  permissions such as writing the the target directories or creating data sets.
+#  permissions such as writing to the target directories or creating data sets.
 #
 # Requirements:
 #     - IBM z/OS core collection 1.11.0 or later
@@ -101,7 +101,7 @@
         name: "{{ tmp_data_set }}(-1)"
         state: absent
 
-    - name: "Submit the JCL last generation{{ tmp_data_set }}(0)"
+    - name: "Submit the JCL from the previous last generation{{ tmp_data_set }}(0)"
       zos_job_submit:
         src: "{{ tmp_data_set }}(0)"
         location: data_set
