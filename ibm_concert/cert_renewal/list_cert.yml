@@ -27,6 +27,7 @@
   tasks:
     - name: Check installed Ansible collections
       ansible.builtin.shell: ansible-galaxy collection list
+      delegate_to: localhost
         
     - name: Create temporary directory to store bank files
       ansible.builtin.tempfile:
