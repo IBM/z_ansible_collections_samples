@@ -25,47 +25,6 @@
     uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
-    # - name: Send cert data to IBM Concert
-    #   ansible.builtin.uri:
-    #       url: 'https://ansibleconcert1.fyre.ibm.com:12443/ingestion/api/v1/upload_files'
-    #       method: POST
-    #       body:
-    #         data_type:
-    #           content: certificate
-    #         filename:
-    #           filename: '/tmp/zos-cert-data.csv'
-    #         metadata:
-    #           content: '{"env_name" : "prod"}'
-    #       body_format: form-multipart
-    #       headers:
-    #         Content-Type: multipart/form-data
-    #         InstanceId: 0000-0000-0000-0000
-    #         Accept: application/json
-    #         Authorization: 'C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk='
-    #       validate_certs: false
-    #   register: result
-
-    # - ansible.builtin.meta: end_host
-
-    # - name: Send cert data to IBM Concert
-    #   ansible.builtin.shell: |
-    #       /usr/bin/curl -k https://9.30.45.195:12443
-    #   delegate_to: localhost
-
-    # - name: Send cert data to IBM Concert
-    #   ansible.builtin.shell: |
-    #       /usr/bin/curl -k -X POST https://9.30.45.195:12443/ingestion/api/v1/upload_files \
-    #           -H 'Content-Type: multipart/form-data' \
-    #           -H 'InstanceId: 0000-0000-0000-0000' \
-    #           -H 'Accept: application/json' \
-    #           -H 'Authorization: C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk=' \
-    #           -F 'data_type=certificate' \
-    #           -F 'filename=@zos-cert-data.csv' \
-    #           -F 'metadata={"env_name" : "prod"}'
-    #   delegate_to: localhost
-
-    # - ansible.builtin.meta: end_host
-
     - name: Create temporary directory to store bank files
       ansible.builtin.tempfile:
         state: directory
@@ -102,25 +61,25 @@
       - ansible.builtin.debug:
           msg: "Num of YES lines: {{report_lines | length}}"
 
-      # - name: Search for ID in report
-      #   ansible.builtin.set_fact:
-      #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
-      #         'owner_id': item[6:14] | regex_replace('\\)', ''),
-      #         'cert_type': 'USER',
-      #         'cert_label': item[16:48] }] }}"
-      #   loop: "{{report_lines}}"
-      #   when: 
-      #     - item is search('E ID')
+      - name: Search for ID in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': item[6:14] | regex_replace('\\)', ''),
+              'cert_type': 'USER',
+              'cert_label': item[16:48] }] }}"
+        loop: "{{report_lines}}"
+        when: 
+          - item is search('E ID')
 
-      # - name: Search for CERTAUTH in report
-      #   ansible.builtin.set_fact:
-      #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
-      #         'owner_id': '',
-      #         'cert_type': 'CERTAUTH',
-      #         'cert_label': item[16:48] }] }}"
-      #   loop: "{{report_lines}}"
-      #   when: 
-      #     - item is search('CERTAUTH')
+      - name: Search for CERTAUTH in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': '',
+              'cert_type': 'CERTAUTH',
+              'cert_label': item[16:48] }] }}"
+        loop: "{{report_lines}}"
+        when: 
+          - item is search('CERTAUTH')
       
       - name: Search for SITE in report
         ansible.builtin.set_fact:
@@ -258,11 +217,11 @@
           ansible.builtin.file:
             path: "{{ playbook_tmp_dir.path }}"
             state: absent
-        # - name: Delete the sbom on z/os
-        #   ansible.builtin.file:
-        #     path: /tmp/{{json_file}}
-        #     state: absent
-        # - name: Delete the CSV on z/os
-        #   ansible.builtin.file:
-        #     path: /tmp/{{ csv_file }}
-        #     state: absent
+        - name: Delete the sbom on z/os
+          ansible.builtin.file:
+            path: /tmp/{{json_file}}
+            state: absent
+        - name: Delete the CSV on z/os
+          ansible.builtin.file:
+            path: /tmp/{{ csv_file }}
+            state: absent
