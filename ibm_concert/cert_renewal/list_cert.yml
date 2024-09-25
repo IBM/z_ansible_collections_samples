@@ -25,6 +25,21 @@
     uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -k -X POST https://9.30.45.195:12443/ingestion/api/v1/upload_files \
+              -H 'Content-Type: multipart/form-data' \
+              -H 'InstanceId: 0000-0000-0000-0000' \
+              -H 'Accept: application/json' \
+              -H 'Authorization: C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk=' \
+              -F 'data_type=certificate' \
+              -F 'filename=@zos-cert-data.csv' \
+              -F 'metadata={"env_name" : "prod"}'
+      delegate_to: localhost
+
+    - ansible.builtin.meta: end_host
+      
+
     - name: Check installed Ansible collections
       ansible.builtin.shell: ansible-galaxy collection list
       delegate_to: localhost
@@ -199,17 +214,17 @@
       #       filename: "zos-cert-data.csv"
       #       metadata: '{"env_name" : "prod"}'
 
-      - name: Send cert data to IBM Concert
-        ansible.builtin.shell: |
-            /usr/bin/curl -k -X POST https://9.30.45.195:12443/ingestion/api/v1/upload_files \
-                -H 'Content-Type: multipart/form-data' \
-                -H 'InstanceId: 0000-0000-0000-0000' \
-                -H 'Accept: application/json' \
-                -H 'Authorization: C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk=' \
-                -F 'data_type=certificate' \
-                -F 'filename=@zos-cert-data.csv' \
-                -F 'metadata={"env_name" : "prod"}'
-        delegate_to: localhost
+      # - name: Send cert data to IBM Concert
+      #   ansible.builtin.shell: |
+      #       /usr/bin/curl -k -X POST https://9.30.45.195:12443/ingestion/api/v1/upload_files \
+      #           -H 'Content-Type: multipart/form-data' \
+      #           -H 'InstanceId: 0000-0000-0000-0000' \
+      #           -H 'Accept: application/json' \
+      #           -H 'Authorization: C_API_KEY aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk=' \
+      #           -F 'data_type=certificate' \
+      #           -F 'filename=@zos-cert-data.csv' \
+      #           -F 'metadata={"env_name" : "prod"}'
+      #   delegate_to: localhost
 
       always:
         - name: Delete the temporary directory
