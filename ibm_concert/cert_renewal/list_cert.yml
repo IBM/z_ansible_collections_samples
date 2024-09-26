@@ -217,11 +217,11 @@
           ansible.builtin.file:
             path: "{{ playbook_tmp_dir.path }}"
             state: absent
-        # - name: Delete the sbom on z/os
-        #   ansible.builtin.file:
-        #     path: /tmp/{{json_file}}
-        #     state: absent
-        # - name: Delete the CSV on z/os
-        #   ansible.builtin.file:
-        #     path: /tmp/{{ csv_file }}
-        #     state: absent
+        - name: Delete the sbom on z/os
+          ansible.builtin.file:
+            path: /tmp/{{json_file}}
+            state: absent
+        - name: Delete the CSV on z/os
+          ansible.builtin.file:
+            path: /tmp/{{ csv_file }}
+            state: absent
