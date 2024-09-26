@@ -29,30 +29,34 @@
     vf_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Start Date') }}"
     vt_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'End Date') }}"
     tp_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Fingerprint') }}"
+    kr_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Ring:') }}"
 
 - ansible.builtin.set_fact:
-    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* +{{ role_cert.cert_type }}+"
+    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
   when: role_cert.cert_type == 'SITE'
 
 - ansible.builtin.set_fact:
-    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* +{{ role_cert.cert_type }}+"
+    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
   when: role_cert.cert_type == 'CERTAUTH'
 
 - ansible.builtin.set_fact:
-    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* +{{ role_cert.owner_id }}+"
+    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.owner_id }}+"
   when: role_cert.cert_type == 'USER'
 
 - ansible.builtin.set_fact:
-    cert_name: "{{ role_cert.cert_label }}"
+    cert_sn: "{{ cert_sn | regex_replace(' ', '') }}"
+
+- ansible.builtin.set_fact:
+    cert_name: "{{ role_cert.cert_label | regex_replace(' ', '') }}"
     cert_subject: ""
-    cert_cn: "{{ buffer[sb_index | int + 1] }}"
-    cert_issuer: "{{ buffer[is_index | int + 1] }}"
-    cert_algo: "{{ buffer[ka_index | int][21:] }}"
-    cert_key_size: " {{ buffer[ks_index | int][12:] }}"
+    cert_cn: "{{ buffer[sb_index | int + 1] | regex_replace(' ', '') }}"
+    cert_issuer: "{{ buffer[is_index | int + 1] | regex_replace(' ', '') }}"
+    cert_algo: "{{ buffer[ka_index | int][21:] | regex_replace(' ', '') }}"
+    cert_key_size: " {{ buffer[ks_index | int][12:] | regex_replace(' ', '') }}"
     cert_sans: ""
-    cert_valid_from: "{{ buffer[vf_index | int][14:] }}"
-    cert_valid_to: "{{ buffer[vt_index | int][14:] }}"
-    cert_thumb: "{{ buffer[tp_index | int + 1] }}"
+    cert_valid_from: "{{ buffer[vf_index | int][14:] | regex_replace(' ', '') }}"
+    cert_valid_to: "{{ buffer[vt_index | int][14:] | regex_replace(' ', '') }}"
+    cert_thumb: "{{ buffer[tp_index | int + 1] | regex_replace(' ', '') }}"
     cert_hosts: ""
     cert_sysref_id: ""
     cert_dn: ""
