@@ -54,9 +54,9 @@
     cert_algo: "{{ buffer[ka_index | int][21:] | regex_replace(' ', '') }}"
     cert_key_size: " {{ buffer[ks_index | int][12:] | regex_replace(' ', '') }}"
     cert_sans: ""
-    cert_valid_from: "{{ buffer[vf_index | int][14:] | regex_replace(' ', '') }}"
-    cert_valid_to: "{{ buffer[vt_index | int][14:] | regex_replace(' ', '') }}"
-    cert_thumb: "{{ buffer[tp_index | int + 1] | regex_replace(' ', '') }}"
+    cert_valid_from: "{{ buffer[vf_index | int][14:] }}"
+    cert_valid_to: "{{ buffer[vt_index | int][14:] }}"
+    cert_thumb: "{{ buffer[tp_index | int + 1] }}"
     cert_hosts: ""
     cert_sysref_id: ""
     cert_dn: ""
@@ -72,15 +72,15 @@
   ansible.builtin.set_fact:
     cert_detail: "{{ cert_detail | default({}) | combine ({
       'Serial Number': cert_sn,
-      'Name': role_cert.cert_label,
+      'Name': cert_name,
       'Subject': '',
       'CN': cert_cn,
       'Issuer': cert_issuer,
       'Key Algorithm': cert_algo,
       'Key Size': cert_key_size,
       'SANS': '',
-      'ValidFrom': cert_valid_from[14:],
-      'ValidTo': cert_valid_to[14:],
+      'ValidFrom': cert_valid_from,
+      'ValidTo': cert_valid_to,
       'Thumbprint': cert_thumb,
       'Certificate Hosts': '',
       'System Reference id': '',
