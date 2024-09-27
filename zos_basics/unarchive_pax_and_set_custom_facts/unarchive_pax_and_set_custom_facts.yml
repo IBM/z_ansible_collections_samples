@@ -1,0 +1,167 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to unpackage and install a z/OS program from a
+# pax archive on a remote system, update configuration, and persist the changes
+# in Ansible facts with a static file using Red Hat Ansible Certified Content
+# for IBM Z.
+# Try running the 'gather_and_print_facts' playbook before and after running
+# this one to see the effect updating the static file 'zoau.fact' has on the 
+# facts Ansible gathers.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories unarchive_pax_and_set_custom_facts.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.10.0 or later.
+#
+# Configure:
+#   path_to_new_zoau_pax - Location of the pax file on the remote system.
+#   new_zoau_target_dir - Directory on the remote system to which the ZOAU
+#                         package will be installed.
+#   remote_facts_dir - Path to remote directory which contains static files
+#                      in which local facts are stored as json or ini.
+###############################################################################
+
+- name: Sample zoau pax installation playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+
+  environment: '{{ environment_vars }}'
+
+  vars:
+    new_zoau_target_dir: "/path/to/new/zoau/target/dir/"
+    path_to_new_zoau_pax: "/path/to/new/zoau.pax"
+
+    remote_facts_dir: "/path/to/facts/"
+
+  ##############################################################################
+  # 'gather_facts' and 'fact_path' are play keywords, meaning they are
+  # configurations affecting how a playbook is run.
+  # Ansible, by default, runs many scripts to discover facts about a remote
+  # system. The 'gather_facts' keyword is used to toggle the behavior.
+  # 'gather_facts' is explicitly set to True below to emphasize that fact
+  # gathering is enabled for this playbook. Much of the sample content from Red
+  # Hat Ansible Certified Content for IBM Z has disabled automatic fact
+  # gathering because the facts in question are already known or to achieve a
+  # performance boost by skipping the discovery step.
+  # The default location for storing custom facts on a remote system is
+  # '/etc/ansible/facts.d/'. The 'fact_path' keyword is used to specify a
+  # different directory.
+  ##############################################################################
+  gather_facts: True
+  fact_path: "{{ remote_facts_dir }}"
+
+  tasks:
+
+  ##############################################################################
+  # The first two tasks delete and recreate the target directory for the sake of
+  # getting this sample playbook to run consistently even after repeated runs.
+  # In a production set up, such a step may not be advisable as it may at best
+  # unecessarily repeat copy operations and at worst delete important files.
+  ##############################################################################
+  - name: Remove target directory for new-zoau to ensure clean build.
+    file:
+      name: "{{ new_zoau_target_dir }}"
+      state: absent
+
+  - name: Create target directory for new-zoau.
+    file:
+      name: "{{ new_zoau_target_dir }}"
+      state: directory
+
+  ##############################################################################
+  # The next task unpackages the ZOAU pax file. Notice 'remote_src' is set to
+  # True. For this sample, it is assumed that the pax file already exists on the
+  # remote system. The 'zos_unarchive' module can unpackage local archives too.
+  ##############################################################################
+  - name: Unpackage zoau pax file.
+    zos_unarchive:
+      src: "{{ path_to_new_zoau_pax }}"
+      dest: "{{ new_zoau_target_dir }}"
+      remote_src: True
+      format:
+        name: pax
+
+  ##############################################################################
+  # Once the files are in place, the environemnt needs to be configured. For
+  # ZOAU the two configs which changed are the path where the target ZOAU is and
+  # the path to the ZOAU Python libraries. The next task sets those two as facts
+  # and prints them out. Note, setting facts with the ansible.builtin.set_fact
+  # module creates variables with playbook scope, meaning once this playbook
+  # completes, the values are lost.
+  ##############################################################################
+  - name: Set facts, so the next step can leverage updated values.
+    ansible.builtin.set_fact:
+      ZOAU: "{{ new_zoau_target_dir }}" 
+      ZOAU_PYTHONPATH: "{{ new_zoau_target_dir }}lib/3.11"
+
+  - name: Print the facts set in the previous task.
+    debug:
+      msg:
+        - "{{ ZOAU }}"
+        - "{{ ZOAU_PYTHONPATH }}"
+
+  ##############################################################################
+  # As a validation step that the files and config are set up correctly, the
+  # next task calls the 'zoaversion' command with a task-level environment
+  # configuration. Notice the environment defined here is not the complete
+  # environment defined in the inventories directory. This is because the task
+  # level environment inherits from the playbook and then makes any required
+  # modifications. Running this playbook with verbosity level 3 or higher
+  # ('ansible-playbook -vvv ...') will print the environment to the playbook
+  # output, where the new ZOAU values can be verified visually.
+  ##############################################################################
+  - name: Run zoaversion at new zoau location using a task-level environment
+          config to update the environemnt vars related to zoau, the rest remain
+          in place, inherited from the host_vars/group_vars.
+    environment:
+      PYTHONPATH: "{{ ZOAU_PYTHONPATH }}"
+      LIBPATH: "{{ ZOAU_PYTHONPATH }}:{{ ZOAU }}/lib/:{{ PYZ }}/lib:/lib:/usr/lib:."
+      PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+    ansible.builtin.command: zoaversion
+    register: zoaversion_str
+
+  - name: Print the results of the call to zoaversion.
+    debug:
+      var: zoaversion_str.stdout
+
+  ##############################################################################
+  # Now that the 'new' ZOAU files have been set up, the next tasks update the
+  # custom facts by setting a local variable with the ansible.builtin.set_fact
+  # module, printing the facts, and finally writing the changes to the static
+  # file so that updated facts persist beyond this playbook.
+  ##############################################################################
+  - name: Create a dict with updates. Remember, this dict in its current form is
+          not persistent and changes will be lost once the playbook completes. 
+    ansible.builtin.set_fact:
+      new_zoau_facts:
+        # can use existing value since it won't change with an update.
+        product_name: "{{ ansible_local.zoau.product_name }}"
+
+        # pull this from previous task output, then parse it for the verison.
+        zoaversion : "{{ zoaversion_str.stdout }}"
+        version : "{{ zoaversion_str.stdout.split(' v')[1].split()[0] }}"
+
+        # the next two were configured in a previous task and can be reused here.
+        executable : "{{ ZOAU }}"
+        zoau_pythonpath : "{{ ZOAU_PYTHONPATH }}"
+
+        # take advantage of the now() command built in to jinja.
+        date_last_updated : "{{ now(utc=true,fmt='%Y-%m-%d') }}"
+
+  - name: Print the updated zoau dict before writing to file.
+    debug:
+      var: new_zoau_facts
+
+  - name: Update the 'zoau.fact' file to persist the updates for future users.
+    zos_copy:
+      content: "{{ new_zoau_facts | to_nice_json }}"
+      dest: "{{ remote_facts_dir }}/zoau.fact"
+      force: True
