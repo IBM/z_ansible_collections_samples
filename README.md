@@ -47,6 +47,7 @@ often repeated and in need of automation.
   - [Set Up Ansible Host Variables for Python and ZOAU](zos_administration/host_setup)
   - [Manage z/OS Users Using Ansible](zos_concepts/user_management/add_remove_user) - \[[Playback](https://mediacenter.ibm.com/media/Managing+z+OS+Users+with+Ansible+/1_bnud4enw)]
   - [Ansible Fact Gathering for z/OS](zos_basics/factgathering)
+  - [Unarchive Pax and Set Custom Facts](zos_basics/unarchive_pax_and_set_custom_facts)
   - [Synchronize APF authorized libraries from a configuration cloned from GitHub](zos_concepts/program_authorization/git_apf) - \[[Playback](https://mediacenter.ibm.com/media/Using+Ansible+to+synchronize+z+OS+APF+libraries+from+a+GitHub+configuration+file/1_e6qsiwmg)]
   - [Manage z/OS Certificates](zos_concepts/certificate_management#readme)
 - Basic Operations
@@ -141,7 +142,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020 - 2023
+© Copyright IBM Corporation 2020 - 2024
 
 ## License
 Licensed under

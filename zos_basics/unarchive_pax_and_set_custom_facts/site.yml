@@ -1,0 +1,40 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+###############################################################################
+# This playbook (`site.yml`) is the master playbook for this project. Based on
+# the playbooks requirments, `site.yml` playbook will evalute the requirements
+# and report when the minimum requirements are not configured and fail playbook
+# execution.
+#
+# Upon successful dependency analyais, the z/OS playbook will be executed.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories site.yml
+#  ansible-playbook -i inventories site.yml -v
+###############################################################################
+
+
+---
+- hosts: localhost
+
+  tasks:
+    - name: Parse the registry for collection entries
+      include_vars: runtime-requirements.yml
+
+    - name: Display the registered collections and properites in `registry.yml`.
+      include_role:
+        name: requirements-check
+
+- name: Executing the z/OS Ansible playbook
+  import_playbook: copy_sample_facts_files_to_remote_system.yml
+
+- name: Executing the z/OS Ansible playbook
+  import_playbook: gather_and_print_facts.yml
+
+- name: Executing the z/OS Ansible playbook
+  import_playbook: unarchive_pax_and_set_custom_facts.yml

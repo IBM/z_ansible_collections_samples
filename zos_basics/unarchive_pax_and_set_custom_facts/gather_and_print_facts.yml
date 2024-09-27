@@ -1,0 +1,107 @@
+################################################################################
+# © Copyright IBM Corporation 2024
+################################################################################
+
+################################################################################
+# This playbook demonstrates how to use built in fact gathering to add custom
+# facts from static remote files. An Ansible fact is a variable related to a
+# target system and is accessible throughout playbook execution. Ansible
+# collects certain facts by default and stores them in a variable of type dict
+# called 'ansible_facts'. Custom facts can be added and are nested inside
+# 'ansible_facts' under 'ansible_local'.
+# 
+# This playbook assumes the *.fact files included in the files directory already
+# exist on the remote system. To copy over the included sample files, run the 
+# 'copy_sample_facts_files_to_remote.yml' playbook.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories gather_and_print_facts.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.10.0 or later.
+#
+# Configure:
+#   remote_facts_dir - Path to remote directory which contains static files
+#                      in which local facts are stored as json or ini.
+#
+################################################################################
+
+---
+- name: Gather and print static Ansible facts.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  environment: '{{ environment_vars }}'
+  vars:
+    remote_facts_dir: /path/to/facts/
+
+
+  ##############################################################################
+  # 'gather_facts' and 'fact_path' are play keywords, meaning they are
+  # configurations affecting how a playbook is run.
+  # Ansible, by default, runs many scripts to discover facts about a remote
+  # system. The 'gather_facts' keyword is used to toggle the behavior.
+  # 'gather_facts' is explicitly set to True below to emphasize that fact
+  # gathering is enabled for this playbook. Much of the sample content from Red
+  # Hat Ansible Certified Content for IBM Z has disabled automatic fact
+  # gathering because the facts in question are already known or to achieve a
+  # performance boost by skipping the discovery step.
+  # The default location for storing custom facts on a remote system is
+  # '/etc/ansible/facts.d/'. The 'fact_path' keyword is used to specify a
+  # different directory.
+  ##############################################################################
+  gather_facts: true
+  fact_path: "{{ remote_facts_dir }}"
+
+
+  tasks:
+
+  ##############################################################################
+  # All gathered facts are stored in a dict called 'ansible_facts'.
+  # Custom facts are stored in a dict 'ansible_local', which is nested inside
+  # 'ansible_facts'. Notice however that the 'ansible_local' dict can be
+  # referenced directly and does not require starting at 'ansible_facts', i.e.
+  # 'ansible_facts.ansible_local'.
+  ##############################################################################
+  - name: Print out all the custom facts.
+    ansible.builtin.debug:
+      msg: "{{ ansible_local }}"
+
+  ##############################################################################
+  # Since the facts are stored in a key-value format, they can be accessed and
+  # manipulated conveniently inside of a playbook. The task below builds and
+  # saves a list of all the programs to a variable called 'all_pgms_list' and
+  # the following task prints the list. Unlike the facts from the static files,
+  # facts set in the 'set_fact' module will not persist beyond the playbook run.
+  ##############################################################################
+  - name: Create a list of all programs based on the gathered custom facts.
+    ansible.builtin.set_fact:
+      all_pgms_list: "{{ ansible_local.keys() | list }}"
+
+  - name: Print the list of all programs.
+    debug:
+      var: all_pgms_list
+
+  ##############################################################################
+  # The 'all_pgms_list' can be used to key into the ansible facts dict.
+  # If the data is uniformly structured, a view into the health of the remote
+  # system can be built.
+  # This next task prints the name and date of last update for each program.
+  # This task only prints it, but from here, the data could be fed into an
+  # orchestrator program, for example, one which automatically updates packages.
+  ##############################################################################
+  - name: Print name and date of last update of each program.
+    ansible.builtin.debug:
+      msg: "{{ item }} was last updated: {{ ansible_local[item]['date_last_updated'] }}"
+    loop: "{{ all_pgms_list }}"
+
+  ##############################################################################
+  # Data for individual programs is also acessible.
+  ##############################################################################
+  - name: Print all custom facts for zoau.
+    ansible.builtin.debug:
+      var: ansible_local.zoau
+
