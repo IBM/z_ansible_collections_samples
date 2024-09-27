@@ -1,0 +1,49 @@
+  ################################################################################
+# © Copyright IBM Corporation 2024
+################################################################################
+
+################################################################################
+# This playbook copies static files containing sample facts over to the remote
+# target z/OS system using Red Hat Ansible Certified Content for IBM Z.
+# Run this playbook to set up or reset the remote system in preparation for 
+# running the gather_and_print_facts.yml or
+# the unarchive_pax_and_set_custom_facts.yml playbooks.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_sample_facts_files_to_remote_system.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.10.0 or later.
+#
+# Configure:
+#   remote_facts_dir - Path to remote directory which contains static files
+#                      in which local facts are stored as json or ini.
+# 
+################################################################################
+
+---
+- name: Copy local facts stored in static files to remote system.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  environment: '{{ environment_vars }}'
+  gather_facts: false
+
+  vars:
+    remote_facts_dir: /path/to/facts/
+
+  tasks:
+
+  - name: Ensure target directory exists.
+    file:
+      path: "{{ remote_facts_dir }}"
+      state: directory
+
+  - name: Copy local *.fact files to remote z/OS system.
+    zos_copy:
+      src: "{{ playbook_dir }}/files/facts.d/"
+      dest: "{{ remote_facts_dir }}"
+      force: True # to ensure the set up is clean.
