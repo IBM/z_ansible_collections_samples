@@ -74,8 +74,8 @@
     # | - Using zos_data_set, create a generation of the GDG from {{ tmp_data_set1 }}.
     # | - Using zos_data_set, create a generation of the GDG from {{ tmp_data_set2 }}.
     # | - Using zos_blockinfile, add the logs to the latest generation of GDG {{ tmp_data_set1 }}.
-    # | - Using zos_copy, copy the content from the latest generation to {{ tmp_data_set1 }}
-    # | - latest generation of {{ tmp_data_set2 }}.
+    # | - Using zos_copy, copy the content from the latest generation of {{ tmp_data_set1 }}
+    # |   to latest generation of {{ tmp_data_set2 }}.
     # | - Using zos_lineinfile, add a comment to a latest generation of {{ tmp_data_set2 }}
     # |   using relative notation notation {{ tmp_data_set2 }}(0).
     # | - Using zos_fetch, to fetch the latest generation of the GDG {{ tmp_data_set2 }}.
@@ -87,7 +87,7 @@
         limit: 2
       register: result_create_gdg
 
-    - name: "Create the Generation Data Group(GDG) {{tmp_data_set2}} with a limit of 2 generations to backup {{ tmp1 }}"
+    - name: "Create the Generation Data Group(GDG) {{tmp_data_set2}} with a limit of 2 generations to backup {{ tmp_data_set1 }}"
       zos_data_set:
         name: "{{ tmp_data_set2 }}"
         type: gdg
@@ -119,7 +119,7 @@
         msg:
           - "{{ result_create_gds }}"
 
-    - name: "Write the last 4 minutes of the operator console log into {{ tmp1 }}"
+    - name: "Write the last 4 minutes of the operator console log into {{ tmp_data_set1 }}"
       zos_blockinfile:
         src: "{{ tmp_data_set1 }}(0)"
         marker: "//* {mark} *//"

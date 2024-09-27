@@ -101,7 +101,7 @@
         name: "{{ tmp_data_set }}(-1)"
         state: absent
 
-    - name: "Submit the JCL from the previous last generation{{ tmp_data_set }}(0)"
+    - name: "Submit the JCL from the last generation{{ tmp_data_set }}(0)"
       zos_job_submit:
         src: "{{ tmp_data_set }}(0)"
         location: data_set
