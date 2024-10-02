@@ -49,7 +49,7 @@
 - ansible.builtin.set_fact:
     cert_name: "{{ role_cert.cert_label | regex_replace(' ', '') }}"
     cert_subject: ""
-    cert_cn: "{{ buffer[sb_index | int + 1] | regex_replace(' ', '') }}"
+    cert_cn: "{{ buffer[sb_index | int + 1] }}"
     cert_issuer: "{{ buffer[is_index | int + 1] | regex_replace(' ', '') }}"
     cert_algo: "{{ buffer[ka_index | int][21:] | regex_replace(' ', '') }}"
     cert_key_size: " {{ buffer[ks_index | int][12:] | regex_replace(' ', '') }}"
