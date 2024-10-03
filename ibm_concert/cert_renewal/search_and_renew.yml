@@ -9,6 +9,7 @@
   environment: "{{ environment_vars }}"
   vars:
     ansible_ssh_pipelining: true
+    short_desc: ''
     cert_label: 'zosConnectServerCert2' # must be 8 char or less
     cert_type: 'USER'  # USER or SITE or CERTAUTH
     sign_with: 'CERTAUTH' # blank or CERTAUTH
@@ -23,6 +24,9 @@
     uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
+    - ansible.builtin.debug:
+        var: short_desc
+
     - name: Create temporary directory to store bank files
       ansible.builtin.tempfile:
         state: directory
