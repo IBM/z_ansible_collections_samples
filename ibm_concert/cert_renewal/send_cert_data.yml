@@ -9,9 +9,12 @@
   environment: "{{ environment_vars }}"
   vars:
     ansible_ssh_pipelining: true
-    concert_hostname: 'ansibleconcert1.fyre.ibm.com:12443'
-    concert_instance_id: '0000-0000-0000-0000'
-    api_key: 'aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk='
+    concert_hostname: '93252.us-south-8.concert.saas.ibm.com'
+    concert_instance_id: '20241004-1336-0851-0172-bdce0ebbebf7'
+    api_key: 'YW5keS5uZ3V5ZW5AaWJtLmNvbTplNjY2MjU0NS0wMzQwLTQ1ZTItYTdmYy02YmNhY2I3MjdmMGI='
+    # concert_hostname: 'ansibleconcert1.fyre.ibm.com:12443'
+    # concert_instance_id: '0000-0000-0000-0000'
+    # api_key: 'aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk='
     api_key_type: 'C_API_KEY'
     json_file: "zos-cert-data.json"
     csv_file: "zos-cert-data.csv"
@@ -73,27 +76,28 @@
               'cert_label': item[16:48] }] }}"
         loop: "{{report_lines}}"
         when: 
-          - item is search('E ID')
+          - item is search('STCUSR')
+          # - item is search('E ID')
 
-      - name: Search for CERTAUTH in report
-        ansible.builtin.set_fact:
-          expiring_certs: "{{ expiring_certs | default([]) + [{ 
-              'owner_id': '',
-              'cert_type': 'CERTAUTH',
-              'cert_label': item[16:48] }] }}"
-        loop: "{{report_lines}}"
-        when: 
-          - item is search('CERTAUTH')
+      # - name: Search for CERTAUTH in report
+      #   ansible.builtin.set_fact:
+      #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
+      #         'owner_id': '',
+      #         'cert_type': 'CERTAUTH',
+      #         'cert_label': item[16:48] }] }}"
+      #   loop: "{{report_lines}}"
+      #   when: 
+      #     - item is search('CERTAUTH')
       
-      - name: Search for SITE in report
-        ansible.builtin.set_fact:
-          expiring_certs: "{{ expiring_certs | default([]) + [{ 
-              'owner_id': '',
-              'cert_type': 'SITE',
-              'cert_label': item[16:48] }] }}"
-        loop: '{{report_lines}}'
-        when: 
-          - item is search('SITE')
+      # - name: Search for SITE in report
+      #   ansible.builtin.set_fact:
+      #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
+      #         'owner_id': '',
+      #         'cert_type': 'SITE',
+      #         'cert_label': item[16:48] }] }}"
+      #   loop: '{{report_lines}}'
+      #   when: 
+      #     - item is search('SITE')
 
       - ansible.builtin.debug:
           msg: "Num of expiring certs: {{expiring_certs | length}}"
