@@ -42,9 +42,9 @@
     # Modules: zos_data_set, zos_copy, zos_job_submit
     # ##########################################################################
     # +-------------------------------------------------------------------------
-    # | - Using zos_data_set, generate a Generation Data Group with {{ tmp_data_set }}
-    # |   name with a limit of 3 creations.
-    # | - Using zos_data_set, generate a Generation Data Set with relative notation.
+    # | - Using zos_data_set, create Generation Data Group with {{ tmp_data_set }}
+    # |   name with a limit of 3 generation.
+    # | - Using zos_data_set, create a Generation Data Set with relative notation.
     # | - Using zos_copy, copy {{ playbook_dir }}/UPTIME file to last creation of
     # |   GDS with relative notation {{ tmp_data_set }}(0).
     # | - Using zos_copy, copy {{ tmp_data_set }}(0) to a new generation GDS with
