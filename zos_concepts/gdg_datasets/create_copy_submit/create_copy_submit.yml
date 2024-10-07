@@ -43,7 +43,7 @@
     # ##########################################################################
     # +-------------------------------------------------------------------------
     # | - Using zos_data_set, create Generation Data Group with {{ tmp_data_set }}
-    # |   name with a limit of 3 generation.
+    # |   name with a limit of 3 generations.
     # | - Using zos_data_set, create a Generation Data Set with relative notation.
     # | - Using zos_copy, copy {{ playbook_dir }}/UPTIME file to last creation of
     # |   GDS with relative notation {{ tmp_data_set }}(0).
