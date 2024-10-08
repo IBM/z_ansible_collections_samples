@@ -17,7 +17,7 @@
     # api_key: 'aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk='
     api_key_type: 'C_API_KEY'
     csv_file: "zos-cert-data.csv"
-    short_desc: "[From: IBM Concert] [Environment: prod] Certificate @@@STCUSR@@@zosConnectServerCert3           @@@ has expired"
+    short_desc: "INC0013556@@@[From:IBMConcert][Environment:prod]Certificate@@@STCUSR@@@zosConnectServerCert4@@@hasexpired"
     owner_id: ''
     cert_type: 'USER'  # USER or SITE or CERTAUTH
     cert_label: '' 
@@ -28,6 +28,7 @@
 
     cert_detail: {}
     cert_args: {}
+    incident_number: ''
 
     cert_found: false
     today: ''
@@ -51,6 +52,31 @@
 
     - ansible.builtin.debug:
         var: short_desc
+
+    - ansible.builtin.set_fact:
+        desc_list: "{{ short_desc | split('@@@') }}"
+
+    - ansible.builtin.set_fact:
+        ct_index: "{{ lookup('ansible.utils.index_of', desc_list, 'regex', 'Certificate') }}"
+
+    - ansible.builtin.set_fact:
+        incident_number: "{{desc_list[0] | trim }}"
+
+    - ansible.builtin.set_fact:
+        arg_cert_type: "{{desc_list[ct_index|int + 1] | trim }}"
+
+    - ansible.builtin.set_fact:
+        cert_label: "{{desc_list[ct_index|int + 2] | trim }}"
+
+    - name: Build cert details for {{cert_label}}
+      ansible.builtin.set_fact:
+          'cert_type:': 'SITE'
+      when: cert_type is search('SITE')
+
+    - name: Build cert details for {{cert_label}}
+      ansible.builtin.set_fact:
+          'cert_type:': 'CERTAUTH'
+      when: cert_type is search('CERTAUTH')
 
     - name: Create temporary directory to store bank files
       ansible.builtin.tempfile:
@@ -86,28 +112,6 @@
         - ansible.builtin.set_fact:
             today: "{{ date_result.stdout }}"
           when: cert_found
-        
-        - ansible.builtin.set_fact:
-            desc_list: "{{ short_desc | split('@@@') }}"
-
-        - ansible.builtin.set_fact:
-            ct_index: "{{ lookup('ansible.utils.index_of', desc_list, 'regex', 'Certificate') }}"
-
-        - ansible.builtin.set_fact:
-            arg_cert_type: "{{desc_list[ct_index|int + 1] | trim }}"
-
-        - ansible.builtin.set_fact:
-            cert_label: "{{desc_list[ct_index|int + 2] | trim }}"
-
-        - name: Build cert details for {{cert_label}}
-          ansible.builtin.set_fact:
-              'cert_type:': 'SITE'
-          when: cert_type is search('SITE')
-
-        - name: Build cert details for {{cert_label}}
-          ansible.builtin.set_fact:
-              'cert_type:': 'CERTAUTH'
-          when: cert_type is search('CERTAUTH')
 
         - name: Build cert details for {{cert_label}}
           ansible.builtin.set_fact:
