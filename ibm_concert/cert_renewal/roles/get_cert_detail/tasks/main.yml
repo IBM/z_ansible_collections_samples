@@ -31,20 +31,22 @@
     tp_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Fingerprint') }}"
     kr_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Ring:') }}"
 
-- ansible.builtin.set_fact:
-    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
-  when: role_cert.cert_type == 'SITE'
+# - ansible.builtin.set_fact:
+#     # cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
+#   when: role_cert.cert_type == 'SITE'
 
 - ansible.builtin.set_fact:
-    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
-  when: role_cert.cert_type == 'CERTAUTH'
+    # cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
+    cert_sn: "@@@{{role_cert.cert_type}}@@@{{role_cert.cert_label}}@@@"
+  when: role_cert.cert_type == 'CERTAUTH' or role_cert.cert_type == 'SITE'
 
 - ansible.builtin.set_fact:
-    cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.owner_id }}+"
+    # cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.owner_id }}+"
+    cert_sn: "@@@{{role_cert. owner_id | trim }}@@@{{role_cert.cert_label}}@@@"
   when: role_cert.cert_type == 'USER'
 
-- ansible.builtin.set_fact:
-    cert_sn: "{{ cert_sn | regex_replace(' ', '') }}"
+# - ansible.builtin.set_fact:
+#     cert_sn: "{{ cert_sn | regex_replace(' ', '') }}"
 
 - ansible.builtin.set_fact:
     cert_name: "{{ role_cert.cert_label | regex_replace(' ', '') }}"

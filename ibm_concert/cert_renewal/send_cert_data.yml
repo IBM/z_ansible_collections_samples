@@ -73,7 +73,7 @@
           expiring_certs: "{{ expiring_certs | default([]) + [{ 
               'owner_id': item[6:14] | regex_replace('\\)', ''),
               'cert_type': 'USER',
-              'cert_label': item[16:48] }] }}"
+              'cert_label': item[16:48]}]}}"
         loop: "{{report_lines}}"
         when: 
           - item is search('STCUSR')
@@ -84,7 +84,7 @@
       #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
       #         'owner_id': '',
       #         'cert_type': 'CERTAUTH',
-      #         'cert_label': item[16:48] }] }}"
+      #         'cert_label': item[16:48]}]}}"
       #   loop: "{{report_lines}}"
       #   when: 
       #     - item is search('CERTAUTH')
@@ -94,7 +94,7 @@
       #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
       #         'owner_id': '',
       #         'cert_type': 'SITE',
-      #         'cert_label': item[16:48] }] }}"
+      #         'cert_label': item[16:48]}]}}"
       #   loop: '{{report_lines}}'
       #   when: 
       #     - item is search('SITE')
@@ -179,7 +179,7 @@
         args:
           chdir: '/tmp'
 
-      - name: Fetch SBOM to local
+      - name: Fetch CSV to local
         ibm.ibm_zos_core.zos_fetch:
           src: "/tmp/{{ csv_file }}"
           dest: "{{ playbook_dir }}/{{ csv_file }}"
