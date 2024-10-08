@@ -104,6 +104,9 @@
           when: item.content is search(cert_label)
 
         - ansible.builtin.debug: msg="{{cert_label}} expiring - {{cert_found}}"
+
+        - ansible.builtin.meta: end_host
+          when: cert_found is false
         
         - ansible.builtin.command: "date '+%b%d%y'"
           register: date_result
