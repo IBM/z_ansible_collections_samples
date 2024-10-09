@@ -3,8 +3,6 @@
 # © Copyright IBM Corporation 2024
 ###############################################################################
 
-# tasks file for get_cert_detail
-
 ##########################################################################
 # Get Certificate Detail
 ##########################################################################
@@ -31,22 +29,13 @@
     tp_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Fingerprint') }}"
     kr_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Ring:') }}"
 
-# - ansible.builtin.set_fact:
-#     # cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
-#   when: role_cert.cert_type == 'SITE'
-
 - ansible.builtin.set_fact:
-    # cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.cert_type }}+"
     cert_sn: "@@@{{role_cert.cert_type}}@@@{{role_cert.cert_label}}@@@"
   when: role_cert.cert_type == 'CERTAUTH' or role_cert.cert_type == 'SITE'
 
 - ansible.builtin.set_fact:
-    # cert_sn: "{{buffer[sn_index | int + 1]}} *{{ role_cert.cert_label  }}* &{{ buffer[kr_index | int +1] }}& +{{ role_cert.owner_id }}+"
     cert_sn: "@@@{{role_cert. owner_id | trim }}@@@{{role_cert.cert_label}}@@@"
   when: role_cert.cert_type == 'USER'
-
-# - ansible.builtin.set_fact:
-#     cert_sn: "{{ cert_sn | regex_replace(' ', '') }}"
 
 - ansible.builtin.set_fact:
     cert_name: "{{ role_cert.cert_label | regex_replace(' ', '') }}"
@@ -69,36 +58,6 @@
     cert_sec_owner: ""
     cert_ns: ""
 
-
-- name: Build cert details for {{role_cert.cert_label}}
-  ansible.builtin.set_fact:
-    cert_detail: "{{ cert_detail | default({}) | combine ({
-      'Serial Number': cert_sn,
-      'Name': cert_name,
-      'Subject': '',
-      'CN': cert_cn,
-      'Issuer': cert_issuer,
-      'Key Algorithm': cert_algo,
-      'Key Size': cert_key_size,
-      'SANS': '',
-      'ValidFrom': cert_valid_from,
-      'ValidTo': cert_valid_to,
-      'Thumbprint': cert_thumb,
-      'Certificate Hosts': '',
-      'System Reference id': '',
-      'DN': '',
-      'ParentDN': '',
-      'Certificate Type': role_cert.cert_type,
-      'CreatedOn': '',
-      'Primary Owner': role_cert.owner_id,
-      'Secondary Owner': '',
-      'Namespace': ''
-      }) }}"
-
-- name: Add JSON record into list
-  ansible.builtin.set_fact:
-    cert_list: '{{ cert_list | default([]) + [cert_detail] }}'
-
 # Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
 - name: Build CSV record for {{role_cert.cert_label}}
   ansible.builtin.set_fact:
@@ -108,5 +67,5 @@
 - name: Write cert data into .csv file
   ansible.builtin.lineinfile:
     insertafter: EOF
-    dest: "/tmp/{{ csv_file }}"
+    dest: "/tmp/{{ concert_csv_file }}"
     line: "{{ csv_line }}"
