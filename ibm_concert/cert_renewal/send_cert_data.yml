@@ -9,15 +9,15 @@
   environment: "{{ environment_vars }}"
   vars:
     ansible_ssh_pipelining: true
-    concert_hostname: '93252.us-south-8.concert.saas.ibm.com'
-    concert_instance_id: '20241004-1336-0851-0172-bdce0ebbebf7'
-    api_key: 'YW5keS5uZ3V5ZW5AaWJtLmNvbTplNjY2MjU0NS0wMzQwLTQ1ZTItYTdmYy02YmNhY2I3MjdmMGI='
-    # concert_hostname: 'ansibleconcert1.fyre.ibm.com:12443'
-    # concert_instance_id: '0000-0000-0000-0000'
-    # api_key: 'aWJtY29uY2VydDo0ZDM3YmQ1ZS0wYzQ2LTQxNmMtYWNhMS1hNGE4NDVhNjY1ODk='
-    api_key_type: 'C_API_KEY'
-    json_file: "zos-cert-data.json"
-    csv_file: "zos-cert-data.csv"
+
+    # IBM Concert variables
+    concert_hostname: ''
+    concert_instance_id: ''
+    concert_api_key: ''
+    concert_api_key_type: ''
+    concert_csv_file: "zos-cert-data.csv"
+
+    # variables for cert data
     owner_id: ''
     cert_type: ''
     cert_label: ''
@@ -75,29 +75,25 @@
               'cert_type': 'USER',
               'cert_label': item[16:48]}]}}"
         loop: "{{report_lines}}"
-        when: 
-          - item is search('STCUSR')
-          # - item is search('E ID')
+        when: item is search('E ID')
 
-      # - name: Search for CERTAUTH in report
-      #   ansible.builtin.set_fact:
-      #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
-      #         'owner_id': '',
-      #         'cert_type': 'CERTAUTH',
-      #         'cert_label': item[16:48]}]}}"
-      #   loop: "{{report_lines}}"
-      #   when: 
-      #     - item is search('CERTAUTH')
+      - name: Search for CERTAUTH in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': '',
+              'cert_type': 'CERTAUTH',
+              'cert_label': item[16:48]}]}}"
+        loop: "{{report_lines}}"
+        when: item is search('CERTAUTH')
       
-      # - name: Search for SITE in report
-      #   ansible.builtin.set_fact:
-      #     expiring_certs: "{{ expiring_certs | default([]) + [{ 
-      #         'owner_id': '',
-      #         'cert_type': 'SITE',
-      #         'cert_label': item[16:48]}]}}"
-      #   loop: '{{report_lines}}'
-      #   when: 
-      #     - item is search('SITE')
+      - name: Search for SITE in report
+        ansible.builtin.set_fact:
+          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+              'owner_id': '',
+              'cert_type': 'SITE',
+              'cert_label': item[16:48]}]}}"
+        loop: '{{report_lines}}'
+        when: item is search('SITE')
 
       - ansible.builtin.debug:
           msg: "Num of expiring certs: {{expiring_certs | length}}"
@@ -112,7 +108,7 @@
 
       - name: CSV - Create file and set the header
         lineinfile:
-          dest: "/tmp/{{ csv_file }}"
+          dest: "/tmp/{{ concert_csv_file }}"
           line:
             Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
           create: yes
@@ -148,65 +144,24 @@
         loop: "{{expiring_certs}}"
         when: item.cert_type is defined and item.cert_type == 'SITE'
 
-
-      - ansible.builtin.debug:    
-          msg: "Num of certs in JSON file: {{cert_list | length}}"
-
-      - ansible.builtin.copy:
-          dest: /tmp/{{json_file}}
-          content: "{{ cert_list | to_nice_json }}"
-
-      - ansible.builtin.shell: chtag -t -c ISO8859-1 {{json_file}}
-        args:
-          chdir: '/tmp'
-
-      - name: Fetch SBOM to local
-        ibm.ibm_zos_core.zos_fetch:
-          src: "/tmp/{{json_file}}"
-          dest: "{{ playbook_dir }}/{{json_file}}"
-          encoding:
-            from: ISO8859-1
-            to: ISO8859-1
-          flat: true
-
       - name: CSV - Blank lines removal
         ansible.builtin.lineinfile:
-            path: "/tmp/{{ csv_file }}"
+            path: "/tmp/{{ concert_csv_file }}"
             state: absent
             regex: '^\s*$'
       
-      - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ csv_file }}
+      - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ concert_csv_file }}
         args:
           chdir: '/tmp'
 
       - name: Fetch CSV to local
         ibm.ibm_zos_core.zos_fetch:
-          src: "/tmp/{{ csv_file }}"
-          dest: "{{ playbook_dir }}/{{ csv_file }}"
+          src: "/tmp/{{ concert_csv_file }}"
+          dest: "{{ playbook_dir }}/{{ concert_csv_file }}"
           encoding:
             from: ISO8859-1
             to: ISO8859-1
           flat: true
-
-      # - name: Send cert data to IBM Concert
-      #   ansible.builtin.uri:
-      #       url: 'https://{{ concert_hostname }}/ingestion/api/v1/upload_files'
-      #       method: POST
-      #       body:
-      #         data_type:
-      #           content: certificate
-      #         filename:
-      #           filename: '@/tmp/{{csv_file}}'
-      #         metadata:
-      #           content: '{"env_name" : "prod"}'
-      #       body_format: form-multipart
-      #       headers:
-      #         Content-Type: multipart/form-data
-      #         InstanceId: {{concert_instance_id}}
-      #         Accept: application/json
-      #         Authorization: '{{api_key_type}} {{api_key}}'
-      #       validate_certs: false
-      #   register: result
 
       - name: Send cert data to IBM Concert
         ansible.builtin.shell: |
@@ -214,9 +169,9 @@
                 -H 'Content-Type: multipart/form-data' \
                 -H 'InstanceId: {{concert_instance_id}}' \
                 -H 'Accept: application/json' \
-                -H 'Authorization: {{ api_key_type }} {{ api_key }}' \
+                -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
                 -F 'data_type=certificate' \
-                -F 'filename=@{{ playbook_dir }}/{{ csv_file }}' \
+                -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
                 -F 'metadata={"env_name" : "prod"}'
         delegate_to: localhost
 
@@ -225,11 +180,7 @@
           ansible.builtin.file:
             path: "{{ playbook_tmp_dir.path }}"
             state: absent
-        - name: Delete the sbom on z/os
-          ansible.builtin.file:
-            path: /tmp/{{json_file}}
-            state: absent
         - name: Delete the CSV on z/os
           ansible.builtin.file:
-            path: /tmp/{{ csv_file }}
+            path: /tmp/{{ concert_csv_file }}
             state: absent

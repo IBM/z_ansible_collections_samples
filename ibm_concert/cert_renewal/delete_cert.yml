@@ -11,7 +11,7 @@
     ansible_ssh_pipelining: true
     owner_id: 'STCUSR'
     cert_type: 'USER'
-    cert_label: 'zosConnectServerCert2'
+    cert_label: 'zosConnectServerCert6'
 
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 

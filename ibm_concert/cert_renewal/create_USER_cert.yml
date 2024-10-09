@@ -10,13 +10,13 @@
   vars:
     ansible_ssh_pipelining: true
     owner_id: 'STCUSR'
-    cert_label: 'zosConnectServerCert2'
+    cert_label: 'zosConnectServerCert7'
     sign_label: 'IBM CA'
     cn: 'share.centers.ihost.com:19080'
     altname: 'IP(192.148.8.225)'
     ou: 'ANSIBLE CORE'
     country: 'US'
-    expiry_date: '2024-10-17'
+    expiry_date: '2024-10-31'
     expiry_time: '10:06:00' # UTC time
     keyring: 'Keyring.ZOSCONN'
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
