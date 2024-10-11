@@ -75,7 +75,8 @@
               'cert_type': 'USER',
               'cert_label': item[16:48]}]}}"
         loop: "{{report_lines}}"
-        when: item is search('E ID')
+        when: item is search('STCUSR')
+        # when: item is search('E ID')
 
       - name: Search for CERTAUTH in report
         ansible.builtin.set_fact:
