@@ -215,7 +215,7 @@
             command:
               - RACDCERT {{cert_type}} GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}') SIGNWITH({{sign_with}} LABEL('{{sign_label}}')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label}}-NEW')) NEWLABEL('{{ cert_label}}')
-              - RACDCERT ID({{owner_id}}) CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
+              - RACDCERT {{ cert_type }} CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: not sign_label == ' ' and not cert_type == 'USER'
 
         - ansible.builtin.include_role:
@@ -235,7 +235,7 @@
             command:
               - RACDCERT {{cert_type}}  GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_label}}NEW')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label}}-NEW'))  NEWLABEL('{{ cert_label}}')
-              - RACDCERT ID({{owner_id}})  CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
+              - RACDCERT {{ cert_type }}  CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
           when: sign_label == ' ' and not cert_type == 'USER'
 
         - ansible.builtin.include_role:
