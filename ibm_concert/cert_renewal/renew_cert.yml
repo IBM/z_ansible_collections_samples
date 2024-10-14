@@ -62,12 +62,12 @@
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
           'cert_type:': 'SITE'
-      when: cert_type is search('SITE')
+      when: arg_cert_type is search('SITE')
 
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
           'cert_type:': 'CERTAUTH'
-      when: cert_type is search('CERTAUTH')
+      when: arg_cert_type is search('CERTAUTH')
 
     - name: Create temporary directory to store bank files
       ansible.builtin.tempfile:
