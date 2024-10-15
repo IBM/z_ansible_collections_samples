@@ -15,7 +15,7 @@
     sn_username: ""
     sn_pwd: ""
     sn_incident_number: ""
-    sn_short_desc: ""
+    sn_short_desc: "INC0013870@@@[From: IBM Concert] [Environment: prod] Certificate @@@SITE@@@TIV4 - Cert                               @@@ has expired"
 
     # IBM Concert info
     concert_hostname: ""
@@ -29,8 +29,8 @@
     cert_type: 'USER'  # defautl to USER
     cert_label: '' 
     sign_with: 'CERTAUTH' # blank or CERTAUTH
-    sign_label: 'IBM CA'
-    keyring_name: 'Keyring.ZOSCONN'
+    # sign_label: 'IBM CA'
+    keyring_name: ''
     expiry_date: '2025-12-31'
     cert_detail: {}
     cert_args: {}
@@ -161,6 +161,9 @@
               - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'SITE'
 
+        - debug:
+            var: cert_args
+
         - ansible.builtin.include_role:
             name: issue_tso_cmd
           vars:
@@ -213,20 +216,20 @@
           vars:
             task_description: 'Install and connect local cert for {{cert_type}}'
             command:
-              - RACDCERT {{cert_type}} GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}') SIGNWITH({{sign_with}} LABEL('{{sign_label}}')) NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT {{cert_type}} GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}') SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label}} NEW')) NEWLABEL('{{ cert_label}}')
-              - RACDCERT {{ cert_type }} CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: not sign_label == ' ' and not cert_type == 'USER'
+          when: not cert_args.cert_signer == ' ' and not cert_type == 'USER'
+              # - RACDCERT {{ cert_type }} CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
 
         - ansible.builtin.include_role:
             name: issue_tso_cmd
           vars:
             task_description: 'Install and connect local cert for {{cert_type}}'
             command:
-              - RACDCERT ID({{owner_id}})  GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{sign_label}}')) NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT ID({{owner_id}})  GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT ID({{ owner_id}}) ALTER(LABEL('{{ cert_label}} NEW'))  NEWLABEL('{{ cert_label}}')
-              - RACDCERT ID({{owner_id}})  CONNECT(LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: not sign_label == ' ' and cert_type == 'USER'
+              - RACDCERT ID({{owner_id}})  CONNECT(LABEL('{{cert_label}}')  RING({{ cert_args.cert_ring }}) DEFAULT USAGE(PERSONAL))
+          when: not cert_args.cert_signer == ' ' and cert_type == 'USER'
 
         - ansible.builtin.include_role:
             name: issue_tso_cmd
@@ -235,8 +238,8 @@
             command:
               - RACDCERT {{cert_type}}  GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_label}}NEW')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label}} NEW'))  NEWLABEL('{{ cert_label}}')
-              - RACDCERT {{ cert_type }}  CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: sign_label == ' ' and not cert_type == 'USER'
+              - RACDCERT ID({{ cert_args.cert_ring_owner }})  CONNECT({{cert_type}} LABEL('{{cert_label}}')  RING({{ cert_args.cert_ring }}) DEFAULT USAGE(PERSONAL))
+          when: cert_args.cert_signer == ' ' and not cert_type == 'USER'
 
         - ansible.builtin.include_role:
             name: issue_tso_cmd
@@ -245,8 +248,8 @@
             command:
               - RACDCERT ID({{owner_id}})  GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_label}}NEW')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT ID({{ owner_id}}) ALTER(LABEL('{{ cert_label}} NEW'))  NEWLABEL('{{ cert_label}}')
-              - RACDCERT ID({{owner_id}})  CONNECT(LABEL('{{cert_label}}')  RING({{keyring_name}}) DEFAULT USAGE(PERSONAL))
-          when: sign_label == ' ' and cert_type == 'USER'
+              - RACDCERT ID({{ cert_args.cert_ring_owner }})  CONNECT(LABEL('{{cert_label}}')  RING({{ cert_args.cert_ring }}) DEFAULT USAGE(PERSONAL))
+          when: cert_args.cert_signer == ' ' and cert_type == 'USER'
             
         - ansible.builtin.include_role:
             name: get_cert_detail
@@ -293,6 +296,8 @@
               from: ISO8859-1
               to: ISO8859-1
             flat: true
+
+        - meta: end_host
 
         - name: Send cert data to IBM Concert
           ansible.builtin.shell: |

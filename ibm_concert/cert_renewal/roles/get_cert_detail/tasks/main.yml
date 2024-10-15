@@ -27,23 +27,25 @@
     vf_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Start Date') }}"
     vt_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'End Date') }}"
     tp_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Fingerprint') }}"
+    ro_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Ring Owner:') }}"
     kr_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', 'Ring:') }}"
+    in_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', '.') }}"
 
 - ansible.builtin.set_fact:
     cert_sn: "@@@{{role_cert.cert_type}}@@@{{role_cert.cert_label}}@@@"
   when: role_cert.cert_type == 'CERTAUTH' or role_cert.cert_type == 'SITE'
 
 - ansible.builtin.set_fact:
-    cert_sn: "@@@{{role_cert. owner_id | trim }}@@@{{role_cert.cert_label}}@@@"
+    cert_sn: "@@@{{role_cert.owner_id | trim }}@@@{{role_cert.cert_label}}@@@"
   when: role_cert.cert_type == 'USER'
 
 - ansible.builtin.set_fact:
-    cert_name: "{{ role_cert.cert_label | regex_replace(' ', '') }}"
+    cert_name: "{{ role_cert.cert_label }}"
     cert_subject: ""
     cert_cn: "{{ buffer[sb_index | int + 1] }}"
-    cert_issuer: "{{ buffer[is_index | int + 1] | regex_replace(' ', '') }}"
-    cert_algo: "{{ buffer[ka_index | int][21:] | regex_replace(' ', '') }}"
-    cert_key_size: " {{ buffer[ks_index | int][12:] | regex_replace(' ', '') }}"
+    cert_issuer: "{{ buffer[is_index | int + 1] }}"
+    cert_algo: "{{ buffer[ka_index | int][21:] }}"
+    cert_key_size: " {{ buffer[ks_index | int][12:] }}"
     cert_sans: ""
     cert_valid_from: "{{ buffer[vf_index | int][14:] }}"
     cert_valid_to: "{{ buffer[vt_index | int][14:] }}"
@@ -57,6 +59,21 @@
     cert_pri_owner: "{{ role_cert.owner_id }}"
     cert_sec_owner: ""
     cert_ns: ""
+    cert_ring_owner: " {{ buffer [ro_index | int][16:23] }}"
+    cert_ring: " {{ buffer [kr_index | int + 1] }}"
+
+- ansible.builtin.set_fact:
+    new_issuer: "{{ cert_issuer | split('.') }}"
+- ansible.builtin.set_fact:
+    final_issuer: "{{ new_issuer[0] | split('=') }}"
+
+- name: Build cert details for {{cert_label}}
+  ansible.builtin.set_fact:
+    cert_args: "{{ cert_args | default({}) | combine ({
+      'cert_ring_owner': cert_ring_owner | trim,
+      'cert_ring': cert_ring | regex_replace('[><]', '') | trim,
+      'cert_signer': final_issuer[1]
+      }) }}"
 
 # Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
 - name: Build CSV record for {{role_cert.cert_label}}
