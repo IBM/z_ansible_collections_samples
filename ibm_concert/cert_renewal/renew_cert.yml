@@ -297,8 +297,6 @@
               to: ISO8859-1
             flat: true
 
-        - meta: end_host
-
         - name: Send cert data to IBM Concert
           ansible.builtin.shell: |
               /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
