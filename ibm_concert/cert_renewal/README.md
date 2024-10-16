@@ -31,7 +31,7 @@ authority, and the artifacts that will be created and cleaned up.
 ## Playbook Requirements
 This playbook requires:
 
-- [IBM® z/OS® core collection 1.3.1 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+- [IBM® z/OS® core collection 1.10.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Configuration
@@ -53,24 +53,6 @@ ansible-playbook -i inventories <playbook-name>
 
 ## Playbook
 - [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions.
-
-## Playbooks Using module `zos_mvs_raw` (operationally the same as playbooks using `zos_tso_command`)
-- [**create_CERTAUTH_cert_raw.yml**](create_CERTAUTH_cert_raw.yml) - Create a CERTAUTH certificate using zos_mvs_raw module.
-- [**create_SITE_cert_raw.yml**](create_SITE_cert_raw.yml) - Create a SITE certificate using zos_mvs_raw module.
-- [**create_USER_cert_raw.yml**](create_USER_cert_raw.yml) - Create a USER certificate using zos_mvs_raw module.
-- [**delete_cert_raw.yml**](delete_cert_raw.yml) - Delete a certificate using zos_mvs_raw module.
-- [**delete_keyring_raw.yml**](delete_keyring_raw.yml) - Delete a keyring using zos_mvs_raw module.
-- [**list_cert_raw.yml**](list_cert_raw.yml) - Display a certificate's details using zos_mvs_raw module.
-- [**search_and_renew_raw.yml**](search_and_renew_raw.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report using zos_mvs_raw module.
-
-## Playbooks Using module `zos_tso_command` (operationally the same as playbooks using `zos_mvs_raw`)
-- [**create_CERTAUTH_cert_tsocmd.yml**](create_CERTAUTH_cert_tsocmd.yml) - Create a CERTAUTH certificate using zos_tso_command module.
-- [**create_SITE_cert_tsocmd.yml**](create_SITE_cert_tsocmd.yml) - Create a SITE certificate using zos_tso_command module.
-- [**create_USER_cert_tsocmd.yml**](create_USER_cert_tsocmd.yml) - Create a USER certificate using zos_tso_command module.
-- [**delete_cert_tsocmd.yml**](delete_cert_tsocmd.yml) - Delete a certificate using zos_tso_command module.
-- [**delete_keyring_tsocmd.yml**](delete_keyring_tsocmd.yml) - Delete a keyring using zos_tso_command module.
-- [**list_cert_tsocmd.yml**](list_cert_tsocmd.yml) - Display a certificate details using zos_tso_command module.
-- [**search_and_renew_tsocmd.yml**](search_and_renew_tsocmd.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report using zos_tso_command module.
 
 ## Role Summary
 - [**issue_operator_cmd**](roles/issue_operator_cmd/README.md) - Issue an operator command
