@@ -5,7 +5,7 @@ can simplify the tracking and resolving RACF certificate issues.
 
 [**send_cert_data.yml**](send_cert_data.yml) this playbook will run the z/OS Health Checker RACF Certificate Expiriation report and pull the data
 into a CSV file and send it to a IBM Concert instance
-[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate
+[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate using AAP
 
 These playbook use:
 
