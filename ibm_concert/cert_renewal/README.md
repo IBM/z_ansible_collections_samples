@@ -56,7 +56,7 @@ ansible-playbook -i inventories <playbook-name>
 
 ## Role Summary
 - [**get_cert_detail**](roles/get_cert_detail/README.md) - Retrieve certificate details from RACF and build a CSV record
-- [**issue_racf_cmd**](roles/issue_racf_cmd/README.md) - Isuue RACF command(s)
+- [**issue_operator_cmd**](roles/issue_tso_cmd/README.md) - Issue z/OS system command(s)
 - [**issue_tso_cmd**](roles/issue_tso_cmd/README.md) - Issue TSO command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
 - [**send-template**](roles/send-template/README.md) - send template to a zOS host
