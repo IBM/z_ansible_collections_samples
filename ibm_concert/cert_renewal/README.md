@@ -55,7 +55,7 @@ ansible-playbook -i inventories <playbook-name>
 - [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions.
 
 ## Role Summary
-- [**issue_operator_cmd**](roles/issue_operator_cmd/README.md) - Issue an operator command
+- [**get_cert_detail**](roles/get_cert_detail/README.md) - Retrieve certificate details from RACF and build a CSV record
 - [**issue_racf_cmd**](roles/issue_racf_cmd/README.md) - Isuue RACF command(s)
 - [**issue_tso_cmd**](roles/issue_tso_cmd/README.md) - Issue TSO command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
