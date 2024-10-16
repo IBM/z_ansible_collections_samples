@@ -1,37 +1,28 @@
-# Manage z/OS Certificates
+# Manage z/OS Certificates using IBM Concert/ServiceNow/Ansible Automation Platform
 
-This playbook demonstrates how to copy data to and from a z/OS system using modules included in the Red Hat Ansible Certified Content for IBM Z core collection.
+These sample playbooks when used with IBM Concert, SericeNow, and Ansible Automation Platform
+can simplify the tracking and resolving RACF certificate issues.
 
-This project contains playbooks and roles that demonstrates certificate renewal
-using RACF. The playbooks in this project are designed to address an end to end
-scenario managing z/OS certificates beginning with monitoring certificates using
-Health Checker, creating an authority and certificates, deleting certificates
-and even renewing them.
-
-ALthough this is an end to end scenario, you can choose to run the individual
-playbooks if you are interested in one particular operation. Review the individual
-playbook for more details.
-
-In addition to providing the various operations, this project goes further and
-demonstrates how some of the same operations can be run various ways. For example,
-you will notice that the two modules `zos_mvs_raw` and `zos_tso_command` are
-heavily used to perform the same operation. You can choose to create a certificate
-authority using the playbook based on `zos_mvs_raw` which is
-[**create_CERTAUTH_cert_raw.yml**](create_CERTAUTH_cert_raw.yml) or you could
-choose the playbook leveraging TSO commands to do the same thing
-[**create_CERTAUTH_cert_tsocmd.yml**](create_CERTAUTH_cert_tsocmd.yml). Either
-playbook will yield the same results and this offers you the opportunity to
-explore multiple ways to do the same operation.
+[**send_cert_data.yml**](send_cert_data.yml) this playbook will run the z/OS Health Checker RACF Certificate Expiriation report and pull the data
+into a CSV file and send it to a IBM Concert instance
+[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate
 
 These playbook use:
 
-    collection:
-        ibm.ibm_zos_core
-    modules:
-        zos_mvs_raw
-        zos_tso_command
-        zos_operator
-        zos_job_submit
+    collections:
+      - name: ibm.ibm_zos_core
+        version: 1.10.0
+      - name: ibm.ibm_zos_ims
+        version: 1.3.0
+      - name: ansible.posix
+        version: 1.5.4
+      - name: ansible.utils
+        version: 4.1.0
+      - name: community.general
+        version: 9.4.0
+      - name: servicenow.itsm
+        version: 2.7.0
+
 
 It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
@@ -52,7 +43,7 @@ This playbook requires:
   - Review [host_vars documentation](../../docs/share/zos_core/configure_host_vars.md)
     and any additional noted variables in the configuration.
 
-## Run the playbook
+## Set up job templates on Ansible Automation Platform
 This project has several playbooks that you can run, choose a `playbook-name`
 and substitute it in the command below to execute it.
 
@@ -87,6 +78,17 @@ ansible-playbook -i inventories <playbook-name>
 - [**issue_tso_cmd**](roles/issue_tso_cmd/README.md) - Issue TSO command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
 - [**send-template**](roles/send-template/README.md) - send template to a zOS host
+
+## Set up ServiceNow for Ansible Automation Platform Integration
+- Create REST message
+- Create business rule to send REST message when Incident tickets State change
+- Customize script to send correct inputs to AAP job templates
+- Change State to 'In progress' to kick off the renewal process
+
+## Using IBM Concert to track and resolve expired Certificates
+- Set up AAP schedule to send cert data to IBM Concert on a regular basis
+- Create ServiceNow ticket to renew a cert
+
 
 # Changelog
 All changes are maintained chronologically by date found in the
