@@ -1,14 +1,14 @@
-# Manage z/OS Certificates using IBM Concert/ServiceNow/Ansible Automation Platform
+# Manage z/OS Certificates using IBM Concert, ServiceNow, and Ansible Automation Platform
 
 These sample playbooks when used with IBM Concert, SericeNow, and Ansible Automation Platform
 can simplify tracking and resolving RACF certificate issues.
 
-[**send_cert_data.yml**](send_cert_data.yml) this playbook will run the z/OS Health Checker RACF Certificate Expiriation report and pull the data
-into a CSV file and send it to a IBM Concert instance
+It is a good practice to review the playbook contents before executing them.
+It will help you understand the requirements in terms of space, location, names,
+authority, and the artifacts that will be created and cleaned up.
 
-[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate using the certificate data sent in from a ServiceNow REST message to Ansible Automation Platform
-
-These playbook use:
+## Playbook Requirements
+These playbooks use:
 
     collections:
       - name: ibm.ibm_zos_core
@@ -24,36 +24,10 @@ These playbook use:
       - name: servicenow.itsm
         version: 2.7.0
 
+## Playbooks
+[**send_cert_data.yml**](send_cert_data.yml) this playbook will run the z/OS Health Checker RACF Certificate Expiriation report and pull the data into a CSV file and send it to a IBM Concert instance for visualization and management.
 
-It is a good practice to review the playbook contents before executing them.
-It will help you understand the requirements in terms of space, location, names,
-authority, and the artifacts that will be created and cleaned up.
-
-## Playbook Requirements
-This playbook requires:
-
-- [IBM® z/OS® core collection 1.10.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
-- [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-
-## Configuration
-- Configure the included [inventory.yml](inventories/inventory.yml) with the
-  information from the managed z/OS host.
-  - Review [inventory documentation](../docs/share/zos_core/configure_inventory.md)
-- Configure the included **host_vars** [zos_host.yml](inventories/host_vars/zos_host.yml)
-  with the information from your z/OS system.
-  - Review [host_vars documentation](../../docs/share/zos_core/configure_host_vars.md)
-    and any additional noted variables in the configuration.
-
-## Set up job templates on Ansible Automation Platform
-This project has several playbooks that you can run, choose a `playbook-name`
-and substitute it in the command below to execute it.
-
-```bash
-ansible-playbook -i inventories <playbook-name>
-```
-
-## Playbook
-- [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions.
+[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate using the certificate data sent in from a ServiceNow REST message using a job template on an Ansible Automation Platform.
 
 ## Role Summary
 - [**get_cert_detail**](roles/get_cert_detail/README.md) - Retrieve certificate details from RACF and build a CSV record
@@ -61,15 +35,20 @@ ansible-playbook -i inventories <playbook-name>
 - [**issue_tso_cmd**](roles/issue_tso_cmd/README.md) - Issue TSO command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
 - [**send-template**](roles/send-template/README.md) - send template to a zOS host
+- 
+## Set up job templates on Ansible Automation Platform
+These playbooks are designed to be used with Ansible Automation Platform (AAP) job templates. The information in the `host_vars` can be used to set up Inventory and Hosts on AAP.
+
+Review the required inputs to each playbooks to set up Survey on AAP so that external callers can call the AAP REST API correctly. 
 
 ## Set up ServiceNow for Ansible Automation Platform Integration
-- Create REST message
-- Create business rule to send REST message when Incident tickets State change
-- Customize script to send correct inputs to AAP job templates
+- Create a REST message and a POST method
+- Create a business rule to send the POST REST message when an Incident ticket State changes
+- Customize a script to send the correct inputs to the AAP job template to renew the certificate on z/OS
 - Change State to 'In progress' to kick off the renewal process
 
 ## Using IBM Concert to track and resolve expired Certificates
-- Set up AAP schedule to send cert data to IBM Concert on a regular basis
+- Set up an AAP schedule to send cert data to IBM Concert on a regular basis
 - Create ServiceNow ticket to renew a cert
 
 
