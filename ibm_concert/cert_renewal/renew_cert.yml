@@ -15,7 +15,7 @@
     sn_username: ""
     sn_pwd: ""
     sn_incident_number: ""
-    sn_short_desc: "INC0010074@@@[From: IBM Concert] [Environment: prod] Certificate @@@STCUSR@@@concertCertificate              @@@ expires in 4 days"
+    sn_short_desc: "INC0010077@@@[From: IBM Concert] [Environment: prod] Certificate @@@STCUSR@@@concertCertificateDemo3         @@@ expires in 4 days"
 
     # IBM Concert info
     concert_hostname: ""
@@ -214,7 +214,21 @@
               - RACDCERT {{cert_type}} LIST(LABEL('{{cert_label[:-3]}}{{random_str}}'))
               - RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
-          when: not cert_type == 'USER'
+          when: cert_type == 'CERTAUTH'
+
+        - ansible.builtin.include_role:
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+            command:
+              - RACDCERT {{cert_type}} REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}') NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT {{cert_type}} GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
+              - RACDCERT {{cert_type}} GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT {{cert_type}} ROLLOVER(LABEL('{{cert_label}}')) NEWLABEL('{{cert_label[:-3]}}{{random_str}}')
+              - RACDCERT {{cert_type}} LIST(LABEL('{{cert_label[:-3]}}{{random_str}}'))
+              - RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
+              - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
+          when: cert_type == 'SITE'
 
         - ansible.builtin.include_role:
             name: issue_tso_cmd
@@ -222,13 +236,13 @@
             task_description: 'Rekey and Generate new cert request for {{cert_type}}'
             command:
               - RACDCERT ID({{owner_id}}) REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}')  NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT ID({{owner_id}}) GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
+              - RACDCERT ID({{owner_id}}) GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT ID({{owner_id}}) ROLLOVER(LABEL('{{cert_label}}')) NEWLABEL('{{cert_label[:-3]}}{{random_str}}')
               - RACDCERT ID({{owner_id}}) LIST(LABEL('{{cert_label[:-3]}}{{random_str}}'))
               - RACDCERT ID({{owner_id}}) DELETE(LABEL('{{cert_label}}'))
               - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
           when: cert_type == 'USER'
-              # - RACDCERT ID({{owner_id}}) GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
-              # - RACDCERT ID({{owner_id}}) GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
 
         - name: Save new expiration date
           ansible.builtin.set_fact:
