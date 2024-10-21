@@ -9,7 +9,6 @@
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
-  # PYTHONPATH: "{{ ZOAU }}/lib"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
@@ -25,7 +24,6 @@ environment_vars:
 ################################################################################
 # - Property BPXK_AUTOCVT must be configured to "ON"; e.g., _BPXK_AUTOCVT: "ON"
 # - Property ZOAU_HOME is the ZOA Utilities install root path; e.g., ZOAU_HOME: "/usr/lpp/IBM/zoautil"
-# - Property PYTHONPATH is the ZOA Utilities Python library path; e.g., PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"
 # - Property LIBPATH is both the path to the Python libraries on the target
 #   and the ZOA Utilities Python library path separated by semi-colons; e.g.,
 #   LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."

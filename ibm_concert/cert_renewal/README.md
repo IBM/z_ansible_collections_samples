@@ -1,7 +1,7 @@
 # Manage z/OS Certificates using IBM Concert, ServiceNow, and Ansible Automation Platform
 
 These sample playbooks when used with IBM Concert, SericeNow, and Ansible Automation Platform
-can simplify tracking and resolving RACF certificate issues.
+can simplify the monitroing and resolving RACF certificate issues.
 
 It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
@@ -13,8 +13,6 @@ These playbooks use:
     collections:
       - name: ibm.ibm_zos_core
         version: 1.10.0
-      - name: ibm.ibm_zos_ims
-        version: 1.3.0
       - name: ansible.posix
         version: 1.5.4
       - name: ansible.utils
@@ -35,22 +33,22 @@ These playbooks use:
 - [**issue_tso_cmd**](roles/issue_tso_cmd/README.md) - Issue TSO command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
 - [**send-template**](roles/send-template/README.md) - send template to a zOS host
-- 
+
 ## Set up job templates on Ansible Automation Platform
 These playbooks are designed to be used with Ansible Automation Platform (AAP) job templates. The information in the `host_vars` can be used to set up Inventory and Hosts on AAP.
 
 Review the required inputs to each playbooks to set up Survey on AAP so that external callers can call the AAP REST API correctly. 
 
+- Set up an AAP schedule to send cert data to IBM Concert on a regular basis
+- Set up an AAP job template to renew a certificate data to IBM Concert on a regular basi
+
 ## Set up ServiceNow for Ansible Automation Platform Integration
-- Create a REST message and a POST method
+- Create an Outbound REST message and a POST method ton interact with AAP
 - Create a business rule to send the POST REST message when an Incident ticket State changes
 - Customize a script to send the correct inputs to the AAP job template to renew the certificate on z/OS
-- Change State to 'In progress' to kick off the renewal process
 
 ## Using IBM Concert to track and resolve expired Certificates
-- Set up an AAP schedule to send cert data to IBM Concert on a regular basis
-- Create ServiceNow ticket to renew a cert
-
+- Create a ServiceNow incident ticket to renew a certificate
 
 # Changelog
 All changes are maintained chronologically by date found in the
