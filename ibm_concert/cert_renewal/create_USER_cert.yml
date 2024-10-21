@@ -10,15 +10,15 @@
   vars:
     ansible_ssh_pipelining: true
     owner_id: 'STCUSR'
-    cert_label: 'zosConnectServerCert7'
+    cert_label: 'concertCertificateDemo10'
     sign_label: 'IBM CA'
-    cn: 'share.centers.ihost.com:19080'
+    cn: 'share.centers.ihost.com:19999'
     altname: 'IP(192.148.8.225)'
     ou: 'ANSIBLE CORE'
     country: 'US'
-    expiry_date: '2024-10-31'
+    expiry_date: '2024-10-22'
     expiry_time: '10:06:00' # UTC time
-    keyring: 'Keyring.ZOSCONN'
+    keyring: 'Keyring.CONCERT'
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
   tasks:
@@ -80,8 +80,16 @@
           - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
       when: not sign_label == ' ' and expiry_date == ''
 
+    # - ansible.builtin.include_role:
+    #     name: issue_operator_cmd
+    #   vars:
+    #     task_description: 'Run Health Check for {{check_name}}'
+    #     command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+
     - ansible.builtin.include_role:
-        name: issue_operator_cmd
+        name: issue_tso_cmd
       vars:
-        task_description: 'Run Health Check for {{check_name}}'
-        command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+        task_description: 'Clean up certs and keyring'
+        command:
+          - RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
+      ignore_errors: true

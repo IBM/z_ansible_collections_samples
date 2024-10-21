@@ -11,7 +11,7 @@
     ansible_ssh_pipelining: true
     owner_id: 'STCUSR'
     cert_type: 'USER'
-    cert_label: 'zosConnectServerCert6'
+    cert_label: 'concertCertificateDemo9'
 
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
@@ -40,8 +40,9 @@
           - RACDCERT SITE DELETE(LABEL('{{cert_label}}'))
       when: cert_type == 'SITE'
 
-    - ansible.builtin.include_role:
-        name: issue_operator_cmd
-      vars:
-        task_description: 'Run Health Checker'
-        command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+    # - ansible.builtin.include_role:
+    #     name: issue_operator_cmd
+    #   vars:
+    #     task_description: 'Run Health Checker'
+    #     command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+  

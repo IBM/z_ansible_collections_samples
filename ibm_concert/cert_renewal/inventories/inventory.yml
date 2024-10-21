@@ -4,10 +4,8 @@
 
 ################################################################################
 # Description of the properties used in this configuration:
-# - Property `ansible_host` is the z/OS managed node (target),
-#    e.g, ansible_host: "zvm1.vmec.svl.ibm.com"
-# - Property `ansible_user` is the z/OS managed user to connect and run as over SSH,
-#    e.g, ansible_user: "zosadm"
+# - Property `ansible_host` is the z/OS managed node (target)
+# - Property `ansible_user` is the z/OS managed user to connect and run as over SSH
 ################################################################################
 
 source_system:
