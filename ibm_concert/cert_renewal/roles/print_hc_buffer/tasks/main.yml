@@ -1,0 +1,24 @@
+---
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+# tasks file for print_hc_buffer
+###########################################################################
+# skeleton for HZSPRNT
+###########################################################################
+- name: Send JCL template
+  block:
+    - ansible.builtin.set_fact:
+        eager_role_path: '{{ role_path }}'
+
+    - ansible.builtin.include_role:
+        name: send-template
+      vars:
+        path: '{{ eager_role_path }}/templates/HZSPRINT.J2'
+
+    - name: Get expiring certs report for {{ hc_check }}
+      ibm.ibm_zos_core.zos_job_submit:
+        src: '{{ uss_file_path }}/HZSPRINT.J2'
+        location: uss
+      register: hc_job_output
