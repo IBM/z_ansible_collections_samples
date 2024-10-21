@@ -15,7 +15,7 @@
     sn_username: ""
     sn_pwd: ""
     sn_incident_number: ""
-    sn_short_desc: "INC0010077@@@[From: IBM Concert] [Environment: prod] Certificate @@@STCUSR@@@concertCertificateDemo3         @@@ expires in 4 days"
+    sn_short_desc: ""
 
     # IBM Concert info
     concert_hostname: ""
@@ -40,25 +40,6 @@
     uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
-    # - name: Resolve incident in ServiceNow
-    #   servicenow.itsm.incident:
-    #     instance:
-    #       host: "https://dev195580.service-now.com"
-    #       username: "admin"
-    #       password: "ycy@XZRz60%J"
-    #       validate_certs: false
-    #     state: resolved
-    #     caller: "admin"
-    #     number: "INC0013870"
-    #     close_code: "Solved (Permanently)"
-    #     close_notes: "Certificate renewed with Ansible"
-    #   delegate_to: localhost
-
-    # - ansible.builtin.set_fact:
-    #         random_str: "{{lookup('community.general.random_string', length=3, special=false)}}"
-
-    # - meta: end_host
-  
     - ansible.builtin.debug:
         var: sn_short_desc
 
