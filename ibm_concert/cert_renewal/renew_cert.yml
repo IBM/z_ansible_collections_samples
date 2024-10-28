@@ -308,7 +308,7 @@
           ansible.builtin.file:
             path: "{{ playbook_tmp_dir.path }}"
             state: absent
-        - name: Delete the CSV on z/os
+        - name: Delete the CSV on z/OS
           ansible.builtin.file:
             path: /tmp/{{ concert_csv_file }}
             state: absent
