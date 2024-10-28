@@ -23,9 +23,9 @@ These playbooks use:
         version: 2.7.0
 
 ## Playbooks
-[**send_cert_data.yml**](send_cert_data.yml) this playbook will run the z/OS Health Checker RACF Certificate Expiriation report and pull the data into a CSV file and send it to a IBM Concert instance for visualization and management.
+[**send_cert_data.yml**](send_cert_data.yml) this playbook will run the z/OS Health Checker RACF Certificate Expiration report and pull the data into a CSV file and send it to an IBM Concert instance for visualization and management.
 
-[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate using the certificate data sent in from a ServiceNow REST message using a job template on an Ansible Automation Platform.
+[**renew_cert.yml**](renew_cert.yml) this playbook will renew a z/OS certificate using the certificate data sent in from a ServiceNow REST message using a job template on Ansible Automation Platform.
 
 ## Role Summary
 - [**get_cert_detail**](roles/get_cert_detail/README.md) - Retrieve certificate details from RACF and build a CSV record
@@ -37,13 +37,13 @@ These playbooks use:
 ## Set up job templates on Ansible Automation Platform
 These playbooks are designed to be used with Ansible Automation Platform (AAP) job templates. The information in the `host_vars` can be used to set up Inventory and Hosts on AAP.
 
-Review the required inputs to each playbooks to set up Survey on AAP so that external callers can call the AAP REST API correctly. 
+Review the required inputs to each playbooks to set up Surveys on AAP so that external callers can call the AAP REST API correctly.
 
-- Set up an AAP schedule to send cert data to IBM Concert on a regular basis
-- Set up an AAP job template to renew a certificate data to IBM Concert on a regular basi
+- Set up an AAP schedule to send certificate data to IBM Concert on a regular basis
+- Set up an AAP job template to renew a certificate data to IBM Concert on a regular basis
 
 ## Set up ServiceNow for Ansible Automation Platform Integration
-- Create an Outbound REST message and a POST method ton interact with AAP
+- Create an Outbound REST message and a POST method to interact with AAP
 - Create a business rule to send the POST REST message when an Incident ticket State changes
 - Customize a script to send the correct inputs to the AAP job template to renew the certificate on z/OS
 
