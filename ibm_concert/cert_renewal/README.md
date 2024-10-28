@@ -40,7 +40,7 @@ These playbooks are designed to be used with Ansible Automation Platform (AAP) j
 Review the required inputs to each playbooks to set up Surveys on AAP so that external callers can call the AAP REST API correctly.
 
 - Set up an AAP schedule to send cert data to IBM Concert on a regular basis
-- Set up an AAP job template to renew a certificate on z/OS
+- Set up an AAP job template to renew a certificate on z/OS when requested by a REST caller
 
 ## Set up ServiceNow for Ansible Automation Platform Integration
 - Create an Outbound REST message and a POST method to interact with AAP
