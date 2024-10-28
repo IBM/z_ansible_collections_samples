@@ -1,7 +1,7 @@
 # Manage z/OS Certificates using IBM Concert, ServiceNow, and Ansible Automation Platform
 
-These sample playbooks when used with IBM Concert, SericeNow, and Ansible Automation Platform
-can simplify the monitroing and resolving RACF certificate issues.
+These sample playbooks when used with IBM Concert, ServiceNow, and Ansible Automation Platform
+can simplify the monitoring and resolution of RACF certificate issues.
 
 It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
