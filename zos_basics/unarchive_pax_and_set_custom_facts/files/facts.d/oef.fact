@@ -1,0 +1,6 @@
+{
+    "product_name" : "IBM Open Enterprise Foundation for z/OS",
+    "version" : "1.1",
+    "executable" : "/global/foz/v1r1/bin",
+    "date_last_updated" : "2024-08-28"
+}

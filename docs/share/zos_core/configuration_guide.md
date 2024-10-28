@@ -121,13 +121,15 @@ execution.
 `group_vars` environment variables:
 
 - Property `BPXK_AUTOCVT` must be configured to `"ON"`; e.g., `_BPXK_AUTOCVT: "ON"`
-- Property `ZOAU_HOME` is the **ZOA Utilities** install root path; e.g., `ZOAU_HOME: "/usr/lpp/IBM/zoautil"`
-- Property `PYTHONPATH` is the **ZOA Utilities** Python library path; e.g., `PYTHONPATH: "/usr/lpp/IBM/zoautil/lib"`
+- Property `ZOAU_HOME` is the **Z Open Automation Utilities (ZOAU)** install root path;
+  e.g., `ZOAU_HOME: "/usr/lpp/IBM/zoautil"`
+- Property `PYTHONPATH` is the **Z Open Automation Utilities (ZOAU)** Python library path;
+  e.g., `PYTHONPATH: "/usr/zoau-wheel/"`
 - Property `LIBPATH` is **both** the path to the **Python libraries** on the target
-  and the **ZOA Utilities Python library path** separated by semi-colons; e.g.,
-  `LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r8/pyz/lib:/usr/lib:/lib:."`
+  and the **Z Open Automation Utilities (ZOAU) Python library path** separated by semi-colons; e.g.,
+  `LIBPATH: "/usr/lpp/IBM/zoautil/lib/:/usr/lpp/IBM/cyp/v3r12/pyz/lib:/usr/lib:/lib:."`
 - Property `PATH` is the ZOA utilities **BIN** path and **Python interpreter** path, e.g.,
-  `PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin"`
+  `PATH: "/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r12/pyz/bin:/bin"`
 - Property `_CEE_RUNOPTS` is the invocation Language Environment® runtime
   options for programs and used by Python. e.g.,
   `_CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"`
@@ -154,7 +156,7 @@ A complete example of `all.yml` is:
 environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
-  PYTHONPATH: "{{ ZOAU }}/lib"
+  PYTHONPATH: "{{ ZOAU_PYTHON_LIBRARY_PATH }}"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/sbin"
   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
@@ -183,7 +185,7 @@ complete the configuration.
 `host_vars` environment variables:
 
 - Property `PYZ` is the python installation home path on the z/OS managed node
-  (target), e.g, `pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"`
+  (target), e.g, `pyz: "/usr/lpp/IBM/cyp/v3r12/pyz"`
 - Property `ZOAU` is the ZOAU installation home on the z/OS managed node
   (target), e.g, `zoau: "/usr/lpp/IBM/zoautil"`
 - Property `ansible_python_interpreter` is the z/OS managed node (target) Python
@@ -194,8 +196,10 @@ complete the configuration.
 A complete example of `zos_host.yml` is:
 
 ``` {.yaml}
-PYZ: "/usr/lpp/IBM/cyp/v3r8/pyz"
+PYZ: "/usr/lpp/IBM/cyp/v3r12/pyz"
 ZOAU: "/usr/lpp/IBM/zoautil"
+ZOAU_PYTHON_LIBRARY_PATH: "{{ path_to_wheel_installation_directory }}"
+
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 ```
 

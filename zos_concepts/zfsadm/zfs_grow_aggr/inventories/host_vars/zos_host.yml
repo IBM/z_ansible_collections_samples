@@ -1,25 +1,64 @@
 ---
 ################################################################################
-# Copyright (c) IBM Corporation 2022
+# Copyright (c) IBM Corporation 2022, 2024
 ################################################################################
 
 ################################################################################
 # Description of the properties used in this configuration:
-# - Property `PYZ` is the python installation home path on the z/OS managed node (target),
-#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
-# - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
-#    e.g, zoau: "/usr/lpp/IBM/zoautil"
-# - property `ansible_python_interpreter` is the z/OS managed node (target) Python
+# - Property `PYZ` is the python installation home path on the z/OS managed
+#    (target) node e.g, PYZ: "/usr/lpp/IBM/cyp/v3r12/pyz"
+# - Property `PYZ_VERSION` is the version of python on the z/OS managed
+#    (target) node e.g, PYZ_VERSION: "3.12".
+# - Property `ZOAU` is the ZOAU installation home on the z/OS managed (target)
+#    node, e.g, ZOAU: "/usr/lpp/IBM/zoautil".
+# - Property `ZOAU_PYTHON_LIBRARY_PATH` is the path to the Z Open Automation
+#    Utilities (ZOAU) python library. Specifically, the path points to the
+#    directory containing 'zoautil_py'. Packages installed using 'pip' generally
+#    default to the 'site-packages' directory within the python installation,
+#    eg "/usr/lpp/IBM/cyp/v3r12/pyz/lib/python3.12/site-packages/".
+#    If the installation uses options such as '--user' or '--target', the module
+#    is installed to a non-default location which must be configured in
+#    `ZOAU_PYTHON_LIBRARY_PATH`.
+#    If the wheel installation method is used with the '--target' or '--user'
+#    option, `ZOAU_PYTHON_LIBRARY_PATH` should point to the directory the wheel
+#    file was installed to. e.g ZOAU_PYTHON_LIBRARY_PATH: "/usr/zoau-wheel/".
+#    Else 'ZOAU_PYTHON_LIBRARY_PATH' should point to the directory containing
+#    the pre-compiled binary.
+#    For ZOAU v1.2.x, the pre-compiled binary is located in the 'lib' directory.
+#    e.g "/usr/lpp/IBM/zoautil/lib" or "{{ ZOAU }}/lib".
+#    For ZOAU v1.3.x, the pre-compiled binary is located in a sub-directory
+#    corresponding to the `PYZ_VERSION` inside the 'lib' directory,
+#    e.g "/usr/lpp/IBM/zoautil/lib/3.12" or "{{ ZOAU }}/lib/{{ PYZ_VERSION }}".
+# - Property `ansible_python_interpreter` is the z/OS managed node (target) Python
 #    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
 #
-# Note, PYZ and ZOAU environment variables must be configured.
+# Note, PYZ, PYZ_VERSION, and ZOAU environment variables must be configured.
 ################################################################################
 
 PYZ: "path_to_python_installation_on_zos_target"
+PYZ_VERSION: "3.xx"
+
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
+# Configuring the `ZOAU_PYTHON_LIBRARY_PATH` property is required.
+
+# If the ZOAU python package, zoautil_py, has been installed as a wheel (*.whl)
+# with the '--target' or '--user' option, uncomment the following line:
+# ZOAU_PYTHON_LIBRARY_PATH: "{{ path_to_wheel_installation_directory }}"
+
+# If the ZOAU python zoautil_py package has been installed in the default location
+# that is part of Python's search path, the `ZOAU_PYTHON_LIBRARY_PATH` environment
+# variable must be set as an empty string. Uncomment the following line:
+# ZOAU_PYTHON_LIBRARY_PATH: ""
+
+# If using pre-compiled binaries for ZOAU v1.3.x, uncomment the following line:
+# ZOAU_PYTHON_LIBRARY_PATH: "{{ ZOAU }}/lib/{{ PYZ_VERSION }}"
+
+# If using pre-compiled binaries for ZOAU v1.2.x, uncomment the following line:
+# ZOAU_PYTHON_LIBRARY_PATH: "{{ ZOAU }}/lib"
+
 ################################################################################
-# Do not configure, variable substituion will correctly set the
-# variable`ansible_python_interpreter`
+# Do not configure, variable substitution will correctly set the
+# variable `ansible_python_interpreter`
 ################################################################################
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
