@@ -44,7 +44,7 @@
         vars:
           task_description: 'Run Health Checker'
           command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
-        
+
       - ansible.builtin.include_role:
           name: print_hc_buffer
         vars:
@@ -62,7 +62,7 @@
           cert_found: true
           report_lines: '{{ report_lines | default([]) + [item] }}'
         loop: '{{sysout_lines}}'
-        when: 
+        when:
           - item is search('Yes')
 
       - ansible.builtin.debug:
@@ -70,7 +70,7 @@
 
       - name: Search for ID in report
         ansible.builtin.set_fact:
-          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+          expiring_certs: "{{ expiring_certs | default([]) + [{
               'owner_id': item[6:14] | regex_replace('\\)', ''),
               'cert_type': 'USER',
               'cert_label': item[16:48]}]}}"
@@ -79,16 +79,16 @@
 
       - name: Search for CERTAUTH in report
         ansible.builtin.set_fact:
-          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+          expiring_certs: "{{ expiring_certs | default([]) + [{
               'owner_id': '',
               'cert_type': 'CERTAUTH',
               'cert_label': item[16:48]}]}}"
         loop: "{{report_lines}}"
         when: item is search('CERTAUTH')
-      
+
       - name: Search for SITE in report
         ansible.builtin.set_fact:
-          expiring_certs: "{{ expiring_certs | default([]) + [{ 
+          expiring_certs: "{{ expiring_certs | default([]) + [{
               'owner_id': '',
               'cert_type': 'SITE',
               'cert_label': item[16:48]}]}}"
@@ -111,7 +111,7 @@
           dest: "/tmp/{{ concert_csv_file }}"
           line:
             Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
-          create: yes
+          create: true
           state: present
 
       - ansible.builtin.include_role:
@@ -149,7 +149,7 @@
             path: "/tmp/{{ concert_csv_file }}"
             state: absent
             regex: '^\s*$'
-      
+
       - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ concert_csv_file }}
         args:
           chdir: '/tmp'
