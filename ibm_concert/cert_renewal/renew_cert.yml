@@ -68,7 +68,7 @@
           'cert_type': 'CERTAUTH'
       when: arg_cert_type is search('CERTAUTH')
 
-    - name: Create temporary directory to store bank files
+    - name: Create temporary directory for playbook use
       ansible.builtin.tempfile:
         state: directory
         path: /tmp
