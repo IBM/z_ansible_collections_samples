@@ -15,8 +15,8 @@
 # Note, PYZ and ZOAU environment variables must be configured.
 ################################################################################
 
-PYZ: "/usr/lpp/IBM/cyp/v3r11/pyz"
-ZOAU: "/usr/lpp/IBM/zoau/v1r3/"
+PYZ: "path_to_python"
+ZOAU: "path_to_zoau"
 
 ################################################################################
 # Do not configure, variable substituion will correctly set the

@@ -4,12 +4,10 @@
 
 - hosts: all
   collections:
-    - ibm.ibm_zos_core
+    - ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    ansible_ssh_pipelining: true
-
     # IBM Concert variables
     concert_hostname: ''
     concert_instance_id: ''
