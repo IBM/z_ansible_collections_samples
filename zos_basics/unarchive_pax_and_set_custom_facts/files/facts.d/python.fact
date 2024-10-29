@@ -1,0 +1,6 @@
+{
+    "product_name" : "IBM Open Enterprise SDK for Python",
+    "version" : "3.11.3",
+    "executable" : "/allpython/3.11/usr/lpp/IBM/cyp/v3r11/pyz/bin/python3",
+    "date_last_updated" : "2024-08-28"
+}

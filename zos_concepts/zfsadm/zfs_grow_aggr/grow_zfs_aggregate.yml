@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2022
+# © Copyright IBM Corporation 2022, 2024
 ###############################################################################
 
 ###############################################################################
@@ -59,7 +59,7 @@
         name: "{{ zfs_dsn }}"
         type: zfs
         space_primary: 1
-        space_type: M
+        space_type: m
         replace: true
 
     - name: Create mount dir on z/OS USS.
