@@ -20,5 +20,5 @@
     - name: Get expiring certs report for {{ hc_check }}
       ibm.ibm_zos_core.zos_job_submit:
         src: '{{ uss_file_path }}/HZSPRINT.J2'
-        location: uss
+        location: USS
       register: hc_job_output
