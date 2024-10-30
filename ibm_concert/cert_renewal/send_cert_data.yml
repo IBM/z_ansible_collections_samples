@@ -3,8 +3,6 @@
 ###############################################################################
 
 - hosts: all
-  collections:
-    - ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -36,7 +34,7 @@
         path: /tmp
       register: playbook_tmp_dir
 
-    - block: 
+    - block:
       - ansible.builtin.include_role:
           name: issue_operator_cmd
         vars:
@@ -96,7 +94,7 @@
       - ansible.builtin.debug:
           msg: "Num of expiring certs: {{expiring_certs | length}}"
 
-      - command: "date '+%b%d%y'"
+      - ansible.builtin.command: "date '+%b%d%y'"
         register: date_result
         when: cert_found
 
@@ -105,7 +103,7 @@
         when: cert_found
 
       - name: CSV - Create file and set the header
-        lineinfile:
+        ansible.builtin.lineinfile:
           dest: "/tmp/{{ concert_csv_file }}"
           line:
             Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
@@ -144,9 +142,9 @@
 
       - name: CSV - Blank lines removal
         ansible.builtin.lineinfile:
-            path: "/tmp/{{ concert_csv_file }}"
-            state: absent
-            regex: '^\s*$'
+          path: "/tmp/{{ concert_csv_file }}"
+          state: absent
+          regex: '^\s*$'
 
       - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ concert_csv_file }}
         args:
