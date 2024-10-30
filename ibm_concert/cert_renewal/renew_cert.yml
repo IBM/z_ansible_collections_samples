@@ -3,8 +3,6 @@
 ###############################################################################
 
 - hosts: all
-  collections:
-    - ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -25,7 +23,7 @@
     # variables for cert renewal logic
     owner_id: ''
     cert_type: 'USER'  # defautl to USER
-    cert_label: '' 
+    cert_label: ''
     sign_with: 'CERTAUTH' # blank or CERTAUTH
     # sign_label: 'IBM CA'
     keyring_name: ''
@@ -58,12 +56,12 @@
 
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
-          'cert_type': 'SITE'
+        'cert_type': 'SITE'
       when: arg_cert_type is search('SITE')
 
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
-          'cert_type': 'CERTAUTH'
+        'cert_type': 'CERTAUTH'
       when: arg_cert_type is search('CERTAUTH')
 
     - name: Create temporary directory for playbook use
@@ -94,7 +92,7 @@
 
         - ansible.builtin.meta: end_host
           when: cert_found is false
-        
+
         - ansible.builtin.command: "date '+%b%d%y'"
           register: date_result
 
@@ -121,14 +119,14 @@
           when: cert_type != 'USER'
 
         - ansible.builtin.debug:
-              var: cert_args 
+            var: cert_args
 
         - name: CSV - Create file and set the header
-          lineinfile:
+          ansible.builtin.lineinfile:
             dest: "/tmp/{{ concert_csv_file }}"
             line:
               Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
-            create: yes
+            create: true
             state: present
 
         - ansible.builtin.include_role:
@@ -158,7 +156,7 @@
               - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'SITE'
 
-        - debug:
+        - ansible.builtin.debug:
             var: cert_args
 
         - ansible.builtin.include_role:
@@ -258,10 +256,10 @@
 
         - name: CSV - Blank lines removal
           ansible.builtin.lineinfile:
-              path: "/tmp/{{ concert_csv_file }}"
-              state: absent
-              regex: '^\s*$'
-      
+            path: "/tmp/{{ concert_csv_file }}"
+            state: absent
+            regex: '^\s*$'
+
         - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ concert_csv_file }}
           args:
             chdir: '/tmp'
