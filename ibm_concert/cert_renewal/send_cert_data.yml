@@ -1,0 +1,182 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+- hosts: all
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    # IBM Concert variables
+    concert_hostname: ''
+    concert_instance_id: ''
+    concert_api_key: ''
+    concert_api_key_type: ''
+    concert_csv_file: "zos-cert-data.csv"
+
+    # variables for cert data
+    owner_id: ''
+    cert_type: ''
+    cert_label: ''
+    cert_list: []
+    cert_detail: {}
+    expiring_certs: []
+    expiring_cert_data: {}
+    report_lines: []
+    sysout_lines: []
+    cert_found: false
+
+    uss_file_path: '{{ playbook_tmp_dir.path }}'
+
+  tasks:
+    - name: Create temporary directory to store bank files
+      ansible.builtin.tempfile:
+        state: directory
+        path: /tmp
+      register: playbook_tmp_dir
+
+    - block:
+        - ansible.builtin.include_role:
+            name: issue_operator_cmd
+          vars:
+            task_description: 'Run Health Checker'
+            command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+
+        - ansible.builtin.include_role:
+            name: print_hc_buffer
+          vars:
+            hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+        - name: Get report lines
+          ansible.builtin.set_fact:
+            sysout_lines: '{{item.content}}'
+          with_items: "{{hc_job_output.jobs.0.ddnames}}"
+          when: item.ddname == 'SYSOUT'
+
+
+        - name: Search for YES in report
+          ansible.builtin.set_fact:
+            cert_found: true
+            report_lines: '{{ report_lines | default([]) + [item] }}'
+          loop: '{{sysout_lines}}'
+          when:
+            - item is search('Yes')
+
+        - ansible.builtin.debug:
+            msg: "Num of YES lines: {{report_lines | length}}"
+
+        - name: Search for ID in report
+          ansible.builtin.set_fact:
+            expiring_certs: "{{ expiring_certs | default([]) + [{
+                'owner_id': item[6:14] | regex_replace('\\)', ''),
+                'cert_type': 'USER',
+                'cert_label': item[16:48]}]}}"
+          loop: "{{report_lines}}"
+          when: item is search('E ID')
+
+        - name: Search for CERTAUTH in report
+          ansible.builtin.set_fact:
+            expiring_certs: "{{ expiring_certs | default([]) + [{
+                'owner_id': '',
+                'cert_type': 'CERTAUTH',
+                'cert_label': item[16:48]}]}}"
+          loop: "{{report_lines}}"
+          when: item is search('CERTAUTH')
+
+        - name: Search for SITE in report
+          ansible.builtin.set_fact:
+            expiring_certs: "{{ expiring_certs | default([]) + [{
+                'owner_id': '',
+                'cert_type': 'SITE',
+                'cert_label': item[16:48]}]}}"
+          loop: '{{report_lines}}'
+          when: item is search('SITE')
+
+        - ansible.builtin.debug:
+            msg: "Num of expiring certs: {{expiring_certs | length}}"
+
+        - ansible.builtin.command: "date '+%b%d%y'"
+          register: date_result
+          when: cert_found
+
+        - ansible.builtin.set_fact:
+            today: "{{ date_result.stdout }}"
+          when: cert_found
+
+        - name: CSV - Create file and set the header
+          ansible.builtin.lineinfile:
+            dest: "/tmp/{{ concert_csv_file }}"
+            line:
+              Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
+            create: true
+            state: present
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{item.cert_label}}'
+            role_cert: "{{item}}"
+            tso_command:
+              - RACDCERT ID({{ item.owner_id}}) LIST(LABEL('{{item.cert_label}}'))
+          loop: "{{expiring_certs}}"
+          when: item.cert_type is defined and item.cert_type == 'USER'
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{item.cert_label}}'
+            role_cert: "{{item}}"
+            tso_command:
+              - RACDCERT CERTAUTH LIST(LABEL('{{item.cert_label}}'))
+          loop: "{{expiring_certs}}"
+          when: item.cert_type is defined and item.cert_type == 'CERTAUTH'
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Querying cert {{item.cert_label}}'
+            role_cert: "{{item}}"
+            tso_command:
+              - RACDCERT SITE LIST(LABEL('{{item.cert_label}}'))
+          loop: "{{expiring_certs}}"
+          when: item.cert_type is defined and item.cert_type == 'SITE'
+
+        - name: CSV - Blank lines removal
+          ansible.builtin.lineinfile:
+            path: "/tmp/{{ concert_csv_file }}"
+            state: absent
+            regex: '^\s*$'
+
+        - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ concert_csv_file }}
+          args:
+            chdir: '/tmp'
+
+        - name: Fetch CSV to local
+          ibm.ibm_zos_core.zos_fetch:
+            src: "/tmp/{{ concert_csv_file }}"
+            dest: "{{ playbook_dir }}/{{ concert_csv_file }}"
+            encoding:
+              from: ISO8859-1
+              to: ISO8859-1
+            flat: true
+
+        - name: Send cert data to IBM Concert
+          ansible.builtin.shell: |
+              /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+                  -H 'Content-Type: multipart/form-data' \
+                  -H 'InstanceId: {{concert_instance_id}}' \
+                  -H 'Accept: application/json' \
+                  -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
+                  -F 'data_type=certificate' \
+                  -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
+                  -F 'metadata={"env_name" : "prod"}'
+          delegate_to: localhost
+
+      always:
+        - name: Delete the temporary directory
+          ansible.builtin.file:
+            path: "{{ playbook_tmp_dir.path }}"
+            state: absent
+        - name: Delete the CSV on z/os
+          ansible.builtin.file:
+            path: /tmp/{{ concert_csv_file }}
+            state: absent

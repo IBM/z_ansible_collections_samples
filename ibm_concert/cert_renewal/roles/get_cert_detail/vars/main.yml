@@ -1,0 +1,5 @@
+---
+# vars file for get_cert_detail
+tso_command: ''
+role_cert: {}
+task_description: 'Get certificate detail'

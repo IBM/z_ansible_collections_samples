@@ -1,0 +1,11 @@
+collections:
+  - name: ibm.ibm_zos_core
+    version: 1.10.0
+  - name: ansible.posix
+    version: 1.5.4
+  - name: ansible.utils
+    version: 4.1.0
+  - name: community.general
+    version: 9.4.0
+  - name: servicenow.itsm
+    version: 2.7.0
