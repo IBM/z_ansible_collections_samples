@@ -41,10 +41,17 @@
             task_description: 'Run Health Checker'
             command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
 
-        - ansible.builtin.include_role:
-            name: print_hc_buffer
-          vars:
-            hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+        - name: Get expiring certs report for {{ hc_check }}
+          ibm.ibm_zos_core.zos_job_submit:
+            src: '{{ playbook_dir }}/HZSPRINT.J2'
+            location: local
+            use_template: true
+          register: hc_job_output
+
+        # - ansible.builtin.include_role:
+        #     name: print_hc_buffer
+        #   vars:
+        #     hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
         - name: Get report lines
           ansible.builtin.set_fact:
