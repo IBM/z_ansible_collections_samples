@@ -6,12 +6,6 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-     # IBM Concert info
-    concert_hostname: "93252.us-south-8.concert.saas.ibm.com"
-    concert_instance_id: "20241004-1336-0851-0172-bdce0ebbebf7"
-    concert_api_key: "YW5keS5uZ3V5ZW5AaWJtLmNvbTo4ZjRlMTZhYS0xN2RiLTQ5YWYtOTczOS1lZWEyZGFlOTY4ODQ="
-    concert_api_key_type: "C_API_KEY"
-    concert_csv_file: "zos-cert-data.csv"
 
     # IBM Concert variables
     # concert_hostname: ''

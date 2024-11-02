@@ -7,17 +7,17 @@
   environment: "{{ environment_vars }}"
   vars:
     # ServiceNow info
-    sn_hostname: "https://ibmglobalservicesdemo50.service-now.com/"
-    sn_username: "andyn"
-    sn_pwd: "ypc1cgt6PMJ5bdx@jfh"
-    sn_incident_number: "INC0010087"
-    sn_short_desc: "INC0010089@@@[From: IBM Concert] [Environment: prod] Certificate @@@STCUSR@@@concertCertificateTest2@@@ expires in about 1 year"
+    sn_hostname: ""
+    sn_username: ""
+    sn_pwd: ""
+    sn_incident_number: ""
+    sn_short_desc: ""
 
     # IBM Concert info
-    concert_hostname: "93252.us-south-8.concert.saas.ibm.com"
-    concert_instance_id: "20241004-1336-0851-0172-bdce0ebbebf7"
-    concert_api_key: "YW5keS5uZ3V5ZW5AaWJtLmNvbTo4ZjRlMTZhYS0xN2RiLTQ5YWYtOTczOS1lZWEyZGFlOTY4ODQ="
-    concert_api_key_type: "C_API_KEY"
+    concert_hostname: ""
+    concert_instance_id: ""
+    concert_api_key: ""
+    concert_api_key_type: ""
     concert_csv_file: "zos-cert-data.csv"
 
     # variables for cert renewal logic
