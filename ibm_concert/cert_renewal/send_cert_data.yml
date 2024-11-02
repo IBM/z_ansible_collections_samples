@@ -6,12 +6,19 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    # IBM Concert variables
-    concert_hostname: ''
-    concert_instance_id: ''
-    concert_api_key: ''
-    concert_api_key_type: ''
+     # IBM Concert info
+    concert_hostname: "93252.us-south-8.concert.saas.ibm.com"
+    concert_instance_id: "20241004-1336-0851-0172-bdce0ebbebf7"
+    concert_api_key: "YW5keS5uZ3V5ZW5AaWJtLmNvbTo4ZjRlMTZhYS0xN2RiLTQ5YWYtOTczOS1lZWEyZGFlOTY4ODQ="
+    concert_api_key_type: "C_API_KEY"
     concert_csv_file: "zos-cert-data.csv"
+
+    # IBM Concert variables
+    # concert_hostname: ''
+    # concert_instance_id: ''
+    # concert_api_key: ''
+    # concert_api_key_type: ''
+    # concert_csv_file: "zos-cert-data.csv"
 
     # variables for cert data
     owner_id: ''
@@ -35,23 +42,18 @@
       register: playbook_tmp_dir
 
     - block:
-        - ansible.builtin.include_role:
-            name: issue_operator_cmd
-          vars:
-            task_description: 'Run Health Checker'
-            command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+        - name: Run Health Checker
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          register: zos_operator_output
 
-        - name: Get expiring certs report for {{ hc_check }}
+        - name: Get expiring certs report from IBMRACF,RACF_CERTIFICATE_EXPIRATION
           ibm.ibm_zos_core.zos_job_submit:
             src: '{{ playbook_dir }}/HZSPRINT.J2'
             location: local
             use_template: true
-          register: hc_job_output
 
-        # - ansible.builtin.include_role:
-        #     name: print_hc_buffer
-        #   vars:
-        #     hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+          register: hc_job_output
 
         - name: Get report lines
           ansible.builtin.set_fact:
@@ -78,25 +80,26 @@
                 'cert_type': 'USER',
                 'cert_label': item[16:48]}]}}"
           loop: "{{report_lines}}"
-          when: item is search('E ID')
+          when: item is search('STCUSR')
+          # when: item is search('E ID')
 
-        - name: Search for CERTAUTH in report
-          ansible.builtin.set_fact:
-            expiring_certs: "{{ expiring_certs | default([]) + [{
-                'owner_id': '',
-                'cert_type': 'CERTAUTH',
-                'cert_label': item[16:48]}]}}"
-          loop: "{{report_lines}}"
-          when: item is search('CERTAUTH')
+        # - name: Search for CERTAUTH in report
+        #   ansible.builtin.set_fact:
+        #     expiring_certs: "{{ expiring_certs | default([]) + [{
+        #         'owner_id': '',
+        #         'cert_type': 'CERTAUTH',
+        #         'cert_label': item[16:48]}]}}"
+        #   loop: "{{report_lines}}"
+        #   when: item is search('CERTAUTH')
 
-        - name: Search for SITE in report
-          ansible.builtin.set_fact:
-            expiring_certs: "{{ expiring_certs | default([]) + [{
-                'owner_id': '',
-                'cert_type': 'SITE',
-                'cert_label': item[16:48]}]}}"
-          loop: '{{report_lines}}'
-          when: item is search('SITE')
+        # - name: Search for SITE in report
+        #   ansible.builtin.set_fact:
+        #     expiring_certs: "{{ expiring_certs | default([]) + [{
+        #         'owner_id': '',
+        #         'cert_type': 'SITE',
+        #         'cert_label': item[16:48]}]}}"
+        #   loop: '{{report_lines}}'
+        #   when: item is search('SITE')
 
         - ansible.builtin.debug:
             msg: "Num of expiring certs: {{expiring_certs | length}}"

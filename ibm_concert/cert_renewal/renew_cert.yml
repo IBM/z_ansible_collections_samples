@@ -7,17 +7,17 @@
   environment: "{{ environment_vars }}"
   vars:
     # ServiceNow info
-    sn_hostname: ""
-    sn_username: ""
-    sn_pwd: ""
-    sn_incident_number: ""
-    sn_short_desc: ""
+    sn_hostname: "https://ibmglobalservicesdemo50.service-now.com/"
+    sn_username: "andyn"
+    sn_pwd: "ypc1cgt6PMJ5bdx@jfh"
+    sn_incident_number: "INC0010087"
+    sn_short_desc: "INC0010089@@@[From: IBM Concert] [Environment: prod] Certificate @@@STCUSR@@@concertCertificateTest2@@@ expires in about 1 year"
 
     # IBM Concert info
-    concert_hostname: ""
-    concert_instance_id: ""
-    concert_api_key: ""
-    concert_api_key_type: ""
+    concert_hostname: "93252.us-south-8.concert.saas.ibm.com"
+    concert_instance_id: "20241004-1336-0851-0172-bdce0ebbebf7"
+    concert_api_key: "YW5keS5uZ3V5ZW5AaWJtLmNvbTo4ZjRlMTZhYS0xN2RiLTQ5YWYtOTczOS1lZWEyZGFlOTY4ODQ="
+    concert_api_key_type: "C_API_KEY"
     concert_csv_file: "zos-cert-data.csv"
 
     # variables for cert renewal logic
@@ -71,23 +71,17 @@
       register: playbook_tmp_dir
 
     - block:
-        - ansible.builtin.include_role:
-            name: issue_operator_cmd
-          vars:
-            task_description: 'Run Health Checker'
-            command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
-
-        - name: Get expiring certs report for {{ hc_check }}
+        - name: Run Health Checker
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          register: zos_operator_output
+          
+        - name: Get expiring certs report for IBMRACF,RACF_CERTIFICATE_EXPIRATION
           ibm.ibm_zos_core.zos_job_submit:
             src: '{{ playbook_dir }}/HZSPRINT.J2'
             location: local
             use_template: true
           register: hc_job_output
-
-        # - ansible.builtin.include_role:
-        #     name: print_hc_buffer
-        #   vars:
-        #     hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
         - name: Search for {{cert_label}} in report
           ansible.builtin.set_fact:
@@ -166,32 +160,27 @@
         - ansible.builtin.debug:
             var: cert_args
 
-        - ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            task_description: 'Back up current certificate'
-            command:
+        - name: Back up current certificate
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
               - RACDCERT EXPORT(LABEL('{{cert_label}}'))  DSN('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}') {{cert_type}}
               - RACDCERT CHECKCERT('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}')
           when: not cert_type == 'USER'
-
-        - ansible.builtin.include_role:
-
-            name: issue_tso_cmd
-          vars:
-            task_description: 'Back up current certificate'
+          register: tso_cmd_output
+          
+        - name: Back up current certificate
+          ibm.ibm_zos_core.zos_tso_command:
             command:
               - RACDCERT EXPORT(LABEL('{{cert_label}}')) ID({{owner_id}})  DSN('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}')
               - RACDCERT CHECKCERT('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}')  ID({{owner_id}})
           when: cert_type == 'USER'
+          register: tso_cmd_output
 
         - ansible.builtin.set_fact:
             random_str: "{{lookup('community.general.random_string', length=3, special=false)}}"
 
-        - ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+        - name: Rekey and Generate new cert request for {{cert_type}}
+          ibm.ibm_zos_core.zos_tso_command:
             command:
               - RACDCERT {{cert_type}} REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}') NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT {{cert_type}} ROLLOVER(LABEL('{{cert_label}}')) NEWLABEL('{{cert_label[:-3]}}{{random_str}}')
@@ -199,11 +188,10 @@
               - RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
           when: cert_type == 'CERTAUTH'
+          register: tso_cmd_output
 
-        - ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+        - name: Rekey and Generate new cert request for {{cert_type}}
+          ibm.ibm_zos_core.zos_tso_command:
             command:
               - RACDCERT {{cert_type}} REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}') NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT {{cert_type}} GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
@@ -213,11 +201,10 @@
               - RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
               - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
           when: cert_type == 'SITE'
+          register: tso_cmd_output
 
-        - ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+        - name: Rekey and Generate new cert request for {{cert_type}}
+          ibm.ibm_zos_core.zos_tso_command:
             command:
               - RACDCERT ID({{owner_id}}) REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}')  NOTAFTER(DATE({{expiry_date}}))
               - RACDCERT ID({{owner_id}}) GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
@@ -227,6 +214,7 @@
               - RACDCERT ID({{owner_id}}) DELETE(LABEL('{{cert_label}}'))
               - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
           when: cert_type == 'USER'
+          register: tso_cmd_output
 
         - name: Save new expiration date
           ansible.builtin.set_fact:

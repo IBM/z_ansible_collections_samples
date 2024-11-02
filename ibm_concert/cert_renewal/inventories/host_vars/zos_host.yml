@@ -23,3 +23,10 @@ ZOAU: "path_to_zoau"
 # variable`ansible_python_interpreter`
 ################################################################################
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
+
+  # //HZSPRINT JOB 'IMS SYSTEM',
+  # //         NOTIFY=&SYSUID
+# varibles for templates
+JOB_CARD: |-
+  //HZSPRINT JOB ,
+  //         MSGCLASS=H,MSGLEVEL=(1,1),CLASS=A
