@@ -8,11 +8,11 @@
   vars:
 
     # IBM Concert variables
-    # concert_hostname: ''
-    # concert_instance_id: ''
-    # concert_api_key: ''
-    # concert_api_key_type: ''
-    # concert_csv_file: "zos-cert-data.csv"
+    concert_hostname: ''
+    concert_instance_id: ''
+    concert_api_key: ''
+    concert_api_key_type: ''
+    concert_csv_file: "zos-cert-data.csv"
 
     # variables for cert data
     owner_id: ''
