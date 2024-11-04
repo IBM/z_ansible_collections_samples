@@ -25,6 +25,6 @@ ZOAU: "path_to_zoau"
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 
 # varibles for templates
-JOB_CARD: |-
+HZSPRINT_JOB_CARD: |-
   //HZSPRINT JOB ,
-  //         MSGCLASS=H,MSGLEVEL=(1,1),CLASS=A
+  //         MSGCLASS=msg_class,MSGLEVEL=(1,1),CLASS=job_class
