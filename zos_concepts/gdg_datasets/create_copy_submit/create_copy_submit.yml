@@ -62,8 +62,7 @@
 
     - name: "Response from creating GDG {{ tmp_data_set }} with limit of 3"
       debug:
-        msg:
-          - result_create_gdg
+        msg: "{{ result_create_gdg }}"
 
     - name: "Create the GDS with relative notation {{ tmp_data_set }}(+1)"
       zos_data_set:
@@ -74,8 +73,7 @@
 
     - name: "Response of the creation of the GDS {{ tmp_data_set }}(+1)"
       debug:
-        msg:
-          - "{{ result_create_gds_relative }}"
+        msg: "{{ result_create_gds_relative }}"
 
     - name: "Copy local file {{ playbook_dir }}/UPTIME to latest creation of GDG {{ tmp_data_set }}"
       zos_copy:
@@ -101,7 +99,7 @@
         name: "{{ tmp_data_set }}(-1)"
         state: absent
 
-    - name: "Submit the JCL from the last generation{{ tmp_data_set }}(0)"
+    - name: "Submit the JCL from the last generation {{ tmp_data_set }}(0)"
       zos_job_submit:
         src: "{{ tmp_data_set }}(0)"
         location: data_set
@@ -111,3 +109,10 @@
       debug:
         var: result_submit
 
+    - name: Delete the data sets
+      zos_data_set:
+        batch:
+          - name: "{{ tmp_data_set }}(0)"
+            state: absent
+          - name: "{{ tmp_data_set }}"
+            state: absent

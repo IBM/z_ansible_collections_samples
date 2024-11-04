@@ -50,8 +50,12 @@
       command: "zinfo -j -t sys"
       register: sys_info
 
-    - name: Check content of last four minutes of console log
-      command: "pcon -t 4"
+    - name: Ensure console log.
+      command: "pcon -l"
+      ignore_errors: yes
+
+    - name: Check content of last ten minutes of console log
+      command: "pcon -r"
       register: log_output
 
     - set_fact:
@@ -119,7 +123,7 @@
         msg:
           - "{{ result_create_gds }}"
 
-    - name: "Write the last 4 minutes of the operator console log into {{ tmp_data_set1 }}"
+    - name: "Write the last 10 minutes of the operator console log into {{ tmp_data_set1 }}"
       zos_blockinfile:
         src: "{{ tmp_data_set1 }}(0)"
         marker: "//* {mark} *//"
@@ -127,7 +131,7 @@
         marker_end: " End of log time {{ time }} "
         insertbefore: BOF
         state: present
-        block: "{{ log_output }}"
+        block: "{log_output}"
 
     - name: "Copy from the current generation of {{ tmp_data_set1 }} to the last Generation of {{ tmp_data_set2 }}"
       zos_copy:
@@ -152,3 +156,15 @@
       debug:
         msg:
           - "{{ fetch_result }}"
+
+    - name: Delete the data sets
+      zos_data_set:
+        batch:
+          - name: "{{ tmp_data_set1 }}(0)"
+            state: absent
+          - name: "{{ tmp_data_set2 }}(0)"
+            state: absent
+          - name: "{{ tmp_data_set1 }}"
+            state: absent
+          - name: "{{ tmp_data_set2 }}"
+            state: absent
