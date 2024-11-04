@@ -6,6 +6,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
+
     # IBM Concert variables
     concert_hostname: ''
     concert_instance_id: ''
@@ -35,16 +36,18 @@
       register: playbook_tmp_dir
 
     - block:
-        - ansible.builtin.include_role:
-            name: issue_operator_cmd
-          vars:
-            task_description: 'Run Health Checker'
-            command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+        - name: Run Health Checker
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          register: zos_operator_output
 
-        - ansible.builtin.include_role:
-            name: print_hc_buffer
-          vars:
-            hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+        - name: Get expiring certs report from IBMRACF,RACF_CERTIFICATE_EXPIRATION
+          ibm.ibm_zos_core.zos_job_submit:
+            src: '{{ playbook_dir }}/HZSPRINT.J2'
+            location: local
+            use_template: true
+
+          register: hc_job_output
 
         - name: Get report lines
           ansible.builtin.set_fact:
