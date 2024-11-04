@@ -1,0 +1,310 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+- hosts: all
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    # ServiceNow info
+    sn_hostname: ""
+    sn_username: ""
+    sn_pwd: ""
+    sn_incident_number: ""
+    sn_short_desc: ""
+
+    # IBM Concert info
+    concert_hostname: ""
+    concert_instance_id: ""
+    concert_api_key: ""
+    concert_api_key_type: ""
+    concert_csv_file: "zos-cert-data.csv"
+
+    # variables for cert renewal logic
+    owner_id: ''
+    cert_type: 'USER'  # defautl to USER
+    cert_label: ''
+    sign_with: 'CERTAUTH' # blank or CERTAUTH
+    # sign_label: 'IBM CA'
+    keyring_name: ''
+    expiry_date: '2025-12-31'
+    cert_detail: {}
+    cert_args: {}
+    cert_found: false
+    today: ''
+
+    uss_file_path: '{{ playbook_tmp_dir.path }}'
+
+  tasks:
+    - ansible.builtin.debug:
+        var: sn_short_desc
+
+    - ansible.builtin.set_fact:
+        desc_list: "{{ sn_short_desc | split('@@@') }}"
+
+    - ansible.builtin.set_fact:
+        ct_index: "{{ lookup('ansible.utils.index_of', desc_list, 'regex', '\\] Certificate') }}"
+
+    - ansible.builtin.set_fact:
+        sn_incident_number: "{{desc_list[0] | trim }}"
+
+    - ansible.builtin.set_fact:
+        arg_cert_type: "{{desc_list[ct_index|int + 1] | trim }}"
+
+    - ansible.builtin.set_fact:
+        cert_label: "{{desc_list[ct_index|int + 2] | trim }}"
+
+    - name: Build cert details for {{cert_label}}
+      ansible.builtin.set_fact:
+        'cert_type': 'SITE'
+      when: arg_cert_type is search('SITE')
+
+    - name: Build cert details for {{cert_label}}
+      ansible.builtin.set_fact:
+        'cert_type': 'CERTAUTH'
+      when: arg_cert_type is search('CERTAUTH')
+
+    - name: Create temporary directory for playbook use
+      ansible.builtin.tempfile:
+        state: directory
+        path: /tmp
+      register: playbook_tmp_dir
+
+    - block:
+        - ansible.builtin.include_role:
+            name: issue_operator_cmd
+          vars:
+            task_description: 'Run Health Checker'
+            command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+
+        - ansible.builtin.include_role:
+            name: print_hc_buffer
+          vars:
+            hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+        - name: Search for {{cert_label}} in report
+          ansible.builtin.set_fact:
+            cert_found: true
+          with_items: "{{hc_job_output.jobs.0.ddnames}}"
+          when: item.content is search(cert_label)
+
+        - ansible.builtin.debug: msg="{{cert_label}} expiring - {{cert_found}}"
+
+        - ansible.builtin.meta: end_host
+          when: cert_found is false
+
+        - ansible.builtin.command: "date '+%b%d%y'"
+          register: date_result
+
+        - ansible.builtin.set_fact:
+            today: "{{ date_result.stdout }}"
+
+        - name: Build cert details for {{cert_label}}
+          ansible.builtin.set_fact:
+            cert_args: "{{ cert_args | default({}) | combine ({
+              'owner_id': arg_cert_type,
+              'cert_type': cert_type,
+              'cert_label': cert_label
+              }) }}"
+            owner_id: "{{arg_cert_type}}"
+          when: cert_type == 'USER'
+
+        - name: Build cert details for {{cert_label}}
+          ansible.builtin.set_fact:
+            cert_args: "{{ cert_args | default({}) | combine ({
+              'owner_id': '',
+              'cert_type': cert_type,
+              'cert_label': cert_label
+              }) }}"
+          when: cert_type != 'USER'
+
+        - ansible.builtin.debug:
+            var: cert_args
+
+        - name: CSV - Create file and set the header
+          ansible.builtin.lineinfile:
+            dest: "/tmp/{{ concert_csv_file }}"
+            line:
+              Serial Number,Name,Subject,CN,Issuer,Key Algorithm,Key Size,SANS,ValidFrom,Valid To,Thumbprint,Certificate Hosts,System Reference Id,DN,ParentDN,Certificate Type,CreatedOn,Primary Owner,Secondary Owner,Namespace
+            create: true
+            state: present
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{cert_args.cert_label}}'
+            role_cert: "{{cert_args}}"
+            tso_command:
+              - RACDCERT ID({{ cert_args.owner_id}}) LIST(LABEL('{{cert_args.cert_label}}'))
+          when: cert_type is defined and cert_type == 'USER'
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{cert_args.cert_label}}'
+            role_cert: "{{cert_args}}"
+            tso_command:
+              - RACDCERT CERTAUTH LIST(LABEL('{{cert_args.cert_label}}'))
+          when: cert_type is defined and cert_type == 'CERTAUTH'
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{cert_args.cert_label}}'
+            role_cert: "{{cert_args}}"
+            tso_command:
+              - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
+          when: cert_type is defined and cert_type == 'SITE'
+
+        - ansible.builtin.debug:
+            var: cert_args
+
+        - ansible.builtin.include_role:
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Back up current certificate'
+            command:
+              - RACDCERT EXPORT(LABEL('{{cert_label}}'))  DSN('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}') {{cert_type}}
+              - RACDCERT CHECKCERT('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}')
+          when: not cert_type == 'USER'
+
+        - ansible.builtin.include_role:
+
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Back up current certificate'
+            command:
+              - RACDCERT EXPORT(LABEL('{{cert_label}}')) ID({{owner_id}})  DSN('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}')
+              - RACDCERT CHECKCERT('{{ ansible_user }}.CERT.{{cert_type}}.BACKUP.{{today}}')  ID({{owner_id}})
+          when: cert_type == 'USER'
+
+        - ansible.builtin.set_fact:
+            random_str: "{{lookup('community.general.random_string', length=3, special=false)}}"
+
+        - ansible.builtin.include_role:
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+            command:
+              - RACDCERT {{cert_type}} REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}') NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT {{cert_type}} ROLLOVER(LABEL('{{cert_label}}')) NEWLABEL('{{cert_label[:-3]}}{{random_str}}')
+              - RACDCERT {{cert_type}} LIST(LABEL('{{cert_label[:-3]}}{{random_str}}'))
+              - RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
+              - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
+          when: cert_type == 'CERTAUTH'
+
+        - ansible.builtin.include_role:
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+            command:
+              - RACDCERT {{cert_type}} REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}') NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT {{cert_type}} GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
+              - RACDCERT {{cert_type}} GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT {{cert_type}} ROLLOVER(LABEL('{{cert_label}}')) NEWLABEL('{{cert_label[:-3]}}{{random_str}}')
+              - RACDCERT {{cert_type}} LIST(LABEL('{{cert_label[:-3]}}{{random_str}}'))
+              - RACDCERT {{cert_type}} DELETE(LABEL('{{ cert_label }}'))
+              - RACDCERT {{cert_type}} ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
+          when: cert_type == 'SITE'
+
+        - ansible.builtin.include_role:
+            name: issue_tso_cmd
+          vars:
+            task_description: 'Rekey and Generate new cert request for {{cert_type}}'
+            command:
+              - RACDCERT ID({{owner_id}}) REKEY(LABEL('{{cert_label}}')) WITHLABEL('{{cert_label[:-3]}}{{random_str}}')  NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT ID({{owner_id}}) GENREQ (LABEL('{{cert_label[:-3]}}{{random_str}}'))  DSN('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')
+              - RACDCERT ID({{owner_id}}) GENCERT('{{ ansible_user }}.CSR.{{cert_type}}.{{today}}')  SIGNWITH({{sign_with}} LABEL('{{cert_args.cert_signer}}')) NOTAFTER(DATE({{expiry_date}}))
+              - RACDCERT ID({{owner_id}}) ROLLOVER(LABEL('{{cert_label}}')) NEWLABEL('{{cert_label[:-3]}}{{random_str}}')
+              - RACDCERT ID({{owner_id}}) LIST(LABEL('{{cert_label[:-3]}}{{random_str}}'))
+              - RACDCERT ID({{owner_id}}) DELETE(LABEL('{{cert_label}}'))
+              - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{ cert_label[:-3]}}{{random_str}}')) NEWLABEL('{{ cert_label }}')
+          when: cert_type == 'USER'
+
+        - name: Save new expiration date
+          ansible.builtin.set_fact:
+            new_cert_expiration_date: "{{ item }}"
+          with_items: "{{ tso_cmd_output.output.1.content }}"
+          when: tso_cmd_output is defined and item is search("End Date:")
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{cert_args.cert_label}}'
+            role_cert: "{{cert_args}}"
+            tso_command:
+              - RACDCERT ID({{ cert_args.owner_id}}) LIST(LABEL('{{cert_args.cert_label}}'))
+          when: cert_type is defined and cert_type == 'USER'
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{cert_args.cert_label}}'
+            role_cert: "{{cert_args}}"
+            tso_command:
+              - RACDCERT CERTAUTH LIST(LABEL('{{cert_args.cert_label}}'))
+          when: cert_type is defined and cert_type == 'CERTAUTH'
+
+        - ansible.builtin.include_role:
+            name: get_cert_detail
+          vars:
+            task_description: 'Displaying cert {{cert_args.cert_label}}'
+            role_cert: "{{cert_args}}"
+            tso_command:
+              - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
+          when: cert_type is defined and cert_type == 'SITE'
+
+        - name: CSV - Blank lines removal
+          ansible.builtin.lineinfile:
+            path: "/tmp/{{ concert_csv_file }}"
+            state: absent
+            regex: '^\s*$'
+
+        - ansible.builtin.shell: chtag -t -c ISO8859-1 {{ concert_csv_file }}
+          args:
+            chdir: '/tmp'
+
+        - name: Fetch CSV to local
+          ibm.ibm_zos_core.zos_fetch:
+            src: "/tmp/{{ concert_csv_file }}"
+            dest: "{{ playbook_dir }}/{{ concert_csv_file }}"
+            encoding:
+              from: ISO8859-1
+              to: ISO8859-1
+            flat: true
+
+        - name: Send cert data to IBM Concert
+          ansible.builtin.shell: |
+              /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+                  -H 'Content-Type: multipart/form-data' \
+                  -H 'InstanceId: {{concert_instance_id}}' \
+                  -H 'Accept: application/json' \
+                  -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
+                  -F 'data_type=certificate' \
+                  -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
+                  -F 'metadata={"env_name" : "prod"}'
+          delegate_to: localhost
+
+        - name: Resolve incident in ServiceNow
+          servicenow.itsm.incident:
+            instance:
+              host: "{{ sn_hostname }}"
+              username: "{{ sn_username }}"
+              password: "{{ sn_pwd }}"
+              validate_certs: false
+            state: resolved
+            caller: "{{ sn_username }}"
+            number: "{{ sn_incident_number }}"
+            close_code: "Solved (Permanently)"
+            close_notes: "Certificate renewed with Ansible"
+          delegate_to: localhost
+
+      always:
+        - name: Delete the temporary directory
+          ansible.builtin.file:
+            path: "{{ playbook_tmp_dir.path }}"
+            state: absent
+        - name: Delete the CSV on z/OS
+          ansible.builtin.file:
+            path: /tmp/{{ concert_csv_file }}
+            state: absent

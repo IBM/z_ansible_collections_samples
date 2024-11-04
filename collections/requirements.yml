@@ -20,3 +20,5 @@ collections:
     version: 6.5.0
   - name: openstack.cloud
     version: 1.10.0
+  - name: servicenow.itsm
+    version: 2.7.0
