@@ -25,15 +25,12 @@
     cert_type: 'USER'  # defautl to USER
     cert_label: ''
     sign_with: 'CERTAUTH' # blank or CERTAUTH
-    # sign_label: 'IBM CA'
     keyring_name: ''
     expiry_date: '2025-12-31'
     cert_detail: {}
     cert_args: {}
     cert_found: false
     today: ''
-
-    # uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
     - ansible.builtin.debug:
@@ -63,12 +60,6 @@
       ansible.builtin.set_fact:
         'cert_type': 'CERTAUTH'
       when: arg_cert_type is search('CERTAUTH')
-
-    # - name: Create temporary directory for playbook use
-    #   ansible.builtin.tempfile:
-    #     state: directory
-    #     path: /tmp
-    #   register: playbook_tmp_dir
 
     - block:
         - name: Run Health Checker
@@ -295,10 +286,6 @@
           delegate_to: localhost
 
       always:
-        # - name: Delete the temporary directory
-          # ansible.builtin.file:
-          #   path: "{{ playbook_tmp_dir.path }}"
-          #   state: absent
         - name: Delete the CSV on z/OS
           ansible.builtin.file:
             path: /tmp/{{ concert_csv_file }}
