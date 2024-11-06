@@ -131,7 +131,7 @@
         marker_end: " End of log time {{ time }} "
         insertbefore: BOF
         state: present
-        block: "{log_output}"
+        block: "{{ log_output }}"
 
     - name: "Copy from the current generation of {{ tmp_data_set1 }} to the last Generation of {{ tmp_data_set2 }}"
       zos_copy:
