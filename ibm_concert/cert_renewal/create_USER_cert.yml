@@ -8,7 +8,6 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    ansible_ssh_pipelining: true
     owner_id: 'STCUSR'
     cert_label: 'concertCertificateTest'
     sign_label: 'IBM CA'
