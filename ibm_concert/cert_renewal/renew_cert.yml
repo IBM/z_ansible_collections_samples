@@ -268,7 +268,7 @@
                   -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
                   -F 'data_type=certificate' \
                   -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
-                  -F 'metadata={"env_name" : "prod"}'
+                  -F 'metadata={"env_name" : "z/OS"}'
           delegate_to: localhost
 
         - name: Resolve incident in ServiceNow
