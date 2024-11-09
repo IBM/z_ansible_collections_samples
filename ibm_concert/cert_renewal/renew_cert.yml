@@ -37,7 +37,7 @@
         var: sn_short_desc
 
     - ansible.builtin.set_fact:
-        desc_list: "{{ sn_short_desc | split('@@@') }}"
+        desc_list: "{{ sn_short_desc | split('000') }}"
 
     - ansible.builtin.set_fact:
         ct_index: "{{ lookup('ansible.utils.index_of', desc_list, 'regex', '\\] Certificate') }}"
