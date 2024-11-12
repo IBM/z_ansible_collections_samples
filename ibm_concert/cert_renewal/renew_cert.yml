@@ -37,19 +37,22 @@
         var: sn_short_desc
 
     - ansible.builtin.set_fact:
-        desc_list: "{{ sn_short_desc | split('000') }}"
+        desc_list: "{{ sn_short_desc | split('@@@') }}"
 
     - ansible.builtin.set_fact:
-        ct_index: "{{ lookup('ansible.utils.index_of', desc_list, 'regex', '\\] Certificate') }}"
+        desc_list2: "{{ sn_short_desc | split('000') }}"
+
+    - ansible.builtin.set_fact:
+        ct_index: "{{ lookup('ansible.utils.index_of', desc_list2, 'regex', '\\] Certificate') }}"
 
     - ansible.builtin.set_fact:
         sn_incident_number: "{{desc_list[0] | trim }}"
 
     - ansible.builtin.set_fact:
-        arg_cert_type: "{{desc_list[ct_index|int + 1] | trim }}"
+        arg_cert_type: "{{desc_list2[ct_index|int + 1] | trim }}"
 
     - ansible.builtin.set_fact:
-        cert_label: "{{desc_list[ct_index|int + 2] | trim }}"
+        cert_label: "{{desc_list2[ct_index|int + 2] | trim }}"
 
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
