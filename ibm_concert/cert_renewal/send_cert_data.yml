@@ -6,7 +6,6 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-
     # IBM Concert variables
     concert_hostname: ''
     concert_instance_id: ''
@@ -26,15 +25,8 @@
     sysout_lines: []
     cert_found: false
 
-    uss_file_path: '{{ playbook_tmp_dir.path }}'
 
   tasks:
-    - name: Create temporary directory to store bank files
-      ansible.builtin.tempfile:
-        state: directory
-        path: /tmp
-      register: playbook_tmp_dir
-
     - block:
         - name: Run Health Checker
           ibm.ibm_zos_core.zos_operator:
@@ -175,10 +167,6 @@
           delegate_to: localhost
 
       always:
-        - name: Delete the temporary directory
-          ansible.builtin.file:
-            path: "{{ playbook_tmp_dir.path }}"
-            state: absent
         - name: Delete the CSV on z/os
           ansible.builtin.file:
             path: /tmp/{{ concert_csv_file }}
