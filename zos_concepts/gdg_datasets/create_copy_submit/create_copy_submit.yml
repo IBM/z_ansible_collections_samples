@@ -1,0 +1,118 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to create gds, copy a local JCL, copy
+# to a new generation, delete a previous generation and execute the JCL.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories create_copy_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing to the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.11.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    - set_fact:
+        tmp_data_set: "{{ tmp_ds.stdout }}"
+    # ##########################################################################
+    # Modules: zos_data_set, zos_copy, zos_job_submit
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create Generation Data Group with {{ tmp_data_set }}
+    # |   name with a limit of 3 generations.
+    # | - Using zos_data_set, create a Generation Data Set with relative notation.
+    # | - Using zos_copy, copy {{ playbook_dir }}/UPTIME file to last creation of
+    # |   GDS with relative notation {{ tmp_data_set }}(0).
+    # | - Using zos_copy, copy {{ tmp_data_set }}(0) to a new generation GDS with
+    # |   relative notation {{ tmp_data_set }}(+1).
+    # | - Using zos_data_set, delete first creation of GDG {{ tmp_data_set }}(-1).
+    # | - Using zos_job_submit, submit the last creation of GDG with relative
+    # |   notation {{ tmp_data_set }}(0).
+    # +-------------------------------------------------------------------------
+    - name: "Create the GDG {{tmp_data_set}} with limit of 3"
+      zos_data_set:
+        name: "{{ tmp_data_set }}"
+        type: gdg
+        limit: 3
+      register: result_create_gdg
+
+    - name: "Response from creating GDG {{ tmp_data_set }} with limit of 3"
+      debug:
+        msg: "{{ result_create_gdg }}"
+
+    - name: "Create the GDS with relative notation {{ tmp_data_set }}(+1)"
+      zos_data_set:
+        name: "{{ tmp_data_set }}(+1)"
+        type: seq
+        state: "present"
+      register: result_create_gds_relative
+
+    - name: "Response of the creation of the GDS {{ tmp_data_set }}(+1)"
+      debug:
+        msg: "{{ result_create_gds_relative }}"
+
+    - name: "Copy local file {{ playbook_dir }}/UPTIME to latest creation of GDG {{ tmp_data_set }}"
+      zos_copy:
+        src: "{{ playbook_dir }}/UPTIME"
+        dest: "{{ tmp_data_set }}(0)"
+        encoding:
+          from: ISO8859-1
+          to: IBM-1047
+      register: result_copy_dir
+
+    - name: "Response from copying local file {{ playbook_dir }}/UPTIME to latest creation of GDS {{ tmp_data_set }}."
+      debug:
+        var: result_copy_dir
+
+    - name: "Copy SEQ gds {{ tmp_data_set }}(0) to a new GDS creation {{ tmp_data_set }}(+1)"
+      zos_copy:
+        src: "{{ tmp_data_set }}(0)"
+        dest: "{{ tmp_data_set }}(+1)"
+        remote_src: true
+
+    - name: "Delete previous data set {{ tmp_data_set }}(-1)"
+      zos_data_set:
+        name: "{{ tmp_data_set }}(-1)"
+        state: absent
+
+    - name: "Submit the JCL from the last generation {{ tmp_data_set }}(0)"
+      zos_job_submit:
+        src: "{{ tmp_data_set }}(0)"
+        location: data_set
+      register: result_submit
+
+    - name: "Response from submitting JCL {{ tmp_data_set }}(0)"
+      debug:
+        var: result_submit
+
+    - name: Delete the data sets
+      zos_data_set:
+        batch:
+          - name: "{{ tmp_data_set }}(0)"
+            state: absent
+          - name: "{{ tmp_data_set }}"
+            state: absent
