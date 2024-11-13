@@ -47,7 +47,7 @@
       register: date_time
 
     - name: Get system name
-      command: "zinfo -j -t sys"
+      zos_gather_facts:
       register: sys_info
 
     - name: Ensure console log.
@@ -63,11 +63,9 @@
         tmp_data_set2: "{{ tmp_ds2.stdout }}"
         date: "{{ date_time.stdout[0:10] }}"
         time: "{{ date_time.stdout[10:] }}"
-        sys_info: "{{ sys_info.stdout | from_json}}"
+        sys_name: "{{ sys_info.ansible_facts.sys_name}}"
         log_output: "{{ log_output.stdout }}"
 
-    - set_fact:
-        sys_name: "{{ sys_info.data.sys_info.sys_name }}"
     # ##########################################################################
     # Modules: zos_data_set, zos_blockinfile, zos_copy,
     # zos_lineinfile, zos_fetch.
