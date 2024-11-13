@@ -1,0 +1,168 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to create a new Generation Data Group(GDG),
+# add text content to a Generation Data Set(GDS), copy to another
+# Generation Data Group(GDG), edit the copy and fetch the content.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_edit_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.11.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set names, date time, system name and get last
+    # four minutes of the operator console log.
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds1
+
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds2
+
+    - name: Get date time
+      shell: "date +%Y-%m-%d%H:%M:%S"
+      register: date_time
+
+    - name: Get system name
+      zos_gather_facts:
+      register: sys_info
+
+    - name: Ensure console log.
+      command: "pcon -l"
+      ignore_errors: yes
+
+    - name: Check content of last ten minutes of console log
+      command: "pcon -r"
+      register: log_output
+
+    - set_fact:
+        tmp_data_set1: "{{ tmp_ds1.stdout }}"
+        tmp_data_set2: "{{ tmp_ds2.stdout }}"
+        date: "{{ date_time.stdout[0:10] }}"
+        time: "{{ date_time.stdout[10:] }}"
+        sys_name: "{{ sys_info.ansible_facts.sys_name}}"
+        log_output: "{{ log_output.stdout }}"
+
+    # ##########################################################################
+    # Modules: zos_data_set, zos_blockinfile, zos_copy,
+    # zos_lineinfile, zos_fetch.
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create two generation data groups with names
+    # |   {{ tmp_data_set1 }} and {{ tmp_data_set2 }}
+    # | - Using zos_data_set, create a generation of the GDG from {{ tmp_data_set1 }}.
+    # | - Using zos_data_set, create a generation of the GDG from {{ tmp_data_set2 }}.
+    # | - Using zos_blockinfile, add the logs to the latest generation of GDG {{ tmp_data_set1 }}.
+    # | - Using zos_copy, copy the content from the latest generation of {{ tmp_data_set1 }}
+    # |   to latest generation of {{ tmp_data_set2 }}.
+    # | - Using zos_lineinfile, add a comment to a latest generation of {{ tmp_data_set2 }}
+    # |   using relative notation notation {{ tmp_data_set2 }}(0).
+    # | - Using zos_fetch, to fetch the latest generation of the GDG {{ tmp_data_set2 }}.
+    # +-------------------------------------------------------------------------
+    - name: "Create the Generation Data Group(GDG) {{tmp_data_set1}} with a limit of 2 generations"
+      zos_data_set:
+        name: "{{ tmp_data_set1 }}"
+        type: gdg
+        limit: 2
+      register: result_create_gdg
+
+    - name: "Create the Generation Data Group(GDG) {{tmp_data_set2}} with a limit of 2 generations to backup {{ tmp_data_set1 }}"
+      zos_data_set:
+        name: "{{ tmp_data_set2 }}"
+        type: gdg
+        limit: 2
+      register: result_create_gdg
+
+    - name: "Response of the GDG creation {{ tmp_data_set2 }} with a limit of 2 generations"
+      debug:
+        msg:
+          - "{{ result_create_gdg }}"
+
+    - name: "Create the GDS for {{ tmp_data_set1 }} of sequential type and record length of 200"
+      zos_data_set:
+        name: "{{ tmp_data_set1 }}(+1)"
+        type: seq
+        record_length: 200
+        state: "present"
+
+    - name: "Create the GDS for {{ tmp_data_set2 }} of sequential type and record length of 200"
+      zos_data_set:
+        name: "{{ tmp_data_set2 }}(+1)"
+        type: seq
+        record_length: 200
+        state: "present"
+      register: result_create_gds
+
+    - name: "Response of the GDS {{ tmp_data_set2 }}(+1) creation"
+      debug:
+        msg:
+          - "{{ result_create_gds }}"
+
+    - name: "Write the last 10 minutes of the operator console log into {{ tmp_data_set1 }}"
+      zos_blockinfile:
+        src: "{{ tmp_data_set1 }}(0)"
+        marker: "//* {mark} *//"
+        marker_begin: " Log of date {{ date }} "
+        marker_end: " End of log time {{ time }} "
+        insertbefore: BOF
+        state: present
+        block: "{{ log_output }}"
+
+    - name: "Copy from the current generation of {{ tmp_data_set1 }} to the last Generation of {{ tmp_data_set2 }}"
+      zos_copy:
+        src: "{{ tmp_data_set1 }}(0)"
+        dest: "{{ tmp_data_set2 }}(0)"
+        remote_src: true
+
+    - name: "Edit last generation {{ tmp_data_set2 }} to add a comment"
+      zos_lineinfile:
+        src: "{{ tmp_data_set2 }}(0)"
+        insertbefore: BOF
+        state: present
+        line: "#### Console log from system {{ sys_name }} ####"
+
+    - name: "Fetch {{ tmp_data_set2 }}(0) to the local controller"
+      zos_fetch:
+        src: "{{ tmp_data_set2 }}(0)"
+        dest: "{{ playbook_dir }}/"
+      register: fetch_result
+
+    - name: "Result of Fetch {{ tmp_data_set2 }}(0) to the local machine"
+      debug:
+        msg:
+          - "{{ fetch_result }}"
+
+    - name: Delete the data sets
+      zos_data_set:
+        batch:
+          - name: "{{ tmp_data_set1 }}(0)"
+            state: absent
+          - name: "{{ tmp_data_set2 }}(0)"
+            state: absent
+          - name: "{{ tmp_data_set1 }}"
+            state: absent
+          - name: "{{ tmp_data_set2 }}"
+            state: absent
