@@ -32,11 +32,11 @@
     in_index: "{{ lookup('ansible.utils.index_of', buffer, 'regex', '.') }}"
 
 - ansible.builtin.set_fact:
-    cert_sn: "@@@{{role_cert.cert_type}}@@@{{role_cert.cert_label}}@@@"
+    cert_sn: "000{{role_cert.cert_type}}000{{role_cert.cert_label | trim }}000"
   when: role_cert.cert_type == 'CERTAUTH' or role_cert.cert_type == 'SITE'
 
 - ansible.builtin.set_fact:
-    cert_sn: "@@@{{role_cert.owner_id | trim }}@@@{{role_cert.cert_label}}@@@"
+    cert_sn: "000{{role_cert.owner_id | trim }}000{{role_cert.cert_label | trim }}000"
   when: role_cert.cert_type == 'USER'
 
 - ansible.builtin.set_fact:
