@@ -11,7 +11,7 @@
     sn_username: ""
     sn_pwd: ""
     sn_incident_number: ""
-    sn_short_desc: "INC0001@@@[From: IBM Concert] [Environment: z/OS] Certificate 000STCUSR000concertCertificateTest1000>0221<000 expires in 1 day"
+    sn_short_desc: ""
 
     # IBM Concert info
     concert_hostname: ""
