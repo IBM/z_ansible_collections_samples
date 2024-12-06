@@ -35,7 +35,7 @@ ansible-galaxy collection install ibm.ibm_zos_cics
 ```
 
 For more information about the CMCI REST API, see the
-[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/5.6?topic=environment-cics-management-client-interface-cmci).
+[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/latest?topic=fundamentals-cics-management-client-interface-cmci).
 
 Because this playbook only uses the CMCI REST API, it can be run on the control node directly, without having to
 configure an inventory. Generally you'll be able to use this trick with any of the CMCI modules. In this example, we
@@ -82,14 +82,14 @@ the results of the report.
 - Try editing `report.yml` to change the attributes included in the report.
   
   You may want to uncomment the debug task to see the full response from CICSPlex SM, which includes all the attribute
-  names applicable to the target resource. In this example, the returned attributes will correspond to what's listed in the [CICSRGN resource table](https://www.ibm.com/docs/en/cics-ts/5.6?topic=tables-cicsrgn-resource-table). 
+  names applicable to the target resource. In this example, the returned attributes will correspond to what's listed in the [CICSRGN resource table](https://www.ibm.com/docs/en/cics-ts/latest?topic=tables-cicsrgn-resource-table). 
   
 - Try adding a `filter` argument to the `cmci_get` task, to restrict the report to a subset of your CICS regions. For
   information on how to set a filter for the `cmci_get` task, see [the IBM z/OS CICS modules documentation](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_cics/docs/source/modules/cmci_get.html).
   
 - Try supplying a different resource for the `type` argument of the `cmci_get` task, to request attributes for a different type of resource. You can find
   available CMCI resource names at
-  [CMCI resource names](https://www.ibm.com/docs/en/cics-ts/5.6?topic=reference-cmci-resource-names).
+  [CMCI resource names](https://www.ibm.com/docs/en/cics-ts/latest?topic=reference-cmci-resource-names).
 
 - Look at the [other samples](../..) to find examples of what else you can do with the CICS collection.
 
