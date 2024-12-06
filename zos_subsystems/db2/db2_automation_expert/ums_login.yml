@@ -1,0 +1,12 @@
+- name: Authenticate with UMS
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Authenticate with UMS
+      ansible.builtin.include_role:
+        name: ums_login
+      vars:
+        ums_server: umsserver.company.com
+        ums_port: 12023
+        ums_ca_path: "path/to/rootca.pem"
+        ums_validate_certs: true
