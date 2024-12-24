@@ -1,0 +1,148 @@
+###############################################################################
+# © Copyright IBM Corporation 2025
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to create a new Generation Data Group(GDG),
+# add text content to a Generation Data Set(GDS), copy to another
+# Generation Data Group(GDG), edit the copy and fetch the content.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_edit_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.13.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    mount_point: "/tmp/zfs_aggr"
+    aggr_growth_size: 2000
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set names
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds1
+
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds2
+
+    - set_fact:
+        zfs_data_set: "{{ tmp_ds1.stdout }}"
+        trace_back_data_set: "{{ tmp_ds2.stdout }}"
+
+    # ##########################################################################
+    # Modules: zos_data_set, zos_zfs_resize, zos_fetch
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create zfs data set {{ zfs_data_set }}.
+    # | - Using zos_data_set, create seq data set for get the full trace_back.
+    # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }}.
+    # | - Using zos_fetch, to fetch the trace back of the grow operation.
+    # +-------------------------------------------------------------------------
+
+    # ##########################################################################
+    # Create and Mount ZFS data set.
+    # ##########################################################################
+
+    - name: "Create ZFS."
+      zos_data_set:
+        name: "{{ zfs_data_set }}"
+        type: zfs
+        space_primary: 1
+        space_type: m
+        replace: true
+
+    - name: "Create mount dir on z/OS USS."
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: "Mount ZFS data set."
+      command: /usr/sbin/mount -t zfs -f {{ zfs_data_set | upper }} {{ mount_point }}
+
+    - name: "Confirm mount point."
+      command: "df /{{ mount_point }}"
+      register: df_output
+
+    - name: "Echo df output."
+      debug:
+        msg: "{{ df_output.stdout_lines }}"
+
+    # ##########################################################################
+    # Create SEQ ata set for get the full trace back.
+    # ##########################################################################
+
+    - name: "Create data set to trace."
+      zos_data_set:
+        name: "{{ trace_back_data_set }}"
+        record_length: 200
+        type: seq
+
+    # ##########################################################################
+    # Fill up ZFS aggregate with random data.
+    # ##########################################################################
+
+    - name: "Write 1 million bytes to ZFS."
+      shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+
+    # ##########################################################################
+    # Grow ZFS aggregate.
+    # See the full stdout.
+    # Fetch the full trace back
+    # ##########################################################################
+
+    - name: "Grow ZFS aggregate and get trace back on data set {{ trace_back_data_set }}."
+      zos_zfs_resize:
+        target: "{{ zfs_data_set }}"
+        size: "{{ aggr_growth_size }}"
+        trace_destination: "{{ trace_back_data_set }}"
+      register: grow_output
+
+    - name: Echo grow_output.
+      debug:
+        msg: "{{ grow_output }}"
+
+    - name: "Fetch {{ trace_back_data_set }} to the local controller."
+      zos_fetch:
+        src: "{{ trace_back_data_set }}"
+        dest: "{{ playbook_dir }}/"
+      register: fetch_result
+
+    - name: "Result of Fetch {{ trace_back_data_set }} to the local machine."
+      debug:
+        msg: "{{ fetch_result }}"
+
+    # ##########################################################################
+    # clean up - unmount and delete ZFS data sets
+    # ##########################################################################
+
+    - name: Unmount ZFS data set.
+      command: "/usr/sbin/unmount {{ mount_point }}"
+
+    - name: Delete ZFS data set.
+      zos_data_set:
+        name: "{{ zfs_data_set }}"
+        state: absent
+
+    - name: Delete trace_dataset.
+      zos_data_set:
+        name: "{{ trace_back_data_set }}"
+        state: absent
