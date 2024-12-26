@@ -1,0 +1,129 @@
+###############################################################################
+# © Copyright IBM Corporation 2025
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to create a new Generation Data Group(GDG),
+# add text content to a Generation Data Set(GDS), copy to another
+# Generation Data Group(GDG), edit the copy and fetch the content.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_edit_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.13.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    mount_point: "/tmp/zfs_aggr"
+    aggr_shrink_size: 1400
+    aggr_shrink_size_on_m: 2
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds1
+
+    - set_fact:
+        zfs_data_set: "{{ tmp_ds1.stdout }}"
+
+    # ##########################################################################
+    # Modules: zos_data_set, zos_zfs_resize
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create zfs data set {{ zfs_data_set }}.
+    # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }} on trk size.
+    # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }}.
+    # +-------------------------------------------------------------------------
+
+    # ##########################################################################
+    # Create and Mount ZFS data set.
+    # ##########################################################################
+
+    - name: "Create ZFS."
+      zos_data_set:
+        name: "{{ zfs_data_set }}"
+        type: zfs
+        space_primary: 2
+        space_type: m
+        replace: true
+
+    - name: "Create mount dir on z/OS USS."
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: "Mount ZFS data set."
+      command: /usr/sbin/mount -t zfs -f {{ zfs_data_set | upper }} {{ mount_point }}
+
+    - name: "Confirm mount point."
+      command: "df /{{ mount_point }}"
+      register: df_output
+
+    - name: "Echo df output."
+      debug:
+        msg: "{{ df_output.stdout_lines }}"
+
+    # ##########################################################################
+    # Fill up ZFS aggregate with random data.
+    # ##########################################################################
+
+    - name: "Write 1 million bytes to ZFS."
+      shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+
+    # ##########################################################################
+    # Shrink ZFS aggregate on tracks size.
+    # Shrink ZFS aggregate with verbose mode.
+    # ##########################################################################
+
+    - name: "Shrink ZFS aggregate data set {{ zfs_data_set }} on track size."
+      zos_zfs_resize:
+        target: "{{ zfs_data_set }}"
+        size: "{{ aggr_shrink_size_on_m }}"
+        space_type: m
+      register: shrink_output
+
+    - name: Echo shrink_output.
+      debug:
+        msg: "{{ shrink_output }}"
+
+    - name: "Shrink ZFS aggregate data set {{ zfs_data_set }} and verbose mode."
+      zos_zfs_resize:
+        target: "{{ zfs_data_set }}"
+        size: "{{ aggr_shrink_size }}"
+        verbose: True
+      register: shrink_output
+
+    - name: Echo shrink_output.
+      debug:
+        msg: "{{ shrink_output }}"
+
+    # ##########################################################################
+    # clean up - unmount and delete ZFS data sets
+    # ##########################################################################
+
+    - name: Unmount ZFS data set.
+      command: "/usr/sbin/unmount {{ mount_point }}"
+
+    - name: Delete ZFS data set.
+      zos_data_set:
+        name: "{{ zfs_data_set }}"
+        state: absent
+
