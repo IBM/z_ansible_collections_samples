@@ -94,7 +94,12 @@
       zos_data_set:
         name: "{{ trace_back_data_set }}"
         record_length: 200
-        type: seq
+        type: pds
+
+    - name: "Create data set member to trace."
+      zos_data_set:
+        name: "{{ trace_back_data_set }}(MEM)"
+        type: member
 
     # ##########################################################################
     # Fill up ZFS aggregate with random data.
@@ -113,7 +118,7 @@
       zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_growth_size }}"
-        trace_destination: "{{ trace_back_data_set }}"
+        trace_destination: "{{ trace_back_data_set }}(MEM)"
       register: grow_output
 
     - name: Echo grow_output.
@@ -122,11 +127,11 @@
 
     - name: "Fetch {{ trace_back_data_set }} to the local controller."
       zos_fetch:
-        src: "{{ trace_back_data_set }}"
+        src: "{{ trace_back_data_set }}(MEM)"
         dest: "{{ playbook_dir }}/"
       register: fetch_result
 
-    - name: "Result of Fetch {{ trace_back_data_set }} to the local machine."
+    - name: "Result of Fetch {{ trace_back_data_set }}(MEM) to the local machine."
       debug:
         msg: "{{ fetch_result }}"
 
