@@ -1,4 +1,4 @@
-# Create, grow ZFS aggregate with trace back and fetch the trace data set.
+# Create, grow ZFS aggregate with trace back and fetch the trace member.
 This playbook demonstrates how to grow a ZFS aggregate on z/OS using Red Hat
 Ansible Certified Content for IBM Z.
 

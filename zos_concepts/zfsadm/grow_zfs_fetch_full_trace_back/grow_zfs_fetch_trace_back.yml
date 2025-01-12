@@ -47,15 +47,17 @@
     - set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
         trace_back_data_set: "{{ tmp_ds2.stdout }}"
+        trace_back_data_set_mem: "{{ tmp_ds2.stdout }}(MEM)"
 
     # ##########################################################################
     # Modules: zos_data_set, zos_zfs_resize, zos_fetch
     # ##########################################################################
     # +-------------------------------------------------------------------------
     # | - Using zos_data_set, create zfs data set {{ zfs_data_set }}.
-    # | - Using zos_data_set, create seq data set for get the full trace_back.
+    # | - Using zos_data_set, create pds data set to generate a member.
+    # | - Using zos_data_set, create a member to get the full trace back.
     # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }}.
-    # | - Using zos_fetch, to fetch the trace back of the grow operation.
+    # | - Using zos_fetch, to fetch the trace back member of the grow operation.
     # +-------------------------------------------------------------------------
 
     # ##########################################################################
@@ -87,7 +89,7 @@
         msg: "{{ df_output.stdout_lines }}"
 
     # ##########################################################################
-    # Create SEQ ata set for get the full trace back.
+    # Create PDS data set and member for get the full trace back.
     # ##########################################################################
 
     - name: "Create data set to trace."
@@ -96,9 +98,9 @@
         record_length: 200
         type: pds
 
-    - name: "Create data set member to trace."
+    - name: "Create member of data set to trace."
       zos_data_set:
-        name: "{{ trace_back_data_set }}(MEM)"
+        name: "{{ trace_back_data_set_mem }}"
         type: member
 
     # ##########################################################################
@@ -118,7 +120,7 @@
       zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_growth_size }}"
-        trace_destination: "{{ trace_back_data_set }}(MEM)"
+        trace_destination: "{{ trace_back_data_set_mem }}"
       register: grow_output
 
     - name: Echo grow_output.
@@ -127,11 +129,11 @@
 
     - name: "Fetch {{ trace_back_data_set }} to the local controller."
       zos_fetch:
-        src: "{{ trace_back_data_set }}(MEM)"
+        src: "{{ trace_back_data_set_mem }}"
         dest: "{{ playbook_dir }}/"
       register: fetch_result
 
-    - name: "Result of Fetch {{ trace_back_data_set }}(MEM) to the local machine."
+    - name: "Result of Fetch {{ trace_back_data_set_mem }} to the local machine."
       debug:
         msg: "{{ fetch_result }}"
 
