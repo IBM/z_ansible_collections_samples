@@ -54,6 +54,7 @@
     # ##########################################################################
     # +-------------------------------------------------------------------------
     # | - Using zos_data_set, create zfs data set {{ zfs_data_set }}.
+    # | - Using zos_mount, mount zfs {{ zfs_data_set }} on {{ mount_point }}.
     # | - Using zos_data_set, create pds data set to generate a member.
     # | - Using zos_data_set, create a member to get the full trace back.
     # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }}.
@@ -78,7 +79,11 @@
         state: directory
 
     - name: "Mount ZFS data set."
-      command: /usr/sbin/mount -t zfs -f {{ zfs_data_set | upper }} {{ mount_point }}
+      zos_mount:
+        src: "{{ zfs_data_set | upper }}"
+        path: "{{ mount_point }}"
+        fs_type: zfs
+        state: mounted
 
     - name: "Confirm mount point."
       command: "df /{{ mount_point }}"

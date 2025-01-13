@@ -7,6 +7,7 @@ This playbook uses:
     - ibm.ibm_zos_core
   - modules:
     - zos_data_set
+    - zos_mount
     - zos_zfs_resize
     - zos_fetch
 
