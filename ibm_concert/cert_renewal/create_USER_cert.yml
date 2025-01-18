@@ -1,0 +1,82 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: 'STCUSR'
+    cert_label: 'concertCertificateTest'
+    sign_label: 'IBM CA'
+    cn: ''
+    altname: 'IP(xxx.xxx.xxx.xxx)'
+    ou: 'Concert for Z'
+    country: 'US'
+    expiry_date: '2024-11-08'
+    expiry_time: '10:06:00' # UTC time
+    keyring: 'Keyring.CONCERT'
+    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+  tasks:
+    - block:
+        - name: Clean up certs and keyring
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
+              - RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
+          register: tso_cmd_output
+      ignore_errors: true
+
+    - name: Create new self-signed USER cert and connect to keyring
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT GENCERT ID({{owner_id}}) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}') NOTAFTER(DATE({{expiry_date}}) TIME({{expiry_time}}) ) ALTNAME({{altname}})
+          - RACDCERT ID({{owner_id}}) CONNECT(LABEL('{{cert_label}}') RING({{keyring}}) DEFAULT)
+          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
+          - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{cert_label}}')) TRUST
+          - RACDCERT LISTCHAIN(LABEL('{{cert_label}}')) ID({{owner_id}})
+      when: sign_label == ' ' and not expiry_date == ''
+      register: tso_cmd_output
+
+    - name: Create new local-CA-signed USER cert and connect to keyring
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT GENCERT ID({{owner_id}}) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}') SIGNWITH(CERTAUTH LABEL('{{sign_label}}')) NOTAFTER(DATE({{expiry_date}}) TIME({{expiry_time}}) ) ALTNAME({{altname}})
+          - RACDCERT ID({{owner_id}})  CONNECT(LABEL('{{cert_label}}')  RING({{keyring}}) DEFAULT)
+          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
+          - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{cert_label}}')) TRUST
+          - RACDCERT LISTCHAIN(LABEL('{{cert_label}}')) ID({{owner_id}})
+      when: not sign_label == ' ' and not expiry_date == ''
+      register: tso_cmd_output
+
+    - name: Create new self-signed USER cert and connect to keyring
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT GENCERT ID({{owner_id}})  SUBJECTSDN(CN('{{cn}}')  OU('{{ou}}') C('{{country}}'))  WITHLABEL('{{cert_label}}') ALTNAME({{altname}})
+          - RACDCERT ID({{owner_id}}) CONNECT(LABEL('{{cert_label}}') RING({{keyring}}) DEFAULT)
+          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
+          - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{cert_label}}')) TRUST
+          - RACDCERT LISTCHAIN(LABEL('{{cert_label}}')) ID({{owner_id}})
+      when: sign_label == ' ' and expiry_date == ''
+      register: tso_cmd_output
+
+    - name: Create new local-CA-signed USER cert and connect to keyring
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT GENCERT ID({{owner_id}}) SUBJECTSDN(CN('{{cn}}') OU('{{ou}}') C('{{country}}')) WITHLABEL('{{cert_label}}') SIGNWITH(CERTAUTH LABEL('{{sign_label}}')) ALTNAME({{altname}})
+          - RACDCERT ID({{owner_id}}) CONNECT(LABEL('{{cert_label}}') RING({{keyring}}) DEFAULT)
+          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
+          - RACDCERT ID({{owner_id}}) ALTER(LABEL('{{cert_label}}')) TRUST
+          - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) ID({{owner_id}})
+      when: not sign_label == ' ' and expiry_date == ''
+      register: tso_cmd_output
+
+    - name: List keyring
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
+      ignore_errors: true
+      register: tso_cmd_output

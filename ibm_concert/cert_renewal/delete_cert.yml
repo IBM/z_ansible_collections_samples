@@ -1,0 +1,50 @@
+###############################################################################
+# © Copyright IBM Corporation 2024
+###############################################################################
+
+- hosts: all
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: 'STCUSR'
+    cert_type: 'USER'
+    cert_label: 'concertCertificateTest'
+    keyring: 'Keyring.CONCERT'
+
+    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+  tasks:
+    - name: Deleting cert {{cert_label}}
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
+      when: cert_type == 'USER'
+      register: tso_cmd_output
+
+    - name: Deleting cert {{cert_label}}
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT CERTAUTH DELETE(LABEL('{{cert_label}}'))
+      when: cert_type == 'CERTAUTH'
+      register: tso_cmd_output
+
+    - name: Deleting cert {{cert_label}}
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT SITE DELETE(LABEL('{{cert_label}}'))
+      when: cert_type == 'SITE'
+      register: tso_cmd_output
+
+    - name: Issue setropts refresh
+      tags: refresh
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: SETROPTS RACLIST(DIGTCERT) REFRESH
+
+    - name: Display keyring
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT LISTRING({{keyring}}) ID({{ owner_id}})
+      ignore_errors: true
+      register: tso_cmd_output
