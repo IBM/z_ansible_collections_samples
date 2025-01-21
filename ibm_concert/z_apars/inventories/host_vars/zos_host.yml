@@ -1,0 +1,42 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2024
+################################################################################
+
+################################################################################
+# Description of the properties used in this configuration:
+# - Property `PYZ` is the python installation home path on the z/OS managed node (target),
+#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
+# - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
+#    e.g, zoau: "/usr/lpp/IBM/zoautil"
+# - property `ansible_python_interpreter` is the z/OS managed node (target) Python
+#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
+#
+# Note, PYZ and ZOAU environment variables must be configured.
+################################################################################
+
+PYZ: "path_to_python"
+ZOAU: "path_to_zoau"
+
+################################################################################
+# Do not configure, variable substituion will correctly set the
+# variable`ansible_python_interpreter`
+################################################################################
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
+
+# varibles for templates
+JOB_CARD: |-
+  //ANSIBLE JOB ,
+  //         MSGCLASS=H,MSGLEVEL=(1,1),CLASS=A
+
+# zOSMF info
+zmf_host: your_zos_hostname
+zmf_user: zos_userid
+zmf_password: 
+software_instance_name: Db2-V12
+system_nickname: S2
+missing_critical_updates_response_file: '{{ software_instance_name }}-MissingCriticalUpdatesReport.json'
+missing_fixcat_updates_response_file: '{{ software_instance_name }}-MissingFixcatUpdatesReport.json'
+search_software_updates_response_file: '{{ software_instance_name }}-SoftwareUpdateSearchReport.json'
+updates: 
+  - AH41952
