@@ -8,9 +8,20 @@
     #####################################################################################
     # PLAY #1: Retrieve all SW Instances                                                #
     #####################################################################################
-    # - name: Retrieve the z/OS system UUID
-    #   ansible.builtin.include_role:
-    #         name: zmf_swmgmt_zos_system_uuid
+    - ansible.builtin.uri:
+        url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/swmgmt/pswi"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: instance_data
+      delegate_to: localhost
 
     #####################################################################################
     # PLAY #2: Identify missing critical software updates for each SW Instance          #
