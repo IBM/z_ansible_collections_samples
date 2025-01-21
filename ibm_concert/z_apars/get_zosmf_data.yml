@@ -1,0 +1,34 @@
+- name: sample of identifying missing critical software updates for a software instance
+  hosts: all
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+
+  tasks:
+    #####################################################################################
+    # PLAY #1: Retrieve all SW Instances                                                #
+    #####################################################################################
+    # - name: Retrieve the z/OS system UUID
+    #   ansible.builtin.include_role:
+    #         name: zmf_swmgmt_zos_system_uuid
+
+    #####################################################################################
+    # PLAY #2: Identify missing critical software updates for each SW Instance          #
+    #####################################################################################
+    - name: Identify Missing Critical Software Updates
+      ansible.builtin.include_role:
+        name: zmf_swmgmt_identify_missing_critical_updates
+
+    #####################################################################################
+    # PLAY #3: Identify missing fixcat software updates for each SW Instance            #
+    #####################################################################################
+    - name: Identify Missing Fixcat Software Updates
+      ansible.builtin.include_role:
+            name: zmf_swmgmt_identify_missing_fixcat_updates
+            
+    #####################################################################################
+    # PLAY #4: Search SW Instance for software updates.                                 #
+    #####################################################################################
+    - name: Search for Software Updates
+      ansible.builtin.include_role:
+            name: zmf_swmgmt_search_software_updates
