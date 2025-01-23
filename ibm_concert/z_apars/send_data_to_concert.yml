@@ -54,6 +54,7 @@
           vars: 
             software_instance_name: '{{ item.name }}'
             system_nickname: '{{item.system}}'
+            missing_critical_updates_response_file: '{{ software_instance_name }}-MissingCriticalUpdatesReport.json'
           loop: "{{ swi_list }}"
           # when: item.name is defined and not item.name is search('PTF')
           when: 
@@ -65,6 +66,7 @@
         #   vars: 
         #     software_instance_name: '{{ item.name }}'
         #     system_nickname: '{{item.system}}'
+        #     missing_fixcat_updates_response_file: '{{ software_instance_name }}-MissingFixcatUpdatesReport.json'
         #   loop: "{{ swi_list }}"
         #   # when: item.name is defined and not item.name is search('PTF')
         #   when: 
@@ -73,15 +75,14 @@
       ignore_errors: true
 
     # #####################################################################################
-    # # PLAY #4: Identify missing fixcat software updates for each SW Instance            #
-    # #####################################################################################
-    # - name: Identify Missing Fixcat Software Updates
-    #   ansible.builtin.include_role:
-    #         name: zmf_swmgmt_identify_missing_fixcat_updates
-            
-    # #####################################################################################
     # # PLAY #4: Search SW Instance for software updates.                                 #
     # #####################################################################################
     # - name: Search for Software Updates
     #   ansible.builtin.include_role:
     #         name: zmf_swmgmt_search_software_updates
+    #   vars:
+    #     software_instance_name: '{{ item.name }}'
+    #     system_nickname: '{{item.system}}'
+    #     search_software_updates_response_file: '{{ software_instance_name }}-SoftwareUpdateSearchReport.json'
+    #     updates: 
+    #        - AH41952
