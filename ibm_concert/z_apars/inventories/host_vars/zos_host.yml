@@ -33,8 +33,8 @@ JOB_CARD: |-
 zmf_host: your_zos_hostname
 zmf_user: zos_userid
 zmf_password: 
-software_instance_name: Db2-V12
-system_nickname: S2
+software_instance_name: 
+system_nickname: 
 missing_critical_updates_response_file: '{{ software_instance_name }}-MissingCriticalUpdatesReport.json'
 missing_fixcat_updates_response_file: '{{ software_instance_name }}-MissingFixcatUpdatesReport.json'
 search_software_updates_response_file: '{{ software_instance_name }}-SoftwareUpdateSearchReport.json'
