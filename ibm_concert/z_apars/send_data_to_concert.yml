@@ -1,0 +1,87 @@
+- name: Gather and send z topology and missing APARs to Concert
+  hosts: all
+  gather_facts: no
+  collections:
+    - ibm.ibm_zosmf
+
+  tasks:
+    #####################################################################################
+    # PLAY #1: Retrieve z Discovery data                                                #
+    #####################################################################################
+    - ansible.builtin.uri:
+        url: "https://zvs-zlinux1.fyre.ibm.com:8888/zrdds/api/v1/instance/nodes"
+        method: GET
+        headers:
+          ApiToken: '098f6bcd4621d373cade4e832627b4f6'
+        validate_certs: false
+      register: zDiscovery_data
+      delegate_to: localhost
+
+    - copy: 
+        content: "{{ zDiscovery_data | to_nice_json }}" 
+        dest: "./zDiscovery_data.json"
+      delegate_to: localhost
+
+
+    #####################################################################################
+    # PLAY #2: Retrieve all SW Instances                                                #
+    #####################################################################################
+    - ansible.builtin.uri:
+        url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/swmgmt/pswi"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: instance_data
+      delegate_to: localhost
+
+    - set_fact:
+        swi_list: '{{ instance_data.json.pswilist }}'
+
+    #####################################################################################
+    # PLAY #3: Identify missing critical software updates for each SW Instance          #
+    #####################################################################################
+    - block:  
+        - name: Identify Missing Critical Software Updates
+          ansible.builtin.include_role:
+            name: zmf_swmgmt_identify_missing_critical_updates
+          vars: 
+            software_instance_name: '{{ item.name }}'
+            system_nickname: '{{item.system}}'
+          loop: "{{ swi_list }}"
+          # when: item.name is defined and not item.name is search('PTF')
+          when: 
+            - item.name is defined and ( item.name.startswith('ims1') or item.name.startswith('db2') )
+
+        # - name: Identify Missing Fixcat Software Updates
+        #   ansible.builtin.include_role:
+        #     name: zmf_swmgmt_identify_missing_fixcat_updates
+        #   vars: 
+        #     software_instance_name: '{{ item.name }}'
+        #     system_nickname: '{{item.system}}'
+        #   loop: "{{ swi_list }}"
+        #   # when: item.name is defined and not item.name is search('PTF')
+        #   when: 
+            # - item.name is defined and ( item.name.startswith('ims1') or item.name.startswith('db2') )
+          
+      ignore_errors: true
+
+    # #####################################################################################
+    # # PLAY #4: Identify missing fixcat software updates for each SW Instance            #
+    # #####################################################################################
+    # - name: Identify Missing Fixcat Software Updates
+    #   ansible.builtin.include_role:
+    #         name: zmf_swmgmt_identify_missing_fixcat_updates
+            
+    # #####################################################################################
+    # # PLAY #4: Search SW Instance for software updates.                                 #
+    # #####################################################################################
+    # - name: Search for Software Updates
+    #   ansible.builtin.include_role:
+    #         name: zmf_swmgmt_search_software_updates
