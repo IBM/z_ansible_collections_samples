@@ -1,0 +1,101 @@
+{{ JOB_CARD }}
+//*********************************************************************
+//* Licensed Materials - Property of IBM                            ***
+//* 5698-AA4                                                  8.3.1 ***
+//* Copyright IBM Corp. 2011, 2024.  All rights reserved.           ***
+//* Copyright HCL Technologies Ltd. 2020, 2024.                     ***
+//*                                                                 ***
+//*Change Activity:                                                 ***
+//*Flg=Reason   Vers   Date    Name Description                     ***
+//*-----------  ------ ------- ---- --------------------------------***
+//*GA           V8R3M1 13Sep24 HCL                                  ***
+//*GA           V8R3   25Aug23 HCL                                  ***
+//*$P3=OA64003  V8R2   16Nov22 HCL                                  ***
+//*GA           V8R2   11Dec20 HCL                                  ***
+//*$P2=OA45327  V8R1   29Jul14 ADL                                  ***
+//*$P1=OA42802  V8R1   02Aug13 ADL                                  ***
+//*********************************************************************
+//* V8.3.1:                                                          **
+//*  New Analyzer input parameters in //SYSIN                        **
+//*  Expected return codes                                           **
+//*                                                                  **
+//* New in V8.2:                                                     **
+//*  SET OUTFMT=XML   <= was previously "XLS"                       **
+//*  @headers         <= new optional parameter (see example below) **
+//*   @headers = full  <= displays report title, timestamp, list    **
+//*                         of parameters, and column headings       **
+//*   @headers = title <= displays report title, timestamp and      **
+//*                         column headings                          **
+//*   @headers = none  <= displays column headings only             **
+//*                                                                  **
+//* Analyzer batch mode job:                                         **
+//* a. Parameters are case sensitive                                 **
+//* b. All parameters must start in column 1.                        **
+//* c. In OUTDSN, increase the size according to report output.      **
+//* d. In WORK0, increase the size according to report output.       **
+//*    WORK0 can be changed to a permanent dataset, if required.     **
+//* e. In //TPARAM, setting TRACE = Y will force an Analyzer trace.  **
+//*                                                                  **
+//* Records are fetched and stored in the WORK0 file.                **
+//* Once the fetch is complete, records are then physically written  **
+//* to the OUTDSN dataset, in 8K blocks.                             **
+//*                                                                 ***
+//* Acceptable return codes:                                        ***
+//*  0 = Success                                                    ***
+//*  4 = No rows returned                                           ***
+//*  8 = Truncation of output                                       ***
+//*                                                                  **
+//*********************************************************************
+//   JCLLIB  ORDER=(ZSAM.V831.INST.DEMO81.JCLLIB)
+//*
+//*  SET OUTFMT=TXT
+//*  SET OUTFMT=XLS
+//*  SET OUTFMT=XML
+//   SET OUTFMT=CSV
+//*  SET OUTFMT=HTM
+//*
+//   SET OUTDSN=&SYSUID..IZSAMALZ.&OUTFMT  Output dsn
+//*
+//**DELOLD   EXEC PGM=IEFBR14
+//**OUTDSN   DD DSN=&OUTDSN,
+//**         DISP=(MOD,DELETE),UNIT=SYSALLDA,SPACE=(TRK,(0,0))
+//*
+//ALLOC    EXEC PGM=IEFBR14
+//OUTDSN   DD DISP=(MOD,CATLG),DSN=&OUTDSN,
+//            UNIT=SYSALLDA,SPACE=(CYL,(200,100),RLSE)
+/*
+//*********************************************************************
+//ANALYZER EXEC PGM=HSICANLZ,REGION=0M,TIME=NOLIMIT
+//STEPLIB  DD DISP=SHR,DSN=DSN1210.DB2.DSNA.SDSNEXIT
+//         DD DISP=SHR,DSN=DSN1210.DB2.SDSNLOAD
+//         DD DISP=SHR,DSN=ZSAM.V8R31.SHSIMOD1
+//         DD DISP=SHR,DSN=SYS1.LEMVS.SCEERUN
+//         DD DISP=SHR,DSN=SYS1.CPP.SCLBDLL
+//SYSPRINT DD SYSOUT=*,LRECL=500
+//HSIANL1  DD DISP=SHR,DSN=ZSAM.V8R31.SHSIANL1
+//HSIANL2  DD DISP=SHR,DSN=ZSAM.V8R31.SHSIANL2
+//HSICUST  DD DISP=SHR,
+//       DSN=ZSAM.V831.INST.DEMO81.PARMLIB(HSISANCQ)
+//*HSINLS  DD DISP=SHR,DSN=ZSAM.V8R31.SHSIANL1(HSINLSJP)
+//DSNAOINI DD DISP=SHR,
+//       DSN=ZSAM.V831.INST.DEMO81.PARMLIB(HSISCLI)
+//WORK0    DD DSN=&WORK0,DISP=(NEW,DELETE),
+//            UNIT=SYSALLDA,SPACE=(CYL,(200,100),RLSE)
+//TPARAM   DD DUMMY
+//OUTPUT1  DD  DISP=OLD,DSN=&OUTDSN,LRECL=2000
+//APPSTATS DD SYSOUT=*,LRECL=1000
+//APPTRACE DD SYSOUT=*
+//SYSIN    DD  *
+/asset/audit_trail
+vendor             = IBM
+multirep           = TADZADM
+showdiscname       = on
+showeid            = off
+showscrt           = off
+showmultirepsingle = off
+@headers    = full
+/*
+
+
+
+
