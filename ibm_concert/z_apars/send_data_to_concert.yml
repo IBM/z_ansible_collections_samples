@@ -24,11 +24,23 @@
       register: zDiscovery_data
       delegate_to: localhost
 
-    - copy: 
+    - name: Save z Discovery data into a JSON file
+      ansible.builtin.copy:
         content: "{{ zDiscovery_data | to_nice_json }}" 
         dest: "./zDiscovery_data.json"
       delegate_to: localhost
 
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+              -H 'Content-Type: multipart/form-data' \
+              -H 'InstanceId: {{concert_instance_id}}' \
+              -H 'Accept: application/json' \
+              -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
+              -F 'data_type=certificate' \
+              -F 'filename=@{{ playbook_dir }}/{{ zDiscovery_data.json }}' \
+              -F 'metadata={"env_name" : "z/OS"}'
+      delegate_to: localhost
 
     #####################################################################################
     # PLAY #2: Retrieve all SW Instances                                                #
@@ -62,6 +74,20 @@
             software_instance_name: '{{ item.name }}'
             system_nickname: '{{item.system}}'
             missing_critical_updates_response_file: '{{ software_instance_name }}-MissingCriticalUpdatesReport.json'
+
+        - name: Send cert data to IBM Concert
+          ansible.builtin.shell: |
+              /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+                  -H 'Content-Type: multipart/form-data' \
+                  -H 'InstanceId: {{concert_instance_id}}' \
+                  -H 'Accept: application/json' \
+                  -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
+                  -F 'data_type=certificate' \
+                  -F 'filename=@{{ playbook_dir }}/{{ software_instance_name }}-MissingCriticalUpdatesReport.json' \
+                  -F 'metadata={"env_name" : "z/OS"}'
+          delegate_to: localhost
+
+        
           loop: "{{ swi_list }}"
           # when: item.name is defined and not item.name is search('PTF')
           when: 
