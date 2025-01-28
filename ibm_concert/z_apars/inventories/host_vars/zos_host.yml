@@ -26,8 +26,9 @@ ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 
 # varibles for templates
 JOB_CARD: |-
-  //ANSIBLE JOB ,
-  //         MSGCLASS=H,MSGLEVEL=(1,1),CLASS=A
+  //HSISANLB JOB ,'IZSAM Analyz-Batch',REGION=0M,
+  // CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
+TSO_ID: ''
 
 # zOSMF info
 zmf_host: your_zos_hostname
