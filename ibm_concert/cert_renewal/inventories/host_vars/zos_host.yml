@@ -15,8 +15,8 @@
 # Note, PYZ and ZOAU environment variables must be configured.
 ################################################################################
 
-PYZ: "path_to_python"
-ZOAU: "path_to_zoau"
+PYZ: "/usr/lpp/IBM/cyp/v3r11/pyz"
+ZOAU: "/usr/lpp/IBM/zoau/v1r3/"
 
 ################################################################################
 # Do not configure, variable substituion will correctly set the
@@ -27,4 +27,4 @@ ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 # varibles for templates
 JOB_CARD: |-
   //ANSIBLE JOB ,
-  //         MSGCLASS=msg_class,MSGLEVEL=(1,1),CLASS=job_class
+  //         MSGCLASS=H,MSGLEVEL=(1,1),CLASS=A
