@@ -4,6 +4,13 @@
   collections:
     - ibm.ibm_zosmf
 
+  vars:
+    # IBM Concert variables
+    concert_hostname: ''
+    concert_instance_id: ''
+    concert_api_key: ''
+    concert_api_key_type: ''
+
   tasks:
     #####################################################################################
     # PLAY #1: Retrieve z Discovery data                                                #
