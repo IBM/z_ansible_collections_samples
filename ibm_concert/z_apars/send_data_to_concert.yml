@@ -119,3 +119,34 @@
     #     search_software_updates_response_file: '{{ software_instance_name }}-SoftwareUpdateSearchReport.json'
     #     updates: 
     #        - AH41952
+
+    #####################################################################################
+    # PLAY #5: Get SW Usage report from IZSAM                                           #
+    #####################################################################################
+    - name: Get expiring certs report for IBMRACF,RACF_CERTIFICATE_EXPIRATION
+      ibm.ibm_zos_core.zos_job_submit:
+        src: '{{ playbook_dir }}/HSICANLZ.J2'
+        location: local
+        use_template: true
+      register: izsam_job_output
+
+    - name: Fetch CSV to local
+      ibm.ibm_zos_core.zos_fetch:
+        src: "{{ TSO_ID }}.IZSAMALZ.CSV"
+        dest: "{{ playbook_dir }}/{{ izsam_usage.csv }}"
+        # encoding:
+        #   from: ISO8859-1
+        #   to: ISO8859-1
+        flat: true
+
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+              -H 'Content-Type: multipart/form-data' \
+              -H 'InstanceId: {{concert_instance_id}}' \
+              -H 'Accept: application/json' \
+              -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
+              -F 'data_type=certificate' \
+              -F 'filename=@{{ playbook_dir }}/{{ izsam_usage.csv' \
+              -F 'metadata={"env_name" : "z/OS"}'
+      delegate_to: localhost
