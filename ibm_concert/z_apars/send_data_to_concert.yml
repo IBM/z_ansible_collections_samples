@@ -9,8 +9,8 @@
     zmf_port: ''
     zmf_user: ''
     zmf_password: ''
-    zDLA_host:''
-    zDLA_port:''
+    zDLA_host: ''
+    zDLA_port: ''
     zDLA_token: ''
 
   tasks:
