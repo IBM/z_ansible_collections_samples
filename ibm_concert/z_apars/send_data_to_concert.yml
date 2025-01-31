@@ -17,7 +17,8 @@
     #####################################################################################
     # PLAY #1: Retrieve z Discovery data                                                #
     #####################################################################################
-    - ansible.builtin.uri:
+    - name: Get zDLA Nodes
+      ansible.builtin.uri:
         url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/instance/nodes"
         method: GET
         headers:
@@ -47,7 +48,8 @@
     #####################################################################################
     # PLAY #2: Retrieve all SW Instances                                                #
     #####################################################################################
-    - ansible.builtin.uri:
+    - name: Get zosmf software instances
+      ansible.builtin.uri:
         url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/swmgmt/swi"
         method: GET
         user: "{{ zmf_user | trim }}"
