@@ -15,8 +15,8 @@
 # Note, PYZ and ZOAU environment variables must be configured.
 ################################################################################
 
-PYZ: "path_to_python"
-ZOAU: "path_to_zoau"
+PYZ: "/usr/lpp/IBM/cyp/v3r11/pyz"
+ZOAU: "/usr/lpp/IBM/zoau/v1r3/"
 
 ################################################################################
 # Do not configure, variable substituion will correctly set the
@@ -28,10 +28,3 @@ ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 JOB_CARD: |-
   //HSISANLB JOB ,'IZSAM Analyz-Batch',REGION=0M,
   // CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
-TSO_ID: ''
-
-# zOSMF info
-zmf_host: your_zos_hostname
-zmf_port: 
-zmf_user: zos_userid
-zmf_password: 
