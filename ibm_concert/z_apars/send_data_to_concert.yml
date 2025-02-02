@@ -1,9 +1,9 @@
 - name: Gather and send z topology and missing APARs to Concert
   hosts: all
-  gather_facts: no
-  collections:
-    - ibm.ibm_zosmf
-
+  gather_facts: false
+  # collections:
+  #   - ibm.ibm_zosmf
+  environment: "{{ environment_vars }}"
   vars:
     zmf_host: ''
     zmf_port: ''
@@ -12,6 +12,13 @@
     zDLA_host: ''
     zDLA_port: ''
     zDLA_token: ''
+    izsam_jcl: ''
+    izsam_csv_output: ''
+    concert_hostname: ''
+    concert_port: ''
+
+    swilist: []
+    collated_swi: {}
 
   tasks:
     #####################################################################################
@@ -19,7 +26,7 @@
     #####################################################################################
     - name: Get zDLA Nodes
       ansible.builtin.uri:
-        url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/instance/nodes"
+        url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/instance/nodes?nodeType=ZOS"
         method: GET
         headers:
           ApiToken: '{{ zDLA_token }}'
@@ -29,9 +36,15 @@
 
     - name: Save z Discovery data into a JSON file
       ansible.builtin.copy:
-        content: "{{ zDiscovery_data | to_nice_json }}" 
-        dest: "./zDiscovery_data.json"
+        content: "{{ zDiscovery_data.json | to_nice_json }}"
+        dest: "./zdiscovery_data.json"
       delegate_to: localhost
+
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -k --request POST --url http://{{ concert_hostname }}:{{ concert_port }}/z_api/receive_zdiscovery_data -F "file=@./zdiscovery_data.json"
+      delegate_to: localhost
+      ignore_errors: true
 
     # - name: Send cert data to IBM Concert
     #   ansible.builtin.shell: |
@@ -64,69 +77,99 @@
       register: instance_data
       delegate_to: localhost
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         swi_list: '{{ instance_data.json.swilist }}'
+
+    - name: Save SWI to a json file
+      ansible.builtin.copy:
+        content: "{{ instance_data.json | to_nice_json }}"
+        dest: "./swi.json"
+      delegate_to: localhost
 
     #####################################################################################
     # PLAY #3: Identify missing critical software updates for each SW Instance          #
     #####################################################################################
-    - block:  
-        - name: Identify Missing Critical Software Updates
-          ansible.builtin.include_role:
-            name: zmf_swmgmt_identify_missing_critical_updates
-          vars: 
-            software_instance_name: '{{ item.name }}'
-            system_nickname: '{{item.system}}'
-            missing_critical_updates_response_file: '{{ software_instance_name }}-MissingCriticalUpdatesReport.json'
+      ignore_errors: true
+    - name: Get MCU
+      ansible.builtin.include_tasks: build_collated_swi.yml
+      loop: "{{ swi_list }}"
+      when:
+        - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
 
-        # - name: Send cert data to IBM Concert
-        #   ansible.builtin.shell: |
-        #       /usr/bin/curl -k -X POST https://{{ zos_host }}/ingestion/api/v1/upload_files \
-        #           -H 'Content-Type: multipart/form-data' \
-        #           -H 'InstanceId: {{concert_instance_id}}' \
-        #           -H 'Accept: application/json' \
-        #           -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
-        #           -F 'data_type=certificate' \
-        #           -F 'filename=@{{ playbook_dir }}/{{ software_instance_name }}-MissingCriticalUpdatesReport.json' \
-        #           -F 'metadata={"env_name" : "z/OS"}'
-        #   delegate_to: localhost
+    - name: Update collated SWI
+      ansible.builtin.set_fact:
+        collated_swi: "{{ collated_swi | default({}) | combine ({
+                'swilist': swilist
+                }) }}"
 
-        
-          loop: "{{ swi_list }}"
-          # when: item.name is defined and not item.name is search('PTF')
-          when: 
-            - item.name is defined and ( item.name.startswith('zos31') or item.name.startswith('db2') )
+    - ansible.builtin.debug:
+        var: collated_swi
 
-        # - name: Identify Missing Fixcat Software Updates
-        #   ansible.builtin.include_role:
-        #     name: zmf_swmgmt_identify_missing_fixcat_updates
-        #   vars: 
-        #     software_instance_name: '{{ item.name }}'
-        #     system_nickname: '{{item.system}}'
-        #     missing_fixcat_updates_response_file: '{{ software_instance_name }}-MissingFixcatUpdatesReport.json'
-        #   loop: "{{ swi_list }}"
-        #   # when: item.name is defined and not item.name is search('PTF')
-        #   when: 
-            # - item.name is defined and ( item.name.startswith('ims1') or item.name.startswith('db2') )
-          
+    - name: Save SWI to a json file
+      ansible.builtin.copy:
+        content: "{{ collated_swi | to_nice_json }}"
+        dest: "./swi_collated.json"
+      delegate_to: localhost
+
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/swi --form swi.json=@./swi_collated.json
+      delegate_to: localhost
       ignore_errors: true
 
+          # /usr/bin/curl -k -X POST https://{{ zos_host }}/ingestion/api/v1/upload_files \
+          #     -H 'Content-Type: multipart/form-data' \
+          #     -H 'InstanceId: {{concert_instance_id}}' \
+          #     -H 'Accept: application/json' \
+          #     -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
+          #     -F 'data_type=certificate' \
+          #     -F 'filename=@{{ playbook_dir }}/{{ software_instance_name }}-MissingCriticalUpdatesReport.json' \
+          #     -F 'metadata={"env_name" : "z/OS"}'
+
     # #####################################################################################
-    # # PLAY #4: Search SW Instance for software updates.                                 #
+    # # PLAY #4: Get zosmf system topology                                                #
     # #####################################################################################
-    # - name: Search for Software Updates
-    #   ansible.builtin.include_role:
-    #         name: zmf_swmgmt_search_software_updates
-    #   vars:
-    #     software_instance_name: '{{ item.name }}'
-    #     system_nickname: '{{item.system}}'
-    #     search_software_updates_response_file: '{{ software_instance_name }}-SoftwareUpdateSearchReport.json'
-    #     updates: 
-    #        - AH41952
+    - name: Get zosmf software instance detail
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}/zosmf/resttopology/systems"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: zmf_topology_data
+      delegate_to: localhost
+
+    - ansible.builtin.set_fact:
+        info: "{{zmf_topology_data.content}}"
+
+    - name: Save SWI to a json file
+      ansible.builtin.copy:
+        content: "{{ info | to_nice_json }}"
+        dest: "./resttopology.json"
+      delegate_to: localhost
+
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/resttopology/systems --form resttopology.json=@./resttopology.json
+      delegate_to: localhost
+      ignore_errors: true
 
     #####################################################################################
     # PLAY #5: Get SW Usage report from IZSAM                                           #
     #####################################################################################
+    - name: Submit JCL in a PDSE member
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{izsam_jcl}}"
+        location: data_set
+        wait_time_s: 30
+      register: izsam_job_output
+
     # - name: Get software usage data from IZSAM
     #   ibm.ibm_zos_core.zos_job_submit:
     #     src: '{{ playbook_dir }}/HSICANLZ.J2'
@@ -134,14 +177,17 @@
     #     use_template: true
     #   register: izsam_job_output
 
-    # - name: Fetch CSV to local
-    #   ibm.ibm_zos_core.zos_fetch:
-    #     src: "{{ ansible_user }}.IZSAMALZ.CSV"
-    #     dest: "{{ playbook_dir }}/{{ izsam_usage.csv }}"
-    #     # encoding:
-    #     #   from: ISO8859-1
-    #     #   to: ISO8859-1
-    #     flat: true
+    - name: Fetch CSV to local
+      ibm.ibm_zos_core.zos_fetch:
+        src: "{{izsam_csv_output}}"
+        dest: "{{ playbook_dir }}/izsam_detail.csv"
+        flat: true
+
+    - name: Send cert data to IBM Concert
+      ansible.builtin.shell: |
+          /usr/bin/curl -k --request POST --url http://{{ concert_hostname }}:{{ concert_port }}/izsam/receive_izsam_detail_data -F "file=@./izsam_detail.csv"
+      delegate_to: localhost
+      ignore_errors: true
 
     # - name: Send cert data to IBM Concert
     #   ansible.builtin.shell: |
