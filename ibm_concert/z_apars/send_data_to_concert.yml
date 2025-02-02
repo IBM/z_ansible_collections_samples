@@ -13,7 +13,7 @@
     zDLA_port: ''
     zDLA_token: ''
     izsam_jcl: ''
-    izsam_csv_output: ''
+    izsam_csv_dsn: ''
     concert_hostname: ''
     concert_port: ''
 
@@ -179,7 +179,7 @@
 
     - name: Fetch CSV to local
       ibm.ibm_zos_core.zos_fetch:
-        src: "{{izsam_csv_output}}"
+        src: "{{izsam_csv_dsn}}"
         dest: "{{ playbook_dir }}/izsam_detail.csv"
         flat: true
 
