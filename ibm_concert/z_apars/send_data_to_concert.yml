@@ -35,39 +35,15 @@
       register: zDiscovery_data
       delegate_to: localhost
 
-    # - ansible.builtin.debug:
-    #     var: zDiscovery_data.json
-
     - name: Get z Discovery detail
       ansible.builtin.include_tasks: build_zdiscovery_data.yml
       loop: "{{ zDiscovery_data.json }}"
-      # when:
-      #   - item.id is defined and ( item.id.startswith('TIVLP11-ZOS'))
-
 
     - name: Save z Discovery data into a JSON file
       ansible.builtin.copy:
         content: "{{ zDLA_list | to_nice_json }}"
         dest: "./zdiscovery_data.json"
       delegate_to: localhost
-
-    - name: Send cert data to IBM Concert
-      ansible.builtin.shell: |
-          /usr/bin/curl -k --request POST --url http://{{ concert_hostname }}:{{ concert_port }}/z_api/receive_zdiscovery_data -F "file=@./zdiscovery_data.json"
-      delegate_to: localhost
-      ignore_errors: true
-
-    # - name: Send cert data to IBM Concert
-    #   ansible.builtin.shell: |
-    #       /usr/bin/curl -k -X POST https://{{ zos_host }}/ingestion/api/v1/upload_files \
-    #           -H 'Content-Type: multipart/form-data' \
-    #           -H 'InstanceId: {{concert_instance_id}}' \
-    #           -H 'Accept: application/json' \
-    #           -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
-    #           -F 'data_type=certificate' \
-    #           -F 'filename=@{{ playbook_dir }}/{{ zDiscovery_data.json }}' \
-    #           -F 'metadata={"env_name" : "z/OS"}'
-    #   delegate_to: localhost
 
     #####################################################################################
     # PLAY #2: Retrieve all SW Instances                                                #
@@ -121,21 +97,6 @@
         dest: "./swi_collated.json"
       delegate_to: localhost
 
-    - name: Send cert data to IBM Concert
-      ansible.builtin.shell: |
-          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/swi -F "file=@./swi_collated.json"
-      delegate_to: localhost
-      ignore_errors: true
-
-          # /usr/bin/curl -k -X POST https://{{ zos_host }}/ingestion/api/v1/upload_files \
-          #     -H 'Content-Type: multipart/form-data' \
-          #     -H 'InstanceId: {{concert_instance_id}}' \
-          #     -H 'Accept: application/json' \
-          #     -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
-          #     -F 'data_type=certificate' \
-          #     -F 'filename=@{{ playbook_dir }}/{{ software_instance_name }}-MissingCriticalUpdatesReport.json' \
-          #     -F 'metadata={"env_name" : "z/OS"}'
-
     # #####################################################################################
     # # PLAY #4: Get zosmf system topology                                                #
     # #####################################################################################
@@ -164,12 +125,6 @@
         dest: "./resttopology.json"
       delegate_to: localhost
 
-    - name: Send cert data to IBM Concert
-      ansible.builtin.shell: |
-          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/resttopology/systems -F "file=@./resttopology.json"
-      delegate_to: localhost
-      ignore_errors: true
-
     #####################################################################################
     # PLAY #5: Get SW Usage report from IZSAM                                           #
     #####################################################################################
@@ -195,9 +150,13 @@
 
     - name: Send cert data to IBM Concert
       ansible.builtin.shell: |
-          /usr/bin/curl -k --request POST --url http://{{ concert_hostname }}:{{ concert_port }}/izsam/receive_izsam_detail_data -F "file=@./izsam_detail.csv"
+        /usr/bin/curl -X POST http://{{concert_hostname}}:{{concert_port}}/upload \
+            --form zosmf_swi=@swi_collated.json \
+            --form zdiscovery=@zdiscovery_data.json \
+            --form izsam=@izsam_detail.csv \
+            --form zosmf_resttopolgies=@resttopology.json
       delegate_to: localhost
-      ignore_errors: true
+      # ignore_errors: true
 
     # - name: Send cert data to IBM Concert
     #   ansible.builtin.shell: |
