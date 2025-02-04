@@ -1,8 +1,6 @@
 - name: Gather and send z topology and missing APARs to Concert
   hosts: all
   gather_facts: false
-  # collections:
-  #   - ibm.ibm_zosmf
   environment: "{{ environment_vars }}"
   vars:
     zmf_host: ''
@@ -20,6 +18,9 @@
     swilist: []
     collated_swi: {}
 
+    zDLA_list: []
+    collated_zDLA_node: {}
+
   tasks:
     #####################################################################################
     # PLAY #1: Retrieve z Discovery data                                                #
@@ -34,9 +35,19 @@
       register: zDiscovery_data
       delegate_to: localhost
 
+    # - ansible.builtin.debug:
+    #     var: zDiscovery_data.json
+
+    - name: Get z Discovery detail
+      ansible.builtin.include_tasks: build_zdiscovery_data.yml
+      loop: "{{ zDiscovery_data.json }}"
+      # when:
+      #   - item.id is defined and ( item.id.startswith('TIVLP11-ZOS'))
+
+
     - name: Save z Discovery data into a JSON file
       ansible.builtin.copy:
-        content: "{{ zDiscovery_data.json | to_nice_json }}"
+        content: "{{ zDLA_list | to_nice_json }}"
         dest: "./zdiscovery_data.json"
       delegate_to: localhost
 
@@ -89,9 +100,8 @@
     #####################################################################################
     # PLAY #3: Identify missing critical software updates for each SW Instance          #
     #####################################################################################
-      ignore_errors: true
     - name: Get MCU
-      ansible.builtin.include_tasks: build_collated_swi.yml
+      ansible.builtin.include_tasks: build_swi_collated.yml
       loop: "{{ swi_list }}"
       when:
         - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
@@ -113,7 +123,7 @@
 
     - name: Send cert data to IBM Concert
       ansible.builtin.shell: |
-          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/swi --form swi.json=@./swi_collated.json
+          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/swi -F "file=@./swi_collated.json"
       delegate_to: localhost
       ignore_errors: true
 
@@ -156,7 +166,7 @@
 
     - name: Send cert data to IBM Concert
       ansible.builtin.shell: |
-          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/resttopology/systems --form resttopology.json=@./resttopology.json
+          /usr/bin/curl -X POST http://{{ concert_hostname }}:{{ concert_port }}/zosmf/resttopology/systems -F "file=@./resttopology.json"
       delegate_to: localhost
       ignore_errors: true
 
