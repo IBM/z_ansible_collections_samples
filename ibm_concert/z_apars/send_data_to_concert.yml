@@ -22,6 +22,21 @@
     collated_zDLA_node: {}
 
   tasks:
+    - name: Locating all files in files dir
+      ansible.builtin.find:
+        path: "{{ playbook_dir }}/playbook_output/*"
+      register: cleanup
+      delegate_to: localhost
+      ignore_errors: true
+
+    - name: Removing all files previously found in files dir
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ cleanup.files }}"
+      delegate_to: localhost
+      ignore_errors: true
+
     #####################################################################################
     # PLAY #1: Retrieve z Discovery data                                                #
     #####################################################################################
@@ -42,7 +57,7 @@
     - name: Save z Discovery data into a JSON file
       ansible.builtin.copy:
         content: "{{ zDLA_list | to_nice_json }}"
-        dest: "./zdiscovery_data.json"
+        dest: "{{ playbook_dir }}/playbook_output/zdiscovery_data.json"
       delegate_to: localhost
 
     #####################################################################################
@@ -70,7 +85,7 @@
     - name: Save SWI to a json file
       ansible.builtin.copy:
         content: "{{ instance_data.json | to_nice_json }}"
-        dest: "./swi.json"
+        dest: "{{ playbook_dir }}/playbook_output/swi.json"
       delegate_to: localhost
 
     #####################################################################################
@@ -94,7 +109,7 @@
     - name: Save SWI to a json file
       ansible.builtin.copy:
         content: "{{ collated_swi | to_nice_json }}"
-        dest: "./swi_collated.json"
+        dest: "{{ playbook_dir }}/playbook_output/swi_collated.json"
       delegate_to: localhost
 
     # #####################################################################################
@@ -122,7 +137,7 @@
     - name: Save SWI to a json file
       ansible.builtin.copy:
         content: "{{ info | to_nice_json }}"
-        dest: "./resttopology.json"
+        dest: "{{ playbook_dir }}/playbook_output/resttopology.json"
       delegate_to: localhost
 
     #####################################################################################
@@ -145,16 +160,16 @@
     - name: Fetch CSV to local
       ibm.ibm_zos_core.zos_fetch:
         src: "{{izsam_csv_dsn}}"
-        dest: "{{ playbook_dir }}/izsam_detail.csv"
+        dest: "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
         flat: true
 
     - name: Send cert data to IBM Concert
       ansible.builtin.shell: |
         /usr/bin/curl -X POST http://{{concert_hostname}}:{{concert_port}}/upload \
-            --form zosmf_swi=@swi_collated.json \
-            --form zdiscovery=@zdiscovery_data.json \
-            --form izsam=@izsam_detail.csv \
-            --form zosmf_resttopolgies=@resttopology.json
+            --form zosmf_swi=@{{ playbook_dir }}/playbook_output/swi_collated.json \
+            --form zdiscovery=@{{ playbook_dir }}/playbook_output/@zdiscovery_data.json \
+            --form izsam=@{{ playbook_dir }}/playbook_outputizsam_detail.csv \
+            --form zosmf_resttopolgies=@{{ playbook_dir }}/playbook_output/resttopology.json
       delegate_to: localhost
       # ignore_errors: true
 
