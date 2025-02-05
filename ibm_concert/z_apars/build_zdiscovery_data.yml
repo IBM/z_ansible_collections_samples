@@ -34,12 +34,6 @@
           'system_info': zDiscovery_data_sys_info
           }) }}"
 
-# - ansible.builtin.debug:
-#     var: collated_zDLA_node
-
 - name: Transform node data
   ansible.builtin.set_fact:
       zDLA_list: "{{ zDLA_list | default([]) + [collated_zDLA_node] }}"
-
-# - ansible.builtin.debug:
-#     var: zDLA_list
