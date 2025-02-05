@@ -22,9 +22,9 @@
     collated_zDLA_node: {}
 
   tasks:
-    - name: Locating all files in files dir
+    - name: Locating all files in playbook_output directory
       ansible.builtin.find:
-        path: "{{ playbook_dir }}/playbook_output/*"
+        path: "{{ playbook_dir }}/playbook_output"
       register: cleanup
       delegate_to: localhost
       ignore_errors: true
@@ -166,10 +166,10 @@
     - name: Send cert data to IBM Concert
       ansible.builtin.shell: |
         /usr/bin/curl -X POST http://{{concert_hostname}}:{{concert_port}}/upload \
-            --form zosmf_swi=@{{ playbook_dir }}/playbook_output/swi_collated.json \
-            --form zdiscovery=@{{ playbook_dir }}/playbook_output/@zdiscovery_data.json \
-            --form izsam=@{{ playbook_dir }}/playbook_outputizsam_detail.csv \
-            --form zosmf_resttopolgies=@{{ playbook_dir }}/playbook_output/resttopology.json
+            --form zosmf_swi=@playbook_output/swi_collated.json \
+            --form zdiscovery=@playbook_output/zdiscovery_data.json \
+            --form izsam=@playbook_output/izsam_detail.csv \
+            --form zosmf_resttopolgies=@playbook_output/resttopology.json
       delegate_to: localhost
       # ignore_errors: true
 
