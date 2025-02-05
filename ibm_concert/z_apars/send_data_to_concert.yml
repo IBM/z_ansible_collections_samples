@@ -169,7 +169,7 @@
             --form zosmf_swi=@playbook_output/swi_collated.json \
             --form zdiscovery=@playbook_output/zdiscovery_data.json \
             --form izsam=@playbook_output/izsam_detail.csv \
-            --form zosmf_resttopolgies=@playbook_output/resttopology.json
+            --form zosmf_resttopology=@playbook_output/resttopology.json
       delegate_to: localhost
       # ignore_errors: true
 
