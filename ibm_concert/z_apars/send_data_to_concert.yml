@@ -29,7 +29,7 @@
       delegate_to: localhost
       ignore_errors: true
 
-    - name: Removing all files previously found in files dir
+    - name: Removing all files previously found in playbook_output dir
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: absent
