@@ -40,29 +40,6 @@
       ignore_errors: true
 
     #####################################################################################
-    # PLAY #1: Retrieve z Discovery data                                                #
-    #####################################################################################
-    # - name: Get zDLA Nodes
-    #   ansible.builtin.uri:
-    #     url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/instance/nodes?nodeType=ZOS"
-    #     method: GET
-    #     headers:
-    #       ApiToken: '{{ zDLA_token }}'
-    #     validate_certs: false
-    #   register: zDiscovery_data
-    #   delegate_to: localhost
-
-    # - name: Get z Discovery detail
-    #   ansible.builtin.include_tasks: build_zdiscovery_data.yml
-    #   loop: "{{ zDiscovery_data.json }}"
-
-    # - name: Save z Discovery data into a JSON file
-    #   ansible.builtin.copy:
-    #     content: "{{ zDLA_list | to_nice_json }}"
-    #     dest: "{{ playbook_dir }}/playbook_output/zdiscovery_data.json"
-    #   delegate_to: localhost
-
-    #####################################################################################
     # PLAY #2: Retrieve all SW Instances                                                #
     #####################################################################################
     - name: Get zosmf software instances
@@ -153,13 +130,6 @@
         wait_time_s: 30
       register: izsam_job_output
 
-    # - name: Get software usage data from IZSAM
-    #   ibm.ibm_zos_core.zos_job_submit:
-    #     src: '{{ playbook_dir }}/HSICANLZ.J2'
-    #     location: local
-    #     use_template: true
-    #   register: izsam_job_output
-
     - name: Fetch CSV to local
       ibm.ibm_zos_core.zos_fetch:
         src: "{{izsam_csv_dsn}}"
@@ -177,14 +147,3 @@
       delegate_to: localhost
       # ignore_errors: true
 
-    # - name: Send cert data to IBM Concert
-    #   ansible.builtin.shell: |
-    #       /usr/bin/curl -k -X POST https://{{ zos_host }}/ingestion/api/v1/upload_files \
-    #           -H 'Content-Type: multipart/form-data' \
-    #           -H 'InstanceId: {{concert_instance_id}}' \
-    #           -H 'Accept: application/json' \
-    #           -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
-    #           -F 'data_type=certificate' \
-    #           -F 'filename=@{{ playbook_dir }}/{{ izsam_usage.csv' \
-    #           -F 'metadata={"env_name" : "z/OS"}'
-    #   delegate_to: localhost
