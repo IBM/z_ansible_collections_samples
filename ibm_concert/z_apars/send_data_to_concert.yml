@@ -3,19 +3,19 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: tivlp11.pok.stglabs.ibm.com
-    zmf_port: 443
-    zmf_user: concert
-    zmf_password: tivmvs
-    zDLA_host: tvt1108.pok.stglabs.ibm.com
-    zDLA_port: 8888
-    zDLA_token: 098f6bcd4621d373cade4e832627b4f6
-    izsam_jcl: "IZSAM.V820.INST.REPDB1.JCLLIB(HSISANLB)"
-    izsam_csv_dsn: "SYSADM.IZSAMALZ.CSV"
-    concert_api_hostname: "9.30.213.45"
-    concert_api_port: "5000"
-    concert_url: 'https://c98238v1.fyre.ibm.com:12443'
-    concert_api_key: 'aWJtY29uY2VydDo0OTFlYjE5NC0yZjgwLTQ0OGQtOWQwMS02NjVmNDg4OTBiMDg='
+    zmf_host: ''
+    zmf_port: ''
+    zmf_user: ''
+    zmf_password: ''
+    zDLA_host: ''
+    zDLA_port: ''
+    zDLA_token: ''
+    izsam_jcl: ''
+    izsam_csv_dsn: ''
+    concert_api_hostname: ''
+    concert_api_port: ''
+    concert_url: ''
+    concert_ai_key: ''
 
     swilist: []
     collated_swi: {}
