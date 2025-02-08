@@ -3,17 +3,19 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: ''
-    zmf_port: ''
-    zmf_user: ''
-    zmf_password: ''
-    zDLA_host: ''
-    zDLA_port: ''
-    zDLA_token: ''
-    izsam_jcl: ''
-    izsam_csv_dsn: ''
-    concert_hostname: ''
-    concert_port: ''
+    zmf_host: tivlp11.pok.stglabs.ibm.com
+    zmf_port: 443
+    zmf_user: concert
+    zmf_password: tivmvs
+    zDLA_host: tvt1108.pok.stglabs.ibm.com
+    zDLA_port: 8888
+    zDLA_token: 098f6bcd4621d373cade4e832627b4f6
+    izsam_jcl: "IZSAM.V820.INST.REPDB1.JCLLIB(HSISANLB)"
+    izsam_csv_dsn: "SYSADM.IZSAMALZ.CSV"
+    concert_api_hostname: "9.30.213.45"
+    concert_api_port: "5000"
+    concert_url: 'https://c98238v1.fyre.ibm.com:12443'
+    concert_api_key: 'aWJtY29uY2VydDo0OTFlYjE5NC0yZjgwLTQ0OGQtOWQwMS02NjVmNDg4OTBiMDg='
 
     swilist: []
     collated_swi: {}
@@ -40,25 +42,25 @@
     #####################################################################################
     # PLAY #1: Retrieve z Discovery data                                                #
     #####################################################################################
-    - name: Get zDLA Nodes
-      ansible.builtin.uri:
-        url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/instance/nodes?nodeType=ZOS"
-        method: GET
-        headers:
-          ApiToken: '{{ zDLA_token }}'
-        validate_certs: false
-      register: zDiscovery_data
-      delegate_to: localhost
+    # - name: Get zDLA Nodes
+    #   ansible.builtin.uri:
+    #     url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/instance/nodes?nodeType=ZOS"
+    #     method: GET
+    #     headers:
+    #       ApiToken: '{{ zDLA_token }}'
+    #     validate_certs: false
+    #   register: zDiscovery_data
+    #   delegate_to: localhost
 
-    - name: Get z Discovery detail
-      ansible.builtin.include_tasks: build_zdiscovery_data.yml
-      loop: "{{ zDiscovery_data.json }}"
+    # - name: Get z Discovery detail
+    #   ansible.builtin.include_tasks: build_zdiscovery_data.yml
+    #   loop: "{{ zDiscovery_data.json }}"
 
-    - name: Save z Discovery data into a JSON file
-      ansible.builtin.copy:
-        content: "{{ zDLA_list | to_nice_json }}"
-        dest: "{{ playbook_dir }}/playbook_output/zdiscovery_data.json"
-      delegate_to: localhost
+    # - name: Save z Discovery data into a JSON file
+    #   ansible.builtin.copy:
+    #     content: "{{ zDLA_list | to_nice_json }}"
+    #     dest: "{{ playbook_dir }}/playbook_output/zdiscovery_data.json"
+    #   delegate_to: localhost
 
     #####################################################################################
     # PLAY #2: Retrieve all SW Instances                                                #
@@ -94,8 +96,9 @@
     - name: Get MCU
       ansible.builtin.include_tasks: build_swi_collated.yml
       loop: "{{ swi_list }}"
-      when:
-        - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
+      # when:
+      #   - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
+      ignore_errors: true
 
     - name: Update collated SWI
       ansible.builtin.set_fact:
@@ -165,11 +168,12 @@
 
     - name: Send cert data to IBM Concert
       ansible.builtin.shell: |
-        /usr/bin/curl -X POST http://{{concert_hostname}}:{{concert_port}}/upload \
-            --form zosmf_swi=@playbook_output/swi_collated.json \
-            --form zdiscovery=@playbook_output/zdiscovery_data.json \
-            --form izsam=@playbook_output/izsam_detail.csv \
-            --form zosmf_resttopology=@playbook_output/resttopology.json
+        /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload \
+            -F zosmf_swi=@playbook_output/swi_collated.json \
+            -F izsam=@playbook_output/izsam_detail.csv \
+            -F zosmf_resttopology=@playbook_output/resttopology.json \
+            -H 'Concert-API-Key: "{{ concert_api_key }}"' \
+            -H 'Concert-URL: "{{ concert_url }}"'
       delegate_to: localhost
       # ignore_errors: true
 
