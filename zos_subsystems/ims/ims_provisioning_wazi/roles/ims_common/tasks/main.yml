@@ -23,15 +23,9 @@
       when: ctl == "stop"
       ignore_errors: yes
 
-    - name: Wait for IMS ready
-      include_role:
-        name: submit-rexx
-        public: yes
-      vars:
-        rexx_name: 'WaitJob.j2'
-        max_rc: 0
-      ignore_errors: true
-      when: wait_for_job
+    - name: wait 10 seconds for IMS to start
+      ansible.builtin.shell: sleep 10
+      when: ctl == "start" and wait_for_job
 
     - name: IMS cold start
       ims_command:
