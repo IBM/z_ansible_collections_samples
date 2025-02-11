@@ -7,9 +7,6 @@
     zmf_port: ''
     zmf_user: ''
     zmf_password: ''
-    zDLA_host: ''
-    zDLA_port: ''
-    zDLA_token: ''
     izsam_jcl: ''
     izsam_csv_dsn: ''
     concert_api_hostname: ''
@@ -17,6 +14,9 @@
     concert_url: ''
     concert_ai_key: ''
 
+    fmid_list: []
+    fmid_entries: []
+    csi_info: {}
     swilist: []
     collated_swi: {}
 
@@ -40,7 +40,7 @@
       ignore_errors: true
 
     #####################################################################################
-    # PLAY #2: Retrieve all SW Instances                                                #
+    # PLAY #1: Retrieve all SW Instances                                                #
     #####################################################################################
     - name: Get zosmf software instances
       ansible.builtin.uri:
@@ -68,13 +68,14 @@
       delegate_to: localhost
 
     #####################################################################################
-    # PLAY #3: Identify missing critical software updates for each SW Instance          #
+    # PLAY #2: Identify missing critical software updates for each SW Instance          #
     #####################################################################################
     - name: Get MCU
       ansible.builtin.include_tasks: build_swi_collated.yml
       loop: "{{ swi_list }}"
       # when:
-      #   - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
+      #   - item.name is defined and ( item.name.startswith('NETVIEW_V6R3M0') )
+        # - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
       ignore_errors: true
 
     - name: Update collated SWI
@@ -83,9 +84,6 @@
                 'swilist': swilist
                 }) }}"
 
-    - ansible.builtin.debug:
-        var: collated_swi
-
     - name: Save SWI to a json file
       ansible.builtin.copy:
         content: "{{ collated_swi | to_nice_json }}"
@@ -93,7 +91,7 @@
       delegate_to: localhost
 
     # #####################################################################################
-    # # PLAY #4: Get zosmf system topology                                                #
+    # # PLAY #3: Get zosmf system topology                                                #
     # #####################################################################################
     - name: Get zosmf software instance detail
       ansible.builtin.uri:
@@ -121,7 +119,7 @@
       delegate_to: localhost
 
     #####################################################################################
-    # PLAY #5: Get SW Usage report from IZSAM                                           #
+    # PLAY #4: Get SW Usage report from IZSAM                                           #
     #####################################################################################
     - name: Submit JCL in a PDSE member
       ibm.ibm_zos_core.zos_job_submit:
