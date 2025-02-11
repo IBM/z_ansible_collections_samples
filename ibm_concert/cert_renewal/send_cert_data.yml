@@ -110,6 +110,7 @@
           vars:
             task_description: 'Displaying cert {{item.cert_label}}'
             role_cert: "{{item}}"
+            caller: 'send-data'
             tso_command:
               - RACDCERT ID({{ item.owner_id}}) LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
@@ -120,6 +121,7 @@
           vars:
             task_description: 'Displaying cert {{item.cert_label}}'
             role_cert: "{{item}}"
+            caller: 'send-data'
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
@@ -130,6 +132,7 @@
           vars:
             task_description: 'Querying cert {{item.cert_label}}'
             role_cert: "{{item}}"
+            caller: 'send-data'
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
@@ -163,7 +166,7 @@
                   -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
                   -F 'data_type=certificate' \
                   -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
-                  -F 'metadata={"env_name" : "prod"}'
+                  -F 'metadata={"env_name" : "z/OS"}'
           delegate_to: localhost
 
       always:
