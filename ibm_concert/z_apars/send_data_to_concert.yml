@@ -153,7 +153,7 @@
 
     - name: Send IZSAM data to IBM Concert
       ansible.builtin.shell: |
-        /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload/ \
+        /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload \
             -F zosmf_swi=@playbook_output/swi_collated.json \
             -F zosmf_resttopology=@playbook_output/resttopology.json \
             -F izsam=@playbook_output/izsam_detail.csv \
