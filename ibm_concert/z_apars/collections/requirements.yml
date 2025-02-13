@@ -9,5 +9,3 @@ collections:
     version: 4.1.0
   - name: community.general
     version: 9.4.0
-  - name: servicenow.itsm
-    version: 2.7.0
