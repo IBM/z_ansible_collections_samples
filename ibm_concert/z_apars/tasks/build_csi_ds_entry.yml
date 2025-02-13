@@ -1,0 +1,26 @@
+- name: Add FMID attribute
+  ansible.builtin.set_fact:
+    csi_fmid_entry: "{{ csi_fmid_entry | default({}) | combine ({
+          'FMID': fmid_number
+          }) }}"
+
+- name: Add pe_count attribute
+  ansible.builtin.set_fact:
+    csi_fmid_entry: "{{ csi_fmid_entry | default({}) | combine ({
+          'pe_count': inner_map_item.value
+          }) }}"
+  when: inner_map_item.key is search('-PE')
+
+- name: Add hiper_count attribute
+  ansible.builtin.set_fact:
+    csi_fmid_entry: "{{ csi_fmid_entry | default({}) | combine ({
+          'hiper_count': inner_map_item.value
+          }) }}"
+  when: inner_map_item.key is search('-HIPER')
+
+- name: Add secint_count attribute
+  ansible.builtin.set_fact:
+    csi_fmid_entry: "{{ csi_fmid_entry | default({}) | combine ({
+          'secint_count': inner_map_item.value
+          }) }}"
+  when: inner_map_item.key is search('-SECINT')
