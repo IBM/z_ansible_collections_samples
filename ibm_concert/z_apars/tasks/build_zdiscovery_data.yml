@@ -1,0 +1,39 @@
+- name: Transform node data
+  ansible.builtin.set_fact:
+      collated_zDLA_node: "{{ collated_zDLA_node | default({}) | combine ({
+          'node_id': item.id,
+          'node_info': item
+          }) }}"
+
+- name: Get zDLA software info
+  ansible.builtin.uri:
+    url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/simpleGraph??depth=1&direction=out&id={{ item.id }}"
+    method: GET
+    headers:
+      ApiToken: '{{ zDLA_token }}'
+    validate_certs: false
+  register: zDiscovery_data_sw_info
+  delegate_to: localhost
+
+- name: Get zDLA software info
+  ansible.builtin.uri:
+    url: "https://{{ zDLA_host }}:{{ zDLA_port }}/zrdds/api/v1/simpleGraph??depth=2&direction=in&id={{ item.id }}"
+    method: GET
+    headers:
+      ApiToken: '{{ zDLA_token }}'
+    validate_certs: false
+  register: zDiscovery_data_sys_info
+  delegate_to: localhost
+
+- name: Transform node data
+  ansible.builtin.set_fact:
+      collated_zDLA_node: "{{ collated_zDLA_node | default({}) | combine ({
+          'node_id': item.id,
+          'node_info': item,
+          'software_info': zDiscovery_data_sw_info,
+          'system_info': zDiscovery_data_sys_info
+          }) }}"
+
+- name: Transform node data
+  ansible.builtin.set_fact:
+      zDLA_list: "{{ zDLA_list | default([]) + [collated_zDLA_node] }}"
