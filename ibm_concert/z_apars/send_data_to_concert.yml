@@ -15,7 +15,9 @@
     concert_ai_key: ''
 
     fmid_list: []
+    fmid_fix_list: []
     fmid_entries: []
+    csi_fmid_entry: {}
     csi_info: {}
     swilist: []
     collated_swi: {}
@@ -68,14 +70,19 @@
       delegate_to: localhost
 
     #####################################################################################
-    # PLAY #2: Identify missing critical software updates for each SW Instance          #
+    # PLAY #2: Build collated data for each SW Instance                                 #
     #####################################################################################
-    - name: Get MCU
-      ansible.builtin.include_tasks: build_swi_collated.yml
+    - name: Build collated SWI list
+      ansible.builtin.include_tasks: tasks/build_swi_collated.yml
+      vars:
+        outer_var: "{{ outer_item }}"
       loop: "{{ swi_list }}"
-      # when:
-      #   - item.name is defined and ( item.name.startswith('NETVIEW_V6R3M0') )
-        # - item.name is defined and ( item.name.startswith('Db2_V13R1M0') or item.name.startswith('Db2_V12R1M0') )
+      loop_control:
+        loop_var: outer_item
+      no_log: true
+      when:
+        - outer_item.name is defined and not ( outer_item.name.startswith('ASF_V2R1M0') )
+        # - outer_item.name is defined and outer_item.name.startswith('Db2_V12R1M0')
       ignore_errors: true
 
     - name: Update collated SWI
@@ -84,7 +91,7 @@
                 'swilist': swilist
                 }) }}"
 
-    - name: Save SWI to a json file
+    - name: Save collated SWI to a json file
       ansible.builtin.copy:
         content: "{{ collated_swi | to_nice_json }}"
         dest: "{{ playbook_dir }}/playbook_output/swi_collated.json"
@@ -93,7 +100,7 @@
     # #####################################################################################
     # # PLAY #3: Get zosmf system topology                                                #
     # #####################################################################################
-    - name: Get zosmf software instance detail
+    - name: Get zosmf topology
       ansible.builtin.uri:
         url: "https://{{ zmf_host }}/zosmf/resttopology/systems"
         method: GET
@@ -112,11 +119,21 @@
     - ansible.builtin.set_fact:
         info: "{{zmf_topology_data.content}}"
 
-    - name: Save SWI to a json file
+    - name: Save zOSMF Topology to a json file
       ansible.builtin.copy:
         content: "{{ info | to_nice_json }}"
         dest: "{{ playbook_dir }}/playbook_output/resttopology.json"
       delegate_to: localhost
+
+
+    # - name: Send zOSMF data to IBM Concert
+    #   ansible.builtin.shell: |
+    #     /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload/zosmf/ \
+    #         -F zosmf_swi=@playbook_output/swi_collated.json \
+    #         -F zosmf_resttopology=@playbook_output/resttopology.json \
+    #         -H 'Concert-API-Key: "{{ concert_api_key }}"' \
+    #         -H 'Concert-URL: "{{ concert_url }}"'
+    #   delegate_to: localhost
 
     #####################################################################################
     # PLAY #4: Get SW Usage report from IZSAM                                           #
@@ -134,14 +151,12 @@
         dest: "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
         flat: true
 
-    - name: Send cert data to IBM Concert
+    - name: Send IZSAM data to IBM Concert
       ansible.builtin.shell: |
-        /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload \
+        /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload/ \
             -F zosmf_swi=@playbook_output/swi_collated.json \
-            -F izsam=@playbook_output/izsam_detail.csv \
             -F zosmf_resttopology=@playbook_output/resttopology.json \
+            -F izsam=@playbook_output/izsam_detail.csv \
             -H 'Concert-API-Key: "{{ concert_api_key }}"' \
             -H 'Concert-URL: "{{ concert_url }}"'
       delegate_to: localhost
-      # ignore_errors: true
-
