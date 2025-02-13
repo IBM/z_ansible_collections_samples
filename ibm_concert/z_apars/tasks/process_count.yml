@@ -1,0 +1,17 @@
+- name: Count items in a list
+  ansible.builtin.set_fact:
+    fmid_fix_map: "{{ fmid_fix_list | community.general.counter }}"
+
+- name: Build csi_ds entries for {{inner_unique_fmid_item}}
+  ansible.builtin.include_tasks: tasks/build_csi_ds_entry.yml
+  vars:
+    inner_map_item: "{{map_item}}"
+    fmid_number: "{{inner_unique_fmid_item}}"
+  with_dict: "{{fmid_fix_map}}"
+  loop_control:
+    loop_var: map_item
+  no_log: true
+
+- name: Add this csi_ds entries to list
+  ansible.builtin.set_fact:
+    fmid_entries: "{{ fmid_entries | default([]) + [csi_fmid_entry] }}"
