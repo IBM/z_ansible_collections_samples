@@ -24,6 +24,7 @@
     owner_id: ''
     cert_type: 'USER'  # defautl to USER
     cert_label: ''
+    cert_sn: ''
     sign_with: 'CERTAUTH' # blank or CERTAUTH
     keyring_name: ''
     expiry_date: '2025-12-31'
@@ -53,6 +54,9 @@
 
     - ansible.builtin.set_fact:
         cert_label: "{{desc_list2[ct_index|int + 2] | trim }}"
+
+    - ansible.builtin.set_fact:
+        cert_sn: "{{desc_list2[ct_index|int + 3] | trim }}"
 
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
@@ -99,7 +103,8 @@
             cert_args: "{{ cert_args | default({}) | combine ({
               'owner_id': arg_cert_type,
               'cert_type': cert_type,
-              'cert_label': cert_label
+              'cert_label': cert_label,
+              'cert_sn': cert_sn
               }) }}"
             owner_id: "{{arg_cert_type}}"
           when: cert_type == 'USER'
@@ -109,7 +114,8 @@
             cert_args: "{{ cert_args | default({}) | combine ({
               'owner_id': '',
               'cert_type': cert_type,
-              'cert_label': cert_label
+              'cert_label': cert_label,
+              'cert_sn': cert_sn
               }) }}"
           when: cert_type != 'USER'
 
@@ -129,6 +135,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT ID({{ cert_args.owner_id}}) LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'USER'
@@ -138,6 +145,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'CERTAUTH'
@@ -147,6 +155,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'SITE'
@@ -221,6 +230,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT ID({{ cert_args.owner_id}}) LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'USER'
@@ -230,6 +240,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'CERTAUTH'
@@ -239,6 +250,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'SITE'

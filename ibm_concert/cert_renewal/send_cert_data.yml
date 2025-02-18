@@ -110,6 +110,7 @@
           vars:
             task_description: 'Displaying cert {{item.cert_label}}'
             role_cert: "{{item}}"
+            caller: 'send-data'
             tso_command:
               - RACDCERT ID({{ item.owner_id}}) LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
@@ -120,6 +121,7 @@
           vars:
             task_description: 'Displaying cert {{item.cert_label}}'
             role_cert: "{{item}}"
+            caller: 'send-data'
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
@@ -130,6 +132,7 @@
           vars:
             task_description: 'Querying cert {{item.cert_label}}'
             role_cert: "{{item}}"
+            caller: 'send-data'
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"

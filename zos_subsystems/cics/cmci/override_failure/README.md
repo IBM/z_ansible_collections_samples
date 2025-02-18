@@ -41,7 +41,7 @@ ansible-galaxy collection install ibm.ibm_zos_cics
 ```
 
 For more information about the CMCI REST API, see the
-[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/5.6?topic=environment-cics-management-client-interface-cmci).
+[CMCI overview in the CICS TS documentation](https://www.ibm.com/docs/en/cics-ts/latest?topic=fundamentals-cics-management-client-interface-cmci).
 
 Because this playbook only uses the CMCI REST API, it can be run on the control
 node directly, without having to configure an inventory. Generally you'll be
