@@ -1,16 +1,11 @@
 - block:
     - name: Reset working variables
       ansible.builtin.set_fact:
-        fmid_list: []
         fmid_fix_list: []
-        fmid_entries: []
         csi_info: {}
-        csi_fmid_entry: {
-          FMID: '',
-          hiper_count: 0,
-          pe_count: 0,
-          secint_count: 0
-        }
+        csi_libs_entries: []
+        csi_unix_entries: []
+        csi_datasets: {}
 
     - name: Identify Missing Critical Software Updates for {{outer_var.name}}
       ansible.builtin.include_role:
@@ -50,9 +45,7 @@
       register: csi_data
       delegate_to: localhost
       ignore_errors: true
-  ignore_errors: true
 
-- block:
     - name: Retrieve zosmf CSI output
       ansible.builtin.uri:
         url: "{{ csi_data.json.statusurl}}"
@@ -68,11 +61,61 @@
         status_code: "200"
       register: csi_ds
       delegate_to: localhost
+
+    - name: Query zosmf CSI libraries for {{outer_var.name}}
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}/zosmf/swmgmt/swi/{{outer_var.swiuuid}}/datasets"
+        method: POST
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "202"
+      register: api_csi_datasets
+      delegate_to: localhost
       ignore_errors: true
+
+
+    - name: Retrieve zosmf CSI libraries
+      ansible.builtin.uri:
+        url: "{{ api_csi_datasets.json.statusurl}}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "200"
+      register: csi_libs
+      delegate_to: localhost
+
+  ignore_errors: true
+
+- block:
+    - name: Loop thru CSI managed datasets for {{outer_var.name}}
+      ansible.builtin.set_fact:
+        csi_libs_entries: "{{ csi_libs_entries| default([]) + [csi_libs_item.dsname] }}"
+      when: csi_libs.json.smpemanageddatasets is defined
+      loop: "{{ csi_libs.json.smpemanageddatasets}}"
+      loop_control:
+        label: "{{csi_libs_item.dsname}}"
+        loop_var: csi_libs_item
+      no_log: true
+
+    - name: Grab CSI managed unix datasets for {{outer_var.name}}
+      ansible.builtin.set_fact:
+        csi_unix_entries: "{{ csi_unix_entries| default([]) + csi_libs.json.smpemanagedunixdatasets[0].unixdirs }}"
+      when: csi_libs.json.smpemanagedunixdatasets[0].unixdirs is defined
 
     - name: Loop thru CSI APAR entries for {{outer_var.name}}
       ansible.builtin.set_fact:
-        fmid_list: "{{ fmid_list | default([]) + [csi_item.subentries[1].HOLDFMID[0]] }}"
         fmid_fix_list: "{{ fmid_fix_list | default([]) + [csi_item.subentries[1].HOLDFMID[0] + '-' + csi_item.subentries[0].HOLDCLASS[0]] }}"
       when: csi_item.subentries is defined
       loop: "{{ csi_ds.json.entries}}"
@@ -81,28 +124,8 @@
         loop_var: csi_item
       no_log: true
 
-    - name: Count items in a list
-      ansible.builtin.set_fact:
-        fmid_map: "{{ fmid_list | community.general.counter }}"
-
-    - name: Get unique FMID list
-      ansible.builtin.set_fact:
-        unique_fmid_list: "{{fmid_list | unique}}"
-
     - name: Count fix type for each FMID for {{outer_var.name}}
       ansible.builtin.include_tasks: tasks/process_count.yml
-      vars:
-        inner_unique_fmid_item: "{{unique_fmid_item}}"
-      loop: "{{unique_fmid_list}}"
-      loop_control:
-        loop_var: unique_fmid_item
-      no_log: true
-
-    - name: Build csi_ds for {{outer_var.name}}
-      ansible.builtin.set_fact:
-        csi_info: "{{ csi_info | default({}) | combine ({
-                'entries': fmid_entries
-                }) }}"
 
     - ansible.builtin.debug:
         var: csi_info
@@ -148,11 +171,18 @@
         info: "{{instance_data.content}}"
 
     - ansible.builtin.set_fact:
+        csi_datasets: "{{ csi_datasets | default({}) | combine ({
+          'library': csi_libs_entries,
+          'unix': csi_unix_entries
+          }) }}"
+
+    - ansible.builtin.set_fact:
         new_swi: "{{ outer_var | default({}) | combine ({
           'info': info,
           'mcu': mcu,
           'mfu': mfu,
-          'csi_ds': csi_info
+          'csi_ds': csi_info,
+          'datasets': csi_datasets
           }) }}"
 
     - ansible.builtin.set_fact:
