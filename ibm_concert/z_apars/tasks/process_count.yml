@@ -2,16 +2,31 @@
   ansible.builtin.set_fact:
     fmid_fix_map: "{{ fmid_fix_list | community.general.counter }}"
 
-- name: Build csi_ds entries for {{inner_unique_fmid_item}}
-  ansible.builtin.include_tasks: tasks/build_csi_ds_entry.yml
-  vars:
-    inner_map_item: "{{map_item}}"
-    fmid_number: "{{inner_unique_fmid_item}}"
-  with_dict: "{{fmid_fix_map}}"
-  loop_control:
-    loop_var: map_item
-  no_log: true
+- ansible.builtin.debug:
+    var: fmid_fix_map
 
-- name: Add this csi_ds entries to list
+- name: Convert fmid_fix_map to list of items
   ansible.builtin.set_fact:
-    fmid_entries: "{{ fmid_entries | default([]) + [csi_fmid_entry] }}"
+    items_list: "{{ fmid_fix_map | dict2items(key_name='key', value_name='value') }}"
+
+- name: Initialize FMID counts dictionary
+  ansible.builtin.set_fact:
+    fmid_counts: {}
+
+- name: Aggregate counts by FMID
+  ansible.builtin.set_fact:
+    fmid_counts: "{{ fmid_counts | combine({item_fmid: item_counts}, recursive=true) }}"
+  loop: "{{ items_list }}"
+  loop_control:
+    loop_var: process_item
+  vars:
+    item_split: "{{ process_item.key.split('-') }}"
+    item_fmid: "{{ item_split[0] }}"
+    item_type: "{{ item_split[1] | lower }}"
+    current_counts: "{{ fmid_counts.get(item_fmid, {'hiper_count': 0, 'pe_count': 0, 'secint_count': 0}) }}"
+    item_counts: "{{ current_counts | combine({item_type ~ '_count': process_item.value}) }}"
+
+- name: Create final entries structure
+  ansible.builtin.set_fact:
+    csi_info:
+      entries: "{{ fmid_counts | dict2items | json_query('[].{FMID: key, hiper_count: value.hiper_count, pe_count: value.pe_count, secint_count: value.secint_count}') }}"
