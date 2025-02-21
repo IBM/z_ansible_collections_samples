@@ -3,7 +3,6 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: ''
     zmf_port: ''
     zmf_user: ''
     zmf_password: ''
@@ -14,11 +13,12 @@
     concert_url: ''
     concert_ai_key: ''
 
-    fmid_list: []
     fmid_fix_list: []
-    fmid_entries: []
     csi_fmid_entry: {}
     csi_info: {}
+    csi_libs_entries: []
+    csi_unix_entries: []
+    csi_datasets: {}
     swilist: []
     collated_swi: {}
 
@@ -82,7 +82,9 @@
       no_log: true
       when:
         - outer_item.name is defined and not ( outer_item.name.startswith('ASF_V2R1M0') )
+        # - outer_item.name is defined and outer_item.name.startswith('SA_V4R3M0')
         # - outer_item.name is defined and outer_item.name.startswith('Db2_V12R1M0')
+        # - outer_item.name is defined and outer_item.name.startswith('Db2_V13R1M0')
       ignore_errors: true
 
     - name: Update collated SWI
