@@ -3,15 +3,20 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
+    zmf_host: ''
     zmf_port: ''
     zmf_user: ''
     zmf_password: ''
     izsam_jcl: ''
     izsam_csv_dsn: ''
-    concert_api_hostname: ''
-    concert_api_port: ''
     concert_url: ''
+    concert_port: ''
     concert_ai_key: ''
+    concert_drupal_key: ''
+    concert_api_token: ''
+    concert_instance_id: ''
+    concert_user: ''
+    concert_password: ''
 
     fmid_fix_list: []
     csi_fmid_entry: {}
@@ -127,16 +132,6 @@
         dest: "{{ playbook_dir }}/playbook_output/resttopology.json"
       delegate_to: localhost
 
-
-    # - name: Send zOSMF data to IBM Concert
-    #   ansible.builtin.shell: |
-    #     /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload/zosmf/ \
-    #         -F zosmf_swi=@playbook_output/swi_collated.json \
-    #         -F zosmf_resttopology=@playbook_output/resttopology.json \
-    #         -H 'Concert-API-Key: "{{ concert_api_key }}"' \
-    #         -H 'Concert-URL: "{{ concert_url }}"'
-    #   delegate_to: localhost
-
     #####################################################################################
     # PLAY #4: Get SW Usage report from IZSAM                                           #
     #####################################################################################
@@ -153,12 +148,34 @@
         dest: "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
         flat: true
 
-    - name: Send IZSAM data to IBM Concert
+    - name: Get Bearer token
       ansible.builtin.shell: |
-        /usr/bin/curl -k -X POST http://{{concert_api_hostname}}:{{concert_api_port}}/upload \
-            -F zosmf_swi=@playbook_output/swi_collated.json \
-            -F zosmf_resttopology=@playbook_output/resttopology.json \
-            -F izsam=@playbook_output/izsam_detail.csv \
-            -H 'Concert-API-Key: "{{ concert_api_key }}"' \
-            -H 'Concert-URL: "{{ concert_url }}"'
+        /usr/bin/curl -k -X POST 'https://{{concert_url}}:{{concert_port}}/core/api/v1/login' \ 
+        -H 'accept: application/json' \
+        -H 'InstanceId: {{ concert_instance_id }}' \
+        -H 'Content-Type: application/json' \
+        -d '{"password": "{{concert_password }}" , "username": "{{ concert_user }}"}' 
+      register: login_output
+      delegate_to: localhost
+
+    - name: Ensure the variable is a dictionary
+      ansible.builtin.set_fact:
+        login_output_json: "{{ login_output.stdout_lines[0]}}"
+
+    - name: Set Concert API Token
+      ansible.builtin.set_fact:
+        concert_api_token : "{{ login_output_json.token }}"
+
+    - name: Send z APAR data to IBM Concert
+      ansible.builtin.shell: |
+        /usr/bin/curl -X POST -ki 'https://{{concert_url}}:{{concert_port}}/grader/api/v1/zsys/upload' \
+        -F 'files=@playbook_output/izsam_detail.csv'  \
+        -F 'files=@playbook_output/resttopology.json' \
+        -F 'files=@playbook_output/swi_collated.json' \
+        -H 'Concert-API-Key: {{concert_api_key}}' \
+        -H 'Drupal-API-Key: {{ concert_drupal_key }}' \
+        -H 'Authorization: Bearer {{ concert_api_token }}' \
+        -H 'Concert-URL: 'https://{{concert_url}}:{{concert_port}}/ \
+        -H 'InstanceId: {{ concert_instance_id }}' \
+        -H 'Concert-Application-Name: z_apar' 
       delegate_to: localhost
