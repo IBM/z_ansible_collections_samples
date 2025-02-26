@@ -11,5 +11,5 @@
 source_system:
   hosts:
     zos_host:
-      ansible_host: share.centers.ihost.com
-      ansible_user: alicia
+      ansible_host: your_zos_hostname
+      ansible_user: zos_userid
