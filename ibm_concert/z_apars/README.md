@@ -36,7 +36,7 @@ Review the required inputs to each playbooks to set up Surveys on AAP so the job
 
 - Set up an AAP [schedule](https://docs.ansible.com/automation-controller/latest/html/userguide/scheduling.html) to send cert data to IBM Concert on a regular basis
 - Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert
-- The following survey is needed:
+- A survey is needed for the following playbook variables:
   ```
   zmf_host: ''
   zmf_port: ''
@@ -44,10 +44,14 @@ Review the required inputs to each playbooks to set up Surveys on AAP so the job
   zmf_password: ''
   izsam_jcl: ''
   izsam_csv_dsn: ''
-  concert_api_hostname: ''
-  concert_api_port: ''
   concert_url: ''
+  concert_port: ''
   concert_ai_key: ''
+  concert_drupal_key: ''
+  concert_api_token: ''
+  concert_instance_id: ''
+  concert_user: ''
+  concert_password: ''
   ```
 
 # Changelog
