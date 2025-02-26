@@ -23,8 +23,3 @@ ZOAU: "path_to_zoau"
 # variable`ansible_python_interpreter`
 ################################################################################
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
-
-# varibles for templates
-JOB_CARD: |-
-  //HSISANLB JOB ,'IZSAM Analyz-Batch',REGION=0M,
-  // CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
