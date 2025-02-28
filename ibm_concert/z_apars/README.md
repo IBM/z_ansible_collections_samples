@@ -1,6 +1,6 @@
 # Collect z/OS Software instances Topology, Usage, and missing fixes 
 
-These sample playbooks when used with IBM z/OS Management Facility (zOSMF), IBM Z Software Asset Management (IZSAM), IBM Concert, and Ansible Automation Platform (AAP) can simplify the monitoring and resolution of z/OS Software maintenance planning and execution.
+These sample playbooks when used with IBM z/OS Management Facility (zOSMF), IBM Z Software Asset Management (IZSAM), IBM Concert, and Ansible Automation Platform (AAP) can simplify the monitoring and resolution of z/OS Software maintenance, planning, and deployment.
 
 It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
@@ -25,7 +25,7 @@ These playbooks use:
 [**send_data_to_concert.yml**](send_data_to_concert.yml) this playbook will query z/OSMF reports, IZSAM data and send them to an IBM Concert instance for visualization and management.
 
 ## Tasks Summary
-- [**buid_swi_collated**](build_swi_collated.yml) - Retrieve z/OS topology of software instances and their missing updates and CSI dataset information from zOSMF
+- [**build_swi_collated**](build_swi_collated.yml) - Retrieve z/OS topology of software instances and their missing updates and CSI dataset information from zOSMF
 - [**process_count**](process_count.yml) - Aggregate applied critical fixes for each FMID
 
 ## Set up job templates on Ansible Automation Platform
