@@ -22,7 +22,7 @@ These playbooks use:
         version: 9.4.0
 
 ## Playbooks
-[**send_data_to_concert.yml**](send_data_to_concert.yml) this playbook will query z/OSMF reports, IZSAM data and send them to an IBM Concert instance for visualization and management.
+[**send_data_to_concert.yml**](send_data_to_concert.yml) - This playbook will query z/OSMF reports, IZSAM data and send them to an IBM Concert instance for visualization and management.
 
 ## Tasks Summary
 - [**build_swi_collated**](build_swi_collated.yml) - Retrieve z/OS topology of software instances and their missing updates and CSI dataset information from zOSMF
@@ -31,12 +31,10 @@ These playbooks use:
 ## Set up job templates on Ansible Automation Platform
 These playbooks are designed to be used with Ansible Automation Platform (AAP) job templates. The information in the `host_vars` can be used to set up Inventory and Hosts on AAP.
 
-Review the required inputs to each playbooks to set up Surveys on AAP so the job runs correctly.
+Here are the set up steps:
+- Build an [Execution Environment](execution-environments) using the sample files provided 
 
-
-- Set up an AAP [schedule](https://docs.ansible.com/automation-controller/latest/html/userguide/scheduling.html) to send cert data to IBM Concert on a regular basis
-- Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert
-- A survey is needed for the following playbook variables:
+- Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert. A survey is needed for the following playbook variables:
   ```
   zmf_host: ''
   zmf_port: ''
@@ -46,14 +44,10 @@ Review the required inputs to each playbooks to set up Surveys on AAP so the job
   izsam_csv_dsn: ''
   concert_url: ''
   concert_port: ''
-  concert_ai_key: ''
-  concert_drupal_key: ''
   concert_api_token: ''
   concert_instance_id: ''
-  concert_user: ''
-  concert_password: ''
   ```
-
+- Set up an AAP [schedule](https://docs.ansible.com/automation-controller/latest/html/userguide/scheduling.html) to send cert data to IBM Concert on a regular basis
 # Changelog
 All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
