@@ -1,9 +1,13 @@
 ---
 # inventory.yml file for the sample playbooks of the IBM Z HMC Collection
 
-# The HMC inventory the sample playbooks will use:
-my_hmc_list:
+default:  # A group nickname
+
   hosts:
-    myhmc13:  # must match the key name in the vault file
+
+    myhmc13:  # An HMC nickname (must match the nickname in the vault file)
       ansible_host: 10.11.12.13
-      ansible_connection: local  # defaults connection=local for this host on all playbook tasks
+
+    # ... more HMC entries for this group, as needed
+
+# ... more groups, as needed
