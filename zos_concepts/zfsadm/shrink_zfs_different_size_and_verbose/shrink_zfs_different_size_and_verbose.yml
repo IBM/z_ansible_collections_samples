@@ -3,9 +3,9 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to create a new Generation Data Group(GDG),
-# add text content to a Generation Data Set(GDS), copy to another
-# Generation Data Group(GDG), edit the copy and fetch the content.
+# This sample playbook demonstrates how create a zfs aggregate, mount a zfs
+# aggregate shrink the zfs aggregate with a size on megabytes and shrink a zfs
+# aggregate on kilobytes with verbose mode to get the full trace back.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
