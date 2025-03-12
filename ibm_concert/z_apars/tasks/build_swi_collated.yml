@@ -1,0 +1,193 @@
+- block:
+    - name: Reset working variables
+      ansible.builtin.set_fact:
+        fmid_fix_list: []
+        csi_info: {}
+        csi_libs_entries: []
+        csi_unix_entries: []
+        csi_datasets: {}
+
+    - name: Identify Missing Critical Software Updates for {{outer_var.name}}
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swmgmt_identify_missing_critical_updates
+      vars:
+        software_instance_name: '{{ outer_var.name }}'
+        system_nickname: '{{outer_var.system}}'
+        missing_critical_updates_response_file: '{{ playbook_dir }}/playbook_output/{{ software_instance_name }}-MissingCriticalUpdatesReport.json'
+
+    - name: Identify Missing Critical Software Updates for {{outer_var.name}}
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swmgmt_identify_missing_fixcat_updates
+      vars:
+        software_instance_name: '{{ outer_var.name }}'
+        system_nickname: '{{outer_var.system}}'
+        missing_fixcat_updates_response_file: '{{ playbook_dir }}/playbook_output/{{ software_instance_name }}-MissingFixcatUpdatesReport.json'
+
+    - name: Query zosmf CSI HOLDDATA for {{outer_var.name}}
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}/zosmf/swmgmt/swi/{{outer_var.swiuuid}}/csiquery"
+        method: POST
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          zones: ["GLOBAL"]
+          entries: ["HOLDDATA"]
+          subentries: ["HOLDFMID", "HOLDREASON", "HOLDCLASS"]
+          filter: "HOLDTYPE='ERROR' & (HOLDCLASS='HIPER' | HOLDCLASS='PE' | HOLDCLASS='SECINT')"
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "202"
+      register: csi_data
+      delegate_to: localhost
+      ignore_errors: true
+
+    - name: Retrieve zosmf CSI output
+      ansible.builtin.uri:
+        url: "{{ csi_data.json.statusurl}}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "200"
+      register: csi_ds
+      delegate_to: localhost
+
+    - name: Query zosmf CSI libraries for {{outer_var.name}}
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}/zosmf/swmgmt/swi/{{outer_var.swiuuid}}/datasets"
+        method: POST
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "202"
+      register: api_csi_datasets
+      delegate_to: localhost
+      ignore_errors: true
+
+
+    - name: Retrieve zosmf CSI libraries
+      ansible.builtin.uri:
+        url: "{{ api_csi_datasets.json.statusurl}}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "200"
+      register: csi_libs
+      delegate_to: localhost
+
+  ignore_errors: true
+
+- block:
+    - name: Loop thru CSI managed datasets for {{outer_var.name}}
+      ansible.builtin.set_fact:
+        csi_libs_entries: "{{ csi_libs_entries| default([]) + [csi_libs_item.dsname] }}"
+      when: csi_libs.json.smpemanageddatasets is defined
+      loop: "{{ csi_libs.json.smpemanageddatasets}}"
+      loop_control:
+        label: "{{csi_libs_item.dsname}}"
+        loop_var: csi_libs_item
+      no_log: true
+
+    - name: Grab CSI managed unix datasets for {{outer_var.name}}
+      ansible.builtin.set_fact:
+        csi_unix_entries: "{{ csi_unix_entries| default([]) + csi_libs.json.smpemanagedunixdatasets[0].unixdirs }}"
+      when: csi_libs.json.smpemanagedunixdatasets[0].unixdirs is defined
+
+    - name: Loop thru CSI APAR entries for {{outer_var.name}}
+      ansible.builtin.set_fact:
+        fmid_fix_list: "{{ fmid_fix_list | default([]) + [csi_item.subentries[1].HOLDFMID[0] + '-' + csi_item.subentries[0].HOLDCLASS[0]] }}"
+      when: csi_item.subentries is defined
+      loop: "{{ csi_ds.json.entries}}"
+      loop_control:
+        label: "{{csi_item.entryname}}"
+        loop_var: csi_item
+      no_log: true
+
+    - name: Count fix type for each FMID for {{outer_var.name}}
+      ansible.builtin.include_tasks: tasks/process_count.yml
+
+    - ansible.builtin.debug:
+        var: csi_info
+
+    # Assisted by watsonx Code Assistant
+    - name: Read json file
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/playbook_output/{{ outer_var.name }}-MissingCriticalUpdatesReport.json"
+      register: mcu_file_content
+      delegate_to: localhost
+
+    # Assisted by watsonx Code Assistant
+    - name: Read json file
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/playbook_output/{{ outer_var.name }}-MissingFixcatUpdatesReport.json"
+      register: mfu_file_content
+      delegate_to: localhost
+
+    - name: Save content in a variable
+      ansible.builtin.set_fact:
+        mcu: "{{ mcu_file_content['content'] | b64decode | from_json }}"
+        mfu: "{{ mfu_file_content['content'] | b64decode | from_json }}"
+
+    - name: Get zosmf software instance detail
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}/zosmf/swmgmt/swi/{{outer_var.swiuuid}}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: instance_data
+      delegate_to: localhost
+
+    - ansible.builtin.set_fact:
+        info: "{{instance_data.content}}"
+
+    - ansible.builtin.set_fact:
+        csi_datasets: "{{ csi_datasets | default({}) | combine ({
+          'library': csi_libs_entries,
+          'unix': csi_unix_entries
+          }) }}"
+
+    - ansible.builtin.set_fact:
+        new_swi: "{{ outer_var | default({}) | combine ({
+          'info': info,
+          'mcu': mcu,
+          'mfu': mfu,
+          'csi_ds': csi_info,
+          'datasets': csi_datasets
+          }) }}"
+
+    - ansible.builtin.set_fact:
+        swilist: '{{ swilist | default([]) + [new_swi] }}'
+
+    - name: Update collated SWI for {{outer_var.name}}
+      ansible.builtin.set_fact:
+        collated_swi: "{{ collated_swi | default({}) | combine ({
+                'swilist': new_swi
+                }) }}"
