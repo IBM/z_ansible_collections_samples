@@ -114,7 +114,7 @@ often repeated and in need of automation.
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
   - [Security provision](zos_management/zosmf_security_configuration_assistant)
-  - [Shrink on different size and see full verbose](zos_concepts/zfsadm/shrink_zfs_different_size_and_verbose)
+  - [Shrink ZFS and see full verbose](zos_concepts/zfsadm/shrink_zfs_different_size_and_verbose)
 
 
 ## Blogs
