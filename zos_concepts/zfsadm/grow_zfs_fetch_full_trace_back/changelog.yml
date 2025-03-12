@@ -1,0 +1,33 @@
+################################################################################
+# Copyright (c) IBM Corporation 2025
+#
+# All notable changes to this project will be documented in this file. Following
+# releases is a decimal based date since playbooks have no version in this
+# repository.
+#
+# releases:
+#     2025.01.06:
+#         date: 2025-01-06
+#         changes:
+#             added:
+#                 - new features are added
+#             deprecated:
+#                 - features being removed in the future
+#             fixed:
+#                 - bug fixes
+#             minor:
+#                 - changes in existing functionality
+#             removed:
+#                 - features removed no longer available
+#             security:
+#                 - vulnerabilities fixed
+#             summary:
+#                 - summary of changes or link to Git issue, pull request
+################################################################################
+
+releases:
+    2025.03.24:
+        date: 2025-03-24
+        changes:
+            added:
+                - Released initial version
