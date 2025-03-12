@@ -66,7 +66,7 @@ often repeated and in need of automation.
   - [Dump, Archive, Fetch, Copy and Unarchive Data Sets](zos_concepts/data_transfer/archive_copy_unarchive_restore)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
-  - [Grow ZFS fetch full trace back](zos_concepts/zfsadm/grow_zfs_fetch_full_trace_back)
+  - [Grow ZFS fetch and full trace back](zos_concepts/zfsadm/grow_zfs_fetch_full_trace_back)
   - [Copy templates to z/OS](zos_concepts/templates/copy_template)
   - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
   - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
