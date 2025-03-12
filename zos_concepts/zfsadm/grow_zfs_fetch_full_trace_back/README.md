@@ -55,7 +55,7 @@ All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
-© Copyright IBM Corporation 2022
+© Copyright IBM Corporation 2025
 
 # License
 Licensed under [Apache License,
