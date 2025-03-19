@@ -3,9 +3,9 @@
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how create a zfs aggregate, mount a zfs
-# aggregate shrink the zfs aggregate with a size on megabytes and shrink a zfs
-# aggregate on kilobytes with verbose mode to get the full trace back.
+# This sample playbook demonstrates how to create a zFS aggregate, mount it,
+# shrink it with different size options,
+# and use the module's verbose mode to get the full trace back.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -48,17 +48,17 @@
     # Modules: zos_data_set, zos_zfs_resize
     # ##########################################################################
     # +-------------------------------------------------------------------------
-    # | - Using zos_data_set, create zfs data set {{ zfs_data_set }}.
-    # | - Using zos_mount, mount zfs {{ zfs_data_set }} on {{ mount_point }}.
-    # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }} on m size.
+    # | - Using zos_data_set, create zFS data set {{ zfs_data_set }}.
+    # | - Using zos_mount, mount zFS {{ zfs_data_set }} on {{ mount_point }}.
+    # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }} using the space_type option with m.
     # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }}.
     # +-------------------------------------------------------------------------
 
     # ##########################################################################
-    # Create and Mount ZFS data set.
+    # Create and mount zFS data set.
     # ##########################################################################
 
-    - name: "Create ZFS."
+    - name: "Create zFS."
       zos_data_set:
         name: "{{ zfs_data_set }}"
         type: zfs
@@ -71,7 +71,7 @@
         path: "{{ mount_point }}"
         state: directory
 
-    - name: "Mount ZFS data set."
+    - name: "Mount zFS data set."
       zos_mount:
         src: "{{ zfs_data_set | upper }}"
         path: "{{ mount_point }}"
@@ -87,18 +87,18 @@
         msg: "{{ df_output.stdout_lines }}"
 
     # ##########################################################################
-    # Fill up ZFS aggregate with random data.
+    # Fill up zFS aggregate with random data.
     # ##########################################################################
 
-    - name: "Write 1 million bytes to ZFS."
+    - name: "Write 1 million bytes to zFS."
       shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
 
     # ##########################################################################
-    # Shrink ZFS aggregate on tracks size.
-    # Shrink ZFS aggregate with verbose mode.
+    # Shrink zFS aggregate by changing its number of tracks.
+    # Shrink zFS aggregate with verbose mode enabled.
     # ##########################################################################
 
-    - name: "Shrink ZFS aggregate data set {{ zfs_data_set }} on track size."
+    - name: "Shrink zFS aggregate data set {{ zfs_data_set }} on track size."
       zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size_on_m }}"
@@ -109,7 +109,7 @@
       debug:
         msg: "{{ shrink_output }}"
 
-    - name: "Shrink ZFS aggregate data set {{ zfs_data_set }} and verbose mode."
+    - name: "Shrink zFS aggregate data set {{ zfs_data_set }} and enable verbose mode."
       zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size }}"
@@ -121,13 +121,13 @@
         msg: "{{ shrink_output }}"
 
     # ##########################################################################
-    # clean up - unmount and delete ZFS data sets
+    # clean up - unmount and delete zFS data sets
     # ##########################################################################
 
-    - name: Unmount ZFS data set.
+    - name: Unmount zFS data set.
       command: "/usr/sbin/unmount {{ mount_point }}"
 
-    - name: Delete ZFS data set.
+    - name: Delete zFS data set.
       zos_data_set:
         name: "{{ zfs_data_set }}"
         state: absent

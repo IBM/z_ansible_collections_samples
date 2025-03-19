@@ -1,5 +1,5 @@
-# Create, shrink ZFS aggregate with different size and see verbose.
-This playbook demonstrates how to grow a ZFS aggregate on z/OS using Red Hat
+# Create and shrink a zFS aggregate with different sizes and see verbose output.
+This playbook demonstrates how to grow a zFS aggregate on z/OS using Red Hat
 Ansible Certified Content for IBM Z.
 
 This playbook uses:

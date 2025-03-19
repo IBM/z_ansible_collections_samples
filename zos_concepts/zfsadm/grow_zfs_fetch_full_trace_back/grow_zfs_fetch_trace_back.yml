@@ -34,7 +34,7 @@
 
   tasks:
     # ##########################################################################
-    # Generate a temporary data set names
+    # Generate temporary data set names
     # ##########################################################################
     - name: Create temp data set name
       command: "mvstmp {{ ansible_user | upper }}"
@@ -53,19 +53,19 @@
     # Modules: zos_data_set, zos_zfs_resize, zos_fetch
     # ##########################################################################
     # +-------------------------------------------------------------------------
-    # | - Using zos_data_set, create zfs data set {{ zfs_data_set }}.
-    # | - Using zos_mount, mount zfs {{ zfs_data_set }} on {{ mount_point }}.
-    # | - Using zos_data_set, create pds data set to generate a member.
-    # | - Using zos_data_set, create a member to get the full trace back.
+    # | - Using zos_data_set, create zFS data set {{ zfs_data_set }}.
+    # | - Using zos_mount, mount zFS {{ zfs_data_set }} on {{ mount_point }}.
+    # | - Using zos_data_set, create a PDSE.
+    # | - Using zos_data_set, create a member in the PDSE to get the full trace back.
     # | - Using zos_zfs_resize, resize data set {{ zfs_data_set }}.
     # | - Using zos_fetch, to fetch the trace back member of the grow operation.
     # +-------------------------------------------------------------------------
 
     # ##########################################################################
-    # Create and Mount ZFS data set.
+    # Create and mount zFS data set.
     # ##########################################################################
 
-    - name: "Create ZFS."
+    - name: "Create zFS."
       zos_data_set:
         name: "{{ zfs_data_set }}"
         type: zfs
@@ -78,7 +78,7 @@
         path: "{{ mount_point }}"
         state: directory
 
-    - name: "Mount ZFS data set."
+    - name: "Mount zFS data set."
       zos_mount:
         src: "{{ zfs_data_set | upper }}"
         path: "{{ mount_point }}"
@@ -94,10 +94,10 @@
         msg: "{{ df_output.stdout_lines }}"
 
     # ##########################################################################
-    # Create PDS data set and member for get the full trace back.
+    # Create PDSE and member for the full trace back.
     # ##########################################################################
 
-    - name: "Create data set to trace."
+    - name: "Create data set that will contain the trace back."
       zos_data_set:
         name: "{{ trace_back_data_set }}"
         record_length: 400
@@ -106,25 +106,25 @@
         space_type: k
         space_primary: 42000
 
-    - name: "Create member of data set to trace."
+    - name: "Create member for the trace."
       zos_data_set:
         name: "{{ trace_back_data_set_mem }}"
         type: member
 
     # ##########################################################################
-    # Fill up ZFS aggregate with random data.
+    # Fill up zFS aggregate with random data.
     # ##########################################################################
 
-    - name: "Write 1 million bytes to ZFS."
+    - name: "Write 1 million bytes to zFS."
       shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
 
     # ##########################################################################
-    # Grow ZFS aggregate.
+    # Grow zFS aggregate.
     # See the full stdout.
     # Fetch the full trace back
     # ##########################################################################
 
-    - name: "Grow ZFS aggregate and get trace back on data set {{ trace_back_data_set }}."
+    - name: "Grow zFS aggregate and get trace back on data set {{ trace_back_data_set }}."
       zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_growth_size }}"
@@ -149,10 +149,10 @@
     # clean up - unmount and delete ZFS data sets
     # ##########################################################################
 
-    - name: Unmount ZFS data set.
+    - name: Unmount zFS data set.
       command: "/usr/sbin/unmount {{ mount_point }}"
 
-    - name: Delete ZFS data set.
+    - name: Delete zFS data set.
       zos_data_set:
         name: "{{ zfs_data_set }}"
         state: absent
