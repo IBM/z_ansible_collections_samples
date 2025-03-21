@@ -43,22 +43,21 @@
 
     ##############################################################################
     # This first block shows examples of the output given by zos_stat when
-    # querying different types of data sets.
+    # querying data sets.
     # The tasks will allocate temporary data sets in the managed node and then
     # get their attributes with zos_stat. The tasks will allocate a sequential
-    # data set, a partitioned extended one, and a KSDS.
+    # data set on a single volumes and then another on multiple volumes.
     # Additionally, the tasks will highlight how zos_stat can query data sets
-    # when the volumes option isn't present, or when we need to get the
-    # information of a multi-volume data set.
+    # when the volumes option isn't present.
     ##############################################################################
-    - name: Query different types of data sets.
+    - name: Query different data sets.
       tags: data_set
       block:
         - name: Create a temporary data set name.
           command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
 
-        - name: Setting fact `data_set_name` for use by this sample.
+        - name: Setting fact `seq_data_set_name` for use by this sample.
           set_fact:
             seq_data_set_name: "{{ tmp_ds.stdout }}"
 
@@ -84,8 +83,41 @@
           ansible.builtin.debug:
             msg: "{{ seq_data_set_stat }}"
 
+        - name: Create a temporary data set name for a multi-volume data set.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `multi_vol_data_set_name` for use by this sample.
+          set_fact:
+            multi_vol_data_set_name: "{{ tmp_ds.stdout }}"
+
+        - name: Allocate temporary sequential data set on multiple volumes.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ multi_vol_data_set_name }}"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fba
+            record_length: 60
+            volumes: "{{ available_volumes }}"
+
+        - name: "Query {{ multi_vol_data_set_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ multi_vol_data_set_name }}"
+            type: data_set
+            volumes: "{{ available_volumes }}"
+          register: multi_vol_data_set_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ multi_vol_data_set_stat }}"
+
         - name: Remove temporary data sets allocated in this block.
           ibm.ibm_zos_core.zos_data_set:
             batch:
               - name: "{{ seq_data_set_name }}"
+                state: absent
+              - name: "{{ multi_vol_data_set_name }}"
                 state: absent
