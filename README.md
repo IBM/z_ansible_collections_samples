@@ -74,6 +74,7 @@ often repeated and in need of automation.
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
+    - [Submit Jobs Asynchronously, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
   - [z/OSMF Workflows](zos_management/zosmf_workflows)
   - [System Automation](z_system_automation)
     - [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
