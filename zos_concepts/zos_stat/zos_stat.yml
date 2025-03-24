@@ -167,3 +167,69 @@
             msg: "{{ aggregate_stat }}"
 
       when: aggregate_name != ""
+
+    ##############################################################################
+    # This fourth block shows examples of the output given by zos_stat when
+    # querying Generation Data Groups (GDGs) and Generation Data Sets (GDSs).
+    # The tasks will allocate temporary data sets in the managed node and then
+    # get their attributes with zos_stat. The tasks will allocate a new GDG
+    # and then a GDS inside of it. The module supports the use of relative
+    # notation when specifying the name of a GDS.
+    ##############################################################################
+    - name: Query a GDG and a GDS.
+      tags: gdg
+      block:
+        - name: Create a temporary data set name.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `gdg_name` for use by this sample.
+          set_fact:
+            gdg_name: "{{ tmp_ds.stdout }}"
+
+        - name: Allocate temporary GDG.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ gdg_name }}"
+            type: gdg
+            state: present
+            limit: 5
+            empty: true
+
+        - name: "Query {{ gdg_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ gdg_name }}"
+            type: gdg
+          register: gdg_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ gdg_stat }}"
+
+        - name: Allocate the first generation data set of the GDG.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ gdg_name }}(+1)"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fba
+            record_length: 60
+
+        - name: "Query {{ gdg_name }}(0) attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ gdg_name }}(0)"
+            type: data_set
+          register: gds_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ gds_stat }}"
+
+        - name: Remove temporary data sets allocated in this block.
+          ibm.ibm_zos_core.zos_data_set:
+            batch:
+              - name: "{{ gdg_name }}(0)"
+                state: absent
+              - name: "{{ gdg_name }}"
+                state: absent
