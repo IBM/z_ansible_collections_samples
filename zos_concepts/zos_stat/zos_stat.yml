@@ -25,6 +25,8 @@
 # Optional:
 #   available_volumes - Names of the volumes where the sample will allocate
 #                       data sets.
+#   uss_file_path - Absolute path to a Unix System Services file to query.
+#   aggregate_name - Name of an aggregate to query.
 ###############################################################################
 
 - name: Sample zos_stat playbook.
@@ -32,12 +34,14 @@
   collections:
     - "ibm.ibm_zos_core"
   gather_facts: false
-  environment: '{{ environment_vars }}'
+  environment: "{{ environment_vars }}"
 
   vars:
     available_volumes:
-      - '000000'
-      - '222222'
+      - "000000"
+      - "222222"
+    uss_file_path: "/etc/profile"
+    aggregate_name: ""
 
   tasks:
 
@@ -121,3 +125,45 @@
                 state: absent
               - name: "{{ multi_vol_data_set_name }}"
                 state: absent
+
+    ##############################################################################
+    # This second block shows how to query a Unix System Services file.
+    # If uss_file_path is empty, the block will be skipped.
+    ##############################################################################
+    - name: Query a file.
+      tags: file
+      block:
+        - name: "Query {{ uss_file_path }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ uss_file_path }}"
+            type: file
+            get_checksum: true
+            checksum_algorithm: sha224
+            get_mime: true
+            follow: true
+          register: file_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ file_stat }}"
+
+      when: uss_file_path != ""
+
+    ##############################################################################
+    # This third block shows how to query an aggregate.
+    # If aggregate_name is empty, the block will be skipped.
+    ##############################################################################
+    - name: Query an aggregate.
+      tags: aggregate
+      block:
+        - name: "Query {{ aggregate_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ aggregate_name }}"
+            type: aggregate
+          register: aggregate_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ aggregate_stat }}"
+
+      when: aggregate_name != ""
