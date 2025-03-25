@@ -8,6 +8,8 @@ This playbook uses:
     - ibm.ibm_zos_core
   - modules:
     - zos_data_set
+    - zos_job_submit
+    - zos_mount
     - zos_stat
 
 It is a good practice to review the playbook contents before executing
