@@ -36,7 +36,7 @@
         - name: Get expiring certs report from IBMRACF,RACF_CERTIFICATE_EXPIRATION
           ibm.ibm_zos_core.zos_job_submit:
             src: '{{ playbook_dir }}/HZSPRINT.J2'
-            location: LOCAL
+            location: local
             use_template: true
 
           register: hc_job_output
