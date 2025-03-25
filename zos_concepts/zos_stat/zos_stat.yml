@@ -1,0 +1,387 @@
+###############################################################################
+# © Copyright IBM Corporation 2025
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_stat to query the attributes of
+# different types of resources found in z/OS (such as data sets, Generation
+# Data Groups, aggregates and USS files) using Red Hat Ansible Certified
+# Content for IBM Z.
+# This playbook is divided up into five independent sections. The tasks in each
+# section are grouped into 'blocks' that are tagged. The example below shows how
+# the playbook can be run so that only the tasks in the block tagged as
+# 'data_set' are run.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_stat.yml
+#  ansible-playbook -i inventories zos_stat.yml --tags data_set
+#
+# Requirements:
+#   IBM z/OS core collection 1.14.0 or later.
+#
+# Optional:
+#   available_volumes - Names of the volumes where the sample will allocate
+#                       data sets.
+#   uss_file_path - Absolute path to a Unix System Services file to query.
+#   aggregate_name - Name of an aggregate to query.
+#   jcl_file - Path to a JCL file that will be copied and submitted in the
+#              automation-example block.
+#   mount_point - Path where the automation-example block will mount a
+#                 temporary aggregate.
+###############################################################################
+
+- name: Sample zos_stat playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    available_volumes:
+      - "000000"
+      - "222222"
+    uss_file_path: "/etc/profile"
+    aggregate_name: ""
+    jcl_file: "./files/HELLO.jcl"
+    mount_point: "/tmp/aggr"
+
+  tasks:
+
+    ##############################################################################
+    # This first block shows examples of the output given by zos_stat when
+    # querying data sets.
+    # The tasks will allocate temporary data sets in the managed node and then
+    # get their attributes with zos_stat. The tasks will allocate a sequential
+    # data set on a single volumes and then another on multiple volumes.
+    # Additionally, the tasks will highlight how zos_stat can query data sets
+    # when the volumes option isn't present.
+    ##############################################################################
+    - name: Query different data sets.
+      tags: data_set
+      block:
+        - name: Create a temporary data set name.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `seq_data_set_name` for use by this sample.
+          set_fact:
+            seq_data_set_name: "{{ tmp_ds.stdout }}"
+
+        - name: Allocate temporary sequential data set.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ seq_data_set_name }}"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fba
+            record_length: 60
+            volume: "{{ available_volumes[0] }}"
+
+        - name: "Query {{ seq_data_set_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ seq_data_set_name }}"
+            type: data_set
+          register: seq_data_set_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ seq_data_set_stat }}"
+
+        - name: Create a temporary data set name for a multi-volume data set.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `multi_vol_data_set_name` for use by this sample.
+          set_fact:
+            multi_vol_data_set_name: "{{ tmp_ds.stdout }}"
+
+        - name: Allocate temporary sequential data set on multiple volumes.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ multi_vol_data_set_name }}"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fba
+            record_length: 60
+            volumes: "{{ available_volumes }}"
+
+        - name: "Query {{ multi_vol_data_set_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ multi_vol_data_set_name }}"
+            type: data_set
+            volumes: "{{ available_volumes }}"
+          register: multi_vol_data_set_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ multi_vol_data_set_stat }}"
+
+        - name: Remove temporary data sets allocated in this block.
+          ibm.ibm_zos_core.zos_data_set:
+            batch:
+              - name: "{{ seq_data_set_name }}"
+                state: absent
+              - name: "{{ multi_vol_data_set_name }}"
+                state: absent
+
+    ##############################################################################
+    # This second block shows how to query a Unix System Services file.
+    # If uss_file_path is empty, the block will be skipped.
+    ##############################################################################
+    - name: Query a file.
+      tags: file
+      block:
+        - name: "Query {{ uss_file_path }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ uss_file_path }}"
+            type: file
+            get_checksum: true
+            checksum_algorithm: sha224
+            get_mime: true
+            follow: true
+          register: file_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ file_stat }}"
+
+      when: uss_file_path != ""
+
+    ##############################################################################
+    # This third block shows how to query an aggregate.
+    # If aggregate_name is empty, the block will be skipped.
+    ##############################################################################
+    - name: Query an aggregate.
+      tags: aggregate
+      block:
+        - name: "Query {{ aggregate_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ aggregate_name }}"
+            type: aggregate
+          register: aggregate_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ aggregate_stat }}"
+
+      when: aggregate_name != ""
+
+    ##############################################################################
+    # This fourth block shows examples of the output given by zos_stat when
+    # querying Generation Data Groups (GDGs) and Generation Data Sets (GDSs).
+    # The tasks will allocate temporary data sets in the managed node and then
+    # get their attributes with zos_stat. The tasks will allocate a new GDG
+    # and then a GDS inside of it. The module supports the use of relative
+    # notation when specifying the name of a GDS.
+    ##############################################################################
+    - name: Query a GDG and a GDS.
+      tags: gdg
+      block:
+        - name: Create a temporary data set name.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `gdg_name` for use by this sample.
+          set_fact:
+            gdg_name: "{{ tmp_ds.stdout }}"
+
+        - name: Allocate temporary GDG.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ gdg_name }}"
+            type: gdg
+            state: present
+            limit: 5
+            empty: true
+
+        - name: "Query {{ gdg_name }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ gdg_name }}"
+            type: gdg
+          register: gdg_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ gdg_stat }}"
+
+        - name: Allocate the first generation data set of the GDG.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ gdg_name }}(+1)"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fba
+            record_length: 60
+
+        - name: "Query {{ gdg_name }}(0) attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ gdg_name }}(0)"
+            type: data_set
+          register: gds_stat
+
+        - name: Inspect output from zos_stat.
+          ansible.builtin.debug:
+            msg: "{{ gds_stat }}"
+
+        - name: Remove temporary data sets allocated in this block.
+          ibm.ibm_zos_core.zos_data_set:
+            batch:
+              - name: "{{ gdg_name }}(0)"
+                state: absent
+              - name: "{{ gdg_name }}"
+                state: absent
+
+    ##############################################################################
+    # This fifth and final block shows examples of how to use zos_stat to
+    # automate tasks on a managed node with the output returned from the module.
+    # The tasks will allocate one sequential data set and one aggregate.
+    # First, we'll check that the sequential data set has the correct
+    # attributes to hold some JCL code. Then, we'll check that the aggregate has
+    # enough space to copy a text file to it.
+    ##############################################################################
+    - name: Automate tasks on the managed node.
+      tags: automation-example
+      block:
+        - name: Create a temporary data set name.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `jcl_data_set` for use by this sample.
+          set_fact:
+            jcl_data_set: "{{ tmp_ds.stdout }}"
+
+        # If you change the attributes here or in the conditionals in the task below,
+        # the playbook will skip reallocating the data set when it is not needed.
+        - name: Allocate temporary data set to hold some JCL code. These attributes
+                are not the correct ones and will be changed later.          
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ jcl_data_set }}"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fba
+            record_length: 40
+
+        - name: "Query {{ jcl_data_set }} attributes with zos_stat."
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ jcl_data_set }}"
+            type: data_set
+          register: jcl_data_set_stat
+
+        - name: Removing the allocated data set if the record format isn't FB
+                and it doesn't have the record length needed.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ jcl_data_set }}"
+            state: absent
+          when: jcl_data_set_stat.stat.attributes.type != 'seq' or
+                jcl_data_set_stat.stat.attributes.record_format != 'fb' or
+                jcl_data_set_stat.stat.attributes.record_length < 80
+          register: check_result
+
+        - name: Reallocating the data set in case it is necessary.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ jcl_data_set }}"
+            type: seq
+            state: present
+            space_primary: 3
+            space_secondary: 1
+            space_type: trk
+            record_format: fb
+            record_length: 80
+          when: check_result is changed
+
+        - name: "Copy JCL to {{ jcl_data_set }}."
+          ibm.ibm_zos_core.zos_copy:
+            src: "{{ jcl_file }}"
+            dest: "{{ jcl_data_set }}"
+            remote_src: false
+
+        - name: "Submit JCL contained in {{ jcl_data_set }}."
+          ibm.ibm_zos_core.zos_job_submit:
+            src: "{{ jcl_data_set }}"
+            location: data_set
+          register: job_result
+
+        - name: Check the output from zos_job_submit.
+          ansible.builtin.debug:
+            msg: "{{ job_result }}"
+
+        - name: Create a temporary data set name for the aggregate.
+          command: "mvstmp {{ ansible_user | upper }}"
+          register: tmp_ds
+
+        - name: Setting fact `zfs_data_set` for use by this sample.
+          set_fact:
+            zfs_data_set: "{{ tmp_ds.stdout }}"
+
+        - name: Create the zFS.
+          ibm.ibm_zos_core.zos_data_set:
+            name: "{{ zfs_data_set }}"
+            type: zfs
+            space_primary: 2
+            space_type: m
+
+        - name: "Create the mount point for {{ zfs_data_set }}."
+          ansible.builtin.file:
+            path: "{{ mount_point }}"
+            state: directory
+
+        - name: Mount the aggregate.
+          ibm.ibm_zos_core.zos_mount:
+            src: "{{ zfs_data_set | upper }}"
+            path: "{{ mount_point }}"
+            fs_type: zfs
+            state: mounted
+
+        - name: "Query the free size of {{ zfs_data_set}}"
+          ibm.ibm_zos_core.zos_stat:
+            name: "{{ zfs_data_set }}"
+            type: aggregate
+          register: aggregate_stat
+
+        - name: "Get the space used by {{ jcl_file }}."
+          ansible.builtin.stat:
+            name: "{{ jcl_file }}"
+          delegate_to: localhost
+          register: file_stat
+
+        - name: "Copy the local file {{ jcl_file }} only when there is enough space."
+          ibm.ibm_zos_core.zos_copy:
+            src: "{{ jcl_file }}"
+            dest: "{{ mount_point }}/text_file.txt"
+            remote_src: false
+          # Converting the bytes returned by ansible.builtin.stat to the KB,
+          # which is the unit returned by zos_stat.
+          when: (file_stat.stat.size / 1024) < aggregate_stat.stat.attributes.free
+
+        - name: Unmount the aggregate.
+          ibm.ibm_zos_core.zos_mount:
+            src: "{{ zfs_data_set | upper }}"
+            path: "{{ mount_point }}"
+            fs_type: zfs
+            state: unmounted
+
+        - name: Remove the mount point of the aggregate. Please make sure
+                this is allowed before running the playbook.
+          ansible.builtin.file:
+            path: "{{ mount_point }}"
+            state: absent
+
+        - name: Remove the temporary data set allocated in this block.
+          ibm.ibm_zos_core.zos_data_set:
+            batch:
+              - name: "{{ jcl_data_set }}"
+                state: absent
+              - name: "{{ zfs_data_set }}"
+                state: absent
