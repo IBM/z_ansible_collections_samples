@@ -1,0 +1,4 @@
+ansible-builder build -v3 --container-runtime podman -t zoscore-itsm
+podman login quay.io
+podman tag localhost/zoscore-itsm:latest quay.io/your-id/ansiblezos-itsm:latest
+podman push quay.io/your-id/ansiblezos-itsm
