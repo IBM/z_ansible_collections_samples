@@ -53,7 +53,7 @@
             cert_found: true
             report_lines: '{{ report_lines | default([]) + [item] }}'
           loop: '{{sysout_lines}}'
-          when: item is search('Yes')
+          when: item is search('Yes') or not item is search('??????????????????????????????')
 
         - ansible.builtin.debug:
             msg: "Num of YES lines: {{report_lines | length}}"
@@ -113,7 +113,8 @@
             tso_command:
               - RACDCERT ID({{ item.owner_id}}) LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
-          when: item.cert_type is defined and item.cert_type == 'USER' and item.cert_label != '????????????????????????????????'
+          when: item.cert_type is defined and item.cert_type == 'USER'
+          # when: item.cert_type is defined and item.cert_type == 'USER' and item.cert_label != '????????????????????????????????'
 
         - ansible.builtin.include_role:
             name: get_cert_detail
@@ -124,7 +125,8 @@
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
-          when: item.cert_type is defined and item.cert_type == 'CERTAUTH' and item.cert_label != '????????????????????????????????'
+          when: item.cert_type is defined and item.cert_type == 'CERTAUTH' 
+          # when: item.cert_type is defined and item.cert_type == 'CERTAUTH' and item.cert_label != '????????????????????????????????'
 
         - ansible.builtin.include_role:
             name: get_cert_detail
@@ -135,7 +137,8 @@
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{item.cert_label}}'))
           loop: "{{expiring_certs}}"
-          when: item.cert_type is defined and item.cert_type == 'SITE' and item.cert_label != '????????????????????????????????'
+          when: item.cert_type is defined and item.cert_type == 'SITE'
+          # when: item.cert_type is defined and item.cert_type == 'SITE' and item.cert_label != '????????????????????????????????'
 
         - name: CSV - Blank lines removal
           ansible.builtin.lineinfile:
@@ -158,7 +161,7 @@
 
         - name: Send cert data to IBM Concert
           ansible.builtin.shell: |
-              /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+              /usr/bin/curl -k -X POST {{ concert_hostname }}/ingestion/api/v1/upload_files \
                   -H 'Content-Type: multipart/form-data' \
                   -H 'InstanceId: {{concert_instance_id}}' \
                   -H 'Accept: application/json' \
