@@ -60,6 +60,18 @@
     # Additionally, the tasks will highlight how zos_stat can query data sets
     # when the volumes option isn't present.
     ##############################################################################
+    # Modules: zos_data_set, zos_stat
+    ##############################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create a sequential data set with name
+    # |   {{ seq_data_set_name }}.
+    # | - Using zos_stat, query the attributes of {{ seq_data_set_name }}.
+    # | - Using zos_data_set, create a sequential data set over multiple
+    # |   volumes with name {{ multi_vol_data_set_name }}.
+    # | - Using zos_stat, query the attributes of {{ multi_vol_data_set_name }}.
+    # | - Using zos_data_set, remove both {{ seq_data_set_name }} and
+    # |   {{ multi_vol_data_set_name }}.
+    # +-------------------------------------------------------------------------
     - name: Query different data sets.
       tags: data_set
       block:
@@ -136,6 +148,11 @@
     # This second block shows how to query a Unix System Services file.
     # If uss_file_path is empty, the block will be skipped.
     ##############################################################################
+    # Modules: zos_stat
+    ##############################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_stat, query the attributes of the file {{ uss_file_path }}.
+    # +-------------------------------------------------------------------------
     - name: Query a file.
       tags: file
       block:
@@ -159,6 +176,12 @@
     # This third block shows how to query an aggregate.
     # If aggregate_name is empty, the block will be skipped.
     ##############################################################################
+    # Modules: zos_stat
+    ##############################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_stat, query the attributes of the aggregate
+    # |   {{ aggregate_name }}.
+    # +-------------------------------------------------------------------------
     - name: Query an aggregate.
       tags: aggregate
       block:
@@ -182,6 +205,18 @@
     # and then a GDS inside of it. The module supports the use of relative
     # notation when specifying the name of a GDS.
     ##############################################################################
+    # Modules: zos_data_set, zos_stat
+    ##############################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create a Generation Data Group with name
+    # |   {{ gdg_name }}.
+    # | - Using zos_stat, query the attributes of {{ gdg_name }}.
+    # | - Using zos_data_set, create the first Generation Data Set of
+    # |   {{gdg_name}}, with relavite notation ("(+1)").
+    # | - Using zos_stat, query the attributes of the currently active GDS of
+    # |   {{ gdg_name }}.
+    # | - Using zos_data_set, remove both the GDS and the GDG.
+    # +-------------------------------------------------------------------------
     - name: Query a GDG and a GDS.
       tags: gdg
       block:
@@ -249,6 +284,26 @@
     # attributes to hold some JCL code. Then, we'll check that the aggregate has
     # enough space to copy a text file to it.
     ##############################################################################
+    # Modules: zos_data_set, zos_stat, zos_copy, zos_job_submit, zos_mount
+    ##############################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create a sequential data set with name
+    # |   {{ jcl_data_set }}.
+    # | - Using zos_stat, query the attributes of {{ jcl_data_set }}.
+    # | - Using zos_data_set, replace {{ jcl_data_set }} when the output
+    # |   of zos_stat indicates that it doesn't have the needed attributes.
+    # | - Using zos_copy, copy a JCL script to {{ jcl_data_set }}.
+    # | - Using zos_job_submit, submit the JCL contained in {{ jcl_data_set }}.
+    # | - Using zos_data_set, create a data set wiht name {{ zfs_data_set }}
+    # |   to hold an aggregate.
+    # | - Using zos_mount, mount aggregate {{ zfs_data_set }} on the system.
+    # | - Using zos_stat, query the attributes of {{ zfs_data_set }}.
+    # | - Using zos_copy, copy a file to the aggregate only when the output
+    # |   from zos_stat indicates that the aggregate has enough free space.
+    # | - Using zos_mount, unmount the aggregate.
+    # | - Using zos_data_set, remove data sets {{ jcl_data_set }} and
+    # |   {{ zfs_data_set }}.
+    # +-------------------------------------------------------------------------
     - name: Automate tasks on the managed node.
       tags: automation-example
       block:
