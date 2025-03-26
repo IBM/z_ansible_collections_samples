@@ -3,16 +3,16 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: tivlp11.pok.stglabs.ibm.com
-    zmf_port: 443
-    zmf_user: concert
-    zmf_password: tivmvs
-    izsam_jcl: "IZSAM.V820.INST.REPDB1.JCLLIB(HSISANLB)"
-    izsam_csv_dsn: "SYSADM.IZSAMALZ.CSV"
-    concert_url: "zsys-demo1.fyre.ibm.com"
-    concert_port: '12443'
-    concert_api_key: 'Y29uY2VydGlibToyMTYyY2NmNC0zNjZkLTQ2NGEtOWRhMC01MDE5OTRhMDI1ZTI='
-    concert_instance_id: '0000-0000-0000-0000'
+    zmf_host: ''
+    zmf_port: ''
+    zmf_user: ''
+    zmf_password: ''
+    izsam_jcl: ''
+    izsam_csv_dsn: ''
+    concert_url: ''
+    concert_port: ''
+    concert_api_key: ''
+    concert_instance_id: ''
 
     fmid_fix_list: []
     csi_fmid_entry: {}
@@ -80,6 +80,8 @@
         loop_var: outer_item
       no_log: true
       ignore_errors: true
+      when:
+        - outer_item.name is defined and not ( outer_item.name.startswith('ASF_V2R1M0') )
 
     - name: Update collated SWI
       ansible.builtin.set_fact:
