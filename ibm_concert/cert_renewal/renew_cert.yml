@@ -285,6 +285,7 @@
                   -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
                   -F 'metadata={"env_name" : "z/OS"}'
           delegate_to: localhost
+          ignore_errors: true
 
         - name: Resolve incident in ServiceNow
           servicenow.itsm.incident:
