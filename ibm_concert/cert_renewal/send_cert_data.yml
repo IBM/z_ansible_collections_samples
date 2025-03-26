@@ -54,7 +54,7 @@
             report_lines: '{{ report_lines | default([]) + [item] }}'
           loop: '{{sysout_lines}}'
           when:
-            - item is search('Yes')
+            - item is search('Yes') and not item is search('????????????????????????????????')
 
         - ansible.builtin.debug:
             msg: "Num of YES lines: {{report_lines | length}}"
