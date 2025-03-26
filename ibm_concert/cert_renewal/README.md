@@ -7,6 +7,12 @@ It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
 authority, and the artifacts that will be created and cleaned up.
 
+## z/OS Target Requirements
+- Python v3.11
+- ZOAU 1.3.0
+- z/OS Health Checker
+- RACF
+
 ## Playbook Requirements
 These playbooks use:
 
