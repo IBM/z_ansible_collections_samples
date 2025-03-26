@@ -71,6 +71,7 @@ often repeated and in need of automation.
   - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
   - [Run local and remote scripts inside Unix System Services in z/OS](zos_concepts/zos_script)
   - [Run REXX scripts and CLISTs with TSO commands](zos_concepts/tso_commands/scripts)
+  - [Query attributes from data sets, aggregates, Generation Data Groups and Unix System Services files](zos_concepts/zos_stat)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
