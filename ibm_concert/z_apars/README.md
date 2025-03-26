@@ -7,10 +7,11 @@ It will help you understand the requirements in terms of space, location, names,
 authority, and the artifacts that will be created and cleaned up.
 
 ## z/OS Target Requirements:
+- z/OS v2.5 or later
+- z/OS Management Facility v2.5 or later
+- IBM Z Software Asset Management v8.2 or later
 - Python v3.11
 - ZOAU 1.3.0
-- z/OS Management Facility
-- IBM Z Software Asset Management
 
 ## Playbook Requirements
 These playbooks use:

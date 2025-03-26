@@ -3,16 +3,16 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: ''
-    zmf_port: ''
-    zmf_user: ''
-    zmf_password: ''
-    izsam_jcl: ''
-    izsam_csv_dsn: ''
-    concert_url: ''
-    concert_port: ''
-    concert_api_key: ''
-    concert_instance_id: ''
+    zmf_host: tivlp11.pok.stglabs.ibm.com
+    zmf_port: 443
+    zmf_user: concert
+    zmf_password: tivmvs
+    izsam_jcl: "IZSAM.V820.INST.REPDB1.JCLLIB(HSISANLB)"
+    izsam_csv_dsn: "SYSADM.IZSAMALZ.CSV"
+    concert_url: "zsys-demo1.fyre.ibm.com"
+    concert_port: '12443'
+    concert_api_key: 'Y29uY2VydGlibToyMTYyY2NmNC0zNjZkLTQ2NGEtOWRhMC01MDE5OTRhMDI1ZTI='
+    concert_instance_id: '0000-0000-0000-0000'
 
     fmid_fix_list: []
     csi_fmid_entry: {}
@@ -24,6 +24,7 @@
     collated_swi: {}
 
   tasks:
+
     - name: Locating all files in playbook_output directory
       ansible.builtin.find:
         path: "{{ playbook_dir }}/playbook_output"
@@ -138,7 +139,7 @@
 
     - name: Send z APAR data to IBM Concert
       ansible.builtin.shell: |
-        /usr/bin/curl -X POST --max-time 1200 -ki 'https://{{concert_url}}:{{concert_port}}/grader/api/v1/zsys/upload' \
+        /usr/bin/curl -X POST --max-time 1200 -ki '{{concert_url}}:{{concert_port}}/grader/api/v1/zsys/upload' \
         -H 'Authorization: C_API_KEY {{ concert_api_key }}' \
         -H 'InstanceId: {{ concert_instance_id }}' \
         -F 'files=@playbook_output/izsam_detail.csv'  \
@@ -146,4 +147,5 @@
         -F 'files=@playbook_output/swi_collated.json' \
       delegate_to: localhost
       register: curl_output
-      failed_when: "'HTTP/1.1 500' in curl_output.stdout"
+      ignore_errors: true
+      # failed_when: "'HTTP/1.1 500' in curl_output.stdout"
