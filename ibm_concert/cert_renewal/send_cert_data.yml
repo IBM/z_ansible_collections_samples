@@ -7,7 +7,8 @@
   environment: "{{ environment_vars }}"
   vars:
     # IBM Concert variables
-    concert_hostname: ''
+    concert_hostname: '' # i.e., https://hostname
+    concert_port: ''
     concert_instance_id: ''
     concert_api_key: ''
     concert_api_key_type: ''
@@ -161,7 +162,7 @@
 
         - name: Send cert data to IBM Concert
           ansible.builtin.shell: |
-              /usr/bin/curl -k -X POST {{ concert_hostname }}/ingestion/api/v1/upload_files \
+              /usr/bin/curl -k -X POST {{ concert_hostname }}:{{ concert_port }}/ingestion/api/v1/upload_files \
                   -H 'Content-Type: multipart/form-data' \
                   -H 'InstanceId: {{concert_instance_id}}' \
                   -H 'Accept: application/json' \
