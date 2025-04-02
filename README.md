@@ -66,6 +66,7 @@ often repeated and in need of automation.
   - [Dump, Archive, Fetch, Copy and Unarchive Data Sets](zos_concepts/data_transfer/archive_copy_unarchive_restore)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
+  - [Grow ZFS and fetch full trace back](zos_concepts/zfsadm/grow_zfs_fetch_trace_back)
   - [Copy templates to z/OS](zos_concepts/templates/copy_template)
   - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
   - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
@@ -113,6 +114,7 @@ often repeated and in need of automation.
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
   - [Security provision](zos_management/zosmf_security_configuration_assistant)
+  - [Shrink ZFS and see full verbose output](zos_concepts/zfsadm/shrink_zfs_different_size_and_verbose)
 
 
 ## Blogs
@@ -144,7 +146,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020 - 2024
+© Copyright IBM Corporation 2020 - 2025
 
 ## License
 Licensed under
