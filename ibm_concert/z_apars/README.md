@@ -6,6 +6,13 @@ It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
 authority, and the artifacts that will be created and cleaned up.
 
+## z/OS Target Requirements:
+- z/OS v3.1 or later
+- z/OS Management Facility
+- IBM Z Software Asset Management v8.2 or later
+- Python v3.11
+- ZOAU 1.3.0
+
 ## Playbook Requirements
 These playbooks use:
 
@@ -34,7 +41,8 @@ These playbooks are designed to be used with Ansible Automation Platform (AAP) j
 Here are the set up steps:
 - Build an [Execution Environment](execution-environments) using the sample files provided 
 
-- Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert. A survey is needed for the following playbook variables:
+- Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert. 
+- Set up template survey for the following playbook variables:
   ```
   zmf_host: ''
   zmf_port: ''
