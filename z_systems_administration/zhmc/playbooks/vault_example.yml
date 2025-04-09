@@ -1,11 +1,11 @@
 ---
 # vault.yml file for the sample playbooks of the IBM Z HMC Collection
 
-# hmc_auth parameter for the zhmc tasks, for the HMCs in the inventory:
 hmc_auth:
-  myhmc13:  # must match the key name in the inventory file
+
+  myhmc13:  # nickname of the HMC, must match the nickname in the inventory file
     userid: myuserid
     password: mypassword
+    verify: false   # optional, only if you need to disable certificate validation
 
-# The CPC the sample playbooks work with:
-cpc_name: CPCA
+  # ... more HMC entries, as needed
