@@ -18,7 +18,7 @@ This sample additionally shows how to automate installation of pre-requisites fo
 ## Getting Started
 
 If you are unfamiliar with playbooks, you can review our
-[detailed configuration guide](../../../../docs/share/configuration_guide.md) or
+[detailed configuration guide](../../../../docs/share/zos_core/configuration_guide.md) or
 continue with getting started below.
 
 Optionally, you can use the sample
