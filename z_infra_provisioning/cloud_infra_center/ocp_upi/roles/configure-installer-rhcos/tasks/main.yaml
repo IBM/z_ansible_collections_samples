@@ -104,7 +104,7 @@
 
 - name: Download openshift rhcos dasd image
   ansible.builtin.get_url:
-    url: "{{ openshift_rhcos_url }}/rhcos-{{ icic_ocp_version.stdout }}-s390x-dasd.s390x.raw.gz"
+    url: "{{ openshift_rhcos_url }}/rhcos-{{ icic_ocp_version.stdout }}-s390x-metal4k.s390x.raw.gz"
     dest: "{{ openshift_install_dir }}/rhcos-{{ icic_ocp_version.stdout }}-s390x.gz"
   when:
     - vm_type == "zvm"
