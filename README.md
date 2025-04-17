@@ -79,6 +79,9 @@ often repeated and in need of automation.
   - [System Automation](z_system_automation)
     - [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
   - [Invoking REST APIs using the URI module](zos_concepts/rest_apis)
+  - [IBM Concert](ibm_concert)
+    - [Manage z/OS Certificates using IBM Concert, ServiceNow, and Ansible Automation Platform](ibm_concert/cert_renewal/)
+    - [Collect z/OS Software instances Topology, Usage, and missing fixes](ibm_concert/z_apars/)
 - Provisioning
   - [IMS](zos_subsystems/ims)
     - [Deploy an IMS Cobol App](zos_subsystems/ims/ims_cobol_deploy)
