@@ -64,6 +64,18 @@
     cmd: tar -zvxf "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
   when: openshift_install_download_results.changed
 
+- name: Download openshift client RHEL 8
+  ansible.builtin.get_url:
+    url: "{{ openshift_client_url }}/openshift-client-linux-{{ ansible_architecture }}-rhel8.tar.gz"
+    dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+  register: openshift_client_download_results_rhel8
+  when:
+    - not openshift_client_local_tar_results.stat.exists or
+      (openshift_client_local_tar_results.stat.checksum is defined and
+      openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
+    - ansible_distribution == 'RedHat'
+    - (ansible_distribution_version | regex_search('^8\.[0-8]\d*') != None)
+
 - name: Download openshift client
   ansible.builtin.get_url:
     url: "{{ openshift_client_url }}/openshift-client-linux.tar.gz"
@@ -73,19 +85,7 @@
     - not openshift_client_local_tar_results.stat.exists or
       (openshift_client_local_tar_results.stat.checksum is defined and
       openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
-    - not (ansible_distribution_version | regex_search('^8\.[0-8]\d*') != None)
-
-- name: Download openshift client RHEL 8
-  ansible.builtin.get_url:
-    url: "{{ openshift_client_url }}/openshift-client-linux-{{ ansible_architecture }}-rhel8.tar.gz"
-    dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
-  register: openshift_client_download_results
-  when:
-    - not openshift_client_local_tar_results.stat.exists or
-      (openshift_client_local_tar_results.stat.checksum is defined and
-      openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
-    - ansible_distribution == 'RedHat'
-    - (ansible_distribution_version | regex_search('^8\.[0-8]\d*') != None)
+    - openshift_client_download_results_rhel8.skipped == true
 
 - name: Unzip openshift client
   ansible.builtin.command:
