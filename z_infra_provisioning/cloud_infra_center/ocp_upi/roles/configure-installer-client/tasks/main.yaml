@@ -85,7 +85,7 @@
     - not openshift_client_local_tar_results.stat.exists or
       (openshift_client_local_tar_results.stat.checksum is defined and
       openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
-    - openshift_client_download_results_rhel8.skipped == true
+    - openshift_client_download_results_rhel8.skipped is defined and openshift_client_download_results_rhel8.skipped == true
 
 - name: Unzip openshift client
   ansible.builtin.command:
