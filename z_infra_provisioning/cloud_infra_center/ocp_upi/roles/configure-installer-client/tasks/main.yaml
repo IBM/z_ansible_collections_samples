@@ -90,7 +90,7 @@
 - name: Unzip openshift client
   ansible.builtin.command:
     cmd: tar -zvxf "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
-  when: openshift_client_download_results.changed
+  when: openshift_client_download_results.changed or openshift_client_download_results_rhel8.changed
 
 - name: Remove openshift install archive
   ansible.builtin.file:
