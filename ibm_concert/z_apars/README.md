@@ -6,13 +6,6 @@ It is a good practice to review the playbook contents before executing them.
 It will help you understand the requirements in terms of space, location, names,
 authority, and the artifacts that will be created and cleaned up.
 
-## z/OS Target Requirements:
-- z/OS v3.1 or later
-- z/OS Management Facility
-- IBM Z Software Asset Management v8.2 or later
-- Python v3.11
-- ZOAU 1.3.0
-
 ## Playbook Requirements
 These playbooks use:
 
@@ -29,20 +22,26 @@ These playbooks use:
         version: 9.4.0
 
 ## Playbooks
-[**send_data_to_concert.yml**](send_data_to_concert.yml) - This playbook will query z/OSMF reports, IZSAM data and send them to an IBM Concert instance for visualization and management.
+[**send_data_to_concert.yml**](send_data_to_concert.yml) this playbook will query z/OSMF reports, IZSAM data and send them to an IBM Concert instance for visualization and management.
 
 ## Tasks Summary
 - [**build_swi_collated**](build_swi_collated.yml) - Retrieve z/OS topology of software instances and their missing updates and CSI dataset information from zOSMF
 - [**process_count**](process_count.yml) - Aggregate applied critical fixes for each FMID
 
 ## Set up job templates on Ansible Automation Platform
-These playbooks are designed to be used with Ansible Automation Platform (AAP) job templates. The information in the `host_vars` can be used to set up Inventory and Hosts on AAP.
+These playbooks are designed to be used with Ansible Automation Platform (AAP) job templates. The information in the `inventories` folder can be used to set up Inventory and Hosts on AAP. 
 
-Here are the set up steps:
-- Build an [Execution Environment](execution-environments) using the sample files provided 
+Make sure to check the variables in your `host_vars/zos_host.yml` file to make sure they are set to what you need. The `environment_vars` should not need to change.
 
-- Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert. 
-- Set up template survey for the following playbook variables:
+There are also a variety of variables set at the playbook level `z_apars/send_data_to_concert.yml` at the top under `vars`, like the API key and Concert port.
+
+To encrypt the z/OSMF password, use [ansible-vault](https://docs.ansible.com/ansible/2.8/user_guide/vault.html#ansible-vault) to encrypt_string and set the `vault_zmf_password` variable under `z_apars/inventories/host_vars/vault.yml`. Otherwise, prompt for it every time using an AAP survey or [vars_prompt](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html) at the CLI.
+
+Review the required inputs to each playbooks to set up Surveys on AAP so the job runs correctly.
+
+- Set up an AAP [schedule](https://docs.ansible.com/automation-controller/latest/html/userguide/scheduling.html) to send cert data to IBM Concert on a regular basis
+- Set up an AAP [job template](https://docs.ansible.com/automation-controller/latest/html/userguide/job_templates.html#create-a-job-template) to send data to Concert
+- A survey is needed for the following playbook variables:
   ```
   zmf_host: ''
   zmf_port: ''
@@ -52,10 +51,14 @@ Here are the set up steps:
   izsam_csv_dsn: ''
   concert_url: ''
   concert_port: ''
+  concert_api_key: ''
+  concert_drupal_key: ''
   concert_api_token: ''
   concert_instance_id: ''
+  concert_user: ''
+  concert_password: ''
   ```
-- Set up an AAP [schedule](https://docs.ansible.com/automation-controller/latest/html/userguide/scheduling.html) to send cert data to IBM Concert on a regular basis
+
 # Changelog
 All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
