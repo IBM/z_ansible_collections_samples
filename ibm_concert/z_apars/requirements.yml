@@ -1,7 +1,7 @@
 ---
 collections:
   - name: ibm.ibm_zos_core
-    version: 1.11.0
+    version: 1.10.0
   - name: ibm.ibm_zosmf
     version: 1.5.0
   - name: ansible.posix

@@ -1,25 +1,20 @@
 ---
-################################################################################
-# Copyright (c) IBM Corporation 2025
-################################################################################
-
-################################################################################
-# Description of the properties used in this configuration:
-# - Property `PYZ` is the python installation home path on the z/OS managed node (target),
-#    e.g, pyz: "/usr/lpp/IBM/cyp/v3r8/pyz"
-# - Property `ZOAU` is the ZOAU installation home on the z/OS managed node (target),
-#    e.g, zoau: "/usr/lpp/IBM/zoautil"
-# - property `ansible_python_interpreter` is the z/OS managed node (target) Python
-#    binary installation path, e.g, ansible_python_interpreter: "{{PYZ}}/bin/python3"
-#
-# Note, PYZ and ZOAU environment variables must be configured.
-################################################################################
-
-PYZ: "path_to_python"
-ZOAU: "path_to_zoau"
-
-################################################################################
-# Do not configure, variable substituion will correctly set the
-# variable`ansible_python_interpreter`
-################################################################################
+ansible_host: # FQDN or IP here
+ansible_user: concert
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
+
+# these will change depending on your system's installation of IBM Python and Z Open Automation Utilities (ZOAU)
+PYZ: "/shared/IBM/aln/v3r1/ent/pyz/pyz-311"
+ZOAU: "/shared/IBM/zoautil/v1r3"
+
+# these should not need to change
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
