@@ -14,7 +14,6 @@
     concert_port: #
     concert_api_key: #
     concert_instance_id: #
-    concert_application_name: #
 
     # These vars should not need to change.
     fmid_fix_list: []
