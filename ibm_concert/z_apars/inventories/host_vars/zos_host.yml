@@ -1,6 +1,6 @@
 ---
 ansible_host: # FQDN or IP here
-ansible_user: concert
+ansible_user: # user ID on your z/OSMF system
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 
 # these will change depending on your system's installation of IBM Python and Z Open Automation Utilities (ZOAU)
