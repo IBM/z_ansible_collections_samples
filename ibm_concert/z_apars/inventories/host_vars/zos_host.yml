@@ -4,8 +4,8 @@ ansible_user: concert
 ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 
 # these will change depending on your system's installation of IBM Python and Z Open Automation Utilities (ZOAU)
-PYZ: "/shared/IBM/aln/v3r1/ent/pyz/pyz-311"
-ZOAU: "/shared/IBM/zoautil/v1r3"
+PYZ: "/path/to/pyz"
+ZOAU: "/path/to/zoautil"
 
 # these should not need to change
 environment_vars:
