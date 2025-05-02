@@ -59,11 +59,7 @@ Review the required inputs to each playbooks to set up Surveys on AAP so the job
   concert_url: ''
   concert_port: ''
   concert_api_key: ''
-  concert_drupal_key: ''
-  concert_api_token: ''
   concert_instance_id: ''
-  concert_user: ''
-  concert_password: ''
   ```
 
 # Changelog
