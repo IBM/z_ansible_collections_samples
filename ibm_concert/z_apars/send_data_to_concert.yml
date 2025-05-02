@@ -24,6 +24,7 @@
     collated_swi: {}
 
   tasks:
+
     - name: Locating all files in playbook_output directory
       ansible.builtin.find:
         path: "{{ playbook_dir }}/playbook_output"
@@ -79,6 +80,8 @@
         loop_var: outer_item
       no_log: true
       ignore_errors: true
+      when:
+        - outer_item.name is defined and not ( outer_item.name.startswith('ASF_V2R1M0') )
 
     - name: Update collated SWI
       ansible.builtin.set_fact:
@@ -138,7 +141,7 @@
 
     - name: Send z APAR data to IBM Concert
       ansible.builtin.shell: |
-        /usr/bin/curl -X POST --max-time 1200 -ki 'https://{{concert_url}}:{{concert_port}}/grader/api/v1/zsys/upload' \
+        /usr/bin/curl -X POST --max-time 1200 -ki '{{concert_url}}:{{concert_port}}/grader/api/v1/zsys/upload' \
         -H 'Authorization: C_API_KEY {{ concert_api_key }}' \
         -H 'InstanceId: {{ concert_instance_id }}' \
         -F 'files=@playbook_output/izsam_detail.csv'  \
@@ -146,4 +149,5 @@
         -F 'files=@playbook_output/swi_collated.json' \
       delegate_to: localhost
       register: curl_output
-      failed_when: "'HTTP/1.1 500' in curl_output.stdout"
+      ignore_errors: true
+      # failed_when: "'HTTP/1.1 500' in curl_output.stdout"
