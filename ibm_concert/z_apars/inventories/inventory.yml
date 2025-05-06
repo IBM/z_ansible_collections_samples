@@ -5,3 +5,5 @@
 all:
   hosts:
     zos_host:
+      ansible_host: your_zos_hostname
+      ansible_user: zos_userid
