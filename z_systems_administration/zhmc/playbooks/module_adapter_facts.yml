@@ -1,0 +1,35 @@
+---
+# Sample playbook for the zhmc_adapter module of the ibm.ibm_zhmc collection:
+#
+# Get facts for an adapter
+#
+# Command to run this playbook:
+# ansible-playbook -i inventory.yml -e hmc={myhmc} -e cpc={mycpc} -e adapter={myadapter} module_adapter_facts.yml
+
+- hosts:
+    - "{{ hmc | default('default') }}"  # HMC nickname from inventory entry
+  gather_facts: no
+  vars_files:
+    - vault.yml
+  vars:
+    cpc: MYCPC                          # Adjust or override with -e option
+    adapter: sample-hs-1                # Adjust or override with -e option
+    log_file: zhmc.log
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Get facts for adapter {{ adapter }} on CPC {{ cpc }}"
+      delegate_to: localhost
+      zhmc_adapter:
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
+        cpc_name: "{{ hmc_auth[inventory_hostname] }}"
+        name: "{{ adapter }}"
+        state: facts
+        log_file: "{{ log_file | default(omit) }}"
+      register: result
+
+    - name: Print the result
+      ansible.builtin.debug:
+        var: result
