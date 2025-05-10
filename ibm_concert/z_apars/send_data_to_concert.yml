@@ -1,19 +1,21 @@
+---
 - name: Gather and send z topology and missing APARs to Concert
-  hosts: all
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: ''
-    zmf_port: ''
-    zmf_user: ''
-    zmf_password: ''
-    izsam_jcl: ''
-    izsam_csv_dsn: ''
-    concert_url: ''
-    concert_port: ''
-    concert_api_key: ''
-    concert_instance_id: ''
+    zmf_host: "{{ ansible_host }}"
+    zmf_port: #
+    zmf_user: #
+    zmf_password: "{{ vault_zmf_password }}"
+    izsam_jcl: #
+    izsam_csv_dsn: #
+    concert_url: #
+    concert_port: #
+    concert_api_key: #
+    concert_instance_id: #
 
+    # These vars should not need to change.
     fmid_fix_list: []
     csi_fmid_entry: {}
     csi_info: {}
@@ -24,7 +26,6 @@
     collated_swi: {}
 
   tasks:
-
     - name: Locating all files in playbook_output directory
       ansible.builtin.find:
         path: "{{ playbook_dir }}/playbook_output"
@@ -80,8 +81,6 @@
         loop_var: outer_item
       no_log: true
       ignore_errors: true
-      when:
-        - outer_item.name is defined and not ( outer_item.name.startswith('ASF_V2R1M0') )
 
     - name: Update collated SWI
       ansible.builtin.set_fact:
@@ -115,7 +114,7 @@
       delegate_to: localhost
 
     - ansible.builtin.set_fact:
-        info: "{{zmf_topology_data.content}}"
+        info: "{{ zmf_topology_data.content }}"
 
     - name: Save zOSMF Topology to a json file
       ansible.builtin.copy:
@@ -123,31 +122,69 @@
         dest: "{{ playbook_dir }}/playbook_output/resttopology.json"
       delegate_to: localhost
 
-    #####################################################################################
-    # PLAY #4: Get SW Usage report from IZSAM                                           #
-    #####################################################################################
+    # #####################################################################################
+    # # PLAY #4: Get SW Usage report from IZSAM                                           #
+    # # #####################################################################################
     - name: Submit JCL in a PDSE member
       ibm.ibm_zos_core.zos_job_submit:
-        src: "{{izsam_jcl}}"
+        src: "{{ izsam_jcl }}"
         location: data_set
-        wait_time_s: 30
+        wait_time_s: 600
       register: izsam_job_output
+      ignore_errors: true
+
+    - name: Copy data to localhost for inspection.
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/playbook_output/{{ item }}.json"
+        dest: "/tmp/{{ item }}.json"
+      loop:
+        - resttopology
+        - swi_collated
+      register: data_copy
+      delegate_to: localhost
+
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        - "{{ info | to_nice_json }}"
+        - "{{ collated_swi | to_nice_json }}"
 
     - name: Fetch CSV to local
       ibm.ibm_zos_core.zos_fetch:
-        src: "{{izsam_csv_dsn}}"
+        src: "{{ izsam_csv_dsn }}"
         dest: "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
         flat: true
+      loop:
+        - /tmp/izsam_detail.csv
+        - "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
 
-    - name: Send z APAR data to IBM Concert
+    - name: Check to make sure files are populated.
+      ansible.builtin.assert:
+        that: "{{ lookup('ansible.builtin.file', item) | length > 0 }}"
+        fail_msg: "The file at {{ item }} is empty."
+        success_msg: "The file at {{ item }} is ready to be sent to concert."
+      loop:
+        - "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
+        - "{{ playbook_dir }}/playbook_output/resttopology.json"
+        - "{{ playbook_dir }}/playbook_output/swi_collated.json"
+
+    - name: Send z APAR data to IBM Concert using curl
       ansible.builtin.shell: |
-        /usr/bin/curl -X POST --max-time 1200 -ki '{{concert_url}}:{{concert_port}}/grader/api/v1/zsys/upload' \
+        /usr/bin/curl -X POST --max-time 1200 -ki '{{ concert_url }}/grader/api/v1/zsys/upload' \
         -H 'Authorization: C_API_KEY {{ concert_api_key }}' \
         -H 'InstanceId: {{ concert_instance_id }}' \
-        -F 'files=@playbook_output/izsam_detail.csv'  \
+        -H 'Concert-Application-Name: {{ concert_application_name }}' \
+        -H 'Concert-API-Key: {{ concert_api_key }}' \
+        -H 'Concert-URL: {{ concert_url }}' \
+        -F 'files=@playbook_output/izsam_detail.csv' \
         -F 'files=@playbook_output/resttopology.json' \
-        -F 'files=@playbook_output/swi_collated.json' \
+        -F 'files=@playbook_output/swi_collated.json'
       delegate_to: localhost
-      register: curl_output
-      ignore_errors: true
-      # failed_when: "'HTTP/1.1 500' in curl_output.stdout"
+      register: curl_response
+      failed_when: curl_response.rc != 0
+
+
+    - name: Print response from previous.
+      ansible.builtin.debug:
+        var: curl_response
