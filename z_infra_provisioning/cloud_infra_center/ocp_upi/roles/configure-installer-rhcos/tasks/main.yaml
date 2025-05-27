@@ -23,7 +23,8 @@
 
 - name: 'Set fact for openshift rhcos url'
   ansible.builtin.set_fact:
-    openshift_rhcos_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ icic_ocp_version.stdout }}"
+    #openshift_rhcos_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ icic_ocp_version.stdout }}"
+    openshift_rhcos_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/pre-release/{{ icic_ocp_version.stdout }}"
     openshift_install_dir: "."
 
 - name: Download checksum for the rhcos image
