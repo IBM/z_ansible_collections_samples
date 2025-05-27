@@ -13,13 +13,14 @@
 
 - name: Verify openshift minor version
   ansible.builtin.shell: |
-    version=$(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/sha256sum.txt | grep rhcos | wc -l)
-    if [ $version -eq "0" ] || [ "{{ openshift_minor_version }}" -eq "latest" ]; then
-      #echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
-      echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/pre-release/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
-    else
-      echo "{{ openshift_version }}.{{ openshift_minor_version }}"
-    fi
+    # version=$(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/{{ openshift_version }}.{{ openshift_minor_version }}/sha256sum.txt | grep rhcos | wc -l)
+    # if [ $version -eq "0" ] || [ "{{ openshift_minor_version }}" -eq "latest" ]; then
+    #   #echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
+    #   echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rhcos/pre-release/{{ openshift_version }}/latest/sha256sum.txt | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+" | head -n1)
+    # else
+    #   echo "{{ openshift_version }}.{{ openshift_minor_version }}"
+    # fi
+    echo "{{ openshift_version }}.0-ec.3"
   register: icic_ocp_version
 
 - name: 'Set fact for openshift rhcos url'
