@@ -12,12 +12,13 @@
 
 - name: Verify openshift minor version
   ansible.builtin.shell: |
-    version=$(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
-    if [ -z $version ]; then
-      echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
-    else
-      echo $version
-    fi
+    # version=$(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    # if [ -z $version ]; then
+    #   echo $(wget -q -O - https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/latest-{{ openshift_version }}/release.txt | grep 'Name:' | awk -F: '{print $2}' | xargs)
+    # else
+    #   echo $version
+    # fi
+    echo "{{ openshift_version }}.0-rc.3"
   register: icic_ocp_version
 
 - name: 'Set fact for openshift client'
