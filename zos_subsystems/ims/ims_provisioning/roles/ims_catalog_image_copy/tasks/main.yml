@@ -21,29 +21,30 @@
 
       - ansible.builtin.set_fact:
           eager_role_path: '{{role_path}}'
-      
+
       - name: Use template to create proper JCL on localhost
-        template: 
+        template:
           src: '{{ eager_role_path }}/templates/template_image_copy.j2'
           dest: '{{ eager_role_path }}/templates/image_copy.j2'
           force: true
-        delegate_to: localhost 
+        delegate_to: localhost
 
       - name: Submit image copy job
         ibm.ibm_zos_core.zos_job_submit:
           src: '{{ eager_role_path }}/templates/image_copy.j2'
-          location: LOCAL
-          wait: true
+          location: local
+          use_template: true
+          # wait: true
           wait_time_s: 30
       when: image == "copy"
 
-    - block: 
+    - block:
       - name: Delete image copies
         ibm.ibm_zos_core.zos_data_set:
-          batch: 
+          batch:
             - name: "{{ item.icdsn }}"
               volumes: "{{ DFS_DS_VOLUME1 }}"
               state: absent
-        with_items: 
-          - "{{ to_image_copy }}" 
+        with_items:
+          - "{{ to_image_copy }}"
       when: image == "delete" and dbrc_enabled
