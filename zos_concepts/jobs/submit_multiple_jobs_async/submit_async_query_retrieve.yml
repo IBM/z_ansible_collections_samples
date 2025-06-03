@@ -1,0 +1,173 @@
+###############################################################################
+# © Copyright IBM Corporation 2025
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to submit batch jobs in an asynchronous
+# manner making use of ansible's async and poll keywords, query all jobs submitted
+# and retrieve job output using modules included in the Red Hat Ansible Certified Content for
+# IBM Z core collection.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories submit_async_query_retrieve.yaml
+#
+#  Additional facts for this playbook can be configured to override the defaults
+#  by reviewing the "Fact setting" section of this playbook, for example,
+#  `data_set_name`.
+#
+# Requirements:
+#   IBM z/OS core collection 1.13.0 or later
+#
+# Configure:
+#   tgt_tmp_dir - this is the USS directory on the target which will be written
+#                 to for this example.
+# Optional:
+#   job_count - this is the number of jobs that will be executed concurrently.
+#   job_class - this is the job class which you want your jobs to be executed in.
+#               In order for the jobs to run in parallel you need enough job initiators
+#               of this class configured in the z/OS managed node.
+#
+#
+# Ansible Asynchronous submission
+# Familiarize yourself with async and poll's documentation:
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_async.html
+#
+# If you want to run multiple tasks concurrently, use async with poll set to 0.
+# With `poll: 0``, Ansible starts the task and immediately moves on to the next task
+# without waiting for a result. Then, each async task runs until it either completes
+# fails or times out (runs longer than its async value). If the value of `async:`
+# is not hight enough, then the checking it does on the task to fail because
+# `async_status:`` will be looking for a result.
+#
+# Wait up to 50 seconds for the jobs 30 second sleep time to complete. How
+# you configure the modules execution really decides your asynchronous
+# execution plan. In this case, waiting for the module to complete will
+# result in the jobs results to be later retrieved asynchronously, if the
+# wait_time_s is not enough, the module will error and you can expect that
+# the async_status will have an error as the module did not have enough time to
+# execute and you should code to that logic. Another example is if you set the
+# module to submit and forget with wait_time_s=0, you will only receive the job ID
+# and would want to code to that later during the validation step.
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  vars:
+    tgt_tmp_dir: "/tmp"
+    job_count: 5
+    job_class: "K"
+    job_ids: []
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    ############################################################################
+    # Modules zos_copy, zos_job_submit, zos_job_query, zos_job_output
+    #
+    ############################################################################
+    # +-------------------------------------------------------------------------
+    # | Create a data set and member, create JCL on USS target, copy USS JCL to
+    # | data set, submit JCL in data set, query job, get job output. Repeat the
+    # | process with JCL submitted from USS file.
+    # +-------------------------------------------------------------------------
+    ############################################################################
+    - name: Create simple batch jobs to use in this playbook.
+      ibm.ibm_zos_core.zos_copy:
+        content: |
+            //ASYNC{{ item }}   JOB MSGLEVEL=1,MSGCLASS={{ job_class }},CLASS={{ job_class }}
+            //COMMAND  EXEC PGM=BPXBATCH
+            //STDPARM DD *
+            SH echo 'This is a {{ item }} job' && date && sleep 30 && date
+            //STDIN  DD DUMMY
+            //STDOUT DD SYSOUT=*
+            //STDERR DD SYSOUT=*
+            //
+        dest: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
+        force: true
+      register: result
+      with_sequence: count={{ job_count }}
+
+    - name: Response for creating sample jobs on z/OS UNIX
+      debug:
+          var: result
+
+    # +-------------------------------------------------------------------------
+    # | "with_sequence" is a type of conditional Ansible loop. The loop here
+    # | only runs for a single iteration and is included solely to demonstrate
+    # | how multiple jobs could be submitted under a single task for members of
+    # | a single PDS.
+    # | See notes at the top for additional explanation on wait_time_s, async
+    # | and poll times.
+    # +-------------------------------------------------------------------------
+    - name: Submit multiple batch jobs asynchronously.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
+        location: uss
+        wait_time_s: 45
+      with_sequence: count={{ job_count }}
+      async: 60
+      poll: 0
+      register: job_submit
+
+    - name: Query status for asynchronous batch jobs captured in 'job_submit' and place results in 'job_outputs'.
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      until: job_outputs.finished
+      retries: 10
+      delay: 15
+      with_items: "{{ job_submit.results }}"
+      register: job_outputs
+
+    - name: Separating job IDs from async status output for use by zos_job_query module later.
+      set_fact:
+        job_ids: "{{ job_ids + [item] }}"
+      with_items: "{{ job_outputs.results | map(attribute='job_id')|list}}"
+
+    # +-------------------------------------------------------------------------
+    # | There is a list of results returned by the zos_job_submit module. Each
+    # | result contains attributes from the job it refers to including job_id,
+    # | job_name, owner, content, and return codes. Since only one job was
+    # | submitted, it will be the first (and only) job in the results list.
+    # +-------------------------------------------------------------------------
+
+    - name: Query asynchronous batch jobs using zos_job_query module and register the results into list 'job_query'.
+      ibm.ibm_zos_core.zos_job_query:
+        job_id: "{{ item }}"
+      register: job_query
+      loop: "{{ job_ids }}"
+
+    - name: Check if any asynchronous batch job has a RC > 0 and fail if it does.
+      fail: msg="Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}  has a rc of = {{ item.jobs[0].ret_code.code}}, msg = {{ item.jobs[0].ret_code.msg }}"
+      failed_when: >
+         item.jobs[0].ret_code.code > 0
+      with_items: "{{ job_query.results }}"
+
+    - name: Query asynchronous batch jobs using z/OS module and register the output into list 'job_output'.
+      ibm.ibm_zos_core.zos_job_output:
+        job_id: "{{ item }}"
+      register: job_output
+      loop: "{{ job_ids }}"
+
+    - name: Print out each job output
+      debug:
+          var: job_output
+
+    ############################################################################
+    # +-------------------------------------------------------------------------
+    # | Clean up - remove JCL files from USS.
+    # +-------------------------------------------------------------------------
+    ############################################################################
+
+    - name: Remove JCL files on USS target.
+      file:
+        path: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
+        state: absent
+      with_sequence: count={{ job_count }}
+      register: remove_files
+
