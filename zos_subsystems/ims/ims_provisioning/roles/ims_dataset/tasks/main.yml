@@ -12,11 +12,11 @@
         name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.INSTALL"
         state: present
         replace: true
-        type: PDS
+        type: pds
         space_primary: 5
         space_secondary: 2
-        space_type: CYL
-        record_format: FB
+        space_type: cyl
+        record_format: fb
         record_length: 80
         block_size: 3200
         directory_blocks: 46
@@ -35,11 +35,11 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 5
                 space_secondary: 2
-                space_type: CYL
-                record_format: FB
+                space_type: cyl
+                record_format: fb
                 record_length: 80
                 block_size: 3200
                 directory_blocks: 200
@@ -47,11 +47,11 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.OBJDSET'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 10
                 space_secondary: 3
-                space_type: CYL
-                record_format: FB
+                space_type: cyl
+                record_format: fb
                 record_length: 80
                 block_size: 3200
                 directory_blocks: 120
@@ -59,11 +59,11 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENIN'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 8
                 space_secondary: 3
-                space_type: CYL
-                record_format: FB
+                space_type: cyl
+                record_format: fb
                 record_length: 80
                 block_size: 11440
                 directory_blocks: 92
@@ -71,11 +71,11 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.LGENOUT'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 5
                 space_secondary: 3
-                space_type: CYL
-                record_format: FB
+                space_type: cyl
+                record_format: fb
                 record_length: 80
                 block_size: 11440
                 directory_blocks: 92
@@ -83,32 +83,32 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMAT'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
-                record_format: U
+                space_type: cyl
+                record_format: u
                 block_size: 32760
                 directory_blocks: 92
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TFORMAT'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 2
-                space_type: CYL
-                record_format: U
+                space_type: cyl
+                record_format: u
                 block_size: 32760
                 directory_blocks: 46
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.REFERAL'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
-                record_format: FB
+                space_type: cyl
+                record_format: fb
                 record_length: 80
                 block_size: 0
                 directory_blocks: 92
@@ -116,11 +116,11 @@
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS'
                 state: present
                 replace: true
-                type: PDS
+                type: pds
                 space_primary: 22
                 space_secondary: 15
-                space_type: TRK
-                record_format: U
+                space_type: trk
+                record_format: u
                 record_length: 0
                 block_size: 13030
                 directory_blocks: 50
@@ -346,169 +346,169 @@
             batch:
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PGMLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: LIBRARY
+                type: library
                 directory_blocks: 92
                 space_primary: 6
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PSBLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 46
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 92
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.IMSMON'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: VB
+                record_format: vb
                 record_length: 6140
                 block_size: 6144
                 space_primary: 1
                 space_secondary: 1
-                space_type: CYL
-                type: SEQ
+                space_type: cyl
+                type: seq
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DBDLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 46
                 space_primary: 1
                 space_secondary: 1
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBA'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 92
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.ACBLIBB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 92
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSA'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 150
                 space_primary: 10
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKSB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 150
                 space_primary: 8
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODSTAT'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: FB
+                record_format: fb
                 record_length: 80
                 block_size: 80
                 space_primary: 1
-                space_type: TRK
-                type: SEQ
+                space_type: trk
+                type: seq
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.JOBS'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: FB
+                record_format: fb
                 record_length: 80
                 block_size: 0
-                type: PDS
+                type: pds
                 directory_blocks: 46
                 space_primary: 1
                 space_secondary: 1
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATA'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 92
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.FORMATB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: U
+                record_format: u
                 block_size: 32760
-                type: PDS
+                type: pds
                 directory_blocks: 92
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCFSLIB'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: FB
+                record_format: fb
                 record_length: 80
                 block_size: 80
-                type: PDS
+                type: pds
                 directory_blocks: 46
                 space_primary: 1
                 space_secondary: 1
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
               - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.TCPPARMS'
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-                record_format: FB
+                record_format: fb
                 record_length: 80
                 block_size: 3120
-                type: PDS
+                type: pds
                 directory_blocks: 20
                 space_primary: 2
                 space_secondary: 2
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
 
@@ -753,7 +753,7 @@
                 type: seq
                 space_secondary: 0
                 space_primary: 10
-                space_type: CYL
+                space_type: cyl
                 state: present
                 replace: true
                 record_length: 0
