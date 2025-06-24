@@ -31,4 +31,4 @@
         name: requirements-check
 
 - name: Executing the z/OS Ansible playbook
-  import_playbook: replace_regex_backref_on_diferent_ds_types.yml
+  import_playbook: manipulate_text.yml
