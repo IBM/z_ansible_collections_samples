@@ -94,7 +94,7 @@
 
     - name: "Copy the file log_file of the folder to the MEM of {{ pdse_dataset }}"
       zos_copy:
-        src: "{{playbook_dir}}/files/log_file"
+        src: "{{playbook_dir}}/files/log_file.txt"
         dest: "{{ pdse_dataset }}(MEM)"
 
     - name: "Copy {{ pdse_dataset }} to the {{ seq_dataset }} dataset"
@@ -111,7 +111,7 @@
 
     - name: "Execute copy of files_no_utf_8 to the tmp file {{ tmp_file }}"
       zos_copy:
-        src: "{{playbook_dir}}/files/files_no_utf_8"
+        src: "{{playbook_dir}}/files/files_no_utf_8.txt"
         dest: "{{ tmp_file }}"
         force: True
 
