@@ -149,7 +149,8 @@
 
 - name: Upload RHCOS image to ICIC glance
   ansible.builtin.command:
-    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+    #cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+    cmd: openstack image create --disk-format=raw  --property gz_sha256={{ openshift_rhcos_sha256_results.stdout }} --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property disk_type=DASD --file=rhcos-{{ icic_ocp_version.stdout }}-s390x icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
   when:
     - vm_type == "zvm"
     - disk_type == "dasd"
