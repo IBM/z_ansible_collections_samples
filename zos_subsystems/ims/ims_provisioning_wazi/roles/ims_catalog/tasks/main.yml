@@ -33,7 +33,7 @@
     - name: Load Catalog
       ims_catalog_populate:
         mode: LOAD
-        dbrc: false
+        dbrc: False
         dfsdf_member: "000"
         modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
         acb_lib: [
