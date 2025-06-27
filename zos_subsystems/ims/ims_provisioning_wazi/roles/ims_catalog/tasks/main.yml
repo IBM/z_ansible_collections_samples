@@ -34,6 +34,7 @@
       ims_catalog_populate:
         mode: LOAD
         dbrc: False
+        dfsdf_member: "000"
         modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
         acb_lib: [
           "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.ACBLIB"
