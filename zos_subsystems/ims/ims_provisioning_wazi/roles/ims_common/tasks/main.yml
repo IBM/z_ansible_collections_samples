@@ -23,9 +23,14 @@
       when: ctl == "stop"
       ignore_errors: yes
 
-    - name: wait 10 seconds for IMS to start
-      ansible.builtin.shell: sleep 10
-      when: ctl == "start" and wait_for_job
+    - name: Wait for IMS Ready message
+      ibm.ibm_zos_core.zos_operator_action_query:
+        job_name: "{{ DFS_IMS_SSID }}CTL"
+      register: ims_ready_msg
+      retries: 5
+      delay: 5
+      until: ims_ready_msg.actions
+      when: ctl == "start"
 
     - name: IMS cold start
       ims_command:
