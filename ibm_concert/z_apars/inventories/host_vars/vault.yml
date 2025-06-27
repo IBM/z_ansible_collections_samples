@@ -1,0 +1,1 @@
+vault_zmf_password: # set using ansible-vault encrypt_string, or just prompt for zmf_password every time
