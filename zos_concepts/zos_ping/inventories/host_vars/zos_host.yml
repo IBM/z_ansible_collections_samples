@@ -35,10 +35,10 @@
 # Note, PYZ, PYZ_VERSION, and ZOAU environment variables must be configured.
 ################################################################################
 
-PYZ: "path_to_python_installation_on_zos_target"
-PYZ_VERSION: "3.xx"
+PYZ: "/allpython/3.12/usr/lpp/IBM/cyp/v3r12/pyz"
+PYZ_VERSION: "3.12"
 
-ZOAU: "path_to_zoau_installation_on_zos_target"
+ZOAU: "/zoau/v1.3.5"
 
 # Configuring the `ZOAU_PYTHON_LIBRARY_PATH` property is required.
 
@@ -49,7 +49,7 @@ ZOAU: "path_to_zoau_installation_on_zos_target"
 # If the ZOAU python zoautil_py package has been installed in the default location
 # that is part of Python's search path, the `ZOAU_PYTHON_LIBRARY_PATH` environment
 # variable must be set as an empty string. Uncomment the following line:
-# ZOAU_PYTHON_LIBRARY_PATH: ""
+ZOAU_PYTHON_LIBRARY_PATH: ""
 
 # If using pre-compiled binaries for ZOAU v1.3.x, uncomment the following line:
 # ZOAU_PYTHON_LIBRARY_PATH: "{{ ZOAU }}/lib/{{ PYZ_VERSION }}"

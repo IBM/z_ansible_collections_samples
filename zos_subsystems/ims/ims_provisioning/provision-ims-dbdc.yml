@@ -9,7 +9,7 @@
   environment: '{{ system_environment }}'
 
   vars:
-    - provision: true
+    provision: true
 
   tasks:
     - name: Create temporary directory to store provisioning files

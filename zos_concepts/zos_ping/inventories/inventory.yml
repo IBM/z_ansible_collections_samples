@@ -13,5 +13,5 @@
 source_system:
   hosts:
     zos_host:
-      ansible_host: zos_target_address
-      ansible_user: zos_target_username
+      ansible_host: ec01249c.vmec.svl.ibm.com
+      ansible_user: omvsadm

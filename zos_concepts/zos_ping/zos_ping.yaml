@@ -33,7 +33,8 @@
     # Ping the host with Ansible ping module to see if the target is available
     # ##########################################################################
     - name: Ping host - {{ inventory_hostname }}
-      zos_ping:
+      ping:
+
       register: result
 
     # ##########################################################################
