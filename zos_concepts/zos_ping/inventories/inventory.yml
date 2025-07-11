@@ -13,5 +13,5 @@
 source_system:
   hosts:
     zos_host:
-      ansible_host: {{ lookup('env', 'ANSIBLE_HOST') }}
-      ansible_user: {{ lookup('env', 'ANSIBLE_USER') }}
+      ansible_host: "{{ lookup('env', 'ANSIBLE_HOST') }}"
+      ansible_user: "{{ lookup('env', 'ANSIBLE_USER') }}"
