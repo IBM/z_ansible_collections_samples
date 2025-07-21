@@ -1,0 +1,23 @@
+---
+driver:
+  name: podman
+
+dependency:
+  name: shell
+  command: ansible-galaxy collection install ibm.ibm_zos_core
+
+platforms:
+  - name: zos_host
+    # you might want to add your own variables here based on what provisioning
+    # you are doing like:
+    # image: quay.io/centos/centos:stream8
+    image: docker.io/library/python
+    pre_build_image: true
+    user: root
+    command: sleep infinity
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      remote_tmp: /tmp/.ansible/tmp

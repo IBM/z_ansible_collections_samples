@@ -1,0 +1,31 @@
+# molecule/default/create.yml
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Start Podman container
+      containers.podman.podman_container:
+        name: zos_host
+        image: docker.io/library/python
+        command: sleep infinity
+        state: started
+        detach: true
+        tty: true
+        user: root
+
+    - name: Write instance config
+      copy:
+        content: |
+          # Molecule managed
+          - instance: zos_host
+            address: 127.0.0.1
+            user: root
+            port: 22
+            identity_file: null
+            connection: podman
+            become: true
+        dest: "{{ molecule_instance_config }}"
+        mode: '0600'

@@ -1,0 +1,20 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Molecule Hello World!
+      ansible.builtin.debug:
+        msg: Hello, World!
+    
+    - name: Ensure /tmp/.ansible/tmp exists and writable
+      file:
+        path: /tmp/.ansible/tmp
+        state: directory
+        mode: '1777'
+
+- import_playbook: ../../zos_concepts/zos_ping/zos_ping.yaml
+  vars:
+    environment_vars:
+      TEST_VAR: "test"

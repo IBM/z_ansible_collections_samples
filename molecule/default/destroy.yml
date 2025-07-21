@@ -1,0 +1,12 @@
+# molecule/default/destroy.yml
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Stop and remove Podman container
+      containers.podman.podman_container:
+        name: zos_host
+        state: absent
