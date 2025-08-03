@@ -1,0 +1,12 @@
+[{
+  "type": "branch-protection",
+  "name": "code-review",
+  "params": {
+    "checks": [
+      "tekton/code-branch-protection",
+      "tekton/code-unit-tests",
+      "tekton/code-vulnerability-scan",
+      "tekton/code-detect-secrets"
+    ]
+  }
+}]
