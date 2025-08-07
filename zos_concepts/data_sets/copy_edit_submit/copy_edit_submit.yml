@@ -96,9 +96,14 @@
         location: data_set
       register: result_submit_psa
 
-    - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
+    - name: "Get the job output from previous JCL {{ tmp_data_set }}(PSA)"
+      zos_job_output:
+        job_id: "{{ result_submit_psa.job_id }}"
+      register: result_job_output
+
+    - name: "Response for zos_job_output"
       debug:
-        var: result_submit_psa
+        var: result_job_output
 
     - name: "Submit the JCL {{ tmp_data_set }}(UPTIME)"
       zos_job_submit:
