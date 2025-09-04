@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2020, 2023
+# Copyright (c) IBM Corporation 2020, 2025
 ################################################################################
 # This file is required when using repository directly in AWX/Tower
 # for more info: https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#install-multiple-collections-with-a-requirements-file
