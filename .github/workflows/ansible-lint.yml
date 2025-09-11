@@ -16,4 +16,4 @@ jobs:
           requirements: collections/requirements.yml
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v25.8.2
+        uses: ansible/ansible-lint@v6.22.2
