@@ -22,3 +22,5 @@ collections:
     version: 1.10.0
   - name: servicenow.itsm
     version: 2.7.0
+  - name: ansible.posix
+    version: 2.1.0
