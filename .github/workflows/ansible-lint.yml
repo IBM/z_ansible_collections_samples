@@ -17,5 +17,5 @@ jobs:
 
       - name: Run ansible-lint
         env:
-          ANSIBLE_LIBRARY: ./library
+          ANSIBLE_LIBRARY: "$GITHUB_WORKSPACE/zos_subsystems/ims/ims_provisioning/library" 
         uses: ansible/ansible-lint@v6.22.2
