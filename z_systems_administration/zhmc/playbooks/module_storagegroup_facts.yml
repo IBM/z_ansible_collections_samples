@@ -1,0 +1,36 @@
+---
+# Sample playbook for the zhmc_storage_group module of the ibm.ibm_zhmc collection:
+#
+# Get facts about a storage group
+#
+# Command to run this playbook:
+# ansible-playbook -i inventory.yml -e hmc={myhmc} -e cpc={mycpc} -e stogroup={mystogroup} module_storagegroup_facts.yml
+
+- hosts:
+    - "{{ hmc | default('default') }}"  # HMC nickname from inventory entry
+  gather_facts: no
+  vars_files:
+    - vault.yml
+  vars:
+    cpc: MYCPC                          # Adjust or override with -e option
+    stogroup: sample-sg-1               # Adjust or override with -e option
+    log_file: zhmc.log
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Get facts for storage group {{ stogroup }}"
+      delegate_to: localhost
+      zhmc_storage_group:
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
+        cpc_name: "{{ cpc }}"
+        name: "{{ stogroup }}"
+        state: facts
+        expand: true
+        log_file: "{{ log_file | default(omit) }}"
+      register: result
+
+    - name: Print the result
+      ansible.builtin.debug:
+        var: result
