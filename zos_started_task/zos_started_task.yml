@@ -1,0 +1,174 @@
+###############################################################################
+# © Copyright IBM Corporation 2025
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_stat to query the attributes of
+# different types of resources found in z/OS (such as data sets, Generation
+# Data Groups, aggregates and USS files) using Red Hat Ansible Certified
+# Content for IBM Z.
+# This playbook is divided up into five independent sections. The tasks in each
+# section are grouped into 'blocks' that are tagged. The example below shows how
+# the playbook can be run so that only the tasks in the block tagged as
+# 'data_set' are run.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_started_task.yml
+#
+# Requirements:
+#   IBM z/OS core collection 1.16.0 or later.
+#
+###############################################################################
+
+- name: Sample zos_stat playbook.
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    jcl_file: "./files/sample.jcl"
+
+  tasks:
+    - name: Copy a jcl file into PDS member
+      zos_copy:
+        src: "{{ jcl_file }}"
+        dest: "USER.PRIVATE.PROCLIB(MEM1)"
+      register: copy_out
+    - name: print copy_out
+      debug:
+        msg:
+          - "{{ copy_out }}"
+
+    # #######################################################################################
+    # Start a started task using PDS Member name which contains JCL to run as a started task.
+    # The parameters which are commented below, can be used with respective values.
+    # #######################################################################################
+    - name: Execute started task start command
+      zos_started_task:
+          state: started
+          member: MEM1
+          # identifier: 
+          # device_type: 
+          # device_number:
+          # volume_serial:
+          # job_account:
+          # job_name:
+          # parameters:
+          # keyword_parameters:
+          # reus_asid:
+          # subsystem:
+          verbose: True
+      register: start_out
+    - name: print start_out
+      debug:
+        msg:
+          - "{{ start_out }}"
+
+    # #######################################################################################
+    # Display details of a running started task using started task name and other params.
+    # The parameters which are commented below, can be used with respective values.
+    # #######################################################################################
+    - name: Execute started task display command
+      zos_started_task:
+          state: displayed
+          job: MEM1
+          # identifier: vlf
+          verbose: True
+      register: display_out
+    - name: print display_out
+      debug:
+        msg:
+          - "{{ display_out }}"
+
+    # #######################################################################################
+    # Cancel a running started task using a started task name and other params.
+    # The parameters which are commented below, can be used with respective values.
+    # #######################################################################################
+    - name: Execute started task cancel command
+      zos_started_task:
+          state: cancelled
+          job: MEM1
+          # armrestart:
+          # asid: "0071"
+          # dump:
+          # identifier_name:
+          # userid:
+          verbose: True
+      register: cancel_out
+    - name: print cancel_out
+      debug:
+        msg:
+          - "{{ cancel_out }}"
+
+    # #######################################################################################
+    # Modify a running started task using started task name and other params.
+    # The parameters which are commented below, can be used with respective values.
+    # System started tasks like VLF can be modified using list of params 'replace', 'nn=02'
+    # #######################################################################################
+    - name: Execute started task modify command
+      zos_started_task:
+          state: modified
+          job: vlf
+          # identifier_name:
+          parameters: [<<parameters>>]
+          verbose: True
+      register: modify_out
+    - name: print modify_out
+      debug:
+        msg:
+          - "{{ modify_out }}"
+
+    # #######################################################################################
+    # Stop a running started task using started task name and other params.
+    # The parameters which are commented below, can be used with respective values.
+    # System started task like VLF can be stopped.
+    # #######################################################################################
+    - name: Execute started task stop command
+      zos_started_task:
+          state: stopped
+          job: << Started task name >>
+          # asid:
+          # identifier_name:
+          # verbose: True
+      register: stop_out
+    - name: print stop_out
+      debug:
+        msg:
+          - "{{ stop_out }}"
+
+    # #######################################################################################
+    # Force a running started task using started task name and other params.
+    # The parameters which are commented below, can be used with respective values.
+    # System started tasks like TSO, JES2, TCPIP, ICSF ..etc can be forced
+    # #######################################################################################
+    - name: Execute started task force command
+      zos_started_task:
+          state: forced
+          job: << Started task name >>
+          # asid:
+          arm: True
+          # armrestart:
+          # identifier_name:
+          # retry:
+          # tcb_address:
+          # userid:
+          verbose: True
+      register: force_out
+    - name: print force_out
+      debug:
+        msg:
+          - "{{ force_out }}"
+
+    # #######################################################################################
+    # Delete PDS member 'mem1' which got created for testing purpose
+    # #######################################################################################
+    - name: Remove PDS Member MEM1
+      zos_data_set:
+        name: 'user.private.proclib(mem1)'
+        state: absent
+        type: member
