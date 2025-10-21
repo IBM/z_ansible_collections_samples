@@ -53,15 +53,14 @@
           state: started
           member: MEM1
           # identifier: 
-          # device_type: 
-          # device_number:
-          # volume_serial:
           # job_account:
           # job_name:
           # parameters:
           # keyword_parameters:
           # reus_asid:
           # subsystem:
+          # wait_time:
+          # wait_full_time:
           verbose: True
       register: start_out
     - name: print start_out
@@ -154,8 +153,6 @@
           arm: True
           # armrestart:
           # identifier_name:
-          # retry:
-          # tcb_address:
           # userid:
           verbose: True
       register: force_out
