@@ -104,16 +104,16 @@ up-to-date.
 
 - Appliance management (install, activate, deactivate, update) on DPM and non-DPM mode machine.
 - Working in default mode (ACC connected to the HMC) and standalone mode (ACC not connected to the HMC).
-– Uploading appliances for installation.
+- Uploading appliances for installation.
 - Basic sanity checks before installation.
-– Appliance upgrade (complete image replacement) and updates.
-– Appliance cluster management actions (install, activate, deactivate, update).
+- Appliance upgrade (complete image replacement) and updates.
+- Appliance cluster management actions (install, activate, deactivate, update).
 - Downloading logs of appliances.
 - Health monitoring of appliances.
 - ACC user management.
-– Sync with HMC on LPARs running appliances in default mode.
-– Rest APIs and sample ansible scripts for managing appliances.
-– Basic UI functions for managing appliance.
+- Sync with HMC on LPARs running appliances in default mode.
+- Rest APIs and sample ansible scripts for managing appliances.
+- Basic UI functions for managing appliance.
 - Multifactor authentication.
 - Providing an opportunity to the ACC-Admin to upload certificates.
 
