@@ -1,0 +1,73 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+# Variables used for installing SSAs
+
+# ACC variables
+mfa_enabled: false                                                               # Enable or disable Multi-Factor Authentication (true/false)
+default_mode: true                                                               # Initialize the ACC with default mode (default_mode: true) or standalone mode (default_mode: false)     
+acc_ip: 9.152.150.224                                                            # IP of the ACC LPAR, used to create acc_url (e.g., 9.152.150.224)
+acc_port: 8081                                                                   # This port is used to create acc_url (e.g., 8081)
+
+# HMC
+hmc_url: "9.152.150.166"                                                          # hmc host ip (e.g., 9.152.150.166)
+hmc_user: "{{ lookup('env', 'HMC_USER') }}"                                       # ACC-admin's user name on the HMC (e.g., export HMC_USER=xyz.ibm.com) 
+hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                               # ACC-admin's password on the HMC (e.g., export HMC_PASSWORD=passw0rd123)
+
+# Users
+cc_admin_user: "{{ lookup('env', 'ACC_ADMIN_USER') }}"                             # ACC LPAR's username (default admin username) (e.g., export ACC_ADMIN_USER=cc_admin )       
+cc_admin_old_password: "{{ lookup('env', 'ACC_APP_PASSWORD') }}"                   # ACC LPAR's password (default admin password) (e.g., export ACC_APP_PASSWORD="defaultPassw0rd")
+cc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"                     # Updated password for ACC (updated admin password) (e.g., export ACC_ADMIN_PASSWORD="defaultPassw0rd1")
+ssa_owner_user: "cc_owner"                                                         # Specify the owner name for the new Owner's creation (e.g., cc_owner)
+ssa_owner_email: "cc_owner@email.com"                                              # Owner's email address (e.g., "cc_owner@email.com")
+ssa_owner_default_password: "defaultP@ssw0rd"                                      # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
+ssa_owner_password: "{{ lookup('env', 'SSA_OWNER_PASSWORD') }}"                    # Owner's new password to update the old one (e.g., export SSA_OWNER_PASSWORD="defaultPassw0rd1")
+
+# Resources that are assigned to the appliance-owner
+z_machine_name: "T28"                                                              # CPC or machine name (e.g., "T28")
+z_machine_dpm_enabled: true                                                        # If machine is dpm machine then z_machine_dpm_enabled as true or false in ACC to create CPC for standalone mode
+
+# SSA Image
+image_path: "/Users/pujakumari/Downloads/zssa.img.gz"                             # Modify the location of the image file which image you want to install
+hostname: "host"                                                                  # Hostname to assign to the installed image
+image_type: "image"                                                               # This is default type of image (e.g., "image")
+ssa_username: "{{ lookup('env', 'SSA_APP_USER') }}"                               # Set Username for the appliance (used during image installation) (e.g., export SSA_APP_USER=user )   
+ssa_password: "{{ lookup('env', 'SSA_APP_PASSWORD') }}"                           # Set Password for the appliance (used during image installation) (e.g., export SSA_APP_PASSWORD=password )
+
+## First SSA LPAR
+ssa_lpar1: "BLUEC1"                                                               # First LPAR name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name in which appliance will be installed
+interface_name1: "interface1"                                                     # Network interface name for creating resource package (e.g., "interface1")
+fid1: "9342"                                                                      # Function ID (e.g., 00A5) used with the SSC network interface
+prefix1: 24                                                                       # Network prefix length for creating resource package (e.g., 23)
+# vlan_id1: 300                                                                   # VLAN ID [uncomment if applicable for your infra]
+# chpid1: "d0"                                                                    # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
+# zport1: 0                                                                       # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
+disk_id1: "0.0.5f47"                                                              # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+is_fcp1: false                                                                    # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
+ssa_ip1: "9.152.150.230"                                                          # Appliance IP address for ssa lpar
+gw_ip1: "9.152.150.1"                                                             # (IPv4/IPv6) gateway IP address
+execution_action: "default"                                                       # Mode of execution: "default", "prep_lpar_only", "appliance_only", or "switch_to_installer"
+
+## Second SSA LPAR
+ssa_lpar2: "SSC12"                                                               # Second LPAR name for resource assignment (e.g, "SSC12") should be valid SSA lpar name in which appliance will be installed
+interface_name2: "interface2"                                                    # Network interface name for creating resource package (e.g., "interface1")
+fid2: "9352"                                                                     # Function ID (e.g., 00A5) used with the SSC network interface
+prefix2: 24                                                                      # Network prefix length for creating resource package (e.g., 23)
+# vlan_id2: 300                                                                  # VLAN ID [uncomment if applicable for your infra]
+# chpid2: "d0"                                                                   # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
+# zport2: 0                                                                      # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
+disk_id2: "0.0.5f48"                                                             # Disk identifier (e.g., "5f48" start with 0.0) for installing image on lpar disk
+is_fcp2: false                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
+ssa_ip2: "9.152.150.225"                                                         # Appliance IP address for ssa lpar
+gw_ip2: "9.152.150.1"                                                            # (IPv4/IPv6) gateway IP address
+
