@@ -71,7 +71,7 @@ These directories are used to deploy appliances.
 | `03_owner_action.yaml` | Appliance owner can use this playbook to initialize the user on ACC |
 | `04_install_flow.yaml` | Appliance owner can use this playbook to install and activate an appliance |
 
-## File Structure of other_usecases_ansible
+### File Structure of other_usecases_ansible
 
 This directory is used for other use cases associated with ACC and appliances.
 
@@ -100,7 +100,7 @@ and future plans.
 We provide a brief overview of these aspects but they might not be
 up-to-date.
 
-## List of ACC Features
+### List of ACC Features
 
 - Appliance management (install, activate, deactivate, update) on DPM and non-DPM mode machine.
 - Working in default mode (ACC connected to the HMC) and standalone mode (ACC not connected to the HMC).
@@ -117,7 +117,7 @@ up-to-date.
 - Multifactor authentication.
 - Providing an opportunity to the ACC-Admin to upload certificates.
 
-## Current Limitations of ACC
+### Current Limitations of ACC
 
 - Some of these playbooks requires network connectivity of ACC to HMC (i.e., these
   playbooks are for default mode of ACC).
@@ -144,7 +144,7 @@ up-to-date.
   reachable, then ACC will not work.
 - The ACC cannot accept HMC certificates.
 
-## ACC Features in Development
+### ACC Features in Development
 
 The following features are in development:
 
