@@ -1,0 +1,63 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+acc_ip: https://9.152.150.232:8081/api                                      # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+
+# Users
+cc_owner_user: "cc_owner"                                                  # Specify the owner name for created owner (e.g., cc_owner)
+cc_owner_email: "cc_owner@email.com"                                       # Already created Owner's email address (e.g., "xyz.ibm.com")
+cc_owner_default_password: "defaultP@ssw0rd"                               # Owner's old/default password (e.g., "defaultPassw0rd")
+cc_owner_password: "defaultP@ssw0rd1"                                      # Owner's new password to update the old one (e.g., "defaultPassw0rd1")
+
+# Resources that are assigned to the appliance-owner
+package_name: "resource_package_1"                                         # Already created Resource package name (e.g., "RP01")
+lpar_name1: "BLUEC1"                                                        # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
+lpar_name2: "SSC12"                                                         # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
+
+# Image
+image_path: "/Users/pujakumari/Downloads/zssa_1.0.4_iesp_debug.img.gz"       # Path on the control node (e.g., your laptop) with the image file which you want to install
+min_ifls: 1                                                                 # Number of IFLs, Minimum IFLs required by the appliance (e.g., 1)
+min_memory: 1024                                                            # Number of memory, Minimum memory required by the appliance (e.g., 4096)
+image_type: "image"                                                         # This is default type of image
+image_fix_type: "fix"                                                       # This is the fix type of image
+
+# Image install
+install: true                                                               # Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image (true = install new image, false = use existing disk image)
+hostname: "host"                                                            # Hostname to assign to the installed image
+app_cores: 2                                                                # Number of CPU cores allocated for the image
+app_memory: 1024                                                           # Amount of memory (in MB) allocated for the image
+
+# appliance credential
+app_username: "user"                                                        # Set Username for the appliance (used during image installation)
+app_password: "password"                                                    # Set Password for the appliance (used during image installation)
+
+
+# Available execution mode:
+# . For default ACC (i.e, hmc_managed=true): "default", "prep_lpar_only", "appliance_only", "switch_to_installer"
+# . Standalone ACC (i.e, hmcmanaged=false): "appliance_only", "switch_to_installer"
+
+
+################################################################################
+# How to use this execution action for installation in standalone mode
+#
+# You can install lpar with 2 types of execution action with standalone mode:
+#   1️. appliance_only → when execution action is **appliance_only** lpar should be in 'installer' mode in HMC 
+#                        and must include install parameter in task (18 - As owner, install and activate the image).
+#   2️. switch_to_installer   → when execution action is **switch_to_installer** LPAR should be in 'appliance' mode for activation in HMC
+#                              and comment install parameter in task (18 - As owner, install and activate the image)
+   
+################################################################################
+
+
+execution_action1: "appliance_only"  
+execution_action2: "switch_to_installer"           

@@ -1,0 +1,167 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+
+
+- name: ACC playbook, run by ACC-owner, for ACC-owner actions
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  tasks:
+    - name: Wait for user to generate OTP using Owner mfa secret
+      pause:
+        prompt: "Enter OTP generated from the owner mfa_secret:"
+      register: mfa_otp_input
+
+    - name: 17 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ mfa_otp_input.user_input }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+        
+    - name: Printing the image ID
+      tags: owner, install
+      debug:
+        msg: "{{ image_id }}"
+
+    - name: 18 - As owner, install and activate the image
+      tags: owner
+      uri:
+        url: "{{ acc_ip }}/cluster/activate"
+        method: POST
+        body:
+          resource_package_1: #Add resource package name directly
+            image_id: "{{image_id}}"
+            processor_usage: "shared"
+            processor_type: "general-purpose"
+            memory: "{{ app_memory }}"
+            cores: "{{ app_cores }}"
+            username: "{{ app_username }}"
+            password: "{{ app_password }}"
+            hostname: "{{ hostname }}"
+            lpars:           # Comment any one lpar details when running with 1 lpar
+              - name: "{{ lpar_name1 }}"
+                execution_action: "{{ execution_action }}"
+                install: "{{ install }}"
+              - name: "{{ lpar_name2 }}"
+                execution_action: "{{ execution_action }}"
+                install: "{{ install }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+      register: activate_response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        var: activate_response.json
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15
+    
+    # Extract all task IDs from response
+    - name: Extract task IDs dynamically
+      set_fact:
+        task_ids: >-
+          {{
+            activate_response.json
+            | dict2items
+            | map(attribute='value')
+            | map('dict2items')
+            | flatten
+            | map(attribute='value')
+            | selectattr('task_id', 'defined')
+            | map(attribute='task_id')
+            | list
+          }}
+
+    - name: Print extracted task IDs
+      debug:
+       msg: >-
+        {% if task_ids | length > 0 %}
+          Task IDs for active LPARs: {{ task_ids | join(', ') }}
+        {% else %}
+          No task IDs found — activation failed.
+        {% endif %}
+
+    - name: Get status of each install task
+      loop: "{{ task_ids }}"
+      loop_control:
+        loop_var: task_id
+      tags: owner, install
+      uri:
+        url: "{{ acc_ip }}/tasks/{{ task_id }}/status"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: task_status
+
+    - name: Print task status responses
+      debug:
+        msg: "{{ item.json }}"
+      loop: "{{ task_status.results | default([task_status]) }}"
+      loop_control:
+        label: "Task ID {{ item.item | default(task_ids[0]) }}"
+   
+
+    - name: 20a - Get resources assigned to the owner by the admin
+      tags: owner
+      uri:
+        url: "{{ acc_ip }}/resource/pkgs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the assigned resources
+      tags: owner
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 20b - Get resources consumed by the owner
+      tags: owner
+      uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the consumed resources
+      tags: owner
+      debug:
+        msg: "{{ response.json }}"

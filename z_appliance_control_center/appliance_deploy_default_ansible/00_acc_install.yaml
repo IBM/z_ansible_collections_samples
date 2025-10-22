@@ -1,0 +1,71 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+- name: ACC Install playbook
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - acc_env_vars.yaml
+
+  environment:
+    IMAGE_PATH: "{{ IMAGE_PATH }}"
+    HMC_HOST: "{{ HMC_HOST }}"
+    LPAR_IP: "{{ LPAR_IP }}"
+    LPAR: "{{ LPAR }}"
+    DISK_ID: "{{ DISK_ID }}"
+    IS_FCP: "{{ IS_FCP }}"
+    # Note: Uncomment lun and wwpn when uploading for FCP disk
+    # lun: "{{ lun }}"   
+    # wwpn: "{{ wwpn }}"
+    USERNAME: "{{ USERNAME }}"
+    PASSWORD: "{{ PASSWORD }}"
+    HMC_USER: "{{ HMC_USER }}"
+    HMC_PASSWORD: "{{ HMC_PASSWORD }}"
+    CPC: "{{ CPC }}"
+    ACTION: "{{ ACTION }}"
+    HTTP_SCHEME: https 
+    LOCAL_SERVER_IP: localhost
+    LOCAL_SERVER_PORT: 9988
+    LOCAL_SSH_PORT: 9989
+    VERIFY_CERT: false
+    GATEWAY_IP: "{{ GATEWAY_IP }}"
+    GATEWAY_USER: "fpc-gw"
+    HTTPS_PORT: 443
+    SSH_PORT: 23
+    D_PORT: 0
+    IS_PRIVATE: false
+    ANSIBLE_TMPDIR: "{{ INSTALL_SCRIPT_PATH }}"
+    HMC_KEY: "~/.ssh/id_rsa"
+    LPAR_USER: "{{ LPAR_USER }}"
+    LPAR_PASSWORD: "{{ LPAR_PASSWORD }}"
+    STORAGE: "{{ STORAGE }}"  
+      
+  tasks:
+    - name: Check the INSTALL_SCRIPT_PATH variable
+      debug:
+        msg: "{{ INSTALL_SCRIPT_PATH }}"
+
+    - name: Run the setup script to install ACC
+      shell: "./setup.sh"
+      args:
+        chdir: "{{ INSTALL_SCRIPT_PATH }}"
+      register: setup_result
+
+    - name: Split logs into lines
+      set_fact:
+        log_lines: "{{ setup_result.stdout.splitlines() }}"
+
+    - name: Output each log line
+      debug:
+        msg: "{{ item }}"
+      with_items: "{{ log_lines }}"

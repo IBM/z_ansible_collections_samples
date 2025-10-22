@@ -1,0 +1,188 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+- name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - admin_vars.yaml
+
+  tasks:
+    - name: 01 - Initialize ACC with Standalone mode with MFA
+      uri:
+        url: "{{ acc_ip }}/init"
+        body:
+          hmc_managed: "{{ hmc_managed }}"
+          mfa_enable: "{{ mfa_enabled }}"
+          credentials:
+            username: "{{ cc_admin_user }}"
+            password: "{{ cc_admin_old_password}}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: init_response
+
+    - name: Print init response
+      debug:
+        var: init_response.json
+
+    - name: 02 - Get Initialize status
+      uri:
+        url: "{{ acc_ip }}/init"
+        body:
+          hmc_managed: "{{ hmc_managed }}"
+          credentials:
+            username: "{{ cc_admin_user }}"
+            password: "{{ cc_admin_old_password}}"
+        body_format: json
+        method: GET
+        return_content: true
+        validate_certs: false
+      register: get_init_response
+
+    - name: Print init response
+      debug:
+        var: get_init_response.json
+
+    - name: Show the temparory OTP secret
+      debug:
+        msg:
+          - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
+          - "{{ init_response.json.totp_secret }}"
+    
+    - name: Wait for user to generate OTP
+      pause:
+        prompt: "Enter OTP generated from the above totp_secret:"
+      register: otp_input
+
+
+    - name: 03 - Update ACC-admin password (remove this if already done)
+      uri:
+        url: "{{ acc_ip }}/user"
+        body:
+          username: "{{ cc_admin_user }}"
+          old_password: "{{ cc_admin_old_password}}"
+          new_password: "{{ cc_admin_password }}"
+          otp: "{{ otp_input.user_input }}"
+        body_format: json
+        method: PUT
+        return_content: true
+        validate_certs: false
+      register: update_password_response
+
+    - name: Print password update response
+      debug:
+        var: update_password_response.json
+
+    - name: Show admin MFA secret
+      debug:
+        msg:
+          - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app.
+          - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
+          - "{{ update_password_response.json.mfa_secret }}"
+    
+    # Note: The above tasks are intended for one-time execution. 
+    # Please comment them out after running once. when you want to generate access token
+
+    - name: Wait for user to generate OTP
+      pause:
+        prompt: "Enter OTP generated from the above mfa_secret:"
+      register: mfa_otp_input
+
+    - name: 04 - Get authentication token from the ACC as admin
+      uri:
+        url: "{{ acc_ip }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+          otp: "{{ mfa_otp_input.user_input }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response of authentication
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the admin token
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 05 - Insert CPC information in ACC with dummy values (standalone mode)
+      tags: admin
+      uri:
+        url: "{{ acc_ip }}/cpcs"
+        timeout: 200
+        method: POST
+        body:
+          cpcs:
+            - cpc_name: "{{ z_machine_name }}"
+              ifls : "{{ cpc_ifls }}"              
+              gps: "{{ cpc_gps }}"               
+              available_storage: "{{ available_storage }}"    
+              dpm_enabled: "{{ z_machine_dpm_enabled }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+
+    - name: 06 - Get list of CPCs attached to the HMC
+      uri:
+        url: "{{ acc_ip }}/cpcs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the available CPCs
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 07 - Get CPC resources of CPC defined in admin_vars.yaml
+      uri:
+        url: "{{ acc_ip }}/cpcs/{{ z_machine_name }}/resource"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the CPC resources
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 08 - Create an appliance-owner using variables in admin_vars.yaml
+      uri:
+        url: "{{ acc_ip }}/user"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_default_password }}"
+          email: "{{ cc_owner_email }}"
+          role: "owner"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 204
+      register: response

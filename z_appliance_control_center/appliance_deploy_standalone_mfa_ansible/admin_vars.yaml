@@ -1,0 +1,91 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+acc_ip: https://9.152.150.232:8081/api                                     # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+
+#Init ACC
+hmc_managed: False                                                          # Initialize the ACC with Standalone mode (hmc_managed: false) or default mode (hmc_managed: true) 
+mfa_enabled: True
+
+# HMC access
+hmc_url: "9.152.150.166"                                                     # hmc host ip (e.g., T28: 9.152.150.166)
+hmc_user: "{{ lookup('env', 'HMC_USER') }}"                                  # ACC-admin's user name on the HMC (e.g., xyz.ibm.com) 
+hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                          # ACC-admin's password on the HMC (e.g., passw0rd123)
+
+# Users
+cc_admin_user: "user"                                                        # ACC LPAR's username (default admin username) (e.g., cc_admin)
+cc_admin_old_password: "password"                                            # ACC LPAR's password (default admin password) (e.g., "defaultPassw0rd")
+cc_admin_password: "defaultP@ssw0rd1"                                        # Updated password for ACC LPAR (updated admin password) (e.g., "defaultPassw0rd1")
+
+cc_owner_user: "cc_owner"                                                    # Specify the owner name for the new Owner's creation (e.g., cc_owner)
+cc_owner_email: "cc_owner@email.com"                                         # Owner's email address (e.g., "cc_owner@email.com")
+cc_owner_default_password: "defaultP@ssw0rd"                                 # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
+
+
+# Create CPC config
+cpc_ifls : 32                                                                # update number of ifls as per infra support to create cpc
+cpc_gps: 32                                                                  # update number of gps as per infra support to create cpc
+available_storage: 229376                                                    # update number of memory(in MB) as per infra support to create cpc
+z_machine_dpm_enabled: false                                                  # If machine is dpm machine then z_machine_dpm_enabled as true or false in ACC to create CPC for standalone mode
+
+# Resources that are assigned to the appliance-owner
+z_machine_name: "T28"                                                        # CPC or machine name (e.g., "T28")
+z_machine_lpar: "SSC12"                                                     # Logical partition (LPAR) name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name
+package_name: "resource_package_1"                                           # Resource package name (e.g., "RP01")
+package_ifls: 0                                                              # Number of IFLs can range from 0 up to the CPC's available IFL count (e.g., 0)
+package_gps: 6                                                               # Number of general-purpose CPUs (GCPs); can range from 0 up to the CPC's available GCP count (e.g., 6)
+package_memory_mb: 8192                                                      # Memory allocated for resource creation (in MB): depends on the CPC's customerStorageAvailable, it should be multiple of 1024.
+
+
+################################################################################
+# How to use this configuration file for Resource Package creation
+#
+# You can create a Resource Package (RP) with either:
+#   1️. A SINGLE LPAR → Fill in ONLY the **First LPAR Config** section below.
+#   2️. TWO LPARs     → Fill in BOTH the **First LPAR Config** and 
+#                      the **Second LPAR Config** sections below.
+#   3. First LPAR Config (Always required)
+#   4. Second LPAR Config (Only required if you want to create a Resource Package with 2 LPARs)
+################################################################################
+
+
+## First LPAR Config: 
+lpar_name1: "BLUEC1"                                                          # Logical partition (LPAR) name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name
+interface_name1: "interface1"                                                 # SSC network interface name, same as in the SSC profile (e.g., "interface1")
+fid1: "9382"                                                                # Function ID (e.g., 00A5) used with the SSC network interface
+prefix1: 23                                                                   # Network prefix length (e.g., 23)
+# vlan_id1: 300                                                               # VLAN ID (uncomment if applicable for your infra)
+disk_id1: "0.0.5f47"                                                          # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+is_fcp1: false                                                                # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else FALSE
+# wwpn1: "50050763070B46A6"                                                    # World Wide Port Name (WWPN) To be added only when is_fcp is true
+# lun1: "4016403900000000"                                                     # Logical Unit Number (LUN) To be added only when is_fcp is true
+app_ip1: "9.152.150.230"                                                      # Appliance IP address ( lpar ip)
+gw_ip1: "9.152.150.1"                                                         # (IPv4/IPv6) gateway IP address
+# chpid1: "d0"                                                                  # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382"). 
+# zport1: 0                                                                     # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
+
+
+## Second LPAR Config:
+lpar_name2: "SSC12"                                                           # Logical partition (LPAR) name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name
+interface_name2: "interface2"                                                 # SSC network interface name, same as in the SSC profile (e.g., "interface1")
+fid2: "9382"                                                                # Function ID (e.g., 00A5) used with the SSC network interface
+prefix2: 23                                                                   # Network prefix length (e.g., 23)
+# vlan_id2: 300                                                               # VLAN ID (uncomment if applicable for your infra)
+disk_id2: "0.0.5f48"                                                          # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+is_fcp2: false                                                                # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else FALSE
+# wwpn2: "50050763070B46A6"                                                    # World Wide Port Name (WWPN) To be added only when is_fcp is true
+# lun2: "4016403900000000"                                                     # Logical Unit Number (LUN) To be added only when is_fcp is true
+app_ip2: "9.152.150.225"                                                      # Appliance IP address ( lpar ip)
+gw_ip2: "9.152.150.1"                                                         # (IPv4/IPv6) gateway IP address
+# chpid2: "d0"                                                                  # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382"). 
+# zport2: 0                                                                     # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.

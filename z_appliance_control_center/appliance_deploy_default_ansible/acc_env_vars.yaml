@@ -1,0 +1,41 @@
+#*+-------------------------------------------------------------------+
+#*| IBM Confidential                                                  |
+#*|                                                                   |
+#*| Licensed Materials - Property of IBM                              |
+#*|                                                                   |
+#*|                                                                   |
+#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
+#*|                                                                   |
+#*| The source code for this program is not published or otherwise    |
+#*| divested of its trade secrets, irrespective of what has been      |
+#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+
+
+# Variables used for installing ACC
+
+# HMC
+HMC_HOST: "9.152.150.166"                                                                        # hmc host ip (e.g., 9.152.150.166)
+HMC_USER: "{{ lookup('env', 'HMC_USER') }}"                                                      # Set Your hmc username (e.g., export HMC_USER=xyz.ibm.com) 
+HMC_PASSWORD: "{{ lookup('env', 'HMC_PASSWORD') }}"                                              # Set Your hmc password (e.g,. export HMC_PASSWORD=passw0rd123)
+
+# LPAR Credentials
+USERNAME: "user"                                                                                 # Set Username for the appliance [used during image installation] (e.g., user ) 
+PASSWORD: "password"                                                                             # Set Password for the appliance (used during image installation) (e.g., password )
+
+# ACC LPAR
+ACTION: "activate"                                                                              # ACTION as "activate" or "deactivate" the lpar
+CPC: "T28"                                                                                      # CPC or machine name (e.g., "T28")
+LPAR: "BLUEC1"                                                                                   # Logical partition (LPAR) name where you want to install ACC image (e.g., "BLUEC1") should be valid lpar name
+LPAR_IP: "9.152.150.230"                                                                        # Appliance IP address (lpar ip)
+DISK_ID: "0.0.5f47"                                                                             # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+IS_FCP: false                                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False
+# lun: "4026402200000000"                                                                       # To be added only when is_fcp is true (e.g., lun: "4026402200000000")
+# wwpn: "50050763070b46a6"                                                                      # To be added only when disk is_fcp is true (e.g., wwpn: "50050763070b46a6")
+GATEWAY_IP: "9.152.150.1"                                                                       # (IPv4/IPv6) gateway IP address
+LPAR_USER: "root"                                                                               # Username for LPAR login
+LPAR_PASSWORD: "linux390"                                                                       # Password for LPAR login
+STORAGE: 16384                                                                                  # Storage allocated (in MB)
+
+# Paths on the control node (i.e., your laptop)
+IMAGE_PATH: "/Users/dev_ZACC-FINAL-IMAGE-12.13.0-main_2025-10-02_01-1.2.4-final.img.gz"                                          # Path on the control node (e.g., your laptop) with the image file which (ACC image) you want to install
+INSTALL_SCRIPT_PATH: "/Users/zFAB-ACC-User-Guide/acc_ansible_install_scripts"                                                    # Dont change this value its for internal use only, only update absolute path to point to acc_ansible_install_scripts folder.
