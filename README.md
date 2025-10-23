@@ -70,6 +70,7 @@ often repeated and in need of automation.
   - [Copy templates to z/OS](zos_concepts/templates/copy_template)
   - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
   - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
+  - [Replace text with back ref multiple lines on datasets](zos_concepts/manipulate_text)
   - [Run local and remote scripts inside Unix System Services in z/OS](zos_concepts/zos_script)
   - [Run REXX scripts and CLISTs with TSO commands](zos_concepts/tso_commands/scripts)
   - [Query attributes from data sets, aggregates, Generation Data Groups and Unix System Services files](zos_concepts/zos_stat)
