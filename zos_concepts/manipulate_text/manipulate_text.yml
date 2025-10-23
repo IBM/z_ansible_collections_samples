@@ -1,0 +1,238 @@
+###############################################################################
+# © Copyright IBM Corporation 2025
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to create a zFS aggregate, mount it,
+# shrink it with different size options,
+# and use the module's verbose mode to get the full trace back.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_edit_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.15.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set names and a USS tmp file
+    # ##########################################################################
+
+    - name: Create temp data set name for SEQ dataset
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds1
+
+    - name: Create temp data set name for PDSE dataset
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds2
+
+    - name: Create temp data set name for backup name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: backup_tmp
+
+    - name: Create USS file to copy the text
+      tempfile:
+        path: "/tmp"
+        state: file
+        suffix: temp
+      register: tmp_file
+
+    - name: Create temp data set name for SEQ dataset
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds3
+
+    - set_fact:
+        seq_dataset: "{{ tmp_ds1.stdout }}"
+        pdse_dataset: "{{ tmp_ds2.stdout }}"
+        seq_n_dataset: "{{ tmp_ds3.stdout }}"
+        backup_name: "{{ backup_tmp.stdout }}"
+        tmp_file: "{{ tmp_file.path }}"
+
+    # ##########################################################################
+    # Modules: zos_data_set, zos_copy, zos_replace
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_data_set, create seq dataset {{ seq_dataset }}.
+    # | - Using zos_data_set, create pdse dataset {{ pdse_dataset }}.
+    # | - Using zos_copy, from log_file to {{ pdse_dataset }}(MEM).
+    # | - Using zos_copy, copy from the {{ pdse_dataset }}(MEM) to {{ seq_dataset }}.
+    # | - Using zos_copy, copy from the {{ pdse_dataset }}(MEM) to {{ pdse_dataset }}(MEM1).
+    # | - Using zos_copy, copy from files_no_utf_8 to {{ tmp_file }}.
+    # | - Using zos_copy, copy from {{ tmp_file }} to {{ seq_n_dataset }}.
+    # +-------------------------------------------------------------------------
+
+    # ##########################################################################
+    # Create datasets and paste the content of files on datasets to modify.
+    # ##########################################################################
+
+    - name: "Create SEQ dataset {{ seq_dataset }}"
+      zos_data_set:
+        name: "{{ seq_dataset }}"
+        type: seq
+
+    - name: "Create the PDSE dataset {{ pdse_dataset }}"
+      zos_data_set:
+        name: "{{ pdse_dataset }}"
+        type: pdse
+        state: "present"
+
+    - name: "Copy the file log_file of the folder to the MEM of {{ pdse_dataset }}"
+      zos_copy:
+        src: "{{playbook_dir}}/files/log_file.txt"
+        dest: "{{ pdse_dataset }}(MEM)"
+
+    - name: "Copy {{ pdse_dataset }} to the {{ seq_dataset }} dataset"
+      zos_copy:
+        src: "{{ pdse_dataset }}(MEM)"
+        dest: "{{ seq_dataset }}"
+        remote_src: True
+
+    - name: "Generate a new member of {{ pdse_dataset }} with copy of content"
+      zos_copy:
+        src: "{{ pdse_dataset }}(MEM)"
+        dest: "{{ pdse_dataset }}(MEM1)"
+        remote_src: True
+
+    - name: "Execute copy of files_no_utf_8 to the tmp file {{ tmp_file }}"
+      zos_copy:
+        src: "{{playbook_dir}}/files/files_no_utf_8.txt"
+        dest: "{{ tmp_file }}"
+        force: True
+
+    - name: "Copy {{ tmp_file }} to the last SEQ dataset {{ seq_n_dataset }}"
+      zos_copy:
+        src: "{{ tmp_file }}"
+        dest: "{{ seq_n_dataset }}"
+        remote_src: True
+
+    # ##########################################################################
+    # Manipulate text on the files with different options.
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_replace, replace multiple lines on {{ seq_dataset }} and backup.
+    # | - Using zos_replace, replace with disable_regex option on {{ pdse_dataset }}(MEM).
+    # | - Using zos_replace, replace text with back ref on {{ pdse_dataset }}(MEM1).
+    # | - Using zos_replace, replace words on {{ tmp_file }} with no utf-8 characters.
+    # | - Using zos_replace, replace on no utf-8 characters {{ seq_n_dataset }}.
+    # +-------------------------------------------------------------------------
+
+    # ##########################################################################
+    # manipulate the text on files
+    # ##########################################################################
+
+    - name: "Replace multiple lines on {{ seq_dataset }} dataset and backup result"
+      zos_replace:
+        target: "{{ seq_dataset }}"
+        regexp: ^(IE[A-Z0-9]{3}I|IEF[0-9]{3}I)\s.*
+        after: ^\$DA *
+        before: ^\s*NODE\d *
+        backup: True
+        backup_name: "{{ backup_name }}"
+      register: multiple_lines_results
+
+    - name: See the result of replace multiple lines
+      debug:
+        msg: "{{ multiple_lines_results }}"
+
+    - name: Cat backup with original text
+      shell:
+        cmd: dcat "{{ multiple_lines_results.backup_name }}"
+      register: content_of_backup
+
+    - name: See the backup of the original text
+      debug:
+        msg: "{{ content_of_backup }}"
+
+    - name: "Replace a line using disable_regex option for after on {{ pdse_dataset }}(MEM)"
+      zos_replace:
+        target: "{{ pdse_dataset }}(MEM)"
+        regexp: //*SMPTLIB  DD UNIT=SYSALLDA,SPACE=(TRK,(1,1)),VOL=SER=vvvvvv
+        after: $TRACE OFF
+        disable_regex:
+          - regexp
+          - after
+      register: disable_regex_output
+
+    - name: See the result of replace a specif line
+      debug:
+        msg: "{{ disable_regex_output }}"
+
+    - name: "Replace using backref on {{ pdse_dataset }}(MEM1)"
+      zos_replace:
+        target: "{{ pdse_dataset }}(MEM)"
+        regexp: '^(IEF403I|IEF404I|IEF456I) (\S+) - '
+        replace: '\1 PROCESSING_JOB - '
+      register: backref_output
+
+    - name: See the result of replace a specif line
+      debug:
+        msg: "{{ backref_output }}"
+
+    - name: "Replace words between lines on USS file {{ tmp_file }} with no utf-8"
+      zos_replace:
+        target: "{{ tmp_file }}"
+        regexp: 'ZOAU_ROOT'
+        replace: 'NEW_ZOAU_ROOT'
+        after: '^PATH*'
+        before: 'TYPE*'
+      register: replace_words
+
+    - name: See the result of replace words
+      debug:
+        msg: "{{ replace_words }}"
+
+    - name: "Replace on SEQ dataset {{ seq_n_dataset }} with no utf-8 characters"
+      zos_replace:
+        target: "{{ seq_n_dataset }}"
+        regexp: lpp
+        replace: lp
+      register: replace_no_utf_8_characters
+
+    - name: "See the result of replace on {{ seq_n_dataset }}"
+      debug:
+        msg: "{{ replace_no_utf_8_characters }}"
+
+    # ##########################################################################
+    # clean up - delete datasets
+    # ##########################################################################
+
+    - name: Delete dataset
+      zos_data_set:
+        name: "{{ seq_n_dataset }}"
+        state: absent
+
+    - name: Delete dataset
+      zos_data_set:
+        name: "{{ pdse_dataset }}"
+        state: absent
+
+    - name: Delete dataset
+      zos_data_set:
+        name: "{{ seq_dataset }}"
+        state: absent
+
+    - name: Delete uss file
+      file:
+        name: "{{ tmp_file }}"
+        state: absent
+
+    - name: Delete backup dataset
+      zos_data_set:
+        name: "{{ multiple_lines_results.backup_name }}"
+        state: absent
