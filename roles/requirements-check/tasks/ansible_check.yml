@@ -17,9 +17,9 @@
           {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }}
           has been detected."
     that: (
-            ansible_version.major|int == {{tmp.split('.')[0]}}|int and
-            ansible_version.minor|int == {{tmp.split('.')[1]}}|int and
-            ansible_version.revision|int >= {{tmp.split('.')[2]|default (0)}}|int
+            ansible_version.major|int == tmp.split('.')[0]|int and
+            ansible_version.minor|int == tmp.split('.')[1]|int and
+            ansible_version.revision|int >= tmp.split('.')[2]|default (0)|int
           )
     quiet: true
   register: result

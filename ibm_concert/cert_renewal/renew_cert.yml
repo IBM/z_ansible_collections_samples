@@ -24,6 +24,7 @@
     owner_id: ''
     cert_type: 'USER'  # defautl to USER
     cert_label: ''
+    cert_sn: ''
     sign_with: 'CERTAUTH' # blank or CERTAUTH
     keyring_name: ''
     expiry_date: '2025-12-31'
@@ -40,16 +41,22 @@
         desc_list: "{{ sn_short_desc | split('@@@') }}"
 
     - ansible.builtin.set_fact:
-        ct_index: "{{ lookup('ansible.utils.index_of', desc_list, 'regex', '\\] Certificate') }}"
+        desc_list2: "{{ sn_short_desc | split('000') }}"
+
+    - ansible.builtin.set_fact:
+        ct_index: "{{ lookup('ansible.utils.index_of', desc_list2, 'regex', '\\] Certificate') }}"
 
     - ansible.builtin.set_fact:
         sn_incident_number: "{{desc_list[0] | trim }}"
 
     - ansible.builtin.set_fact:
-        arg_cert_type: "{{desc_list[ct_index|int + 1] | trim }}"
+        arg_cert_type: "{{desc_list2[ct_index|int + 1] | trim }}"
 
     - ansible.builtin.set_fact:
-        cert_label: "{{desc_list[ct_index|int + 2] | trim }}"
+        cert_label: "{{desc_list2[ct_index|int + 2] | trim }}"
+
+    - ansible.builtin.set_fact:
+        cert_sn: "{{desc_list2[ct_index|int + 3] | trim }}"
 
     - name: Build cert details for {{cert_label}}
       ansible.builtin.set_fact:
@@ -96,7 +103,8 @@
             cert_args: "{{ cert_args | default({}) | combine ({
               'owner_id': arg_cert_type,
               'cert_type': cert_type,
-              'cert_label': cert_label
+              'cert_label': cert_label,
+              'cert_sn': cert_sn
               }) }}"
             owner_id: "{{arg_cert_type}}"
           when: cert_type == 'USER'
@@ -106,7 +114,8 @@
             cert_args: "{{ cert_args | default({}) | combine ({
               'owner_id': '',
               'cert_type': cert_type,
-              'cert_label': cert_label
+              'cert_label': cert_label,
+              'cert_sn': cert_sn
               }) }}"
           when: cert_type != 'USER'
 
@@ -126,6 +135,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT ID({{ cert_args.owner_id}}) LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'USER'
@@ -135,6 +145,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'CERTAUTH'
@@ -144,6 +155,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'SITE'
@@ -218,6 +230,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT ID({{ cert_args.owner_id}}) LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'USER'
@@ -227,6 +240,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT CERTAUTH LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'CERTAUTH'
@@ -236,6 +250,7 @@
           vars:
             task_description: 'Displaying cert {{cert_args.cert_label}}'
             role_cert: "{{cert_args}}"
+            caller: 'renewal'
             tso_command:
               - RACDCERT SITE LIST(LABEL('{{cert_args.cert_label}}'))
           when: cert_type is defined and cert_type == 'SITE'
@@ -261,15 +276,16 @@
 
         - name: Send cert data to IBM Concert
           ansible.builtin.shell: |
-              /usr/bin/curl -k -X POST https://{{ concert_hostname }}/ingestion/api/v1/upload_files \
+              /usr/bin/curl -k -X POST {{ concert_hostname }}:{{ concert_port }}/ingestion/api/v1/upload_files \
                   -H 'Content-Type: multipart/form-data' \
                   -H 'InstanceId: {{concert_instance_id}}' \
                   -H 'Accept: application/json' \
                   -H 'Authorization: {{ concert_api_key_type }} {{ concert_api_key }}' \
                   -F 'data_type=certificate' \
                   -F 'filename=@{{ playbook_dir }}/{{ concert_csv_file }}' \
-                  -F 'metadata={"env_name" : "prod"}'
+                  -F 'metadata={"env_name" : "z/OS"}'
           delegate_to: localhost
+          ignore_errors: true
 
         - name: Resolve incident in ServiceNow
           servicenow.itsm.incident:

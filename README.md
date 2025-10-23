@@ -66,11 +66,14 @@ often repeated and in need of automation.
   - [Dump, Archive, Fetch, Copy and Unarchive Data Sets](zos_concepts/data_transfer/archive_copy_unarchive_restore)
   - [Transfer, Dump and Unpack Data Sets](zos_concepts/data_transfer/dump_pack_ftp_unpack_restore)
   - [Grow ZFS aggregates](zos_concepts/zfsadm/zfs_grow_aggr)
+  - [Grow ZFS and fetch full trace back](zos_concepts/zfsadm/grow_zfs_fetch_trace_back)
   - [Copy templates to z/OS](zos_concepts/templates/copy_template)
   - [Use templated job cards and JCL to submit jobs](zos_concepts/templates/submit_job_template)
   - [Use templates for compiling and linking libraries](zos_concepts/templates/loadlib)
+  - [Replace text with back ref multiple lines on datasets](zos_concepts/manipulate_text)
   - [Run local and remote scripts inside Unix System Services in z/OS](zos_concepts/zos_script)
   - [Run REXX scripts and CLISTs with TSO commands](zos_concepts/tso_commands/scripts)
+  - [Query attributes from data sets, aggregates, Generation Data Groups and Unix System Services files](zos_concepts/zos_stat)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
@@ -78,6 +81,9 @@ often repeated and in need of automation.
   - [System Automation](z_system_automation)
     - [Managing Dynamic Resources](z_system_automation/dynamic_resources/)
   - [Invoking REST APIs using the URI module](zos_concepts/rest_apis)
+  - [IBM Concert](ibm_concert)
+    - [Manage z/OS Certificates using IBM Concert, ServiceNow, and Ansible Automation Platform](ibm_concert/cert_renewal/)
+    - [Collect z/OS Software instances Topology, Usage, and missing fixes](ibm_concert/z_apars/)
 - Provisioning
   - [IMS](zos_subsystems/ims)
     - [Deploy an IMS Cobol App](zos_subsystems/ims/ims_cobol_deploy)
@@ -113,6 +119,7 @@ often repeated and in need of automation.
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
   - [Security provision](zos_management/zosmf_security_configuration_assistant)
+  - [Shrink ZFS and see full verbose output](zos_concepts/zfsadm/shrink_zfs_different_size_and_verbose)
 
 
 ## Blogs
@@ -144,7 +151,7 @@ For further reading on how playbook projects are organized in this repository,
 review the following [documentation](./docs/share/contribution-guidelines.md#playbook-structure).
 
 ## Copyright
-© Copyright IBM Corporation 2020 - 2024
+© Copyright IBM Corporation 2020 - 2025
 
 ## License
 Licensed under

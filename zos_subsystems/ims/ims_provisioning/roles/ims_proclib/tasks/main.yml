@@ -269,23 +269,23 @@
         batch:
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}CTL)'
             state: absent
-            type: MEMBER
+            type: member
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DLI)'
             state: absent
-            type: MEMBER
+            type: member
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DRC)'
             state: absent
-            type: MEMBER
+            type: member
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}OM)'
             state: absent
-            type: MEMBER
+            type: member
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SCI)'
             state: absent
-            type: MEMBER
+            type: member
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}RM)'
             state: absent
-            type: MEMBER
+            type: member
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}ODBM)'
             state: absent
-            type: MEMBER
+            type: member
       when: delete

@@ -1,0 +1,190 @@
+---
+- name: Gather and send z topology and missing APARs to Concert
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    zmf_host: "{{ ansible_host }}"
+    zmf_port: #
+    zmf_user: #
+    zmf_password: "{{ vault_zmf_password }}"
+    izsam_jcl: #
+    izsam_csv_dsn: #
+    concert_url: #
+    concert_port: #
+    concert_api_key: #
+    concert_instance_id: #
+
+    # These vars should not need to change.
+    fmid_fix_list: []
+    csi_fmid_entry: {}
+    csi_info: {}
+    csi_libs_entries: []
+    csi_unix_entries: []
+    csi_datasets: {}
+    swilist: []
+    collated_swi: {}
+
+  tasks:
+    - name: Locating all files in playbook_output directory
+      ansible.builtin.find:
+        path: "{{ playbook_dir }}/playbook_output"
+      register: cleanup
+      delegate_to: localhost
+      ignore_errors: true
+
+    - name: Removing all files previously found in playbook_output dir
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ cleanup.files }}"
+      delegate_to: localhost
+      ignore_errors: true
+
+    #####################################################################################
+    # PLAY #1: Retrieve all SW Instances                                                #
+    #####################################################################################
+    - name: Get zosmf software instances
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/swmgmt/swi"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: instance_data
+      delegate_to: localhost
+
+    - ansible.builtin.set_fact:
+        swi_list: '{{ instance_data.json.swilist }}'
+
+    - name: Save SWI to a json file
+      ansible.builtin.copy:
+        content: "{{ instance_data.json | to_nice_json }}"
+        dest: "{{ playbook_dir }}/playbook_output/swi.json"
+      delegate_to: localhost
+
+    #####################################################################################
+    # PLAY #2: Build collated data for each SW Instance                                 #
+    #####################################################################################
+    - name: Build collated SWI list
+      ansible.builtin.include_tasks: tasks/build_swi_collated.yml
+      vars:
+        outer_var: "{{ outer_item }}"
+      loop: "{{ swi_list }}"
+      loop_control:
+        loop_var: outer_item
+      no_log: true
+      ignore_errors: true
+
+    - name: Update collated SWI
+      ansible.builtin.set_fact:
+        collated_swi: "{{ collated_swi | default({}) | combine ({
+                'swilist': swilist
+                }) }}"
+
+    - name: Save collated SWI to a json file
+      ansible.builtin.copy:
+        content: "{{ collated_swi | to_nice_json }}"
+        dest: "{{ playbook_dir }}/playbook_output/swi_collated.json"
+      delegate_to: localhost
+
+    # #####################################################################################
+    # # PLAY #3: Get zosmf system topology                                                #
+    # #####################################################################################
+    - name: Get zosmf topology
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}/zosmf/resttopology/systems"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: zmf_topology_data
+      delegate_to: localhost
+
+    - ansible.builtin.set_fact:
+        info: "{{ zmf_topology_data.content }}"
+
+    - name: Save zOSMF Topology to a json file
+      ansible.builtin.copy:
+        content: "{{ info | to_nice_json }}"
+        dest: "{{ playbook_dir }}/playbook_output/resttopology.json"
+      delegate_to: localhost
+
+    # #####################################################################################
+    # # PLAY #4: Get SW Usage report from IZSAM                                           #
+    # # #####################################################################################
+    - name: Submit JCL in a PDSE member
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ izsam_jcl }}"
+        location: data_set
+        wait_time_s: 600
+      register: izsam_job_output
+      ignore_errors: true
+
+    - name: Copy data to localhost for inspection.
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/playbook_output/{{ item }}.json"
+        dest: "/tmp/{{ item }}.json"
+      loop:
+        - resttopology
+        - swi_collated
+      register: data_copy
+      delegate_to: localhost
+
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        - "{{ info | to_nice_json }}"
+        - "{{ collated_swi | to_nice_json }}"
+
+    - name: Fetch CSV to local
+      ibm.ibm_zos_core.zos_fetch:
+        src: "{{ izsam_csv_dsn }}"
+        dest: "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
+        flat: true
+      loop:
+        - /tmp/izsam_detail.csv
+        - "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
+
+    - name: Check to make sure files are populated.
+      ansible.builtin.assert:
+        that: "{{ lookup('ansible.builtin.file', item) | length > 0 }}"
+        fail_msg: "The file at {{ item }} is empty."
+        success_msg: "The file at {{ item }} is ready to be sent to concert."
+      loop:
+        - "{{ playbook_dir }}/playbook_output/izsam_detail.csv"
+        - "{{ playbook_dir }}/playbook_output/resttopology.json"
+        - "{{ playbook_dir }}/playbook_output/swi_collated.json"
+
+    - name: Send z APAR data to IBM Concert using curl
+      ansible.builtin.shell: |
+        /usr/bin/curl -X POST --max-time 1200 -ki '{{ concert_url }}/grader/api/v1/zsys/upload' \
+        -H 'Authorization: C_API_KEY {{ concert_api_key }}' \
+        -H 'InstanceId: {{ concert_instance_id }}' \
+        -H 'Concert-Application-Name: {{ concert_application_name }}' \
+        -H 'Concert-API-Key: {{ concert_api_key }}' \
+        -H 'Concert-URL: {{ concert_url }}' \
+        -F 'files=@playbook_output/izsam_detail.csv' \
+        -F 'files=@playbook_output/resttopology.json' \
+        -F 'files=@playbook_output/swi_collated.json'
+      delegate_to: localhost
+      register: curl_response
+      failed_when: curl_response.rc != 0
+
+
+    - name: Print response from previous.
+      ansible.builtin.debug:
+        var: curl_response

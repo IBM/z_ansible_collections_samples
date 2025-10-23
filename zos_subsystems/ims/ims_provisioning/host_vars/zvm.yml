@@ -1,10 +1,10 @@
-PYZ: /allpython/3.9/usr/lpp/IBM/cyp/v3r9/pyz
-ZOAU: /zoau/v1.2.4
+PYZ: /allpython/3.12/usr/lpp/IBM/cyp/v3r12/pyz
+ZOAU: /zoau/v1.3.3
 
 system_environment:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
-  PYTHONPATH: "{{ ZOAU }}/lib"
+  PYTHONPATH: "{{ ZOAU }}/lib/3.12"
   LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
   # PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin"
   PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin:/usr/lpp/java/java180/J8.0_64/bin:/usr/sbin"
