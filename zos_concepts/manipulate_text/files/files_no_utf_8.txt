@@ -1,0 +1,9 @@
+MOUNT FILESYSTEM('TEST.ANSIBLE.DATA.USER')
+PATH=/usr/lpp/zoautil/v100/bin:/usr/lpp/usr/ported/bin:/bin:/var/bin
+export PATH
+ZOAU_ROOT=/usr/lpp/zoautil/v100
+MOUNTPOINT('/tmp/src/somedirectory') 0xC1
+export ZOAU_ROOT
+MOUNTPOINT('/tmp/zfs_aggr1')
+TYPE('ZFS')
+SECURITY
