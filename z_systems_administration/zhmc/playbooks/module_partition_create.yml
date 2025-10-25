@@ -1,0 +1,43 @@
+---
+# Sample playbook for the zhmc_partition module of the ibm.ibm_zhmc collection:
+#
+# Create a partition
+#
+# Command to run this playbook:
+# ansible-playbook -i inventory.yml -e hmc={myhmc} -e cpc={mycpc} -e partition={mypartition} module_partition_create.yml
+
+- hosts:
+    - "{{ hmc | default('default') }}"  # HMC nickname from inventory entry
+  gather_facts: no
+  vars_files:
+    - vault.yml
+  vars:
+    cpc: MYCPC                          # Adjust or override with -e option
+    partition: sample-part-1            # Adjust or override with -e option
+    log_file: zhmc.log
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure partition {{ partition }} exists and is stopped"
+      delegate_to: localhost
+      zhmc_partition:
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
+        cpc_name: "{{ cpc }}"
+        name: "{{ partition }}"
+        state: stopped
+        properties:
+          description: "This is partition {{ partition }}"
+          ifl_processors: 2
+          initial_memory: 1024
+          maximum_memory: 1024
+          minimum_ifl_processing_weight: 50
+          maximum_ifl_processing_weight: 800
+          initial_ifl_processing_weight: 200
+        log_file: "{{ log_file | default(omit) }}"
+      register: result
+
+    - name: Print the result
+      ansible.builtin.debug:
+        var: result
