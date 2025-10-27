@@ -18,8 +18,6 @@
 # ACC Information
 acc_url: 9.152.150.224                                                      # IP of ACC appliance
 acc_port: 8081                                                              # Port of ACC appliance used for communicating with the ACC
-acc_admin_user: "user"                                                      # ACC-admin's user name on ACC
-acc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"             # ACC-admin's password on ACC
 
 # SSA-1 Information
 ssa1_url: 9.152.150.232                                                     # IP of SSA-1 appliance

@@ -17,6 +17,25 @@
   vars_files:
     - admin_vars.yaml
 
+  pre_tasks:
+  - name: Reminder- Export ACC admin credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export ACC admin credentials:
+        export ACC_ADMIN_USER=<your-admin-username>
+        export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
+        export ACC_ADMIN_PASSWORD=<admin-new-password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  vars_prompt:
+    - name: run_init
+      prompt: "Do you want to initialize ACC in HMC Default Mode with MFA? (yes/no)"
+      private: no
+      default: "yes"
+
   tasks:
     - name: 02 - Initialize ACC with HMC Default mode with MFA
       uri:
@@ -32,6 +51,7 @@
         return_content: true
         validate_certs: false
       register: init_response
+      when: run_init | lower == "yes"
 
     - name: Print init response
       debug:

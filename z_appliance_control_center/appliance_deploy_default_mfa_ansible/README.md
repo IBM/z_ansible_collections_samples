@@ -15,6 +15,12 @@ their control node.
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
+- Export Admin username and default password and new password on a terminal in your laptop:
+  ```
+  export ACC_ADMIN_USER=<your_admin_username>
+  export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
+  export ACC_ADMIN_PASSWORD=<your_admin_old_password>
+  ```
 - `cd` to the directory `appliance_deploy_default_mfa_ansible`.
 - Modify the variables in the file `admin_vars.yaml`.
   - Change the `acc_ip` in the `admin_vars.yaml` file to point to the right IP address.
@@ -82,7 +88,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:-
       modify the task `10 - As ACC-admin, assign single resources to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
       `wwpn` and `lun`.
-    - Check if you use FIDs instead of `chipid`. This means you have to modify the
+    - Check if you use `chpid` instead of `fid`. This means you have to modify the
+      task `10 - As ACC-admin, assign single resources to the owner`.
+    - Check if you use FIDs instead of `chpid`. This means you have to modify the
       task `10 - As ACC-admin, assign single resources to the owner`.
     - Run the playbook:
       ```bash
@@ -96,7 +104,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:-
       modify the task `12- As ACC-admin, assign two lpar to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
       `wwpn` and `lun`.
-    - Check if you use FIDs instead of `chipid`. This means you have to modify the
+    - Check if you use `chpid` instead of `fid`. This means you have to modify the
+      task `12- As ACC-admin, assign two lpar to the owner`.
+    - Check if you use FIDs instead of `chpid`. This means you have to modify the
       task `12- As ACC-admin, assign two lpar to the owner`.
     - Run the playbook:
       ```bash

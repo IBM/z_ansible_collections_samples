@@ -12,7 +12,6 @@
 #*+-------------------------------------------------------------------+
 
 acc_ip: https://9.152.150.225:8081/api                                      # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
-appliance_url: https://9.152.150.230:443/api                                # This IP of the appliance
 
 # Users
 cc_owner_user: "cc_owner"                                                  # Specify the owner name for created owner (e.g., cc_owner)
@@ -25,6 +24,42 @@ package_name: "RP16"                                         # Already created R
 lpar_name: "SSC16"                                                        # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
 
 # Image
+# ***************************************************************************************
+# SSA Image Installation Configuration
+#
+# This section defines the parameters needed to install an SSA (Secure Service
+# Appliance) image onto the target IBM Z environment.
+#
+# The SSA image file is deployed from the control node (e.g., a
+# management workstation or laptop) to the designated appliance LPAR.
+#
+# The parameters below define:
+#   - The location of the image file
+#   - The location of the update bundle file
+#   - The minimum cores and memory resources required for installation
+#   - The type of image being installed (image or fix)
+#   - The name of the update bundle
+# min_ifls
+# ------------------------------------------------------------------------------
+# The minimum number of IFLs (Integrated Facility for Linux) required by
+# the SSA appliance to run successfully.
+#
+# Since SSA runs as a Linux-based appliance on IBM Z, at least **1 IFL**
+# is required. For better performance, more can be assigned depending on
+# the expected workload.
+#
+# Guidance:
+#   - Minimum: 1 IFL (required for installation)
+#   - Recommended: 2–4 IFLs for production or performance testing
+# min_memory
+# ------------------------------------------------------------------------------
+# The minimum memory (in MB) required by the SSA appliance.
+# This is the least amount of memory needed to install and boot the image.
+#
+# Memory should always be a multiple of 1024 (1 GB).
+
+# *****************************************************************************************
+
 image_path: "/Users/Downloads/zfab_test_1.1.1_pre_release.img-new.gz"       # Path on the control node (e.g., your laptop) with the image file which you want to install
 update_bundle_path: "/Users/zssa_update_bundle_v1.0.4_iesp_debug.tar"             # Modify the update bundle image file location which you want to install
 update_bundle_name: "update_bundle_1.0.4"                                     # Update bundle file name
@@ -34,6 +69,18 @@ image_type: "image"                                                         # Th
 image_fix_type: "fix"                                                       # This is the fix type of image
 
 # Image install
+# ***************************************************************************
+# Image Installation Parameters
+#
+# This section controls how an appliance image, managed by ACC (like SSA, Spyre Support Appliance), 
+# is deployed and configured on the target LPAR.
+#
+# The parameters define whether to perform a new installation or reuse an
+# existing image, as well as the cores and memory resources to assign to
+# the appliance during startup.
+# Defines the hostname that will be assigned to the SSA image after installation.
+# ***************************************************************************
+
 install: true                                                               # Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image (true = install new image, false = use existing disk image)
 hostname: "host"                                                            # Hostname to assign to the installed image
 app_cores: 2                                                                # Number of CPU cores allocated for the image

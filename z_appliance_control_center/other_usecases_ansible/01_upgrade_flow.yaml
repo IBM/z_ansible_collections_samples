@@ -90,7 +90,7 @@
         body: |
           {
             "{{ package_name }}": {
-            "lpar": ["{{ lpar_name }}"],
+            "lpars": ["{{ lpar_name }}"],
             "image_id": {{ image_id | int}}
             }
           }

@@ -11,6 +11,9 @@
 #*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
+# NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
+# sections in the scripts as well. Please review the script thoroughly before running it.
+
 acc_ip: https://9.152.150.232:8081/api                                     # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 
 #Init ACC
@@ -18,24 +21,32 @@ hmc_managed: true                                                          # Ini
 
 # HMC access
 hmc_url: "9.152.150.166"                                                     # hmc host ip (e.g., T28: 9.152.150.166)
-hmc_user: "{{ lookup('env', 'HMC_USER') }}"                                  # ACC-admin's user name on the HMC (e.g., xyz.ibm.com) 
-hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                          # ACC-admin's password on the HMC (e.g., passw0rd123)
+hmc_user: "{{ lookup('env', 'HMC_USER') }}"                                  # ACC-admin's user name on the HMC (e.g., xyz.ibm.com). Export before run: export HMC_USER=<your_hmc_username>
+hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                          # ACC-admin's password on the HMC (e.g., passw0rd123).  Export before run: export HMC_PASSWORD=<your_hmc_password>
 
 # Users
-cc_admin_user: "user"                                                        # ACC LPAR's username (default admin username) (e.g., cc_admin)
-cc_admin_old_password: "password"                                            # ACC LPAR's password (default admin password) (e.g., "defaultPassw0rd")
-cc_admin_password: "defaultP@ssw0rd1"                                        # Updated password for ACC LPAR (updated admin password) (e.g., "defaultPassw0rd1")
+cc_admin_user: "{{ lookup('env', 'ACC_ADMIN_USER') }}"                       # ACC LPAR's username (default admin username) (e.g., cc_admin).                     Export before run: export ACC_ADMIN_USER=<your_admin_username>
+cc_admin_old_password: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"   # ACC LPAR's password (default admin password) (e.g., "defaultPassw0rd").            Export before run: export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
+cc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"               # Updated password for ACC LPAR (updated admin password) (e.g., "defaultPassw0rd1"). Export before run: export ACC_ADMIN_PASSWORD=<your_new_password>
 
 cc_owner_user: "cc_owner"                                                    # Specify the owner name for the new Owner's creation (e.g., cc_owner)
 cc_owner_email: "cc_owner@email.com"                                         # Owner's email address (e.g., "cc_owner@email.com")
 cc_owner_default_password: "defaultP@ssw0rd"                                 # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
 
 # Resources that are assigned to the appliance-owner
+
+# ****************************************************************************
+# A *resource package* is a bundle of hardware resources assigned to a
+# specific set of logical partition (LPAR) and an appliance owner on an IBM Z system.
+# The resource package defines how many total number of Cores (GPs or IFLs),
+# how much total memory, and which LPARs within a CPC are assigned to the appliance owner.
+# ****************************************************************************
+
 z_machine_name: "T28"                                                        # CPC or machine name (e.g., "T28")
-z_machine_lpar: "BLUEC1"                                                     # Logical partition (LPAR) name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name
+z_machine_lpar: "SSC16"                                                     # Logical partition (LPAR) name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name
 package_name: "resource_package_1"                                           # Resource package name (e.g., "RP01")
 package_ifls: 0                                                              # Number of IFLs can range from 0 up to the CPC's available IFL count (e.g., 0)
-package_gps: 6                                                               # Number of general-purpose CPUs (GCPs); can range from 0 up to the CPC's available GCP count (e.g., 6)
+package_gps: 8                                                               # Number of general-purpose Cores (GCPs); can range from 0 up to the CPC's available GCP count (e.g., 6)
 package_memory_mb: 16384                                                      # Memory allocated for resource creation (in MB): depends on the CPC's customerStorageAvailable, it should be multiple of 1024.
 
 
@@ -48,6 +59,10 @@ package_memory_mb: 16384                                                      # 
 #                      the **Second LPAR Config** sections below.
 #   3. First LPAR Config (Always required)
 #   4. Second LPAR Config (Only required if you want to create a Resource Package with 2 LPARs)
+#   5. Please set the correct values for LPARS (logical partitions); otherwise,
+#    the installation may fail with a generic error message.
+#   6. Ensure the LPAR name exactly matches an existing, valid LPAR defined
+#    on the target CPC.
 ################################################################################
 
 

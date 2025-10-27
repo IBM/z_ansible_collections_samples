@@ -18,7 +18,7 @@ These example playbooks let the user:
     ```bash
     pip install ansible
     ```
-- Download this directory and the `acc_ansible_install_scripts` directory on 
+- Download this directory and the `acc_install_ansible` directory on 
   the control node (e.g., a laptop), which will connect with ACC.
 
 ## ACC Appliance Installation
@@ -68,6 +68,12 @@ their control node.
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
+- Export Admin username and default password and new password on a terminal in your laptop:
+  ```
+  export ACC_ADMIN_USER=<your_admin_username>
+  export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
+  export ACC_ADMIN_PASSWORD=<your_admin_old_password>
+  ```
 - `cd` to the directory `appliance_deploy_default_ansible`.
 - Modify the variables in the file `admin_vars.yaml`.
   - Change the `acc_ip` in the `admin_vars.yaml` file to point to the right IP address.
@@ -116,7 +122,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:
       modify the task `10 - As ACC-admin, assign single resources to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
       `wwpn` and `lun`.
-    - Check if you use FIDs instead of `chipid`. This means you have to modify the
+    - Check if you use `chpid` instead of `fid`. This means you have to modify the
+      task `10 - As ACC-admin, assign single resources to the owner`.
+    - Check if you use FIDs instead of `chpid`. This means you have to modify the
       task `10 - As ACC-admin, assign single resources to the owner`.
     - Run the playbook:
       ```bash
@@ -130,7 +138,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:
       modify the task `12- As ACC-admin, assign two lpar to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
       `wwpn` and `lun`.
-    - Check if you use FIDs instead of `chipid`. This means you have to modify the
+    - Check if you use `chpid` instead of `fid`. This means you have to modify the
+      task `12- As ACC-admin, assign two lpar to the owner`.
+    - Check if you use FIDs instead of `chpid`. This means you have to modify the
       task `12- As ACC-admin, assign two lpar to the owner`.
     - Run the playbook:
       ```bash
@@ -183,3 +193,9 @@ Note that to pull logs for SSA, concurrent updates for SSA, upgrade, Health chec
 status, or ACC concurrent updates, use the playbooks located in:
 `other_ansible_usecases_scripts` directory.
 
+#### NOTE
+Make sure to run 03_owner_action.yaml before executing 04_install_flow.yaml.
+The 03_owner_action.yaml script appends the image_id: <id> entry to the end of the owner variable file.
+If you skip running 03_owner_action.yaml, you may encounter the following error:
+
+  `"msg": "The task includes an option with an undefined variable. 'image_id' is undefined"`

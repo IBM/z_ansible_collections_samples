@@ -20,6 +20,24 @@
   vars_files:
     - env_vars.yaml
 
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC LPAR's username"
+      private: no
+
+    - name: cc_admin_old_password
+      prompt: "Enter ACC LPAR's Default Password"
+      private: yes
+
+    - name: cc_admin_password
+      prompt: "Enter ACC LPAR's New Password"
+      private: yes
+
+    - name: run_init
+      prompt: "Do you want to initialize ACC with HMC Default Mode? (yes/no)"
+      private: no
+      default: "yes"
+
   tasks:
     - name: Prepare ACC URL
       set_fact:
@@ -52,6 +70,7 @@
         method: POST
         validate_certs: false
         return_content: true
+      when: run_init | lower == "yes"
 
     - name: Update ACC-admin password (remove this if already done)
       tags: admin
@@ -259,8 +278,8 @@
         body:
           ssa_package:
             image_id: 1
-            processor_usage: "shared"
-            processor_type: "general-purpose"
+            processor_usage: "{{ processor_usage }}"
+            processor_type: "{{ processor_type }}"
             memory: 51200
             cores: 2
             username: "{{ ssa_username }}"

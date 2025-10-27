@@ -54,23 +54,32 @@
       uri:
         url: "{{ acc_ip }}/cluster/activate"
         method: POST
-        body:
-          resource_package_1: #Add resource package name directly
-            image_id: "{{image_id}}"
-            processor_usage: "shared"
-            processor_type: "general-purpose"
-            memory: "{{ app_memory }}"
-            cores: "{{ app_cores }}"
-            username: "{{ app_username }}"
-            password: "{{ app_password }}"
-            hostname: "{{ hostname }}"
-            lpars:           # Comment any one lpar details when running with 1 lpar
-              - name: "{{ lpar_name1 }}"
-                execution_action: "{{ execution_action }}"
-                install: "{{ install }}"
-              - name: "{{ lpar_name2 }}"
-                execution_action: "{{ execution_action }}"
-                install: "{{ install }}"
+        body: |
+          {
+            "{{ package_name }}":
+            {
+              "image_id": {{ image_id }},
+              "processor_usage": "{{ processor_usage }}",
+              "processor_type": "{{ processor_type }}",
+              "memory": {{ app_memory }},
+              "cores": {{ app_cores }},
+              "username": "{{ app_username }}",
+              "password": "{{ app_password }}",
+              "hostname": "{{ hostname }}",
+              "lpars": [        # Comment any one lpar details when running with 1 lpar
+                  {
+                    "name": "{{ lpar_name1 }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  },
+                  {
+                    "name": "{{ lpar_name2 }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  }
+                ]
+              }
+            }
         body_format: json
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -131,7 +140,8 @@
         msg: "{{ item.json }}"
       loop: "{{ task_status.results | default([task_status]) }}"
       loop_control:
-        label: "Task ID {{ item.item | default(task_ids[0]) }}"
+        label: "Task ID {{ item.task_id | default('unknown') }}"
+      when: item.json is defined
    
 
     - name: 20a - Get resources assigned to the owner by the admin
