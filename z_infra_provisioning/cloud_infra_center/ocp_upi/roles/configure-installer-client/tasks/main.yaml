@@ -22,7 +22,7 @@
 
 - name: 'Set fact for openshift client'
   ansible.builtin.set_fact:
-    openshift_client_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp/{{ icic_ocp_version.stdout }}"
+    openshift_client_url: "https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/{{ icic_ocp_version.stdout }}/{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"
     openshift_install_dir: "."
 
 - name: Get checksum for local openshift-install-linux.tar.gz
@@ -34,7 +34,7 @@
 
 - name: Get checksum for local openshift-client-linux.tar.gz
   ansible.builtin.stat:
-    path: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+    path: "{{ openshift_install_dir }}/openshift-client-linux-{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}-rhel{{ ansible_distribution_major_version }}.tar.gz"
     checksum_algorithm: sha256
     get_checksum: true
   register: openshift_client_local_tar_results
@@ -66,7 +66,7 @@
 
 - name: Download openshift client
   ansible.builtin.get_url:
-    url: "{{ openshift_client_url }}/openshift-client-linux.tar.gz"
+    url: "{{ openshift_client_url }}/openshift-client-linux-{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}-rhel{{ ansible_distribution_major_version }}.tar.gz"
     dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
   register: openshift_client_download_results
   when:
