@@ -94,7 +94,7 @@ To install 2 SSAs after a fresh install of ACC, you should:
     updating the password).
   - Check if you use FCP disk instead of a dasd. This means you have to
     modify the task `Assign resources to the SSA owner`.
-  - Check if you use FIDs instead of `chipid`. This means you have to modify the
+  - Check if you use FIDs instead of `chpid`. This means you have to modify the
     task `Assign resources to the SSA owner`.
 
 - Run the playbook to install SSA via:

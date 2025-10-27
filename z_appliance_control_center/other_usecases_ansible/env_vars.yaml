@@ -11,6 +11,9 @@
 #*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
+# NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
+# sections in the scripts as well. Please review the script thoroughly before running it.
+
 # Variables used for installing SSAs
 
 # ACC variables
@@ -25,20 +28,27 @@ hmc_user: "{{ lookup('env', 'HMC_USER') }}"                                     
 hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                               # ACC-admin's password on the HMC (e.g., export HMC_PASSWORD=passw0rd123)
 
 # Users
-cc_admin_user: "{{ lookup('env', 'ACC_ADMIN_USER') }}"                             # ACC LPAR's username (default admin username) (e.g., export ACC_ADMIN_USER=cc_admin )       
-cc_admin_old_password: "{{ lookup('env', 'ACC_APP_PASSWORD') }}"                   # ACC LPAR's password (default admin password) (e.g., export ACC_APP_PASSWORD="defaultPassw0rd")
-cc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"                     # Updated password for ACC (updated admin password) (e.g., export ACC_ADMIN_PASSWORD="defaultPassw0rd1")
 ssa_owner_user: "cc_owner"                                                         # Specify the owner name for the new Owner's creation (e.g., cc_owner)
 ssa_owner_email: "cc_owner@email.com"                                              # Owner's email address (e.g., "cc_owner@email.com")
 ssa_owner_default_password: "defaultP@ssw0rd"                                      # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
 ssa_owner_password: "{{ lookup('env', 'SSA_OWNER_PASSWORD') }}"                    # Owner's new password to update the old one (e.g., export SSA_OWNER_PASSWORD="defaultPassw0rd1")
 
 # Resources that are assigned to the appliance-owner
+
+# ****************************************************************************
+# A *resource package* is a bundle of hardware resources assigned to a
+# A *resource package* is a bundle of hardware resources assigned to a
+# specific set of logical partition (LPAR) and an appliance owner on an IBM Z system.
+# The resource package defines how many total number of Cores (GPs or IFLs),
+# how much total memory, and which LPARs within a CPC are assigned to the appliance owner.
+
+# ****************************************************************************
+
 z_machine_name: "T28"                                                              # CPC or machine name (e.g., "T28")
 z_machine_dpm_enabled: true                                                        # If machine is dpm machine then z_machine_dpm_enabled as true or false in ACC to create CPC for standalone mode
 
 # SSA Image
-image_path: "/Users/pujakumari/Downloads/zssa.img.gz"                             # Modify the location of the image file which image you want to install
+image_path: "/Users/user/Downloads/zssa.img.gz"                             # Modify the location of the image file which image you want to install
 hostname: "host"                                                                  # Hostname to assign to the installed image
 image_type: "image"                                                               # This is default type of image (e.g., "image")
 ssa_username: "{{ lookup('env', 'SSA_APP_USER') }}"                               # Set Username for the appliance (used during image installation) (e.g., export SSA_APP_USER=user )   
@@ -70,4 +80,20 @@ disk_id2: "0.0.5f48"                                                            
 is_fcp2: false                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
 ssa_ip2: "9.152.150.225"                                                         # Appliance IP address for ssa lpar
 gw_ip2: "9.152.150.1"                                                            # (IPv4/IPv6) gateway IP address
+
+
+################################################################################
+# In HMC, go to Customize Image Profile, navigate to the Processor section and check the processor type and value,
+  # - Dedicated central processors
+  # - Not Dedicated central processors
+  # - Dedicated integrated facility for Linux Systems
+  # - Not dedicated integrated facility for Linux Systems
+# Based on the selected processor value, determine the appropriate configuration for processor_usage and processor_type
+################################################################################
+
+# Set "processor_type" to "ifls" (likely for "Integrated Facility for Linux Systems") when you're specifying IFLS values for resource package
+# otherwise set it to "general-purpose" for central processors
+processor_type: "general-purpose"                                             # Set processor_type for the LPAR (used during image installation)
+# Set "processor_usage" to "shared" if the processor in the image profile is "not dedicated", and "dedicated" if it is dedicated.
+processor_usage: "shared"                                                     # Set processor_usage for the LPAR (used during image installation)
 

@@ -20,6 +20,15 @@
     acc_base_url: "https://{{ acc_url }}:{{ acc_port }}/api"
     ssa1_base_url: "https://{{ ssa1_url }}/api/com.ibm.zaci.system"
     ssa2_base_url: "https://{{ ssa2_url }}/api/com.ibm.zaci.system"
+    
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC LPAR's username"
+      private: no
+
+    - name: cc_admin_password
+      prompt: "Enter ACC LPAR's Password"
+      private: yes
 
   tasks:
     - name: Check if ACC appliance is operational
@@ -42,8 +51,8 @@
       uri:
         url: "{{ acc_base_url }}/user/token"
         body:
-          username: "{{ acc_admin_user }}"
-          password: "{{ acc_admin_password }}"
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
         body_format: json
         method: POST
         return_content: true

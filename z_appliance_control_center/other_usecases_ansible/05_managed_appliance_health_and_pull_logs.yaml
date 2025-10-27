@@ -74,7 +74,7 @@
         body: |
           {
             "{{ package_name }}": {
-            "lpar": ["{{ lpar_name }}"]
+            "lpars": ["{{ lpar_name }}"]
             }
           }
         body_format: json

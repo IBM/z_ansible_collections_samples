@@ -14,26 +14,44 @@
 - name: ACC playbook, run by appliance-owner, for ACC appliance update
   hosts: localhost
   gather_facts: true
-  vars_files:
-    - owner_vars.yaml
 
+  vars_prompt:
+    - name: ssc_ip
+      prompt: "Enter your SSC LPAR's(ACC) IP"
+      private: no
+
+    - name: app_username
+      prompt: "Enter your SSC LPAR's(ACC) username"
+      private: no
+
+    - name: app_password
+      prompt: "Enter your SSC LPAR's(ACC) password"
+      private: yes
+
+    - name: update_bundle_path
+      prompt: "Enter the absolute path of the update bundle file"
+      private: no
+
+    - name: update_bundle_name
+      prompt: "Enter the update bundle name (e.g. update-bundle-1.2.5)"
+      private: no
+      
+  vars:
+    appliance_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
   tasks:
     - name: 01 - Get authentication token from the ACC as appliance-owner
       uri:
-        url: "{{ appliance_url }}/com.ibm.zaci.system/api-tokens"
+        url: "{{ appliance_url }}/api-tokens"
         method: POST
         headers:
           zACI-API: "com.ibm.zaci.system/1.0"
           Accept: "application/vnd.ibm.zaci.payload+json"
           Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
-        body: |
-          {
-            "kind": "request",
-            "parameters": {
-              "user": "{{ app_username }}",
+        body:
+          kind: "request" 
+          "parameters":
+              "user": "{{ app_username }}"
               "password": "{{ app_password }}"
-            }
-          }
         body_format: json
         return_content: true
         validate_certs: false
@@ -50,7 +68,7 @@
 
     - name: 02 - Prepare appliance for update
       uri:
-        url: "{{ appliance_url }}/com.ibm.zaci.system/appliance-update/prepare-for-update"
+        url: "{{ appliance_url }}/appliance-update/prepare-for-update"
         method: POST
         headers:
           zACI-API: "com.ibm.zaci.system/1.0"
@@ -64,7 +82,7 @@
 
     - name: 03 - Fetch status of the prepare-for-update process
       uri:
-        url: "{{ appliance_url }}/com.ibm.zaci.system/appliance-update/prepare-for-update/status"
+        url: "{{ appliance_url }}/appliance-update/prepare-for-update/status"
         method: GET
         headers:
           zACI-API: "com.ibm.zaci.system/1.0"
@@ -84,7 +102,7 @@
 
         - name: Check status response after wait
           uri:
-            url: "{{ appliance_url }}/com.ibm.zaci.system/appliance-update/prepare-for-update/status"
+            url: "{{ appliance_url }}/appliance-update/prepare-for-update/status"
             method: GET
             headers:
               zACI-API: "com.ibm.zaci.system/1.0"
@@ -118,7 +136,7 @@
     
     - name: 06 - Upload the update bundle
       shell: |
-        curl -k -X POST "{{ appliance_url }}/com.ibm.zaci.system/appliance-update" \
+        curl -k -X POST "{{ appliance_url }}/appliance-update" \
         -H "Authorization: Bearer {{ access_token }}" \
         -H "zACI-API: com.ibm.zaci.system/1.0" \
         -H "Accept: application/vnd.ibm.zaci.payload+json;version=1.0" \
@@ -150,7 +168,7 @@
 
     - name: 07 - Get current appliance update status
       uri:
-        url: "{{ appliance_url }}/com.ibm.zaci.system/appliance-update/status"
+        url: "{{ appliance_url }}/appliance-update/status"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -173,7 +191,7 @@
 
         - name: Check appliance update status after wait
           uri:
-            url: "{{ appliance_url }}/com.ibm.zaci.system/appliance-update/status"
+            url: "{{ appliance_url }}/appliance-update/status"
             method: GET
             headers:
               Authorization: "Bearer {{ access_token }}"
@@ -211,7 +229,7 @@
           block:
             - name: Wait till appliance is operational after reboot
               uri:
-                url: "{{ appliance_url }}/com.ibm.zaci.system/appliance/is-operational"
+                url: "{{ appliance_url }}/appliance/is-operational"
                 method: GET
                 headers:
                   zACI-API: "com.ibm.zaci.system/1.0"
@@ -234,20 +252,17 @@
               
             - name:  Fetch authentication token from the ACC after reboot
               uri:
-                url: "{{ appliance_url }}/com.ibm.zaci.system/api-tokens"
+                url: "{{ appliance_url }}/api-tokens"
                 method: POST
                 headers:
                   zACI-API: "com.ibm.zaci.system/1.0"
                   Accept: "application/vnd.ibm.zaci.payload+json"
                   Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
-                body: |
-                  {
-                    "kind": "request",
-                    "parameters": {
-                      "user": "{{ app_username }}",
+                body: 
+                  kind: "request" 
+                  "parameters":
+                      "user": "{{ app_username }}"
                       "password": "{{ app_password }}"
-                    }
-                  }
                 body_format: json
                 return_content: true
                 validate_certs: false
@@ -268,7 +283,7 @@
 
         - name: Fetch Final appliance update status 
           uri:
-            url: "{{ appliance_url }}/com.ibm.zaci.system/appliance-update/status"
+            url: "{{ appliance_url }}/appliance-update/status"
             method: GET
             headers:
               Authorization: "Bearer {{ access_token }}"

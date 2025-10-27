@@ -2,9 +2,35 @@
 
 ## Preparation
 
+#### Verify OpenSSL Installation
+  Before proceeding, ensure that OpenSSL is installed and correctly linked to your Python environment
+  Activate your virtual environment and check the OpenSSL version with the following commands:
+
+  source /path/to/venv/bin/activate
+  python -c "import ssl; print(ssl.OPENSSL_VERSION)"
+
+  You should see output similar to:
+  ```
+  OpenSSL 3.5.1 1 Jul 2025
+  ```
+
+  If OpenSSL is not installed or an error appears (e.g., ModuleNotFoundError: No module named 'ssl'), follow these steps:
+  Install OpenSSL via Homebrew (on macOS):
+  ```
+  brew install openssl@3
+  ```
+
+  Reinstall Python ensuring it is correctly linked to OpenSSL (you can use pyenv or system installation).
+  Recreate your virtual environment:
+  ```
+  python -m venv /path/to/venv
+  ```
+
+#### Activate and Configure the LPAR
 - Ensure LPAR is activated and has updated the activation profile with correct values of network settings 
 (e.g. `chpid`, `prefix`, etc.) and storage (initial 16 GB storage is required for ACC).
 
+#### Install Ansible on Control Nodes
 - Both ACC-admin and appliance-owners must
   [install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on
   their respective control nodes.
@@ -13,6 +39,8 @@
     ```
     pip install ansible
     ```
+  
+#### Download Installation Scripts
 - Download all these `yaml` files to a directory on the control node (e.g., a laptop) which
   will connect with ACC.
 

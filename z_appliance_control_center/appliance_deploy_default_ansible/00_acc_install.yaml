@@ -11,6 +11,9 @@
 #*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
+# Important: Before running the 00_acc_install.yaml script, kindly review the README file located in
+# the "acc_ansible_install_scripts" directory for important setup instructions and prerequisites.
+
 - name: ACC Install playbook
   hosts: localhost
   gather_facts: true

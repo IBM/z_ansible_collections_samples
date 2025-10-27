@@ -48,6 +48,36 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
+    - name: 10a - Validate WWPN and LUN values
+      vars:
+        hex_pattern: '^[A-Fa-f0-9]{16}$'
+        wwpn_vars:
+          - "{{ wwpn1 | default('') }}"
+          - "{{ wwpn2 | default('') }}"
+        lun_vars:
+          - "{{ lun1 | default('') }}"
+          - "{{ lun2 | default('') }}"
+      block:
+        - name: Validate WWPN formats
+          vars:
+            msg_invalid_wwpn: "Invalid WWPN '{{ item }}': must be a 16-digit hexadecimal string without '0x' prefix."
+          fail:
+            msg: "{{ msg_invalid_wwpn }}"
+          when:
+            - item | length > 0
+            - item is not match(hex_pattern)
+          loop: "{{ wwpn_vars }}"
+        - name: Validate LUN formats
+          vars:
+            msg_invalid_lun: "Invalid LUN '{{ item }}': must be a 16-digit hexadecimal string without '0x' prefix."
+          fail:
+            msg: "{{ msg_invalid_lun }}"
+          when:
+            - item | length > 0
+            - item is not match(hex_pattern)
+          loop: "{{ lun_vars }}"
+
+
     - name: 10 - As ACC-admin, assign single resources to the owner
       uri:
         url: "{{ acc_ip }}/resource/pkgs"
@@ -60,7 +90,7 @@
           gps: "{{ package_gps }}"
           memory: "{{ package_memory_mb }}"
           lpars:
-            - name: "{{ z_machine_lpar }}"
+            - name: "{{ lpar_name1 }}"
               interfaces:
                 - name: "{{ interface_name1 }}"
                   fid: "{{ fid1 }}"

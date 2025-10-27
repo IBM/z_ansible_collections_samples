@@ -16,11 +16,18 @@
   gather_facts : true
   vars_files:
     - env_vars.yaml
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC LPAR's username"
+      private: no
 
+    - name: cc_admin_password
+      prompt: "Enter ACC LPAR's Password"
+      private: yes
   tasks:
     - name: 01 - Get authentication token from the ACC as admin
       uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -36,7 +43,7 @@
 
     - name: 02 - Set HMC configuration in the ACC
       uri:
-        url: "{{ acc_ip }}/config/hmcconfig"
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/config/hmcconfig"
         timeout: 200
         method: POST
         body:
@@ -54,7 +61,7 @@
 
     - name: 03 - As a validation, get list of CPCs attached to the HMC
       uri:
-        url: "{{ acc_ip }}/cpcs"
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/cpcs"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"

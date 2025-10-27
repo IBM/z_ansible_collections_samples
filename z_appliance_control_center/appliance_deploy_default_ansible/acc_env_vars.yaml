@@ -13,6 +13,9 @@
 
 # Variables used for installing ACC
 
+# NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
+# sections in the scripts as well. Please review the script thoroughly before running it.
+
 # HMC
 HMC_HOST: "9.152.150.166"                                                                        # hmc host ip (e.g., 9.152.150.166)
 HMC_USER: "{{ lookup('env', 'HMC_USER') }}"                                                      # Set Your hmc username (e.g., export HMC_USER=xyz.ibm.com) 
@@ -25,9 +28,9 @@ PASSWORD: "password"                                                            
 # ACC LPAR
 ACTION: "activate"                                                                              # ACTION as "activate" or "deactivate" the lpar
 CPC: "T28"                                                                                      # CPC or machine name (e.g., "T28")
-LPAR: "BLUEC1"                                                                                   # Logical partition (LPAR) name where you want to install ACC image (e.g., "BLUEC1") should be valid lpar name
-LPAR_IP: "9.152.150.230"                                                                        # Appliance IP address (lpar ip)
-DISK_ID: "0.0.5f47"                                                                             # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+LPAR: "SSC12"                                                                                   # Logical partition (LPAR) name where you want to install ACC image (e.g., "BLUEC1") should be valid lpar name
+LPAR_IP: "9.152.150.225"                                                                        # Appliance IP address (lpar ip)
+DISK_ID: "0.0.5f48"                                                                             # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
 IS_FCP: false                                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False
 # lun: "4026402200000000"                                                                       # To be added only when is_fcp is true (e.g., lun: "4026402200000000")
 # wwpn: "50050763070b46a6"                                                                      # To be added only when disk is_fcp is true (e.g., wwpn: "50050763070b46a6")
@@ -37,5 +40,5 @@ LPAR_PASSWORD: "linux390"                                                       
 STORAGE: 16384                                                                                  # Storage allocated (in MB)
 
 # Paths on the control node (i.e., your laptop)
-IMAGE_PATH: "/Users/dev_ZACC-FINAL-IMAGE-12.13.0-main_2025-10-02_01-1.2.4-final.img.gz"                                          # Path on the control node (e.g., your laptop) with the image file which (ACC image) you want to install
-INSTALL_SCRIPT_PATH: "/Users/zFAB-ACC-User-Guide/acc_ansible_install_scripts"                                                    # Dont change this value its for internal use only, only update absolute path to point to acc_ansible_install_scripts folder.
+IMAGE_PATH: "/Users/dev_ZACC-1.2.6-dev-debug.image.img.gz"                                          # Path on the control node (e.g., your laptop) with the image file which (ACC image) you want to install
+INSTALL_SCRIPT_PATH: "/Users/zFAB-ACC-User-Guide/acc_install_ansible"                                                    # Dont change this value its for internal use only, only update absolute path to point to acc_ansible_install_scripts folder.
