@@ -16,7 +16,7 @@
         ./oc get csr -o name | xargs ./oc adm certificate approve &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
-      until: result.stdout.find("{{ workerid }}") != -1
+      until: result.stdout.find(workerid) != -1
       retries: 30
       delay: 10
   rescue:
