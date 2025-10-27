@@ -109,7 +109,7 @@
               "username": "{{ app_username }}",
               "password": "{{ app_password }}",
               "hostname": "{{ hostname }}",
-              "lpars": [        # Comment any one lpar details when running with 1 lpar
+              "lpars": [
                   {
                     "name": "{{ lpar_name1 }}",
                     "execution_action": "{{ execution_action }}",
