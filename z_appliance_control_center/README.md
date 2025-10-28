@@ -144,16 +144,4 @@ up-to-date.
   reachable, then ACC will not work.
 - The ACC cannot accept HMC certificates.
 
-### ACC Features in Development
 
-The following features are in development:
-
-- Connectivity to Fix Central for automatic downloading and installing appliances.
-- Auditing of appliances.
-- History of appliance actions.
-- Verifying system and appliance configurations before deployment.
-- Accepting individual username and password for each appliance in a
-  cluster.
-- Automatically reestablish and sync ACC with HMC in case of network
-  disruptions.
-- A local repository of appliance images and their fixes.
