@@ -84,6 +84,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:-
   - Fix the playbook `02a_assign_1_lpar.yaml` if required. For example:
     - Check if you have to remove a task in the playbook (e.g.,
       updating the password).
+    - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
+        - Uncomment the `vlan_id` entry in `admin_vars.yaml`.
+        - Modify the task `10 - As ACC-admin, assign single resources to the owner` by uncommenting the `vlan_id` reference in that task.
     - Check if you use `FCP disk` instead of a dasd. This means you have to
       modify the task `10 - As ACC-admin, assign single resources to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
@@ -100,6 +103,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:-
   - Fix the playbook `02b_assign_2_lpar.yaml` if required. For example:
     - Check if you have to remove a task in the playbook (e.g.,
       updating the password).
+    - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
+        - Uncomment the `vlan_id` entry in `admin_vars.yaml`.
+        - Modify the task `12- As ACC-admin, assign two lpar to the owner` by uncommenting the `vlan_id` reference in that task.
     - Check if you use` FCP disk` instead of a dasd. This means you have to
       modify the task `12- As ACC-admin, assign two lpar to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
@@ -168,3 +174,9 @@ Note that to pull logs for SSA, concurrent updates for SSA, upgrade, jealth chec
 status, or ACC concurrent updates, use the playbooks located in:
 `other_usecases_ansible` directory.
 
+#### NOTE
+Make sure to run 03_owner_action.yaml before executing 04_install_flow.yaml.
+The 03_owner_action.yaml script appends the image_id: <id> entry to the end of the owner variable file.
+If you skip running 03_owner_action.yaml, you may encounter the following error:
+
+  `"msg": "The task includes an option with an undefined variable. 'image_id' is undefined"`

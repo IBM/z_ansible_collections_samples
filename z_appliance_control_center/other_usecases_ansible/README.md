@@ -96,6 +96,9 @@ To install 2 SSAs after a fresh install of ACC, you should:
     modify the task `Assign resources to the SSA owner`.
   - Check if you use FIDs instead of `chpid`. This means you have to modify the
     task `Assign resources to the SSA owner`.
+  - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
+        - Uncomment the `vlan_id` entry in `env_vars.yaml`.
+        - Modify the task `Assign resources to the SSA owner` by uncommenting the `vlan_id` reference in that task.
 
 - Run the playbook to install SSA via:
   ```bash
@@ -124,3 +127,38 @@ The administrator must run the following Ansible playbook once every day to refr
   ```
     ansible-playbook 09_insert_hmc_creds.yaml
   ```
+
+## Restart ACC
+
+If the ACC admin wants to restart ACC, then `admin` can use this playbook:
+
+```
+ansible-playbook 10_restart_acc.yaml
+```
+
+This playbook will help user to restart ACC.
+Note: This playbook will not deactivate and then activate the ACC LPAR. It will just send a restart signal to ACC appliance (similar to `reboot`).
+
+## Trigger Disruptive dumps and Collect Logs from Appliance
+
+This playbook automates the process of triggering a disruptive dump on an SSC appliance and collecting diagnostic logs after the reboot.
+- `cd` to the directory `other_usecases_ansible`.
+- Run the playbook `11_get_disruptive_dumps.yaml`.
+
+  ```bash
+  ansible-playbook 11_get_disruptive_dumps.yaml
+  ```
+
+This playbook with interactively ask for the IP, username, password, reason for downloading dumps and file path where to download for gathering logs from any appliances (e.g., SSA appliance).
+
+## Unlock Appliances
+
+This playbook allows the ACC Owner to manually unlock one or more locked appliances in their resource package.
+Each appliance will be processed one at a time, prompting the user for credentials specific to that appliance.
+Run this playbook as the ACC Owner.
+The file `13_unlock_each_appliance.yaml` must be available in the same directory.
+This file is automatically included by the main playbook (`12_unlock_appliances.yaml`) for each appliance.
+
+```
+ansible-playbook 12_unlock_appliances.yaml
+```

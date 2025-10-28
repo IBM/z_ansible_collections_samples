@@ -118,6 +118,11 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:
   - Fix the playbook `02a_assign_1_lpar.yaml` if required. For example:
     - Check if you have to remove a task in the playbook (e.g.,
       updating the password).
+    - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
+        - Uncomment the `vlan_id` entry in `admin_vars.yaml`.
+        - Modify the task `10 - As ACC-admin, assign single resources to the owner` by uncommenting the `vlan_id` reference in that task.
+    - Check if you use `vlan_id`, Please uncomment in vlan_id in `admin_vars.yaml` . This means you have to 
+      modify the task `10 - As ACC-admin, assign single resources to the owner`(uncomment `vlan_id` in the task).
     - Check if you use FCP disk instead of a dasd. This means you have to
       modify the task `10 - As ACC-admin, assign single resources to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
@@ -134,6 +139,9 @@ As an ACC-admin, run the appropriate playbook depending on the number of LPARs:
   - Fix the playbook `02b_assign_2_lpar.yaml` if required. For example:
     - Check if you have to remove a task in the playbook (e.g.,
       updating the password).
+    - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
+        - Uncomment the `vlan_id` entry in `admin_vars.yaml`.
+        - Modify the task `12- As ACC-admin, assign two lpar to the owner` by uncommenting the `vlan_id` reference in that task.
     - Check if you use FCP disk instead of a dasd. This means you have to
       modify the task `12- As ACC-admin, assign two lpar to the owner`.
       You will have to set the variable `is_fcp` to `true` and use the values for
