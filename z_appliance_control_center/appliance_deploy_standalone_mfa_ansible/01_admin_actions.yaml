@@ -108,7 +108,7 @@
     - name: Show admin MFA secret
       debug:
         msg:
-          - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app.
+          - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app"
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
     
