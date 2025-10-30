@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC Playbook - Trigger disruptive dump and collect logs from appliance
@@ -17,13 +10,13 @@
 
   vars_prompt:
     - name: "ssc_ip"
-      prompt: "Enter SSC Appliance IP"
+      prompt: "Enter SSC LPAR IP"
       private: no
     - name: "lpar_username"
-      prompt: "Enter SSC Appliance username"
+      prompt: "Enter SSC LPAR username"
       private: no
     - name: "lpar_password"
-      prompt: "Enter SSC Appliance password"
+      prompt: "Enter SSC LPAR password"
       private: yes
     - name: reason
       prompt: "Enter reason to trigger disruptive dump"
@@ -45,7 +38,7 @@
         msg: "Run timestamp: {{ cur_timestamp }}"
         
     - name: 00 - Get API authentication token from the SSC LPAR
-      uri:
+      ansible.builtin.uri:
         url: "{{ api_base_url }}/api-tokens"
         method: POST
         headers:
@@ -67,7 +60,7 @@
         access_token: "{{ auth_response.json.parameters.token }}"
 
     - name: 01 - Trigger disruptive dump
-      uri:
+      ansible.builtin.uri:
         url: "{{ api_base_url }}/alerts"
         method: POST
         headers:
@@ -104,10 +97,10 @@
           It may take a few minutes to come back online.
           Waiting for it to become operational...**
 
-    - name: Wait till appliance is operational after reboot
+    - name: 02 - Wait till appliance is operational after reboot
       block:
         - name: Retry until appliance becomes reachable
-          uri:
+          ansible.builtin.uri:
             url: "{{ api_base_url }}/appliance/is-operational"
             method: GET
             headers:
@@ -129,7 +122,7 @@
           ignore_errors: true
               
         - name:  Fetch authentication token from the ACC after reboot
-          uri:
+          ansible.builtin.uri:
             url: "{{ api_base_url }}/api-tokens"
             method: POST
             headers:
@@ -151,7 +144,7 @@
             access_token: "{{ auth_response.json.parameters.token }}"
 
     - name: 03 - Fetch alerts after reboot
-      uri:
+      ansible.builtin.uri:
         url: "{{ api_base_url }}/alerts"
         method: GET
         headers:
@@ -173,15 +166,6 @@
         dump_entries: "{{ alerts_response.json.instances | selectattr('msgtext', 'search', '(?i)disruptive') | list }}"
       when: alerts_response.json.instances is defined
 
-    # - name: Debug all alerts
-    #   debug:
-    #     msg: "{{ alerts_response.json.instances | map(attribute='msgtext') | list }}"
-    #   when: alerts_response.json.instances is defined
-
-    # - name: Filter disruptive dump entries
-    #   set_fact:
-    #     dump_entries: "{{ alerts_response.json.instances | selectattr('msgtext', 'search', cur_timestamp) | list }}"
-    
     - name: Show dump entries found
       debug:
         msg: "Found {{ dump_entries | length }} disruptive dump entries."
@@ -191,7 +175,7 @@
       loop: "{{ dump_entries }}"
       loop_control:
         loop_var: dump_item
-      uri:
+      ansible.builtin.uri:
         url: "https://{{ ssc_ip }}:{{ port }}{{ dump_item['diag-info'] }}"
         method: GET
         headers:
@@ -216,4 +200,5 @@
       when: dump_entries | length == 0
       debug:
         msg: "No disruptive dump entries found."
+
 

@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 import sys

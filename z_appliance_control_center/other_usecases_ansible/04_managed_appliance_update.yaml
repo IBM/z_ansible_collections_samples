@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for appliance upgrade
@@ -17,10 +10,22 @@
   vars_files:
     - owner_vars.yaml
 
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
   tasks:
-    - name: 10 - Get authentication token from the ACC as appliance-owner
+    - name: 00 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         method: POST
         body:
@@ -42,7 +47,7 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 11 - Upload fix image/update bundle to the ACC as owner
+    - name: 01 - Upload fix image/update bundle to the ACC as owner
       tags: owner
       # The uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
@@ -55,9 +60,9 @@
               -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
       register: response
 
-    - name: 12 - Get update bundle information
+    - name: 02 - Get update bundle information
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/images"
         method: GET
         headers:
@@ -81,8 +86,8 @@
       debug:
         msg: "{{ image_id }}"
 
-    - name: 18 - Get list of running appliance
-      uri:
+    - name: 03 - Get list of running appliance
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/resource/quotas"
         method: GET
         headers:
@@ -108,12 +113,12 @@
       debug:
         msg: "App IDs to unlock: {{ app_ids | join(', ') }}"
 
-    - name: 19 - Unlock quota using App id (comment this if already done)
+    - name: 04 - Unlock quota using App id (comment this if already done)
       tags: owner
       loop: "{{ app_ids }}"
       loop_control:
         loop_var: app_id
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/unlock_quota"
         method: POST
         body:
@@ -130,9 +135,9 @@
         validate_certs: false
       register: unlock_responses
 
-    - name: 30 - As owner, concurrent update the image using image_id
+    - name: 05 - As owner, concurrent update the image using image_id
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/cluster/upgrade"
         method: POST
         body: |
@@ -153,4 +158,5 @@
     - name: Wait for 15 seconds
       ansible.builtin.pause:
         seconds: 15
+
 

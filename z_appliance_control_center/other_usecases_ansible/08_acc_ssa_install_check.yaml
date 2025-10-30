@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC playbook, run as ACC-admin, to get sanity check of ACC and SSAs install
@@ -20,19 +13,34 @@
     acc_base_url: "https://{{ acc_url }}:{{ acc_port }}/api"
     ssa1_base_url: "https://{{ ssa1_url }}/api/com.ibm.zaci.system"
     ssa2_base_url: "https://{{ ssa2_url }}/api/com.ibm.zaci.system"
+
+  pre_tasks:
+  - name: Reminder - Export credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export credentials:
+
+          export SSA1_APP_USER=<ssa1_username>
+          export SSA1_APP_PASSWORD=<ssa1_password>
+          export SSA2_APP_USER=<ssa2_username>
+          export SSA2_APP_PASSWORD=<ssa2_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
     
   vars_prompt:
     - name: cc_admin_user
-      prompt: "Enter ACC LPAR's username"
+      prompt: "Enter ACC-admin's username"
       private: no
 
     - name: cc_admin_password
-      prompt: "Enter ACC LPAR's Password"
+      prompt: "Enter ACC-admin's Password"
       private: yes
 
   tasks:
-    - name: Check if ACC appliance is operational
-      uri:
+    - name: 00 - Check if ACC appliance is operational
+      ansible.builtin.uri:
         url: "https://{{ acc_url }}/api/com.ibm.zaci.system/appliance/is-operational"
         method: GET
         headers:
@@ -47,8 +55,8 @@
         msg: "ACC is not operational"
       when: appliance_status.status != 204
 
-    - name: Get authentication token from the ACC as admin
-      uri:
+    - name: 01 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
         url: "{{ acc_base_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
@@ -68,8 +76,8 @@
       set_fact:
         acc_admin_token: "{{ auth_response.json.access_token }}"
 
-    - name: Get status of HMC connectivity from ACC
-      uri:
+    - name: 02 - Get status of HMC connectivity from ACC
+      ansible.builtin.uri:
         url: "{{ acc_base_url }}/cpcs/hmc-connection"
         timeout: 200
         method: GET
@@ -83,8 +91,8 @@
       debug:
         msg: "{{ response.json }}"
 
-    - name: Check if SSA-1 appliance is operational
-      uri:
+    - name: 03 - Check if SSA-1 appliance is operational
+      ansible.builtin.uri:
         url: "{{ ssa1_base_url }}/appliance/is-operational"
         method: GET
         headers:
@@ -99,8 +107,8 @@
         msg: "Appliance SSA-1 is not operational"
       when: appliance_status.status != 204
 
-    - name: Get authentication token from the SSA-1 LPAR
-      uri:
+    - name: 04 - Get authentication token from the SSA-1 LPAR
+      ansible.builtin.uri:
         url: "{{ ssa1_base_url }}/api-tokens"
         method: POST
         headers:
@@ -126,8 +134,8 @@
       set_fact:
         ssa1_admin_token: "{{ auth_response.json.parameters.token }}"
 
-    - name: Get Spyre cards associated with SSA-1
-      uri:
+    - name: 05 - Get Spyre cards associated with SSA-1
+      ansible.builtin.uri:
         url: "{{ ssa1_base_url }}/spyre-cards"
         method: GET
         headers:
@@ -143,8 +151,8 @@
       debug:
         msg: "{{ spyre_response.json.parameters | length }}"
 
-    - name: Get health status of Spyre cards on SSA-1
-      uri:
+    - name: 06 - Get health status of Spyre cards on SSA-1
+      ansible.builtin.uri:
         url: "{{ ssa1_base_url }}/health"
         method: GET
         headers:
@@ -171,8 +179,8 @@
           - "Online Cards: {{ online_cards }}"
           - "Offline Cards: {{ offline_cards }}"
 
-    - name: Check if SSA-2 appliance is operational
-      uri:
+    - name: 07 - Check if SSA-2 appliance is operational
+      ansible.builtin.uri:
         url: "{{ ssa2_base_url }}/appliance/is-operational"
         method: GET
         headers:
@@ -187,8 +195,8 @@
         msg: "Appliance SSA-2 is not operational"
       when: appliance_status.status != 204
 
-    - name: Get authentication token from the SSA-2 LPAR
-      uri:
+    - name: 08 - Get authentication token from the SSA-2 LPAR
+      ansible.builtin.uri:
         url: "{{ ssa2_base_url }}/api-tokens"
         method: POST
         headers:
@@ -214,8 +222,8 @@
       set_fact:
         ssa2_admin_token: "{{ auth_response.json.parameters.token }}"
 
-    - name: Get Spyre cards associated with SSA-2
-      uri:
+    - name: 09 - Get Spyre cards associated with SSA-2
+      ansible.builtin.uri:
         url: "{{ ssa2_base_url }}/spyre-cards"
         method: GET
         headers:
@@ -231,8 +239,8 @@
       debug:
         msg: "{{ spyre_response.json.parameters | length }}"
 
-    - name: Get health status of Spyre cards on SSA-2
-      uri:
+    - name: 10 - Get health status of Spyre cards on SSA-2
+      ansible.builtin.uri:
         url: "{{ ssa2_base_url }}/health"
         method: GET
         headers:

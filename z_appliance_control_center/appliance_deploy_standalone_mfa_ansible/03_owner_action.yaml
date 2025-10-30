@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
@@ -17,6 +10,21 @@
   vars_files:
     - owner_vars.yaml
 
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+        export ACC_OWNER_PASSWORD=<owner_new_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+
   tasks:
 
     - name: Wait for user to generate OTP using admin mfa secret
@@ -24,8 +32,8 @@
         prompt: "Enter OTP generated from the admin mfa_secret:"
       register: mfa_otp_input
 
-    - name: 04 - Get authentication token from the ACC as admin
-      uri:
+    - name: 00 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
@@ -46,8 +54,8 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 10 - Generate temporary 2FA secret for owner
-      uri:
+    - name: 01 - Generate temporary 2FA secret for owner
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/mfa/secret/owner"
         body:
           username: "{{ cc_owner_user }}"
@@ -75,9 +83,9 @@
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
 
-    - name: 13 - As an appliance-owner, update the password (remove this if already done)
+    - name: 02 - As an appliance-owner, update the password (remove this if already done)
       tags: owner
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user"
         body:
           username: "{{ cc_owner_user }}"
@@ -97,8 +105,8 @@
     - name: Show owner MFA secret
       debug:
         msg:
-          - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app.
-        ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
+          - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
+          - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
 
     # Note: The above tasks are intended for one-time execution. 
@@ -109,9 +117,9 @@
         prompt: "Enter OTP generated from the above owner mfa_secret:"
       register: mfa_otp_input
 
-    - name: 14 - Get authentication token from the ACC as appliance-owner
+    - name: 03 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         method: POST
         body:
@@ -134,7 +142,7 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 15 - Upload appliance image to the ACC as owner
+    - name: 04 - Upload appliance image to the ACC as owner
       tags: owner
       # Unfortunately, the uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
@@ -147,9 +155,9 @@
               -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
       register: response
 
-    - name: 16 - Get image information
+    - name: 05 - Get image information
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/images"
         method: GET
         headers:
@@ -179,3 +187,4 @@
         regexp: '^image_id:'
         line: "image_id: {{ image_id }}"
         create: yes
+
