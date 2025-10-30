@@ -1,6 +1,7 @@
 # IBM Z Appliance Control Center
 
-IBM Z Appliance Control Center (ACC) is an IBM product to manage Secure Service Container (SSC) based appliances
+[IBM Z Appliance Control Center](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=library-appliance-control-center-z-linuxone-users-guide)
+(ACC) is an IBM product to manage Secure Service Container (SSC) based appliances
 on IBM Z or LinuxONE systems. You can use ACC to manage appliances like
 Spyre Support Appliance (SSA).
 
@@ -13,27 +14,28 @@ To work efficiently with ACC, it is recommended to do the following in order:
 This set of directories contains ansible playbooks that you can use against ACC to
 manage appliances. These playbooks should be used as a sample. The user is
 expected to understand the infrastructure of ACC and other appliances, as well
-as the user has some understanding of setting up environment variables.
+as have some understanding of setting up environment variables.
 
-All these playbooks are tested on mac.
+All these playbooks are tested on MacOS.
 
 ## ACC User Guide
 
 For a detailed information about ACC, its concepts and working principles,
 read the [ACC user guide](https://www.ibm.com/docs/en/module_1721331501652/pdf/GC28-7073-00.pdf).
 
-## Directory Structure
+## Playbook Directory Structure
 
-The playbooks are distributed into multiple directories.
+The playbooks are organized into multiple directories, based upon the way ACC
+is deployed, configured and used.
 
 | Directory Name | Purpose |
 |:------------|:--------|
-| appliance_deploy_default_ansible | Use this directory to deploy (e.g., install and activate) ACC and appliances, and when ACC is configured to communicate with the HMC |
-| appliance_deploy_standalone_ansible | Use this directory to deploy (e.g., install and activate) ACC and appliances, and when ACC is not configured to communicate with the HMC |
-| appliance_deploy_default_mfa_ansible | Use this directory to deploy (e.g., install and activate) ACC with MFA, and appliances, and when ACC is configured communicate with the HMC |
-| appliance_deploy_standalone_mfa_ansible | Use this directory to deploy (e.g., install and activate) ACC with MFA and appliances, and when ACC is not configured to communicate with the HMC |
-| other_usecases_ansible | Use this directory to use ACC for other use cases like updates, gathering logs, inserting HMC credentials |
-| acc_ansible_install_scripts | A directory with scripts for installing ACC, normally you will not modify this directory |
+| appliance_deploy_default_ansible | Use these playbooks to deploy (e.g., install and activate) ACC and appliances, and when ACC is configured to communicate with the HMC |
+| appliance_deploy_standalone_ansible | Use these playbooks to deploy (e.g., install and activate) ACC and appliances, and when ACC is not configured to communicate with the HMC |
+| appliance_deploy_default_mfa_ansible | Use these playbooks to deploy (e.g., install and activate) ACC with MFA, and appliances, and when ACC is configured communicate with the HMC |
+| appliance_deploy_standalone_mfa_ansible | Use these playbooks to deploy (e.g., install and activate) ACC with MFA and appliances, and when ACC is not configured to communicate with the HMC |
+| other_usecases_ansible | Use these playbooks to use ACC for other use cases like updates, gathering logs, inserting HMC credentials |
+| acc_install_ansible | A directory with scripts for installing ACC, normally you will not modify these playbooks |
 
 Therefore, you must consider the right directory before using these playbooks with ACC.
 Refer to the user guide for more information.
@@ -91,7 +93,15 @@ This directory is used for other use cases associated with ACC and appliances.
 | `08_acc_ssa_install_check.yaml` | This playbook can be used to check and validate that the ACC and 2x SSAs are active and reachable |
 | `09_insert_hmc_creds.yaml` | ACC administrator can use this playbook to insert HMC credentials into ACC when ACC is in the default mode |
 
-## ACC Features, Limitations and Plans
+### File Structure of acc_install_ansible
+
+This directory contains scripts that help with installation of ACC. The user will just
+call the playbook for installing ACC, and the playbook will call these scripts.
+Therefore, it is not expected for the user to modify or deeply understand the
+process behind these scripts. However, it is recommended to read the `README.md` file
+before continuing with the installation of ACC.
+
+## ACC Features and Limitations
 
 It is recommended to read the release notes of each ACC release for
 up-to-date information about ACC and the list of features, limitations,
@@ -119,29 +129,4 @@ up-to-date.
 
 ### Current Limitations of ACC
 
-- Some of these playbooks requires network connectivity of ACC to HMC (i.e., these
-  playbooks are for default mode of ACC).
-- Not all functions are available on the UI. Only a sub set of features is available. These features include:
-  - Login as appliance-owner.
-  - Uploading appliance images.
-  - Installing an appliance image.
-  - Getting a list of appliances and their information.
-- Do not mix machine types for cluster based commands. That is, either
-  use DPM or non-DPM machines within a command.
-  - This scenario is not fully tested. It might work in certain
-    situations.
-- At the moment, the same username and password is used for each appliance
-  within a cluster.
-- If the network between ACC and HMC is interrupted (e.g., due to VPN
-  issues), then the admin must request a manual sync using the ACC
-  provided API to re-establish the connection.
-- Setting HMC-configuration on ACC can take a considerable amount of time,
-  because ACC will pull a lot of information from HMC.
-  - This information is about the CPCs and their resources.
-  - You might get timeout errors in the beginning if you send APIs soon
-    after setting up the HMC-configuration.
-- If the gateway provided in SSC installer configuration is not
-  reachable, then ACC will not work.
-- The ACC cannot accept HMC certificates.
-
-
+See the notes [here](https://www.ibm.com/docs/en/module_1721331501652/pdf/SC28-7067-00.pdf).

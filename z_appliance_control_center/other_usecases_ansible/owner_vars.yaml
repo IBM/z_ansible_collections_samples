@@ -1,27 +1,19 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
-acc_ip: https://9.152.150.225:8081/api                                      # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+acc_ip: https://9.120.0.0:8081/api                                       # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 
 # Users
 cc_owner_user: "cc_owner"                                                  # Specify the owner name for created owner (e.g., cc_owner)
 cc_owner_email: "cc_owner@email.com"                                       # Already created Owner's email address (e.g., "xyz.ibm.com")
-cc_owner_default_password: "defaultP@ssw0rd"                               # Owner's old/default password (e.g., "defaultPassw0rd")
-cc_owner_password: "defaultP@ssw0rd1"                                      # Owner's new password to update the old one (e.g., "defaultPassw0rd1")
+cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"             # Owner's password (e.g., "defaultPassw0rd1")
 
 # Resources that are assigned to the appliance-owner
 package_name: "RP16"                                         # Already created Resource package name (e.g., "RP01")
-lpar_name: "SSC16"                                                        # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
+lpar_name: "CC16"                                                        # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
 
 # Image
 # ***************************************************************************************
@@ -60,8 +52,8 @@ lpar_name: "SSC16"                                                        # LPAR
 
 # *****************************************************************************************
 
-image_path: "/Users/Downloads/zfab_test_1.1.1_pre_release.img-new.gz"       # Path on the control node (e.g., your laptop) with the image file which you want to install
-update_bundle_path: "/Users/zssa_update_bundle_v1.0.4_iesp_debug.tar"             # Modify the update bundle image file location which you want to install
+image_path: "/Users/Downloads/test_1.1.1_pre_release.img-new.gz"       # Path on the control node (e.g., your laptop) with the image file which you want to install
+update_bundle_path: "/Users/update_bundle_v1.0.4_iesp_debug.tar"             # Modify the update bundle image file location which you want to install
 update_bundle_name: "update_bundle_1.0.4"                                     # Update bundle file name
 min_ifls: 2                                                                 # Number of IFLs, Minimum IFLs required by the appliance (e.g., 1)
 min_memory: 4096                                                            # Number of memory, Minimum memory required by the appliance (e.g., 4096)
@@ -87,8 +79,8 @@ app_cores: 2                                                                # Nu
 app_memory: 4096                                                            # Amount of memory (in MB) allocated for the image
 
 # appliance credential
-app_username: "user"                                                        # Set Username for the appliance (used during image installation)
-app_password: "password"                                                    # Set Password for the appliance (used during image installation)
+app_username: "<insert_lpar_username>"                                                        # Set Username for the appliance (used during image installation)
+app_password: "<insert_lpar_password>"                                                    # Set Password for the appliance (used during image installation)
 
 # app_image_id: 1
 
@@ -103,3 +95,4 @@ execution_action: "default"
 upgrade_appliance_data: "/Users/Downloads/zFAB-Appliance-Control-Center/docs/sample_ansible/tmp/upgrade_data.zip"   #Modify the location where you want to download upgrade zip file
 upgrade_fix_data: "/Users/upgrade_fixes_data.zip"                                          #Modify the location where you want to download concurrent update zip file
 ssa_logs: "/Users/Downloads/zFAB-Appliance-Control-Center/docs/sample_ansible/tmp/download_logs.zip"                #Modify the location to download ssa log files
+

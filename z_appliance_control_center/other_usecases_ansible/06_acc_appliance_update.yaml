@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for ACC appliance update
@@ -17,15 +10,15 @@
 
   vars_prompt:
     - name: ssc_ip
-      prompt: "Enter your SSC LPAR's(ACC) IP"
+      prompt: "Enter your SSC LPAR's (ACC) IP"
       private: no
 
     - name: app_username
-      prompt: "Enter your SSC LPAR's(ACC) username"
+      prompt: "Enter your SSC LPAR's (ACC) username"
       private: no
 
     - name: app_password
-      prompt: "Enter your SSC LPAR's(ACC) password"
+      prompt: "Enter your SSC LPAR's (ACC) password"
       private: yes
 
     - name: update_bundle_path
@@ -39,8 +32,8 @@
   vars:
     appliance_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
   tasks:
-    - name: 01 - Get authentication token from the ACC as appliance-owner
-      uri:
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      ansible.builtin.uri:
         url: "{{ appliance_url }}/api-tokens"
         method: POST
         headers:
@@ -66,8 +59,8 @@
       set_fact:
         access_token: "{{ auth_response.json.parameters.token }}"
 
-    - name: 02 - Prepare appliance for update
-      uri:
+    - name: 01 - Prepare appliance for update
+      ansible.builtin.uri:
         url: "{{ appliance_url }}/appliance-update/prepare-for-update"
         method: POST
         headers:
@@ -80,8 +73,8 @@
         validate_certs: false
       register: prepare_response
 
-    - name: 03 - Fetch status of the prepare-for-update process
-      uri:
+    - name: 02 - Fetch status of the prepare-for-update process
+      ansible.builtin.uri:
         url: "{{ appliance_url }}/appliance-update/prepare-for-update/status"
         method: GET
         headers:
@@ -93,7 +86,7 @@
         validate_certs: false
       register: status_response
 
-    - name: 04 - Poll for prepare-for-update status
+    - name: 03 - Poll for prepare-for-update status
       block:
         - name: Wait for the process to complete (polling for 5 min)
           pause:
@@ -101,7 +94,7 @@
           register: poll_wait
 
         - name: Check status response after wait
-          uri:
+          ansible.builtin.uri:
             url: "{{ appliance_url }}/appliance-update/prepare-for-update/status"
             method: GET
             headers:
@@ -121,7 +114,7 @@
           debug:
             msg: "Polling completed with status code: {{ status_check_response }}"
 
-    - name: 05 - Upload the update bundle
+    - name: 04 - Upload the update bundle
       vars:
         sha256sum: "{{ lookup('pipe', 'shasum -a 256 ' + update_bundle_path + ' | cut -d \" \" -f1') }}"
       set_fact:
@@ -134,7 +127,7 @@
           - "Update Bundle Name: {{ update_bundle_name }}"
           - "Update Bundle Path: {{ update_bundle_path }}"
     
-    - name: 06 - Upload the update bundle
+    - name: 05 - Upload the update bundle
       shell: |
         curl -k -X POST "{{ appliance_url }}/appliance-update" \
         -H "Authorization: Bearer {{ access_token }}" \
@@ -148,7 +141,7 @@
       debug:
         msg: "Upload the update bundle response: {{ upload_response }}"
 
-    - name: 06a - Extract reboot parameter from bundle tail
+    - name: 06 - Extract reboot parameter from bundle tail
       shell: "tail -n 12 {{ update_bundle_path }} | grep '\"reboot\"'"
       register: reboot_line
       changed_when: false
@@ -167,7 +160,7 @@
         msg: "Reboot required: {{ reboot_value }} (type: {{ reboot_value | type_debug }})"
 
     - name: 07 - Get current appliance update status
-      uri:
+      ansible.builtin.uri:
         url: "{{ appliance_url }}/appliance-update/status"
         method: GET
         headers:
@@ -190,7 +183,7 @@
           register: poll_wait
 
         - name: Check appliance update status after wait
-          uri:
+          ansible.builtin.uri:
             url: "{{ appliance_url }}/appliance-update/status"
             method: GET
             headers:
@@ -228,7 +221,7 @@
         - name: Wait till appliance is operational after reboot
           block:
             - name: Wait till appliance is operational after reboot
-              uri:
+              ansible.builtin.uri:
                 url: "{{ appliance_url }}/appliance/is-operational"
                 method: GET
                 headers:
@@ -251,7 +244,7 @@
               when: reboot_value
               
             - name:  Fetch authentication token from the ACC after reboot
-              uri:
+              ansible.builtin.uri:
                 url: "{{ appliance_url }}/api-tokens"
                 method: POST
                 headers:
@@ -282,7 +275,7 @@
           when: not reboot_value
 
         - name: Fetch Final appliance update status 
-          uri:
+          ansible.builtin.uri:
             url: "{{ appliance_url }}/appliance-update/status"
             method: GET
             headers:

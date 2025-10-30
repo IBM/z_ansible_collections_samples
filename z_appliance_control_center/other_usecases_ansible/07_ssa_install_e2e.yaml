@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 # Todo
@@ -16,9 +9,28 @@
 
 - name: ACC playbook, run by appliance-owner for installing 2x SSA appliances
   hosts: localhost
-  gather_facts : true
+  gather_facts: true
   vars_files:
     - env_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export credentials:
+
+        export HMC_USER=<enter_HMC_username>
+        export HMC_PASSWORD=<enter_HMC_password>
+
+        export SSA_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+        export SSA_OWNER_PASSWORD=<owner_new_password>
+
+        export SSA_APP_USER=<ssa_username>
+        export SSA_APP_PASSWORD=<ssa_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
 
   vars_prompt:
     - name: cc_admin_user
@@ -56,9 +68,9 @@
         msg: "{{ execution_action }}"
 
 
-    - name: Initialize ACC
+    - name: 00 - Initialize ACC
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/init"
         body:
           mfa_enabled: "{{ mfa_enabled }}"
@@ -72,9 +84,9 @@
         return_content: true
       when: run_init | lower == "yes"
 
-    - name: Update ACC-admin password (remove this if already done)
+    - name: 01 - Update ACC-admin password (remove this if already done)
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/user"
         body:
           username: "{{ cc_admin_user }}"
@@ -85,9 +97,9 @@
         validate_certs: false
         return_content: true
 
-    - name: 01 - Get authentication token from the ACC as admin
+    - name: 02 - Get authentication token from the ACC as admin
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
@@ -103,9 +115,9 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 04 - Set HMC configuration in the ACC (default mode)
+    - name: 03 - Set HMC configuration in the ACC (default mode)
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/config/hmcconfig"
         timeout: 300
         method: POST
@@ -123,18 +135,18 @@
       register: response
       when: default_mode
 
-    - name: Insert CPC information in ACC with dummy values (standalone mode)
+    - name: 04 - Insert CPC information in ACC with dummy values (standalone mode)
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/cpcs"
         timeout: 200
         method: POST
         body:
           cpcs:
             - cpc_name: "{{ z_machine_name }}"
-              ifls : 32              # update number of ifls as per infra support to create cpc
-              gps: 32                # update number of gps as per infra support to create cpc
-              available_storage: 229376    # update number of memory(in MB) as per infra support to create cpc
+              ifls : "{{ ifls }}"              
+              gps: "{{ gps }}"                
+              available_storage: "{{ memory }}"    
               dpm_enabled: "{{ z_machine_dpm_enabled }}"
         body_format: json
         headers:
@@ -144,9 +156,9 @@
         verify_cert: false
       when: not default_mode
 
-    - name: 07 - Create an appliance-owner for both SSAs
+    - name: 05 - Create an appliance-owner for both SSAs
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/user"
         method: POST
         body:
@@ -162,58 +174,196 @@
         validate_certs: false
       register: response
 
-    - name: Assign resources to the SSA owner
-      tags: admin
-      uri:
-        url: "{{ cc_url }}/resource/pkgs"
-        timeout: 300
-        method: POST
-        body:
-          owner: "{{ ssa_owner_user }}"
-          name: "ssa_package"
-          ifls: 0
-          gps: 6
-          memory: 102400
-          lpars:
-            - name: "{{ ssa_lpar1 }}"
-              interfaces:
-                - name: "{{ interface_name1 }}"
-                  fid: "{{ fid1 }}"
-                  # chpid: "{{ chpid1 }}"
-                  # port: "{{ zport1 }}"
-                  # vlan_id: "{{ vlan_id1 }}" # If your infra doesn't support this, comment it out
-                  prefix: "{{ prefix1 }}"
-                  ip: "{{ ssa_ip1 }}"
-                  gw: "{{ gw_ip1 }}"
-              boot-info:
-                disk-id: "{{ disk_id1 }}"
-                is-fcp: "{{ is_fcp1 }}"
-            - name: "{{ ssa_lpar2 }}"
-              interfaces:
-                - name: "{{ interface_name2 }}"
-                  fid: "{{ fid2 }}"
-                  # chpid: "{{ chpid2 }}"
-                  # port: "{{ zport2 }}"
-                  # vlan_id: "{{ vlan_id2 }}" # If your infra doesn't support this, comment it out
-                  prefix: "{{ prefix2 }}"
-                  ip: "{{ ssa_ip2 }}"
-                  gw: "{{ gw_ip2 }}"
-              boot-info:
-                disk-id: "{{ disk_id2 }}"
-                is-fcp: "{{ is_fcp2 }}"
-          cpc: "{{ z_machine_name }}"
-          x86: "dummy"
-        body_format: json
-        headers:
-          Authorization: "Bearer {{ access_token }}"
-          Content-Type: application/json
-        validate_certs: false
-        status_code: 200
-      register: response
+    - name: 06 - Assign resources to the SSA owner
+      block:
+      - name: Gathering Network Parameters from vars for {{ ssa_lpar1 }} and {{ ssa_lpar2 }}
+        set_fact:
+          var_details1:
+            name: "{{ interface_name1 }}"
+            prefix: "{{ prefix1 }}"
+            ip: "{{ ssa_ip1 }}"
+            gw: "{{ gw_ip1 }}"
+          var_details2:
+            name: "{{interface_name2 }}"
+            prefix: "{{ prefix2 }}"
+            ip: "{{ ssa_ip2 }}"
+            gw: "{{ gw_ip2 }}"
 
-    - name: Update the password of SSA appliance-owner
+      - name: Enter Network Card type for 1st LPAR
+        pause:
+          prompt: "Enter Network Card type to be used for Managed LPAR - {{ ssa_lpar1 }} (OSA/NETH)"
+        register: net_type1
+
+      - name: Validate Network type
+        fail:
+          msg: "Invalid input"
+        when: net_type1.user_input not in ['OSA', 'NETH']
+
+      - name: VLAN Configuration
+        pause:
+          prompt: "Is VLAN id has to be set for - {{ ssa_lpar1 }} (yes/no)"
+        register: vlan_1
+
+      - name: Validate VLAN confirmation
+        fail:
+          msg: "Invalid input"
+        when: vlan_1.user_input not in ['yes', 'no']
+
+      - name: Enter Boot disk type for 1st LPAR [DASD/FCP]
+        pause:
+          prompt: "Enter Boot disk type for Managed LPAR - {{ ssa_lpar1 }} (DASD/FCP)"
+        register: is_fcp_1
+
+      - name: Validate Disk type
+        fail:
+          msg: "Invalid input"
+        when: is_fcp_1.user_input not in ['DASD', 'FCP']
+
+      - name: Enter Network Card type for 2nd LPAR 
+        pause:
+          prompt: "Enter Network Card type to be used for Managed LPAR - {{ ssa_lpar2 }} (OSA/NETH)"
+        register: net_type2
+
+      - name: Validate Network type
+        fail:
+          msg: "Invalid input"
+        when: net_type2.user_input not in ['OSA', 'NETH']
+
+      - name: VLAN Configuration
+        pause:
+          prompt: "Is VLAN id has to be set for -  {{ ssa_lpar2 }} (yes/no)"
+        register: vlan_2
+
+      - name: Validate VLAN confirmation
+        fail:
+          msg: "Invalid input"
+        when: vlan_2.user_input not in ['yes', 'no']
+
+      - name: Enter Boot disk type for 2nd LPAR [DASD/FCP]
+        pause:
+          prompt: "Enter Boot disk type for Managed LPAR - {{ ssa_lpar2 }} (DASD/FCP)"
+        register: is_fcp_2
+
+      - name: Validate Disk type
+        fail:
+          msg: "Invalid input"
+        when: is_fcp_2.user_input not in ['DASD', 'FCP']
+
+      - name: Entered values for cards from user 
+        debug:
+          msg:
+          - "{{ net_type1.user_input }}" 
+          - "{{ net_type2.user_input }}"
+          - "{{ vlan_1.user_input }}"
+          - "{{ vlan_2.user_input }}"
+          - "{{ is_fcp_1.user_input }}"
+          - "{{ is_fcp_2.user_input }}"
+
+      - name: Add OSA params for "{{ ssa_lpar1 }}"
+        set_fact:
+          nw_details1: >- 
+            {{ var_details1 
+                | combine({'chpid': chpid1, 'port': zport1}) 
+                | combine((vlan_1.user_input == 'yes') 
+                | ternary({'vlan_id':vlan_id1}, {})
+                ) }}
+        when: net_type1.user_input == 'OSA'
+
+      - name: Add OSA params for "{{ ssa_lpar2 }}"
+        set_fact:
+          nw_details2: >-  
+            {{ var_details2 
+              | combine({'chpid': chpid2, 'port': zport2})
+              | combine((vlan_2.user_input == 'yes') | ternary({'vlan_id':vlan_id2},{})) }}
+        when: net_type2.user_input == 'OSA'
+
+      - name: Add NETH params for {{ ssa_lpar1 }}
+        set_fact:
+          nw_details1: "{{ var_details1 
+                        | combine({'fid': fid1})
+                        | combine((vlan_1.user_input == 'yes')| ternary({'vlan_id':vlan_id1},{})) }}"
+        when: net_type1.user_input == 'NETH'
+
+      - name: Add NETH params for {{ ssa_lpar2 }}
+        set_fact:
+          nw_details2: "{{ var_details2 
+                        | combine({'fid': fid2})
+                        | combine((vlan_2.user_input == 'yes')| ternary({'vlan_id':vlan_id2},{})) }}" 
+        when: net_type2.user_input == 'NETH'
+
+      - name: Add Boot params for {{ ssa_lpar1 }}
+        set_fact:
+          boot_info1: "{{ {'disk-id': disk_id1}
+                        | combine(
+                        (is_fcp_1.user_input == 'FCP')
+                        | ternary({
+                        'is-fcp': true,
+                        'wwpn': wwpn1,
+                        'lun': lun1
+                        },{
+                        'is-fcp': false
+                        })) }}" 
+      - name: Add Boot params for {{ ssa_lpar2 }}
+        set_fact:
+          boot_info2: "{{ {'disk-id': disk_id2}
+                        | combine(
+                        (is_fcp_2.user_input == 'FCP')
+                        | ternary({
+                        'is-fcp': true,
+                        'wwpn': wwpn2,
+                        'lun': lun2
+                        },{
+                        'is-fcp': false
+                        })) }}" 
+
+      - name: Creating the request for resource pkg creation
+        set_fact:
+          body: >-
+            {{
+              {
+                'owner': ssa_owner_user,
+                'name': ssa_package_name,
+                'ifls': ifls,
+                'gps': gps,
+                'memory': memory,
+                'lpars':[
+                  {
+                    'name': ssa_lpar1,
+                    'interfaces':[ nw_details1 ],  
+                    'boot-info': boot_info1
+                    },
+                { 'name': ssa_lpar2,
+                  'interfaces': [ nw_details2 ],
+                    'boot-info': boot_info2
+                  }
+                ],
+                'cpc':  z_machine_name,
+                'x86': "dummy"
+              }
+            }}
+      - name: Resource package request body
+        debug:
+          var: body
+
+      - name: Submitting the request to ACC to create package with 2 SSA lpars
+        tags: admin
+        ansible.builtin.uri:
+          url: "{{ cc_url }}/resource/pkgs"
+          timeout: 300
+          method: POST
+          body: "{{ body }}"
+
+          body_format: json
+          headers:
+            Authorization: "Bearer {{ access_token }}"
+            Content-Type: application/json
+          validate_certs: false
+          status_code: 200
+        register: response
+
+    - name: 07 - Update the password of SSA appliance-owner
       tags: owner
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/user"
         body:
           username: "{{ ssa_owner_user }}"
@@ -224,9 +374,9 @@
         validate_certs: false
         return_content: true
 
-    - name: Get authentication token from the ACC as appliance-owner
+    - name: 08 - Get authentication token from the ACC as appliance-owner
       tags: owner
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/user/token"
         method: POST
         body:
@@ -242,7 +392,7 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 11 - Upload the SSA appliance image to the ACC
+    - name: 09 - Upload the SSA appliance image to the ACC
       tags: owner
       # Unfortunately, the uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
@@ -252,11 +402,12 @@
               -H "Content-Type: multipart/form-data" \
               -F "data=@{{ image_path }}" \
               -F "image_type={{ image_type }}" \
-              -F "min_ifls=2" -F "min_memory=51200"'
+              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      register: response
 
-    - name: 12 - Get image information
+    - name: 10 - Get image information
       tags: owner
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/images"
         method: GET
         headers:
@@ -265,33 +416,47 @@
         validate_certs: false
       register: response
 
-    - name: Printing the image information
-      tags: owner
+    - name: Printing the response
+      tags: owner, install
       debug:
         msg: "{{ response.json }}"
 
-    - name: 13 - As owner, install and activate the image
+    - name: Extract the image ID from the DB
+      tags: owner, install
+      set_fact:
+        image_id: "{{ response.json.images[-1].id }}"
+
+    - name: 11 - As owner, install and activate the image
       tags: owner
-      uri:
+      ansible.builtin.uri:
         url: "{{ cc_url }}/cluster/activate"
         method: POST
-        body:
-          ssa_package:
-            image_id: 1
-            processor_usage: "{{ processor_usage }}"
-            processor_type: "{{ processor_type }}"
-            memory: 51200
-            cores: 2
-            username: "{{ ssa_username }}"
-            password: "{{ ssa_password }}"
-            hostname: "{{ hostname }}"
-            lpars:
-              - name: "{{ ssa_lpar1 }}"
-                execution_action: "{{ execution_action }}"
-                install: true
-              - name: "{{ ssa_lpar2 }}"
-                execution_action: "{{ execution_action }}"
-                install: true
+        body: |
+          {
+            "{{ ssa_package_name }}":
+            {
+              "image_id": {{ image_id }},
+              "processor_usage": "{{ processor_usage }}",
+              "processor_type": "{{ processor_type }}",
+              "memory": {{ app_memory }},
+              "cores": {{ app_cores }},
+              "username": "{{ ssa_username }}",
+              "password": "{{ ssa_password }}",
+              "hostname": "{{ hostname }}",
+              "lpars": [
+                  {
+                    "name": "{{ ssa_lpar1 }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  },
+                  {
+                    "name": "{{ ssa_lpar2 }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  }
+                ]
+              }
+            }
         body_format: json
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -309,17 +474,93 @@
       ansible.builtin.pause:
         seconds: 15
 
-    - name: 14 - Get status of the install process with task_id=1
+    # Extract all task IDs from response
+    - name: Extract task IDs dynamically
+      set_fact:
+        task_ids: >-
+          {{
+            response.json
+            | dict2items
+            | map(attribute='value')
+            | map('dict2items')
+            | flatten
+            | map(attribute='value')
+            | selectattr('task_id', 'defined')
+            | map(attribute='task_id')
+            | list
+          }}
+
+    - name: Print extracted task IDs
+      debug:
+        msg: >-
+          {% if task_ids | length > 0 %}
+            Task IDs for active LPARs: {{ task_ids | join(', ') }}
+          {% else %}
+            No task IDs found — activation failed.
+          {% endif %}
+
+    - name: Fail playbook if no task IDs were generated
+      ansible.builtin.fail:
+        msg: >
+          ❌ No task IDs Found.
+          This indicates activation failed before tasks could be created.
+          Please check the previous step's response for details.
+      when: task_ids | length == 0
+
+    - name: 04 - Get status of each install task
+      loop: "{{ task_ids }}"
+      loop_control:
+        loop_var: task_id
       tags: owner, install
-      uri:
-        url: "{{ cc_url }}/tasks/1/status"
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/tasks/{{ task_id }}/status"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
         validate_certs: false
-      register: response
+      register: task_status
 
-    - name: Printing the task status
-      tags: owner
+    - name: Print task status responses
       debug:
-        msg: "{{ response.json }}"
+        msg: "{{ item.json }}"
+      loop: "{{ task_status.results | default([task_status]) }}"
+      loop_control:
+        label: "Task ID {{ item.task_id | default('unknown') }}"
+      when: item.json is defined
+    - name: Notify user if task is In progress
+      ansible.builtin.debug:
+        msg: >
+          ⏳ One or more tasks are still in progress.
+          Please check their current status using the task IDs:
+          {{
+            task_status.results
+            | selectattr('json.action-status', 'defined')
+            | selectattr('json.action-status', 'match', '(?i)in progress')
+            | map(attribute='task_id')
+            | list
+          }}
+          Use the 'sample_scripts/14-task_status.sh' script to check in-progress task status.
+      when: >
+        task_status.results
+        | selectattr('json.action-status', 'defined')
+        | selectattr('json.action-status', 'match', '(?i)In progress')
+        | list
+        | length > 0
+
+    - name: Fail playbook if any task failed
+      ansible.builtin.fail:
+        msg: >
+          ❌ One or more install tasks have failed.
+          Failed Task IDs: {{
+            task_status.results
+            | selectattr('json.action-status', 'defined')
+            | selectattr('json.action-status', 'match', '(?i)fail')
+            | map(attribute='task_id')
+            | list
+          }}
+      when: >
+        task_status.results
+        | selectattr('json.action-status', 'defined')
+        | selectattr('json.action-status', 'match', '(?i)fail')
+        | list
+        | length > 0

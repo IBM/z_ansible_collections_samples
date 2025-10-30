@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 
@@ -26,7 +19,7 @@
         echo: no
       register: password_input
 
-    - name: Try to unlock appliance {{ appliance.name }} (up to 3 attempts)
+    - name: 00 - Try to unlock appliance {{ appliance.name }} (up to 3 attempts)
       vars:
         req_body: >
           {{
@@ -36,7 +29,7 @@
               "app_id": appliance.id | int
             } | to_json
           }}
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/unlock_quota"
         method: POST
         body: "{{ req_body }}"
@@ -61,3 +54,4 @@
           {% else %}
             Failed to unlock even after retries
           {% endif %}
+

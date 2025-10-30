@@ -3,9 +3,54 @@
 The playbooks in this directory cover multiple use cases that might arise when
 working with ACC and appliances.
 
+These playbooks can be used for:
+
+- Pulling ACC logs
+- Updating ACC image
+- End-to-end installation of the appliance
+- Upgrading and updating SSA image
+- Pulling SSA logs and Checking health status of SSA
+- Syncing LPARs
+- Install checks for ACC and SSA
+- Inserting HMC credentials
+- Unlocking appliances
+- Restarting ACC
+
+### Note
+
+The use cases here cover the default mode of ACC, without using MFA. If MFA
+is enabled, then you will need to modify the playbooks a little:
+
+- Add a task at the start of the playbook to ask the user for a TOTP. For example:
+  ```
+  - name: Wait for user to generate OTP using Owner mfa secret
+    pause:
+      prompt: "Enter OTP generated from the owner mfa_secret:"
+    register: mfa_otp_input
+  ```
+- Change the token generation to also send TOTP from the previous step:
+  ```
+  - name: 00 - Get authentication token from the ACC as appliance-owner
+    tags: owner, install
+    ansible.builtin.uri:
+      url: "{{ acc_ip }}/user/token"
+      method: POST
+      body:
+        username: "{{ cc_owner_user }}"
+        password: "{{ cc_owner_password }}"
+        otp: "{{ mfa_otp_input.user_input }}"
+      body_format: json
+      return_content: true
+      validate_certs: false
+    register: auth_response
+  ```
+
+The rest of the playbook should be not change. For reference and example of using
+MFA, check the `appliance_deploy_default_mfa_ansible/04_install_flow.yaml` playbook.
+
 ## Preparation
 
-- Ensure that ACC and the appliances under consideration are activated and
+- Almost all the playbooks here require that ACC and the appliances under consideration are activated and
   working as expected.
 - Both ACC-admin and appliance-owners must
   [install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on
@@ -14,28 +59,31 @@ working with ACC and appliances.
     ```bash
     pip install ansible
     ```
-- Download all these `yaml` files to a directory on the control node (e.g., a
+- Download this repository on the control node (e.g., a
   laptop) which will connect with ACC.
+- The playbooks that are run by an appliance-owner require to export the owner password
+  on a terminal in your control node (laptop):
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_password>
+  ```
+- `cd` to the directory `other_usecases_ansible`.
+- Modify the variables in the file `owner_vars.yaml`.
+  - Change the `acc_ip` in the `owner_vars.yaml` file to point to the right
+    IP address. Change this IP and port to the one that should be serving ACC APIs.
 
-## Upgrade or Concurrently Updating the Appliances
+## Updating the Appliances - 01_upgrade_flow.yaml | 04_managed_appliance_update.yaml
 
 An appliance can be upgraded (wiping the complete disk and replacing it with the
 new image) or concurrently updated by the appliance-owner. For that, perform the
 following actions as appliance-owner.
 
-- `cd` to the directory `other_usecases_ansible`.
 - Download the appliance image you want to install to your control node (e.g., 
   your laptop).
-- Modify the variables in the file `owner_vars.yaml`.
-  - Change the `acc_ip` in the `owner_vars.yaml` file to point to the right
-    IP address.
-    - Currently, it is set to a dummy IP 9.152.150.224, and port 8081.
-    - Change this IP to the one that should be serving ACC APIs.
 - Modify the location of that image file for upgrade in the `owner_vars.yaml` file.
   - Specifically, change the `image_path` variable.
   - This image is used for both upgrade and concurrent update.
   - The variable `image_type` denotes the kind of update:
-    - Set the `image_type` variable to to `image` for upgrade.
+    - Set the `image_type` variable to `image` for upgrade.
       - Run the playbook for appliance upgrade:
         ```bash
         ansible-playbook 01_upgrade_flow.yaml
@@ -46,61 +94,58 @@ following actions as appliance-owner.
         ansible-playbook 04_managed_appliance_update.yaml
         ```
 
-## Pull Logs from ACC and other Appliances
+## Pull Logs from ACC and other Appliances | 03_pull_scc_logs.yaml
 
-- `cd` to the directory `other_usecases_ansible`.
-- Run the playbook to get logs from ACC, decryptable only by IBM:
+- Run the playbook to get logs from ACC:
   ```bash
   ansible-playbook 03_pull_scc_logs.yaml
   ```
 
-This playbook with interactively ask for the IP, username and password of the
-appliance from which logs are gathered. This means that this playbook can also be
+This playbook will interactively ask for the IP, username and password of the
+SSC LPAR of the appliance, from which logs are gathered. This means that this playbook can also be
 used for gathering logs from other appliances (e.g., SSA appliance).
 
+## Pull SSA logs and Check Health Status | 05_managed_appliance_health_and_pull_logs.yaml
 
-## ACC Appliance Update
+- Run the playbook for health checking and pulling appliance (like SSA) logs:
+  ```bash
+  ansible-playbook 05_managed_appliance_health_and_pull_logs.yaml
+  ```
 
-- `cd` to the directory `other_usecases_ansible`.
+## ACC Appliance Update | 06_acc_appliance_update.yaml
+
 - Run the playbook to update the ACC appliance:
   ```bash
   ansible-playbook 06_acc_appliance_update.yaml
   ```
 
-## Pull SSA logs and Check Health Status
+## SSA Installation (End-to-End) | 07_ssa_install_e2e.yaml
 
-- Run the playbook, for health checking and pulling SSA logs:
-  ```bash
-  ansible-playbook 05_managed_appliance_health_and_pull_logs.yaml
-  ```
+To install 2 SSAs after a fresh install of ACC, you can run this playbook. For
+running this playbook, it is expected that ACC is just installed using
+`appliance_deploy_default_ansible/00_acc_install.yaml` playbook.
 
-## SSA Installation (End-to-End)
-
-To install 2 SSAs after a fresh install of ACC, you should:
-
-- `cd` to the directory `other_usecases_ansible`.
-- Export your HMC username and password on a terminal in your control node
-  (laptop):
+- Export the username and password in a terminal on your control node
+  (laptop), via which the ACC will communicate with the HMC:
   ```bash
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
+- Export the owner variables in a terminal on your control node (laptop):
+  ```bash
+  export SSA_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+  export SSA_OWNER_PASSWORD=<owner_new_password>
+  ```
+- Export the SSA appliances credentials in a terminal on your control node (laptop):
+  ```bash
+  export SSA_APP_USER=<ssa_username>
+  export SSA_APP_PASSWORD=<ssa_password>
+  ```
+  At the moment, the playbook is configured in such a way that both SSAs will use the
+  same credentials.
 - Download and store the SSA installation image to your control node.
-- Modify the `env_vars.yaml` file.
-  - Modify the variables for the LPAR that appliance-owner will use for installing
-    the appliance.
-- Modify the `07_ssa_install_e2e.yaml` playbook if required. For example:
-  - Check if you have to remove a task in the playbook (e.g.,
-    updating the password).
-  - Check if you use FCP disk instead of a dasd. This means you have to
-    modify the task `Assign resources to the SSA owner`.
-  - Check if you use FIDs instead of `chpid`. This means you have to modify the
-    task `Assign resources to the SSA owner`.
-  - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
-        - Uncomment the `vlan_id` entry in `env_vars.yaml`.
-        - Modify the task `Assign resources to the SSA owner` by uncommenting the `vlan_id` reference in that task.
-
-- Run the playbook to install SSA via:
+- Update the variables to the required values in `env_vars.yaml`
+- Run the playbook `07_ssa_install_e2e.yaml`  to install SSA via:
   ```bash
   ansible-playbook 07_ssa_install_e2e.yaml
   ```
@@ -109,56 +154,81 @@ This playbook will set up ACC, upload the images, initiate the install and then
 check the status of the install. The installation itself can take more than 15
 mins. Check the status of installation on HMC.
 
-## ACC and 2-SSAs Installation Sanity-Check
+## ACC and 2-SSAs Installation Sanity-Check | 08_acc_ssa_install_check.yaml
 
 If you have installed ACC and 2-SSAs, you can do a quick check to see if the
 appliances are functional. For this purpose:
 
-- `cd` to the directory `other_usecases_ansible`.
+- Export the SSA appliances credentials in a terminal on your control node (laptop):
+  ```bash
+  export SSA1_APP_USER=<ssa1_username>
+  export SSA1_APP_PASSWORD=<ssa1_password>
+  export SSA2_APP_USER=<ssa2_username>
+  export SSA2_APP_PASSWORD=<ssa2_password>
+  ```
 - Modify the file `acc_ssa_install_check_vars.yaml`.
 - Run the playbook to check the sanity of the installation via:
   ```bash
   ansible-playbook 08_acc_ssa_install_check.yaml
   ```
 
-## Set HMC Credentials (Daily Task)
+## Set HMC Credentials (Daily Task) | 09_insert_hmc_creds.yaml
 
-The administrator must run the following Ansible playbook once every day to refresh and set the HMC credentials:
+The administrator must run the following Ansible playbook once every day to
+refresh and set the HMC credentials in ACC.
+
+For this purpose:
+
+- Export the username and password in a terminal on your control node
+  (laptop), via which the ACC will communicate with the HMC:
+  ```bash
+  export HMC_USER=<enter_HMC_username>
+  export HMC_PASSWORD=<enter_HMC_password>
   ```
+- Run the playbook:
+  ```bash
     ansible-playbook 09_insert_hmc_creds.yaml
   ```
 
-## Restart ACC
+## Restart ACC | 10_restart_acc.yaml
 
-If the ACC admin wants to restart ACC, then `admin` can use this playbook:
+If the ACC-admin wants to restart ACC, then ACC-admin can use this playbook:
 
 ```
 ansible-playbook 10_restart_acc.yaml
 ```
 
-This playbook will help user to restart ACC.
-Note: This playbook will not deactivate and then activate the ACC LPAR. It will just send a restart signal to ACC appliance (similar to `reboot`).
+This playbook will help user to restart ACC, which can be helpful in certain conditions.
 
-## Trigger Disruptive dumps and Collect Logs from Appliance
+Note: This playbook will not deactivate and then activate the ACC LPAR. It will
+just send a restart signal to ACC appliance (similar to `reboot`).
 
-This playbook automates the process of triggering a disruptive dump on an SSC appliance and collecting diagnostic logs after the reboot.
-- `cd` to the directory `other_usecases_ansible`.
-- Run the playbook `11_get_disruptive_dumps.yaml`.
+## Trigger and Collect Disruptive dumps from Appliance | 11_get_disruptive_dumps.yaml
 
-  ```bash
-  ansible-playbook 11_get_disruptive_dumps.yaml
-  ```
+This playbook automates the process of triggering a disruptive dump on an SSC appliance
+and collecting diagnostic logs after the reboot.  Handle with care, as you might lose unsaved data
+on your appliances.
 
-This playbook with interactively ask for the IP, username, password, reason for downloading dumps and file path where to download for gathering logs from any appliances (e.g., SSA appliance).
+For starting and collecting disruptive dumps, run the playbook `11_get_disruptive_dumps.yaml`.
 
-## Unlock Appliances
-
-This playbook allows the ACC Owner to manually unlock one or more locked appliances in their resource package.
-Each appliance will be processed one at a time, prompting the user for credentials specific to that appliance.
-Run this playbook as the ACC Owner.
-The file `13_unlock_each_appliance.yaml` must be available in the same directory.
-This file is automatically included by the main playbook (`12_unlock_appliances.yaml`) for each appliance.
-
+```bash
+ansible-playbook 11_get_disruptive_dumps.yaml
 ```
+
+This playbook with interactively ask for the IP, username, password, reason for
+downloading dumps and file path where to download for gathering logs from any
+appliances (e.g., SSA appliance).
+
+## Unlock Appliances | 12_unlock_appliances.yaml | 13_unlock_each_appliance.yaml
+
+This playbook allows the appliance-owner to unlock one or more locked appliances in their resource package.
+Each appliance will be processed one at a time, prompting the user for credentials specific to that appliance.
+
+Run this playbook as the appliance-owner.
+```bash
 ansible-playbook 12_unlock_appliances.yaml
 ```
+
+To successfully run the above command, the file `13_unlock_each_appliance.yaml` must
+be available in the same directory. This file is included by the main playbook
+(`12_unlock_appliances.yaml`) for each appliance.

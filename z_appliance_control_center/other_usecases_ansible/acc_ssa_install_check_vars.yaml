@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 # Fill up these variables for checking the sanity of the Default-mode ACC and 2x SSA installation.
@@ -16,15 +9,16 @@
 # environment variables.
 
 # ACC Information
-acc_url: 9.152.150.224                                                      # IP of ACC appliance
+acc_url: 9.120.100.200                                                      # IP of ACC appliance
 acc_port: 8081                                                              # Port of ACC appliance used for communicating with the ACC
 
 # SSA-1 Information
-ssa1_url: 9.152.150.232                                                     # IP of SSA-1 appliance
-ssa1_admin_user: user                                                       # SSA-1's user name (same as on the SSC LPAR)
-ssa1_admin_password: "{{ lookup('env', 'SSA1_USER_PASSWORD') }}"            # SSA-1's password (same as on the SSC LPAR)
+ssa1_url: 9.120.100.201                                                     # IP of SSA-1 appliance
+ssa1_admin_user: "{{ lookup('env', 'SSA1_APP_USER') }}"                     # SSA-1's user name (same as on the SSC LPAR)
+ssa1_admin_password: "{{ lookup('env', 'SSA1_APP_PASSWORD') }}"             # SSA-1's password (same as on the SSC LPAR)
 
 # SSA-2 Information
-ssa2_url: 9.152.150.230                                                     # IP of SSA-2 appliance
-ssa2_admin: user                                                            # SSA-2's user name (same as on the SSC LPAR)
-ssa2_admin_password: "{{ lookup('env', 'SSA2_USER_PASSWORD') }}"            # SSA-2's password (same as on the SSC LPAR)
+ssa2_url: 9.120.100.203                                                     # IP of SSA-2 appliance
+ssa2_admin_user: "{{ lookup('env', 'SSA2_APP_USER') }}"                     # SSA-2's user name (same as on the SSC LPAR)
+ssa2_admin_password: "{{ lookup('env', 'SSA2_APP_PASSWORD') }}"             # SSA-2's password (same as on the SSC LPAR)
+

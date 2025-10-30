@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
@@ -22,23 +15,25 @@
     pause:
       prompt: |
         Before running this playbook, please export ACC admin credentials:
-        export ACC_ADMIN_USER=<your-admin-username>
-        export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
-        export ACC_ADMIN_PASSWORD=<admin-new-password>
-
+        
+        export ACC_ADMIN_USER=<admin_username>
+        export ACC_ADMIN_DEFAULT_PASSWORD=<admin_old_password>
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+        
         Press Ctrl+C now to cancel if you haven't done this.
         The playbook will continue shortly.
       seconds: 5
 
   vars_prompt:
     - name: run_init
-      prompt: "Do you want to initialize ACC with HMC Default Mode? (yes/no)"
+      prompt: "Do you want to initialize ACC in Standalone Mode with MFA? (yes/no)"
       private: no
       default: "yes"
 
   tasks:
-    - name: 01 - Initialize ACC with Standalone mode with MFA
-      uri:
+    - name: 00 - Initialize ACC with Standalone mode with MFA
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/init"
         body:
           hmc_managed: "{{ hmc_managed }}"
@@ -57,8 +52,8 @@
       debug:
         var: init_response.json
 
-    - name: 02 - Get Initialize status
-      uri:
+    - name: 01 - Get Initialize status
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/init"
         body:
           hmc_managed: "{{ hmc_managed }}"
@@ -87,8 +82,8 @@
       register: otp_input
 
 
-    - name: 03 - Update ACC-admin password (remove this if already done)
-      uri:
+    - name: 02 - Update ACC-admin password (remove this if already done)
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user"
         body:
           username: "{{ cc_admin_user }}"
@@ -120,8 +115,8 @@
         prompt: "Enter OTP generated from the above mfa_secret:"
       register: mfa_otp_input
 
-    - name: 04 - Get authentication token from the ACC as admin
-      uri:
+    - name: 03 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
@@ -142,9 +137,9 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 05 - Insert CPC information in ACC with dummy values (standalone mode)
+    - name: 04 - Insert CPC information in ACC with dummy values (standalone mode)
       tags: admin
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/cpcs"
         timeout: 200
         method: POST
@@ -162,8 +157,8 @@
         status_code: 200
         validate_certs: false
 
-    - name: 06 - Get list of CPCs attached to the HMC
-      uri:
+    - name: 05 - Get list of CPCs attached to the HMC
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/cpcs"
         method: GET
         headers:
@@ -176,8 +171,8 @@
       debug:
         msg: "{{ response.json }}"
 
-    - name: 07 - Get CPC resources of CPC defined in admin_vars.yaml
-      uri:
+    - name: 06 - Get CPC resources of CPC defined in admin_vars.yaml
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/cpcs/{{ z_machine_name }}/resource"
         method: GET
         headers:
@@ -190,8 +185,8 @@
       debug:
         msg: "{{ response.json }}"
 
-    - name: 08 - Create an appliance-owner using variables in admin_vars.yaml
-      uri:
+    - name: 07 - Create an appliance-owner using variables in admin_vars.yaml
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user"
         method: POST
         body:
@@ -206,3 +201,4 @@
         validate_certs: false
         status_code: 204
       register: response
+

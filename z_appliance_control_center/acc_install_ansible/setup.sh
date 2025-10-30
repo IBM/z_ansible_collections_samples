@@ -1,105 +1,20 @@
 #!/bin/bash
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
-#*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
 #*+-------------------------------------------------------------------+
 
 echo "Directory for ansible script"
 echo $ANSIBLE_TMPDIR
 
-# Detect OS
-ARCH=$(uname -m)
-KERNEL=$(uname -s)
-OS_ID="unknown"
-
-if [ "$KERNEL" = "Darwin" ]; then
-  # macOS
-  OS_ID="darwin"
-else
-  if [ -r /etc/os-release ]; then
-    . /etc/os-release
-    if [ -n "${ID:-}" ]; then
-      OS_ID=$ID
-    elif [ -n "${NAME:-}" ]; then
-      # fallback: use NAME if ID not present
-      OS_ID=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
-    fi
-  fi
-
-  # extra fallback if still unknown
-  if [ "$OS_ID" = "unknown" ]; then
-    if [ -r /etc/debian_version ]; then
-      OS_ID="debian"
-    elif [ -r /etc/redhat-release ]; then
-      OS_ID="rhel"
-    elif command -v lsb_release >/dev/null 2>&1; then
-      OS_ID=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-    fi
-  fi
-fi
-
-echo "Detected OS : $OS_ID"
-echo "Detected Architecture : $ARCH"
-
-
-
 # Step 1: Install sshpass
-echo "Step 1: Installing sshpass..."
-case "$OS_ID" in
-  ubuntu|debian)
-    if [ "$ARCH" = "s390x" ]; then
-      echo "s390x detected → building sshpass from source..."
-      sudo apt update
-      sudo apt install -y build-essential wget
-      wget http://downloads.sourceforge.net/project/sshpass/sshpass/1.09/sshpass-1.09.tar.gz
-      tar -xvzf sshpass-1.09.tar.gz
-      cd sshpass-1.09
-      ./configure
-      make
-      sudo make install
-      cd ..
-    else
-      echo "Using apt to install sshpass..."
-      sudo apt-get update
-      sudo apt-get install -y sshpass
-    fi
-    ;;
-  rhel|centos|fedora)
-    echo "Using yum to install sshpass..."
-    sudo yum install -y sshpass
-    ;;
-  darwin)
-    echo "Using Homebrew on macOS to install sshpass..."
-    if command -v brew >/dev/null 2>&1; then
-      brew install hudochenkov/sshpass/sshpass
-    else
-      echo "Homebrew is not installed. Please install Homebrew first: https://brew.sh/"
-      exit 1
-    fi
-    ;;
-  brew)
-    echo "Using Homebrew to install sshpass..."
-    brew install sshpass
-    ;;
-    *)
-    if command -v brew >/dev/null 2>&1; then
-      echo "Unknown OS, but Homebrew is available. Using brew..."
-      brew install sshpass
-    else
-      echo "Unsupported OS: $OS_ID and no known package manager found."
-      exit 1
-    fi
-    ;;
-esac
-
+echo "Step 1: Checking for sshpass..."
+if ! command -v sshpass >/dev/null 2>&1; then
+  echo "Error: 'sshpass' is not installed. Please install it manually before running this script."
+  echo "Refer to README.md for installation instructions."
+  exit 1
+else
+  echo "'sshpass' is already installed."
+fi
 
 # Step 2: Check if the virtual environment already exists
 if [ -d "venv" ]; then
@@ -113,22 +28,53 @@ fi
 echo "Step 3: Activating virtual environment..."
 source "$ANSIBLE_TMPDIR/venv/bin/activate"
 
-# Step 4: Install Python dependencies from requirements.txt
 
-echo $ANSIBLE_TMPDIR/requirements.txt
-
-if [ -f "$ANSIBLE_TMPDIR/requirements.txt" ]; then
-  echo "Step 4: Installing dependencies..."
-  pip3 install -r "$ANSIBLE_TMPDIR/requirements.txt"
-else
-  echo "$ANSIBLE_TMPDIR/requirements.txt not found!"
+# Step 4: Verify Python and pip availability
+echo "Step 4: Checking Python and pip..."
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: 'python3' is not installed or not in PATH."
+  echo "Please install Python 3 and retry."
   exit 1
 fi
 
-# Step 5: Set environment variables for the Python script
-echo "Step 5: Setting environment variables..."
+if ! command -v pip3 >/dev/null 2>&1; then
+  echo "Error: 'pip3' is not installed or not in PATH."
+  echo "Please install pip3 manually."
+  exit 1
+fi
+echo "Python and pip are available."
 
-# Step 5: Run the Python script (hmc_cli.py)
+
+# Step 5: Verify required Python packages
+echo "Step 5: Verifying required Python packages..."
+required_packages=("click" "click_shell" "zhmcclient" "urllib3")
+missing_packages=()
+
+for pkg in "${required_packages[@]}"; do
+  python3 -c "import $pkg" 2>/dev/null
+  if [ $? -ne 0 ]; then
+    missing_packages+=("$pkg")
+  fi
+done
+
+if [ ${#missing_packages[@]} -ne 0 ]; then
+  echo "Error: Missing required Python packages:"
+  for pkg in "${missing_packages[@]}"; do
+    echo "  - $pkg"
+  done
+  echo "Please install them manually inside the virtual environment before running this script."
+  echo "Example:"
+  echo "  source $ANSIBLE_TMPDIR/venv/bin/activate"
+  echo "  pip install ${missing_packages[*]}"
+  echo "Refer to README.md for more details."
+  deactivate
+  exit 1
+else
+  echo "All required Python packages are available."
+fi
+
+
+# Step 6: Run the Python script (hmc_cli.py)
 if [ -f "$ANSIBLE_TMPDIR/hmc_cli.py" ]; then
   echo "Step 5: Launching CLI..."
   python3 "$ANSIBLE_TMPDIR/hmc_cli.py"

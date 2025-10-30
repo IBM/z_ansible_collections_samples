@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for assigning two resource.
@@ -16,6 +9,20 @@
   gather_facts : true
   vars_files:
     - admin_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export ACC admin credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export ACC admin credentials:
+
+        export ACC_ADMIN_USER=<admin_username>
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
   tasks:
     - name: Confirmation required before proceeding
       ansible.builtin.pause:
@@ -27,8 +34,8 @@
           If no action is taken, it will auto-continue in 20 seconds.
         seconds: 20
 
-    - name: 11 - Get authentication token from the ACC as admin
-      uri:
+    - name: 00 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
@@ -48,8 +55,8 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 12- As ACC-admin, assign two lpar to the owner
-      uri:
+    - name: 01 - As ACC-admin, assign two LPARs to the owner
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/resource/pkgs"
         timeout: 300
         method: POST
@@ -91,7 +98,7 @@
                 # wwpn: "{{ wwpn2 }}"
                 # lun: "{{ lun2 }}"
           cpc: "{{ z_machine_name }}"
-          x86: "dummy" # If your infra support this, please add the correct x86 machine name
+          x86: "dummy" # This will be deprecated
         body_format: json
         headers:
           Authorization: "Bearer {{ access_token }}"

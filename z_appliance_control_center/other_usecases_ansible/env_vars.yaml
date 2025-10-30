@@ -1,36 +1,30 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 # NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
 # sections in the scripts as well. Please review the script thoroughly before running it.
 
 # Variables used for installing SSAs
+# Dont comment any variables here it may fail the playbook if the variable is not applicable just skip changing to right values
 
 # ACC variables
-mfa_enabled: false                                                               # Enable or disable Multi-Factor Authentication (true/false)
+mfa_enabled: false                                                               # Enable or disable Multi-Factor Authentication (true/false, keep it false)
 default_mode: true                                                               # Initialize the ACC with default mode (default_mode: true) or standalone mode (default_mode: false)     
-acc_ip: 9.152.150.224                                                            # IP of the ACC LPAR, used to create acc_url (e.g., 9.152.150.224)
+acc_ip: 9.152.150.200                                                            # IP of the ACC LPAR, used to create acc_url (e.g., 9.152.150.224)
 acc_port: 8081                                                                   # This port is used to create acc_url (e.g., 8081)
 
 # HMC
 hmc_url: "9.152.150.166"                                                          # hmc host ip (e.g., 9.152.150.166)
 hmc_user: "{{ lookup('env', 'HMC_USER') }}"                                       # ACC-admin's user name on the HMC (e.g., export HMC_USER=xyz.ibm.com) 
-hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                               # ACC-admin's password on the HMC (e.g., export HMC_PASSWORD=passw0rd123)
+hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"                               # ACC-admin's password on the HMC (e.g., export HMC_PASSWORD=<your_hmc_password>)
 
 # Users
 ssa_owner_user: "cc_owner"                                                         # Specify the owner name for the new Owner's creation (e.g., cc_owner)
 ssa_owner_email: "cc_owner@email.com"                                              # Owner's email address (e.g., "cc_owner@email.com")
-ssa_owner_default_password: "defaultP@ssw0rd"                                      # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
+ssa_owner_default_password: "{{ lookup('env', 'SSA_OWNER_DEFAULT_PASSWORD') }}"    # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
 ssa_owner_password: "{{ lookup('env', 'SSA_OWNER_PASSWORD') }}"                    # Owner's new password to update the old one (e.g., export SSA_OWNER_PASSWORD="defaultPassw0rd1")
 
 # Resources that are assigned to the appliance-owner
@@ -48,38 +42,54 @@ z_machine_name: "T28"                                                           
 z_machine_dpm_enabled: true                                                        # If machine is dpm machine then z_machine_dpm_enabled as true or false in ACC to create CPC for standalone mode
 
 # SSA Image
-image_path: "/Users/user/Downloads/zssa.img.gz"                             # Modify the location of the image file which image you want to install
-hostname: "host"                                                                  # Hostname to assign to the installed image
+ssa_package_name: "resource_package_1"
+image_path: "/Users/Downloads/zssa.img.gz"                                        # Modify the location of the image file which image you want to install
 image_type: "image"                                                               # This is default type of image (e.g., "image")
+min_ifls: 2                                                                        # Number of IFLs, Minimum IFLs required by the appliance (e.g., 1)
+min_memory: 5120                                                                  # Number of memory, Minimum memory required by the appliance (e.g., 4096)
 ssa_username: "{{ lookup('env', 'SSA_APP_USER') }}"                               # Set Username for the appliance (used during image installation) (e.g., export SSA_APP_USER=user )   
 ssa_password: "{{ lookup('env', 'SSA_APP_PASSWORD') }}"                           # Set Password for the appliance (used during image installation) (e.g., export SSA_APP_PASSWORD=password )
 
+## SSA Package inputs
+#Both ifls and gps cant be 0
+#max value of ifls that can be used for the allocated lpars in a package.CPC should contain more than the specified number.if none specify 0 
+ifls: 0  
+#max value of gps that can be used for the allocated lpars.CPC should contain more than the specified number.if none specify 0                                                                
+gps: 10
+##max value of memory(MB) that can be used for the allocated lpars.CPC should contain more than the specified number
+memory: 102400
+
 ## First SSA LPAR
-ssa_lpar1: "BLUEC1"                                                               # First LPAR name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name in which appliance will be installed
+ssa_lpar1: "CC10"                                                               # First LPAR name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name in which appliance will be installed
 interface_name1: "interface1"                                                     # Network interface name for creating resource package (e.g., "interface1")
-fid1: "9342"                                                                      # Function ID (e.g., 00A5) used with the SSC network interface
+fid1: "A123"                                                                      # Function ID (e.g., 00A5) used with the SSC network interface
 prefix1: 24                                                                       # Network prefix length for creating resource package (e.g., 23)
-# vlan_id1: 300                                                                   # VLAN ID [uncomment if applicable for your infra]
-# chpid1: "d0"                                                                    # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
-# zport1: 0                                                                       # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
-disk_id1: "0.0.5f47"                                                              # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+vlan_id1: 123                                                                   # VLAN ID [uncomment if applicable for your infra]
+chpid1: "xx"                                                                    # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
+zport1: 0                                                                       # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
+disk_id1: "0123"                                                              # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
 is_fcp1: false                                                                    # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
-ssa_ip1: "9.152.150.230"                                                          # Appliance IP address for ssa lpar
-gw_ip1: "9.152.150.1"                                                             # (IPv4/IPv6) gateway IP address
+wwpn1: "500570B46A6"                                                              # World Wide Port Name (WWPN) To be added only when is_fcp is true
+lun1: "40164000"                                                                  # Logical Unit Number (LUN) To be added only when is_fcp is true
+ssa_ip1: "9.152.150.200"                                                          # Appliance IP address for ssa lpar
+gw_ip1: "9.102.0.1"                                                             # (IPv4/IPv6) gateway IP address
 execution_action: "default"                                                       # Mode of execution: "default", "prep_lpar_only", "appliance_only", or "switch_to_installer"
 
+
 ## Second SSA LPAR
-ssa_lpar2: "SSC12"                                                               # Second LPAR name for resource assignment (e.g, "SSC12") should be valid SSA lpar name in which appliance will be installed
+ssa_lpar2: "CC12"                                                               # Second LPAR name for resource assignment (e.g, "SSC12") should be valid SSA lpar name in which appliance will be installed
 interface_name2: "interface2"                                                    # Network interface name for creating resource package (e.g., "interface1")
-fid2: "9352"                                                                     # Function ID (e.g., 00A5) used with the SSC network interface
+fid2: "A123"                                                                     # Function ID (e.g., 00A5) used with the SSC network interface
 prefix2: 24                                                                      # Network prefix length for creating resource package (e.g., 23)
-# vlan_id2: 300                                                                  # VLAN ID [uncomment if applicable for your infra]
-# chpid2: "d0"                                                                   # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
-# zport2: 0                                                                      # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
-disk_id2: "0.0.5f48"                                                             # Disk identifier (e.g., "5f48" start with 0.0) for installing image on lpar disk
+vlan_id2: 123                                                                  # VLAN ID [uncomment if applicable for your infra]
+chpid2: "xx"                                                                   # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
+zport2: 0                                                                      # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
+disk_id2: "0123"                                                             # Disk identifier (e.g., "5f48" start with 0.0) for installing image on lpar disk
 is_fcp2: false                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
-ssa_ip2: "9.152.150.225"                                                         # Appliance IP address for ssa lpar
-gw_ip2: "9.152.150.1"                                                            # (IPv4/IPv6) gateway IP address
+wwpn2: "50056A6"                                                    # World Wide Port Name (WWPN) To be added only when is_fcp is true
+lun2: "4016400"                                                     # Logical Unit Number (LUN) To be added only when is_fcp is true
+ssa_ip2: "9.152.150.200"                                                         # Appliance IP address for ssa lpar
+gw_ip2: "9.102.0.1"                                                            # (IPv4/IPv6) gateway IP address
 
 
 ################################################################################
@@ -91,9 +101,16 @@ gw_ip2: "9.152.150.1"                                                           
 # Based on the selected processor value, determine the appropriate configuration for processor_usage and processor_type
 ################################################################################
 
-# Set "processor_type" to "ifls" (likely for "Integrated Facility for Linux Systems") when you're specifying IFLS values for resource package
+# Set "processor_type" to "ifl" (likely for "Integrated Facility for Linux Systems") when you're specifying IFLS values for resource package
 # otherwise set it to "general-purpose" for central processors
 processor_type: "general-purpose"                                             # Set processor_type for the LPAR (used during image installation)
 # Set "processor_usage" to "shared" if the processor in the image profile is "not dedicated", and "dedicated" if it is dedicated.
 processor_usage: "shared"                                                     # Set processor_usage for the LPAR (used during image installation)
+
+# install 
+
+install: true                                                               # Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image (true = install new image, false = use existing disk image)
+app_cores: 2                                                                # Number of CPU cores allocated for the image
+app_memory: 5120                                                           # Amount of memory (in MB) allocated for the image
+hostname: "host"                                                                  # Hostname to assign to the installed image
 

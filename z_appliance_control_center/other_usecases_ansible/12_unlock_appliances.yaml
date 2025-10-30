@@ -1,28 +1,33 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 
 
-- name: ACC Playbook, run by ACC-owner, for ACC-owner actions
+- name: ACC Playbook, run by appliance-owner, for appliance-owner actions
   hosts: localhost
   gather_facts : true
   vars_files:
     - owner_vars.yaml
 
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
   tasks:
-    - name: 17 - Get authentication token from the ACC as appliance-owner
+    - name: 00 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         method: POST
         body:
@@ -38,8 +43,8 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 18 - Get list of running appliance
-      uri:
+    - name: 01 - Get list of running appliance
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/resource/quotas"
         method: GET
         headers:
@@ -52,7 +57,6 @@
       fail:
         msg: "No appliances found in resource quotas for this owner."
       when: quotas_response.json | length == 0
-
     
     - name: Print available appliances summary
       debug:
@@ -64,9 +68,10 @@
             Status: {{ 'Locked' if app.is_locked else 'Unlocked' }}
           {% endfor %}
 
-    - name: Unlock appliances one by one
+    - name: 02 - Unlock appliances one by one
       include_tasks: 13_unlock_each_appliance.yaml
       loop: "{{ quotas_response.json }}"
       loop_control:
         loop_var: appliance
+
       

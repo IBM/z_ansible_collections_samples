@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC Default playbook with MFA enabled, run by ACC-admin, for ACC-admin actions
@@ -22,10 +15,15 @@
     pause:
       prompt: |
         Before running this playbook, please export ACC admin credentials:
-        export ACC_ADMIN_USER=<your-admin-username>
-        export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
-        export ACC_ADMIN_PASSWORD=<admin-new-password>
 
+        export HMC_USER=<enter_HMC_username>
+        export HMC_PASSWORD=<enter_HMC_password>
+
+        export ACC_ADMIN_USER=<admin_username>
+        export ACC_ADMIN_DEFAULT_PASSWORD=<admin_old_password>
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+        
         Press Ctrl+C now to cancel if you haven't done this.
         The playbook will continue shortly.
       seconds: 5
@@ -37,8 +35,8 @@
       default: "yes"
 
   tasks:
-    - name: 02 - Initialize ACC with HMC Default mode with MFA
-      uri:
+    - name: 00 - Initialize ACC with HMC Default mode with MFA
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/init"
         body:
           mfa_enable: "{{ mfa_enabled }}"
@@ -57,7 +55,7 @@
       debug:
         var: init_response.json
 
-    - name: Show the temparory OTP secret
+    - name: Show the temporary OTP secret
       debug:
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
@@ -69,8 +67,8 @@
       register: otp_input
 
 
-    - name: 03 - Update ACC-admin password (remove this if already done)
-      uri:
+    - name: 01 - Update ACC-admin password (remove this if already done)
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user"
         body:
           username: "{{ cc_admin_user }}"
@@ -90,7 +88,7 @@
     - name: Show admin MFA secret
       debug:
         msg:
-          - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app.
+          - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
     
@@ -102,8 +100,8 @@
         prompt: "Enter OTP generated from the above mfa_secret:"
       register: mfa_otp_input
 
-    - name: 04 - Get authentication token from the ACC as admin
-      uri:
+    - name: 02 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
@@ -124,8 +122,8 @@
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 05 - Set HMC configuration in the ACC (required)
-      uri:
+    - name: 03 - Set HMC configuration in the ACC (required)
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/config/hmcconfig"
         timeout: 200
         method: POST
@@ -142,8 +140,8 @@
         status_code: 204
       register: response
 
-    - name: 06 - Get list of CPCs attached to the HMC
-      uri:
+    - name: 04 - Get list of CPCs attached to the HMC
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/cpcs"
         method: GET
         headers:
@@ -156,8 +154,8 @@
       debug:
         msg: "{{ response.json }}"
 
-    - name: 07 - Get CPC resources of CPC defined in admin_vars.yaml
-      uri:
+    - name: 05 - Get CPC resources of CPC defined in admin_vars.yaml
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/cpcs/{{ z_machine_name }}/resource"
         method: GET
         headers:
@@ -170,8 +168,8 @@
       debug:
         msg: "{{ response.json }}"
 
-    - name: 08 - Create an appliance-owner using variables in admin_vars.yaml
-      uri:
+    - name: 06 - Create an appliance-owner using variables in admin_vars.yaml
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user"
         method: POST
         body:
@@ -186,3 +184,4 @@
         validate_certs: false
         status_code: 204
       register: response
+

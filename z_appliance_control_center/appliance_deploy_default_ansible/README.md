@@ -1,6 +1,6 @@
 # Ansible Playbooks for Appliance Installation in Default Mode without MFA
 
-These example playbooks let the user:
+These sample playbooks:
 
 - Install IBM Appliance Control Center (ACC) and
 - Install a single appliance, or install 2 appliances.
@@ -10,7 +10,8 @@ These example playbooks let the user:
 - Download the ACC installation image from Fix Central and store it on your
   control node (i.e., your laptop).
 - Ensure that in the HMC, the Secure Service Container (SSC) based ACC LPAR
-  activation profile is created and has updated with correct values of network settings. (e.g. `chpid`, `prefix`, etc.) and storage (initial 16 GB storage is required for ACC).
+  activation profile is created and is updated with correct values of network
+  settings. (`chpid`, `prefix`, `fid`, etc.) and storage (initial 16 GB storage is required for ACC).
 - Both ACC-admin and appliance-owners must
   [install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on
   their respective control nodes.
@@ -21,189 +22,258 @@ These example playbooks let the user:
 - Download this directory and the `acc_install_ansible` directory on 
   the control node (e.g., a laptop), which will connect with ACC.
 
-## ACC Appliance Installation
+- Before Installing ACC, ensure the following tools and packages are available on your system:
+
+**System Requirements**
+  - Ansible (must already be installed)
+  - Python 3.x
+  - sshpass
+
+**Note**:
+- The ansible playbook does not automatically install `packages`.
+- If `sshpass` is missing, the playbook will stop with an error. Install it manually depending on your OS.
+
+**Python Packages:**
+
+The following Python packages are required for successful execution of ACC installation playbook:
+  - click
+  - click_shell
+  - zhmcclient
+  - urllib3
+
+The ansible playbook automatically creates and activates a `Python virtual environment`.
+If the above packages are missing, the playbook will display an error message and stop.
+
+To install them manually inside the created virtual environment:
+```bash
+source <ansible_temp_dir>/venv/bin/activate
+
+pip install click click_shell zhmcclient urllib3
+
+deactivate
+```
+Replace <ansible_temp_dir> with the value of your $ANSIBLE_TMPDIR environment 
+variable (displayed in the console output [e.g., in the error message]). 
+Use that same path to activate the virtual environment and install the packages.
+
+**Note** that the following steps are tested and verified on MacOS terminal.
+Windows users can either use Windows Subsystem for Linux (WSL) or run equivalent
+commands of the ones described below. Linux users can use terminal to
+run the commands.
+
+## ACC Appliance Installation - 00_acc_install.yaml
 
 To set up the ACC, the following actions must be performed by the ACC-admin.
 
-Note that the following steps are tested and verified on mac/Linux laptops.
-Windows users can either use Windows Subsystem for Linux (WSL) or run equivalent
-commands of the ones described below.
-
-- Export your HMC username and password on a terminal in your laptop:
-  ```
+- Export your HMC username and password in a terminal on your laptop:
+  ```bash
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
-
+- Export ACC-admin username and default password and new password on a terminal in your laptop:
+  ```bash
+  export ACC_ADMIN_USER=<lpar_username>
+  export ACC_ADMIN_DEFAULT_PASSWORD=<lpar_password>
+  ```
+  `lpar_username` and `lpar_password` are the ACC's SSC LPAR's credentials. These credentials
+  are used by ACC-admin later as well, when initializing ACC.
 - Update the variables in the file (`appliance_deploy_default_ansible/acc_env_vars.yaml`):
-  - Change the `IMAGE_PATH` and `INSTALL_SCRIPT_PATH` in the `acc_env_vars.yaml`
-    file to point to the right one.
+  - Change the `IMAGE_PATH` in the `acc_env_vars.yaml` file.
   - Change the `CPC`, `LPAR`, `LPAR_IP`, `DISK_ID` in the `acc_env_vars.yaml` file.
   - Update other values accordingly to point to the right LPAR for installation.
-  - **For FCP Disk Uploads**:
-    When uploading an image using an **FCP disk**, perform the following updates:
-      - Uncomment the `lun` and `wwpn` parameters, and set `IS_FCP` to **true** in the `acc_env_vars.yaml` file.
-      - Also, uncomment the `lun` and `wwpn` environment variables in the` 00_acc_install.yaml` file.
-
-
-- Run the following playbook to install ACC via:
-  ```
+    - If you use FCP disk instead of a dasd to install ACC, ensure that the variables are enabled in the configuration:
+      - Uncomment the `lun` and `wwpn` parameters, and set `IS_FCP` to `true` in the `acc_env_vars.yaml` file.
+      - Uncomment the `lun` and `wwpn` environment variables in the` 00_acc_install.yaml` file.
+- Run the following playbook to install ACC:
+  ```bash
   ansible-playbook ./appliance_deploy_default_ansible/00_acc_install.yaml
   ```
 
-The above step will take time (about 15 mins) to complete. The ansible playbook
+The above step will take time (about 15 mins) to complete. The scripts
 will first set up the LPAR in the right mode, then upload the ACC image and
 afterwards, install the ACC image on the disk.
 
 Check the status of ACC LPAR on the HMC for successful installation. After this
 step is completed, ACC will be installed and running.
 
-## Setting Up ACC
+## Setting Up ACC - 01_admin_actions.yaml
 
 To set up the ACC, the following actions must be performed by the ACC-admin on
 their control node.
 
-- Export your HMC username and password on a terminal in your laptop:
-  ```
+- Export HMC username and password on a terminal in your control node (laptop):
+  ```bash
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
-- Export Admin username and default password and new password on a terminal in your laptop:
+  Here, ACC-admin should use the credentials with which ACC will access the HMC.
+- Export ACC-admin username and default password and new password on a terminal in your laptop:
+  ```bash
+  export ACC_ADMIN_USER=<admin_username>
+  export ACC_ADMIN_DEFAULT_PASSWORD=<admin_old_password>
+  export ACC_ADMIN_PASSWORD=<admin_new_password>
+  export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
   ```
-  export ACC_ADMIN_USER=<your_admin_username>
-  export ACC_ADMIN_DEFAULT_PASSWORD=<your_admin_old_password>
-  export ACC_ADMIN_PASSWORD=<your_admin_old_password>
-  ```
+  The `admin_username` is the ACC's SSC LPAR username, and the `admin_old_password` is the
+  ACC's SSC LPAR password. `admin_new_password` is the new password that is set by the
+  ACC-admin. `owner_default_password` is the default password set by the ACC-admin for
+  the appliance-owner.
 - `cd` to the directory `appliance_deploy_default_ansible`.
 - Modify the variables in the file `admin_vars.yaml`.
   - Change the `acc_ip` in the `admin_vars.yaml` file to point to the right IP address.
-    - Currently, it is set to a dummy IP 9.152.150.224, and port 8081.
-    - Change this IP to the one that is used with ACC installation. Keep the port
-      to 8081.
-- Modify the variables of the LPAR that appliance-owner will use for installing
-  the appliance.
-  - For example, change `z_machine_lpar` to denote on which LPAR the appliance
-    will be installed.
-  - Also, assign the LPAR an IP address using the `app_ip` variable.
+    Change the IP to the IP of the ACC's SSC LPAR. Keep the port to 8081.
+- Check if you have to remove an already executed task in the playbook (e.g.,
+  updating the password).
+  - Some of the tasks might fail if executed twice.
 - Run the playbook via:
-  ```
+  ```bash
   ansible-playbook 01_admin_actions.yaml
   ```
 
-This will perform one time operations and will configure ACC. Ideally, you should
-never require a re-run of this script.
+This will perform one time operations and will configure ACC. Moreover, it will
+create an appliance-owner.
 
-## Adding Resource Packages
+## Adding Resource Packages - 02a_assign_1_lpar.yaml | 02b_assign_2_lpar.yaml
 
 To assign the resources to appliance-owners, the following steps must be taken by
-an ACC-admin on their control node.
+an ACC-admin on the control node.
 
-The directory provides 2 example playbooks:
+The directory provides sample playbooks for 2 scenarios:
 
 - `02a_assign_1_lpar.yaml`:
-  - This should be used to assign one LPAR to the appliance-owner.
-  - The appliance-owner will then install only one appliance.
+  - This should be used to assign one LPAR to the appliance-owner. This playbook will not
+    activate the LPAR.
+  - The appliance-owner will then be able to install only one appliance.
 - `02b_assign_2_lpar.yaml`:
-  - This should be used to assign two LPARs to the appliance-owner.
-  - The appliance-owner will then install two appliances at the same time.
+  - This should be used to assign two LPARs to the appliance-owner. This playbook will not
+    activate the LPAR.
+  - The appliance-owner will then be able to install two appliances at the same time.
 
 As an ACC-admin, you should **only run one of the above scripts**.
 
 The information about one or both appliances should be entered in the
 `admin_vars.yaml` file.
 
+Moreover, export ACC-admin username and password on a terminal in your laptop:
+```bash
+export ACC_ADMIN_USER=<admin_username>
+export ACC_ADMIN_PASSWORD=<admin_password>
+```
+The `admin_username` is the ACC's SSC LPAR username, and `admin_password` is 
+the password.
+
 As an ACC-admin, run the appropriate playbook depending on the number of LPARs:
 
-- For one LPAR:
-  - Fix the playbook `02a_assign_1_lpar.yaml` if required. For example:
-    - Check if you have to remove a task in the playbook (e.g.,
-      updating the password).
-    - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
-        - Uncomment the `vlan_id` entry in `admin_vars.yaml`.
-        - Modify the task `10 - As ACC-admin, assign single resources to the owner` by uncommenting the `vlan_id` reference in that task.
-    - Check if you use `vlan_id`, Please uncomment in vlan_id in `admin_vars.yaml` . This means you have to 
-      modify the task `10 - As ACC-admin, assign single resources to the owner`(uncomment `vlan_id` in the task).
-    - Check if you use FCP disk instead of a dasd. This means you have to
-      modify the task `10 - As ACC-admin, assign single resources to the owner`.
-      You will have to set the variable `is_fcp` to `true` and use the values for
-      `wwpn` and `lun`.
-    - Check if you use `chpid` instead of `fid`. This means you have to modify the
-      task `10 - As ACC-admin, assign single resources to the owner`.
-    - Check if you use FIDs instead of `chpid`. This means you have to modify the
-      task `10 - As ACC-admin, assign single resources to the owner`.
-    - Run the playbook:
-      ```bash
-      ansible-playbook 02a_assign_1_lpar.yaml
-      ```
-- For two LPARs:
-  - Fix the playbook `02b_assign_2_lpar.yaml` if required. For example:
-    - Check if you have to remove a task in the playbook (e.g.,
-      updating the password).
-    - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
-        - Uncomment the `vlan_id` entry in `admin_vars.yaml`.
-        - Modify the task `12- As ACC-admin, assign two lpar to the owner` by uncommenting the `vlan_id` reference in that task.
-    - Check if you use FCP disk instead of a dasd. This means you have to
-      modify the task `12- As ACC-admin, assign two lpar to the owner`.
-      You will have to set the variable `is_fcp` to `true` and use the values for
-      `wwpn` and `lun`.
-    - Check if you use `chpid` instead of `fid`. This means you have to modify the
-      task `12- As ACC-admin, assign two lpar to the owner`.
-    - Check if you use FIDs instead of `chpid`. This means you have to modify the
-      task `12- As ACC-admin, assign two lpar to the owner`.
-    - Run the playbook:
-      ```bash
-      ansible-playbook 02b_assign_2_lpar.yaml
-      ```
+- **For one LPAR**, update the playbook `02a_assign_1_lpar.yaml` to match your infrastructure. For example:
+  - If your setup uses a `vlan_id`, ensure that the variable is enabled in the configuration:
+      - Uncomment the `vlan_id1` entry in `admin_vars.yaml`.
+      - Uncomment the line with `vlan_id` in the task `As ACC-admin, assign single LPAR to the owner`.
+  - If you use FCP disk instead of a dasd, ensure that the variables are enabled in the configuration:
+      - Set `is_fcp1` to `true` in `admin_vars.yaml`.
+      - Uncomment the `wwpn1` and `lun1` entries in `admin_vars.yaml`.
+      - Uncomment the lines with `wwpn` and `lun` in the task `As ACC-admin, assign single LPAR to the owner`.
+  - If you use `chpid` instead of `fid`, ensure that the variables are enabled in the configuration:
+      - Uncomment the `chpid1` and `zport1` entries in `admin_vars.yaml`.
+      - Uncomment the lines with `chpid` and `port` in the task `As ACC-admin, assign single LPAR to the owner`.
+      - Comment-out the line with `fid` in the task `As ACC-admin, assign single LPAR to the owner`.
+  - Run the playbook:
+    ```bash
+    ansible-playbook 02a_assign_1_lpar.yaml
+    ```
+- **For two LPARs**, update the playbook `02b_assign_2_lpar.yaml` to match your infrastructure. For example:
+  - If your setup uses a `vlan_id`, ensure that the variables are enabled in the configuration:
+      - Uncomment the `vlan_id1` and `vland_id2` entries in `admin_vars.yaml`.
+      - Uncomment the line with `vlan_id` in the task `As ACC-admin, assign two LPARs to the owner`.
+  - If you use FCP disk instead of a dasd, ensure that the variables are enabled in the configuration:
+      - Set `is_fcp1` and `is_fcp2` to `true` in `admin_vars.yaml`.
+      - Uncomment the `wwpn1`, `wwpn2`, `lun1` and `lun2` entries in `admin_vars.yaml`.
+      - Uncomment the lines with `wwpn` and `lun` in the task `As ACC-admin, assign two LPARs to the owner`.
+  - If you use `chpid` instead of `fid`, ensure that the variables are enabled in the configuration:
+      - Uncomment the `chpid1`,  `chpid2`, `zport1` and `zport2` entries in `admin_vars.yaml`.
+      - Uncomment the lines with `chpid` and `port` in the task `As ACC-admin, assign two LPARs to the owner`.
+      - Comment-out the line with `fid` in the task `As ACC-admin, assign two LPARs to the owner`.
+  - Run the playbook:
+    ```bash
+    ansible-playbook 02b_assign_2_lpar.yaml
+    ```
 
-This action has just assigned LPARs to the appliance-owner. The LPARs are not
+This action will just assigned LPARs to the appliance-owner. The LPARs will not be
 activated. Now, the appliance-owner must install and activate the appliances
 on these LPARs.
 
-## Appliance Installation - Preparations
+## Appliance Installation - Preparations - 03_owner_action.yaml
 
 The appliance must be installed by the appliance-owner. For that, perform the
 following actions as appliance-owner.
 
+- Export default password and new password on a terminal in your control node (laptop):
+  ```bash
+  export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+  export ACC_OWNER_PASSWORD=<owner_new_password>
+  ```
+  `owner_default_password` is the default password set by the ACC-admin for
+  the appliance-owner. `owner_new_password` is the password created by the
+  appliance-owner, which will replace the default password.
 - `cd` to the directory `appliance_deploy_default_ansible`.
 - Download the appliance image you want to install to your control node.
 - Modify the variables in the file `owner_vars.yaml`.
-  - Change the `acc_ip` in the `admin_vars.yaml` file to point to the right IP.
-    - Currently, it is set to a dummy IP 9.152.150.224, and port 8081.
-    - Change this IP to the one that should be serving ACC APIs.
+  - Change the `acc_ip` in the `owner_vars.yaml` file to point to the right IP.
+    - Change this IP and port to the one that should be serving ACC APIs.
 - Modify the location of that image file in the `owner_vars.yaml` file.
   - Specifically, change the `image_path` variable.
 - Run the`03_owner_action.yaml` playbook to update owner credentials and upload
   the appliance image:
-  ```
+  ```bash
   ansible-playbook 03_owner_action.yaml
   ```
 
 The above playbook will update the passwords of the appliance-owner and upload the
-appliance image to ACC. Ideally, you should never re-run this script unless you know what you are doing.
+appliance image to ACC. 
 
+Ideally, you should never re-run this script unless you know what you are doing.
 For example, this playbook will update the password of the owner, which is
 required only once. If you want to re-run this playbook, then remove
 the password change task in the playbook.
 
-## Installing Appliances
+## Installing Appliances - 04_install_flow.yaml
 
 Once the appliance-owner has performed the actions above, the appliance-owner can
-install the appliance by running the following command on their control node.
+install the appliance. For that, perform the following actions as appliance-owner.
 
-```
-ansible-playbook 04_install_flow.yaml
-```
+- Export password on a terminal in your control node (laptop):
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_new_password>
+  ```
+- Export the username and password of the appliance in a terminal on your control node (laptop):
+  ```bash
+  export APP_USERNAME=<appliance_username>
+  export APP_PASSWORD=<appliance_password>
+  ```
+  `appliance_username` and `appliance_passwords` are the credentials of the SSC LPAR (appliance)
+  that will be installed by ACC.
+- `cd` to the directory `appliance_deploy_default_ansible`.
+- Modify the variables in the file `owner_vars.yaml`.
+- Run the playbook:
+  ```bash
+  ansible-playbook 04_install_flow.yaml
+  ```
 
 The above playbook with send the install command to ACC. ACC will take up to
 20 mins to install the appliance. Check the status of the appliances on HMC.
 
-Note that to pull logs for SSA, concurrent updates for SSA, upgrade, Health check
+Note that to pull logs for SSA, concurrent updates for SSA, upgrade, health check
 status, or ACC concurrent updates, use the playbooks located in:
-`other_ansible_usecases_scripts` directory.
+`other_usecases_ansible` directory.
 
 #### NOTE
-Make sure to run 03_owner_action.yaml before executing 04_install_flow.yaml.
-The 03_owner_action.yaml script appends the image_id: <id> entry to the end of the owner variable file.
-If you skip running 03_owner_action.yaml, you may encounter the following error:
 
-  `"msg": "The task includes an option with an undefined variable. 'image_id' is undefined"`
+Make sure to run `03_owner_action.yaml` before executing `04_install_flow.yaml`.
+The `03_owner_action.yaml` playbook appends the `image_id`: <id> entry to the end of the `owner_vars.yaml` file.
+If you skip running `03_owner_action.yaml`, you may encounter the following error:
+
+```bash
+"msg": "The task includes an option with an undefined variable. 'image_id' is undefined"
+```
+
+You can also manually add `image_id` variable to the `owner_vars.yaml` file, in case you
+do not want to re-run `03_owner_action.yaml`.

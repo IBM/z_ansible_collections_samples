@@ -1,4 +1,4 @@
-click
-click_shell
-zhmcclient
-urllib3
+# click
+# click_shell
+# zhmcclient
+# urllib3

@@ -1,14 +1,7 @@
-#*+-------------------------------------------------------------------+
-#*| IBM Confidential                                                  |
+#*+-------------------------------------------------------------------+                                                                                            |
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
 #*|                                                                   |
-#*| Licensed Materials - Property of IBM                              |
-#*|                                                                   |
-#*|                                                                   |
-#*| © Copyright IBM Corp. 2025 All Rights Reserved                    |
-#*|                                                                   |
-#*| The source code for this program is not published or otherwise    |
-#*| divested of its trade secrets, irrespective of what has been      |
-#*| deposited with the U.S. Copyright Office.                         |
 #*+-------------------------------------------------------------------+
 
 - name: ACC playbook, run as appliance-owner, to demo ACC sync behavior
@@ -16,10 +9,22 @@
   vars_files:
     - owner_vars.yaml
 
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
   tasks:
     - name: 00 - Get authentication token from the ACC as owner
       tags: owner, install
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         method: POST
         body:
@@ -41,7 +46,7 @@
 
     - name: 02 - Get resources consumed by the owner
       tags: owner
-      uri:
+      ansible.builtin.uri:
         url: "{{ acc_ip }}/resource/quotas"
         method: GET
         headers:
@@ -54,4 +59,5 @@
       tags: owner
       debug:
         msg: "{{ response.json }}"
+
 
