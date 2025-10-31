@@ -1,5 +1,8 @@
 # IBM Z Appliance Control Center
 
+**Note that these playbooks are constantly improved, and can be treated as
+a draft. It is strongly advised that users always check for latest changes.**
+
 [IBM Z Appliance Control Center](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=library-appliance-control-center-z-linuxone-users-guide)
 (ACC) is an IBM product to manage Secure Service Container (SSC) based appliances
 on IBM Z or LinuxONE systems. You can use ACC to manage appliances like
@@ -130,3 +133,55 @@ up-to-date.
 ### Current Limitations of ACC
 
 See the notes [here](https://www.ibm.com/docs/en/module_1721331501652/pdf/SC28-7067-00.pdf).
+
+## Troubleshooting
+
+As a result of executing the playbooks in this repository, the ACC LPAR appliance may occasionally enter a failed or unresponsive state. You can use the [ACC API](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=guide-api-reference) to restore the appliance to a healthy condition.
+
+Refer to the [Troubleshooting](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=guide-troubleshooting)
+chapter of the user-guide.
+
+Here are some useful examples:
+
+### Obtaining a Token
+
+You will need a token to communicate with ACC. To generate the token, you can use
+the following API example.
+
+```bash
+curl -k -X 'POST' \
+  "https://${ACC_IP}:${ACC_PORT}/api/user/token" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "username": "your_cc_owner_username",
+  "password": "you_cc_owner_user_password"
+}
+```
+
+This will return a JSON object, with `access_token` field containing the token.
+You can copy the `access_token` into a variable like `TOKEN` and use it later.
+
+### Deleting the Resource Package
+
+If as an ACC-admin, you have assigned wrong resources to the appliance-owner,
+you must delete and re-create the resource package.
+
+For that purpose, use the following resource package deletion API example below.
+
+```bash
+curl -k -X 'DELETE' \
+  "https://$ACC_IP:$ACC_PORT/api/resource/pkgs/${RESOURCE_PKG}?owner=${ACC_OWNER1_USERID}" \
+  -H 'accept: */*' \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H 'Content-Type: application/json'
+```
+
+If the resource package cannot be deleted because of already activated LPARs,
+then use the `force=true` parameter like:
+
+```bash
+/api/resource/pkgs/${RESOURCE_PKG}?owner=${ACC_OWNER1_USERID}&force=true
+```
+
+Afterwards, you can re-create the resource package for the owner.
