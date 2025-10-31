@@ -125,6 +125,35 @@ To install 2 SSAs after a fresh install of ACC, you can run this playbook. For
 running this playbook, it is expected that ACC is just installed using
 `appliance_deploy_default_ansible/00_acc_install.yaml` playbook.
 
+### Pre-requisites:
+
+- Please ensure that all SSA LPARs are **deactivated** from the HMC before
+  executing the SSA appliance installation playbook `07_ssa_install_e2e.yaml`.
+- The playbooks is configured in such a way that both SSA LPARs will use the
+  same credentials.
+- If the playbook must be re-run due to task failures, be careful re-running the
+  the following tasks:
+  ```
+    00 - Initialize ACC
+    01 - Update ACC-admin password
+    05 - Create an appliance-owner for both SSAs
+    06 - Assign resources to the SSA owner
+    07 - Update the password of SSA appliance-owner
+    09 - Upload the SSA appliance image to the ACC
+  ```
+  If you need to re-run this playbook, the tasks above may fail during
+  subsequent playbook executions. To prevent these failures, comment out the
+  applicable tasks listed above that were successfully completed during previous
+  playbook runs.
+- **Note:** If you receive an error during or after execution of task
+  `09 - Upload the SSA appliance image to the ACC`, you can use the tag `retry`
+  while executing the playbook to automatically skip all the above tasks. For example:
+  ```bash
+  ansible-playbook 07_ssa_install_e2e.yaml -t retry
+  ```  
+
+### Procedure
+
 - Export the username and password in a terminal on your control node
   (laptop), via which the ACC will communicate with the HMC:
   ```bash
@@ -141,10 +170,10 @@ running this playbook, it is expected that ACC is just installed using
   export SSA_APP_USER=<ssa_username>
   export SSA_APP_PASSWORD=<ssa_password>
   ```
-  At the moment, the playbook is configured in such a way that both SSAs will use the
-  same credentials.
 - Download and store the SSA installation image to your control node.
-- Update the variables to the required values in `env_vars.yaml`
+- Update the variables to the required values in `env_vars.yaml`.
+  - Do not comment out any variables, even if they are not supposed to be used
+    in your infrastructure.
 - Run the playbook `07_ssa_install_e2e.yaml`  to install SSA via:
   ```bash
   ansible-playbook 07_ssa_install_e2e.yaml

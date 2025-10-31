@@ -4,8 +4,7 @@
 #*|                                                                   |
 #*+-------------------------------------------------------------------+
 
-# Todo
-# Check if we can add a certificate and then remove verify_cert
+# Tested with OSA and FCP devices, on non-DPM mode machine.
 
 - name: ACC playbook, run by appliance-owner for installing 2x SSA appliances
   hosts: localhost
@@ -17,6 +16,8 @@
   - name: Reminder - Export credentials
     pause:
       prompt: |
+
+
         Before running this playbook, please export credentials:
 
         export HMC_USER=<enter_HMC_username>
@@ -30,7 +31,35 @@
 
         Press Ctrl+C now to cancel if you haven't done this.
         The playbook will continue shortly.
+
       seconds: 5
+
+  - name: "Reminder for Re-run"
+    tags: retry
+    ansible.builtin.pause:
+      prompt: |
+
+        REMINDER: If you need to re-run this playbook, certain tasks may fail
+        during subsequent executions. To prevent these failures, comment
+        out the applicable tasks listed below that were successfully completed
+        in previous runs.
+        
+          00 - Initialize ACC
+          01 - Update ACC-admin password
+          05 - Create an appliance-owner for both SSAs
+          06 - Assign resources to the SSA owner
+          07 - Update the password of SSA appliance-owner
+          09 - Upload the SSA appliance image to the ACC
+
+        The above tasks should only be executed once, otherwise errors may occur.
+
+        If you are re-running this playbook due to an error that occurred during
+        or after the execution of task '09 - Upload the SSA appliance image to the ACC'. The 
+        tag 'retry' can be used to skip all of the problematic tasks. 
+        For example: ansible-playbook 07_ssa_install_e2e.yaml -t retry
+        
+        Press enter (or ctrl+C then C) to continue.
+        If you want to abort and modify this playbook, press Ctrl+C then A.
 
   vars_prompt:
     - name: cc_admin_user
@@ -38,11 +67,11 @@
       private: no
 
     - name: cc_admin_old_password
-      prompt: "Enter ACC LPAR's Default Password"
+      prompt: "Enter ACC LPAR's password"
       private: yes
 
     - name: cc_admin_password
-      prompt: "Enter ACC LPAR's New Password"
+      prompt: "Enter ACC-admin's new password"
       private: yes
 
     - name: run_init
@@ -52,21 +81,24 @@
 
   tasks:
     - name: Prepare ACC URL
+      tags: admin, owner, retry
       set_fact:
         cc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
     
-    - name: Printing the acc url 
+    - name: Printing the ACC url
+      tags: admin, owner, retry
       debug:
         msg: "{{ cc_url }}"
 
     - name: Prepare execution_action
+      tags: retry
       set_fact:
         execution_action: "{{ 'default' if default_mode else 'appliance_only' }}"
 
     - name: Printing execution_action
+      tags: admin, owner, retry
       debug:
         msg: "{{ execution_action }}"
-
 
     - name: 00 - Initialize ACC
       tags: admin
@@ -98,7 +130,7 @@
         return_content: true
 
     - name: 02 - Get authentication token from the ACC as admin
-      tags: admin
+      tags: admin, retry
       ansible.builtin.uri:
         url: "{{ cc_url }}/user/token"
         body:
@@ -110,13 +142,13 @@
         validate_certs: false
       register: auth_response
 
-    - name: Extract the admin token
-      tags: admin
+    - name: Extract the ACC-admin's token
+      tags: admin, retry
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
     - name: 03 - Set HMC configuration in the ACC (default mode)
-      tags: admin
+      tags: admin, retry
       ansible.builtin.uri:
         url: "{{ cc_url }}/config/hmcconfig"
         timeout: 300
@@ -175,6 +207,7 @@
       register: response
 
     - name: 06 - Assign resources to the SSA owner
+      tags: admin
       block:
       - name: Gathering Network Parameters from vars for {{ ssa_lpar1 }} and {{ ssa_lpar2 }}
         set_fact:
@@ -189,19 +222,19 @@
             ip: "{{ ssa_ip2 }}"
             gw: "{{ gw_ip2 }}"
 
-      - name: Enter Network Card type for 1st LPAR
+      - name: Enter network card type for 1st LPAR
         pause:
-          prompt: "Enter Network Card type to be used for Managed LPAR - {{ ssa_lpar1 }} (OSA/NETH)"
+          prompt: "Enter network card type to be used for LPAR {{ ssa_lpar1 }}: (OSA/NETH)"
         register: net_type1
 
-      - name: Validate Network type
+      - name: Validate network type
         fail:
           msg: "Invalid input"
         when: net_type1.user_input not in ['OSA', 'NETH']
 
-      - name: VLAN Configuration
+      - name: VLAN configuration
         pause:
-          prompt: "Is VLAN id has to be set for - {{ ssa_lpar1 }} (yes/no)"
+          prompt: "Does the LPAR {{ ssa_lpar1 }} need VLAN configuration? (yes/no)"
         register: vlan_1
 
       - name: Validate VLAN confirmation
@@ -209,19 +242,19 @@
           msg: "Invalid input"
         when: vlan_1.user_input not in ['yes', 'no']
 
-      - name: Enter Boot disk type for 1st LPAR [DASD/FCP]
+      - name: Enter boot disk type for 1st LPAR [DASD/FCP]
         pause:
-          prompt: "Enter Boot disk type for Managed LPAR - {{ ssa_lpar1 }} (DASD/FCP)"
+          prompt: "Enter boot disk type for LPAR {{ ssa_lpar1 }}: (DASD/FCP)"
         register: is_fcp_1
 
-      - name: Validate Disk type
+      - name: Validate disk type
         fail:
           msg: "Invalid input"
         when: is_fcp_1.user_input not in ['DASD', 'FCP']
 
-      - name: Enter Network Card type for 2nd LPAR 
+      - name: Enter network card type for 2nd LPAR 
         pause:
-          prompt: "Enter Network Card type to be used for Managed LPAR - {{ ssa_lpar2 }} (OSA/NETH)"
+          prompt: "Enter network card type to be used for LPAR {{ ssa_lpar2 }}: (OSA/NETH)"
         register: net_type2
 
       - name: Validate Network type
@@ -231,7 +264,7 @@
 
       - name: VLAN Configuration
         pause:
-          prompt: "Is VLAN id has to be set for -  {{ ssa_lpar2 }} (yes/no)"
+          prompt: "Does the LPAR {{ ssa_lpar2 }} need VLAN configuration? (yes/no)"
         register: vlan_2
 
       - name: Validate VLAN confirmation
@@ -239,9 +272,9 @@
           msg: "Invalid input"
         when: vlan_2.user_input not in ['yes', 'no']
 
-      - name: Enter Boot disk type for 2nd LPAR [DASD/FCP]
+      - name: Enter boot disk type for 2nd LPAR [DASD/FCP]
         pause:
-          prompt: "Enter Boot disk type for Managed LPAR - {{ ssa_lpar2 }} (DASD/FCP)"
+          prompt: "Enter boot disk type for LPAR {{ ssa_lpar2 }}: (DASD/FCP)"
         register: is_fcp_2
 
       - name: Validate Disk type
@@ -249,7 +282,7 @@
           msg: "Invalid input"
         when: is_fcp_2.user_input not in ['DASD', 'FCP']
 
-      - name: Entered values for cards from user 
+      - name: Entered values for network by the user
         debug:
           msg:
           - "{{ net_type1.user_input }}" 
@@ -259,7 +292,7 @@
           - "{{ is_fcp_1.user_input }}"
           - "{{ is_fcp_2.user_input }}"
 
-      - name: Add OSA params for "{{ ssa_lpar1 }}"
+      - name: Preparing OSA params for "{{ ssa_lpar1 }}"
         set_fact:
           nw_details1: >- 
             {{ var_details1 
@@ -269,7 +302,7 @@
                 ) }}
         when: net_type1.user_input == 'OSA'
 
-      - name: Add OSA params for "{{ ssa_lpar2 }}"
+      - name: Preparing OSA params for "{{ ssa_lpar2 }}"
         set_fact:
           nw_details2: >-  
             {{ var_details2 
@@ -277,21 +310,21 @@
               | combine((vlan_2.user_input == 'yes') | ternary({'vlan_id':vlan_id2},{})) }}
         when: net_type2.user_input == 'OSA'
 
-      - name: Add NETH params for {{ ssa_lpar1 }}
+      - name: Preparing NETH params for {{ ssa_lpar1 }}
         set_fact:
           nw_details1: "{{ var_details1 
                         | combine({'fid': fid1})
                         | combine((vlan_1.user_input == 'yes')| ternary({'vlan_id':vlan_id1},{})) }}"
         when: net_type1.user_input == 'NETH'
 
-      - name: Add NETH params for {{ ssa_lpar2 }}
+      - name: Preparing NETH params for {{ ssa_lpar2 }}
         set_fact:
           nw_details2: "{{ var_details2 
                         | combine({'fid': fid2})
                         | combine((vlan_2.user_input == 'yes')| ternary({'vlan_id':vlan_id2},{})) }}" 
         when: net_type2.user_input == 'NETH'
 
-      - name: Add Boot params for {{ ssa_lpar1 }}
+      - name: Preparing boot params for {{ ssa_lpar1 }}
         set_fact:
           boot_info1: "{{ {'disk-id': disk_id1}
                         | combine(
@@ -303,7 +336,7 @@
                         },{
                         'is-fcp': false
                         })) }}" 
-      - name: Add Boot params for {{ ssa_lpar2 }}
+      - name: Preparing boot params for {{ ssa_lpar2 }}
         set_fact:
           boot_info2: "{{ {'disk-id': disk_id2}
                         | combine(
@@ -316,7 +349,7 @@
                         'is-fcp': false
                         })) }}" 
 
-      - name: Creating the request for resource pkg creation
+      - name: Creating the API request for resource pkg creation
         set_fact:
           body: >-
             {{
@@ -345,7 +378,7 @@
         debug:
           var: body
 
-      - name: Submitting the request to ACC to create package with 2 SSA lpars
+      - name: Submitting the request to ACC to create package with 2 SSA LPARs
         tags: admin
         ansible.builtin.uri:
           url: "{{ cc_url }}/resource/pkgs"
@@ -360,6 +393,22 @@
           validate_certs: false
           status_code: 200
         register: response
+      
+      - name: Printing the response
+        tags: owner, install
+        debug:
+          msg: "{{ response.json }}"
+
+      - name: Check if SSA LPARs are already activated
+        vars:
+          lpars_sync_list: "{{ response.json.lpars_sync_scheduled | from_yaml }}"
+        when: lpars_sync_list | length > 0
+        ansible.builtin.fail:
+          msg: >
+
+            ⚠️ WARNING: One or more LPARs are in *Operating* state in HMC.
+            Please be cautious before performing installation.
+            LPARs: {{ lpars_sync_list }}
 
     - name: 07 - Update the password of SSA appliance-owner
       tags: owner
@@ -375,7 +424,7 @@
         return_content: true
 
     - name: 08 - Get authentication token from the ACC as appliance-owner
-      tags: owner
+      tags: owner, retry
       ansible.builtin.uri:
         url: "{{ cc_url }}/user/token"
         method: POST
@@ -388,15 +437,13 @@
       register: auth_response
 
     - name: Extract the owner token
-      tags: owner
+      tags: owner, retry
       set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
     - name: 09 - Upload the SSA appliance image to the ACC
       tags: owner
-      # Unfortunately, the uri module cannot upload binary files.
-      # One can use `src`, but both `src` and `body` can't be used together.
-      shell: 'curl -k -X "POST" \
+      ansible.builtin.shell: 'curl -k -X "POST" \
               "{{ cc_url }}/images" \
               -H "Authorization: Bearer {{ access_token }}" \
               -H "Content-Type: multipart/form-data" \
@@ -406,7 +453,7 @@
       register: response
 
     - name: 10 - Get image information
-      tags: owner
+      tags: owner, retry
       ansible.builtin.uri:
         url: "{{ cc_url }}/images"
         method: GET
@@ -417,17 +464,17 @@
       register: response
 
     - name: Printing the response
-      tags: owner, install
+      tags: owner, install, retry
       debug:
         msg: "{{ response.json }}"
 
     - name: Extract the image ID from the DB
-      tags: owner, install
+      tags: owner, install, retry
       set_fact:
         image_id: "{{ response.json.images[-1].id }}"
 
     - name: 11 - As owner, install and activate the image
-      tags: owner
+      tags: owner, retry
       ansible.builtin.uri:
         url: "{{ cc_url }}/cluster/activate"
         method: POST
@@ -466,7 +513,7 @@
       register: response
 
     - name: Printing the response
-      tags: owner, install
+      tags: owner, install, retry
       debug:
         msg: "{{ response.json }}"
 
@@ -476,6 +523,7 @@
 
     # Extract all task IDs from response
     - name: Extract task IDs dynamically
+      tags: owner, install, retry
       set_fact:
         task_ids: >-
           {{
@@ -491,6 +539,7 @@
           }}
 
     - name: Print extracted task IDs
+      tags: owner, install, retry
       debug:
         msg: >-
           {% if task_ids | length > 0 %}
@@ -500,6 +549,7 @@
           {% endif %}
 
     - name: Fail playbook if no task IDs were generated
+      tags: owner, install, retry
       ansible.builtin.fail:
         msg: >
           ❌ No task IDs Found.
@@ -511,7 +561,7 @@
       loop: "{{ task_ids }}"
       loop_control:
         loop_var: task_id
-      tags: owner, install
+      tags: owner, install, retry
       ansible.builtin.uri:
         url: "{{ cc_url }}/tasks/{{ task_id }}/status"
         method: GET
@@ -521,6 +571,7 @@
       register: task_status
 
     - name: Print task status responses
+      tags: owner, install, retry
       debug:
         msg: "{{ item.json }}"
       loop: "{{ task_status.results | default([task_status]) }}"
@@ -530,16 +581,18 @@
     - name: Notify user if task is In progress
       ansible.builtin.debug:
         msg: >
-          ⏳ One or more tasks are still in progress.
-          Please check their current status using the task IDs:
-          {{
-            task_status.results
+          ⏳ One or more tasks are still in progress. Please check the current
+          status of in-progress task using the ACC API endpoints below. Be sure
+          to include the API token in the header in order to view the necessary
+          information.
+          {%- set in_progress = task_status.results
             | selectattr('json.action-status', 'defined')
             | selectattr('json.action-status', 'match', '(?i)in progress')
             | map(attribute='task_id')
-            | list
-          }}
-          Use the 'sample_scripts/14-task_status.sh' script to check in-progress task status.
+            | list %}
+          {%- for id in in_progress %}
+          * {{ cc_url }}/tasks/{{ id }}/status
+          {%- endfor %}
       when: >
         task_status.results
         | selectattr('json.action-status', 'defined')

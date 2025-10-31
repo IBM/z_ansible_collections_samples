@@ -79,8 +79,10 @@ app_cores: 2                                                                # Nu
 app_memory: 4096                                                            # Amount of memory (in MB) allocated for the image
 
 # appliance credential
-app_username: "<insert_lpar_username>"                                                        # Set Username for the appliance (used during image installation)
-app_password: "<insert_lpar_password>"                                                    # Set Password for the appliance (used during image installation)
+# Export before run: export APP_USERNAME=<lpar_username>
+app_username: "{{ lookup('env', 'APP_USERNAME') }}"                          # Set Username for the appliance (used during image installation)
+#Export before run: export APP_PASSWORD=<lpar_password>
+app_password: "{{ lookup('env', 'APP_PASSWORD') }}"                          # Set Password for the appliance (used during image installation)
 
 # app_image_id: 1
 

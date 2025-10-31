@@ -17,6 +17,8 @@
         Before running this playbook, please export appliance-owner credentials:
 
         export ACC_OWNER_PASSWORD=<owner_password>
+        export APP_USERNAME=<appliance_username>
+        export APP_PASSWORD=<appliance_password>
 
         Press Ctrl+C now to cancel if you haven't done this.
         The playbook will continue shortly.

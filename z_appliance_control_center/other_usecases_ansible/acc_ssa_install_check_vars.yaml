@@ -9,16 +9,16 @@
 # environment variables.
 
 # ACC Information
-acc_url: 9.120.100.200                                                      # IP of ACC appliance
+acc_ip: 9.120.100.200                                                      # IP of ACC appliance
 acc_port: 8081                                                              # Port of ACC appliance used for communicating with the ACC
 
 # SSA-1 Information
-ssa1_url: 9.120.100.201                                                     # IP of SSA-1 appliance
+ssa1_ip: 9.120.100.201                                                     # IP of SSA-1 appliance
 ssa1_admin_user: "{{ lookup('env', 'SSA1_APP_USER') }}"                     # SSA-1's user name (same as on the SSC LPAR)
 ssa1_admin_password: "{{ lookup('env', 'SSA1_APP_PASSWORD') }}"             # SSA-1's password (same as on the SSC LPAR)
 
 # SSA-2 Information
-ssa2_url: 9.120.100.203                                                     # IP of SSA-2 appliance
+ssa2_ip: 9.120.100.203                                                     # IP of SSA-2 appliance
 ssa2_admin_user: "{{ lookup('env', 'SSA2_APP_USER') }}"                     # SSA-2's user name (same as on the SSC LPAR)
 ssa2_admin_password: "{{ lookup('env', 'SSA2_APP_PASSWORD') }}"             # SSA-2's password (same as on the SSC LPAR)
 
