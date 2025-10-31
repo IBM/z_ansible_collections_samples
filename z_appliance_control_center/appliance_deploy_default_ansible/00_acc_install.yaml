@@ -21,8 +21,8 @@
     DISK_ID: "{{ DISK_ID }}"
     IS_FCP: "{{ IS_FCP }}"
     # Note: Uncomment lun and wwpn when uploading for FCP disk
-    # lun: "{{ lun }}"   
-    # wwpn: "{{ wwpn }}"
+    lun: "{{ lun }}"   
+    wwpn: "{{ wwpn }}"
     USERNAME: "{{ USERNAME }}"
     PASSWORD: "{{ PASSWORD }}"
     HMC_USER: "{{ HMC_USER }}"
@@ -48,7 +48,16 @@
   - name: Reminder - Export credentials
     pause:
       prompt: |
-        Before running this playbook, please export credentials:
+
+        Before running this playbook, make sure that:
+
+        - You have installed the required software packages
+        - You have created a python virtual environment 'venv' in the directory
+          "{{ INSTALL_SCRIPT_PATH }}"
+        - You have installed the required python packages in the
+          virtual environment
+        
+        Moreover, please export credentials:
 
         export HMC_USER=<enter_HMC_username>
         export HMC_PASSWORD=<enter_HMC_password>

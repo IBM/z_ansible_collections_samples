@@ -151,6 +151,18 @@ the password change task in the playbook.
 Once the appliance-owner has performed the actions above, the appliance-owner can
 install the appliance. For that, perform the following actions as appliance-owner.
 
+- In case the admin has only assigned a single LPAR using the
+  `02a_assign_1_lpar.yaml` playbook, then comment the second LPAR's details in
+  task `01 - As owner, install and activate the image` of `04_install_flow.yaml` 
+
+  For example, comment out these lines:
+  ```bash
+  {
+      "name": "{{ lpar_name2 }}",
+      "execution_action": "{{ execution_action }}",
+      "install": "{{ install }}"
+  }
+  ```
 - Export password on a terminal in your control node (laptop):
   ```bash
   export ACC_OWNER_PASSWORD=<owner_new_password>
@@ -178,6 +190,7 @@ install the appliance. For that, perform the following actions as appliance-owne
 
 The above playbook with send the install command to ACC. ACC will take up to
 20 mins to install the appliance. Check the status of the appliances on HMC.
+
 
 Note that to pull logs for SSA, concurrent updates for SSA, upgrade, health check
 status, or ACC concurrent updates, use the playbooks located in:

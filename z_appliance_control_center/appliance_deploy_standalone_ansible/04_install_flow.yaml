@@ -213,15 +213,15 @@
       ansible.builtin.debug:
         msg: >
           ⏳ One or more tasks are still in progress.
-          Please check their current status using the task IDs:
-          {{
-            task_status.results
+          Please check the current status of in-progress task using the URLs below:
+          {%- set in_progress = task_status.results
             | selectattr('json.action-status', 'defined')
             | selectattr('json.action-status', 'match', '(?i)in progress')
             | map(attribute='task_id')
-            | list
-          }}
-          Use the 'sample_scripts/14-task_status.sh' script to check in-progress task status.
+            | list %}
+          {%- for id in in_progress %}
+          • {{ acc_ip }}/tasks/{{ id }}/status
+          {%- endfor %}
       when: >
         task_status.results
         | selectattr('json.action-status', 'defined')

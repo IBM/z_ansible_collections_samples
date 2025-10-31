@@ -185,6 +185,18 @@ Note: To generate the access token for the owner, provide the OTP when prompted 
 Use the last saved mfa_secret of owner to generate this OTP through your authenticator app.
 When the command prompt requests an OTP, enter the OTP generated using the saved mfa_secret.
 
+- In case the admin has only assigned a single LPAR using the
+  `02a_assign_1_lpar.yaml` playbook, then comment the second LPAR's details in
+  task `01 - As owner, install and activate the image` of `04_install_flow.yaml` 
+
+  For example, comment out these lines:
+  ```bash
+  {
+      "name": "{{ lpar_name2 }}",
+      "execution_action": "{{ execution_action }}",
+      "install": "{{ install }}"
+  }
+  ```
 - Export password on a terminal in your control node (laptop):
   ```bash
   export ACC_OWNER_PASSWORD=<owner_new_password>
@@ -205,6 +217,7 @@ When the command prompt requests an OTP, enter the OTP generated using the saved
 
 The above playbook with send the install command to ACC. ACC will take up to
 20 mins to install the appliance. Check the status of the appliances on HMC.
+
 
 Note that to pull logs for SSA, concurrent updates for SSA, upgrade, health check
 status, or ACC concurrent updates, use the playbooks located in:

@@ -8,7 +8,7 @@
 
 # NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
 # sections in the scripts as well. Please review the script thoroughly before running it.
-
+#Do not comment any vars here which might cause playbook to fail
 # HMC
 HMC_HOST: "9.0.0.0"                                                                        # hmc host ip (e.g., 9.152.150.166)
 HMC_USER: "{{ lookup('env', 'HMC_USER') }}"                                                      # Set Your hmc username (e.g., export HMC_USER=<enter_hmc_email>) 
@@ -20,14 +20,14 @@ PASSWORD: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"                   
 
 # ACC LPAR
 ACTION: "activate"                                                                              # ACTION as "activate" or "deactivate" the lpar
-CPC: "T28"                                                                                      # CPC or machine name (e.g., "T28")
+CPC: "CPC1"                                                                                      # CPC or machine name (e.g., "T28")
 LPAR: "CC12"                                                                                   # Logical partition (LPAR) name where you want to install ACC image (e.g., "BLUEC1") should be valid lpar name
 LPAR_IP: "9.120.100.200"                                                                        # Appliance IP address (lpar ip)
 DISK_ID: "<enter_disk_id>"                                                                             # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
 IS_FCP: false                                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False
-# lun: "4026402200000000"                                                                       # To be added only when is_fcp is true (e.g., lun: "4026402200000000")
-# wwpn: "50050763070b46a6"                                                                      # To be added only when disk is_fcp is true (e.g., wwpn: "50050763070b46a6")
-GATEWAY_IP: "9.152.150.1"                                                                       # (IPv4/IPv6) gateway IP address
+lun: "0000000000000000"                                                                       # To be added only when is_fcp is true (e.g., lun: "4026402200000000")
+wwpn: "0000000000000000"                                                                      # To be added only when disk is_fcp is true (e.g., wwpn: "50050763070b46a6")
+GATEWAY_IP: "9.x.x.x"                                                                       # (IPv4/IPv6) gateway IP address
 STORAGE: 16384                                                                                  # Storage allocated (in MB)
 
 # Paths on the control node (i.e., your laptop)
