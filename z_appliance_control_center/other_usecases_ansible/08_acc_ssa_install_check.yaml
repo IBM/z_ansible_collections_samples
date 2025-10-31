@@ -10,9 +10,9 @@
   vars_files:
     - acc_ssa_install_check_vars.yaml
   vars:
-    acc_base_url: "https://{{ acc_url }}:{{ acc_port }}/api"
-    ssa1_base_url: "https://{{ ssa1_url }}/api/com.ibm.zaci.system"
-    ssa2_base_url: "https://{{ ssa2_url }}/api/com.ibm.zaci.system"
+    acc_base_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
+    ssa1_base_url: "https://{{ ssa1_ip }}/api/com.ibm.zaci.system"
+    ssa2_base_url: "https://{{ ssa2_ip }}/api/com.ibm.zaci.system"
 
   pre_tasks:
   - name: Reminder - Export credentials
@@ -41,7 +41,7 @@
   tasks:
     - name: 00 - Check if ACC appliance is operational
       ansible.builtin.uri:
-        url: "https://{{ acc_url }}/api/com.ibm.zaci.system/appliance/is-operational"
+        url: "https://{{ acc_ip }}/api/com.ibm.zaci.system/appliance/is-operational"
         method: GET
         headers:
           zaci-api: "com.ibm.zaci.system/1.0"

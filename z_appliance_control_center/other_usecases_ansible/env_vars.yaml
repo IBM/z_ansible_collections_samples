@@ -8,7 +8,7 @@
 # sections in the scripts as well. Please review the script thoroughly before running it.
 
 # Variables used for installing SSAs
-# Dont comment any variables here it may fail the playbook if the variable is not applicable just skip changing to right values
+# Do not comment any variables here it may fail the playbook if the variable is not applicable just skip changing to right values
 
 # ACC variables
 mfa_enabled: false                                                               # Enable or disable Multi-Factor Authentication (true/false, keep it false)
@@ -67,7 +67,7 @@ prefix1: 24                                                                     
 vlan_id1: 123                                                                   # VLAN ID [uncomment if applicable for your infra]
 chpid1: "xx"                                                                    # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
 zport1: 0                                                                       # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
-disk_id1: "0123"                                                              # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+disk_id1: "0.0.5abc"                                                              # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
 is_fcp1: false                                                                    # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
 wwpn1: "500570B46A6"                                                              # World Wide Port Name (WWPN) To be added only when is_fcp is true
 lun1: "40164000"                                                                  # Logical Unit Number (LUN) To be added only when is_fcp is true
@@ -84,7 +84,7 @@ prefix2: 24                                                                     
 vlan_id2: 123                                                                  # VLAN ID [uncomment if applicable for your infra]
 chpid2: "xx"                                                                   # Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382") [uncomment if applicable for your infra]
 zport2: 0                                                                      # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added.
-disk_id2: "0123"                                                             # Disk identifier (e.g., "5f48" start with 0.0) for installing image on lpar disk
+disk_id2: "0.0.5abc"                                                             # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
 is_fcp2: false                                                                   # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
 wwpn2: "50056A6"                                                    # World Wide Port Name (WWPN) To be added only when is_fcp is true
 lun2: "4016400"                                                     # Logical Unit Number (LUN) To be added only when is_fcp is true
