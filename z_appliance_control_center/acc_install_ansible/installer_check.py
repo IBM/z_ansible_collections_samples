@@ -57,7 +57,10 @@ def lpar_status(client, cpc, lpar_name):
     """Checks the status of the LPAR and prints its mode."""
     try:
         start_time = time.time()
-        lpar = cpc.lpars.find(name=lpar_name)
+        if cpc.dpm_enabled:
+            lpar = cpc.partitions.find(name=lpar_name)
+        else:
+            lpar = cpc.lpars.find(name=lpar_name)
 
         os_name = lpar.get_property("os-name")
         current_status = lpar.get_property("status")
@@ -68,9 +71,9 @@ def lpar_status(client, cpc, lpar_name):
         print(f"📟 Current Status: {current_status}\n")
         print(f"📟 Acceptable Status: {acceptable_status[0]}\n")
 
-        if os_name == "INSTALL" and current_status == "operating":
+        if os_name == "INSTALL" and current_status in ["operating","active"]:
             print(f"✅ LPAR '{lpar_name}' is in installer mode and operating.")
-        elif os_name == "ZACC" and current_status == "operating":
+        elif os_name == "ZACC" and current_status in ["operating","active"]:
             print(f"✅ LPAR '{lpar_name}' is in Appliance mode and operating.")
         else:
             print(f"⚠️ LPAR '{lpar_name}' is not in the required state. Please check manually.")

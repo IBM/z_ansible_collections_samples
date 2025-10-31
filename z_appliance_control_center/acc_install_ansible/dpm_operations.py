@@ -12,18 +12,18 @@ import zhmcclient
 import urllib3
 
 urllib3.disable_warnings()
-NOT_ACTIVATED_STATUS = 'not-activated'
-OPERATING_STATUS = 'operating'
+NOT_ACTIVATED_STATUS = 'stopped'
+OPERATING_STATUS = 'active'
 EXCEPTIONS_STATUS = 'exceptions'
 
 ACTION_ACTIVATE = "activate"
 ACTION_DEACTIVATE = "deactivate"
 
-def main(session, set_image_profile):
+def main(session,set_image_profile):
     try:
         cpc_name = os.environ.get("CPC")
         lpar_name = os.environ.get("LPAR")
-        action = os.environ.get("ACTION")
+        action = os.environ.get("ACTION")       
 
         if action not in [ACTION_ACTIVATE, ACTION_DEACTIVATE]:
             print(f"Unsupported action: {action}")
@@ -39,7 +39,7 @@ def main(session, set_image_profile):
                 if set_image_profile:
                     print(f"LPAR {lpar_name} is already active. Deactivating and reactivating...")
                     if deactivate_lpar(cpc, lpar):
-                        set_image_activation_profile(cpc, lpar_name)
+                        update_partition_properties(cpc, lpar_name)
                         time.sleep(10)
                     activate_lpar(cpc, lpar)
                     print(f"CPC {cpc_name} LPAR {lpar_name} has been successfully reactivated...and switched to Installer Mode")
@@ -48,7 +48,7 @@ def main(session, set_image_profile):
             elif status == NOT_ACTIVATED_STATUS:
                 if set_image_profile:
                     print(f"LPAR {lpar_name} is inactive. Activating with Installer mode...")
-                    set_image_activation_profile(cpc, lpar_name)
+                    update_partition_properties(cpc, lpar_name)
                     activate_lpar(cpc, lpar)
                     print(f"CPC {cpc_name} LPAR {lpar_name} has been successfully activated.")
                 else:
@@ -58,7 +58,7 @@ def main(session, set_image_profile):
             else:
                 print(f"LPAR {lpar_name} is in an unexpected state: {status}. Attempting deactivation and reactivation and setting to Installer mode...")
                 if deactivate_lpar(cpc, lpar):
-                    set_image_activation_profile(cpc, lpar_name)
+                    update_partition_properties(cpc, lpar_name)
                     time.sleep(10)
                 activate_lpar(cpc, lpar)
                 print(f"CPC {cpc_name} LPAR {lpar_name} has been successfully reactivated.")
@@ -84,7 +84,7 @@ def get_cpc_lpar(session, cpc: str, lpar: str):
     cpc = cpcs[0]
     print(f"Machine type: {cpc.get_property('machine-type')}")
 
-    partitions = cpc.lpars.list(filter_args={'name': lpar})
+    partitions = cpc.partitions.list(filter_args={'name': lpar})
     if len(partitions) != 1:
         raise Exception(f"Expected 1 LPAR, but got {len(partitions)}.")
     lpar = partitions[0]
@@ -92,9 +92,9 @@ def get_cpc_lpar(session, cpc: str, lpar: str):
 
 def activate_lpar(cpc, lpar, retries: int = 10, interval: int = 2):
     print(f"Activating LPAR {lpar.get_property('name')}...")
-    lpar.activate()
+    lpar.start(wait_for_completion=True)
     for attempt in range(retries):
-        lpar = cpc.lpars.list(filter_args={'name': lpar.get_property('name')})[0]
+        lpar = cpc.partitions.list(filter_args={'name': lpar.get_property('name')})[0]
         status = lpar.get_property('status')
         if status == OPERATING_STATUS:
             print(f"LPAR {lpar.get_property('name')} is now active.")
@@ -111,9 +111,9 @@ def deactivate_lpar(cpc, lpar, retries: int = 10, interval: int = 2):
         return False  #No action was needed
 
     print(f"Deactivating LPAR {lpar.get_property('name')}...")
-    lpar.deactivate(force=True)  #this will remove the existing image and shutdowns, if deactivates, it will be still in appliance mode, we need to activate it to switch to installer mode
+    lpar.stop(wait_for_completion=True)  
     for attempt in range(retries):
-        lpar = cpc.lpars.list(filter_args={'name': lpar.get_property('name')})[0]
+        lpar = cpc.partitions.list(filter_args={'name': lpar.get_property('name')})[0]
         status = lpar.get_property('status')
         if status == NOT_ACTIVATED_STATUS:
             print(f"LPAR {lpar.get_property('name')} is now inactive.")
@@ -122,19 +122,19 @@ def deactivate_lpar(cpc, lpar, retries: int = 10, interval: int = 2):
         time.sleep(interval)
     raise Exception(f"Failed to deactivate LPAR {lpar.get_property('name')} after {retries} attempts.")
 
-def set_image_activation_profile(cpc, profile_name: str):
-    print(f"Setting image activation profile for LPAR {profile_name}...")
-    profiles = cpc.image_activation_profiles.list(filter_args={'name': profile_name})
-    if len(profiles) != 1:
-        raise Exception(f"Unexpected number of profiles returned: {len(profiles)}.")
-    profile = profiles[0]
-    print(f"profile : {profile}")
+def update_partition_properties(cpc, lpar_name: str):
+    print(f"Setting partition properties for LPAR {lpar_name}...")
+    lpar_list = cpc.partitions.list(filter_args={'name': lpar_name})
+    if len(lpar_list) != 1:
+        raise Exception(f"Unexpected number of profiles returned: {len(lpar_list)}.")
+    lpar_obj = lpar_list[0]
+    print(f"profile : {lpar_obj}")
     #profile.update_properties({'ssc-boot-selection': 'installer'})
     storage = int(os.environ.get("STORAGE", 0))
     user = os.environ.get("USERNAME")
     password = os.environ.get("PASSWORD")
-    profile.update_properties({'ssc-boot-selection': 'installer',
-                                'central-storage': storage,
+    lpar_obj.update_properties({'ssc-boot-selection': 'installer',
+                                'initial-memory': storage,
                                 'ssc-master-userid':user,
                                 'ssc-master-pw':password}) #sending central storage, value should be number 16384
-    print(f"Image activation profile set for LPAR {profile_name}.")
+    print(f"Partition properties set for LPAR {lpar_name}.")

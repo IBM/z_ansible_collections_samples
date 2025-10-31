@@ -10,6 +10,8 @@ from click_shell import shell
 # import config as app_config
 from installer_check import *
 from activate_deactivate import *
+from activate_deactivate import main as classic_operations
+from dpm_operations import main as dpm_operations
 from upload_image import upload_zfab_image, select
 import connection
 from api_token import get_api_token
@@ -190,10 +192,35 @@ def image_action(action, set_image_profile=True):
         verify_cert = False
         session = zhmcclient.Session(host, userid, password, verify_cert=verify_cert)
         os.environ["ACTION"] = action
-        main(session, set_image_profile)
+        initiate_action(session,set_image_profile)
     except Exception as e:
         print(f"Unhandled exception occurred in image_action: {e}")
         sys.exit(1)
+
+def initiate_action(session, set_image_profile):
+    cpc_name = os.environ.get("CPC")
+    lpar_name = os.environ.get("LPAR")
+    action = os.environ.get("ACTION")       
+    print(f"CPC Name: {cpc_name}")
+    print(f"LPAR Name: {lpar_name}")
+    print(f"Action: {action}")
+    print("Image Activation Profile:",set_image_profile)
+    cpc = get_cpc(session, cpc_name)
+    if cpc.dpm_enabled:
+        dpm_operations(session,set_image_profile)
+    else:
+        classic_operations(session, set_image_profile)
+
+def get_cpc(session, cpc):
+    client = zhmcclient.Client(session)
+    cpcs = client.cpcs.list(filter_args={'name': cpc})
+    print(cpcs)
+    if len(cpcs) != 1:
+        raise Exception(f"Expected 1 CPC, but got {len(cpcs)}.")
+    cpc = cpcs[0]
+    print(f"Machine type: {cpc.get_property('machine-type')}")
+    print(f"Machine type - DPM : {cpc.dpm_enabled}")
+    return cpc
 
 def image_task():
     """Helper function to execute LPAR actions"""
@@ -220,7 +247,7 @@ def image_task():
         if rc != HTTPStatus.NO_CONTENT:
             sys.exit(1)
 
-        if os.environ['IS_FCP']:
+        if os.environ.get('IS_FCP').lower()=="true":
             lun = os.environ.get("lun")
             wwpn = os.environ.get("wwpn")
             rc, text = select(token, param_disk, lun, wwpn)
