@@ -18,10 +18,11 @@ fi
 
 # Step 2: Check if the virtual environment already exists
 if [ -d "venv" ]; then
-  echo "Step 2: Virtual environment already exists. Activating it..."
+  echo "Step 2: Virtual environment already exists."
 else
-  echo "Step 2: Creating virtual environment..."
-  python3 -m venv "$ANSIBLE_TMPDIR/venv"
+  echo "Error: Virtual environment venv does not exist at $ANSIBLE_TMPDIR"
+  echo "Refer to README.md for installation instructions."
+  exit 1
 fi
 
 # Step 3: Activate the virtual environment
