@@ -1,7 +1,6 @@
 #*+-------------------------------------------------------------------+
 #*| # © Copyright IBM Corp. 2025                                      |
 #*| # This playbook is tested with ACC 1.2.6                          |
-#*|                                                                   |
 #*+-------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for assigning two resource.
