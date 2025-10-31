@@ -7,8 +7,16 @@ These sample playbooks:
 
 ## Installing ACC - Preparations
 
+**Note**: The following steps are tested and verified on MacOS terminal.
+Windows users can either use Windows Subsystem for Linux (WSL) or run equivalent
+commands of the ones described below. Linux users can use terminal to
+run the commands.
+
 - Download the ACC installation image from Fix Central and store it on your
   control node (i.e., your laptop).
+- Ensure the control node (your laptop) and ACC IP address have sufficient
+  authority and are added to the appropriate HMC whitelist to allow for proper
+  communication to the HMC.
 - Ensure that in the HMC, the Secure Service Container (SSC) based ACC LPAR
   activation profile is created and is updated with correct values of network
   settings. (`chpid`, `prefix`, `fid`, etc.) and storage (initial 16 GB storage is required for ACC).
@@ -21,45 +29,41 @@ These sample playbooks:
     ```
 - Download this directory and the `acc_install_ansible` directory on 
   the control node (e.g., a laptop), which will connect with ACC.
+- Install the following software on your control node.
 
-- Before Installing ACC, ensure the following tools and packages are available on your system:
+### System Requirements
 
-**System Requirements**
   - Ansible (must already be installed)
   - Python 3.x
   - sshpass
 
 **Note**:
+
 - The ansible playbook does not automatically install `packages`.
 - If `sshpass` is missing, the playbook will stop with an error. Install it manually depending on your OS.
 
-**Python Packages:**
+### Python Packages
 
-The following Python packages are required for successful execution of ACC installation playbook:
+The following python packages are required to be installed within a python virtual environment for successful execution of the ACC installation playbook:
+
   - click
   - click_shell
   - zhmcclient
   - urllib3
 
-The ansible playbook automatically creates and activates a `Python virtual environment`.
-If the above packages are missing, the playbook will display an error message and stop.
+To setup a python virtual environment and install the required packages, please execute the following procedure:
 
-To install them manually inside the created virtual environment:
-```bash
-source <ansible_temp_dir>/venv/bin/activate
-
-pip install click click_shell zhmcclient urllib3
-
-deactivate
-```
-Replace <ansible_temp_dir> with the value of your $ANSIBLE_TMPDIR environment 
-variable (displayed in the console output [e.g., in the error message]). 
-Use that same path to activate the virtual environment and install the packages.
-
-**Note** that the following steps are tested and verified on MacOS terminal.
-Windows users can either use Windows Subsystem for Linux (WSL) or run equivalent
-commands of the ones described below. Linux users can use terminal to
-run the commands.
+- `cd` to the `../acc_install_ansible` directory on your control node (laptop).
+- Run the command:
+  ```bash
+  python3 -m venv venv
+  ```
+- Afterwards, run the following commands to enter the python virtual environment, install the required python packages, and exit the virtual environment:
+  ```bash
+  source venv/bin/activate
+  pip install click click_shell zhmcclient urllib3
+  deactivate
+  ```
 
 ## ACC Appliance Installation - 00_acc_install.yaml
 
@@ -81,13 +85,16 @@ To set up the ACC, the following actions must be performed by the ACC-admin.
   - Change the `IMAGE_PATH` in the `acc_env_vars.yaml` file.
   - Change the `CPC`, `LPAR`, `LPAR_IP`, `DISK_ID` in the `acc_env_vars.yaml` file.
   - Update other values accordingly to point to the right LPAR for installation.
-    - If you use FCP disk instead of a dasd to install ACC, ensure that the variables are enabled in the configuration:
-      - Uncomment the `lun` and `wwpn` parameters, and set `IS_FCP` to `true` in the `acc_env_vars.yaml` file.
-      - Uncomment the `lun` and `wwpn` environment variables in the` 00_acc_install.yaml` file.
+    - If you use FCP disk instead of a dasd to install ACC, ensure that the variables are enabled in the configuration, set `IS_FCP` to `true` in the `acc_env_vars.yaml` file.
 - Run the following playbook to install ACC:
   ```bash
   ansible-playbook ./appliance_deploy_default_ansible/00_acc_install.yaml
   ```
+
+If required, the ansible playbook will create and activate a
+`Python virtual environment` at `INSTALL_SCRIPT_PATH` location. However, if the
+the above python virtual environment and packages within the virtual environment are missing, the playbook
+will display an error message and stop.
 
 The above step will take time (about 15 mins) to complete. The scripts
 will first set up the LPAR in the right mode, then upload the ACC image and
@@ -240,6 +247,18 @@ the password change task in the playbook.
 Once the appliance-owner has performed the actions above, the appliance-owner can
 install the appliance. For that, perform the following actions as appliance-owner.
 
+- In case the admin has only assigned a single LPAR using the
+  `02a_assign_1_lpar.yaml` playbook, then comment the second LPAR's details in
+  task `01 - As owner, install and activate the image` of `04_install_flow.yaml` 
+
+  For example, comment out these lines:
+  ```bash
+  {
+      "name": "{{ lpar_name2 }}",
+      "execution_action": "{{ execution_action }}",
+      "install": "{{ install }}"
+  }
+  ```
 - Export password on a terminal in your control node (laptop):
   ```bash
   export ACC_OWNER_PASSWORD=<owner_new_password>
