@@ -16,7 +16,6 @@
 
 - hosts: localhost
   gather_facts: false
-
   tasks:
     - name: 'Import common yaml'
       ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
@@ -51,27 +50,35 @@
         - add_worker_ip != "random"
         - "{{ add_worker_ip.split(',') | length }} != {{ add_worker_number | int }}"
 
-    - name: 'Generate new worker name'
-      ansible.builtin.shell: |
-        rm -rf {{ new_worker_file }}
-        shuf -i 1000-9999 -n {{ add_worker_number }} -o {{ new_worker_file }}
-        if [ "{{ add_worker_ip }}" != "random" ];then
-          count=0
-          multi=$(echo "{{ add_worker_ip }}" | tr -cd , | wc -c)
-          if [[ $multi -ge 1 ]];then
-            IFS=',' read -ra ip_ary <<< "{{ add_worker_ip }}"
-            for i in "${!ip_ary[@]}"; do
-                if [ $i == $count ];then
-                    sed -i -e "$((i+1)) s/$/ ${ip_ary[$i]}/" {{ new_worker_file }}
-                fi
-                ((count++))
-            done
-          else
-            sed -i -e 's/$/ {{ add_worker_ip }}/' {{ new_worker_file }}
-          fi
-        else
-          sed -i -e 's/$/ random/' {{ new_worker_file }}
-        fi
+    - name: Find existing compute nodes
+      openstack.cloud.server_info:
+        name: '{{ infra_id.stdout }}-worker-*'
+        timeout: "{{ create_server_timeout|int * 60 }}"
+        filters:
+          vm_state: active
+      register: existing_compute
+
+    - name: Create lists
+      ansible.builtin.set_fact:
+        worker_sequence: "{{ range(count_of_ex_cmpt|int, count_of_ex_cmpt|int + add_worker_number|int) | list }}"
+        add_worker_ips: "{{add_worker_ip.split(',')}}"
+      vars:
+        count_of_ex_cmpt: "{{ existing_compute.servers|count }}"
+
+    - name: Remove existing worker file
+      ansible.builtin.file:
+        path: "{{ new_worker_file }}"
+        state: absent
+
+    - name: Generate new worker name
+      ansible.builtin.lineinfile:
+        path: "{{ new_worker_file }}"
+        create: true
+        insertafter: EOF
+        line: "{{ name_list_ip if add_worker_ip != 'random' else name_list_random }}"
+      vars:
+        name_list_ip: "{% set zipped_lists = worker_sequence | zip(add_worker_ips|list) %}{% for item in zipped_lists|list %}{{ item.0 }} {{ item.1 }}\n{% endfor %}"
+        name_list_random: "{% for item in worker_sequence %}{{ item }} random\n{% endfor %}"
 
     - name: 'Get new worker list'
       ansible.builtin.command:
