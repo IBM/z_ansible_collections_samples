@@ -1,0 +1,82 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run by ACC-admin, for inserting HMC credentials
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - env_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export credentials:
+
+        export HMC_USER=<enter_HMC_username>
+        export HMC_PASSWORD=<enter_HMC_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC-admin's username"
+      private: no
+
+    - name: cc_admin_password
+      prompt: "Enter ACC-admin's Password"
+      private: yes
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the admin token
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Set HMC configuration in the ACC
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/config/hmcconfig"
+        timeout: 200
+        method: POST
+        body:
+          host: "{{ hmc_url }}"
+          userid: "{{ hmc_user }}"
+          password: "{{ hmc_password }}"
+          verify_cert: false
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 204
+      register: response
+
+    - name: 02 - As a validation, get list of CPCs attached to the HMC
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/cpcs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the available CPCs
+      debug:
+        msg: "{{ response.json }}"
+

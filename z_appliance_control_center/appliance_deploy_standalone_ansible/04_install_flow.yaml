@@ -1,0 +1,279 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+
+
+- name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_new_password>
+        export APP_USERNAME=<appliance_username>
+        export APP_PASSWORD=<appliance_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Printing the image ID
+      tags: owner, install
+      debug:
+        msg: "{{ image_id }}"
+
+    - name: 01 - Get list of running appliance
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: quotas_response
+
+    - name: Print quotas response
+      debug:
+        var: quotas_response.json
+
+    - name: Extract app IDs from quotas
+      set_fact:
+        app_ids: >-
+          {{
+            quotas_response.json
+            | selectattr('id', 'defined')
+            | map(attribute='id')
+            | list
+          }}
+    - name: Print extracted app IDs
+      debug:
+        msg: "App IDs to unlock: {{ app_ids | join(', ') }}"
+
+    - name: Notify user about unlock appliance credentials
+      ansible.builtin.debug:
+        msg: |
+          **Note:** The unlock quota operation will use the **same appliance username and password** for both LPARs.  
+          If you have created **two LPARs** for the resource package, 
+          please ensure that you **export the same credentials** (username and password) for both.
+
+    - name: 02 - Unlock quota using App id (comment this if already done)
+      tags: owner
+      loop: "{{ app_ids }}"
+      loop_control:
+        loop_var: app_id
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/unlock_quota"
+        method: POST
+        body:
+          {
+            "ssc_username": "{{ app_username }}",
+            "ssc_password": "{{ app_password }}",
+            "app_id": "{{ app_id }}"
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+      register: unlock_responses
+
+    - name: 03 - As owner, install and activate the image
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cluster/activate"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}":
+            {
+              "image_id": {{ image_id }},
+              "processor_usage": "{{ processor_usage }}",
+              "processor_type": "{{ processor_type }}",
+              "memory": {{ app_memory }},
+              "cores": {{ app_cores }},
+              "username": "{{ app_username }}",
+              "password": "{{ app_password }}",
+              "hostname": "{{ hostname }}",
+              "lpars": [
+                  {
+                    "name": "{{ lpar_name1 }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  },
+                  {
+                    "name": "{{ lpar_name2 }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  }
+                ]
+              }
+            }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+      register: activate_response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        var: activate_response.json
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15
+
+    # Extract all task IDs from response
+    - name: Extract task IDs dynamically
+      set_fact:
+        task_ids: >-
+          {{
+            activate_response.json
+            | dict2items
+            | map(attribute='value')
+            | map('dict2items')
+            | flatten
+            | map(attribute='value')
+            | selectattr('task_id', 'defined')
+            | map(attribute='task_id')
+            | list
+          }}
+
+    - name: Print extracted task IDs
+      debug:
+        msg: >-
+          {% if task_ids | length > 0 %}
+            Task IDs for active LPARs: {{ task_ids | join(', ') }}
+          {% else %}
+            No task IDs found — activation failed.
+          {% endif %}
+
+    - name: Fail playbook if no task IDs were generated
+      ansible.builtin.fail:
+        msg: >
+          ❌ No task IDs Found.
+          This indicates activation failed before tasks could be created.
+          Please check the previous step's response for details.
+      when: task_ids | length == 0
+
+    - name: 04 - Get status of each install task
+      loop: "{{ task_ids }}"
+      loop_control:
+        loop_var: task_id
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/tasks/{{ task_id }}/status"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: task_status
+
+    - name: Print task status responses
+      debug:
+        msg: "{{ item.json }}"
+      loop: "{{ task_status.results | default([task_status]) }}"
+      loop_control:
+        label: "Task ID {{ item.task_id | default('unknown') }}"
+      when: item.json is defined
+
+    - name: Notify user if task is In progress
+      ansible.builtin.debug:
+        msg: >
+          ⏳ One or more tasks are still in progress.
+          Please check the current status of in-progress task using the URLs below:
+          {%- set in_progress = task_status.results
+            | selectattr('json.action-status', 'defined')
+            | selectattr('json.action-status', 'match', '(?i)in progress')
+            | map(attribute='task_id')
+            | list %}
+          {%- for id in in_progress %}
+          • {{ acc_ip }}/tasks/{{ id }}/status
+          {%- endfor %}
+      when: >
+        task_status.results
+        | selectattr('json.action-status', 'defined')
+        | selectattr('json.action-status', 'match', '(?i)In progress')
+        | list
+        | length > 0
+
+    - name: Fail playbook if any task failed
+      ansible.builtin.fail:
+        msg: >
+          ❌ One or more install tasks have failed.
+          Failed Task IDs: {{
+            task_status.results
+            | selectattr('json.action-status', 'defined')
+            | selectattr('json.action-status', 'match', '(?i)fail')
+            | map(attribute='task_id')
+            | list
+          }}
+      when: >
+        task_status.results
+        | selectattr('json.action-status', 'defined')
+        | selectattr('json.action-status', 'match', '(?i)fail')
+        | list
+        | length > 0
+
+    - name: 05 - Get resources assigned to the owner by the admin
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/pkgs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the assigned resources
+      tags: owner
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 06 - Get resources consumed by the owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the consumed resources
+      tags: owner
+      debug:
+        msg: "{{ response.json }}"

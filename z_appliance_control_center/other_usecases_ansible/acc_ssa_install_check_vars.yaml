@@ -1,0 +1,23 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+# Fill up these variables for checking the sanity of the Default-mode ACC and 2x SSA installation.
+# Also "export" the ACC_ADMIN_PASSWORD, SSA1_USER_PASSWORD and SSA2_USER_PASSWORD
+# environment variables.
+
+# ACC Information
+acc_ip: 9.120.100.200                                                      # IP of ACC appliance
+acc_port: 8081                                                              # Port of ACC appliance used for communicating with the ACC
+
+# SSA-1 Information
+ssa1_ip: 9.120.100.201                                                     # IP of SSA-1 appliance
+ssa1_admin_user: "{{ lookup('env', 'SSA1_APP_USER') }}"                     # SSA-1's user name (same as on the SSC LPAR)
+ssa1_admin_password: "{{ lookup('env', 'SSA1_APP_PASSWORD') }}"             # SSA-1's password (same as on the SSC LPAR)
+
+# SSA-2 Information
+ssa2_ip: 9.120.100.203                                                     # IP of SSA-2 appliance
+ssa2_admin_user: "{{ lookup('env', 'SSA2_APP_USER') }}"                     # SSA-2's user name (same as on the SSC LPAR)
+ssa2_admin_password: "{{ lookup('env', 'SSA2_APP_PASSWORD') }}"             # SSA-2's password (same as on the SSC LPAR)
+

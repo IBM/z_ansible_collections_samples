@@ -1,0 +1,164 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - admin_vars.yaml
+
+  pre_tasks:
+  - name: Reminder- Export ACC admin credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export credentials:
+        
+        export ACC_ADMIN_USER=<admin_username>
+        export ACC_ADMIN_DEFAULT_PASSWORD=<admin_old_password>
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  vars_prompt:
+    - name: run_init
+      prompt: "Do you want to initialize ACC with Standalone Mode? (yes/no)"
+      private: no
+      default: "yes"
+
+  tasks:
+    - name: 00 - Initialize ACC with Standalone mode
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/init"
+        body:
+          hmc_managed: "{{ hmc_managed }}"
+          credentials:
+            username: "{{ cc_admin_user }}"
+            password: "{{ cc_admin_old_password}}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      when: run_init | lower == "yes"
+
+    - name: 01 - Get Initialize status
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/init"
+        body:
+          hmc_managed: "{{ hmc_managed }}"
+          credentials:
+            username: "{{ cc_admin_user }}"
+            password: "{{ cc_admin_old_password}}"
+        body_format: json
+        method: GET
+        return_content: true
+        validate_certs: false
+      register: init_response
+
+    - name: Printing the response of init
+      debug:
+        msg: 
+          - "{{ init_response.json}}"
+
+    - name: 02 - Update ACC-admin password (remove this if already done)
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user"
+        body:
+          username: "{{ cc_admin_user }}"
+          old_password: "{{ cc_admin_old_password}}"
+          new_password: "{{ cc_admin_password }}"
+        body_format: json
+        method: PUT
+        return_content: true
+        validate_certs: false
+
+    - name: 03 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response of authentication
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the admin token
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 04 - Insert CPC information in ACC with dummy values (standalone mode)
+      tags: admin
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cpcs"
+        timeout: 200
+        method: POST
+        body:
+          cpcs:
+            - cpc_name: "{{ z_machine_name }}"
+              ifls : "{{ cpc_ifls }}"              
+              gps: "{{ cpc_gps }}"               
+              available_storage: "{{ available_storage }}"    
+              dpm_enabled: "{{ z_machine_dpm_enabled }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+
+    - name: 05 - Get list of CPCs attached to the HMC
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cpcs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the available CPCs
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 06 - Get CPC resources of CPC defined in admin_vars.yaml
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cpcs/{{ z_machine_name }}/resource"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the CPC resources
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 07 - Create an appliance-owner using variables in admin_vars.yaml
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_default_password }}"
+          email: "{{ cc_owner_email }}"
+          role: "owner"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 204
+      register: response
+

@@ -1,0 +1,56 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+
+
+- name: "Prompt for username for appliance {{ appliance.name }} (ID: {{ appliance.id }}, IP: {{ appliance.interfaces[0].ip | default('N/A') }})"
+  block:
+    - name: app_username
+      pause:
+        prompt: "Enter username for appliance {{ appliance.name }} (ID: {{ appliance.id }} , IP: {{ appliance.interfaces[0].ip }})"
+      register: username_input
+
+    - name: app_password
+      pause:
+        prompt: "Enter password for appliance {{ appliance.name }} (ID: {{ appliance.id }} , IP: {{ appliance.interfaces[0].ip }})"
+        echo: no
+      register: password_input
+
+    - name: 00 - Try to unlock appliance {{ appliance.name }} (up to 3 attempts)
+      vars:
+        req_body: >
+          {{
+            {
+              "ssc_username": username_input.user_input,
+              "ssc_password": password_input.user_input,
+              "app_id": appliance.id | int
+            } | to_json
+          }}
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/unlock_quota"
+        method: POST
+        body: "{{ req_body }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: "application/json"
+        status_code: 200
+        validate_certs: false
+      register: unlock_response
+      retries: 3
+      delay: 3
+      until: unlock_response.status == 200
+      ignore_errors: true
+
+    - name: Print unlock result
+      debug:
+        msg: >
+          Appliance {{ appliance.name }} (ID: {{ appliance.id }}):
+          {% if unlock_response is defined and unlock_response.status == 200 %}
+            ✅ Successfully unlocked
+          {% else %}
+            Failed to unlock even after retries
+          {% endif %}
+

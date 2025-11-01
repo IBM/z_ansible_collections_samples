@@ -1,0 +1,90 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+# Important: Before running the 00_acc_install.yaml script, kindly review the README file located in
+# the "acc_ansible_install_scripts" directory for important setup instructions and prerequisites.
+
+- name: ACC Install playbook
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - acc_env_vars.yaml
+
+  environment:
+    IMAGE_PATH: "{{ IMAGE_PATH }}"
+    HMC_HOST: "{{ HMC_HOST }}"
+    LPAR_IP: "{{ LPAR_IP }}"
+    LPAR: "{{ LPAR }}"
+    DISK_ID: "{{ DISK_ID }}"
+    IS_FCP: "{{ IS_FCP }}"
+    # Note: Uncomment lun and wwpn when uploading for FCP disk
+    lun: "{{ lun }}"   
+    wwpn: "{{ wwpn }}"
+    USERNAME: "{{ USERNAME }}"
+    PASSWORD: "{{ PASSWORD }}"
+    HMC_USER: "{{ HMC_USER }}"
+    HMC_PASSWORD: "{{ HMC_PASSWORD }}"
+    CPC: "{{ CPC }}"
+    ACTION: "{{ ACTION }}"
+    HTTP_SCHEME: https 
+    LOCAL_SERVER_IP: localhost
+    LOCAL_SERVER_PORT: 9988
+    LOCAL_SSH_PORT: 9989
+    VERIFY_CERT: false
+    GATEWAY_IP: "{{ GATEWAY_IP }}"
+    GATEWAY_USER: "fpc-gw"
+    HTTPS_PORT: 443
+    SSH_PORT: 23
+    D_PORT: 0
+    IS_PRIVATE: false
+    ANSIBLE_TMPDIR: "{{ INSTALL_SCRIPT_PATH }}"
+    HMC_KEY: "~/.ssh/id_rsa"
+    STORAGE: "{{ STORAGE }}"  
+
+  pre_tasks:
+  - name: Reminder - Export credentials
+    pause:
+      prompt: |
+
+        Before running this playbook, make sure that:
+
+        - You have installed the required software packages
+        - You have created a python virtual environment 'venv' in the directory
+          "{{ INSTALL_SCRIPT_PATH }}"
+        - You have installed the required python packages in the
+          virtual environment
+        
+        Moreover, please export credentials:
+
+        export HMC_USER=<enter_HMC_username>
+        export HMC_PASSWORD=<enter_HMC_password>
+
+        export ACC_ADMIN_USER=<lpar_username>
+        export ACC_ADMIN_DEFAULT_PASSWORD=<lpar_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: Check the INSTALL_SCRIPT_PATH variable
+      debug:
+        msg: "{{ INSTALL_SCRIPT_PATH }}"
+
+    - name: Run the setup script to install ACC
+      shell: "./setup.sh"
+      args:
+        chdir: "{{ INSTALL_SCRIPT_PATH }}"
+      register: setup_result
+
+    - name: Split logs into lines
+      set_fact:
+        log_lines: "{{ setup_result.stdout.splitlines() }}"
+
+    - name: Output each log line
+      debug:
+        msg: "{{ item }}"
+      with_items: "{{ log_lines }}"
+

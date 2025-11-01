@@ -1,0 +1,189 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+        export ACC_OWNER_PASSWORD=<owner_new_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+
+  tasks:
+
+    - name: Wait for user to generate OTP using admin mfa secret
+      pause:
+        prompt: "Enter OTP generated from the admin mfa_secret:"
+      register: mfa_otp_input
+
+    - name: 00 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+          otp: "{{ mfa_otp_input.user_input }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response of authentication
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the admin token
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Generate temporary 2FA secret for owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/mfa/secret/owner"
+        body:
+          username: "{{ cc_owner_user }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: totp_response
+
+    - name: Print create owner totp secret response
+      debug:
+        var: totp_response.json
+
+    - name: Show the temparory OTP secret
+      debug:
+        msg:
+          - "Please copy this TOTP secret and generate OTP using any authenticator app to update owner password:"
+          - "{{ totp_response.json.secret }}"
+    
+    - name: Wait for user to generate OTP
+      pause:
+        prompt: "Enter OTP generated from the above totp_secret:"
+      register: otp_input
+
+    - name: 02 - As an appliance-owner, update the password (remove this if already done)
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user"
+        body:
+          username: "{{ cc_owner_user }}"
+          old_password: "{{ cc_owner_default_password}}"
+          new_password: "{{ cc_owner_password }}"
+          otp: "{{ otp_input.user_input }}"
+        body_format: json
+        method: PUT
+        return_content: true
+        validate_certs: false
+      register: update_password_response
+
+    - name: Print owner password update response
+      debug:
+        var: update_password_response.json
+
+    - name: Show owner MFA secret
+      debug:
+        msg:
+          - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
+          - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
+          - "{{ update_password_response.json.mfa_secret }}"
+
+    # Note: The above tasks are intended for one-time execution. 
+    # Please comment them out after running once. when you want to generate access token
+
+    - name: Wait for user to generate OTP for owner
+      pause:
+        prompt: "Enter OTP generated from the above owner mfa_secret:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ mfa_otp_input.user_input }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response
+      tags: owner
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 04 - Upload appliance image to the ACC as owner
+      tags: owner
+      # Unfortunately, the uri module cannot upload binary files.
+      # One can use `src`, but both `src` and `body` can't be used together.
+      shell: 'curl -k -X "POST" \
+              "{{ acc_ip }}/images" \
+              -H "Authorization: Bearer {{ access_token }}" \
+              -H "Content-Type: multipart/form-data" \
+              -F "data=@{{ image_path }}" \
+              -F "image_type={{ image_type }}" \
+              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      register: response
+
+    - name: 05 - Get image information
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/images"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: Extract the image ID from the DB
+      tags: owner, install
+      set_fact:
+        image_id: "{{ response.json.images[-1].id }}"
+
+    - name: Printing the image ID
+      tags: owner, install
+      debug:
+        msg: "{{ image_id }}"
+
+    - name: Save image_id into owner_vars.yaml
+      lineinfile:
+        path: "./owner_vars.yaml"
+        regexp: '^image_id:'
+        line: "image_id: {{ image_id }}"
+        create: yes
+

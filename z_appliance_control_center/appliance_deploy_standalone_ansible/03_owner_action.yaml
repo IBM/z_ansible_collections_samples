@@ -1,0 +1,108 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+        export ACC_OWNER_PASSWORD=<owner_new_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: 00 - As an appliance-owner, update the password (remove this if already done)
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user"
+        body:
+          username: "{{ cc_owner_user }}"
+          old_password: "{{ cc_owner_default_password}}"
+          new_password: "{{ cc_owner_password }}"
+        body_format: json
+        method: PUT
+        return_content: true
+        validate_certs: false
+
+    - name: 01 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response
+      tags: owner
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 02 - Upload appliance image to the ACC as owner
+      tags: owner
+      # Unfortunately, the uri module cannot upload binary files.
+      # One can use `src`, but both `src` and `body` can't be used together.
+      shell: 'curl -k -X "POST" \
+              "{{ acc_ip }}/images" \
+              -H "Authorization: Bearer {{ access_token }}" \
+              -H "Content-Type: multipart/form-data" \
+              -F "data=@{{ image_path }}" \
+              -F "image_type={{ image_type }}" \
+              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      register: response
+
+    - name: 03 - Get image information
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/images"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: Extract the image ID from the DB
+      tags: owner, install
+      set_fact:
+        image_id: "{{ response.json.images[-1].id }}"
+
+    - name: Printing the image ID
+      tags: owner, install
+      debug:
+        msg: "{{ image_id }}"
+
+    - name: Save image_id into owner_vars.yaml
+      lineinfile:
+        path: "./owner_vars.yaml"
+        regexp: '^image_id:'
+        line: "image_id: {{ image_id }}"
+        create: yes
+

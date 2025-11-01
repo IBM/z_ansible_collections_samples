@@ -1,0 +1,111 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run by appliance-owner, for appliance upgrade
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response
+      tags: owner
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Upload upgrade appliance image to the ACC as owner
+      tags: owner
+      # The uri module cannot upload binary files.
+      # One can use `src`, but both `src` and `body` can't be used together.
+      shell: 'curl -k -X "POST" \
+              "{{ acc_ip }}/images" \
+              -H "Authorization: Bearer {{ access_token }}" \
+              -H "Content-Type: multipart/form-data" \
+              -F "data=@{{ image_path }}" \
+              -F "image_name=awesome-img-2" -F "image_version=v1.0" -F "description=This image is an awesome image..." \
+              -F "image_type={{ image_type }}" \
+              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      register: response
+
+    - name: 02 - Get image information
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/images"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: Extract the image ID from the DB
+      tags: owner, install
+      set_fact:
+        image_id: "{{ response.json.images[0].id }}"
+
+    - name: Printing the image ID
+      tags: owner, install
+      debug:
+        msg: "{{ image_id }}"
+
+    - name: 03 - As owner, upgrade the image using image
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cluster/upgrade"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}": {
+            "lpars": ["{{ lpar_name }}"],
+            "image_id": {{ image_id | int}}
+            }
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 200
+        dest: "{{ upgrade_appliance_data }}"
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15

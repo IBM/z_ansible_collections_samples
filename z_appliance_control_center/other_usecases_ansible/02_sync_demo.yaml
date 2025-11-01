@@ -1,0 +1,62 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run as appliance-owner, to demo ACC sync behavior
+  hosts: localhost
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Demonstrate sync mechanism
+      tags: owner
+      pause:
+        prompt: Please hit the enter key after deactivating the LPAR {{ lpar_name }} on HMC. Otherwise, press Ctrl+c and then "a" to abort.
+
+    - name: 02 - Get resources consumed by the owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the consumed resources
+      tags: owner
+      debug:
+        msg: "{{ response.json }}"
+
+

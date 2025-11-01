@@ -1,0 +1,113 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+acc_ip: https://9.120.0.0:8081/api                                       # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+
+# Users
+cc_owner_user: "cc_owner"                                                  # Specify the owner name for created owner (e.g., cc_owner)
+cc_owner_email: "cc_owner@email.com"                                       # Already created Owner's email address (e.g., "xyz.ibm.com")
+#Export before run: export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+cc_owner_default_password: "{{ lookup('env', 'ACC_OWNER_DEFAULT_PASSWORD') }}" # Owner's old/default password (e.g., "defaultPassw0rd")
+
+# Export before run: export ACC_OWNER_PASSWORD=<owner_new_password>
+cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"             # Owner's new password to update the old one (e.g., "defaultPassw0rd1") 
+
+# Resources that are assigned to the appliance-owner
+package_name: "resource_package_1"                                         # Already created Resource package name (e.g., "RP01")
+#####################################################################
+# For single LPAR execution, comment out the lines below in the script 04_install_flow.yaml:
+# name: "{{ lpar_name1 }}"
+# execution_action: "{{ execution_action }}"
+# install: "{{ install }}"
+#####################################################################
+lpar_name1: "CC16"                                                        # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
+lpar_name2: "CC09"
+
+# Image
+# ***************************************************************************************
+# SSA Image Installation Configuration
+#
+# This section defines the parameters needed to install an SSA (Secure Service
+# Appliance) image onto the target IBM Z environment.
+#
+# The SSA image file is deployed from the control node (e.g., a
+# management workstation or laptop) to the designated appliance LPAR.
+#
+# The parameters below define:
+#   - The location of the image file
+#   - The minimum cores and memory resources required for installation
+#   - The type of image being installed (image or fix)
+# min_ifls
+# ------------------------------------------------------------------------------
+# The minimum number of IFLs (Integrated Facility for Linux) required by
+# the SSA appliance to run successfully.
+#
+# Since SSA runs as a Linux-based appliance on IBM Z, at least **1 IFL**
+# is required. For better performance, more can be assigned depending on
+# the expected workload.
+#
+# Guidance:
+#   - Minimum: 1 IFL (required for installation)
+#   - Recommended: 2–4 IFLs for production or performance testing
+# min_memory
+# ------------------------------------------------------------------------------
+# The minimum memory (in MB) required by the SSA appliance.
+# This is the least amount of memory needed to install and boot the image.
+#
+# Memory should always be a multiple of 1024 (1 GB).
+
+# *****************************************************************************************
+image_path: "/Users/zssa.img.gz"                                            # Path on the control node (e.g., your laptop) with the image file which you want to install
+min_ifls: 1                                                                 # Number of IFLs, Minimum IFLs required by the appliance (e.g., 1)
+min_memory: 1024                                                            # Number of memory, Minimum memory required by the appliance (e.g., 4096)
+image_type: "image"                                                         # This is default type of image
+image_fix_type: "fix"                                                       # This is the fix type of image
+
+# Image install
+# ***************************************************************************
+# Image Installation Parameters
+#
+# This section controls how an appliance image, managed by ACC (like SSA, Spyre Support Appliance), 
+# is deployed and configured on the target LPAR.
+#
+# The parameters define whether to perform a new installation or reuse an
+# existing image, as well as the cores and memory resources to assign to
+# the appliance during startup.
+# Defines the hostname that will be assigned to the SSA image after installation.
+# ***************************************************************************
+install: true                                                               # Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image (true = install new image, false = use existing disk image)
+hostname: "host"                                                            # Hostname to assign to the installed image
+app_cores: 2                                                                # Number of CPU cores allocated for the image
+app_memory: 1024                                                           # Amount of memory (in MB) allocated for the image
+
+# appliance credential:
+
+# Export before run: export APP_USERNAME=<lpar_username>
+app_username: "{{ lookup('env', 'APP_USERNAME') }}"                          # Set Username for the appliance (used during image installation)
+#Export before run: export APP_PASSWORD=<lpar_password>
+app_password: "{{ lookup('env', 'APP_PASSWORD') }}"                          # Set Password for the appliance (used during image installation)
+
+
+# Available execution mode:
+# . For default ACC (i.e, hmc_managed=true): "default", "prep_lpar_only", "appliance_only", "switch_to_installer"
+# . Standalone ACC (i.e, hmcmanaged=false): "appliance_only", "switch_to_installer"
+
+execution_action: "default"                        
+
+
+################################################################################
+# In HMC, go to Customize Image Profile, navigate to the Processor section and check the processor type and value,
+  # - Dedicated central processors
+  # - Not Dedicated central processors
+  # - Dedicated integrated facility for Linux Systems
+  # - Not dedicated integrated facility for Linux Systems
+# Based on the selected processor value, determine the appropriate configuration for processor_usage and processor_type
+################################################################################
+
+# Set "processor_type" to "ifl" (likely for "Integrated Facility for Linux Systems") when you're specifying IFLS values for resource package
+# otherwise set it to "general-purpose" for central processors
+processor_type: "general-purpose"                                             # Set processor_type for the LPAR (used during image installation)
+# Set "processor_usage" to "shared" if the processor in the image profile is "not dedicated", and "dedicated" if it is dedicated.
+processor_usage: "shared"                                                     # Set processor_usage for the LPAR (used during image installation)

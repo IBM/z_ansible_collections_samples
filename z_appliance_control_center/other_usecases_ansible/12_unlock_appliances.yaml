@@ -1,0 +1,76 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+
+
+- name: ACC Playbook, run by appliance-owner, for appliance-owner actions
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Get list of running appliance
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: quotas_response
+
+    - name: Fail if no appliances found
+      fail:
+        msg: "No appliances found in resource quotas for this owner."
+      when: quotas_response.json | length == 0
+    
+    - name: Print available appliances summary
+      debug:
+        msg: >
+          {% for app in quotas_response.json %}
+            ID: {{ app.id }},
+            Name: {{ app.name }},
+            IP: {{ app.interfaces[0].ip | default('N/A') }},
+            Status: {{ 'Locked' if app.is_locked else 'Unlocked' }}
+          {% endfor %}
+
+    - name: 02 - Unlock appliances one by one
+      include_tasks: 13_unlock_each_appliance.yaml
+      loop: "{{ quotas_response.json }}"
+      loop_control:
+        loop_var: appliance
+
+      

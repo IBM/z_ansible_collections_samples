@@ -1,0 +1,163 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run by appliance-owner, for appliance upgrade
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+        export APP_USERNAME=<appliance_username>
+        export APP_PASSWORD=<appliance_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response
+      tags: owner
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Upload fix image/update bundle to the ACC as owner
+      tags: owner
+      # The uri module cannot upload binary files.
+      # One can use `src`, but both `src` and `body` can't be used together.
+      shell: 'curl -k -X "POST" \
+              "{{ acc_ip }}/images" \
+              -H "Authorization: Bearer {{ access_token }}" \
+              -H "Content-Type: multipart/form-data" \
+              -F "data=@{{ update_bundle_path }}" \
+              -F "image_type={{ image_fix_type }}" \
+              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      register: response
+
+    - name: 02 - Get update bundle information
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/images"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: Extract the update bundle ID from the DB
+      tags: owner, install
+      set_fact:
+        image_id: "{{ response.json.images[-1].id }}"
+
+    - name: Printing the update bundle ID
+      tags: owner, install
+      debug:
+        msg: "{{ image_id }}"
+
+    - name: 03 - Get list of running appliance
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: quotas_response
+
+    - name: Print quotas response
+      debug:
+        var: quotas_response.json
+
+    - name: Extract app IDs from quotas
+      set_fact:
+        app_ids: >-
+          {{
+            quotas_response.json
+            | selectattr('id', 'defined')
+            | map(attribute='id')
+            | list
+          }}
+    - name: Print extracted app IDs
+      debug:
+        msg: "App IDs to unlock: {{ app_ids | join(', ') }}"
+
+    - name: 04 - Unlock quota using App id (comment this if already done)
+      tags: owner
+      loop: "{{ app_ids }}"
+      loop_control:
+        loop_var: app_id
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/unlock_quota"
+        method: POST
+        body:
+          {
+            "ssc_username": "{{ app_username }}", 
+            "ssc_password": "{{ app_password }}",
+            "app_id": "{{ app_id }}"
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+      register: unlock_responses
+
+    - name: 05 - As owner, concurrent update the image using image_id
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cluster/upgrade"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}": {
+              "lpars": ["{{ lpar_name }}"],
+              "image_id": {{ image_id | int}}
+            }
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 200
+        dest: "{{ upgrade_fix_data }}"
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15
+
+

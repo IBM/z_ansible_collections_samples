@@ -1,0 +1,92 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook to reboot SSC appliance (ACC)
+  hosts: localhost
+  gather_facts: no
+
+  vars_prompt:
+    - name: "ssc_ip"
+      prompt: "Enter SSC LPAR's (ACC) IP"
+      private: no
+    - name: "lpar_username"
+      prompt: "Enter SSC LPAR's (ACC) username"
+      private: no
+    - name: "lpar_password"
+      prompt: "Enter SSC LPAR's (ACC) password"
+      private: yes
+
+  vars:
+    api_base_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
+
+  tasks:
+
+    - name: 00 - Get authentication token from the SSC LPAR
+      ansible.builtin.uri:
+        url: "{{ api_base_url }}/api-tokens"
+        method: POST
+        headers:
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          zACI-API: "com.ibm.zaci.system/1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ lpar_username }}"
+            password: "{{ lpar_password }}"
+        validate_certs: false
+        return_content: true
+        body_format: json
+      register: auth_response
+
+    - name: Extract the token
+      set_fact:
+        access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: 01 - Reboot the SSC appliance
+      ansible.builtin.uri:
+        url: "{{ api_base_url }}/appliance/reboot"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+        validate_certs: false
+        status_code: 202
+        return_content: true
+      register: reboot_response
+
+    - name: Print reboot status
+      debug:
+        msg: "Reboot initiated successfully. HTTP Status: {{ reboot_response.status }}"
+
+    - name: Wait for a short period before checking reboot
+      pause:
+        seconds: 60
+
+    - name: 02 -  Wait till appliance is operational after reboot
+      ansible.builtin.uri:
+        url: "{{ api_base_url }}/appliance/is-operational"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        validate_certs: false
+        return_content: no
+        status_code:
+            - 202
+            - 204
+      register: is_operational_response
+      until: is_operational_response.status in [202, 204]
+      retries: 10
+      delay: 5
+      failed_when: false
+
+    - name: Display appliance status
+      debug:
+        msg: "SSC appliance is back online and operational."
+

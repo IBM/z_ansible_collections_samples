@@ -1,0 +1,95 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run by appliance-owner, for Health Check and Pull SSA logs
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export appliance-owner credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export appliance-owner credentials:
+
+        export ACC_OWNER_PASSWORD=<owner_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response
+      tags: owner
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the token
+      tags: owner, install
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Health Monitoring of SSA
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/cluster/health"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}": {
+            "lpars": ["{{ lpar_name }}"]
+            }
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 200
+      register: response
+
+    - name: Printing the health status response
+      tags: machine
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 02 - Pull logs from SSA
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/alerts/download_logs"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}": {
+            "lpars": ["{{ lpar_name }}"]
+            }
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 200
+        dest: "{{ ssa_logs }}"
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15
+

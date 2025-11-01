@@ -1,0 +1,125 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run by ACC-admin, for assigning two resource.
+  hosts: localhost
+  gather_facts : true
+  vars_files:
+    - admin_vars.yaml
+
+  pre_tasks:
+  - name: Reminder - Export ACC admin credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export ACC admin credentials:
+
+        export ACC_ADMIN_USER=<admin_username>
+        export ACC_ADMIN_PASSWORD=<admin_new_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+
+  tasks:
+    - name: Confirmation required before proceeding
+      ansible.builtin.pause:
+        prompt: |
+          This playbook will create **resource package with TWO LPAR **.
+          Use 02a_assign_1_lpar.yaml playbook to create resource package with 1 lpars (Don't Run Both).
+          If you want to proceed, press **Ctrl+C** and then **C**.
+          If you want to cancel, press **Ctrl+C** and then **A**.
+          If no action is taken, it will auto-continue in 20 seconds.
+        seconds: 20
+
+    - name: 00 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response of authentication
+      debug:
+        msg: 
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the admin token
+      set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - As ACC-admin, assign two LPARs to the owner
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/pkgs"
+        timeout: 300
+        method: POST
+        body:
+          owner: "{{ cc_owner_user }}"
+          name: "{{ package_name }}"
+          ifls: "{{ package_ifls }}"
+          gps: "{{ package_gps }}"
+          memory: "{{ package_memory_mb }}"
+          lpars:
+            - name: "{{ lpar_name1 }}"
+              interfaces:
+                - name: "{{ interface_name1 }}"
+                  fid: "{{ fid1 }}"
+                  # chpid: "{{ chpid1 }}"
+                  # port: "{{ zport1 }}"
+                  # vlan_id: "{{ vlan_id1 }}" # If your infra doesn't support this, comment it out
+                  prefix: "{{ prefix1 }}"
+                  ip: "{{ app_ip1 }}"
+                  gw: "{{ gw_ip1 }}"
+              boot-info:
+                disk-id: "{{ disk_id1 }}"
+                is-fcp: "{{ is_fcp1 }}"
+                # wwpn: "{{ wwpn1 }}"
+                # lun: "{{ lun1 }}"
+            - name: "{{ lpar_name2 }}"
+              interfaces:
+                - name: "{{ interface_name2 }}"
+                  fid: "{{ fid2 }}"
+                  # chpid: "{{ chpid2 }}"
+                  # port: "{{ zport2 }}"
+                  # vlan_id: "{{ vlan_id2 }}" # If your infra doesn't support this, comment it out
+                  prefix: "{{ prefix2 }}"
+                  ip: "{{ app_ip2 }}"
+                  gw: "{{ gw_ip2 }}"
+              boot-info:
+                disk-id: "{{ disk_id2 }}"
+                is-fcp: "{{ is_fcp2 }}"
+                # wwpn: "{{ wwpn2 }}"
+                # lun: "{{ lun2 }}"
+          cpc: "{{ z_machine_name }}"
+          x86: "dummy" # This will be deprecated
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 200
+      register: response
+
+    - name: Printing the response
+      tags: owner, install
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: Check if any LPARs are activated in HMC.
+      vars:
+        lpars_sync_list: "{{ response.json.lpars_sync_scheduled | from_yaml }}"
+      when: lpars_sync_list | length > 0
+      ansible.builtin.debug:
+        msg: >
+          ⚠️ Caution: One or more LPARs are in *Operating* state in HMC.
+          Please be cautious before performing installation.
+          LPARs: {{ lpars_sync_list }}
+
+
+

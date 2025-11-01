@@ -1,0 +1,267 @@
+#*+-------------------------------------------------------------------+
+#*| # © Copyright IBM Corp. 2025                                      |
+#*| # This playbook is tested with ACC 1.2.6                          |
+#*+-------------------------------------------------------------------+
+
+- name: ACC playbook, run as ACC-admin, to get sanity check of ACC and SSAs install
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - acc_ssa_install_check_vars.yaml
+  vars:
+    acc_base_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
+    ssa1_base_url: "https://{{ ssa1_ip }}/api/com.ibm.zaci.system"
+    ssa2_base_url: "https://{{ ssa2_ip }}/api/com.ibm.zaci.system"
+
+  pre_tasks:
+  - name: Reminder - Export credentials
+    pause:
+      prompt: |
+        Before running this playbook, please export credentials:
+
+          export SSA1_APP_USER=<ssa1_username>
+          export SSA1_APP_PASSWORD=<ssa1_password>
+          export SSA2_APP_USER=<ssa2_username>
+          export SSA2_APP_PASSWORD=<ssa2_password>
+
+        Press Ctrl+C now to cancel if you haven't done this.
+        The playbook will continue shortly.
+      seconds: 5
+    
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC-admin's username"
+      private: no
+
+    - name: cc_admin_password
+      prompt: "Enter ACC-admin's Password"
+      private: yes
+
+  tasks:
+    - name: 00 - Check if ACC appliance is operational
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}/api/com.ibm.zaci.system/appliance/is-operational"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        validate_certs: no
+        status_code: 204
+      register: appliance_status
+
+    - name: Fail if ACC appliance is not operational
+      fail:
+        msg: "ACC is not operational"
+      when: appliance_status.status != 204
+
+    - name: 01 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "{{ acc_base_url }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Fail if ACC did not response properly
+      fail:
+        msg: "ACC authentication failed"
+      when: auth_response.status != 200
+
+    - name: Extract the ACC-admin token
+      set_fact:
+        acc_admin_token: "{{ auth_response.json.access_token }}"
+
+    - name: 02 - Get status of HMC connectivity from ACC
+      ansible.builtin.uri:
+        url: "{{ acc_base_url }}/cpcs/hmc-connection"
+        timeout: 200
+        method: GET
+        headers:
+          Authorization: "Bearer {{ acc_admin_token }}"
+        validate_certs: false
+        status_code: 200
+      register: response
+
+    - name: Printing the response of HMC connectivity
+      debug:
+        msg: "{{ response.json }}"
+
+    - name: 03 - Check if SSA-1 appliance is operational
+      ansible.builtin.uri:
+        url: "{{ ssa1_base_url }}/appliance/is-operational"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        validate_certs: no
+        status_code: 204
+      register: appliance_status
+
+    - name: Fail if SSA-1 appliance is not operational
+      fail:
+        msg: "Appliance SSA-1 is not operational"
+      when: appliance_status.status != 204
+
+    - name: 04 - Get authentication token from the SSA-1 LPAR
+      ansible.builtin.uri:
+        url: "{{ ssa1_base_url }}/api-tokens"
+        method: POST
+        headers:
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          zACI-API: "com.ibm.zaci.system/1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ ssa1_admin_user }}"
+            password: "{{ ssa1_admin_password }}"
+        validate_certs: false
+        return_content: true
+        body_format: json
+      register: auth_response
+
+    - name: Fail if SSA-1 did not response properly
+      fail:
+        msg: "Appliance SSA-1 authentication failed"
+      when: auth_response.status != 200
+
+    - name: Extract the SSA1-admin token
+      set_fact:
+        ssa1_admin_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: 05 - Get Spyre cards associated with SSA-1
+      ansible.builtin.uri:
+        url: "{{ ssa1_base_url }}/spyre-cards"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ ssa1_admin_token }}"
+        validate_certs: no
+        return_content: yes
+        status_code: 200
+      register: spyre_response
+
+    - name: Printing the number of Spyre cards associated with SSA-1
+      debug:
+        msg: "{{ spyre_response.json.parameters | length }}"
+
+    - name: 06 - Get health status of Spyre cards on SSA-1
+      ansible.builtin.uri:
+        url: "{{ ssa1_base_url }}/health"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ ssa1_admin_token }}"
+        validate_certs: no
+        return_content: yes
+        status_code: 200
+      register: health_response
+
+    - name: Gathering health details for SSA-1
+      set_fact:
+        spyre_details: "{{ health_response.json.parameters.spyre_cards_health_monitor[0].details }}"
+
+    - name: Get the online and offline card lists for SSA-1
+      set_fact:
+        online_cards: "{{ spyre_details | dict2items | selectattr('value.status', 'equalto', 'OK') | map(attribute='key') | list }}"
+        offline_cards: "{{ spyre_details | dict2items | rejectattr('value.status', 'equalto', 'OK') | map(attribute='key') | list }}"
+
+    - name: Display results for SSA-1
+      debug:
+        msg: 
+          - "Online Cards: {{ online_cards }}"
+          - "Offline Cards: {{ offline_cards }}"
+
+    - name: 07 - Check if SSA-2 appliance is operational
+      ansible.builtin.uri:
+        url: "{{ ssa2_base_url }}/appliance/is-operational"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        validate_certs: no
+        status_code: 204
+      register: appliance_status
+
+    - name: Fail if SSA-2 appliance is not operational
+      fail:
+        msg: "Appliance SSA-2 is not operational"
+      when: appliance_status.status != 204
+
+    - name: 08 - Get authentication token from the SSA-2 LPAR
+      ansible.builtin.uri:
+        url: "{{ ssa2_base_url }}/api-tokens"
+        method: POST
+        headers:
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          zACI-API: "com.ibm.zaci.system/1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ ssa2_admin_user }}"
+            password: "{{ ssa2_admin_password }}"
+        validate_certs: false
+        return_content: true
+        body_format: json
+      register: auth_response
+
+    - name: Fail if SSA-2 did not response properly
+      fail:
+        msg: "Appliance SSA-2 authentication failed"
+      when: auth_response.status != 200
+
+    - name: Extract the SSA2-admin token
+      set_fact:
+        ssa2_admin_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: 09 - Get Spyre cards associated with SSA-2
+      ansible.builtin.uri:
+        url: "{{ ssa2_base_url }}/spyre-cards"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ ssa2_admin_token }}"
+        validate_certs: no
+        return_content: yes
+        status_code: 200
+      register: spyre_response
+
+    - name: Printing the number of Spyre cards associated with SSA-2
+      debug:
+        msg: "{{ spyre_response.json.parameters | length }}"
+
+    - name: 10 - Get health status of Spyre cards on SSA-2
+      ansible.builtin.uri:
+        url: "{{ ssa2_base_url }}/health"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ ssa2_admin_token }}"
+        validate_certs: no
+        return_content: yes
+        status_code: 200
+      register: health_response
+
+    - name: Gathering health details for SSA-2
+      set_fact:
+        spyre_details: "{{ health_response.json.parameters.spyre_cards_health_monitor[0].details }}"
+
+    - name: Get the online and offline card lists for SSA-2
+      set_fact:
+        online_cards: "{{ spyre_details | dict2items | selectattr('value.status', 'equalto', 'OK') | map(attribute='key') | list }}"
+        offline_cards: "{{ spyre_details | dict2items | rejectattr('value.status', 'equalto', 'OK') | map(attribute='key') | list }}"
+
+    - name: Display results for SSA-2
+      debug:
+        msg: 
+          - "Online Cards: {{ online_cards }}"
+          - "Offline Cards: {{ offline_cards }}"
