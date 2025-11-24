@@ -77,8 +77,11 @@ bastion_dict["cluster_nodes"]["bootstrap"] = bootstrap
 master = get_nodes_ips(infra_id, "master")
 bastion_dict["cluster_nodes"]["masters"] = master
 
-worker = get_nodes_ips(infra_id, "worker")
-bastion_dict["cluster_nodes"]["infra"] = worker
+node_types = ["worker", "infra", "storage"]
+bastion_dict["cluster_nodes"]["infra"] = {}
+for node_type in node_types:
+    nodes = get_nodes_ips(infra_id, node_type)
+    bastion_dict["cluster_nodes"]["infra"].update(nodes)
 
 with open("cluster-template.yaml", "w") as b:
     result = yaml.dump(bastion_dict)
