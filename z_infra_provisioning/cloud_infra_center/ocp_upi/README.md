@@ -74,13 +74,8 @@ After you performed the previous steps successfully, you get one ready OpenShift
 ### 1. Preparation of the servers
 
 - **(Required)** A Linux server, the machine that runs Ansible.
-<<<<<<< HEAD
-    - RHEL8 is the operation system version we tested
-    - Ansible == 2.9
-=======
     - RHEL8/9 is the operating system version we tested
     - Ansible == 2.14/2.15
->>>>>>> 76276b2a (Updated the playbook with required changes and version updates.)
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
     - You can use a single LPAR server or virtual machine
       - Disk with at least 20 GiB
@@ -116,12 +111,8 @@ Use the following command to register the Linux server, then automatically assoc
 sudo subscription-manager register --username <username> --password <password> --auto-attach
 ```
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
-
-<<<<<<< HEAD
-**Note:** Our scenario is only tested for Ansible 2.9.20 on RHEL8.6. 
-=======
 **Note:** Our scenario is only tested for Ansible 2.14.18/2.16.3 on RHEL8 and RHEL9. 
->>>>>>> 76276b2a (Updated the playbook with required changes and version updates.)
+
 ```sh
 dnf install ansible-core
 ```
@@ -299,11 +290,7 @@ Update your settings based on the samples. The following propeties are **require
 | `use_network_subnet`      | \<subnet id from network name in icic\>         | `openstack network list -c Subnets -f value`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `vm_type`                 | kvm                                             | The operation system of OpenShift Container Platform, <br>supported: `kvm` or `zvm`                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | |
 | `disk_type`               | dasd                                            | The disk storage of OpenShift Container Platform, <br>supported: `dasd` or `scsi`                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | |
-<<<<<<< HEAD
-| `openshift_version`       | 4.12                                            | The product version of OpenShift Container Platform, <br>such as `4.12`,`4.13` or `4.14`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)                                                                                                                                                                                                                                                             | |
-=======
 | `openshift_version`       | 4.19                                            | The product version of OpenShift Container Platform, <br>such as `4.12`,`4.13`,`4.14`,`4.15`,`4.16`,`4.17`,`4.18`,`4.19`. <br> And the rhcos is not updated for every single minor version. User can get available openshift_version from [here](https://mirror.openshift.com/pub/openshift-v4/s390x/dependencies/rhcos/)                                                                                                                                                                                                                                                             | |
->>>>>>> 76276b2a (Updated the playbook with required changes and version updates.)
 | `openshift_minor_version` | 3                                               | The minor version of Openshift Container Platform, <br>such as `3`.Support to use `latest` tag to install the latest minor version under`openshift_version` <br> And User can inspect what minor releases are available by checking [here](https://mirror.openshift.com/pub/openshift-v4/s390x/clients/ocp/) to see whats there                                                                                                                                                                                                                       | 
 | `auto_allocated_ip`       | true                                            | (Boolean) true or false, if false, <br>IPs will be allocated from `allocation_pool_start` and `allocation_pool_end`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `os_flavor_bootstrap`     | medium                                          | `openstack flavor list`, Minimum flavor disk size >= 35 GiB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | |
