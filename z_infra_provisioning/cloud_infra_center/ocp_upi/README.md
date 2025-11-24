@@ -74,8 +74,6 @@ After you performed the previous steps successfully, you get one ready OpenShift
 ### 1. Preparation of the servers
 
 - **(Required)** A Linux server, the machine that runs Ansible.
-    - RHEL8 is the operation system version we tested
-    - Ansible == 2.9
     - RHEL8/9 is the operating system version we tested
     - Ansible == 2.14/2.15
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
