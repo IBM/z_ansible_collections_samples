@@ -74,8 +74,6 @@ After you performed the previous steps successfully, you get one ready OpenShift
 ### 1. Preparation of the servers
 
 - **(Required)** A Linux server, the machine that runs Ansible.
-    - RHEL8 is the operation system version we tested
-    - Ansible == 2.9
     - RHEL8/9 is the operating system version we tested
     - Ansible == 2.14/2.15
     - This server **must not** be any of the IBM Cloud Infrastructure Center nodes
@@ -115,7 +113,6 @@ sudo subscription-manager register --username <username> --password <password> -
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
 **Note:** Our scenario is only tested for Ansible 2.14.18/2.16.3 on RHEL8 and RHEL9. 
->>>>>>> 76276b2a (Updated the playbook with required changes and version updates.)
 ```sh
 dnf install ansible-core
 ```
