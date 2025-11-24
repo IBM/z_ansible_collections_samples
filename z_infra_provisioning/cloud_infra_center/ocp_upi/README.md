@@ -115,7 +115,6 @@ sudo subscription-manager register --username <username> --password <password> -
 After registration, use the following command to enable ansible repository, or use a newer version of your installed systems. 
 
 **Note:** Our scenario is only tested for Ansible 2.14.18/2.16.3 on RHEL8 and RHEL9. 
->>>>>>> 76276b2a (Updated the playbook with required changes and version updates.)
 ```sh
 dnf install ansible-core
 ```
