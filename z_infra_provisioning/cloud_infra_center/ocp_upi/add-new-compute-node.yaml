@@ -52,7 +52,7 @@
 
     - name: Find existing compute nodes
       openstack.cloud.server_info:
-        name: '{{ infra_id.stdout }}-worker-*'
+        name: '{{os_compute_server_name}}-*'
         timeout: "{{ create_server_timeout|int * 60 }}"
         filters:
           vm_state: active
