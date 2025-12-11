@@ -56,7 +56,7 @@ their control node.
         displayed only once.
     - Use this secret to generate TOTP, which will be required to obtain the
       access token.
-- Check if you have to remove an already executed task in the playbook (e.g.,
+- Check if you have to remove any already executed task in the playbook (e.g.,
   updating the password).
   - Some of the tasks might fail if executed twice.
 - Run the playbook via:
@@ -96,7 +96,7 @@ export ACC_ADMIN_USER=<admin_username>
 export ACC_ADMIN_PASSWORD=<admin_password>
 ```
 
-The `admin_username` is the ACC's SSC LPAR username, and `admin_password` is 
+The `admin_username` is the ACC's LPAR username, and `admin_password` is 
 the password.
 
 To generate the access token for the admin user, provide the OTP when prompted in

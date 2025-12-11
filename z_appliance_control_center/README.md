@@ -260,7 +260,7 @@ process behind these scripts. However, it is required that the user reads the
 
 ### File Structure of appliance_deploy_*_ansible
 
-These directories are used to deploy appliances.
+These files are used to deploy appliances.
 
 | File | Purpose |
 |:---------|:--------|
@@ -268,7 +268,7 @@ These directories are used to deploy appliances.
 | `owner_vars.yaml` | This file contains variables used by the appliance owners to install their appliances |
 | `01_admin_actions.yaml` | ACC administrator can use this playbook to initialize ACC |
 | `02a_assign_1_lpar.yaml` | ACC administrator can use this playbook to assign a single LPAR to an appliance owner |
-| `02b_assign_2_lpar.yaml` | ACC administrator can use this playbook to assign two LPARs ot an appliance owner |
+| `02b_assign_2_lpar.yaml` | ACC administrator can use this playbook to assign two LPARs to an appliance owner |
 | `03_owner_actions.yaml` | Appliance owner can use this playbook to initialize the user on ACC |
 | `04_install_flow.yaml` | Appliance owner can use this playbook to install and activate an appliance |
 
@@ -279,8 +279,8 @@ This directory has the following ansible playbooks:
 | File | Purpose |
 |:---------|:--------|
 | `env_vars.yaml` | This file contains variables that can be used to configure ACC and SSAs |
-| `01_ssa_install_e2e_default.yaml` | This playbook can be use end-to-end, for initializing ACC in default mode, and installing and activating 2x SSAs |
-| `02_ssa_install_e2e_standalone.yaml` | This playbook can be use end-to-end, for initializing ACC in standalone mode, and installing and activating 2x SSAs |
+| `01_ssa_install_e2e_default.yaml` | This playbook provides an end-to-end workflow, for initializing ACC in default mode, and installing and activating 2x SSAs |
+| `02_ssa_install_e2e_standalone.yaml` | This playbook provides an end-to-end workflow, for initializing ACC in standalone mode, and installing and activating 2x SSAs |
 | `03_acc_ssa_install_check.yaml` | This playbook can be used to check and validate that the ACC and 2x SSAs are active and reachable |
 | `04_unlock_ssa_after_hmc_install.yaml` | This playbook is used to bring the 2x SSAs under ACC management when the SSAs are installed using the HMC |
 
@@ -292,7 +292,7 @@ This directory is used for other use cases associated with ACC and appliances.
 |:---------|:--------|
 | `env_vars.yaml` | This file contains variables used by the environment, e.g., to install 2x SSAs |
 | `owner_vars.yaml` | This file contains variables used by the appliance owners regarding their appliances |
-| `acc_ssa_install_check_vars.yaml` | This file contains variable used for checking ACC and 2x SSA installations |
+| `acc_ssa_install_check_vars.yaml` | This file contains variables used for checking ACC and 2x SSA installations |
 | `00_resource_scan.yaml`| Appliance owner can use this playbook to gather information about the resources assigned and consumed by the owner |
 | `01_upgrade_flow.yaml` | Appliance owner can use this playbook to upgrade an appliance, which will format the disk and install a new appliance |
 | `02_sync_cpc_lpars.yaml` | ACC administrator can use this playbook to sync the state of the CPCs on the HMC, and LPARs. |
@@ -358,14 +358,13 @@ curl -k -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "username": "your_cc_owner_username",
-  "password": "you_cc_owner_user_password"
+  "username": "your_username",
+  "password": "your_password"
 }'
 ```
 
-This will return a JSON object, with `access_token` field containing the token.
-You can copy the `access_token` into a variable like `ADMIN_TOKEN` or
-`OWNER_TOKEN` (depending upon the role) and use it later.
+This will return a JSON object, with an `access_token` field containing the token to be used for communicating with the ACC.
+You can export the `access_token` to an appropriate environment variable, such as `ADMIN_TOKEN` or `OWNER_TOKEN`, depending on the credentials used above, for reuse in later ACC API calls.
 
 Note that the `ACC_IP` is the IP of the ACC LPAR, and the `ACC_PORT` is 8081.
 
@@ -432,8 +431,8 @@ curl -k -X 'GET' \
 
 The above API will pull the information from the ACC about the CPCs that ACC is
 currently handling. If this list is complete, then ACC had successfully synced
-with the HMC. And when retrying running the playbook, the ACC user can comment
+with the HMC. And when running the playbook again, the ACC user can comment
 out or remove the task that calls the `/api/config/hmcconfig` API.
 
-Moreover, it is advisable that no other activity is triggered by user of the
-ACC when synching with HMC is in progress.
+Moreover, it is advisable that no other activity is triggered by the user of the ACC when HMC 
+syncing is in progress.

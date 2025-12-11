@@ -45,7 +45,7 @@ their control node.
 - `cd` to the directory `appliance_deploy_standalone_ansible`.
 - Modify the variables in the file `admin_vars.yaml`.
   - **Note**: Be sure the `acc_ip` in the `admin_vars.yaml` file points to the IP of the ACC LPAR. Keep the port to 8081.
-- Check if you have to remove an already executed task in the playbook (e.g.,
+- Check if you have to remove any already executed task in the playbook (e.g.,
   updating the password).
   - Some of the tasks might fail if executed twice.
 - Run the playbook via:
@@ -85,7 +85,7 @@ export ACC_ADMIN_USER=<admin_username>
 export ACC_ADMIN_PASSWORD=<admin_password>
 ```
 
-The `admin_username` is the ACC's SSC LPAR username, and `admin_password` is
+The `admin_username` is the ACC's LPAR username, and `admin_password` is
 the password.
 
 As an ACC-admin, run the appropriate playbook depending on the number of LPARs:

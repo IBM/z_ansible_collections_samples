@@ -149,14 +149,9 @@ To set up the ACC, the following actions must be performed by the ACC-admin.
   ansible-playbook ./acc_install_ansible/00_acc_install.yaml
   ```
 
-If required, the ansible playbook will create and activate a
-`Python virtual environment` at `INSTALL_SCRIPT_PATH` location. However, if the
-the above python virtual environment and packages within the virtual environment are missing, the playbook
-will display an error message and stop.
+If the above python virtual environment and packages within the virtual environment are missing, the playbook will display an error message and stop running.
 
-The above step will take time (about 15 mins) to complete. The scripts
-will first set up the LPAR in the right mode, then upload the ACC image and
-afterwards, install the ACC image on the disk.
+The above step will take time (about 15 mins) to complete. The scripts begin by setting up the ACC LPAR, followed by uploading the ACC image and installing it on the LPAR.
 
 Check the status of ACC LPAR on the HMC for successful installation. After this
 step is completed, ACC will be installed and running.
