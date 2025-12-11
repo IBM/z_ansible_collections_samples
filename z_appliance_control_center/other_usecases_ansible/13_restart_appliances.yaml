@@ -1,0 +1,187 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Initial release                                                    |
+# *+------------------------------------------------------------------------+
+
+- name: ACC playbook, run by appliance-owner, for restarting an appliance.
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export appliance-owner credentials:
+
+          export ACC_OWNER_PASSWORD=<owner_password>
+
+          Make sure that the appliances are 'unlocked' before restarting them.
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+  tasks:
+    - name: 00 - Check if MFA is enabled.
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no)"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.legacy.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA OTP generated for owner"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 04 - Get list of running appliance
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/resource/quotas"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: quotas_response
+
+    - name: Fail if no appliances found
+      ansible.builtin.fail:
+        msg: "No appliances found in resource quotas for this owner."
+      when: quotas_response.json | length == 0
+
+    - name: Build appliance dictionary
+      no_log: true
+      ansible.builtin.set_fact:
+        app_dict: "{{ app_dict | default({}) | combine( { idx: item.pkg ~ ' - ' ~ item.name  } ) }}"
+      loop: "{{ quotas_response.json }}"
+      loop_control:
+        index_var: idx
+
+    - name: Select the numbers for the LPARs to be restarted
+      ansible.builtin.debug:
+        var: app_dict
+
+    - name: Enter the ids mapped to the LPARs in app_dict from the above response to restart (space-separated)
+      ansible.builtin.pause:
+        prompt: "Enter the numbers (e.g., 0 2 3)"
+      register: selected_keys_raw
+
+    - name: Convert input to list of integers
+      ansible.builtin.set_fact:
+        selected_keys: "{{ selected_keys_raw.user_input.split() | map('int') | list }}"
+
+    - name: Show selected numbers entered by user
+      ansible.builtin.debug:
+        msg: "You selected: {{ selected_keys }}"
+
+    - name: Validate selected keys
+      ansible.builtin.fail:
+        msg: "Invalid selection: {{ selected_keys }}. Valid keys: {{ app_dict.keys() | list }}"
+      when: (selected_keys | difference(app_dict.keys() | list) | length) > 0
+
+    - name: Build selected appliance list
+      ansible.builtin.set_fact:
+        selected_appliances: "{{ selected_keys | map('extract', app_dict) | list }}"
+
+    - name: Selected Appliances
+      ansible.builtin.debug:
+        var: selected_appliances
+
+    - name: Build restart request list
+      ansible.builtin.set_fact:
+        restart_list: >-
+          {{
+            restart_list|default([]) +
+            [ { "resource_pkg": item.split(' - ')[0],
+                "lpar": item.split(' - ')[1] } ]
+          }}
+      loop: "{{ selected_appliances }}"
+
+    - name: Restart selected appliances
+      ansible.builtin.uri:
+        url: "{{ acc_ip }}/appliance/restart"
+        method: PUT
+        body:
+          resource_pkg_name: "{{ item.resource_pkg }}"
+          lpar: "{{ item.lpar }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: "application/json"
+        status_code: 200
+        validate_certs: false
+      loop: "{{ restart_list }}"
+      loop_control:
+        label: "{{ item.resource_pkg }} - {{ item.lpar }}"
+      register: restart_response
+      ignore_errors: true
+
+    - name: Collect task IDs from successful restarts
+      no_log: true
+      ansible.builtin.set_fact:
+        task_ids: "{{ task_ids | default([]) + [item.json.task_id] }}"
+      when: item.status == 200 and item.json.task_id is defined
+      loop: "{{ restart_response.results }}"
+
+    - name: Print restart results
+      ansible.builtin.debug:
+        msg: |
+          Resource Package: {{ item.item.resource_pkg }}
+          LPAR: {{ item.item.lpar }}
+          Status: {{ 'SUCCESS' if item.status == 200 else 'FAILED' }}
+
+          {% if item.json is defined and 'exceptions' in item.json %}
+          Exceptions:
+          {{ item.json.exceptions | to_nice_json }}
+          {% else %}
+          Full Response:
+          {{ item.json | to_nice_json if item.json is defined else 'No JSON returned' }}
+          {% endif %}
+      loop: "{{ restart_response.results }}"
+      loop_control:
+        label: "{{ item.item.resource_pkg }} - {{ item.item.lpar }}"
+
+    - name: Show task status URLs
+      ansible.builtin.debug:
+        msg: |
+          Task status URLs:
+          {% for id in task_ids %}
+          • {{ acc_ip }}/tasks/{{ id }}/status
+          {% endfor %}
+      when: task_ids is defined and task_ids | length > 0

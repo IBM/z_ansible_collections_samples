@@ -1,28 +1,58 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Added checking of environment variables                            |
+# *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for appliance upgrade
   hosts: localhost
-  gather_facts : true
+  gather_facts: true
   vars_files:
     - owner_vars.yaml
 
   pre_tasks:
-  - name: Reminder - Export appliance-owner credentials
-    pause:
-      prompt: |
-        Before running this playbook, please export appliance-owner credentials:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export appliance-owner credentials:
 
-        export ACC_OWNER_PASSWORD=<owner_password>
+          export ACC_OWNER_PASSWORD=<owner_password>
 
-        Press Ctrl+C now to cancel if you haven't done this.
-        The playbook will continue shortly.
-      seconds: 5
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
 
   tasks:
-    - name: 00 - Get authentication token from the ACC as appliance-owner
+    - name: 00 - Check MFA is enabled or not
+      ansible.legacy.pause:
+        prompt: "Do you have MFA enabled? (yes/no):"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.legacy.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.legacy.pause:
+        prompt: "Enter MFA OTP generated for owner:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
@@ -30,6 +60,7 @@
         body:
           username: "{{ cc_owner_user }}"
           password: "{{ cc_owner_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
         body_format: json
         return_content: true
         validate_certs: false
@@ -37,30 +68,35 @@
 
     - name: Printing the response
       tags: owner
-      debug:
-        msg: 
+      ansible.builtin.debug:
+        msg:
           - "{{ auth_response.json.access_token }}"
 
     - name: Extract the token
       tags: owner, install
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 01 - Upload upgrade appliance image to the ACC as owner
+    - name: 04 - Upload upgrade appliance image to the ACC as owner
       tags: owner
       # The uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
-      shell: 'curl -k -X "POST" \
-              "{{ acc_ip }}/images" \
-              -H "Authorization: Bearer {{ access_token }}" \
-              -H "Content-Type: multipart/form-data" \
-              -F "data=@{{ image_path }}" \
-              -F "image_name=awesome-img-2" -F "image_version=v1.0" -F "description=This image is an awesome image..." \
-              -F "image_type={{ image_type }}" \
-              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      ansible.builtin.shell: 'curl -k -X "POST" \
+        "{{ acc_ip }}/images" \
+        -H "Authorization: Bearer {{ access_token }}" \
+        -H "Content-Type: multipart/form-data" \
+        -F "data=@{{ image_path }}" \
+        -F "image_name=awesome-img-2" -F "image_version=v1.0" -F "description=This image is an awesome image..." \
+        -F "image_type={{ image_type }}" \
+        -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
       register: response
+      changed_when: false
+      failed_when: >
+        response.rc != 0 or
+        (response.stdout is defined and 'exception' in response.stdout | lower)
+      # noqa command-instead-of-module command-instead-of-shell
 
-    - name: 02 - Get image information
+    - name: 05 - Get image information
       tags: owner, install
       ansible.builtin.uri:
         url: "{{ acc_ip }}/images"
@@ -70,23 +106,24 @@
           Content-Type: application/json
         validate_certs: false
       register: response
+      failed_when: response.json.images | length == 0
 
-    - name: Printing the response
+    - name: Printing the response of get image
       tags: owner, install
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
 
     - name: Extract the image ID from the DB
       tags: owner, install
-      set_fact:
-        image_id: "{{ response.json.images[0].id }}"
+      ansible.builtin.set_fact:
+        image_id: "{{ response.json.images[-1].id }}"
 
     - name: Printing the image ID
       tags: owner, install
-      debug:
+      ansible.builtin.debug:
         msg: "{{ image_id }}"
 
-    - name: 03 - As owner, upgrade the image using image
+    - name: 06 - As owner, upgrade the image using image
       tags: owner, install
       ansible.builtin.uri:
         url: "{{ acc_ip }}/cluster/upgrade"
@@ -95,7 +132,7 @@
           {
             "{{ package_name }}": {
             "lpars": ["{{ lpar_name }}"],
-            "image_id": {{ image_id | int}}
+            "image_id": {{ image_id | int }}
             }
           }
         body_format: json
@@ -105,7 +142,23 @@
         validate_certs: false
         status_code: 200
         dest: "{{ upgrade_appliance_data }}"
+      changed_when: false
 
     - name: Wait for 15 seconds
       ansible.builtin.pause:
         seconds: 15
+
+    - name: Inform user about downloaded upgrade info and next steps
+      ansible.builtin.debug:
+        msg: "{{ playbook_info.split('\n') }}"
+      vars:
+        playbook_info: |
+          ✔ The upgrade ZIP file has been successfully downloaded.
+
+          📁 Location:
+          {{ upgrade_appliance_data }}
+
+          🔓 Please unzip the file and note the "task_id" from upgrade_info.json inside it.
+
+          📡 To check the current status of the in-progress task, use:
+          {{ acc_ip }}/tasks/<task_id>/status

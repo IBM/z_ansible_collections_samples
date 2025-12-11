@@ -1,20 +1,39 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
 
-acc_ip: https://9.120.0.0:8081/api                                       # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+# IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+acc_ip: https://9.120.0.0:8081/api
 
-# Users
-cc_owner_user: "cc_owner"                                                  # Specify the owner name for created owner (e.g., cc_owner)
-cc_owner_email: "cc_owner@email.com"                                       # Already created Owner's email address (e.g., "xyz.ibm.com")
-cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"             # Owner's password (e.g., "defaultPassw0rd1")
 
-# Resources that are assigned to the appliance-owner
-package_name: "RP16"                                         # Already created Resource package name (e.g., "RP01")
-lpar_name: "CC16"                                                        # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
+####### Users #######
 
-# Image
+# Specify the owner name for created owner (e.g., cc_owner)
+cc_owner_user: "cc_owner"
+
+# Already created Owner's email address (e.g., "xyz.ibm.com")
+cc_owner_email: "cc_owner@email.com"
+
+# Owner's password (e.g., "defaultPassw0rd1")
+cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"
+
+
+####### Resources that are assigned to the appliance-owner #######
+
+# Already created Resource package name (e.g., "RP01")
+package_name: "RP16"
+
+# LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
+lpar_name: "CC16"
+
+
+####### Image #######
+
 # ***************************************************************************************
 # SSA Image Installation Configuration
 #
@@ -35,35 +54,49 @@ lpar_name: "CC16"                                                        # LPAR 
 # The minimum number of IFLs (Integrated Facility for Linux) required by
 # the SSA appliance to run successfully.
 #
-# Since SSA runs as a Linux-based appliance on IBM Z, at least **1 IFL**
-# is required. For better performance, more can be assigned depending on
+# Since SSA runs as a Linux-based appliance on IBM Z, at least 2 IFLs
+# are required. For better performance, more can be assigned depending on
 # the expected workload.
 #
 # Guidance:
-#   - Minimum: 1 IFL (required for installation)
+#   - Minimum: 2 IFLs (required for installation)
 #   - Recommended: 2–4 IFLs for production or performance testing
 # min_memory
 # ------------------------------------------------------------------------------
-# The minimum memory (in MB) required by the SSA appliance.
+# The minimum memory 51200 (in MB) required by the SSA appliance.
 # This is the least amount of memory needed to install and boot the image.
 #
 # Memory should always be a multiple of 1024 (1 GB).
-
 # *****************************************************************************************
 
-image_path: "/Users/Downloads/test_1.1.1_pre_release.img-new.gz"       # Path on the control node (e.g., your laptop) with the image file which you want to install
-update_bundle_path: "/Users/update_bundle_v1.0.4_iesp_debug.tar"             # Modify the update bundle image file location which you want to install
-update_bundle_name: "update_bundle_1.0.4"                                     # Update bundle file name
-min_ifls: 2                                                                 # Number of IFLs, Minimum IFLs required by the appliance (e.g., 1)
-min_memory: 4096                                                            # Number of memory, Minimum memory required by the appliance (e.g., 4096)
-image_type: "image"                                                         # This is default type of image
-image_fix_type: "fix"                                                       # This is the fix type of image
+# Path on the control node (e.g., your laptop) with the image file which you want to install
+image_path: "/Users/Downloads/test_1.1.1_pre_release.img-new.gz"
 
-# Image install
+# Modify the update bundle image file location which you want to install
+update_bundle_path: "/Users/update_bundle_v1.0.4_iesp_debug.tar"
+
+# Update bundle file name
+update_bundle_name: "update_bundle_1.0.4"
+
+# Number of IFLs, Minimum IFLs required by the appliance (e.g., 2)
+min_ifls: 2
+
+# Number of memory, Minimum memory required by the appliance (e.g., 51200)
+min_memory: 51200
+
+# This is default type of image
+image_type: "image"
+
+# This is the fix type of image
+image_fix_type: "fix"
+
+
+####### Image install #######
+
 # ***************************************************************************
 # Image Installation Parameters
 #
-# This section controls how an appliance image, managed by ACC (like SSA, Spyre Support Appliance), 
+# This section controls how an appliance image, managed by ACC (like SSA, Spyre Support Appliance),
 # is deployed and configured on the target LPAR.
 #
 # The parameters define whether to perform a new installation or reuse an
@@ -72,28 +105,50 @@ image_fix_type: "fix"                                                       # Th
 # Defines the hostname that will be assigned to the SSA image after installation.
 # ***************************************************************************
 
-install: true                                                               # Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image (true = install new image, false = use existing disk image)
-hostname: "host"                                                            # Hostname to assign to the installed image
-app_cores: 2                                                                # Number of CPU cores allocated for the image
-app_memory: 4096                                                            # Amount of memory (in MB) allocated for the image
+# Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image
+# - true = install new image
+# - false = use existing disk image
+install: true
 
-# appliance credential
-# Export before run: export APP_USERNAME=<lpar_username>
-app_username: "{{ lookup('env', 'APP_USERNAME') }}"                          # Set Username for the appliance (used during image installation)
-#Export before run: export APP_PASSWORD=<lpar_password>
-app_password: "{{ lookup('env', 'APP_PASSWORD') }}"                          # Set Password for the appliance (used during image installation)
+# Hostname to assign to the installed image
+hostname: "host"
+
+# Number of CPU cores allocated for the image
+app_cores: 2
+
+# Amount of memory (in MB) allocated for the image
+app_memory: 51200
+
+
+####### Appliance credential #######
+
+# Set Username for the appliance (used during appliance installation)
+# If you have not used ACC to install the appliance, then this is the username of the SSC LPAR.
+# Export before run: export APP_USERNAME=<appliance_username>
+app_username: "{{ lookup('env', 'APP_USERNAME') }}"
+
+# Set Password for the appliance (used during image installation)
+# If you have not used ACC to install the appliance, then this is the password of the SSC LPAR.
+# Export before run: export APP_PASSWORD=<appliance_password>
+app_password: "{{ lookup('env', 'APP_PASSWORD') }}"
 
 # app_image_id: 1
 
-# Available execution mode:
+####### Available execution mode #######
+
 # . For default ACC (i.e, hmc_managed=true): "default", "prep_lpar_only", "appliance_only", "switch_to_installer"
 # . Standalone ACC (i.e, hmcmanaged=false): "appliance_only", "switch_to_installer"
 
-execution_action: "default"                                                 
-                                                                              
+execution_action: "default"
 
-#download zip files
-upgrade_appliance_data: "/Users/Downloads/zFAB-Appliance-Control-Center/docs/sample_ansible/tmp/upgrade_data.zip"   #Modify the location where you want to download upgrade zip file
-upgrade_fix_data: "/Users/upgrade_fixes_data.zip"                                          #Modify the location where you want to download concurrent update zip file
-ssa_logs: "/Users/Downloads/zFAB-Appliance-Control-Center/docs/sample_ansible/tmp/download_logs.zip"                #Modify the location to download ssa log files
 
+####### Download zip files #######
+
+# The location where the upgrade ZIP file is downloaded
+upgrade_appliance_data: "{{ lookup('env','HOME') }}/Downloads/upgrade_data_{{ ansible_date_time.epoch }}.zip"
+
+# The location where the concurrent update ZIP file is downloaded
+upgrade_fix_data: "{{ lookup('env','HOME') }}/Downloads/upgrade_fixes_data_{{ ansible_date_time.epoch }}.zip"
+
+# # The location where the ssa log files is downloaded
+ssa_logs: "{{ lookup('env','HOME') }}/Downloads/download_logs_{{ ansible_date_time.epoch }}.zip"

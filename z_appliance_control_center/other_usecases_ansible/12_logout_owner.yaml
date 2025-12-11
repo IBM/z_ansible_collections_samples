@@ -1,15 +1,13 @@
 # *+------------------------------------------------------------------------+
 # *| © Copyright IBM Corp. 2025                                             |
-# *| [10.17.2025]                                                           |
-# *|   - Tested with ACC 1.2.6                                              |
+# *| [11.13.2025]                                                           |
+# *|   - Tested with ACC 1.2.8                                              |
 # *|   - Initial release                                                    |
-# *| [12.12.2025]                                                           |
+# *| [[12.12.2025]                                                          |
 # *|   - Tested with ACC 1.2.10                                             |
-# *|   - Renamed 12_unlock_appliances.yaml to 10_unlock_appliances.yaml     |
-# *|   - Added checking of environment variables                            |
 # *+------------------------------------------------------------------------+
 
-- name: ACC Playbook, run by appliance-owner, for appliance-owner actions
+- name: ACC playbook, run by appliance-owner user, to logout the user
   hosts: localhost
   gather_facts: true
   vars_files:
@@ -17,7 +15,7 @@
 
   pre_tasks:
     - name: Reminder - Export appliance-owner credentials
-      ansible.builtin.pause:
+      ansible.legacy.pause:
         prompt: |
           Before running this playbook, please export appliance-owner credentials:
 
@@ -53,8 +51,8 @@
         prompt: "Enter MFA OTP generated for owner:"
       register: mfa_otp_input
 
-    - name: 03 - Get authentication token from the ACC as appliance-owner
-      tags: owner, install
+    - name: 03 - Get authentication token from the ACC as owner
+      tags: owner
       ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
         method: POST
@@ -69,36 +67,21 @@
 
     - name: Extract the token
       tags: owner, install
-      ansible.builtin.set_fact:
+      ansible.legacy.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 04 - Get list of running appliance
+    - name: 04 - Logout appliance-owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/quotas"
-        method: GET
+        url: "{{ acc_ip }}/user/logout"
+        method: DELETE
         headers:
-          Accept: "application/json"
           Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        return_content: true
         validate_certs: false
-      register: quotas_response
+      register: logout_response
 
-    - name: Fail if no appliances found
-      ansible.builtin.fail:
-        msg: "No appliances found in resource quotas for this owner."
-      when: quotas_response.json | length == 0
-
-    - name: Print available appliances summary
-      ansible.builtin.debug:
-        msg: >
-          {% for app in quotas_response.json %}
-            ID: {{ app.id }},
-            Name: {{ app.name }},
-            IP: {{ app.interfaces[0].ip | default('N/A') }},
-            Status: {{ 'Locked' if app.is_locked else 'Unlocked' }}
-          {% endfor %}
-
-    - name: 05 - Unlock appliances one by one
-      ansible.builtin.include_tasks: 11_unlock_each_appliance.yaml
-      loop: "{{ quotas_response.json }}"
-      loop_control:
-        loop_var: appliance
+    - name: Printing the response of logout
+      ansible.legacy.debug:
+        msg:
+          - "{{ logout_response.json }}"

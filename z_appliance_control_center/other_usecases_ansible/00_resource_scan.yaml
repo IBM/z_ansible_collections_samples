@@ -1,7 +1,12 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Added checking of environment variables                            |
+# *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run as appliance-owner, to scan the resources
   hosts: localhost
@@ -9,19 +14,44 @@
     - owner_vars.yaml
 
   pre_tasks:
-  - name: Reminder - Export appliance-owner credentials
-    pause:
-      prompt: |
-        Before running this playbook, please export appliance-owner credentials:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export appliance-owner credentials:
 
-        export ACC_OWNER_PASSWORD=<owner_password>
+          export ACC_OWNER_PASSWORD=<owner_password>
 
-        Press Ctrl+C now to cancel if you haven't done this.
-        The playbook will continue shortly.
-      seconds: 5
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
 
   tasks:
-    - name: 00 - Get authentication token from the ACC as owner
+    - name: 00 - Check MFA is enabled or not
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no):"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.legacy.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA OTP generated for owner:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as owner
       tags: owner
       ansible.builtin.uri:
         url: "{{ acc_ip }}/user/token"
@@ -29,6 +59,7 @@
         body:
           username: "{{ cc_owner_user }}"
           password: "{{ cc_owner_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
         body_format: json
         return_content: true
         validate_certs: false
@@ -36,10 +67,10 @@
 
     - name: Extract the token
       tags: owner, install
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 01 - Get resources assigned to the owner by the admin
+    - name: 04 - Get resources assigned to the owner by the admin
       tags: owner
       ansible.builtin.uri:
         url: "{{ acc_ip }}/resource/pkgs"
@@ -52,10 +83,10 @@
 
     - name: Printing the assigned resources
       tags: owner
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
 
-    - name: 02 - Get resources consumed by the owner
+    - name: 05 - Get resources consumed by the owner
       tags: owner
       ansible.builtin.uri:
         url: "{{ acc_ip }}/resource/quotas"
@@ -68,7 +99,5 @@
 
     - name: Printing the consumed resources
       tags: owner
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
-
-
