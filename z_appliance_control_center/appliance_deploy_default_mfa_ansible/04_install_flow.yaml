@@ -1,33 +1,48 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
-
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Added checking of environment variables                            |
+# *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-owner, for ACC-owner actions
   hosts: localhost
   gather_facts: true
   vars_files:
     - owner_vars.yaml
-  
+
   pre_tasks:
-  - name: Reminder - Export appliance-owner credentials
-    pause:
-      prompt: |
-        Before running this playbook, please export credentials:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export credentials:
 
-        export ACC_OWNER_PASSWORD=<owner_new_password>
-        export APP_USERNAME=<appliance_username>
-        export APP_PASSWORD=<appliance_password>
+          export ACC_OWNER_PASSWORD=<owner_new_password>
+          export APP_USERNAME=<appliance_username>
+          export APP_PASSWORD=<appliance_password>
 
-        Press Ctrl+C now to cancel if you haven't done this.
-        The playbook will continue shortly.
-      seconds: 5
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
 
-      
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_PASSWORD
+          - APP_USERNAME
+          - APP_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
   tasks:
     - name: Wait for user to generate OTP using Owner mfa secret
-      pause:
+      ansible.builtin.pause:
         prompt: "Enter OTP generated from the owner mfa_secret:"
       register: mfa_otp_input
 
@@ -47,12 +62,12 @@
 
     - name: Extract the token
       tags: owner, install
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
-        
+
     - name: Printing the image ID
       tags: owner, install
-      debug:
+      ansible.builtin.debug:
         msg: "{{ image_id }}"
 
     - name: 01 - As owner, install and activate the image
@@ -96,16 +111,16 @@
 
     - name: Printing the response
       tags: owner, install
-      debug:
+      ansible.builtin.debug:
         var: activate_response.json
 
     - name: Wait for 15 seconds
       ansible.builtin.pause:
         seconds: 15
-    
+
     # Extract all task IDs from response
     - name: Extract task IDs dynamically
-      set_fact:
+      ansible.builtin.set_fact:
         task_ids: >-
           {{
             activate_response.json
@@ -120,7 +135,7 @@
           }}
 
     - name: Print extracted task IDs
-      debug:
+      ansible.builtin.debug:
         msg: >-
           {% if task_ids | length > 0 %}
             Task IDs for active LPARs: {{ task_ids | join(', ') }}
@@ -150,7 +165,7 @@
       register: task_status
 
     - name: Print task status responses
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item.json }}"
       loop: "{{ task_status.results | default([task_status]) }}"
       loop_control:
@@ -208,7 +223,7 @@
 
     - name: Printing the assigned resources
       tags: owner
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
 
     - name: 04 - Get resources consumed by the owner
@@ -224,5 +239,5 @@
 
     - name: Printing the consumed resources
       tags: owner
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
