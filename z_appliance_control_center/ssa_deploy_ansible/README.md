@@ -25,8 +25,7 @@ use the playbooks in the `appliance_deploy_*` directories.
 
 To install 2x SSAs after a fresh install of ACC, you can run this playbook.
 This helps you to avoid the other playbooks in the `appliance_deploy_*`
-directory. For example, this single playbook replaces `01_admin_actions.yaml`,
-`02b_assign_2_lpar.yaml`, `03_owner_actions.yaml` and `04_install_flow.yaml`.
+directory.
 
 This playbook is specifically configured for installing SSAs with the default
 mode of ACC, where ACC can communicate with the HMC.

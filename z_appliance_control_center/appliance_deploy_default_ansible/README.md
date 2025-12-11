@@ -47,7 +47,7 @@ their control node.
 - Modify the variables in the file `admin_vars.yaml`.
   - When reviewing the `admin_vars` file from top to bottom, all variables up to and including `z_machine_name` must be updated to run this playbook. The remaining variables will be modified later when running the [Adding Resource Package playbooks](#adding-resource-packages---02a_assign_1_lparyaml--02b_assign_2_lparyaml).
     - **Note**: Be sure the `acc_ip` in the `admin_vars.yaml` file points to the IP of the ACC LPAR. Keep the port to 8081.
-- Check if you have to remove an already executed tasks in the playbook (e.g.,
+- Check if you have to remove any already executed tasks in the playbook (e.g.,
   updating the password).
   - Some of the tasks might fail if executed twice.
 - Run the playbook via:
@@ -87,7 +87,7 @@ export ACC_ADMIN_USER=<admin_username>
 export ACC_ADMIN_PASSWORD=<admin_password>
 ```
 
-The `admin_username` is the ACC's SSC LPAR username, and `admin_password` is
+The `admin_username` is the ACC's LPAR username, and `admin_password` is
 the password.
 
 As an ACC-admin, run the appropriate playbook depending on the number of LPARs:

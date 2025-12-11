@@ -59,7 +59,7 @@ IS_FCP: false
 # To be added only when is_fcp is true (e.g., lun: "4026402200000000")
 lun: "0000000000000000"
 
-# To be added only when disk is_fcp is true (e.g., wwpn: "50050763070b46a6")
+# To be added only when is_fcp is true (e.g., wwpn: "50050763070b46a6")
 wwpn: "0000000000000000"
 
 # Storage allocated (in MB)
