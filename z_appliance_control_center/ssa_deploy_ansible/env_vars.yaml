@@ -1,0 +1,306 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Initial release                                                    |
+# *+------------------------------------------------------------------------+
+
+#####################################################################################################
+# NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
+# sections in the scripts as well. Please review the script thoroughly before running it.
+# Do not comment any variables here it may fail the playbook if the variable is not applicable
+# just skip changing to right values
+######################################################################################################
+
+# Variables used for installing SSAs
+
+# NOTE: Select the correct network card type based on system configuration:
+#   - CHPID, Port  -> choose OSA
+#   - FID          -> choose NETH
+# Incorrect selection will update HMC config improperly and may make the LPAR unreachable
+
+####### ACC variables #######
+
+# Enable or disable Multi-Factor Authentication (true/false)
+mfa_enabled: false
+
+# IP of the ACC LPAR, used to create acc_url (e.g., 9.15.120.100)
+acc_ip: 9.15.150.200
+
+# This port is used to create acc_url (8081)
+acc_port: 8081
+
+####### HMC #######
+
+# HMC host ip (e.g., 9.152.150.166)
+hmc_url: "9.0.0.0"
+
+# ACC-admin's user name on the HMC (e.g., export HMC_USER=<your_hmc_userid>)
+hmc_user: "{{ lookup('env', 'HMC_USER') }}"
+
+# ACC-admin's password on the HMC (e.g., export HMC_PASSWORD=<your_hmc_password>)
+hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"
+
+####### Users #######
+
+# Specify the owner name for the new Owner's creation (e.g., cc_owner)
+cc_owner_user: "cc_owner"
+
+# Owner's email address (e.g., "cc_owner@email.com")
+cc_owner_email: "cc_owner@email.com"
+
+# Specify default password for Owner's creation (e.g., export ACC_OWNER_DEFAULT_PASSWORD=defaultP@ssw0rd)
+cc_owner_default_password: "{{ lookup('env', 'ACC_OWNER_DEFAULT_PASSWORD') }}"
+
+# Owner's new password to update the old one (e.g., export ACC_OWNER_PASSWORD=defaultPassw0rd1)
+cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"
+
+######## Create CPC config in standalone mode #######
+
+# In the standalone mode, we need to provide the CPC configurations ourselves
+# to the ACC. The ACC takes these values and compares the resources assigned
+# based upon these values. These values are not use in default mode.
+
+# If machine is dpm machine then z_machine_dpm_enabled as true or false in ACC to create CPC for standalone mode
+z_machine_dpm_enabled: false
+
+# update number of ifls as per infra support to create cpc
+cpc_ifls: 32
+
+# update number of gps as per infra support to create cpc
+cpc_gps: 32
+
+# update number of memory(in MB) as per infra support to create cpc
+available_storage: 229376
+
+####### SSA Image #######
+
+ssa_package_name: "resource_package_1"
+
+# Modify the location of the image file which image you want to install
+image_path: "/Users/Downloads/zssa.img.gz"
+
+# This is default type of image (e.g., "image")
+image_type: "image"
+
+####### Resources that are assigned to the appliance-owner #######
+
+# ****************************************************************************
+# A *resource package* is a bundle of hardware resources assigned to a
+# specific set of logical partition (LPAR) and an appliance owner on an IBM Z system.
+# The resource package defines how many total number of Cores (GPs or IFLs),
+# how much total memory, and which LPARs within a CPC are assigned to the appliance owner.
+# The parameters below define the resource package to be created and assigned. When installing  
+# two SSAs, ensure that the resource package includes sufficient resources (ifls/gps and memory)
+# to accommodate both SSA LPARs. The allocations defined later in the Install section below
+# for the SSA appliances will be drawn from the total resources specified in the resource package.
+# ------------------------------------------------------------------------------
+#
+# The SSA appliance requires at least 2 IFLs and a minimum of 51200 (in MB) per LPAR. 
+# For better performance, more resource can be assigned depending on the expected workload.
+#
+# Memory should always be a multiple of 1024 (1 GB).
+# ****************************************************************************
+
+####### SSA Package inputs #######
+
+# CPC or machine name (e.g., "T28")
+z_machine_name: "T28"
+
+# Both ifls and gps cant be 0
+# Max value of ifls that can be used for the allocated lpars in a package.
+# Obviously, the CPC should contain more than the specified number here.
+# If none, then specify 0.
+ifls: 0
+
+# Max value of gps that can be used for the allocated lpars.
+# Obviously, the CPC should contain more than the specified number here.
+# If none, then specify 0.
+gps: 10
+
+# Max value of memory (MB) that can be used for the allocated lpars.
+# Obviously, the CPC should contain more than the specified number here.
+memory: 102400
+
+####### First SSA LPAR Configuration #######
+
+# First LPAR name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name in which appliance will be installed
+lpar1_name: "CC10"
+
+# Network interface name for creating resource package (e.g., "interface1")
+interface1_name: "interface1"
+
+# Function ID (e.g., 00A5) used with the SSC network interface
+fid1: "A123"
+
+# Network prefix length for creating resource package (e.g., 23)
+prefix1: 24
+
+# Add VLAN ID if the infrastructure supports VLAN-based LPAR network configuration
+vlan1_id: 123
+
+# Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382")
+chpid1: "xx"
+
+# Port number for the lpar (0 or 1), if CHIP ID available then only port can be added
+zport1: 0
+
+# Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
+disk1_id: "0.0.5abc"
+
+# Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
+is_fcp1: false
+
+# World Wide Port Name (WWPN) To be added only when is_fcp is true
+wwpn1: "500570B46A6"
+
+# Logical Unit Number (LUN) To be added only when is_fcp is true
+lun1: "40164000"
+
+# Appliance IP address for ssa lpar
+app1_ip: "9.152.150.200"
+
+# (IPv4/IPv6) gateway IP address
+gw1_ip: "9.102.0.1"
+
+# Used in 03_acc_ssa_install_check to see if the appliances are functional
+
+# SSA-1's user name (same as on the SSC LPAR)
+lpar1_admin_user: "{{ lookup('env', 'SSA1_APP_USERNAME') }}"
+
+# SSA-1's password (same as on the SSC LPAR)
+lpar1_admin_password: "{{ lookup('env', 'SSA1_APP_PASSWORD') }}"
+
+####### Second SSA LPAR Configuration #######
+
+# Second LPAR name for resource assignment (e.g, "SSC12") should be valid SSA lpar name in which appliance will be installed
+lpar2_name: "CC12"
+
+# Network interface name for creating resource package (e.g., "interface1")
+interface2_name: "interface2"
+
+# Function ID (e.g., 00A5) used with the SSC network interface
+fid2: "A123"
+
+# Network prefix length for creating resource package (e.g., 23)
+prefix2: 24
+
+# Add VLAN ID if the infrastructure supports VLAN-based LPAR network configuration
+vlan2_id: 123
+
+# Channel Path ID (CHPID), if CHIP ID (e.g., "d0") available else FID (e.g., "9382")
+chpid2: "xx"
+
+# Port number for the lpar (0 or 1), if CHIP ID available then only port can be added
+zport2: 0
+
+# Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
+disk2_id: "0.0.5abc"
+
+# Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
+is_fcp2: false
+
+# World Wide Port Name (WWPN) To be added only when is_fcp is true
+wwpn2: "50056A6"
+
+# Logical Unit Number (LUN) To be added only when is_fcp is true
+lun2: "4016400"
+
+# Appliance IP address for ssa lpar
+app2_ip: "9.152.150.200"
+
+# (IPv4/IPv6) gateway IP address
+gw2_ip: "9.102.0.1"
+
+# Used in 03_acc_ssa_install_check to see if the appliances are functional
+
+# SSA-2's user name (same as on the SSC LPAR)
+lpar2_admin_user: "{{ lookup('env', 'SSA2_APP_USERNAME') }}"
+
+# SSA-2's password (same as on the SSC LPAR)
+lpar2_admin_password: "{{ lookup('env', 'SSA2_APP_PASSWORD') }}"
+
+################################################################################
+# From the HMC, select the LPAR you’re working with. In the Tasks panel, 
+# open the Operational Customization drop-down, choose Customize/Delete Activation Profiles,
+# and navigate to the Processor section, check the processor type and value:
+# - Dedicated central processors
+# - Not Dedicated central processors
+# - Dedicated integrated facility for Linux Systems
+# - Not dedicated integrated facility for Linux Systems
+# Based on the selected processor value, determine the appropriate configuration for processor_usage and processor_type
+################################################################################
+
+# Set "processor_type" to "ifl" ("Integrated Facility for Linux Systems") when you're specifying IFL values for resource package
+# otherwise set it to "general-purpose" for central processors
+# Set processor_type for the LPAR (used during image installation)
+# Keep in mind, the processor type defined here correlates to the min_ifl value defined below.
+#   - For example, if min_ifls is set to 2 and processor_type is "ifl", then 2 IFLs will be assigned as the minimum for the appliance. 
+#     If min_ifls is set to 2 and processor_type is "general-purpose", then 2 gps will be assigned as the minimum for the appliance.
+
+processor_type: "general-purpose"
+# Set "processor_usage" to "shared" if the processor in the image profile is "not dedicated", and "dedicated" if it is dedicated.
+# Set processor_usage for the LPAR (used during image installation)
+processor_usage: "shared"
+
+# Number of IFLs, Minimum IFLs required by the appliance (e.g., 2)
+# Note: SSAs require at least 2 IFLs
+min_ifls: 2
+
+# Number of memory, Minimum memory required by the appliance (e.g., 51200)
+# Note: SSAs require at least 50 GB memory
+min_memory: 51200
+
+####### Install #######
+
+# Set "install" to true, to install a new image on a LPAR, or false to reuse the existing disk image
+# - true = install new image
+# - false = use existing disk image
+install: true
+
+# **********************************************************************************************
+# Keep in mind when two SSA appliances are being installed, the cores and memory defined here
+# will be applied to each appliance LPAR individually. 
+# 
+# Always ensure that the resource package defined earlier above provides sufficient capacity
+# to support the appliances being installed.
+# **********************************************************************************************
+
+# Number of cores allocated to the appliance.
+# This value represents the cores assigned to each appliance LPAR.
+app_cores: 2
+
+# Memory (in MB) allocated for the appliance.
+# This value represents the memory assigned to each appliance LPAR.
+app_memory: 51200
+
+# Hostname to assign to the installed image
+# Keep in mind, the LPAR name will be appended as a suffix to this hostname during installation.
+# For example, if hostname is set as "testssa" and the LPAR name is "LP01", the hostname will be "testssa-lp01".
+hostname: "host"
+
+# Set Username for the appliance (used during appliance installation)
+# This is the username of the SSC LPAR.
+# e.g., export APP_USERNAME=appliance_username
+app_username: "{{ lookup('env', 'APP_USERNAME') }}"
+
+# Set Password for the appliance (used during appliance installation)
+# This is the password of the SSC LPAR.
+# e.g., export APP_PASSWORD=appliance_password
+app_password: "{{ lookup('env', 'APP_PASSWORD') }}"
+
+# Available execution mode:
+# . For default ACC (i.e, hmc_managed=true): "default", "prep_lpar_only", "appliance_only", "switch_to_installer"
+# . Standalone ACC (i.e, hmc_managed=false): "appliance_only", "switch_to_installer"
+
+################################################################################
+
+# How to use this execution action for installation in default mode:-
+#   1️. default → when execution action is **default** lpar should be in 'Not activated' mode in HMC.
+
+# How to use this execution action for installation in standalone mode:-
+#   2. appliance_only → when execution action is **appliance_only** lpar should be in 'installer' mode in HMC.
+
+################################################################################
+
+execution_action: "default"
