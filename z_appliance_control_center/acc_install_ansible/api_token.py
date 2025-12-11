@@ -1,7 +1,11 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
 
 """Module for fetching API tokens."""
 
@@ -19,8 +23,10 @@ def get_api_token() -> tuple[int, str, str]:
         tuple[int, str, str]: Status code, token, response text.
     """
     is_private = os.environ.get("IS_PRIVATE", "false").lower() == "true"
+    local_server_port = int(os.environ.get("LOCAL_SERVER_PORT"))
+
     if is_private:
-        url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LOCAL_SERVER_IP')}:{os.environ.get('LOCAL_SERVER_PORT')}{API_TOKEN_URL}"
+        url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LOCAL_SERVER_IP')}:{local_server_port}{API_TOKEN_URL}"
         print(f"TOKEN URL:: {url}")
     else:
         url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LPAR_IP')}{API_TOKEN_URL}"

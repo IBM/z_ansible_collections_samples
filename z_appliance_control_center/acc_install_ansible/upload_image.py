@@ -1,7 +1,11 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
 
 """
 This module automates the process of installing zFAB images to target SSC LPAR.
@@ -42,8 +46,9 @@ def upload_zfab_image(api_token: str, disk: str, image_file: str) -> tuple[int, 
         tuple[int, str]: The HTTP status code and the response text from the server.
     """
     is_private = os.environ.get("IS_PRIVATE", "false").lower() == "true"
+    local_server_port = int(os.environ.get("LOCAL_SERVER_PORT"))
     if is_private:
-        url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LOCAL_SERVER_IP')}:{os.environ.get('LOCAL_SERVER_PORT')}{INSTALL_URL}?id={disk}"
+        url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LOCAL_SERVER_IP')}:{local_server_port}{INSTALL_URL}?id={disk}"
         print(f"UPLOAD URL:: {url}")
     else:
         url = f"{os.environ['HTTP_SCHEME']}://{os.environ['LPAR_IP']}{INSTALL_URL}?id={disk}"
@@ -87,8 +92,9 @@ def select(api_token: str, disk: str, lun: str=None, wwpn: str=None) -> tuple[in
         tuple[int, str]: The HTTP status code and the response text from the server.
     """
     is_private = os.environ.get("IS_PRIVATE", "false").lower() == "true"
+    local_server_port = int(os.environ.get("LOCAL_SERVER_PORT"))
     if is_private:
-        url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LOCAL_SERVER_IP')}:{os.environ.get('LOCAL_SERVER_PORT')}{SELECT_URL}"
+        url = f"{os.environ.get('HTTP_SCHEME')}://{os.environ.get('LOCAL_SERVER_IP')}:{local_server_port}{SELECT_URL}"
         print(f"SELECT DISK URL:: {url}")
     else:
         url = f"{os.environ['HTTP_SCHEME']}://{os.environ['LPAR_IP']}{SELECT_URL}"

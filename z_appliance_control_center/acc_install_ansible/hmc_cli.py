@@ -1,7 +1,11 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
 
 import random
 import string
@@ -156,7 +160,7 @@ def installer():
 @installer.command()
 def soft():
     """Switch from appliance to installer mode softly"""
-    click.echo("Soft Insattler Mode, which is switching from Appliance to Installer Mode...")
+    click.echo("Soft installer Mode, which is switching from Appliance to Installer Mode...")
     installer_action("activate")
 
 @installer.command()
@@ -165,7 +169,7 @@ def hard():
     click.echo("Switching to installer mode with image removal...")
     image_action("activate")
     image_task()
-    click.echo("Image task is done succesfully ✅")
+    click.echo("Image task is done successfully ✅")
     click.echo("Invoking lpar boot status...")
     check_lpar_boot_status()
 
