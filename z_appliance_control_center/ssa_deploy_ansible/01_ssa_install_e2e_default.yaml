@@ -1,0 +1,750 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Renamed other_usecases_ansible/07_ssa_install_e2e.yaml to          |
+# *|     ssa_deploy_ansible/01_ssa_install_e2e_default.yaml.                |
+# *|   - Added checking of environment variables                            |
+# *+------------------------------------------------------------------------+
+
+# Tested with OSA and FCP devices, on non-DPM mode machine.
+
+- name: ACC playbook, run by appliance-owner for installing 2x SSA appliances
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - env_vars.yaml
+
+  pre_tasks:
+    - name: Reminder - Export credentials
+      ansible.builtin.pause:
+        prompt: |
+
+
+          Before running this playbook, please export credentials:
+
+          export HMC_USER=<enter_HMC_username>
+          export HMC_PASSWORD=<enter_HMC_password>
+
+          export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+          export ACC_OWNER_PASSWORD=<owner_new_password>
+
+          export APP_USERNAME=<appliance_username>
+          export APP_PASSWORD=<appliance_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - HMC_USER
+          - HMC_PASSWORD
+          - ACC_OWNER_DEFAULT_PASSWORD
+          - ACC_OWNER_PASSWORD
+          - APP_USERNAME
+          - APP_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+    - name: "Reminder for Re-run"
+      tags: retry
+      ansible.builtin.pause:
+        prompt: |
+
+          REMINDER: If you need to re-run this playbook, certain tasks may fail
+          during subsequent executions. To prevent these failures, comment
+          out the applicable tasks listed below that were successfully completed
+          in previous runs.
+
+            00 - Initialize ACC
+            01 - Update ACC-admin password
+            04 - Create an appliance-owner for both SSAs
+            05 - Assign resources to the SSA owner
+            07 - Update the password of SSA appliance-owner
+            09 - Upload the SSA appliance image to the ACC
+
+          The above tasks should only be executed once, otherwise errors may occur.
+
+          If you are re-running this playbook due to an error that occurred during
+          or after the execution of task '09 - Upload the SSA appliance image to the ACC'. The
+          tag 'retry' can be used to skip all of the problematic tasks.
+          For example: ansible-playbook 01_ssa_install_e2e_default.yaml -t retry
+
+          Press enter (or ctrl+C then C) to continue.
+          If you want to abort and modify this playbook, press Ctrl+C then A.
+
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC LPAR's username"
+      private: false
+
+    - name: cc_admin_old_password
+      prompt: "Enter ACC LPAR's password"
+      private: true
+
+    - name: cc_admin_password
+      prompt: "Enter ACC-admin's new password"
+      private: true
+
+    - name: run_init
+      prompt: "Do you want to initialize ACC? If you have already, then please type no. (yes/no)"
+      private: false
+      default: "yes"
+
+  tasks:
+    - name: Prepare ACC URL
+      tags: admin, owner, retry
+      ansible.builtin.set_fact:
+        cc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
+
+    - name: Printing the ACC url
+      tags: admin, owner, retry
+      ansible.builtin.debug:
+        msg: "{{ cc_url }}"
+
+    - name: Prepare execution_action
+      tags: retry
+      ansible.builtin.set_fact:
+        execution_action: "{{ execution_action }}"
+
+    - name: Printing execution_action
+      tags: admin, owner, retry
+      ansible.builtin.debug:
+        msg: "{{ execution_action }}"
+
+    - name: 00 - Initialize ACC
+      tags: admin
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/init"
+        body:
+          mfa_enable: "{{ mfa_enabled }}"
+          hmc_managed: true
+          credentials:
+            username: "{{ cc_admin_user }}"
+            password: "{{ cc_admin_old_password }}"
+        body_format: json
+        method: POST
+        validate_certs: false
+        return_content: true
+      when: run_init | lower == "yes"
+      register: init_response
+
+    - name: Print init response
+      tags: admin
+      ansible.builtin.debug:
+        var: init_response.json
+
+    - name: Show the temporary OTP secret for admin
+      tags: admin
+      ansible.builtin.debug:
+        msg:
+          - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
+          - "{{ init_response.json.totp_secret }}"
+      when: mfa_enabled | bool
+
+    - name: Wait for user to generate OTP from totp_secret
+      tags: admin
+      ansible.builtin.pause:
+        prompt: "Enter OTP generated from the above totp_secret:"
+      register: otp_input
+      when: mfa_enabled | bool
+
+    - name: 01 - Update ACC-admin password (remove this if already done)
+      tags: admin
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user"
+        body:
+          username: "{{ cc_admin_user }}"
+          old_password: "{{ cc_admin_old_password }}"
+          new_password: "{{ cc_admin_password }}"
+          otp: "{{ (otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        method: PUT
+        validate_certs: false
+        return_content: true
+      register: update_password_response
+
+    - name: Print password update response
+      tags: admin
+      ansible.builtin.debug:
+        var: update_password_response.json
+
+    - name: Show admin MFA secret
+      tags: admin
+      ansible.builtin.debug:
+        msg:
+          - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
+          - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
+          - "{{ update_password_response.json.mfa_secret }}"
+      when: mfa_enabled | bool
+
+    - name: Wait for user to generate admin OTP with mfa_secret
+      tags: admin, retry
+      ansible.builtin.pause:
+        prompt: "Enter OTP generated from the above admin mfa_secret:"
+      register: mfa_admin_otp_input
+      when: mfa_enabled | bool
+
+    - name: 02 - Get authentication token from the ACC as admin
+      tags: admin, retry
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+          otp: "{{ (mfa_admin_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the ACC-admin's token
+      tags: admin, retry
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 03 - Set HMC configuration in the ACC (default mode, can take 10 mins)
+      tags: admin, retry
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/config/hmcconfig"
+        timeout: 600
+        method: POST
+        body:
+          host: "{{ hmc_url }}"
+          userid: "{{ hmc_user }}"
+          password: "{{ hmc_password }}"
+          verify_cert: false
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        status_code: 204
+      register: response
+
+    - name: 04 - Create an appliance-owner for both SSAs
+      tags: admin
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_default_password }}"
+          email: "{{ cc_owner_email }}"
+          role: "owner"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 204
+        validate_certs: false
+      register: response
+
+    - name: 05 - Assign resources to the SSA owner
+      tags: admin
+      block:
+        - name: Gathering Network Parameters for LPARs
+          ansible.builtin.set_fact:
+            var_details1:
+              name: "{{ interface1_name }}"
+              prefix: "{{ prefix1 }}"
+              ip: "{{ app1_ip }}"
+              gw: "{{ gw1_ip }}"
+            var_details2:
+              name: "{{ interface2_name }}"
+              prefix: "{{ prefix2 }}"
+              ip: "{{ app2_ip }}"
+              gw: "{{ gw2_ip }}"
+
+        - name: IMPORTANT - Network Card Type Selection
+          ansible.builtin.debug:
+            msg: |
+              Select the correct network card type based on the system configuration.
+              Selection Criteria:
+                - If CHPID and Port are provided -> choose OSA
+                - If FID is provided -> choose NETH
+
+        - name: Enter network card type for 1st LPAR
+          ansible.builtin.pause:
+            prompt: "Enter network card type to be used for LPAR {{ lpar1_name }}: (OSA/NETH)"
+          register: net_type1_raw
+
+        - name: Normalize network type 1
+          ansible.builtin.set_fact:
+            net_type1: "{{ net_type1_raw.user_input | trim | upper }}"
+
+        - name: Validate network type
+          ansible.legacy.fail:
+            msg: "Invalid input! Allowed values: OSA, NETH"
+          when: net_type1 not in ['OSA', 'NETH']
+
+        - name: VLAN configuration
+          ansible.builtin.pause:
+            prompt: "Does the LPAR {{ lpar1_name }} need VLAN configuration? (yes/no)"
+          register: vlan_1_raw
+
+        - name: Normalize VLAN input for LPAR1
+          ansible.builtin.set_fact:
+            vlan_1: "{{ (vlan_1_raw.user_input | trim | lower) == 'yes' }}"
+
+        - name: Validate VLAN confirmation
+          ansible.builtin.fail:
+            msg: "Invalid input"
+          when: vlan_1_raw.user_input | trim | lower not in ['yes', 'no']
+
+        - name: IMPORTANT - Boot Disk Selection
+          ansible.builtin.debug:
+            msg: |
+              Select the correct disk type based on the system configuration.
+                - For FCP disk, ensure that valid values for 'wwpn1' and 'lun1' are provided
+                - For DASD disk, the 'wwpn1' and 'lun1' values are not required
+
+
+        - name: Enter boot disk type for 1st LPAR [DASD/FCP]
+          ansible.builtin.pause:
+            prompt: "Enter boot disk type for LPAR {{ lpar1_name }}: (DASD/FCP)"
+          register: is_fcp_1_raw
+
+        - name: Normalize boot disk 1
+          ansible.builtin.set_fact:
+            is_fcp_1: "{{ is_fcp_1_raw.user_input | trim | upper }}"
+
+        - name: Validate disk type
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: is_fcp_1 not in ['DASD', 'FCP']
+
+        - name: Enter network card type for 2nd LPAR
+          ansible.builtin.pause:
+            prompt: "Enter network card type to be used for LPAR {{ lpar2_name }}: (OSA/NETH)"
+          register: net_type2_raw
+
+        - name: Normalize network type 2
+          ansible.builtin.set_fact:
+            net_type2: "{{ net_type2_raw.user_input | trim | upper }}"
+
+        - name: Validate Network type
+          ansible.legacy.fail:
+            msg: "Invalid input! Allowed values: OSA, NETH"
+          when: net_type2 not in ['OSA', 'NETH']
+
+        - name: VLAN Configuration
+          ansible.builtin.pause:
+            prompt: "Does the LPAR {{ lpar2_name }} need VLAN configuration? (yes/no)"
+          register: vlan_2_raw
+
+        - name: Normalize VLAN input for LPAR1
+          ansible.builtin.set_fact:
+            vlan_2: "{{ (vlan_2_raw.user_input | trim | lower) == 'yes' }}"
+
+        - name: Validate VLAN confirmation
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: vlan_2_raw.user_input | trim | lower not in ['yes', 'no']
+
+        - name: Enter boot disk type for 2nd LPAR [DASD/FCP]
+          ansible.builtin.pause:
+            prompt: "Enter boot disk type for LPAR {{ lpar2_name }}: (DASD/FCP)"
+          register: is_fcp_2_raw
+
+        - name: Normalize boot disk 2
+          ansible.builtin.set_fact:
+            is_fcp_2: "{{ is_fcp_2_raw.user_input | trim | upper }}"
+
+        - name: Validate Disk type
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: is_fcp_2 not in ['DASD', 'FCP']
+
+        - name: Entered values for network by the user
+          ansible.builtin.debug:
+            msg:
+              - "{{ net_type1 }}"
+              - "{{ net_type2 }}"
+              - "{{ vlan_1 }}"
+              - "{{ vlan_2 }}"
+              - "{{ is_fcp_1 }}"
+              - "{{ is_fcp_2 }}"
+
+        - name: Preparing OSA params for "{{ lpar1_name }}"
+          ansible.builtin.set_fact:
+            nw_details1: >-
+              {{ var_details1
+                  | combine({'chpid': chpid1, 'port': zport1})
+                  | combine(vlan_1 | ternary({'vlan_id':vlan1_id}, {})
+                  ) }}
+          when: net_type1 == 'OSA'
+
+        - name: Preparing OSA params for "{{ lpar2_name }}"
+          ansible.builtin.set_fact:
+            nw_details2: >-
+              {{ var_details2
+                | combine({'chpid': chpid2, 'port': zport2})
+                | combine(vlan_2 | ternary({'vlan_id':vlan2_id}, {})
+                ) }}
+          when: net_type2 == 'OSA'
+
+        - name: Preparing NETH params for {{ lpar1_name }}
+          ansible.builtin.set_fact:
+            nw_details1: "{{ var_details1 | combine({'fid': fid1}) | combine(vlan_1 | ternary({'vlan_id': vlan1_id}, {})) }}"
+          when: net_type1 == 'NETH'
+
+        - name: Preparing NETH params for {{ lpar2_name }}
+          ansible.builtin.set_fact:
+            nw_details2: "{{ var_details2 | combine({'fid': fid2}) | combine(vlan_2 | ternary({'vlan_id': vlan2_id}, {})) }}"
+          when: net_type2 == 'NETH'
+
+        - name: Preparing boot params for {{ lpar1_name }}
+          ansible.builtin.set_fact:
+            boot_info1: "{{ {'disk-id': disk1_id} | combine((is_fcp_1 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn1, 'lun': lun1}, {'is-fcp': false})) }}"
+
+        - name: Preparing boot params for {{ lpar2_name }}
+          ansible.builtin.set_fact:
+            boot_info2: "{{ {'disk-id': disk2_id} | combine((is_fcp_2 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn2, 'lun': lun2}, {'is-fcp': false})) }}"
+
+        - name: Creating the API request for resource pkg creation
+          ansible.builtin.set_fact:
+            body: >-
+              {{
+                {
+                  'owner': cc_owner_user,
+                  'name': ssa_package_name,
+                  'ifls': ifls,
+                  'gps': gps,
+                  'memory': memory,
+                  'lpars':[
+                    {
+                      'name': lpar1_name,
+                      'interfaces':[ nw_details1 ],
+                      'boot-info': boot_info1
+                      },
+                  { 'name': lpar2_name,
+                    'interfaces': [ nw_details2 ],
+                      'boot-info': boot_info2
+                    }
+                  ],
+                  'cpc':  z_machine_name,
+                  'x86': "dummy"
+                }
+              }}
+        - name: Resource package request body
+          ansible.builtin.debug:
+            var: body
+
+        - name: Submitting the request to ACC to create package with 2 SSA LPARs
+          tags: admin
+          ansible.builtin.uri:
+            url: "{{ cc_url }}/resource/pkgs"
+            timeout: 300
+            method: POST
+            body: "{{ body }}"
+
+            body_format: json
+            headers:
+              Authorization: "Bearer {{ access_token }}"
+              Content-Type: application/json
+            validate_certs: false
+            status_code: 200
+          register: response
+
+        - name: Printing the response for create package
+          tags: owner, install
+          ansible.builtin.debug:
+            msg: "{{ response.json }}"
+
+        - name: Check if SSA LPARs are already activated
+          vars:
+            lpars_sync_list: "{{ response.json.lpars_sync_scheduled | from_yaml }}"
+          when: lpars_sync_list | length > 0
+          ansible.builtin.fail:
+            msg: >
+
+              ⚠️ WARNING: One or more LPARs are in *Operating* state in HMC.
+              Please be cautious before performing installation.
+              LPARs: {{ lpars_sync_list }}
+
+    - name: 06 - Generate temporary 2FA secret for owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/mfa/secret/owner"
+        body:
+          username: "{{ cc_owner_user }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: totp_response
+      when: mfa_enabled | bool
+
+    - name: Print create owner totp secret response
+      tags: owner
+      ansible.builtin.debug:
+        var: totp_response.json
+      when: mfa_enabled | bool
+
+    - name: Show the temporary OTP secret for owner
+      tags: owner
+      ansible.builtin.debug:
+        msg:
+          - "Please copy this TOTP secret and generate OTP using any authenticator app to update owner password:"
+          - "{{ totp_response.json.secret }}"
+      when: mfa_enabled | bool
+
+    - name: Wait for user to generate OTP
+      tags: owner
+      ansible.builtin.pause:
+        prompt: "Enter owner OTP generated from the above totp_secret:"
+      register: otp_input
+      when: mfa_enabled | bool
+
+    - name: 07 - Update the password of ACC appliance-owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user"
+        body:
+          username: "{{ cc_owner_user }}"
+          old_password: "{{ cc_owner_default_password }}"
+          new_password: "{{ cc_owner_password }}"
+          otp: "{{ (otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        method: PUT
+        validate_certs: false
+        return_content: true
+      register: owner_update_password_response
+
+    - name: Print owner password update response
+      tags: owner
+      ansible.builtin.debug:
+        var: owner_update_password_response.json
+      when: mfa_enabled | bool
+
+    - name: Show owner MFA secret
+      tags: owner
+      ansible.builtin.debug:
+        msg:
+          - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
+          - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
+          - "{{ owner_update_password_response.json.mfa_secret }}"
+      when: mfa_enabled | bool
+
+    - name: Wait for user to generate OTP for owner
+      tags: owner, retry
+      ansible.builtin.pause:
+        prompt: "Enter OTP generated from the above owner mfa_secret:"
+      register: mfa_owner_otp_input
+      when: mfa_enabled | bool
+
+    - name: 08 - Get authentication token from the ACC as appliance-owner
+      tags: owner, retry
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ (mfa_owner_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the owner token
+      tags: owner, retry
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 09 - Upload the SSA appliance image to the ACC
+      tags: owner
+      ansible.builtin.shell: 'curl -k -X "POST" \
+        "{{ cc_url }}/images" \
+        -H "Authorization: Bearer {{ access_token }}" \
+        -H "Content-Type: multipart/form-data" \
+        -F "data=@{{ image_path }}" \
+        -F "image_type={{ image_type }}" \
+        -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      register: response
+      changed_when: false
+      failed_when: >
+        response.rc != 0 or
+        (response.stdout is defined and 'exception' in response.stdout | lower)
+      # noqa command-instead-of-module command-instead-of-shell
+
+    - name: 10 - Get image information
+      tags: owner, retry
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/images"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+      failed_when: response.json.images | length == 0
+
+    - name: Printing the response for upload image
+      tags: owner, install, retry
+      ansible.builtin.debug:
+        msg: "{{ response.json }}"
+
+    - name: Extract the image ID from the DB
+      tags: owner, install, retry
+      ansible.builtin.set_fact:
+        image_id: "{{ response.json.images[-1].id }}"
+
+    - name: 11 - As owner, install and activate the image
+      tags: owner, retry
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/cluster/activate"
+        method: POST
+        body: |
+          {
+            "{{ ssa_package_name }}":
+            {
+              "image_id": {{ image_id }},
+              "processor_usage": "{{ processor_usage }}",
+              "processor_type": "{{ processor_type }}",
+              "memory": {{ app_memory }},
+              "cores": {{ app_cores }},
+              "username": "{{ app_username }}",
+              "password": "{{ app_password }}",
+              "hostname": "{{ hostname }}",
+              "lpars": [
+                  {
+                    "name": "{{ lpar1_name }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  },
+                  {
+                    "name": "{{ lpar2_name }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  }
+                ]
+              }
+            }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+      register: response
+
+    - name: Printing the response for installation
+      tags: owner, install, retry
+      ansible.builtin.debug:
+        msg: "{{ response.json }}"
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15
+
+    # Extract all task IDs from response
+    - name: Extract task IDs dynamically
+      tags: owner, install, retry
+      ansible.builtin.set_fact:
+        task_ids: >-
+          {{
+            response.json
+            | dict2items
+            | map(attribute='value')
+            | map('dict2items')
+            | flatten
+            | map(attribute='value')
+            | selectattr('task_id', 'defined')
+            | map(attribute='task_id')
+            | list
+          }}
+
+    - name: Print extracted task IDs
+      tags: owner, install, retry
+      ansible.builtin.debug:
+        msg: >-
+          {% if task_ids | length > 0 %}
+            Task IDs for active LPARs: {{ task_ids | join(', ') }}
+          {% else %}
+            No task IDs found — activation failed.
+          {% endif %}
+
+    - name: Fail playbook if no task IDs were generated
+      tags: owner, install, retry
+      ansible.builtin.fail:
+        msg: >
+          ❌ No task IDs Found.
+          This indicates activation failed before tasks could be created.
+          Please check the previous step's response for details.
+      when: task_ids | length == 0
+
+    - name: 04 - Get status of each install task
+      loop: "{{ task_ids }}"
+      loop_control:
+        loop_var: task_id
+      tags: owner, install, retry
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/tasks/{{ task_id }}/status"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: task_status
+
+    - name: Print task status responses
+      tags: owner, install, retry
+      ansible.builtin.debug:
+        msg: "{{ item.json }}"
+      loop: "{{ task_status.results | default([task_status]) }}"
+      loop_control:
+        label: "Task ID {{ item.task_id | default('unknown') }}"
+      when: item.json is defined
+    - name: Notify user if task is In progress
+      ansible.builtin.debug:
+        msg: >
+          ⏳ One or more tasks are still in progress. Please check the current
+          status of in-progress task using the ACC API endpoints below. Be sure
+          to include the API token in the header in order to view the necessary
+          information.
+          {%- set in_progress = task_status.results
+            | selectattr('json.action-status', 'defined')
+            | selectattr('json.action-status', 'match', '(?i)in progress')
+            | map(attribute='task_id')
+            | list %}
+          {%- for id in in_progress %}
+          * {{ cc_url }}/tasks/{{ id }}/status
+          {%- endfor %}
+      when: >
+        task_status.results
+        | selectattr('json.action-status', 'defined')
+        | selectattr('json.action-status', 'match', '(?i)In progress')
+        | list
+        | length > 0
+
+    - name: Fail playbook if any task failed
+      ansible.builtin.fail:
+        msg: >
+          ❌ One or more install tasks have failed.
+          Failed Task IDs: {{
+            task_status.results
+            | selectattr('json.action-status', 'defined')
+            | selectattr('json.action-status', 'match', '(?i)fail')
+            | map(attribute='task_id')
+            | list
+          }}
+      when: >
+        task_status.results
+        | selectattr('json.action-status', 'defined')
+        | selectattr('json.action-status', 'match', '(?i)fail')
+        | list
+        | length > 0

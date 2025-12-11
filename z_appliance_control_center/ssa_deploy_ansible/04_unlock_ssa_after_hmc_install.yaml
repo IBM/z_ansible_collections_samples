@@ -1,0 +1,235 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Initial release                                                    |
+# *+------------------------------------------------------------------------+
+
+- name: ACC Playbook, run by appliance-owner, for appliance-owner actions
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - env_vars.yaml
+
+  pre_tasks:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export appliance-owner credentials:
+
+          export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+          export ACC_OWNER_PASSWORD=<owner_new_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_DEFAULT_PASSWORD
+          - ACC_OWNER_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+    - name: Display purpose of this playbook
+      ansible.builtin.debug:
+        msg: "{{ playbook_info.split('\n') }}"
+      vars:
+        playbook_info: |
+          📌 ** Purpose of This Playbook **
+                Use this playbook only if you have:
+                - Installed ACC.
+                - Ran the playbooks for performing admin actions.
+                - Assigned 2 LPARs as an admin to the appliance-owner.
+                - Installed SSAs using the HMC's UI, without using the ansible playbooks provided in this repo.
+                - SSA LPARs are activated.
+                - Updated the env_vars.yaml file in this directory.
+
+            Please follow the process explained in Chapter-2 and Chapter-3 of Spyre Accelerator Guide:
+            https://www.ibm.com/docs/de/module_1721331501652/pdf/GC28-7071-00.pdf
+
+  vars_prompt:
+    - name: cc_admin_user
+      prompt: "Enter ACC LPAR's username"
+      private: false
+
+    - name: cc_admin_password
+      prompt: "Enter ACC-admin's new password"
+      private: true
+
+    - name: update_owner_password
+      prompt: "Do you want to update the owner password? If no, we will skip password update. (yes/no)"
+      private: false
+      default: "yes"
+
+  tasks:
+    - name: Prepare ACC URL
+      tags: admin, owner, retry
+      ansible.builtin.set_fact:
+        cc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
+
+    - name: Printing the ACC url
+      tags: admin, owner
+      ansible.builtin.debug:
+        msg: "{{ cc_url }}"
+
+    - name: 00 - Check MFA is enabled or not
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no):"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.builtin.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for TOTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA TOTP generated for admin:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the admin token
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 04 - Generate temporary MFA secret for owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/mfa/secret/owner"
+        body:
+          username: "{{ cc_owner_user }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: totp_response
+      when: mfa_enabled | bool
+
+    - name: Print the MFA secret creation response
+      tags: owner
+      ansible.builtin.debug:
+        var: totp_response.json
+      when: mfa_enabled | bool
+
+    - name: Show the temporary MFA secret of owner
+      tags: owner
+      ansible.builtin.debug:
+        msg:
+          - "Please copy this MFA secret and generate TOTP using any authenticator app to update owner password:"
+          - "{{ totp_response.json.secret }}"
+      when: mfa_enabled | bool
+
+    - name: Wait for user to generate TOTP
+      tags: owner
+      ansible.builtin.pause:
+        prompt: "Enter owner TOTP generated from the above secret:"
+      register: otp_input
+      when: mfa_enabled | bool
+
+    - name: 05 - Update the password of ACC appliance-owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user"
+        body:
+          username: "{{ cc_owner_user }}"
+          old_password: "{{ cc_owner_default_password }}"
+          new_password: "{{ cc_owner_password }}"
+          otp: "{{ (otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        method: PUT
+        validate_certs: false
+        return_content: true
+      register: owner_update_password_response
+      when: update_owner_password | lower == "yes"
+
+    - name: Print owner password update response
+      tags: owner
+      ansible.builtin.debug:
+        var: owner_update_password_response.json
+      when: mfa_enabled | bool
+
+    - name: Show owner MFA secret
+      tags: owner
+      ansible.builtin.debug:
+        msg:
+          - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
+          - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
+          - "{{ owner_update_password_response.json.mfa_secret }}"
+      when: mfa_enabled | bool
+
+    - name: Wait for user to generate TOTP for owner
+      tags: owner
+      ansible.builtin.pause:
+        prompt: "Enter TOTP generated from the above owner mfa_secret"
+      register: mfa_owner_otp_input
+      when: mfa_enabled | bool
+
+    - name: 06 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 07 - Get list of active SSAs
+      ansible.builtin.uri:
+        url: "{{ cc_url }}/resource/quotas"
+        method: GET
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+      register: quotas_response
+
+    - name: Fail if no active SSAs found
+      ansible.builtin.fail:
+        msg: "No active SSAs found for this owner."
+      when: quotas_response.json | length == 0
+
+    - name: Print active SSAs summary
+      ansible.builtin.debug:
+        msg: >
+          {% for app in quotas_response.json %}
+            ID: {{ app.id }},
+            Name: {{ app.name }},
+            IP: {{ app.interfaces[0].ip | default('N/A') }},
+            Status: {{ 'Locked' if app.is_locked else 'Unlocked' }}
+          {% endfor %}
+
+    - name: 08 - Unlock appliances one by one
+      ansible.builtin.include_tasks: ../other_usecases_ansible/11_unlock_each_appliance.yaml
+      loop: "{{ quotas_response.json }}"
+      loop_control:
+        loop_var: appliance
