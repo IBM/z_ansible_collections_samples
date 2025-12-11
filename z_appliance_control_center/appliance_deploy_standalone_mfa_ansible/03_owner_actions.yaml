@@ -1,33 +1,49 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Renamed 03_owner_action.yaml to 03_owner_actions.yaml              |
+# *|   - Added checking of environment variables                            |
+# *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
   hosts: localhost
-  gather_facts : true
+  gather_facts: true
   vars_files:
     - owner_vars.yaml
 
   pre_tasks:
-  - name: Reminder - Export appliance-owner credentials
-    pause:
-      prompt: |
-        Before running this playbook, please export appliance-owner credentials:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export appliance-owner credentials:
 
-        export ACC_ADMIN_PASSWORD=<admin_new_password>
-        export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
-        export ACC_OWNER_PASSWORD=<owner_new_password>
+          export ACC_ADMIN_PASSWORD=<admin_new_password>
+          export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
+          export ACC_OWNER_PASSWORD=<owner_new_password>
 
-        Press Ctrl+C now to cancel if you haven't done this.
-        The playbook will continue shortly.
-      seconds: 5
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
 
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_ADMIN_PASSWORD
+          - ACC_OWNER_DEFAULT_PASSWORD
+          - ACC_OWNER_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
 
   tasks:
-
     - name: Wait for user to generate OTP using admin mfa secret
-      pause:
+      ansible.builtin.pause:
         prompt: "Enter OTP generated from the admin mfa_secret:"
       register: mfa_otp_input
 
@@ -45,12 +61,12 @@
       register: auth_response
 
     - name: Printing the response of authentication
-      debug:
-        msg: 
+      ansible.builtin.debug:
+        msg:
           - "{{ auth_response.json.access_token }}"
 
     - name: Extract the admin token
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
     - name: 01 - Generate temporary 2FA secret for owner
@@ -68,17 +84,17 @@
       register: totp_response
 
     - name: Print create owner totp secret response
-      debug:
+      ansible.builtin.debug:
         var: totp_response.json
 
     - name: Show the temparory OTP secret
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update owner password:"
           - "{{ totp_response.json.secret }}"
-    
+
     - name: Wait for user to generate OTP
-      pause:
+      ansible.builtin.pause:
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
 
@@ -88,7 +104,7 @@
         url: "{{ acc_ip }}/user"
         body:
           username: "{{ cc_owner_user }}"
-          old_password: "{{ cc_owner_default_password}}"
+          old_password: "{{ cc_owner_default_password }}"
           new_password: "{{ cc_owner_password }}"
           otp: "{{ otp_input.user_input }}"
         body_format: json
@@ -98,21 +114,21 @@
       register: update_password_response
 
     - name: Print owner password update response
-      debug:
+      ansible.builtin.debug:
         var: update_password_response.json
 
     - name: Show owner MFA secret
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
 
-    # Note: The above tasks are intended for one-time execution. 
+    # Note: The above tasks are intended for one-time execution.
     # Please comment them out after running once. when you want to generate access token
 
     - name: Wait for user to generate OTP for owner
-      pause:
+      ansible.builtin.pause:
         prompt: "Enter OTP generated from the above owner mfa_secret:"
       register: mfa_otp_input
 
@@ -132,27 +148,32 @@
 
     - name: Printing the response
       tags: owner
-      debug:
-        msg: 
+      ansible.builtin.debug:
+        msg:
           - "{{ auth_response.json.access_token }}"
 
     - name: Extract the token
       tags: owner, install
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
     - name: 04 - Upload appliance image to the ACC as owner
       tags: owner
       # Unfortunately, the uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
-      shell: 'curl -k -X "POST" \
-              "{{ acc_ip }}/images" \
-              -H "Authorization: Bearer {{ access_token }}" \
-              -H "Content-Type: multipart/form-data" \
-              -F "data=@{{ image_path }}" \
-              -F "image_type={{ image_type }}" \
-              -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
+      ansible.builtin.shell: 'curl -k -X "POST" \
+        "{{ acc_ip }}/images" \
+        -H "Authorization: Bearer {{ access_token }}" \
+        -H "Content-Type: multipart/form-data" \
+        -F "data=@{{ image_path }}" \
+        -F "image_type={{ image_type }}" \
+        -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
       register: response
+      changed_when: false
+      failed_when: >
+        response.rc != 0 or
+        (response.stdout is defined and 'exception' in response.stdout | lower)
+      # noqa command-instead-of-module command-instead-of-shell
 
     - name: 05 - Get image information
       tags: owner, install
@@ -164,26 +185,27 @@
           Content-Type: application/json
         validate_certs: false
       register: response
+      failed_when: response.json.images | length == 0
 
-    - name: Printing the response
+    - name: Printing the response for upload image
       tags: owner, install
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
 
     - name: Extract the image ID from the DB
       tags: owner, install
-      set_fact:
+      ansible.builtin.set_fact:
         image_id: "{{ response.json.images[-1].id }}"
 
     - name: Printing the image ID
       tags: owner, install
-      debug:
+      ansible.builtin.debug:
         msg: "{{ image_id }}"
 
     - name: Save image_id into owner_vars.yaml
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "./owner_vars.yaml"
-        regexp: '^image_id:'
+        regexp: "^image_id:"
         line: "image_id: {{ image_id }}"
-        create: yes
-
+        create: true
+        mode: "0600"
