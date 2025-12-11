@@ -162,8 +162,7 @@ the ACC.
 
 #### ACC-Admin and Appliance-Owner Credentials
 
-The default ACC-admin credentials are LPAR credentials, which must be updated
-before using ACC. These credentials are username and password.
+The default ACC-admin credentials correspond to the ACC LPAR credentials. These default credentials must be updated using the [update password](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=reference-user-management#api_reference__title__3) ACC API endpoint. These credentials must be updated before issuing any other ACC API requests.
 
 Moreover, the ACC-admin creates credentials for the appliance-owners, and the
 appliance-owners must update the credentials before sending any commands to ACC.
@@ -179,6 +178,19 @@ the appliance-owner when installing the appliances using ACC.
 
 If the appliances are already active, then the appliance-owner can provide their
 credentials to the ACC using the unlock API.
+
+#### Providers and Consumers of Credentials
+
+The diagram below shows who provides the credentials to ACC, and how ACC uses
+these credentials. For example, HMC credentials are provided by the ACC-admin,
+which are used by ACC for actions on the HMC (e.g., activating LPARs).
+Appliance-owners provide appliance credentials, which are the usernames and
+passwords of the SSC LPARs, and ACC uses these credentials to create a token
+and run actions on the appliances (e.g., updating the appliances).
+
+![Credentials stored by ACC](images/credentials.png)
+
+  - **Note**: The diagram above does not depict a few key processes, including how the ACC administrator creates the appliance-owner credentials, how the appliance owner updates those credentials, and how ACC securely stores their hashed values.
 
 ## Playbook Directory Structure
 
@@ -199,11 +211,13 @@ is deployed, configured and used.
 
 Therefore, you must consider the right directory before using these playbooks with ACC.
 
-For example, If your focus is to install 2x SSAs using these playbooks, then
+For example, if your focus is to install 2x SSAs using these playbooks, then
 you can either use the playbooks in `appliance_deploy_*` directory, or use the
-right playbook in the `ssa_deploy_ansible` directory. The figure below shows the
-path you can follow to install SSAs using the end-to-end playbooks using the
-`ssa_deploy_ansible` directory.
+right playbook in the `ssa_deploy_ansible` directory.
+
+### Ansible Workflow Diagram for ACC/SSA Deployment
+
+The figure below outlines the available paths for installing ACC/SSA appliances using the playbooks mentioned in the directories listed above:
 
 ![SSA Install Process](images/ssa_install.png)
 
@@ -394,7 +408,7 @@ curl -k -X GET \
 
 Using the `/api/config/hmcconfig`, ACC-admin can add information about the CPCs
 and the LPARs on the HMC to the default mode ACC. However, if the HMC is
-handling multiple CPC (e.g., >20), then a timeout can occur. This is because
+handling multiple CPCs (e.g., >20), then a timeout can occur. This is because
 ACC pulls information about the CPCs and all their LPARs from the HMC as a
 blocking call to the HMC.
 
