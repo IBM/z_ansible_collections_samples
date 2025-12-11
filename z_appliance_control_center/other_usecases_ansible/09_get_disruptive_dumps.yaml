@@ -1,41 +1,46 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+--------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                               |
+# *| [10.17.2025]                                                             |
+# *|   - Tested with ACC 1.2.6                                                |
+# *|   - Initial release                                                      |
+# *| [12.12.2025]                                                             |
+# *|   - Tested with ACC 1.2.10                                               |
+# *|   - Renamed 11_get_disruptive_dumps.yaml to 09_get_disruptive_dumps.yaml |
+# *+--------------------------------------------------------------------------+
 
 - name: ACC Playbook - Trigger disruptive dump and collect logs from appliance
   hosts: localhost
-  gather_facts: no
+  gather_facts: true
 
   vars_prompt:
     - name: "ssc_ip"
       prompt: "Enter SSC LPAR IP"
-      private: no
+      private: false
     - name: "lpar_username"
       prompt: "Enter SSC LPAR username"
-      private: no
+      private: false
     - name: "lpar_password"
       prompt: "Enter SSC LPAR password"
-      private: yes
+      private: true
     - name: reason
       prompt: "Enter reason to trigger disruptive dump"
-      private: no
+      private: false
     - name: output_dir
       prompt: "Enter output directory path for dump files (e.g. /tmp/dumps)"
-      private: no
+      private: false
 
   vars:
     api_base_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
-    port: 443
+    api_port: 443
     wait_interval: 30
     max_wait: 900
     cur_timestamp: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
 
   tasks:
     - name: Display current timestamp
-      debug:
+      ansible.builtin.debug:
         msg: "Run timestamp: {{ cur_timestamp }}"
-        
+
     - name: 00 - Get API authentication token from the SSC LPAR
       ansible.builtin.uri:
         url: "{{ api_base_url }}/api-tokens"
@@ -55,7 +60,7 @@
       register: auth_response
 
     - name: Extract the token
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.parameters.token }}"
 
     - name: 01 - Trigger disruptive dump
@@ -80,17 +85,17 @@
       failed_when: trigger_response.status not in [200, 202, 204]
 
     - name: Log dump initiation status
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Disruptive dump initiated successfully. Appliance will reboot shortly."
 
     - name: Wait for a short period before start reboot
-      pause:
-        seconds:  120
+      ansible.builtin.pause:
+        seconds: 120
       register: poll_wait
 
     - name: Notify user appliance is rebooting
-      debug:
+      ansible.builtin.debug:
         msg: |
           ** Appliance is rebooting or temporarily unreachable.
           It may take a few minutes to come back online.
@@ -107,10 +112,10 @@
               Accept: "application/vnd.ibm.zaci.payload+json"
               Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
               Authorization: "Bearer {{ access_token }}"
-            return_content: no
+            return_content: false
             validate_certs: false
             body_format: json
-            status_code: 
+            status_code:
               - 202
               - 204
           register: is_operational_response
@@ -119,8 +124,8 @@
           until: is_operational_response.status in [202, 204]
           failed_when: false
           ignore_errors: true
-              
-        - name:  Fetch authentication token from the ACC after reboot
+
+        - name: Fetch authentication token from the ACC after reboot
           ansible.builtin.uri:
             url: "{{ api_base_url }}/api-tokens"
             method: POST
@@ -128,18 +133,18 @@
               zACI-API: "com.ibm.zaci.system/1.0"
               Accept: "application/vnd.ibm.zaci.payload+json"
               Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
-            body: 
-              kind: "request" 
+            body:
+              kind: "request"
               "parameters":
-                  user: "{{ lpar_username }}"
-                  password: "{{ lpar_password }}"
+                user: "{{ lpar_username }}"
+                password: "{{ lpar_password }}"
             body_format: json
             return_content: true
             validate_certs: false
           register: auth_response
 
         - name: Extract the token from response
-          set_fact:
+          ansible.builtin.set_fact:
             access_token: "{{ auth_response.json.parameters.token }}"
 
     - name: 03 - Fetch alerts after reboot
@@ -157,16 +162,16 @@
       failed_when: alerts_response.status != 200
 
     - name: Debug alert response
-      debug:
+      ansible.builtin.debug:
         var: alerts_response.json.instances
 
     - name: Filter disruptive dump entries
-      set_fact:
+      ansible.builtin.set_fact:
         dump_entries: "{{ alerts_response.json.instances | selectattr('msgtext', 'search', '(?i)disruptive') | list }}"
       when: alerts_response.json.instances is defined
 
     - name: Show dump entries found
-      debug:
+      ansible.builtin.debug:
         msg: "Found {{ dump_entries | length }} disruptive dump entries."
 
     - name: 04 - Download dump files
@@ -175,7 +180,7 @@
       loop_control:
         loop_var: dump_item
       ansible.builtin.uri:
-        url: "https://{{ ssc_ip }}:{{ port }}{{ dump_item['diag-info'] }}"
+        url: "https://{{ ssc_ip }}:{{ api_port }}{{ dump_item['diag-info'] }}"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -190,14 +195,12 @@
 
     - name: Display dump download summary
       when: dump_entries | length > 0
-      debug:
+      ansible.builtin.debug:
         msg: >
           Downloaded {{ download_result.results | selectattr('status', 'equalto', 200) | list | length }}
           out of {{ dump_entries | length }} dump files successfully.
 
     - name: No dumps found
       when: dump_entries | length == 0
-      debug:
+      ansible.builtin.debug:
         msg: "No disruptive dump entries found."
-
-

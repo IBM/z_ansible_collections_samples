@@ -1,43 +1,77 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Renamed 09_insert_hmc_creds.yaml to 07_insert_hmc_creds.yaml       |
+# *|   - Added admin_vars.yaml for checking environment variables           |
+# *|   - Added checking of environment variables                            |
+# *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for inserting HMC credentials
   hosts: localhost
-  gather_facts : true
+  gather_facts: true
   vars_files:
-    - env_vars.yaml
+    - admin_vars.yaml
 
   pre_tasks:
-  - name: Reminder - Export credentials
-    pause:
-      prompt: |
-        Before running this playbook, please export credentials:
+    - name: Reminder - Export credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export credentials:
 
-        export HMC_USER=<enter_HMC_username>
-        export HMC_PASSWORD=<enter_HMC_password>
+          export HMC_USER=<enter_HMC_username>
+          export HMC_PASSWORD=<enter_HMC_password>
 
-        Press Ctrl+C now to cancel if you haven't done this.
-        The playbook will continue shortly.
-      seconds: 5
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - HMC_USER
+          - HMC_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
 
   vars_prompt:
     - name: cc_admin_user
       prompt: "Enter ACC-admin's username"
-      private: no
+      private: false
 
     - name: cc_admin_password
       prompt: "Enter ACC-admin's Password"
-      private: yes
+      private: true
 
   tasks:
-    - name: 00 - Get authentication token from the ACC as admin
+    - name: 00 - Check MFA is enabled or not
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no):"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.builtin.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA OTP generated for admin:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}:{{ acc_port }}/api/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
         body_format: json
         method: POST
         return_content: true
@@ -45,13 +79,13 @@
       register: auth_response
 
     - name: Extract the admin token
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 01 - Set HMC configuration in the ACC
+    - name: 04 - Set HMC configuration in the ACC (can take up to 10 mins)
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}:{{ acc_port }}/api/config/hmcconfig"
-        timeout: 200
+        timeout: 600
         method: POST
         body:
           host: "{{ hmc_url }}"
@@ -66,7 +100,7 @@
         status_code: 204
       register: response
 
-    - name: 02 - As a validation, get list of CPCs attached to the HMC
+    - name: 05 - As a validation, get list of CPCs attached to the HMC
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}:{{ acc_port }}/api/cpcs"
         method: GET
@@ -77,6 +111,5 @@
       register: response
 
     - name: Printing the available CPCs
-      debug:
+      ansible.builtin.debug:
         msg: "{{ response.json }}"
-
