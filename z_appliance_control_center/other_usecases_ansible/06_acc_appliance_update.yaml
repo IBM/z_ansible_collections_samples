@@ -1,7 +1,11 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for ACC appliance update
   hosts: localhost
@@ -10,24 +14,24 @@
   vars_prompt:
     - name: ssc_ip
       prompt: "Enter your SSC LPAR's (ACC) IP"
-      private: no
+      private: false
 
     - name: app_username
       prompt: "Enter your SSC LPAR's (ACC) username"
-      private: no
+      private: false
 
     - name: app_password
       prompt: "Enter your SSC LPAR's (ACC) password"
-      private: yes
+      private: true
 
     - name: update_bundle_path
       prompt: "Enter the absolute path of the update bundle file"
-      private: no
+      private: false
 
     - name: update_bundle_name
       prompt: "Enter the update bundle name (e.g. update-bundle-1.2.5)"
-      private: no
-      
+      private: false
+
   vars:
     appliance_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
   tasks:
@@ -40,22 +44,22 @@
           Accept: "application/vnd.ibm.zaci.payload+json"
           Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
         body:
-          kind: "request" 
+          kind: "request"
           "parameters":
-              "user": "{{ app_username }}"
-              "password": "{{ app_password }}"
+            "user": "{{ app_username }}"
+            "password": "{{ app_password }}"
         body_format: json
         return_content: true
         validate_certs: false
       register: auth_response
 
     - name: Debug the authentication response
-      debug:
-        msg: 
+      ansible.builtin.debug:
+        msg:
           - "{{ auth_response }}"
 
     - name: Extract the token from response
-      set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.parameters.token }}"
 
     - name: 01 - Prepare appliance for update
@@ -85,10 +89,32 @@
         validate_certs: false
       register: status_response
 
-    - name: 03 - Poll for prepare-for-update status
+    - name: 03 - Fetch authentication token from the ACC after prepare-for-update process
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/api-tokens"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        body:
+          kind: "request"
+          "parameters":
+            "user": "{{ app_username }}"
+            "password": "{{ app_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token from response after  prepare-for-update process
+      ansible.legacy.set_fact:
+        access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: 04 - Poll for prepare-for-update status
       block:
         - name: Wait for the process to complete (polling for 5 min)
-          pause:
+          ansible.builtin.pause:
             seconds: 15
           register: poll_wait
 
@@ -110,24 +136,24 @@
           failed_when: status_check_response.json.parameters.status in [4]
 
         - name: Debug the response of prepare-for-update
-          debug:
+          ansible.builtin.debug:
             msg: "Polling completed with status code: {{ status_check_response }}"
 
-    - name: 04 - Upload the update bundle
+    - name: 05 - Upload the update bundle
       vars:
-        sha256sum: "{{ lookup('pipe', 'shasum -a 256 ' + update_bundle_path + ' | cut -d \" \" -f1') }}"
-      set_fact:
+        sha256sum: '{{ lookup(''pipe'', ''shasum -a 256 '' + update_bundle_path + '' | cut -d " " -f1'') }}'
+      ansible.builtin.set_fact:
         sha256sum: "{{ sha256sum }}"
 
     - name: Debug the sha256sum and bundle name for verification
-      debug:
+      ansible.builtin.debug:
         msg:
           - "SHA256 Sum: {{ sha256sum }}"
           - "Update Bundle Name: {{ update_bundle_name }}"
           - "Update Bundle Path: {{ update_bundle_path }}"
-    
-    - name: 05 - Upload the update bundle
-      shell: |
+
+    - name: 06 - Upload the update bundle
+      ansible.builtin.shell: |
         curl -k -X POST "{{ appliance_url }}/appliance-update" \
         -H "Authorization: Bearer {{ access_token }}" \
         -H "zACI-API: com.ibm.zaci.system/1.0" \
@@ -135,30 +161,55 @@
         -F "data_binary=@{{ update_bundle_path }}" \
         -F "parameters={\"kind\": \"request\", \"parameters\": { \"file_name\": \"{{ update_bundle_name }}\", \"sha256sum\": \"{{ sha256sum }}\" }}"
       register: upload_response
+      changed_when: false
+      # noqa command-instead-of-module command-instead-of-shell
 
     - name: Debug the response of Upload the update bundle
-      debug:
+      ansible.builtin.debug:
         msg: "Upload the update bundle response: {{ upload_response }}"
 
-    - name: 06 - Extract reboot parameter from bundle tail
-      shell: "tail -n 12 {{ update_bundle_path }} | grep '\"reboot\"'"
+    - name: 07 - Fetch authentication token from the ACC after upload bundle
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/api-tokens"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        body:
+          kind: "request"
+          "parameters":
+            "user": "{{ app_username }}"
+            "password": "{{ app_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token from response after upload bundle
+      ansible.legacy.set_fact:
+        access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: 08 - Extract reboot parameter from bundle tail
+      ansible.legacy.shell: 'tail -n 12 {{ update_bundle_path }} | grep ''"reboot"'''
       register: reboot_line
       changed_when: false
 
     - name: Parse reboot value
-      set_fact:
-        reboot_str: "{{ reboot_line.stdout.split(':')[1] | replace(',', '') | replace('\"', '') | trim  }}"
+      ansible.builtin.set_fact:
+        reboot_str: '{{ reboot_line.stdout.split('':'')[1] | replace('','', '''') | replace(''"'', '''') | trim  }}'
       register: reboot_required
+      # noqa jinja[spacing]
 
     - name: Convert reboot string to boolean
-      set_fact:
+      ansible.builtin.set_fact:
         reboot_value: "{{ reboot_str | lower == 'true' }}"
 
     - name: Debug reboot flag
-      debug:
+      ansible.builtin.debug:
         msg: "Reboot required: {{ reboot_value }} (type: {{ reboot_value | type_debug }})"
 
-    - name: 07 - Get current appliance update status
+    - name: 09 - Get current appliance update status
       ansible.builtin.uri:
         url: "{{ appliance_url }}/appliance-update/status"
         method: GET
@@ -170,18 +221,30 @@
         validate_certs: false
       register: update_status_response
 
-    - name: Debug the response of appliance update status
-      debug:
+    - name: Print the initial response of appliance update status
+      ansible.builtin.debug:
         msg: "Polling initial status with status code: {{ update_status_response.json }}"
 
-    - name: 08 - Poll for appliance update status
+    - name: 10 - Poll for appliance update status
       block:
-        - name: Wait for the appliance update process to complete (polling for status)
-          pause:
-            seconds: 10
-          register: poll_wait
+        - name: Check appliance update status
+          ansible.builtin.uri:
+            url: "{{ appliance_url }}/appliance-update/status"
+            timeout: 60
+            method: GET
+            headers:
+              Authorization: "Bearer {{ access_token }}"
+              zACI-API: "com.ibm.zaci.system/1.0"
+              Accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+            return_content: true
+            validate_certs: false
+          register: appliance_update_status_response
+          until: (appliance_update_status_response.json.parameters.status | default(-1)) in [2]
+          retries: 20
+          delay: 5
+          failed_when: (appliance_update_status_response.json.parameters.status | default(-1)) in [3, 4, 5, 6, 8]
 
-        - name: Check appliance update status after wait
+        - name: Check appliance update status again
           ansible.builtin.uri:
             url: "{{ appliance_url }}/appliance-update/status"
             method: GET
@@ -192,25 +255,20 @@
             return_content: true
             validate_certs: false
           register: appliance_update_status_response
-          until: > 
-              (
-                appliance_update_status_response.json.parameters.status
-                | default(1)
-              ) in [2]
-          retries: 10
-          failed_when: >
-              (
-                (appliance_update_status_response.json.parameters.status | default(0))
-                in [3, 4, 5, 6, 8]
-              )
+          failed_when: (appliance_update_status_response.json.parameters.status | default(-1)) not in [2]
+          when: not reboot_value
+
+        - name: Print the last response of appliance update status
+          ansible.builtin.debug:
+            msg: "Last returned status with status code: {{ appliance_update_status_response }}"
 
         - name: Wait for a short period before checking reboot
-          pause:
+          ansible.builtin.pause:
             seconds: 15
           register: poll_wait
 
         - name: Notify user appliance is rebooting
-          debug:
+          ansible.builtin.debug:
             msg: |
               ** Appliance is rebooting or temporarily unreachable.
               It may take a few minutes to come back online.
@@ -228,21 +286,17 @@
                   Accept: "application/vnd.ibm.zaci.payload+json"
                   Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
                   Authorization: "Bearer {{ access_token }}"
-                return_content: no
+                return_content: false
                 validate_certs: false
                 body_format: json
-                status_code: 
-                  - 202
-                  - 204
               register: is_operational_response
-              retries: 10
+              failed_when: is_operational_response.status not in [-1, 204]
+              retries: 20
               delay: 10
-              until: is_operational_response.status in [202, 204]
-              failed_when: false
-              ignore_errors: true
+              until: is_operational_response.status in [204]
               when: reboot_value
-              
-            - name:  Fetch authentication token from the ACC after reboot
+
+            - name: Fetch authentication token from the ACC after reboot
               ansible.builtin.uri:
                 url: "{{ appliance_url }}/api-tokens"
                 method: POST
@@ -250,30 +304,26 @@
                   zACI-API: "com.ibm.zaci.system/1.0"
                   Accept: "application/vnd.ibm.zaci.payload+json"
                   Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
-                body: 
-                  kind: "request" 
+                body:
+                  kind: "request"
                   "parameters":
-                      "user": "{{ app_username }}"
-                      "password": "{{ app_password }}"
+                    "user": "{{ app_username }}"
+                    "password": "{{ app_password }}"
                 body_format: json
                 return_content: true
                 validate_certs: false
               register: auth_response
 
-            - name: Debug the authentication response
-              debug:
-                msg: 
-                  - "{{ auth_response }}"
-
             - name: Extract the token from response
-              set_fact:
+              ansible.builtin.set_fact:
                 access_token: "{{ auth_response.json.parameters.token }}"
-        
-        - debug:
+
+        - name: Skip operational check when reboot_value is false
+          ansible.builtin.debug:
             msg: "Skipping operational check because reboot_value is false"
           when: not reboot_value
 
-        - name: Fetch Final appliance update status 
+        - name: Fetch Final appliance update status
           ansible.builtin.uri:
             url: "{{ appliance_url }}/appliance-update/status"
             method: GET
@@ -284,17 +334,9 @@
             return_content: true
             validate_certs: false
           register: appliance_update_status_response
-          until: >
-            (
-                appliance_update_status_response.json.parameters.status
-                | default(1)
-            ) in [2]
-          failed_when: >
-              (
-                (appliance_update_status_response.json.parameters.status | default(0))
-                in [3, 4, 5, 6, 8]
-              )
+          until: appliance_update_status_response.json.parameters.status in [2]
+          failed_when: appliance_update_status_response.json.parameters.status in [3, 4, 5, 6, 8]
 
         - name: Print appliance updated appliance update status response json
-          debug:
-            msg: "Appliance update completed successfully. Current version: {{ appliance_update_status_response.json.parameters.appliance_version | default('Appliance updated successfully.') }}"
+          ansible.builtin.debug:
+            msg: "Appliance update completed successfully: {{ appliance_update_status_response.json }}"

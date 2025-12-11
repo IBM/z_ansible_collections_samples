@@ -1,0 +1,75 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
+
+# Variables used for installing ACC
+
+########################################################################################################
+# NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
+# sections in the scripts as well. Please review the script thoroughly before running it.
+# Do not comment any vars here which might cause playbook to fail
+########################################################################################################
+
+####### HMC #######
+
+# HMC host ip (e.g., 9.152.150.166)
+HMC_HOST: "9.x.x.x"
+
+# Set Your hmc username (e.g., export HMC_USER=<enter_hmc_email>)
+HMC_USER: "{{ lookup('env', 'HMC_USER') }}"
+
+# Set Your hmc password (e.g,. export HMC_PASSWORD=<enter_hmc_password>)
+HMC_PASSWORD: "{{ lookup('env', 'HMC_PASSWORD') }}"
+
+
+####### LPAR Credentials #######
+
+# Set Username for the appliance [used during image installation]
+USERNAME: "{{ lookup('env', 'ACC_ADMIN_USER') }}"
+
+# Set Password for the appliance (used during image installation)
+PASSWORD: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"
+
+
+####### ACC LPAR #######
+
+# ACTION as "activate" or "deactivate" the lpar
+ACTION: "activate"
+
+# CPC or machine name (e.g., "T28")
+CPC: "CPC1"
+
+# Logical partition (LPAR) name where you want to install ACC image (e.g., "BLUEC1") should be valid lpar name
+LPAR: "CC12"
+
+# Appliance IP address (lpar ip)
+LPAR_IP: "9.120.100.200"
+
+# Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+DISK_ID: "<enter_disk_id>"
+
+# Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False
+IS_FCP: false
+
+# To be added only when is_fcp is true (e.g., lun: "4026402200000000")
+lun: "0000000000000000"
+
+# To be added only when is_fcp is true (e.g., wwpn: "50050763070b46a6")
+wwpn: "0000000000000000"
+
+# Storage allocated (in MB)
+STORAGE: 16384
+
+
+#######  Paths on the control node (i.e., your laptop) #######
+
+# Path on the control node (e.g., your laptop) with the image file which (ACC image) you want to install
+IMAGE_PATH: "/Users/dev_ZACC-1.2.6-dev-debug.image.img.gz"
+
+# Do not change this value its for internal use only, this is the absolute path to point to acc_install_ansible folder
+INSTALL_SCRIPT_PATH: "{{ lookup('pipe', 'realpath ' + playbook_dir + '/../acc_install_ansible') }}"

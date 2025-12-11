@@ -1,0 +1,69 @@
+# *+----------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                                 |
+# *| [10.17.2025]                                                               |
+# *|   - Tested with ACC 1.2.6                                                  |
+# *|   - Initial release                                                        |
+# *| [12.12.2025]                                                               |
+# *|   - Tested with ACC 1.2.10                                                 |
+# *|   - Renamed 13_unlock_each_appliances.yaml to 11_unlock_eachappliance.yaml |
+# *+----------------------------------------------------------------------------+
+
+
+# This playbook is not meant to be executed directly. It is automatically called by the other_usecases_ansible/12_unlock_appliances.yaml
+# and ssa_deploy_ansible/04_unlock_ssa_after_hmc_install.yaml playbooks when run as the appliance owner
+
+- name: Normalize ACC URL
+  ansible.builtin.set_fact:
+    acc_base_url: >-
+      {% if acc_ip is match('^https?://') %}
+        {{ acc_ip | trim }}
+      {% else %}
+        https://{{ acc_ip | trim }}:8081/api
+      {% endif %}
+
+- name: "Prompt for username for appliance"
+  block:
+    - name: App_username
+      ansible.builtin.pause:
+        prompt: "Enter username for appliance {{ appliance.name }} (ID: {{ appliance.id }} , IP: {{ appliance.interfaces[0].ip }})"
+      register: username_input
+
+    - name: App_password
+      ansible.builtin.pause:
+        prompt: "Enter password for appliance {{ appliance.name }} (ID: {{ appliance.id }} , IP: {{ appliance.interfaces[0].ip }})"
+        echo: false
+      register: password_input
+
+    - name: 00 - Try to unlock appliance {{ appliance.name }}
+      vars:
+        req_body: >
+          {{
+            {
+              "ssc_username": username_input.user_input,
+              "ssc_password": password_input.user_input,
+              "app_id": appliance.id | int
+            } | to_json
+          }}
+      ansible.builtin.uri:
+        url: "{{ acc_base_url | trim }}/unlock_quota"
+        method: POST
+        body: "{{ req_body }}"
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: "application/json"
+        status_code: 200
+        timeout: 200
+        validate_certs: false
+      register: unlock_response
+      ignore_errors: true
+
+    - name: Print unlock result
+      ansible.builtin.debug:
+        msg: >
+          Appliance {{ appliance.name }} (ID: {{ appliance.id }}):
+          {% if unlock_response is defined and unlock_response.status == 200 %}
+            ✅ Successfully unlocked
+          {% else %}
+            Failed to unlock even after retries
+          {% endif %}

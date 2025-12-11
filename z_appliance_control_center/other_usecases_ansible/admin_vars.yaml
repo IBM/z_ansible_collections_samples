@@ -1,0 +1,25 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Initial release                                                    |
+# *+------------------------------------------------------------------------+
+
+##### ACC variables #######
+
+# IP of the ACC LPAR, used to create acc_url (e.g., 9.15.150.200)
+acc_ip: 127.0.0.1
+
+# This port is used to create acc_url (e.g., 8081)
+acc_port: 8081
+
+##### HMC #######
+
+# hmc host ip (e.g., 9.0.0.0)
+hmc_url: "9.152.150.166"
+
+# ACC-admin's user name on the HMC (e.g., export HMC_USER=xyz.ibm.com)
+hmc_user: "{{ lookup('env', 'HMC_USER') }}"
+
+# ACC-admin's password on the HMC (e.g., export HMC_PASSWORD=<your_hmc_password>)
+hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"

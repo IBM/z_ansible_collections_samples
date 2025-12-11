@@ -1,7 +1,11 @@
-#*+-------------------------------------------------------------------+
-#*| # © Copyright IBM Corp. 2025                                      |
-#*| # This playbook is tested with ACC 1.2.6                          |
-#*+-------------------------------------------------------------------+
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *+------------------------------------------------------------------------+
 
 import subprocess
 import click
@@ -28,13 +32,13 @@ def start_tunneling():
         click.echo("SSH tunnel is already active, please check 'ps -ef | grep ssh'")
         return
     
-    local_server_port = os.environ.get("LOCAL_SERVER_PORT")
-    local_ssh_port = os.environ.get("LOCAL_SSH_PORT")
+    local_server_port = int(os.environ.get("LOCAL_SERVER_PORT"))
+    local_ssh_port = int(os.environ.get("LOCAL_SSH_PORT"))
     gateway_ip = os.environ.get("GATEWAY_IP")
     gateway_user = os.environ.get("GATEWAY_USER")
-    https_port = os.environ.get("HTTPS_PORT")
-    ssh_port = os.environ.get("SSH_PORT")
-    d_port = os.environ.get("D_PORT")
+    https_port = int(os.environ.get("HTTPS_PORT"))
+    ssh_port = int(os.environ.get("SSH_PORT"))
+    d_port = int(os.environ.get("D_PORT"))
     lpar_ip = os.environ.get("LPAR_IP")
     ssh_key = os.environ.get("HMC_KEY")
 
