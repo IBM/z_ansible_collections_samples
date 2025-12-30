@@ -1,0 +1,58 @@
+# Copyright (c) IBM Corporation 2024
+# This playbook demonstrates using roles:
+# 'zmf_swmgmt_zos_system_uuid', 'zmf_swmgmt_identify_missing_critical_updates',
+# 'zmf_swmgmt_identify_missing_fixcat_updates', and 'zmf_swmgmt_search_software_updates'
+# to complete the software management software instance report REST APIs on the global
+# zone CSI data set associated with the z/OS system's UUID.
+
+#####################################################################################
+# PLAY #1: Retrieve the z/OS system's UUID.                                         #
+#####################################################################################
+- name: Retrieve the z/OS system UUID
+  hosts: swmgmt
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Retrieve the z/OS system UUID
+      include_role:
+        name: zmf_swmgmt_zos_system_uuid
+
+#####################################################################################
+# PLAY #2: Identify missing critical software updates for the z/OS system's UUID.   #
+#####################################################################################
+- name: Identify Missing Critical Software Updates for the z/OS system's UUID
+  hosts: swmgmt
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Identify missing critical updates
+      include_role:
+        name: zmf_swmgmt_identify_missing_critical_updates
+
+#####################################################################################
+# PLAY #3: Identify missing fixcat software updates for the z/OS system's UUID.     #
+#####################################################################################
+- name: Identify Missing Fixcat Software Updates for the z/OS system's UUID
+  hosts: swmgmt
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Identify missing fixcat updates
+      include_role:
+        name: zmf_swmgmt_identify_missing_fixcat_updates
+
+#####################################################################################
+# PLAY #4: Search the the z/OS system's UUID for software updates.                  #
+#####################################################################################
+- name: Search the z/OS system's UUID for Software Updates
+  hosts: swmgmt
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Search software updates
+      include_role:
+        name: zmf_swmgmt_search_software_updates
