@@ -14,6 +14,7 @@
     concert_port: #
     concert_api_key: #
     concert_instance_id: #
+    concert_operation_tag: #
 
     # These vars should not need to change.
     fmid_fix_list: []
@@ -174,16 +175,30 @@
         /usr/bin/curl -X POST --max-time 1200 -ki '{{ concert_url }}/grader/api/v1/zsys/upload' \
         -H 'Authorization: C_API_KEY {{ concert_api_key }}' \
         -H 'InstanceId: {{ concert_instance_id }}' \
-        -H 'Concert-Application-Name: {{ concert_application_name }}' \
         -H 'Concert-API-Key: {{ concert_api_key }}' \
         -H 'Concert-URL: {{ concert_url }}' \
-        -F 'files=@playbook_output/izsam_detail.csv' \
-        -F 'files=@playbook_output/resttopology.json' \
-        -F 'files=@playbook_output/swi_collated.json'
+        -F 'operation_tag={{ concert_operation_tag }}' \
+        -F 'izsam=@playbook_output/izsam_detail.csv' \
+        -F 'resttopology=@playbook_output/resttopology.json' \
+        -F 'zosmf=@playbook_output/swi_collated.json'
       delegate_to: localhost
       register: curl_response
       failed_when: curl_response.rc != 0
 
+    - name: Print response from previous.
+      ansible.builtin.debug:
+        var: curl_response
+
+    - name: Begin collation in IBM Concert using curl
+      ansible.builtin.shell: |
+        /usr/bin/curl -X PUT --max-time 1200 -ki '{{ concert_url }}/grader/api/v1/zsys/upload?operation_tag={{ concert_operation_tag }}' \
+        -H 'Authorization: C_API_KEY {{ concert_api_key }}' \
+        -H 'InstanceId: {{ concert_instance_id }}' \
+        -H 'Concert-API-Key: {{ concert_api_key }}' \
+        -H 'Concert-URL: {{ concert_url }}'
+      delegate_to: localhost
+      register: curl_response
+      failed_when: curl_response.rc != 0
 
     - name: Print response from previous.
       ansible.builtin.debug:
