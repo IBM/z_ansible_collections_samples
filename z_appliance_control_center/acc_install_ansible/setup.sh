@@ -88,4 +88,3 @@ else
   echo "$ANSIBLE_TMPDIR/hmc_cli.py not found!"
   exit 1
 fi
-

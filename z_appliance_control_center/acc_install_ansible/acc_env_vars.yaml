@@ -51,6 +51,8 @@ LPAR: "CC12"
 LPAR_IP: "9.120.100.200"
 
 # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
+# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# communicate with the boot volume on the storage controller
 DISK_ID: "<enter_disk_id>"
 
 # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False
