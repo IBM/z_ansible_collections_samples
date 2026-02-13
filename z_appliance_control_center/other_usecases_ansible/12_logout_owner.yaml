@@ -1,11 +1,14 @@
 # *+------------------------------------------------------------------------+
 # *| © Copyright IBM Corp. 2025                                             |
-# *| [11.13.2025]                                                           |
-# *|   - Tested with ACC 1.2.8                                              |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
 # *|   - Initial release                                                    |
-# *| [[12.12.2025]                                                          |
-# *|   - Tested with ACC 1.2.10                                             |
+# *|   - With older ACC versions, replace the 'method: POST' by             |
+# *|     'method: DELETE'                                                   |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
+
+# This playbook is tested and updated with ACC version 1.2.12
 
 - name: ACC playbook, run by appliance-owner user, to logout the user
   hosts: localhost
@@ -17,6 +20,7 @@
     - name: Reminder - Export appliance-owner credentials
       ansible.legacy.pause:
         prompt: |
+          This playbook is tested and updated with ACC version 1.2.12,
           Before running this playbook, please export appliance-owner credentials:
 
           export ACC_OWNER_PASSWORD=<owner_password>
@@ -54,7 +58,7 @@
     - name: 03 - Get authentication token from the ACC as owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -72,12 +76,11 @@
 
     - name: 04 - Logout appliance-owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/logout"
-        method: DELETE
+        url: "{{ acc_url }}/user/logout"
+        method: POST
         headers:
           Authorization: "Bearer {{ access_token }}"
-          Content-Type: application/json
-        return_content: true
+        status_code: 200
         validate_certs: false
       register: logout_response
 

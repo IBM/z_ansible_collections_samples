@@ -6,6 +6,9 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run as appliance-owner, to scan the resources
@@ -54,7 +57,7 @@
     - name: 03 - Get authentication token from the ACC as owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -73,7 +76,7 @@
     - name: 04 - Get resources assigned to the owner by the admin
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/pkgs"
+        url: "{{ acc_url }}/resource/pkgs"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -89,7 +92,7 @@
     - name: 05 - Get resources consumed by the owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"

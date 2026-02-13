@@ -7,6 +7,9 @@
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Renamed 03_owner_action.yaml to 03_owner_actions.yaml              |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-owner, for ACC-owner actions
@@ -52,7 +55,7 @@
 
     - name: 00 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -74,7 +77,7 @@
 
     - name: 01 - Generate temporary 2FA secret for owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/mfa/secret/owner"
+        url: "{{ acc_url }}/mfa/secret/owner"
         body:
           username: "{{ cc_owner_user }}"
         body_format: json
@@ -104,7 +107,7 @@
     - name: 02 - As an appliance-owner, update the password (remove this if already done)
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user"
+        url: "{{ acc_url }}/user"
         body:
           username: "{{ cc_owner_user }}"
           old_password: "{{ cc_owner_default_password }}"
@@ -138,7 +141,7 @@
     - name: 03 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -165,7 +168,7 @@
       # Unfortunately, the uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
       ansible.builtin.shell: 'curl -k -X "POST" \
-        "{{ acc_ip }}/images" \
+        "{{ acc_url }}/images" \
         -H "Authorization: Bearer {{ access_token }}" \
         -H "Content-Type: multipart/form-data" \
         -F "data=@{{ image_path }}" \
@@ -181,7 +184,7 @@
     - name: 05 - Get image information
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/images"
+        url: "{{ acc_url }}/images"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"

@@ -6,6 +6,8 @@
 # *|   - Initial release                                                    |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
 # *+------------------------------------------------------------------------+
 
 echo "Directory for ansible script"
@@ -88,4 +90,3 @@ else
   echo "$ANSIBLE_TMPDIR/hmc_cli.py not found!"
   exit 1
 fi
-

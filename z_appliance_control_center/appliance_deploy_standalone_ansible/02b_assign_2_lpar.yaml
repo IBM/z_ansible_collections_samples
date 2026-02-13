@@ -6,6 +6,11 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Introduced configurable user inputs for network                    |
+# *|     parameters (VLAN, FCP/DASD, OSA/NETH).                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for assigning two resource.
@@ -51,7 +56,7 @@
 
     - name: 00 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -99,57 +104,212 @@
             - item is not match(hex_pattern)
           loop: "{{ lun_vars }}"
 
+
     - name: 02 - As ACC-admin, assign two LPARs to the owner
-      ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/pkgs"
-        timeout: 300
-        method: POST
-        body:
-          owner: "{{ cc_owner_user }}"
-          name: "{{ package_name }}"
-          ifls: "{{ package_ifls }}"
-          gps: "{{ package_gps }}"
-          memory: "{{ package_memory_mb }}"
-          lpars:
-            - name: "{{ lpar_name1 }}"
-              interfaces:
-                - name: "{{ interface1_name }}"
-                  fid: "{{ fid1 }}"
-                  # chpid: "{{ chpid1 }}"
-                  # port: "{{ zport1 }}"
-                  # vlan_id: "{{ vlan_id1 }}" # If your infra doesn't support this, comment it out
-                  prefix: "{{ prefix1 }}"
-                  ip: "{{ app_ip1 }}"
-                  gw: "{{ gw_ip1 }}"
-              boot-info:
-                disk-id: "{{ disk_id1 }}"
-                is-fcp: "{{ is_fcp1 }}"
-                # wwpn: "{{ wwpn1 }}"
-                # lun: "{{ lun1 }}"
-            - name: "{{ lpar_name2 }}"
-              interfaces:
-                - name: "{{ interface2_name }}"
-                  fid: "{{ fid2 }}"
-                  # chpid: "{{ chpid2 }}"
-                  # port: "{{ zport2 }}"
-                  # vlan_id: "{{ vlan_id2 }}" # If your infra doesn't support this, comment it out
-                  prefix: "{{ prefix2 }}"
-                  ip: "{{ app_ip2 }}"
-                  gw: "{{ gw_ip2 }}"
-              boot-info:
-                disk-id: "{{ disk_id2 }}"
-                is-fcp: "{{ is_fcp2 }}"
-                # wwpn: "{{ wwpn2 }}"
-                # lun: "{{ lun2 }}"
-          cpc: "{{ z_machine_name }}"
-          x86: "dummy" # This will be deprecated
-        body_format: json
-        headers:
-          Authorization: "Bearer {{ access_token }}"
-          Content-Type: application/json
-        validate_certs: false
-        status_code: 200
-      register: response
+      block:
+        - name: Gathering Network Parameters for LPARs
+          ansible.builtin.set_fact:
+            var_details1:
+              name: "{{ interface1_name }}"
+              prefix: "{{ prefix1 }}"
+              ip: "{{ app1_ip }}"
+              gw: "{{ gw1_ip }}"
+            var_details2:
+              name: "{{ interface2_name }}"
+              prefix: "{{ prefix2 }}"
+              ip: "{{ app2_ip }}"
+              gw: "{{ gw2_ip }}"
+
+        - name: IMPORTANT - Network Card Type Selection
+          ansible.builtin.debug:
+            msg: |
+              Select the correct network card type based on the system configuration.
+              Selection Criteria:
+                - If CHPID and Port are provided -> choose OSA
+                - If FID is provided -> choose NETH
+
+        - name: Enter network card type for 1st LPAR
+          ansible.builtin.pause:
+            prompt: "Enter network card type to be used for LPAR {{ lpar1_name }}: (OSA/NETH)"
+          register: net1_type_raw
+
+        - name: Normalize network type 1
+          ansible.builtin.set_fact:
+            net1_type: "{{ net1_type_raw.user_input | trim | upper }}"
+
+        - name: Validate network type
+          ansible.legacy.fail:
+            msg: "Invalid input! Allowed values: OSA, NETH"
+          when: net1_type not in ['OSA', 'NETH']
+
+        - name: VLAN configuration
+          ansible.builtin.pause:
+            prompt: "Does the LPAR {{ lpar1_name }} need VLAN configuration? (yes/no)"
+          register: vlan1_raw
+
+        - name: Normalize VLAN input for LPAR1
+          ansible.builtin.set_fact:
+            vlan_1: "{{ (vlan1_raw.user_input | trim | lower) == 'yes' }}"
+
+        - name: Validate VLAN confirmation
+          ansible.builtin.fail:
+            msg: "Invalid input"
+          when: vlan1_raw.user_input | trim | lower not in ['yes', 'no']
+
+        - name: IMPORTANT - Boot Disk Selection
+          ansible.builtin.debug:
+            msg: |
+              Select the correct disk type based on the system configuration.
+                - For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
+                - For DASD disk, the 'wwpn' and 'lun' values are not required
+
+
+        - name: Enter boot disk type for 1st LPAR [DASD/FCP]
+          ansible.builtin.pause:
+            prompt: "Enter boot disk type for LPAR {{ lpar1_name }}: (DASD/FCP)"
+          register: is_fcp1_raw
+
+        - name: Normalize boot disk 1
+          ansible.builtin.set_fact:
+            is_fcp_1: "{{ is_fcp1_raw.user_input | trim | upper }}"
+
+        - name: Validate disk type
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: is_fcp_1 not in ['DASD', 'FCP']
+
+        - name: Enter network card type for 2nd LPAR
+          ansible.builtin.pause:
+            prompt: "Enter network card type to be used for LPAR {{ lpar2_name }}: (OSA/NETH)"
+          register: net2_type_raw
+
+        - name: Normalize network type 2
+          ansible.builtin.set_fact:
+            net2_type: "{{ net2_type_raw.user_input | trim | upper }}"
+
+        - name: Validate Network type
+          ansible.legacy.fail:
+            msg: "Invalid input! Allowed values: OSA, NETH"
+          when: net2_type not in ['OSA', 'NETH']
+
+        - name: VLAN Configuration
+          ansible.builtin.pause:
+            prompt: "Does the LPAR {{ lpar2_name }} need VLAN configuration? (yes/no)"
+          register: vlan2_raw
+
+        - name: Normalize VLAN input for LPAR1
+          ansible.builtin.set_fact:
+            vlan_2: "{{ (vlan2_raw.user_input | trim | lower) == 'yes' }}"
+
+        - name: Validate VLAN confirmation
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: vlan2_raw.user_input | trim | lower not in ['yes', 'no']
+
+        - name: Enter boot disk type for 2nd LPAR [DASD/FCP]
+          ansible.builtin.pause:
+            prompt: "Enter boot disk type for LPAR {{ lpar2_name }}: (DASD/FCP)"
+          register: is_fcp2_raw
+
+        - name: Normalize boot disk 2
+          ansible.builtin.set_fact:
+            is_fcp_2: "{{ is_fcp2_raw.user_input | trim | upper }}"
+
+        - name: Validate Disk type
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: is_fcp_2 not in ['DASD', 'FCP']
+
+        - name: Entered values for network by the user
+          ansible.builtin.debug:
+            msg:
+              - "LPAR1 Network Type: {{ net1_type }}"
+              - "LPAR2 Network Type: {{ net2_type }}"
+              - "LPAR1 VLAN Usage: {{ vlan1_raw.user_input }}"
+              - "LPAR2 VLAN Usage: {{ vlan2_raw.user_input }}"
+              - "LPAR1 Boot Disk Type: {{ is_fcp_1 }}"
+              - "LPAR2 Boot Disk Type: {{ is_fcp_2 }}"
+
+        - name: Preparing OSA params for "{{ lpar1_name }}"
+          ansible.builtin.set_fact:
+            nw1_details: >-
+              {{ var_details1
+                  | combine({'chpid': chpid1, 'port': zport1})
+                  | combine(vlan_1 | ternary({'vlan_id':vlan1_id}, {})
+                  ) }}
+          when: net1_type == 'OSA'
+
+        - name: Preparing OSA params for "{{ lpar2_name }}"
+          ansible.builtin.set_fact:
+            nw2_details: >-
+              {{ var_details2
+                | combine({'chpid': chpid2, 'port': zport2})
+                | combine(vlan_2 | ternary({'vlan_id':vlan2_id}, {})
+                ) }}
+          when: net2_type == 'OSA'
+
+        - name: Preparing NETH params for {{ lpar1_name }}
+          ansible.builtin.set_fact:
+            nw1_details: "{{ var_details1 | combine({'fid': fid1}) | combine(vlan_1 | ternary({'vlan_id': vlan1_id}, {})) }}"
+          when: net1_type == 'NETH'
+
+        - name: Preparing NETH params for {{ lpar2_name }}
+          ansible.builtin.set_fact:
+            nw2_details: "{{ var_details2 | combine({'fid': fid2}) | combine(vlan_2 | ternary({'vlan_id': vlan2_id}, {})) }}"
+          when: net2_type == 'NETH'
+
+        - name: Preparing boot params for {{ lpar1_name }}
+          ansible.builtin.set_fact:
+            boot1_info: "{{ {'disk-id': disk1_id} | combine((is_fcp_1 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn1, 'lun': lun1}, {'is-fcp': false})) }}"
+
+        - name: Preparing boot params for {{ lpar2_name }}
+          ansible.builtin.set_fact:
+            boot2_info: "{{ {'disk-id': disk2_id} | combine((is_fcp_2 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn2, 'lun': lun2}, {'is-fcp': false})) }}"
+
+        - name: Creating the API request for resource pkg creation
+          ansible.builtin.set_fact:
+            body: >-
+              {{
+                {
+                  'owner': cc_owner_user,
+                  'name': package_name,
+                  'ifls': package_ifls,
+                  'gps': package_gps,
+                  'memory': package_memory_mb,
+                  'lpars':[
+                    {
+                      'name': lpar1_name,
+                      'interfaces':[ nw1_details ],
+                      'boot-info': boot1_info
+                      },
+                  { 'name': lpar2_name,
+                    'interfaces': [ nw2_details ],
+                      'boot-info': boot2_info
+                    }
+                  ],
+                  'cpc':  z_machine_name,
+                  'x86': "dummy"
+                }
+              }}
+        - name: Resource package request body
+          ansible.builtin.debug:
+            var: body
+
+        - name: Submitting the request to ACC to create package with 2 SSA LPARs
+          tags: admin
+          ansible.builtin.uri:
+            url: "{{ acc_url }}/resource/pkgs"
+            timeout: 300
+            method: POST
+            body: "{{ body }}"
+
+            body_format: json
+            headers:
+              Authorization: "Bearer {{ access_token }}"
+              Content-Type: application/json
+            validate_certs: false
+            status_code: 200
+          register: response
 
     - name: Printing the response
       tags: owner, install

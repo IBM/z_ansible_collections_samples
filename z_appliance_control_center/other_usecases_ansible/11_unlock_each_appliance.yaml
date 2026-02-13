@@ -6,20 +6,15 @@
 # *| [12.12.2025]                                                               |
 # *|   - Tested with ACC 1.2.10                                                 |
 # *|   - Renamed 13_unlock_each_appliances.yaml to 11_unlock_eachappliance.yaml |
+# *| [02.13.2026]                                                               |
+# *|   - Tested with ACC 1.2.12                                                 |
 # *+----------------------------------------------------------------------------+
 
 
-# This playbook is not meant to be executed directly. It is automatically called by the other_usecases_ansible/12_unlock_appliances.yaml
-# and ssa_deploy_ansible/04_unlock_ssa_after_hmc_install.yaml playbooks when run as the appliance owner
-
-- name: Normalize ACC URL
-  ansible.builtin.set_fact:
-    acc_base_url: >-
-      {% if acc_ip is match('^https?://') %}
-        {{ acc_ip | trim }}
-      {% else %}
-        https://{{ acc_ip | trim }}:8081/api
-      {% endif %}
+# This playbook is not meant to be executed directly. It is automatically called 
+# by the other_usecases_ansible/12_unlock_appliances.yaml.
+# and ssa_deploy_ansible/04_unlock_ssa_after_hmc_install.yaml playbooks when run as
+# the appliance owner.
 
 - name: "Prompt for username for appliance"
   block:
@@ -45,7 +40,7 @@
             } | to_json
           }}
       ansible.builtin.uri:
-        url: "{{ acc_base_url | trim }}/unlock_quota"
+        url: "{{ acc_url }}/unlock_quota"
         method: POST
         body: "{{ req_body }}"
         body_format: json

@@ -6,6 +6,9 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for appliance upgrade
@@ -59,7 +62,7 @@
     - name: 03 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -86,7 +89,7 @@
       # The uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
       ansible.builtin.shell: 'curl -k -X "POST" \
-        "{{ acc_ip }}/images" \
+        "{{ acc_url }}/images" \
         -H "Authorization: Bearer {{ access_token }}" \
         -H "Content-Type: multipart/form-data" \
         -F "data=@{{ update_bundle_path }}" \
@@ -102,7 +105,7 @@
     - name: 05 - Get update bundle information
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/images"
+        url: "{{ acc_url }}/images"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -128,7 +131,7 @@
 
     - name: 06 - Get list of running appliance
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Accept: "application/json"
@@ -159,7 +162,7 @@
       loop_control:
         loop_var: app_id
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/unlock_quota"
+        url: "{{ acc_url }}/unlock_quota"
         method: POST
         body:
           {
@@ -179,7 +182,7 @@
     - name: 08 - As owner, concurrent update the image using image_id {{ image_id }}
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cluster/upgrade"
+        url: "{{ acc_url }}/cluster/upgrade"
         method: POST
         body: |
           {
@@ -213,4 +216,4 @@
           🔓 Please unzip the file and note the "task_id" from upgrade_info.json inside it.
 
           📡 To check the current status of the in-progress task, use:
-          {{ acc_ip }}/tasks/<task_id>/status
+          {{ acc_url }}/tasks/<task_id>/status

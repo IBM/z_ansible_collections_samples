@@ -3,6 +3,8 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Initial release                                                    |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
 # *+------------------------------------------------------------------------+
 
 #####################################################################################################
@@ -24,16 +26,14 @@
 # Enable or disable Multi-Factor Authentication (true/false)
 mfa_enabled: false
 
-# IP of the ACC LPAR, used to create acc_url (e.g., 9.15.120.100)
-acc_ip: 9.15.150.200
+# IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+acc_url: https://9.120.0.0:8081/api
 
-# This port is used to create acc_url (8081)
-acc_port: 8081
 
 ####### HMC #######
 
 # HMC host ip (e.g., 9.152.150.166)
-hmc_url: "9.0.0.0"
+hmc_ip: "9.0.0.0"
 
 # ACC-admin's user name on the HMC (e.g., export HMC_USER=<your_hmc_userid>)
 hmc_user: "{{ lookup('env', 'HMC_USER') }}"
@@ -130,7 +130,7 @@ lpar1_name: "CC10"
 # Network interface name for creating resource package (e.g., "interface1")
 interface1_name: "interface1"
 
-# Function ID (e.g., 00A5) used with the SSC network interface
+# Function ID (e.g., 00A5) used with the SSC network interface. Only applicable if Channel Path ID (CHPID) is not used
 fid1: "A123"
 
 # Network prefix length for creating resource package (e.g., 23)
@@ -146,6 +146,8 @@ chpid1: "xx"
 zport1: 0
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
+# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# communicate with the boot volume on the storage controller
 disk1_id: "0.0.5abc"
 
 # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
@@ -179,7 +181,7 @@ lpar2_name: "CC12"
 # Network interface name for creating resource package (e.g., "interface1")
 interface2_name: "interface2"
 
-# Function ID (e.g., 00A5) used with the SSC network interface
+# Function ID (e.g., 00A5) used with the SSC network interface. Only applicable if Channel Path ID (CHPID) is not used
 fid2: "A123"
 
 # Network prefix length for creating resource package (e.g., 23)
@@ -195,6 +197,8 @@ chpid2: "xx"
 zport2: 0
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
+# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# communicate with the boot volume on the storage controller
 disk2_id: "0.0.5abc"
 
 # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]

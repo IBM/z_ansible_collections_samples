@@ -6,6 +6,10 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url, hmc_url with hmc_ip and              |
+# *|     hmc_managed by acc_default_mode                                    |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Default playbook, run by ACC-admin, for ACC-admin actions
@@ -56,9 +60,9 @@
   tasks:
     - name: 00 - Initialize ACC with HMC Default Mode
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/init"
+        url: "{{ acc_url }}/init"
         body:
-          hmc_managed: "{{ hmc_managed }}"
+          hmc_managed: "{{ acc_default_mode }}"
           credentials:
             username: "{{ cc_admin_user }}"
             password: "{{ cc_admin_old_password }}"
@@ -70,7 +74,7 @@
 
     - name: 01 - Update ACC-admin password (remove this if already done)
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user"
+        url: "{{ acc_url }}/user"
         body:
           username: "{{ cc_admin_user }}"
           old_password: "{{ cc_admin_old_password }}"
@@ -82,7 +86,7 @@
 
     - name: 02 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -103,11 +107,11 @@
 
     - name: 03 - Set HMC configuration in the ACC (required)
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/config/hmcconfig"
+        url: "{{ acc_url }}/config/hmcconfig"
         timeout: 600
         method: POST
         body:
-          host: "{{ hmc_url }}"
+          host: "{{ hmc_ip }}"
           userid: "{{ hmc_user }}"
           password: "{{ hmc_password }}"
           verify_cert: false
@@ -121,7 +125,7 @@
 
     - name: 04 - Get list of CPCs attached to the HMC
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cpcs"
+        url: "{{ acc_url }}/cpcs"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -135,7 +139,7 @@
 
     - name: 05 - Get CPC resources of CPC defined in admin_vars.yaml
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cpcs/{{ z_machine_name }}/resource"
+        url: "{{ acc_url }}/cpcs/{{ z_machine_name }}/resource"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -149,7 +153,7 @@
 
     - name: 06 - Create an appliance-owner using variables in admin_vars.yaml
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user"
+        url: "{{ acc_url }}/user"
         method: POST
         body:
           username: "{{ cc_owner_user }}"

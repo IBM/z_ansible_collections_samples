@@ -6,6 +6,8 @@
 # *| [12.12.2025]                                                             |
 # *|   - Tested with ACC 1.2.10                                               |
 # *|   - Renamed 11_get_disruptive_dumps.yaml to 09_get_disruptive_dumps.yaml |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
 # *+--------------------------------------------------------------------------+
 
 - name: ACC Playbook - Trigger disruptive dump and collect logs from appliance

@@ -3,6 +3,9 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Initial release                                                    |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for restarting an appliance.
@@ -54,7 +57,7 @@
     - name: 03 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -72,7 +75,7 @@
 
     - name: 04 - Get list of running appliance
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Accept: "application/json"
@@ -135,7 +138,7 @@
 
     - name: Restart selected appliances
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/appliance/restart"
+        url: "{{ acc_url }}/appliance/restart"
         method: PUT
         body:
           resource_pkg_name: "{{ item.resource_pkg }}"
@@ -182,6 +185,6 @@
         msg: |
           Task status URLs:
           {% for id in task_ids %}
-          • {{ acc_ip }}/tasks/{{ id }}/status
+          • {{ acc_url }}/tasks/{{ id }}/status
           {% endfor %}
       when: task_ids is defined and task_ids | length > 0

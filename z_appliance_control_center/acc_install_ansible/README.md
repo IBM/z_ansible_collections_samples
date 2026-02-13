@@ -25,7 +25,7 @@ run the commands.
 - Both ACC-admin and appliance-owners must
   [install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on
   their respective control nodes.
-  - For example, on your laptop that will connect with ACC, install `ansible` via:
+  - For example, on your machine that will connect with ACC, install `ansible` via:
 
     ```bash
     pip install ansible
@@ -84,6 +84,8 @@ To setup a python virtual environment and install the required packages, please 
   ```bash
   python3 -m venv venv
   ```
+
+  - _**Note:** Depending on your python installation and the version you intend to use, the python command may differ slightly from the example above. In some environments, `python` may be used instead of `python3`. Ensure that the correct python binary is available in your `PATH`. The `--version` flag can be used to confirm which python version is being invoked_
 
 - Afterwards, run the following commands to enter the python virtual environment,
   install the required python packages, and exit the virtual environment:

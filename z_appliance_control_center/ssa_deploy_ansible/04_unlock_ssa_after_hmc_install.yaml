@@ -3,6 +3,9 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Initial release                                                    |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced cc_url with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Playbook, run by appliance-owner, for appliance-owner actions
@@ -67,15 +70,6 @@
       default: "yes"
 
   tasks:
-    - name: Prepare ACC URL
-      tags: admin, owner, retry
-      ansible.builtin.set_fact:
-        cc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
-
-    - name: Printing the ACC url
-      tags: admin, owner
-      ansible.builtin.debug:
-        msg: "{{ cc_url }}"
 
     - name: 00 - Check MFA is enabled or not
       ansible.builtin.pause:
@@ -94,7 +88,7 @@
 
     - name: 03 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -112,7 +106,7 @@
     - name: 04 - Generate temporary MFA secret for owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ cc_url }}/mfa/secret/owner"
+        url: "{{ acc_url }}/mfa/secret/owner"
         body:
           username: "{{ cc_owner_user }}"
         body_format: json
@@ -149,7 +143,7 @@
     - name: 05 - Update the password of ACC appliance-owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user"
+        url: "{{ acc_url }}/user"
         body:
           username: "{{ cc_owner_user }}"
           old_password: "{{ cc_owner_default_password }}"
@@ -187,7 +181,7 @@
     - name: 06 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -205,7 +199,7 @@
 
     - name: 07 - Get list of active SSAs
       ansible.builtin.uri:
-        url: "{{ cc_url }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Accept: "application/json"

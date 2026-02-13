@@ -143,6 +143,7 @@ used for gathering logs from other appliances (e.g., SSA appliance).
 ## ACC Appliance Update | 06_acc_appliance_update.yaml
 
 - Run the playbook to update the ACC appliance:
+
   ```bash
   ansible-playbook 06_acc_appliance_update.yaml
   ```
@@ -150,6 +151,57 @@ used for gathering logs from other appliances (e.g., SSA appliance).
 This playbook is different than `01_upgrade_flow.yaml`, because this playbook
 should be used to upgrade ACC itself. The `01_upgrade_flow.yaml` playbook is
 used to upgrade an appliance that is managed by ACC.
+
+**Note**: If the ACC LPAR does not reboot as part of the appliance update process, be aware that the operating system messages shown for the ACC LPAR in the HMC may display stale ACC version information.
+
+With the [jq](https://jqlang.org/download/) package installed on your system, the following `curl` commands can be used to verify the ACC version:
+
+- Obtain zACI ACC_Admin Token
+
+  ```Linux
+  export ADMIN_TOKEN=$(curl -k -X 'POST' \
+    'https://{ACC_IP}/api/com.ibm.zaci.system/api-tokens' \
+    -H 'Accept: application/vnd.ibm.zaci.payload+json' \
+    -H 'zACI-API: com.ibm.zaci.system/1.0' \
+    -H 'Content-Type: application/vnd.ibm.zaci.payload+json;version=1.0' \
+    -d '{
+      "kind": "request",
+      "parameters": {
+        "user": "acc_admin_username",
+        "password": "acc_admin_password"
+       }
+     }' | jq -r '.parameters.token')
+  
+  ```
+
+  - Be sure to replace `{ACC_IP}` with the IP address of the ACC LPAR, and substitute `acc_admin_username` and `acc_admin_password` with the appropriate ACC administrator credentials.
+
+- Query ACC Status Information
+
+  ```Linux
+  curl -k -X "GET" \
+    "https://{ACC_IP}/api/com.ibm.zaci.system/appliance/" \
+    -H "Accept: application/vnd.ibm.zaci.payload+json" \
+    -H "zACI-API: com.ibm.zaci.system/1.0" \
+    -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+    -H "Content-Type: application/vnd.ibm.zaci.payload+json;version=1.0" | jq
+  ```
+
+- Sample Response:
+
+  ```Linux
+  {
+    "kind": "instance",
+    "self": "/api/com.ibm.zaci.system/appliance/",
+    "resource-name": "appliance",
+    "resource-version": "1.0",
+    "properties": {
+      "self": "/api/com.ibm.zaci.system/appliance",
+      "name": "zAppliance Control Center",
+      "description": "zAppliance Control center - zACC",
+      "version": "1.2.11",
+      ...
+  ```
 
 ## Set HMC Credentials (Daily Task) | 07_insert_hmc_creds.yaml
 
@@ -270,6 +322,11 @@ To logout:
   ```bash
   ansible-playbook 12_logout_owner.yaml
   ```
+
+**Note**: In the ACC versions older than 1.2.12, the `/user/logout` API of
+ACC used `DELETE` instead of `POST`. If you are using ACC version older than
+1.2.12, then replace the `method: POST` with `method: DELETE` in the
+`04 - Logout appliance-owner` task.
 
 ## Appliance Restart via ACC | 13_restart_appliances.yaml
 

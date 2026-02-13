@@ -7,6 +7,9 @@
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Renamed 12_unlock_appliances.yaml to 10_unlock_appliances.yaml     |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Playbook, run by appliance-owner, for appliance-owner actions
@@ -56,7 +59,7 @@
     - name: 03 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -74,7 +77,7 @@
 
     - name: 04 - Get list of running appliance
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Accept: "application/json"
