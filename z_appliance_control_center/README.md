@@ -14,6 +14,11 @@ To work efficiently with ACC, it is recommended to do the following in order:
 - Use the ansible scripts.
 - Check the ACC's UI.
 
+In addition, a comprehensive experience report outlining the key use cases addressed by the Ansible playbooks
+in this project is available. Please review the guide linked below.
+
+- [Getting Started with Ansible for IBM Z Appliance Control Center Configuration](https://ibm.biz/Z-ACC-and-SSA-install-with-ansible)
+
 This set of directories contains ansible playbooks that you can use against ACC to
 manage appliances. These playbooks should be used as a sample. The user is
 expected to understand the infrastructure of ACC and other appliances, as well
@@ -91,7 +96,7 @@ there in the standalone mode.
 Moreover, the ACC-admin can configure each of the above default and standalone
 modes with and without multi-factor authentication (MFA). This means that
 whenever an ACC user wants to get an authentication token from ACC, then that
-user must provide time based one time password (TOTP) to ACC in addition
+user must provide a time based one time password (TOTP) to ACC in addition
 to the login credentials.
 
 ### Resources
@@ -116,16 +121,15 @@ For now, a resource package can only be assigned to a single appliance-owner.
 
 #### Resource Quota
 
-A resource quota presents an LPAR that is activated (also called appliance). Any activated LPAR within the
-resource package will have its associated resource quota in ACC. The
-appliance-owner can get information about the LPAR by getting information about its
-resource quota within the ACC.
+A resource quota represents an LPAR that is activated (also called appliance). Any activated LPAR will have an associated resource quota in ACC. The
+appliance-owner can get information about the LPAR by querying its
+resource quota.
 
 #### Cluster
 
-A logical grouping of appliances is called a cluster. Via ACC, an appliance-owner can then send
-a single command to a group of appliances, that may traverse resource package boundaries.
-
+A logical grouping of appliances is called a cluster. Through clusters, an appliance
+owner can issue a single command to ACC, which will then be replicated to multiple
+appliances, even when that command traverses resource package boundaries.
 
 ### Execution Action
 
@@ -139,10 +143,10 @@ and which action is intended to be carried out. The following table outlines the
 |:-----------------|:--------------|:-------------------------|:-----------------------|:---------------------|
 | `default` | Deactivated | True | Default | LPAR brought to SSC Installer mode, its profile is updated, new appliance image is then uploaded and installed onto the disk. |
 | `default` | Deactivated | False | Default | LPAR profile updated, LPAR is brought up in SSC Installer mode, boot disk image is compared against the intended image to start the appliance (image is not install). |
-| `switch_to_installer` | Activated as appliance | | Default and standalone | LPAR in SSC mode signaled to switch to SSC Installer mode, image not used. |
+| `switch_to_installer` | Activated as appliance | N/A | Default and standalone | LPAR in SSC mode signaled to switch to SSC Installer mode, image not used. |
 | `appliance_only` | Activated as Installer | True | Default and standalone	| Image file is uploaded to the LPAR in SSC Installer mode, appliance is installed and booted into SSC mode. |
-| `appliance_only` | Activated as Installer | False | Default and standalone | Boot disk image on SSC Installer LPAR mode compared with the image that is used. If true, then LPAR activated in SSC mode. |
-| `prep_lpar_only` | Deactivated | | Default | LPAR profile updated, LPAR activated in SSC Installer mode. |
+| `appliance_only` | Activated as Installer | False | Default and standalone | Installer LPAR mode compared with the image that is used. If true, then LPAR activated in SSC mode. |
+| `prep_lpar_only` | Deactivated | N/A | Default | LPAR profile updated, LPAR activated in SSC Installer mode. |
 
 More information about execution can be [found here](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=linuxone-installing-appliances-using-acc-ui).
 
@@ -165,16 +169,14 @@ the ACC.
 The default ACC-admin credentials correspond to the ACC LPAR credentials. These default credentials must be updated using the [update password](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=reference-user-management#api_reference__title__3) ACC API endpoint. These credentials must be updated before issuing any other ACC API requests.
 
 Moreover, the ACC-admin creates credentials for the appliance-owners, and the
-appliance-owners must update the credentials before sending any commands to ACC.
+appliance-owners must update these credentials before sending any commands to ACC.
 
 The hash of the passwords (for both ACC-admin and appliance-owner) are
 stored by ACC and used for authentication (token generation) and authorizations.
 
 #### Appliance Credentials
 
-Since ACC has to manage appliances, and appliances must authenticate requests,
-therefore, ACC must store these credentials. These credentials are provided by
-the appliance-owner when installing the appliances using ACC.
+Since ACC manages appliances that require authenticated requests, it must securely store the necessary credentials, which are provided by the appliance owner during appliance installation.
 
 If the appliances are already active, then the appliance-owner can provide their
 credentials to the ACC using the unlock API.
@@ -185,12 +187,11 @@ The diagram below shows who provides the credentials to ACC, and how ACC uses
 these credentials. For example, HMC credentials are provided by the ACC-admin,
 which are used by ACC for actions on the HMC (e.g., activating LPARs).
 Appliance-owners provide appliance credentials, which are the usernames and
-passwords of the SSC LPARs, and ACC uses these credentials to create a token
-and run actions on the appliances (e.g., updating the appliances).
+passwords of the SSC LPARs, and ACC uses these credentials to run actions on the appliances (e.g., updating the appliances).
 
 ![Credentials stored by ACC](images/credentials.png)
 
-  - **Note**: The diagram above does not depict a few key processes, including how the ACC administrator creates the appliance-owner credentials, how the appliance owner updates those credentials, and how ACC securely stores their hashed values.
+- **Note**: The diagram above does not depict a few key processes, including how the ACC administrator creates the appliance-owner credentials, how the appliance owner updates those credentials, and how ACC securely stores their hashed values.
 
 ## Playbook Directory Structure
 
@@ -239,7 +240,7 @@ use-cases for:
 - Syncing LPARs
 - Install checks for ACC and SSA
 
-Please read the README.md file in the same directory, before proceeding with the playbooks.
+Please read the `README.md` file in the appropriate playbook directory before proceeding.
 
 ### File Structure of acc_install_ansible
 
@@ -249,14 +250,13 @@ Please read the README.md file in the same directory, before proceeding with the
 | `00_acc_install.yaml` | ACC administrator can use this playbook to install ACC, and it will use the scripts in `acc_install_ansible` directory |
 
 This directory contains a playbook `00_acc_install.yaml`, a variable file
-`acc_env_vars.yaml`, and scripts that help with installation of
-ACC. The user should update the environment variables and then run this
-playbook for installing ACC. The playbook will call the other scripts in this
-directory.
+`acc_env_vars.yaml`, and various scripts that help with installation of
+ACC.
 
-Therefore, it is not expected for the user to modify or deeply understand the
-process behind these scripts. However, it is required that the user reads the
-`README.md` file in this directory before continuing with the installation of ACC.
+The user should update the `acc_env_vars.yaml` file and then execute the `00_acc_install.yaml` to install the ACC. The playbook will handle running the other scripts in this
+directory. As a result, it is not expected for the user to modify or deeply understand the
+process behind the various scripts in this directory. However, it is necessary that the user reads the
+`README.md` file before continuing with the ACC installation.
 
 ### File Structure of appliance_deploy_*_ansible
 
@@ -434,5 +434,63 @@ currently handling. If this list is complete, then ACC had successfully synced
 with the HMC. And when running the playbook again, the ACC user can comment
 out or remove the task that calls the `/api/config/hmcconfig` API.
 
-Moreover, it is advisable that no other activity is triggered by the user of the ACC when HMC 
+Moreover, it is advisable that no other activity is triggered by the user of the ACC when HMC
 syncing is in progress.
+
+### Setup Ansible-lint in local repo
+
+If you want to contribute your playbooks in this repo or create your own playbooks,
+then as a developer, it is expected to follow some best
+practices. One of these best practices is to use `ansible-lint`.
+
+We use the `pre-commit` python package to configure `ansible-lint` locally.
+
+Configure `pre-commit` with the following steps:
+
+- **Step 1: Install python package**
+
+  - Run the following command in the root project folder:
+
+    ```Linux
+    python -m pip install --user -r requirements.txt
+    ```
+
+- **Step 2: Setup pre-commit webhook**
+
+  - This will configure the pre-commit script at `.git/hooks/pre-commit`:
+
+    ```Linux
+    pre-commit install
+    ```
+
+- **Step 3: Verification**
+
+  - Test it by making some changes and commit them using:
+
+    ```Linux
+    git commit -m '<commit-message>'
+    ```
+
+Thats it. Ansible-lint should run and block you from commit locally if there are linting issues.
+
+If pre-commit is previously installed and a reinstall is required:
+
+```Linux
+pre-commit clean   
+pre-commit uninstall
+python -m pip install --user -r requirements.txt
+```
+
+## Versioning Notes
+
+These playbooks are tested with different versions of ACC. Below is a
+brief change-log of these playbooks.
+
+### ACC version 1.2.10 to 1.2.12
+
+- The names of the variables have changed. You will have to provide the right values to the
+  variables names in `*_ansible/admin_vars.yaml`, `*_ansible/owner_vars.yaml`
+  and `acc_install_ansible/acc_env_vars.yaml`.
+- The `other_usecases_ansible/12_logout_owner.yaml` has changed. ACC now
+  uses `POST /user/logout` instead of `DELETE /user/logout` API. This change
+  is reflected in the playbook.
