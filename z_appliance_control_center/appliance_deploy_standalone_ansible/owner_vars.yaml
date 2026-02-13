@@ -5,10 +5,13 @@
 # *|   - Initial release                                                    |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
-acc_ip: https://9.120.0.0:8081/api
+acc_url: https://9.120.0.0:8081/api
 
 ####### Users #######
 
@@ -33,14 +36,14 @@ package_name: "resource_package_1"
 
 ###########################################################################################
 # For single LPAR execution, comment out the lines below in the script 04_install_flow.yaml:
-# name: "{{ lpar_name1 }}"
+# name: "{{ lpar1_name }}"
 # execution_action: "{{ execution_action }}"
 # install: "{{ install }}"
 ###########################################################################################
 
 # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
-lpar_name1: "CC16"
-lpar_name2: "CC09"
+lpar1_name: "CC16"
+lpar2_name: "CC09"
 
 ####### Image #######
 

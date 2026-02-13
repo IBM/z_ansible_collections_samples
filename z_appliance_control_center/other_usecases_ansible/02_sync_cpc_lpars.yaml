@@ -8,6 +8,10 @@
 # *|   - Added checking of environment variables                            |
 # *|   - Renamed other_usecases_ansible/02_sync_demo to                     |
 # *|     other_usecases_ansible/02_sync_cpc_lpars.yaml.                     |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url and hmc_url with hmc_ip               |
+# *|   - Increased the timeout to 180 seconds                               |
 # *+------------------------------------------------------------------------+
 - name: ACC playbook, to be run as an ACC-admin, for syncing ACC with the HMC.
   hosts: localhost
@@ -18,16 +22,16 @@
     - name: Prepare ACC URL
       tags: admin
       ansible.builtin.set_fact:
-        cc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
+        acc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
 
     - name: Printing the ACC url
       tags: admin
       ansible.builtin.debug:
-        msg: "{{ cc_url }}"
+        msg: "{{ acc_url }}"
 
     - name: Get Initialize status
       ansible.builtin.uri:
-        url: "{{ cc_url }}/init"
+        url: "{{ acc_url }}/init"
         method: GET
         return_content: true
         validate_certs: false
@@ -101,7 +105,7 @@
     - name: 03 - Get authentication token from the ACC as admin
       tags: admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -121,11 +125,11 @@
       tags: admin
       when: acc_mode == "default"
       ansible.builtin.uri:
-        url: "{{ cc_url }}/config/hmcconfig"
+        url: "{{ acc_url }}/config/hmcconfig"
         timeout: 200
         method: POST
         body:
-          host: "{{ hmc_url }}"
+          host: "{{ hmc_ip }}"
           userid: "{{ hmc_user }}"
           password: "{{ hmc_password }}"
           verify_cert: false
@@ -141,7 +145,7 @@
       tags: admin
       when: acc_mode == "default"
       ansible.builtin.uri:
-        url: "{{ cc_url }}/sync/cpcs"
+        url: "{{ acc_url }}/sync/cpcs"
         method: POST
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -168,11 +172,12 @@
     - name: 07 - Sync LPARs
       tags: admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/sync/lpars"
+        url: "{{ acc_url }}/sync/lpars"
         method: POST
         headers:
           Authorization: "Bearer {{ access_token }}"
         validate_certs: false
+        timeout: 180
       register: lpar_sync_response
 
     - name: Print LPAR sync response

@@ -10,6 +10,8 @@
 # *|   - Moved appliance_deploy_default_ansible/acc_env_vars.yaml to        |
 # *|     acc_install_ansible/acc_env_vars.yaml checking of environment      |
 # *|     variables                                                          |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
 # *+------------------------------------------------------------------------+
 
 # Important: Before running the 00_acc_install.yaml script, kindly review the README file located in

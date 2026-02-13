@@ -5,6 +5,9 @@
 # *|   - Initial release                                                    |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Added mandatory wait before checking if appliance rebooted         |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for ACC appliance update
@@ -17,11 +20,11 @@
       private: false
 
     - name: app_username
-      prompt: "Enter your SSC LPAR's (ACC) username"
+      prompt: "Enter your SSC LPAR's (ACC) admin username"
       private: false
 
     - name: app_password
-      prompt: "Enter your SSC LPAR's (ACC) password"
+      prompt: "Enter your SSC LPAR's (ACC) admin password"
       private: true
 
     - name: update_bundle_path
@@ -262,10 +265,9 @@
           ansible.builtin.debug:
             msg: "Last returned status with status code: {{ appliance_update_status_response }}"
 
-        - name: Wait for a short period before checking reboot
-          ansible.builtin.pause:
-            seconds: 15
-          register: poll_wait
+        - name: Mandatory wait before checking reboot
+          ansible.builtin.wait_for:
+            timeout: 15
 
         - name: Notify user appliance is rebooting
           ansible.builtin.debug:
