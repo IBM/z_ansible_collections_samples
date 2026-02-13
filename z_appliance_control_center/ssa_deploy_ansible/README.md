@@ -45,8 +45,8 @@ mode of ACC, where ACC can communicate with the HMC.
   ```linux
     00 - Initialize ACC
     01 - Update ACC-admin password
-    05 - Create an appliance-owner for both SSAs
-    06 - Assign resources to the SSA owner
+    04 - Create an appliance-owner for both SSAs
+    05 - Assign resources to the SSA owner
     07 - Update the password of SSA appliance-owner
     09 - Upload the SSA appliance image to the ACC
   ```
@@ -131,9 +131,9 @@ To avoid such issues, always verify the correct network type in HMC before execu
 
 Please ensure that the correct disk type based on the system configuration:
 
-- For FCP disk, ensure that valid values for 'wwpn1' and 'lun1' are provided
+- For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
   - **Note**: When using FCP, the `disk*_id` variable represents the FCP device number used to communicate with the `lun` on the storage controller.
-- For DASD disk, the 'wwpn1' and 'lun1' values are not required
+- For DASD disk, the 'wwpn' and 'lun' values are not required
 
 This playbook will set up ACC, upload the images, initiate the install and then
 check the status of the install. The installation itself can take more than 15
@@ -165,8 +165,8 @@ mode of ACC, where ACC cannot communicate with the HMC.
   ```linux
     00 - Initialize ACC
     01 - Update ACC-admin password
-    05 - Create an appliance-owner for both SSAs
-    06 - Assign resources to the SSA owner
+    04 - Create an appliance-owner for both SSAs
+    05 - Assign resources to the SSA owner
     07 - Update the password of SSA appliance-owner
     09 - Upload the SSA appliance image to the ACC
   ```
@@ -216,7 +216,6 @@ mode of ACC, where ACC cannot communicate with the HMC.
 
 ### Important
 
-
 #### Select Correct Network Card Type (OSA/NETH)
 
 When running the playbook `02_ssa_install_e2e_standalone.yaml` under `ssa_deploy_ansible`, the playbook prompts the user to select the network card type for each SSA LPAR:
@@ -247,9 +246,9 @@ To avoid such issues, always verify the correct network type in HMC before execu
 
 Please ensure that the correct disk type based on the system configuration:
 
-- For FCP disk, ensure that valid values for 'wwpn1' and 'lun1' are provided
+- For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
   - **Note**: When using FCP, the `disk*_id` variable represents the FCP device number used to communicate with the `lun` on the storage controller.
-- For DASD disk, the 'wwpn1' and 'lun1' values are not required
+- For DASD disk, the 'wwpn' and 'lun' values are not required
 
 This playbook will set up ACC, upload the images, initiate the install and then
 check the status of the install. The installation itself can take more than 15

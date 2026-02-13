@@ -6,6 +6,11 @@
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Enhanced task monitoring by implementing dynamic                   |
+# *|     status polling until completion (Success/Failure).                 |
+# *|   - Replaced acc_ip with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-owner, for ACC-owner actions
@@ -44,7 +49,7 @@
     - name: 00 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -67,7 +72,7 @@
     - name: 01 - As owner, install and activate the image
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cluster/activate"
+        url: "{{ acc_url }}/cluster/activate"
         method: POST
         body: |
           {
@@ -83,12 +88,12 @@
               "hostname": "{{ hostname }}",
               "lpars": [
                   {
-                    "name": "{{ lpar_name1 }}",
+                    "name": "{{ lpar1_name }}",
                     "execution_action": "{{ execution_action }}",
                     "install": "{{ install }}"
                   },
                   {
-                    "name": "{{ lpar_name2 }}",
+                    "name": "{{ lpar2_name }}",
                     "execution_action": "{{ execution_action }}",
                     "install": "{{ install }}"
                   }
@@ -145,69 +150,51 @@
           Please check the previous step's response for details.
       when: task_ids | length == 0
 
-    - name: 02 - Get status of each install task
-      loop: "{{ task_ids }}"
-      loop_control:
-        loop_var: task_id
-      tags: owner, install
+    - name: Notify user that task status polling is starting
+      ansible.builtin.debug:
+        msg: |
+          ⏳ Fetching ACC task statuses for task IDs: {{ task_ids | join(', ') }}
+          This may take several minutes.
+
+    - name: Poll tasks status until all finish
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/tasks/{{ task_id }}/status"
+        url: "{{ acc_url }}/tasks/{{ item }}/status"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
         validate_certs: false
-      register: task_status
-
-    - name: Print task status responses
-      ansible.builtin.debug:
-        msg: "{{ item.json }}"
-      loop: "{{ task_status.results | default([task_status]) }}"
+        return_content: yes
+      loop: "{{ task_ids }}"
       loop_control:
-        label: "Task ID {{ item.task_id | default('unknown') }}"
-      when: item.json is defined
+        label: "Task {{ item }}"
+      register: poll_status
+      retries: 45       # max retries
+      delay: 40         # wait between retries
+      until: poll_status.json["action-status"] in ["Success", "Failed"]
+      failed_when: false 
 
-    - name: Notify user if task is In progress
-      ansible.builtin.debug:
-        msg: >
-          ⏳ One or more tasks are still in progress.
-          Please check the current status of in-progress task using the URLs below:
-          {%- set in_progress = task_status.results
-            | selectattr('json.action-status', 'defined')
-            | selectattr('json.action-status', 'match', '(?i)in progress')
-            | map(attribute='task_id')
-            | list %}
-          {%- for id in in_progress %}
-          • {{ acc_ip }}/tasks/{{ id }}/status
-          {%- endfor %}
-      when: >
-        task_status.results
-        | selectattr('json.action-status', 'defined')
-        | selectattr('json.action-status', 'match', '(?i)In progress')
-        | list
-        | length > 0
-
-    - name: Fail playbook if any task failed
-      ansible.builtin.fail:
-        msg: >
-          ❌ One or more install tasks have failed.
-          Failed Task IDs: {{
-            task_status.results
-            | selectattr('json.action-status', 'defined')
-            | selectattr('json.action-status', 'match', '(?i)fail')
-            | map(attribute='task_id')
+    - name: Evaluate all task results
+      ansible.builtin.set_fact:
+        acc_failed_tasks: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='item')
             | list
           }}
-      when: >
-        task_status.results
-        | selectattr('json.action-status', 'defined')
-        | selectattr('json.action-status', 'match', '(?i)fail')
-        | list
-        | length > 0
+    - name: Fail play if any task failed
+      ansible.builtin.fail:
+        msg: "❌ One or more ACC install tasks failed. Failed Task IDs: {{ acc_failed_tasks }}"
+      when: acc_failed_tasks | length > 0
+   
+    - name: "Success message if both completed"
+      ansible.builtin.debug:
+        msg: "✅ Both tasks finished successfully or one succeeded and the other failed."
 
     - name: 03 - Get resources assigned to the owner by the admin
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/pkgs"
+        url: "{{ acc_url }}/resource/pkgs"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -223,7 +210,7 @@
     - name: 04 - Get resources consumed by the owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"

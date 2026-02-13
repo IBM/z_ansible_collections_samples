@@ -6,6 +6,9 @@
 # *|     ssa_deploy_ansible/03_acc_ssa_install_check.yaml                   |
 # *|   - Added checking of environment variables                            |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - acc_ip extracted from acc_url automatically                        |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run as ACC-admin, to get sanity check of ACC and SSAs install
@@ -14,7 +17,6 @@
   vars_files:
     - env_vars.yaml
   vars:
-    acc_base_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
     ssa1_base_url: "https://{{ app1_ip }}/api/com.ibm.zaci.system"
     ssa2_base_url: "https://{{ app2_ip }}/api/com.ibm.zaci.system"
 
@@ -56,6 +58,10 @@
       private: true
 
   tasks:
+    - name: Extract IP from URL
+      ansible.builtin.set_fact:
+        acc_ip: "{{ acc_url | urlsplit('hostname') }}"
+        
     - name: 00 - Check if ACC appliance is operational
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}/api/com.ibm.zaci.system/appliance/is-operational"
@@ -89,7 +95,7 @@
 
     - name: 04 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
-        url: "{{ acc_base_url }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -111,7 +117,7 @@
 
     - name: 05 - Get status of HMC connectivity from ACC
       ansible.builtin.uri:
-        url: "{{ acc_base_url }}/cpcs/hmc-connection"
+        url: "{{ acc_url }}/cpcs/hmc-connection"
         timeout: 200
         method: GET
         headers:

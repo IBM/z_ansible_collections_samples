@@ -4,6 +4,11 @@
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Initial release                                                    |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Enhanced task monitoring by implementing dynamic                   |
+# *|     status polling until completion (Success/Failure).                 |
+# *|   - Replaced cc_url with acc_url                                       |
 # *+------------------------------------------------------------------------+
 
 # Tested with OSA and FCP devices, on non-DPM mode machine.
@@ -58,8 +63,8 @@
 
             00 - Initialize ACC
             01 - Update ACC-admin password
-            05 - Create an appliance-owner for both SSAs
-            06 - Assign resources to the SSA owner
+            04 - Create an appliance-owner for both SSAs
+            05 - Assign resources to the SSA owner
             07 - Update the password of SSA appliance-owner
             09 - Upload the SSA appliance image to the ACC
 
@@ -92,15 +97,6 @@
       default: "yes"
 
   tasks:
-    - name: Prepare ACC URL
-      tags: admin, owner, retry
-      ansible.builtin.set_fact:
-        cc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
-
-    - name: Printing the ACC url
-      tags: admin, owner, retry
-      ansible.builtin.debug:
-        msg: "{{ cc_url }}"
 
     - name: Prepare execution_action
       tags: retry
@@ -115,7 +111,7 @@
     - name: 00 - Initialize ACC
       tags: admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/init"
+        url: "{{ acc_url }}/init"
         body:
           mfa_enable: "{{ mfa_enabled }}"
           hmc_managed: false
@@ -152,7 +148,7 @@
     - name: 01 - Update ACC-admin password (remove this if already done)
       tags: admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user"
+        url: "{{ acc_url }}/user"
         body:
           username: "{{ cc_admin_user }}"
           old_password: "{{ cc_admin_old_password }}"
@@ -188,7 +184,7 @@
     - name: 02 - Get authentication token from the ACC as admin
       tags: admin, retry
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -207,7 +203,7 @@
     - name: 03 - Insert CPC information in ACC with dummy values (standalone mode)
       tags: admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/cpcs"
+        url: "{{ acc_url }}/cpcs"
         timeout: 200
         method: POST
         body:
@@ -227,7 +223,7 @@
     - name: 04 - Create an appliance-owner for both SSAs
       tags: admin
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user"
+        url: "{{ acc_url }}/user"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -269,47 +265,47 @@
         - name: Enter network card type for 1st LPAR
           ansible.builtin.pause:
             prompt: "Enter network card type to be used for LPAR {{ lpar1_name }}: (OSA/NETH)"
-          register: net_type1_raw
+          register: net1_type_raw
 
         - name: Normalize network type 1
           ansible.builtin.set_fact:
-            net_type1: "{{ net_type1_raw.user_input | trim | upper }}"
+            net1_type: "{{ net1_type_raw.user_input | trim | upper }}"
 
         - name: Validate network type
           ansible.legacy.fail:
             msg: "Invalid input! Allowed values: OSA, NETH"
-          when: net_type1 not in ['OSA', 'NETH']
+          when: net1_type not in ['OSA', 'NETH']
 
         - name: VLAN configuration
           ansible.builtin.pause:
             prompt: "Does the LPAR {{ lpar1_name }} need VLAN configuration? (yes/no)"
-          register: vlan_1_raw
+          register: vlan1_raw
 
         - name: Normalize VLAN input for LPAR1
           ansible.builtin.set_fact:
-            vlan_1: "{{ (vlan_1_raw.user_input | trim | lower) == 'yes' }}"
+            vlan_1: "{{ (vlan1_raw.user_input | trim | lower) == 'yes' }}"
 
         - name: Validate VLAN confirmation
           ansible.legacy.fail:
             msg: "Invalid input"
-          when: vlan_1_raw.user_input | trim | lower not in ['yes', 'no']
+          when: vlan1_raw.user_input | trim | lower not in ['yes', 'no']
 
         - name: IMPORTANT - Boot Disk Selection
           ansible.builtin.debug:
             msg: |
               Select the correct disk type based on the system configuration.
-                - For FCP disk, ensure that valid values for 'wwpn1' and 'lun1' are provided
-                - For DASD disk, the 'wwpn1' and 'lun1' values are not required
+                - For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
+                - For DASD disk, the 'wwpn' and 'lun' values are not required
 
                 
         - name: Enter boot disk type for 1st LPAR [DASD/FCP]
           ansible.builtin.pause:
             prompt: "Enter boot disk type for LPAR {{ lpar1_name }}: (DASD/FCP)"
-          register: is_fcp_1_raw
+          register: is_fcp1_raw
 
         - name: Normalize boot disk 1
           ansible.builtin.set_fact:
-            is_fcp_1: "{{ is_fcp_1_raw.user_input | trim | upper }}"
+            is_fcp_1: "{{ is_fcp1_raw.user_input | trim | upper }}"
 
         - name: Validate disk type
           ansible.legacy.fail:
@@ -319,39 +315,39 @@
         - name: Enter network card type for 2nd LPAR
           ansible.builtin.pause:
             prompt: "Enter network card type to be used for LPAR {{ lpar2_name }}: (OSA/NETH)"
-          register: net_type2_raw
+          register: net2_type_raw
 
         - name: Normalize network type 2
           ansible.builtin.set_fact:
-            net_type2: "{{ net_type2_raw.user_input | trim | upper }}"
+            net2_type: "{{ net2_type_raw.user_input | trim | upper }}"
 
         - name: Validate Network type
           ansible.legacy.fail:
             msg: "Invalid input! Allowed values: OSA, NETH"
-          when: net_type2 not in ['OSA', 'NETH']
+          when: net2_type not in ['OSA', 'NETH']
 
         - name: VLAN Configuration
           ansible.builtin.pause:
             prompt: "Does the LPAR {{ lpar2_name }} need VLAN configuration? (yes/no)"
-          register: vlan_2_raw
+          register: vlan2_raw
 
         - name: Normalize VLAN input for LPAR1
           ansible.builtin.set_fact:
-            vlan_2: "{{ (vlan_2_raw.user_input | trim | lower) == 'yes' }}"
+            vlan_2: "{{ (vlan2_raw.user_input | trim | lower) == 'yes' }}"
 
         - name: Validate VLAN confirmation
           ansible.legacy.fail:
             msg: "Invalid input"
-          when: vlan_2_raw.user_input | trim | lower not in ['yes', 'no']
+          when: vlan2_raw.user_input | trim | lower not in ['yes', 'no']
 
         - name: Enter boot disk type for 2nd LPAR [DASD/FCP]
           ansible.builtin.pause:
             prompt: "Enter boot disk type for LPAR {{ lpar2_name }}: (DASD/FCP)"
-          register: is_fcp_2_raw
+          register: is_fcp2_raw
 
         - name: Normalize boot disk 2
           ansible.builtin.set_fact:
-            is_fcp_2: "{{ is_fcp_2_raw.user_input | trim | upper }}"
+            is_fcp_2: "{{ is_fcp2_raw.user_input | trim | upper }}"
 
         - name: Validate Disk type
           ansible.legacy.fail:
@@ -361,48 +357,48 @@
         - name: Entered values for network by the user
           ansible.builtin.debug:
             msg:
-              - "{{ net_type1 }}"
-              - "{{ net_type2 }}"
-              - "{{ vlan_1 }}"
-              - "{{ vlan_2 }}"
-              - "{{ is_fcp_1 }}"
-              - "{{ is_fcp_2 }}"
+              - "LPAR1 Network Type: {{ net1_type }}"
+              - "LPAR2 Network Type: {{ net2_type }}"
+              - "LPAR1 VLAN Usage: {{ vlan1_raw.user_input }}"
+              - "LPAR2 VLAN Usage: {{ vlan2_raw.user_input }}"
+              - "LPAR1 Boot Disk Type: {{ is_fcp_1 }}"
+              - "LPAR2 Boot Disk Type: {{ is_fcp_2 }}"
 
         - name: Preparing OSA params for "{{ lpar1_name }}"
           ansible.builtin.set_fact:
-            nw_details1: >-
+            nw1_details: >-
               {{ var_details1
                   | combine({ 'chpid': chpid1, 'port': zport1 })
                   | combine(vlan_1 | ternary({ 'vlan_id':vlan1_id }, {})
                   ) }}
-          when: net_type1 == 'OSA'
+          when: net1_type == 'OSA'
 
         - name: Preparing OSA params for "{{ lpar2_name }}"
           ansible.builtin.set_fact:
-            nw_details2: >-
+            nw2_details: >-
               {{ var_details2
                 | combine({ 'chpid': chpid2, 'port': zport2 })
                 | combine(vlan_2 | ternary({ 'vlan_id':vlan2_id }, {})
                 ) }}
-          when: net_type2 == 'OSA'
+          when: net2_type == 'OSA'
 
         - name: Preparing NETH params for {{ lpar1_name }}
           ansible.builtin.set_fact:
-            nw_details1: "{{ var_details1 | combine({'fid': fid1}) | combine(vlan_1 | ternary({'vlan_id': vlan1_id}, {})) }}"
-          when: net_type1 == 'NETH'
+            nw1_details: "{{ var_details1 | combine({'fid': fid1}) | combine(vlan_1 | ternary({'vlan_id': vlan1_id}, {})) }}"
+          when: net1_type == 'NETH'
 
         - name: Preparing NETH params for {{ lpar2_name }}
           ansible.builtin.set_fact:
-            nw_details2: "{{ var_details2 | combine({'fid': fid2}) | combine(vlan_2 | ternary({'vlan_id': vlan2_id}, {})) }}"
-          when: net_type2 == 'NETH'
+            nw2_details: "{{ var_details2 | combine({'fid': fid2}) | combine(vlan_2 | ternary({'vlan_id': vlan2_id}, {})) }}"
+          when: net2_type == 'NETH'
 
         - name: Preparing boot params for {{ lpar1_name }}
           ansible.builtin.set_fact:
-            boot_info1: "{{ {'disk-id': disk1_id} | combine((is_fcp_1 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn1, 'lun': lun1}, {'is-fcp': false})) }}"
+            boot1_info: "{{ {'disk-id': disk1_id} | combine((is_fcp_1 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn1, 'lun': lun1}, {'is-fcp': false})) }}"
 
         - name: Preparing boot params for {{ lpar2_name }}
           ansible.builtin.set_fact:
-            boot_info2: "{{ {'disk-id': disk2_id} | combine((is_fcp_2 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn2, 'lun': lun2}, {'is-fcp': false})) }}"
+            boot2_info: "{{ {'disk-id': disk2_id} | combine((is_fcp_2 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn2, 'lun': lun2}, {'is-fcp': false})) }}"
 
         - name: Creating the API request for resource pkg creation
           ansible.builtin.set_fact:
@@ -417,12 +413,12 @@
                   'lpars':[
                     {
                       'name': lpar1_name,
-                      'interfaces':[ nw_details1 ],
-                      'boot-info': boot_info1
+                      'interfaces':[ nw1_details ],
+                      'boot-info': boot1_info
                       },
                   { 'name': lpar2_name,
-                    'interfaces': [ nw_details2 ],
-                      'boot-info': boot_info2
+                    'interfaces': [ nw2_details ],
+                      'boot-info': boot2_info
                     }
                   ],
                   'cpc':  z_machine_name,
@@ -436,7 +432,7 @@
         - name: Submitting the request to ACC to create package with 2 SSA LPARs
           tags: admin
           ansible.builtin.uri:
-            url: "{{ cc_url }}/resource/pkgs"
+            url: "{{ acc_url }}/resource/pkgs"
             timeout: 300
             method: POST
             body: "{{ body }}"
@@ -457,7 +453,7 @@
     - name: 06 - Generate temporary 2FA secret for owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ cc_url }}/mfa/secret/owner"
+        url: "{{ acc_url }}/mfa/secret/owner"
         body:
           username: "{{ cc_owner_user }}"
         body_format: json
@@ -494,7 +490,7 @@
     - name: 07 - Update the password of ACC appliance-owner
       tags: owner
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user"
+        url: "{{ acc_url }}/user"
         body:
           username: "{{ cc_owner_user }}"
           old_password: "{{ cc_owner_default_password }}"
@@ -531,7 +527,7 @@
     - name: 08 - Get authentication token from the ACC as appliance-owner
       tags: owner, retry
       ansible.builtin.uri:
-        url: "{{ cc_url }}/user/token"
+        url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
@@ -550,7 +546,7 @@
     - name: 09 - Upload the SSA appliance image to the ACC
       tags: owner
       ansible.builtin.shell: 'curl -k -X "POST" \
-        "{{ cc_url }}/images" \
+        "{{ acc_url }}/images" \
         -H "Authorization: Bearer {{ access_token }}" \
         -H "Content-Type: multipart/form-data" \
         -F "data=@{{ image_path }}" \
@@ -566,7 +562,7 @@
     - name: 10 - Get image information
       tags: owner, retry
       ansible.builtin.uri:
-        url: "{{ cc_url }}/images"
+        url: "{{ acc_url }}/images"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -588,7 +584,7 @@
     - name: 11 - Get list of running appliance
       tags: owner, install, retry
       ansible.builtin.uri:
-        url: "{{ cc_url }}/resource/quotas"
+        url: "{{ acc_url }}/resource/quotas"
         method: GET
         headers:
           Accept: "application/json"
@@ -633,7 +629,7 @@
       loop_control:
         loop_var: app_id
       ansible.builtin.uri:
-        url: "{{ cc_url }}/unlock_quota"
+        url: "{{ acc_url }}/unlock_quota"
         method: POST
         body:
           {
@@ -654,7 +650,7 @@
     - name: 13 - As owner, install and activate the image
       tags: owner, retry
       ansible.builtin.uri:
-        url: "{{ cc_url }}/cluster/activate"
+        url: "{{ acc_url }}/cluster/activate"
         method: POST
         body: |
           {
@@ -735,63 +731,38 @@
           Please check the previous step's response for details.
       when: task_ids | length == 0
 
-    - name: 14 - Get status of each install task
-      loop: "{{ task_ids }}"
-      loop_control:
-        loop_var: task_id
-      tags: owner, install, retry
+    - name: Poll tasks status until all finish
       ansible.builtin.uri:
-        url: "{{ cc_url }}/tasks/{{ task_id }}/status"
+        url: "{{ acc_url }}/tasks/{{ item }}/status"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
         validate_certs: false
-      register: task_status
-
-    - name: Print task status responses
-      tags: owner, install, retry
-      ansible.builtin.debug:
-        msg: "{{ item.json }}"
-      loop: "{{ task_status.results | default([task_status]) }}"
+        return_content: yes
+      loop: "{{ task_ids }}"
       loop_control:
-        label: "Task ID {{ item.task_id | default('unknown') }}"
-      when: item.json is defined
-    - name: Notify user if task is In progress
-      ansible.builtin.debug:
-        msg: >
-          ⏳ One or more tasks are still in progress. Please check the current
-          status of in-progress task using the ACC API endpoints below. Be sure
-          to include the API token in the header in order to view the necessary
-          information.
-          {%- set in_progress = task_status.results
-            | selectattr('json.action-status', 'defined')
-            | selectattr('json.action-status', 'match', '(?i)in progress')
-            | map(attribute='task_id')
-            | list %}
-          {%- for id in in_progress %}
-          * {{ cc_url }}/tasks/{{ id }}/status
-          {%- endfor %}
-      when: >
-        task_status.results
-        | selectattr('json.action-status', 'defined')
-        | selectattr('json.action-status', 'match', '(?i)In progress')
-        | list
-        | length > 0
+        label: "Task {{ item }}"
+      register: poll_status
+      retries: 45       # max retries
+      delay: 40         # wait between retries
+      until: poll_status.json["action-status"] in ["Success", "Failed"]
+      failed_when: false 
 
-    - name: Fail playbook if any task failed
-      ansible.builtin.fail:
-        msg: >
-          ❌ One or more install tasks have failed.
-          Failed Task IDs: {{
-            task_status.results
-            | selectattr('json.action-status', 'defined')
-            | selectattr('json.action-status', 'match', '(?i)fail')
-            | map(attribute='task_id')
+    - name: Evaluate all task results
+      ansible.builtin.set_fact:
+        acc_failed_tasks: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='item')
             | list
           }}
-      when: >
-        task_status.results
-        | selectattr('json.action-status', 'defined')
-        | selectattr('json.action-status', 'match', '(?i)fail')
-        | list
-        | length > 0
+    - name: Fail play if any task failed
+      ansible.builtin.fail:
+        msg: "❌ One or more ACC install tasks failed. Failed Task IDs: {{ acc_failed_tasks }}"
+      when: acc_failed_tasks | length > 0
+   
+    - name: "Success message if both completed"
+      ansible.builtin.debug:
+        msg: "✅ Both tasks finished successfully or one succeeded and the other failed."
+
