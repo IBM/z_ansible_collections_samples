@@ -1,0 +1,224 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Enhanced task monitoring by implementing dynamic                   |
+# *|     status polling until completion (Success/Failure).                 |
+# *|   - Replaced acc_ip with acc_url                                       |
+# *+------------------------------------------------------------------------+
+
+- name: ACC playbook, run by ACC-owner, for ACC-owner actions
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - owner_vars.yaml
+
+  pre_tasks:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export credentials:
+
+          export ACC_OWNER_PASSWORD=<owner_new_password>
+          export APP_USERNAME=<appliance_username>
+          export APP_PASSWORD=<appliance_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_PASSWORD
+          - APP_USERNAME
+          - APP_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+  tasks:
+    - name: Wait for user to generate OTP using Owner mfa secret
+      ansible.builtin.pause:
+        prompt: "Enter OTP generated from the owner mfa_secret:"
+      register: mfa_otp_input
+
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ mfa_otp_input.user_input }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the token
+      tags: owner, install
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Printing the image ID
+      tags: owner, install
+      ansible.builtin.debug:
+        msg: "{{ image_id }}"
+
+    - name: 01 - As owner, install and activate the image
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/cluster/activate"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}":
+            {
+              "image_id": {{ image_id }},
+              "processor_usage": "{{ processor_usage }}",
+              "processor_type": "{{ processor_type }}",
+              "memory": {{ app_memory }},
+              "cores": {{ app_cores }},
+              "username": "{{ app_username }}",
+              "password": "{{ app_password }}",
+              "hostname": "{{ hostname }}",
+              "lpars": [
+                  {
+                    "name": "{{ lpar1_name }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  },
+                  {
+                    "name": "{{ lpar2_name }}",
+                    "execution_action": "{{ execution_action }}",
+                    "install": "{{ install }}"
+                  }
+                ]
+              }
+            }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: 200
+        validate_certs: false
+      register: activate_response
+
+    - name: Printing the response
+      tags: owner, install
+      ansible.builtin.debug:
+        var: activate_response.json
+
+    - name: Wait for 15 seconds
+      ansible.builtin.pause:
+        seconds: 15
+
+    # Extract all task IDs from response
+    - name: Extract task IDs dynamically
+      ansible.builtin.set_fact:
+        task_ids: >-
+          {{
+            activate_response.json
+            | dict2items
+            | map(attribute='value')
+            | map('dict2items')
+            | flatten
+            | map(attribute='value')
+            | selectattr('task_id', 'defined')
+            | map(attribute='task_id')
+            | list
+          }}
+
+    - name: Print extracted task IDs
+      ansible.builtin.debug:
+        msg: >-
+          {% if task_ids | length > 0 %}
+            Task IDs for active LPARs: {{ task_ids | join(', ') }}
+          {% else %}
+            No task IDs found — activation failed.
+          {% endif %}
+
+    - name: Fail playbook if no task IDs were generated
+      ansible.builtin.fail:
+        msg: >
+          ❌ No task IDs Found.
+          This indicates activation failed before tasks could be created.
+          Please check the previous step's response for details.
+      when: task_ids | length == 0
+
+    - name: Poll tasks status until all finish
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/tasks/{{ item }}/status"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+        return_content: yes
+      loop: "{{ task_ids }}"
+      loop_control:
+        label: "Task {{ item }}"
+      register: poll_status
+      retries: 45       # max retries
+      delay: 40         # wait between retries
+      until: poll_status.json["action-status"] in ["Success", "Failed"]
+      failed_when: false 
+
+    - name: Evaluate all task results
+      ansible.builtin.set_fact:
+        acc_failed_tasks: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='item')
+            | list
+          }}
+    - name: Fail play if any task failed
+      ansible.builtin.fail:
+        msg: "❌ One or more ACC install tasks failed. Failed Task IDs: {{ acc_failed_tasks }}"
+      when: acc_failed_tasks | length > 0
+   
+    - name: "Success message if both completed"
+      ansible.builtin.debug:
+        msg: "✅ Both tasks finished successfully or one succeeded and the other failed."
+
+    - name: 03 - Get resources assigned to the owner by the admin
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/resource/pkgs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the assigned resources
+      tags: owner
+      ansible.builtin.debug:
+        msg: "{{ response.json }}"
+
+    - name: 04 - Get resources consumed by the owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/resource/quotas"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+      register: response
+
+    - name: Printing the consumed resources
+      tags: owner
+      ansible.builtin.debug:
+        msg: "{{ response.json }}"

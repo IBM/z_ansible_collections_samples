@@ -1,0 +1,261 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| [10.17.2025]                                                           |
+# *|   - Tested with ACC 1.2.6                                              |
+# *|   - Initial release                                                    |
+# *| [12.12.2025]                                                           |
+# *|   - Tested with ACC 1.2.10                                             |
+# *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Introduced configurable user inputs for network                    |
+# *|     parameters (VLAN, FCP/DASD, OSA/NETH).                             |
+# *|   - Replaced acc_ip with acc_url                                       |
+# *+------------------------------------------------------------------------+
+
+- name: ACC playbook, run by ACC-admin, for assigning one resource.
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - admin_vars.yaml
+
+  pre_tasks:
+    - name: Reminder - Export ACC admin credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export ACC admin credentials:
+
+          export ACC_ADMIN_USER=<admin_username>
+          export ACC_ADMIN_PASSWORD=<admin_new_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_ADMIN_USER
+          - ACC_ADMIN_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+  tasks:
+    - name: Confirmation required before proceeding
+      ansible.builtin.pause:
+        prompt: |
+          This playbook will create a **resource package with ONE LPAR only**.
+          Use 02b_assign_2_lpar.yaml playbook to create resource package with 2 lpars (Don't Run Both).
+          If you want to proceed, press **Ctrl+C** and then **C**.
+          If you want to cancel, press **Ctrl+C** and then **A**.
+          If no action is taken, it will auto-continue in 20 seconds.
+        seconds: 20
+
+    - name: Wait for user to generate OTP
+      ansible.builtin.pause:
+        prompt: "Enter OTP generated from the admin mfa_secret:"
+      register: mfa_otp_input
+
+    - name: 00 - Get authentication token from the ACC as admin
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+          otp: "{{ mfa_otp_input.user_input }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Printing the response of authentication
+      ansible.builtin.debug:
+        msg:
+          - "{{ auth_response.json.access_token }}"
+
+    - name: Extract the admin token
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 01 - Validate WWPN and LUN values
+      vars:
+        hex_pattern: "^[A-Fa-f0-9]{16}$"
+        wwpn_vars:
+          - "{{ wwpn1 | default('') }}"
+          - "{{ wwpn2 | default('') }}"
+        lun_vars:
+          - "{{ lun1 | default('') }}"
+          - "{{ lun2 | default('') }}"
+      block:
+        - name: Validate WWPN formats
+          vars:
+            msg_invalid_wwpn: "Invalid WWPN '{{ item }}': must be a 16-digit hexadecimal string without '0x' prefix."
+          ansible.builtin.fail:
+            msg: "{{ msg_invalid_wwpn }}"
+          when:
+            - item | length > 0
+            - item is not match(hex_pattern)
+          loop: "{{ wwpn_vars }}"
+        - name: Validate LUN formats
+          vars:
+            msg_invalid_lun: "Invalid LUN '{{ item }}': must be a 16-digit hexadecimal string without '0x' prefix."
+          ansible.builtin.fail:
+            msg: "{{ msg_invalid_lun }}"
+          when:
+            - item | length > 0
+            - item is not match(hex_pattern)
+          loop: "{{ lun_vars }}"
+
+
+    - name: 02 - As ACC-admin, assign single LPAR to the owner
+      block:
+        - name: Gathering Network Parameters for lpar1
+          ansible.builtin.set_fact:
+            var_details1:
+              name: "{{ interface1_name }}"
+              prefix: "{{ prefix1 }}"
+              ip: "{{ app1_ip }}"
+              gw: "{{ gw1_ip }}"
+
+        - name: IMPORTANT - Network Card Type Selection
+          ansible.builtin.debug:
+            msg: |
+              Select the correct network card type based on the system configuration.
+              Selection Criteria:
+                - If CHPID and Port are provided -> choose OSA
+                - If FID is provided -> choose NETH
+
+        - name: Enter network card type for 1st LPAR
+          ansible.builtin.pause:
+            prompt: "Enter network card type to be used for LPAR {{ lpar1_name }}: (OSA/NETH)"
+          register: net1_type_raw
+
+        - name: Normalize network type 1
+          ansible.builtin.set_fact:
+            net1_type: "{{ net1_type_raw.user_input | trim | upper }}"
+
+        - name: Validate network type
+          ansible.legacy.fail:
+            msg: "Invalid input! Allowed values: OSA, NETH"
+          when: net1_type not in ['OSA', 'NETH']
+
+        - name: VLAN configuration
+          ansible.builtin.pause:
+            prompt: "Does the LPAR {{ lpar1_name }} need VLAN configuration? (yes/no)"
+          register: vlan1_raw
+
+        - name: Normalize VLAN input for LPAR1
+          ansible.builtin.set_fact:
+            vlan_1: "{{ (vlan1_raw.user_input | trim | lower) == 'yes' }}"
+
+        - name: Validate VLAN confirmation
+          ansible.builtin.fail:
+            msg: "Invalid input"
+          when: vlan1_raw.user_input | trim | lower not in ['yes', 'no']
+
+        - name: IMPORTANT - Boot Disk Selection
+          ansible.builtin.debug:
+            msg: |
+              Select the correct disk type based on the system configuration.
+                - For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
+                - For DASD disk, the 'wwpn' and 'lun' values are not required
+
+
+        - name: Enter boot disk type for 1st LPAR [DASD/FCP]
+          ansible.builtin.pause:
+            prompt: "Enter boot disk type for LPAR {{ lpar1_name }}: (DASD/FCP)"
+          register: is_fcp1_raw
+
+        - name: Normalize boot disk 1
+          ansible.builtin.set_fact:
+            is_fcp_1: "{{ is_fcp1_raw.user_input | trim | upper }}"
+
+        - name: Validate disk type
+          ansible.legacy.fail:
+            msg: "Invalid input"
+          when: is_fcp_1 not in ['DASD', 'FCP']
+
+        - name: Entered values for network by the user
+          ansible.builtin.debug:
+            msg:
+              - "Network Type: {{ net1_type }}"
+              - "VLAN Usage: {{ vlan1_raw.user_input }}"
+              - "Boot Disk Type: {{ is_fcp_1 }}"
+
+        - name: Preparing OSA params for "{{ lpar1_name }}"
+          ansible.builtin.set_fact:
+            nw1_details: >-
+              {{ var_details1
+                  | combine({'chpid': chpid1, 'port': zport1})
+                  | combine(vlan_1 | ternary({'vlan_id':vlan1_id}, {})
+                  ) }}
+          when: net1_type == 'OSA'
+
+        - name: Preparing NETH params for {{ lpar1_name }}
+          ansible.builtin.set_fact:
+            nw1_details: "{{ var_details1 | combine({'fid': fid1}) | combine(vlan_1 | ternary({'vlan_id': vlan1_id}, {})) }}"
+          when: net1_type == 'NETH'
+
+        - name: Preparing boot params for {{ lpar1_name }}
+          ansible.builtin.set_fact:
+            boot1_info: "{{ {'disk-id': disk1_id} | combine((is_fcp_1 == 'FCP') | ternary({'is-fcp': true, 'wwpn': wwpn1, 'lun': lun1}, {'is-fcp': false})) }}"
+
+        - name: Creating the API request for resource pkg creation
+          ansible.builtin.set_fact:
+            body: >-
+              {{
+                {
+                  'owner': cc_owner_user,
+                  'name': package_name,
+                  'ifls': package_ifls,
+                  'gps': package_gps,
+                  'memory': package_memory_mb,
+                  'lpars':[
+                    {
+                      'name': lpar1_name,
+                      'interfaces':[ nw1_details ],
+                      'boot-info': boot1_info
+                      }
+                  ],
+                  'cpc':  z_machine_name,
+                  'x86': "dummy"
+                }
+              }}
+        - name: Resource package request body
+          ansible.builtin.debug:
+            var: body
+
+        - name: Submitting the request to ACC to create package with 1 LPAR
+          tags: admin
+          ansible.builtin.uri:
+            url: "{{ acc_url }}/resource/pkgs"
+            timeout: 300
+            method: POST
+            body: "{{ body }}"
+
+            body_format: json
+            headers:
+              Authorization: "Bearer {{ access_token }}"
+              Content-Type: application/json
+            validate_certs: false
+            status_code: 200
+          register: response
+
+    - name: Printing the response
+      tags: owner, install
+      ansible.builtin.debug:
+        msg: "{{ response.json }}"
+
+    - name: Check if any LPARs are activated in HMC.
+      vars:
+        lpars_sync_list: "{{ response.json.lpars_sync_scheduled | from_yaml }}"
+      when: lpars_sync_list | length > 0
+      ansible.builtin.debug:
+        msg: >
+          ⚠️ Caution: One or more LPARs are in *Operating* state in HMC.
+          Please be cautious before performing installation.
+          LPARs: {{ lpars_sync_list }}
