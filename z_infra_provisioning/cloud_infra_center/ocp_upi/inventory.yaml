@@ -41,7 +41,7 @@ all:
       disk_type: 'dasd'
       # volume_type_id: '<storage-template-id>'
 
-      openshift_version: '4.12'
+      openshift_version: '4.18'
       openshift_minor_version: 'latest'
 
       auto_allocated_ip: true
