@@ -38,6 +38,7 @@
       zos_copy:
         src: "{{ jcl_file }}"
         dest: "USER.PRIVATE.PROCLIB(MEM1)"
+        replace: True
       register: copy_out
     - name: print copy_out
       debug:
@@ -61,6 +62,7 @@
           # subsystem:
           # wait_time:
           # wait_full_time:
+          system_logs: True
           verbose: True
       register: start_out
     - name: print start_out
@@ -76,7 +78,9 @@
       zos_started_task:
           state: displayed
           job: MEM1
+          # task_id: STC00266
           # identifier: vlf
+          # system_logs: True
           verbose: True
       register: display_out
     - name: print display_out
@@ -92,12 +96,14 @@
       zos_started_task:
           state: cancelled
           job: MEM1
-          # armrestart:
-          # asid: "0071"
+          # task_id: STC00266
+          # armrestart: 
+          # asidx: "0071"
           # dump:
           # identifier_name:
           # userid:
-          verbose: True
+          # system_logs: True
+          # verbose: True
       register: cancel_out
     - name: print cancel_out
       debug:
@@ -113,9 +119,13 @@
       zos_started_task:
           state: modified
           job: vlf
+          # task_id: STC00266
           # identifier_name:
-          parameters: [<<parameters>>]
-          verbose: True
+          parameters:
+            - "REPLACE"
+            - "NN=02"
+          # system_logs: True
+          # verbose: True
       register: modify_out
     - name: print modify_out
       debug:
@@ -130,10 +140,12 @@
     - name: Execute started task stop command
       zos_started_task:
           state: stopped
-          job: << Started task name >>
-          # asid:
+          job: VLF
+          # task_id: STC00266
+          # asidx:
           # identifier_name:
           # verbose: True
+          # system_logs: True
       register: stop_out
     - name: print stop_out
       debug:
@@ -148,13 +160,15 @@
     - name: Execute started task force command
       zos_started_task:
           state: forced
-          job: << Started task name >>
-          # asid:
+          job: ICSF
+          # task_id: STC00266
+          # asidx:
           arm: True
           # armrestart:
           # identifier_name:
           # userid:
-          verbose: True
+          # system_logs: True
+          # verbose: True
       register: force_out
     - name: print force_out
       debug:
@@ -169,3 +183,51 @@
         name: 'user.private.proclib(mem1)'
         state: absent
         type: member
+
+    # #######################################################################################
+    # Start default started task 'ICSF' which got stopped in previous steps
+    # #######################################################################################
+    - name: Execute started task start command to restart default task ICSF
+      zos_started_task:
+          state: started
+          member: ICSF
+          # identifier: 
+          # job_account:
+          # job_name:
+          # parameters:
+          # keyword_parameters:
+          # reus_asid:
+          # subsystem:
+          # wait_time:
+          # wait_full_time:
+          # system_logs: True
+          # verbose: True
+      register: start_out
+    - name: print start_out
+      debug:
+        msg:
+          - "{{ start_out }}"
+    
+    # #######################################################################################
+    # Start default started task 'VLF' which got stopped in previous steps
+    # #######################################################################################
+    - name: Execute started task start command to restart default task VLF
+      zos_started_task:
+          state: started
+          member: VLF
+          # identifier: 
+          # job_account:
+          # job_name:
+          # parameters:
+          # keyword_parameters:
+          # reus_asid:
+          subsystem: MSTR
+          # wait_time:
+          # wait_full_time:
+          system_logs: True
+          # verbose: True
+      register: start_out
+    - name: print start_out
+      debug:
+        msg:
+          - "{{ start_out }}"
