@@ -34,7 +34,7 @@
     # a simple script that executes a sleep command, which is used for demonstration purposes
     # in this playbook.
     # #######################################################################################
-    - name: Copy a jcl file into PDS member
+    - name: Copy sample JCL containing sleep command to 'MEM1' member
       zos_copy:
         src: "{{ jcl_file }}"
         dest: "USER.PRIVATE.PROCLIB(MEM1)"
