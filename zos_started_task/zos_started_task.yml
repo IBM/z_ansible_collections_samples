@@ -1,16 +1,11 @@
 ###############################################################################
-# © Copyright IBM Corporation 2025
+# © Copyright IBM Corporation 2026
 ###############################################################################
 
 ###############################################################################
-# This playbook demonstrates how to use zos_stat to query the attributes of
-# different types of resources found in z/OS (such as data sets, Generation
-# Data Groups, aggregates and USS files) using Red Hat Ansible Certified
-# Content for IBM Z.
-# This playbook is divided up into five independent sections. The tasks in each
-# section are grouped into 'blocks' that are tagged. The example below shows how
-# the playbook can be run so that only the tasks in the block tagged as
-# 'data_set' are run.
+# This playbook demonstrates how to use zos_started_task to manage z/OS started
+# tasks (such as start, stop, display, cancel, force and modify) using Red Hat
+# Ansible Certified Content for IBM Z.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -23,7 +18,7 @@
 #
 ###############################################################################
 
-- name: Sample zos_stat playbook.
+- name: Sample zos_started_task playbook.
   hosts: zos_host
   collections:
     - "ibm.ibm_zos_core"
@@ -31,9 +26,14 @@
   environment: "{{ environment_vars }}"
 
   vars:
-    jcl_file: "./files/sample.jcl"
+    jcl_file: "{{ playbook_dir }}/files/sample.jcl"
 
   tasks:
+    # #######################################################################################
+    # This task copies a sample JCL file to a z/OS dataset member (MEM1). The JCL contains
+    # a simple script that executes a sleep command, which is used for demonstration purposes
+    # in this playbook.
+    # #######################################################################################
     - name: Copy a jcl file into PDS member
       zos_copy:
         src: "{{ jcl_file }}"
@@ -49,19 +49,13 @@
     # Start a started task using PDS Member name which contains JCL to run as a started task.
     # The parameters which are commented below, can be used with respective values.
     # #######################################################################################
-    - name: Execute started task start command
+    - name: Start a started task with JCL stored in 'MEM1' and have output written to system logs
       zos_started_task:
           state: started
           member: MEM1
-          # identifier: 
-          # job_account:
-          # job_name:
-          # parameters:
-          # keyword_parameters:
-          # reus_asid:
-          # subsystem:
-          # wait_time:
-          # wait_full_time:
+          reus_asid: True
+          wait_time: 30
+          wait_full_time: True
           system_logs: True
           verbose: True
       register: start_out
@@ -74,13 +68,13 @@
     # Display details of a running started task using started task name and other params.
     # The parameters which are commented below, can be used with respective values.
     # #######################################################################################
-    - name: Execute started task display command
+    - name: Display the status of started task 'MEM1' using task ID 'STC00266' and identifier 'MEM1'
       zos_started_task:
           state: displayed
           job: MEM1
-          # task_id: STC00266
-          # identifier: vlf
-          # system_logs: True
+          task_id: STC00266
+          identifier: vlf
+          system_logs: True
           verbose: True
       register: display_out
     - name: print display_out
@@ -92,18 +86,10 @@
     # Cancel a running started task using a started task name and other params.
     # The parameters which are commented below, can be used with respective values.
     # #######################################################################################
-    - name: Execute started task cancel command
+    - name: Cancel the started task 'MEM1'
       zos_started_task:
           state: cancelled
           job: MEM1
-          # task_id: STC00266
-          # armrestart: 
-          # asidx: "0071"
-          # dump:
-          # identifier_name:
-          # userid:
-          # system_logs: True
-          # verbose: True
       register: cancel_out
     - name: print cancel_out
       debug:
@@ -115,17 +101,15 @@
     # The parameters which are commented below, can be used with respective values.
     # System started tasks like VLF can be modified using list of params 'replace', 'nn=02'
     # #######################################################################################
-    - name: Execute started task modify command
+    - name: Modify 'VLF' started task to replace configuration for class 02
       zos_started_task:
           state: modified
-          job: vlf
-          # task_id: STC00266
-          # identifier_name:
+          job: VLF
           parameters:
             - "REPLACE"
             - "NN=02"
-          # system_logs: True
-          # verbose: True
+          system_logs: True
+          verbose: True
       register: modify_out
     - name: print modify_out
       debug:
@@ -137,15 +121,12 @@
     # The parameters which are commented below, can be used with respective values.
     # System started task like VLF can be stopped.
     # #######################################################################################
-    - name: Execute started task stop command
+    - name: Stop the started task 'VLF'
       zos_started_task:
           state: stopped
           job: VLF
-          # task_id: STC00266
-          # asidx:
-          # identifier_name:
-          # verbose: True
-          # system_logs: True
+          verbose: True
+          system_logs: True
       register: stop_out
     - name: print stop_out
       debug:
@@ -157,18 +138,12 @@
     # The parameters which are commented below, can be used with respective values.
     # System started tasks like TSO, JES2, TCPIP, ICSF ..etc can be forced
     # #######################################################################################
-    - name: Execute started task force command
+    - name: Forcefully terminate the ICSF started task without graceful shutdown
       zos_started_task:
           state: forced
           job: ICSF
-          # task_id: STC00266
-          # asidx:
-          arm: True
-          # armrestart:
-          # identifier_name:
-          # userid:
-          # system_logs: True
-          # verbose: True
+          system_logs: True
+          verbose: True
       register: force_out
     - name: print force_out
       debug:
@@ -176,7 +151,7 @@
           - "{{ force_out }}"
 
     # #######################################################################################
-    # Delete PDS member 'mem1' which got created for testing purpose
+    # Delete PDS member 'MEM1' which got created for testing purpose
     # #######################################################################################
     - name: Remove PDS Member MEM1
       zos_data_set:
@@ -187,21 +162,12 @@
     # #######################################################################################
     # Start default started task 'ICSF' which got stopped in previous steps
     # #######################################################################################
-    - name: Execute started task start command to restart default task ICSF
+    - name: Start the started task 'ICSF' which got stopped in previous steps
       zos_started_task:
           state: started
           member: ICSF
-          # identifier: 
-          # job_account:
-          # job_name:
-          # parameters:
-          # keyword_parameters:
-          # reus_asid:
-          # subsystem:
-          # wait_time:
-          # wait_full_time:
-          # system_logs: True
-          # verbose: True
+          system_logs: True
+          verbose: True
       register: start_out
     - name: print start_out
       debug:
@@ -211,21 +177,12 @@
     # #######################################################################################
     # Start default started task 'VLF' which got stopped in previous steps
     # #######################################################################################
-    - name: Execute started task start command to restart default task VLF
+    - name: Start the started task 'VLF' which got stopped in previous steps
       zos_started_task:
           state: started
           member: VLF
-          # identifier: 
-          # job_account:
-          # job_name:
-          # parameters:
-          # keyword_parameters:
-          # reus_asid:
           subsystem: MSTR
-          # wait_time:
-          # wait_full_time:
           system_logs: True
-          # verbose: True
       register: start_out
     - name: print start_out
       debug:
