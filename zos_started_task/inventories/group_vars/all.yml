@@ -1,9 +1,9 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2025
+# Copyright (c) IBM Corporation 2026
 ################################################################################
 
 ################################################################################
-# Enviroment variables for all z/OS managed nodes (target) that do not need
+# Environment variables for all z/OS managed nodes (target) that do not need
 # further configuration.
 ################################################################################
 environment_vars:
@@ -18,7 +18,6 @@ environment_vars:
   _TAG_REDIR_OUT: "txt"
   LANG: "C"
   PYTHONSTDINENCODING: "cp1047"
-
 ################################################################################
 # Description of the properties used in this configuration:
 ################################################################################
@@ -35,7 +34,7 @@ environment_vars:
 # - Property _CEE_RUNOPTS is the invocation Language Environment® runtime
 #   options for programs and used by Python. e.g.,
 #   _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
-# - Properties __TAG_REDIR_ERR, _TAG_REDIR_IN, _TAG_REDIR_OUT are txt and used
+# - Properties _TAG_REDIR_ERR, _TAG_REDIR_IN, _TAG_REDIR_OUT are txt and used
 #   by the shell; e.g.,
 #      _TAG_REDIR_ERR: "txt"
 #      _TAG_REDIR_IN: "txt"
