@@ -1,0 +1,27 @@
+# Copyright (c) IBM Corporation 2025
+# This playbook demonstrates using roles:
+# 'zmf_swupdate_cancel',
+# and 'zmf_swupdate_copy' to complete the software management
+# software update Cancel and Copy REST APIs.
+
+#######################################################################################
+# PLAY #1: Cancel the Software Update process.                                        #
+#######################################################################################
+- name: Cancel the Software Update
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  tasks:
+    - name: Cancel Software Update
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swupdate_cancel
+
+#######################################################################################
+# PLAY #2: Copy the Software Update output to a directory.                            #
+#######################################################################################
+- name: Copy the output from the Software Update
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  tasks:
+    - name: Copy Software Update
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swupdate_copy

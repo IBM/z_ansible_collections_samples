@@ -1,0 +1,15 @@
+# Copyright (c) IBM Corporation 2025
+# This playbook demonstrates using role:
+# 'zmf_swupdate_retrieve_all' to complete the software management
+# software update Retrieve all REST API.
+
+#######################################################################################
+# PLAY #1: Retrieve all Software Updates for a Software Instance.                     #
+#######################################################################################
+- name: Retrieve all Software Updates for a Software Instance
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  tasks:
+    - name: Retrieve all Software Updates
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swupdate_retrieve_all

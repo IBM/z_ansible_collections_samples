@@ -1,0 +1,43 @@
+# Copyright (c) IBM Corporation 2025
+# This playbook demonstrates using roles:
+# 'zmf_swupdate_resume', 'zmf_swupdate_retrieve',
+# and 'zmf_swupdate_copy' to complete the software management
+# software update Resume, Retrieve, and Copy REST APIs.
+
+#######################################################################################
+# PLAY #1: Resume the Software Update.                                                #
+#######################################################################################
+- name: Resume a Software Update on a Software Instance
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  tasks:
+    - name: Resume Software Update
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swupdate_resume
+
+#######################################################################################
+# PLAY #2: Retrieve the Status of the Software Update.                                #
+#######################################################################################
+- name: Retrieve the Status of the Software Update after Resolve Holds were specified
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  tasks:
+    - name: Retrieve Software Update Status
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swupdate_retrieve
+
+#######################################################################################
+# PLAY #3: Copy the Software Update output to a directory.                            #
+#######################################################################################
+- name: Copy the output from the Software Update
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  tasks:
+    - name: Copy Software Update
+      ansible.builtin.include_role:
+        name: ibm.ibm_zosmf.zmf_swupdate_copy
+      when: >
+        (swupdate_retrieve_response.json['update-processes'][0]['status'] is defined) and
+        ((swupdate_retrieve_response.json['update-processes'][0]['status'] == 'COMPLETED') or
+        (swupdate_retrieve_response.json['update-processes'][0]['status'] == 'CANCELED') or
+        (swupdate_retrieve_response.json['update-processes'][0]['status'] == 'CANCELED WITH ERROR'))
