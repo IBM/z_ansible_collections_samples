@@ -55,7 +55,8 @@ We recommend using the `-e` parameter with these ansible playbooks. That equates
 
 In this set of example files we have a few sample playbooks that we've written for you to try out prefabricated upgrade scenarios. Those are as follows:
 
-- A Software Update playbook where we **retrieve all software updates for a software instance**.
+- A Software Update playbook where we **retrieve the status of the latest software update process for a software instance**.
+- A Software Update playbook where we **retrieve the status of all software update processes for a software instance**.
 - A Software Update playbook where we **start a software update and go through the entire process resolving all system holds**.
 - A Software Update playbook where we **start a software update and wait for user intervention to do things like handle holds**.
 - A Software Update playbook dedicated to **resuming after manually resolving the aforementioned holds**.
@@ -71,7 +72,7 @@ The command to run our playbooks will look something like this. From the root of
 
 ***Note: Notice how when using a file with the `-e` parameter we have an `@` symbol preceding the file path. That is needed by ansible. Without that ansible doesn't register the value as a file path and the playbook will fail.**
 
-***Note: We're providing an inventory because it's needed and expected although we're not really using it. For this since we're using REST services localhost is sufficient.**
+***Note: We're providing a sample inventory because it's required by Ansible. Ansible can be run locally or remotely using the `hosts` parameter in the notebook; `nodes` in our variable files. Most users want to run their playbooks from the machine they're on which would be `localhost`. For our usage, we're using REST services for our API calls, providing `localhost` as the `host/node` is typically preferred. If you'd like to use an alternate `host/node` feel free to do so.**
 
 ```bash
 ansible-playbook -i example-inventory/inventory.yaml example-playbooks/software_management_swu_start.yml -e "@./example-variables/start_variables.yaml"
