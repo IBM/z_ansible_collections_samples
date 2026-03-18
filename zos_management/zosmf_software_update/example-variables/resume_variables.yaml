@@ -1,3 +1,4 @@
+# default(..., true) treats empty strings as “unset.”
 nodes: "localhost"
 zmf_host: your.zosmf.instance.url.com
 zmf_port: 0000
