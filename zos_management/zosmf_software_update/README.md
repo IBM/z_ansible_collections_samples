@@ -51,6 +51,13 @@ The new roles to look at are the following:
 
 We recommend using the `-e` parameter with these ansible playbooks. That equates out to the `extra-vars` flag. That basically allows us to make the playbooks runnable without having to hardcode the needed variables. We can pass those variables along at runtime.
 
+The example configuration retrieves credentials from the `ZOSMF_USERNAME` and `ZOSMF_PASSWORD` environment variables. This approach helps prevent sensitive information from being committed to source control. If either environment variable is not defined, the corresponding value is omitted from the configuration.
+
+```yaml
+zmf_user: "{{ lookup('env', 'ZOSMF_USERNAME') | default(omit, true) }}" # omit if unset
+zmf_password: "{{ lookup('env', 'ZOSMF_PASSWORD') | default(omit, true) }}" # omit if unset
+```
+
 ## zOSMF Software Update Examples
 
 In this set of example files we have a few sample playbooks that we've written for you to try out prefabricated upgrade scenarios. Those are as follows:
