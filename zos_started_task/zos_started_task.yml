@@ -18,6 +18,51 @@
 #
 ###############################################################################
 
+###############################################################################
+# Playbook Overview:
+# This playbook demonstrates comprehensive started task management on z/OS by
+# performing the following operations: First, it copies a sample JCL containing
+# a sleep command to a PDS member and starts it as a task. Next, it displays
+# the task status to verify it's running. The playbook then cancels this custom
+# task and proceeds to modify the VLF (Virtual Lookaside Facility) system task
+# by replacing its configuration for class 02, followed by stopping the VLF task.
+# Subsequently, it forcefully terminates the ICSF (Integrated Cryptographic
+# Service Facility) task without graceful shutdown. Finally, the playbook cleans
+# up by removing the test PDS member and restarts both the ICSF and VLF system
+# tasks to restore the system to its original state.
+#
+# Configurable Variables:
+#   jcl_file: Path to the source JCL file on the controller
+#             Default: "{{ playbook_dir }}/files/sample.jcl"
+#             Description: Local JCL file containing the sleep command to be
+#                         copied to z/OS for testing started task operations
+#
+#   usr_proclib: Target PDS (Partitioned Data Set) on z/OS
+#                Default: "USER.PRIVATE.PROCLIB"
+#                Description: A standard z/OS procedure library that is
+#                            accessible by the system when starting tasks.
+#                            This is a default dataset in the JES2 PROCLIB
+#                            concatenation, allowing started tasks to be
+#                            initiated from members stored within it
+#
+#   member_name: Name of the PDS member
+#                Default: "SLEEPJCL"
+#                Description: The member name (up to 8 characters) used to
+#                            store the JCL and identify the started task.
+#                            This name will be used throughout the playbook
+#                            for task operations
+#
+# Prerequisites:
+#   - The target z/OS system must have VLF and ICSF started tasks available
+#   - User must have appropriate permissions to start, stop, and modify tasks
+#   - The USER.PRIVATE.PROCLIB dataset must exist or user must have authority to create it
+#   - IBM z/OS core collection 1.16.0 or later must be installed
+#
+# Note: This playbook modifies system-level started tasks (VLF, ICSF). Ensure
+#       you have proper authorization and understand the impact before running
+#       in a production environment.
+###############################################################################
+
 - name: Sample zos_started_task playbook.
   hosts: zos_host
   collections:
@@ -27,6 +72,8 @@
 
   vars:
     jcl_file: "{{ playbook_dir }}/files/sample.jcl"
+    usr_proclib: "USER.PRIVATE.PROCLIB"
+    member_name: "SLEEPJCL"
 
   tasks:
     # #######################################################################################
@@ -34,10 +81,10 @@
     # a simple script that executes a sleep command, which is used for demonstration purposes
     # in this playbook.
     # #######################################################################################
-    - name: Copy sample JCL containing sleep command to 'MEM1' member
+    - name: Copy sample JCL containing sleep command to 'SLEEPJCL' member
       zos_copy:
         src: "{{ jcl_file }}"
-        dest: "USER.PRIVATE.PROCLIB(MEM1)"
+        dest: "{{ usr_proclib }}({{ member_name }})"
         replace: True
       register: copy_out
     - name: print copy_out
@@ -47,12 +94,11 @@
 
     # #######################################################################################
     # Start a started task using PDS Member name which contains JCL to run as a started task.
-    # The parameters which are commented below, can be used with respective values.
     # #######################################################################################
-    - name: Start a started task with JCL stored in 'MEM1' and have output written to system logs
+    - name: Start a started task with JCL stored in 'SLEEPJCL' and have output written to system logs
       zos_started_task:
           state: started
-          member: MEM1
+          member: "{{ member_name }}"
           reus_asid: True
           wait_time: 30
           wait_full_time: True
@@ -66,12 +112,11 @@
 
     # #######################################################################################
     # Display details of a running started task using started task name and other params.
-    # The parameters which are commented below, can be used with respective values.
     # #######################################################################################
-    - name: Display the status of started task 'MEM1' using task ID 'STC00266' and identifier 'MEM1'
+    - name: Display the status of started task 'SLEEPJCL' using task ID 'STC00266' and identifier 'SLEEPJCL'
       zos_started_task:
           state: displayed
-          job: MEM1
+          job: "{{ member_name }}"
           task_id: STC00266
           identifier: vlf
           system_logs: True
@@ -84,12 +129,11 @@
 
     # #######################################################################################
     # Cancel a running started task using a started task name and other params.
-    # The parameters which are commented below, can be used with respective values.
     # #######################################################################################
-    - name: Cancel the started task 'MEM1'
+    - name: Cancel the started task 'SLEEPJCL'
       zos_started_task:
           state: cancelled
-          job: MEM1
+          job: "{{ member_name }}"
       register: cancel_out
     - name: print cancel_out
       debug:
@@ -98,7 +142,6 @@
 
     # #######################################################################################
     # Modify a running started task using started task name and other params.
-    # The parameters which are commented below, can be used with respective values.
     # System started tasks like VLF can be modified using list of params 'replace', 'nn=02'
     # #######################################################################################
     - name: Modify 'VLF' started task to replace configuration for class 02
@@ -118,7 +161,6 @@
 
     # #######################################################################################
     # Stop a running started task using started task name and other params.
-    # The parameters which are commented below, can be used with respective values.
     # System started task like VLF can be stopped.
     # #######################################################################################
     - name: Stop the started task 'VLF'
@@ -135,7 +177,6 @@
 
     # #######################################################################################
     # Force a running started task using started task name and other params.
-    # The parameters which are commented below, can be used with respective values.
     # System started tasks like TSO, JES2, TCPIP, ICSF ..etc can be forced
     # #######################################################################################
     - name: Forcefully terminate the ICSF started task without graceful shutdown
@@ -151,11 +192,11 @@
           - "{{ force_out }}"
 
     # #######################################################################################
-    # Delete PDS member 'MEM1' which got created for testing purpose
+    # Delete PDS member 'SLEEPJCL' which got created for testing purpose
     # #######################################################################################
-    - name: Remove PDS Member MEM1
+    - name: Remove PDS Member SLEEPJCL
       zos_data_set:
-        name: 'user.private.proclib(mem1)'
+        name: "{{ usr_proclib }}({{ member_name }})"
         state: absent
         type: member
 
