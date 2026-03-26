@@ -148,8 +148,10 @@ DFS_SMS_MCLASS: NONE
 # ------------------------ for when SMS is not in use ------------------------ #
 
 # first volume to use to store IMS datasets
+# DFS_DS_VOLUME1: ANSI01
 DFS_DS_VOLUME1: USRV01
 # second volume to use to store IMS datasets
+# DFS_DS_VOLUME2: ANSI01
 DFS_DS_VOLUME2: USRV01
 
 # ---------------------------------------------------------------------------- #
@@ -175,6 +177,23 @@ JAVA_CONF_PATH: /u/dfsjvmpr.props
 # Working directory for the IMS Java region (JMP)
 DFS_workingdir: /u/{{ TARGET_USERNAME }}
 
+
+# For the DFSDFxxx member that the IMSPB points to
+DFS_MEMBER_SUFFIX: '000'
+
+
+#Buffer pool member
+BUFFER_POOL_PARAMETER: DFSVSMHP
+
+
+# The fully qualified dataset name for the IMS RESLIB
+# DFS_RESLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
+
+# The fully qualified dataset name for the IMS PROCLIB
+DFS_IMS_PROCLIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
+
+# -------------
+
 # ---------------------------------------------------------------------------- #
 #                             Catalog related settings                            #
 # ---------------------------------------------------------------------------- #
@@ -186,8 +205,8 @@ to_image_copy:
   - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00001', ddn: DFSCD01B, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01B.IC.CD01B' }
   - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00001', ddn: DFSCD01C, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01C.IC.CD01C' }
   - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00001', ddn: DFSCD01D, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCD01.DFSCD01D.IC.CD01D' }
-  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00002', ddn: DFSCP01A, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01A.IC.CP01A' }
-  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00002', ddn: DFSCP01B, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01B.IC.CP01B' }
-  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00002', ddn: DFSCP01C, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01C.IC.CP01C' }
-  - { dataset: DFSCD000, dbd: DFSCP01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00002', ddn: DFSCP01D, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01D.IC.CP01D' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00002', ddn: DFSCP01A, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01A.IC.CP01A' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00002', ddn: DFSCP01B, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01B.IC.CP01B' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00002', ddn: DFSCP01C, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01C.IC.CP01C' }
+  - { dataset: DFSCD000, dbd: DFSCD01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00002', ddn: DFSCP01D, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCP01.DFSCP01D.IC.CP01D' }
   - { dataset: DFSCX000, dbd: DFSCX01, dsn: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000.A00001', ddn: DFSCX01A, icdsn: '{{ DFS_AUTH_LIB_HLQ1 }}.DFSCX01.DFSCX01A.IC.CX01A' }

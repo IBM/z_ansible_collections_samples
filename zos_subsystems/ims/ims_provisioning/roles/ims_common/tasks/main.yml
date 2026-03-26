@@ -7,6 +7,37 @@
 
   block:
 
+    - name: Sample DBRC Module -- LIST commands
+      ims_dbrc:
+        command:
+          - "CHANGE.DBDS DBD(DFSCD01) DDN(DFSCD01A) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCD01) DDN(DFSCD01B) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCD01) DDN(DFSCD01C) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCD01) DDN(DFSCD01D) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCP01) DDN(DFSCP01A) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCP01) DDN(DFSCP01B) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCP01) DDN(DFSCP01C) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCP01) DDN(DFSCP01D) ICOFF"
+          - "CHANGE.DBDS DBD(DFSCX01) DDN(DFSCX01A) ICOFF"
+        #   - "CHANGE.DBDS DBD(DFSCD02) DDN(DFSCD02A) ICOFF"
+        #   - "CHANGE.DBDS DBD(DFSCD02) DDN(DFSCD02B) ICOFF"
+        #   - "CHANGE.DBDS DBD(DFSCD02) DDN(DFSCD02C) ICOFF"
+        #   - "CHANGE.DBDS DBD(DFSCD02) DDN(DFSCD02D) ICOFF"
+        #   - "CHANGE.DBDS DBD(DFSCX01) DDN(DFSCX01A) ICOFF"
+        steplib:
+          - IMSTESTU.IMS1501.MARKER
+          - IMSTESTL.IMS1.EXITLIB
+          - IMSTESTG.IMS15R.TSTRES
+          - IMSBLD.IMS15R.USERLIB
+          - IMSBLD.I15RTSMM.CRESLIB
+        dbd_lib: IMSTESTL.IMS1.DBDLIB
+        genjcl_input_dataset: IMSTESTL.IMS1.PROCLIB
+          # genjcl_output_dataset: IMSTESTL.IMS1.JCLOUT
+        recon1: IMSTESTL.IMS1.RECON1
+        recon2: IMSTESTL.IMS1.RECON2
+        recon3: IMSTESTL.IMS1.RECON3
+      when: ctl == "start"
+
     # Start IMS control region if start_ctl is true
     - name: Start IMS control region
       zos_operator:
@@ -26,7 +57,7 @@
         job_name: "{{ DFS_IMS_SSID }}CTL"
       register: ims_ready_msg
       retries: 5
-      delay: 5
+      delay: 20
       until: ims_ready_msg.actions
       # ignore_errors: true
       when: ctl == "start"
@@ -42,8 +73,8 @@
     - name: ICON start
       zos_job_submit:
         src: IMSTESTL.IMS1.JOBS(IMS1HWS1)
-        location: DATA_SET
-        wait: true
+        location: data_set
+        # wait: true
         wait_time_s: 30
       ignore_errors: true #ICON successfully starts, but the job itself exceeds the wait time
       when: icon == "start"
