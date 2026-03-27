@@ -87,6 +87,7 @@
         dest: "{{ usr_proclib }}({{ member_name }})"
         replace: True
       register: copy_out
+
     - name: print copy_out
       debug:
         msg:
@@ -95,16 +96,18 @@
     # #######################################################################################
     # Start a started task using PDS Member name which contains JCL to run as a started task.
     # #######################################################################################
-    - name: Start a started task with JCL stored in 'SLEEPJCL' and have output written to system logs
+    - name: Start a started task with JCL stored in 'SLEEPJCL', ensuring to wait the full 30 seconds,
+            assign a reusable ASID, and have output written to system logs
       zos_started_task:
           state: started
           member: "{{ member_name }}"
-          reus_asid: True
+          reusable_asid: True
           wait_time: 30
           wait_full_time: True
           system_logs: True
           verbose: True
       register: start_out
+
     - name: print start_out
       debug:
         msg:
@@ -118,10 +121,11 @@
           state: displayed
           job: "{{ member_name }}"
           task_id: STC00266
-          identifier: vlf
+          identifier_name: "{{ member_name }}"
           system_logs: True
           verbose: True
       register: display_out
+
     - name: print display_out
       debug:
         msg:
@@ -133,8 +137,9 @@
     - name: Cancel the started task 'SLEEPJCL'
       zos_started_task:
           state: cancelled
-          job: "{{ member_name }}"
+          job_name: "{{ member_name }}"
       register: cancel_out
+
     - name: print cancel_out
       debug:
         msg:
@@ -144,16 +149,17 @@
     # Modify a running started task using started task name and other params.
     # System started tasks like VLF can be modified using list of params 'replace', 'nn=02'
     # #######################################################################################
-    - name: Modify 'VLF' started task to replace configuration for class 02
+    - name: Modify 'VLF' started task to replace configuration for class 02 by specifying additional parameters.
       zos_started_task:
           state: modified
-          job: VLF
+          job_name: VLF
           parameters:
             - "REPLACE"
             - "NN=02"
           system_logs: True
           verbose: True
       register: modify_out
+
     - name: print modify_out
       debug:
         msg:
@@ -166,10 +172,11 @@
     - name: Stop the started task 'VLF'
       zos_started_task:
           state: stopped
-          job: VLF
+          job_name: VLF
           verbose: True
           system_logs: True
       register: stop_out
+
     - name: print stop_out
       debug:
         msg:
@@ -182,10 +189,11 @@
     - name: Forcefully terminate the ICSF started task without graceful shutdown
       zos_started_task:
           state: forced
-          job: ICSF
+          job_name: ICSF
           system_logs: True
           verbose: True
       register: force_out
+
     - name: print force_out
       debug:
         msg:
@@ -206,25 +214,27 @@
     - name: Start the started task 'ICSF' which got stopped in previous steps
       zos_started_task:
           state: started
-          member: ICSF
+          member_name: ICSF
           system_logs: True
           verbose: True
       register: start_out
+
     - name: print start_out
       debug:
         msg:
           - "{{ start_out }}"
     
     # #######################################################################################
-    # Start default started task 'VLF' which got stopped in previous steps
+    # Start default started task 'VLF' under MSTR subsystem which got stopped in previous steps
     # #######################################################################################
-    - name: Start the started task 'VLF' which got stopped in previous steps
+    - name: Start the started task 'VLF' under MSTR subsystem which got stopped in previous steps
       zos_started_task:
           state: started
-          member: VLF
+          member_name: VLF
           subsystem: MSTR
           system_logs: True
       register: start_out
+
     - name: print start_out
       debug:
         msg:
