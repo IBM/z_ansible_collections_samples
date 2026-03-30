@@ -1,10 +1,12 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Initial release                                                    |
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 
 #####################################################################################################
@@ -167,6 +169,26 @@ gw1_ip: "9.102.0.1"
 
 # Used in 03_acc_ssa_install_check to see if the appliances are functional
 
+# Credentials
+
+# You must follow the [Secure Service Container user guide](https://www.ibm.com/docs/en/module_1707928542006/pdf/SC28-6971-01.pdf)
+# for setting up SSA1_APP_USERNAME and SSA1_APP_PASSWORD. At the moment, the guidelines are:
+# SSA1_APP_USERNAME: This is the Administrator user ID in the SSC user guide and is to be
+# used as the default administrator user ID for the Secure Service Container partition.
+# This user ID has authority to perform any task that is available through the
+# Secure Service Container graphical user interface (GUI). An administrator user ID can
+# be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
+# 0 - 9, letters A - Z (upper or lower case), and the following special
+# characters: period (.), underscore (_), and hyphen (-). 
+# SSA1_APP_PASSWORD: This is the Administrator password in the SSC user guide.
+# This password can have a minimum of 8 characters and a maximum of 256 characters.
+# An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
+# (upper or lower case), and the following special characters: hyphen (-),
+# underscore (_), exclamation (!), at (@), hash (#), dollar ($), percent (%), carat (^),
+# ampersand (&), asterisk (*), left parenthesis ((), right parenthesis ()), plus (+),
+# left brace ({), right brace (}), vertical bar (|), colon (:), less than (<),
+# greater than (>), question mark (?), and equals (=).
+
 # SSA-1's user name (same as on the SSC LPAR)
 lpar1_admin_user: "{{ lookup('env', 'SSA1_APP_USERNAME') }}"
 
@@ -217,6 +239,26 @@ app2_ip: "9.152.150.200"
 gw2_ip: "9.102.0.1"
 
 # Used in 03_acc_ssa_install_check to see if the appliances are functional
+
+# Credentials
+
+# You must follow the [Secure Service Container user guide](https://www.ibm.com/docs/en/module_1707928542006/pdf/SC28-6971-01.pdf)
+# for setting up SSA2_APP_USERNAME and SSA2_APP_PASSWORD. At the moment, the guidelines are:
+# SSA2_APP_USERNAME: This is the Administrator user ID in the SSC user guide and is to be
+# used as the default administrator user ID for the Secure Service Container partition.
+# This user ID has authority to perform any task that is available through the
+# Secure Service Container graphical user interface (GUI). An administrator user ID can
+# be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
+# 0 - 9, letters A - Z (upper or lower case), and the following special
+# characters: period (.), underscore (_), and hyphen (-). 
+# SSA2_APP_PASSWORD: This is the Administrator password in the SSC user guide.
+# This password can have a minimum of 8 characters and a maximum of 256 characters.
+# An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
+# (upper or lower case), and the following special characters: hyphen (-),
+# underscore (_), exclamation (!), at (@), hash (#), dollar ($), percent (%), carat (^),
+# ampersand (&), asterisk (*), left parenthesis ((), right parenthesis ()), plus (+),
+# left brace ({), right brace (}), vertical bar (|), colon (:), less than (<),
+# greater than (>), question mark (?), and equals (=).
 
 # SSA-2's user name (same as on the SSC LPAR)
 lpar2_admin_user: "{{ lookup('env', 'SSA2_APP_USERNAME') }}"
