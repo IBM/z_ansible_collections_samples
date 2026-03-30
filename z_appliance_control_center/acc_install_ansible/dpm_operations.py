@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -7,11 +7,16 @@
 # *|   - Tested with ACC 1.2.10                                             |
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Added network configuration for ACC LPAR                           |
+# *|   - Added IFLs/GPs configuration for ACC LPAR                          |
 # *+------------------------------------------------------------------------+
 
 import sys
 import time
 import os
+from dpm_nw import attach_nic, delete_all_nics
 import config as app_config
 import zhmcclient
 import urllib3
@@ -127,6 +132,23 @@ def deactivate_lpar(cpc, lpar, retries: int = 10, interval: int = 2):
         time.sleep(interval)
     raise Exception(f"Failed to deactivate LPAR {lpar.get_property('name')} after {retries} attempts.")
 
+def set_processor_values():
+    # Add processor configuration if specified
+    ifls = int(os.environ.get("IFLS", 0))
+    gps = int(os.environ.get("GPS", 0))
+    if ifls > 0 and gps > 0:
+        raise Exception(f"IFLS {ifls} and GPS {gps} are both non-zero")
+    properties = {}
+    if ifls > 0 or gps > 0:
+        properties['processor-mode'] = 'shared'
+        if ifls > 0:
+            properties['ifl-processors'] = ifls
+            properties['cp-processors'] = 0
+        if gps > 0:
+            properties['cp-processors'] = gps
+            properties['ifl-processors'] = 0
+    return properties
+
 def update_partition_properties(cpc, lpar_name: str):
     print(f"Setting partition properties for LPAR {lpar_name}...")
     lpar_list = cpc.partitions.list(filter_args={'name': lpar_name})
@@ -138,8 +160,17 @@ def update_partition_properties(cpc, lpar_name: str):
     storage = int(os.environ.get("STORAGE", 0))
     user = os.environ.get("USERNAME")
     password = os.environ.get("PASSWORD")
-    lpar_obj.update_properties({'ssc-boot-selection': 'installer',
+    gw_ip = os.environ.get("NW_GW_IP")
+    properties = { "ssc-host-name" : "acchost",
+                                'ssc-boot-selection': 'installer',
                                 'initial-memory': storage,
                                 'ssc-master-userid':user,
-                                'ssc-master-pw':password}) #sending central storage, value should be number 16384
+                                "ssc-ipv4-gateway" : gw_ip,
+                                'ssc-master-pw':password}
+    
+    properties.update(set_processor_values())
+    lpar_obj.update_properties(properties) #sending central storage, value should be number 16384
+    
+    delete_all_nics(lpar_obj)
+    attach_nic(lpar_obj)
     print(f"Partition properties set for LPAR {lpar_name}.")

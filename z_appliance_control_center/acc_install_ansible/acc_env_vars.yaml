@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -7,6 +7,10 @@
 # *|   - Tested with ACC 1.2.10                                             |
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Added network configuration for ACC LPAR                           |
+# *|   - Added IFLs/GPs configuration for ACC LPAR                          |
 # *+------------------------------------------------------------------------+
 
 # Variables used for installing ACC
@@ -17,10 +21,23 @@
 # Do not comment any vars here which might cause playbook to fail
 ########################################################################################################
 
+# Set to true if the control node (this machine/laptop that runs this ansible playbook) can
+# connect to the HMC. If yes, then set the "HMC" variables below. The playbook will handle
+# activate/start etc. by directly communicating with the HMC.
+
+# If the control node cannot directly communicate with the HMC, then set this value to false.
+# Also, login to the HMC. Then, activate/start the LPAR/partition in SSC installer mode with the right set of
+# properties in the activation profile. Afterwards, run the playbook.
+
+# For the DPM partition, attach the storage group to the partition in both cases.
+hmc_connected: true
+
 ####### HMC #######
 
 # HMC host ip (e.g., 9.152.150.166)
-HMC_HOST: "9.x.x.x"
+# HMC_HOST: "9.x.x.x"
+HMC_HOST: "9.87.77.2"
+# HMC_HOST: "9.152.150.67"
 
 # Set Your hmc username (e.g., export HMC_USER=<enter_hmc_email>)
 HMC_USER: "{{ lookup('env', 'HMC_USER') }}"
@@ -30,13 +47,38 @@ HMC_PASSWORD: "{{ lookup('env', 'HMC_PASSWORD') }}"
 
 
 ####### LPAR Credentials #######
+# Use during image installation
+# If this machine which will run the ansible playbook for ACC install
+# can send commands to the HMC, then these credentials will be set for the ACC LPAR.
+# If this machine that will run the ansible playbook for ACC install cannot sent
+# commands to the HMC, then these credentials are the credentials already set for the
+# ACC LPAR on the SSC Installer window on the HMC.
 
-# Set Username for the appliance [used during image installation]
+# You must follow the [Secure Service Container user guide](https://www.ibm.com/docs/en/module_1707928542006/pdf/SC28-6971-01.pdf)
+# for setting up ACC_ADMIN_USER and ACC_ADMIN_DEFAULT_PASSWORD. At the moment, the guidelines are:
+# ACC_ADMIN_USER: This is the Administrator user ID in the SSC user guide and is to be
+# used as the default administrator user ID for the Secure Service Container partition.
+# This user ID has authority to perform any task that is available through the
+# Secure Service Container graphical user interface (GUI). An administrator user ID can
+# be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
+# 0 - 9, letters A - Z (upper or lower case), and the following special
+# characters: period (.), underscore (_), and hyphen (-).
+# ACC_ADMIN_DEFAULT_PASSWORD: This is the Administrator password in the SSC user guide.
+# This password can have a minimum of 8 characters and a maximum of 256 characters.
+# An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
+# (upper or lower case), and the following special characters: hyphen (-),
+# underscore (_), exclamation (!), at (@), hash (#), dollar ($), percent (%), carat (^),
+# ampersand (&), asterisk (*), left parenthesis ((), right parenthesis ()), plus (+),
+# left brace ({), right brace (}), vertical bar (|), colon (:), less than (<),
+# greater than (>), question mark (?), and equals (=).
+
+# Set Username for the appliance (used during image installation)
+# Export before run: export ACC_ADMIN_USER=<admin_username_which_is_the_same_as_administrator_user_id>
 USERNAME: "{{ lookup('env', 'ACC_ADMIN_USER') }}"
 
 # Set Password for the appliance (used during image installation)
+# Export before run: export ACC_ADMIN_DEFAULT_PASSWORD=<admin_password_which_is_the_same_as_administrator_password>
 PASSWORD: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"
-
 
 ####### ACC LPAR #######
 
@@ -44,18 +86,26 @@ PASSWORD: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"
 ACTION: "activate"
 
 # CPC or machine name (e.g., "T28")
-CPC: "CPC1"
+# CPC: "CPC1"
+CPC: "5X142359"
+# CPC: "T28"
 
 # Logical partition (LPAR) name where you want to install ACC image (e.g., "BLUEC1") should be valid lpar name
-LPAR: "CC12"
+# LPAR: "CC12"
+LPAR: "ACCFIDtest"
+# LPAR: "BLUEC1"
 
-# Appliance IP address (lpar ip)
-LPAR_IP: "9.120.100.200"
+# Appliance IP address (IP of the ACC LPAR)
+# LPAR_IP: "9.120.100.200"
+LPAR_IP: "9.82.21.140"
+# LPAR_IP: "9.152.150.230"
 
 # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
 # Note: When using FCP this variable represents the LPAR's FCP device number used to 
 # communicate with the boot volume on the storage controller
-DISK_ID: "<enter_disk_id>"
+# DISK_ID: "<enter_disk_id>"
+DISK_ID: "0.0.5a00"
+# DISK_ID: "0.0.5f47"
 
 # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False
 IS_FCP: false
@@ -69,11 +119,55 @@ wwpn: "0000000000000000"
 # Storage allocated (in MB)
 STORAGE: 16384
 
+# Shared IFLs (initial weight 10) for the ACC LPAR
+# Keep the IFLS variable 0 if not using IFLs, and ACC will use GPs
+# You can either use IFLs or GPs, IFLS and GPS cannot be non-zero at the same time
+IFLS: 0
+
+# Shared General Purpose processors (GPs, initial weight 10) for the ACC LPAR
+# Keep the GPS variable 0 if not using GPs, and ACC will use IFLs
+# You can either use IFLs or GPs, IFLS and GPS cannot be non-zero at the same time
+GPS: 2
+
+# Name of the network
+NW_NAME: "net0"
+
+# FID
+# NOTE: Select the correct network card type based on system configuration:
+#   - FID          -> choose NETH
+#   - CHPID, Port  -> choose OSA
+# If not using FID, then keep the NW_FID variable empty ""
+#In DPM mode machines provide adapte-id without 0s in the front
+NW_FID: "130"
+# NW_FID: ""
+
+# CHPID
+#In DPM mode machines provide channel-path-id 
+NW_CHPID: ""
+# NW_CHPID: "d0"
+
+# Port
+NW_PORT: 0
+
+# Prefix
+NW_PREFIX: 24
+# NW_PREFIX: 23
+
+# VLAN ID
+# If not used, then NW_VLANID variable empty ""
+NW_VLANID: 21
+# NW_VLANID: ""
+
+# Gateway
+NW_GW_IP: "9.82.21.1"
+# NW_GW_IP: "9.152.150.1"
 
 #######  Paths on the control node (i.e., your laptop) #######
 
 # Path on the control node (e.g., your laptop) with the image file which (ACC image) you want to install
-IMAGE_PATH: "/Users/dev_ZACC-1.2.6-dev-debug.image.img.gz"
+# IMAGE_PATH: "/Users/dev_ZACC-1.2.6-dev-debug.image.img.gz"
+IMAGE_PATH: "/Users/mkhan/Downloads/release_ZACC-FINAL-IMAGE-12.13.0-main_2026-02-26_17-01-42.image.img.gz"
+# IMAGE_PATH: "/Users/mkhan/Downloads/dev_ZACC-FINAL-IMAGE-12.13.0-main_2026-02-26_17-06-25.image.img.gz"
 
 # Do not change this value its for internal use only, this is the absolute path to point to acc_install_ansible folder
 INSTALL_SCRIPT_PATH: "{{ lookup('pipe', 'realpath ' + playbook_dir + '/../acc_install_ansible') }}"

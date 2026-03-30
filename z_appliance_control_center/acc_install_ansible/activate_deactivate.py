@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -7,6 +7,10 @@
 # *|   - Tested with ACC 1.2.10                                             |
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Added network configuration for ACC LPAR                           |
+# *|   - Added IFLs/GPs configuration for ACC LPAR                          |
 # *+------------------------------------------------------------------------+
 
 import sys
@@ -15,6 +19,7 @@ import os
 import config as app_config
 import zhmcclient
 import urllib3
+from ssc_nw import get_ssc_network
 
 urllib3.disable_warnings()
 NOT_ACTIVATED_STATUS = 'not-activated'
@@ -84,6 +89,7 @@ def main(session, set_image_profile):
 def get_cpc_lpar(session, cpc: str, lpar: str):
     client = zhmcclient.Client(session)
     cpcs = client.cpcs.list(filter_args={'name': cpc})
+    print(f"Received CPCs: {cpcs}")
     if len(cpcs) != 1:
         raise Exception(f"Expected 1 CPC, but got {len(cpcs)}.")
     cpc = cpcs[0]
@@ -127,6 +133,7 @@ def deactivate_lpar(cpc, lpar, retries: int = 10, interval: int = 2):
         time.sleep(interval)
     raise Exception(f"Failed to deactivate LPAR {lpar.get_property('name')} after {retries} attempts.")
 
+
 def set_image_activation_profile(cpc, profile_name: str):
     print(f"Setting image activation profile for LPAR {profile_name}...")
     profiles = cpc.image_activation_profiles.list(filter_args={'name': profile_name})
@@ -136,10 +143,58 @@ def set_image_activation_profile(cpc, profile_name: str):
     print(f"profile : {profile}")
     #profile.update_properties({'ssc-boot-selection': 'installer'})
     storage = int(os.environ.get("STORAGE", 0))
+    ifls = int(os.environ.get("IFLS", 0))
+    gps = int(os.environ.get("GPS", 0))
+
     user = os.environ.get("USERNAME")
     password = os.environ.get("PASSWORD")
-    profile.update_properties({'ssc-boot-selection': 'installer',
-                                'central-storage': storage,
-                                'ssc-master-userid':user,
-                                'ssc-master-pw':password}) #sending central storage, value should be number 16384
+
+    # network
+    ssc_nw = []
+    ssc_nw_obj = get_ssc_network()
+    if cpc.dpm_enabled:
+        ssc_nw_obj["name"] = os.environ.get("NW_NAME")
+    ssc_nw.append(get_ssc_network())
+
+    print(ssc_nw)
+
+    gw_ip = os.environ.get("NW_GW_IP")
+    gw_ip_info = {"ip-address": gw_ip, "type": "ipv4"}
+
+    # Build properties dictionary
+    properties = {
+        'ssc-boot-selection': 'installer',
+        'ssc-master-userid': user,
+        'ssc-master-pw': password,
+        'ssc-gateway-info': gw_ip_info,
+        'ssc-network-info': ssc_nw
+    }
+    
+    # Add storage if specified
+    if storage > 0:
+        properties['central-storage'] = storage
+    
+    # Add processor configuration if specified
+    if ifls > 0 and gps > 0:
+        raise Exception(f"IFLS {ifls} and GPS {gps} are both non-zero")
+
+    if ifls > 0 or gps > 0:
+        properties['processor-usage'] = 'shared'
+        
+        if ifls > 0:
+            properties['number-shared-ifl-processors'] = ifls
+            properties['number-shared-general-purpose-processors'] = 0
+            properties['initial-ifl-processing-weight'] = 10
+        
+        if gps > 0:
+            properties['number-shared-ifl-processors'] = 0
+            properties['number-shared-general-purpose-processors'] = gps
+            # initial-processing-weight only applies to general-purpose processors
+            properties['initial-processing-weight'] = 10
+    
+    print("Using the following activation profile properties for the LPAR:")
+    print(properties)
+
+    profile.update_properties(properties)
+    
     print(f"Image activation profile set for LPAR {profile_name}.")
