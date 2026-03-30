@@ -139,6 +139,14 @@ This playbook will set up ACC, upload the images, initiate the install and then
 check the status of the install. The installation itself can take more than 15
 mins. Check the status of installation on HMC.
 
+To make sure that the appliance has been installed successfully,
+this playbook tries to check the status of the tasks. If the status
+of the tasks is not successful, the playbook
+will print `FAILED - RETRYING: ...` message on the terminal, and then
+retry pulling the status of the task again after a pause. Please let
+the playbook run and give enough time for the appliance to
+install and boot-up. Afterwards, the playbook will run normally.
+
 ## SSA Installation (Standalone Mode) | 02_ssa_install_e2e_standalone.yaml
 
 To install 2x SSAs after a fresh install of ACC, you can run this playbook.
@@ -202,6 +210,14 @@ mode of ACC, where ACC cannot communicate with the HMC.
   export APP_PASSWORD=<appliance_password>
   ```
 
+  Note: These are the credentials already set on the SSC LPARs by the
+  HMC administrator, and these credentials are used by the playbook to
+  communicate with the SSC LPAR. These credentials are the
+  'Administrator user ID` and `Administrator password` as it appears on
+  the HMC UI for SSC Installer.
+
+  Moreover, it is expected that both SSC LPARs have the same
+  credentials.
 - Download and store the SSA installation image to your control node.
 - Update the variables to the required values in `env_vars.yaml`.
   - Do not comment out any variables, even if they are not supposed to be used
@@ -253,6 +269,14 @@ Please ensure that the correct disk type based on the system configuration:
 This playbook will set up ACC, upload the images, initiate the install and then
 check the status of the install. The installation itself can take more than 15
 mins. Check the status of installation on HMC.
+
+To make sure that the appliance has been installed successfully,
+this playbook tries to check the status of the tasks. If the status
+of the tasks is not successful, the playbook
+will print `FAILED - RETRYING: ...` message on the terminal, and then
+retry pulling the status of the task again after a pause. Please let
+the playbook run and give enough time for the appliance to
+install and boot-up. Afterwards, the playbook will run normally.
 
 ## ACC and 2x SSAs Installation Sanity-Check | 03_acc_ssa_install_check.yaml
 
