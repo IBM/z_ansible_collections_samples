@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -12,6 +12,10 @@
 # *|     variables                                                          |
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Added network configuration for ACC LPAR                           |
+# *|   - Added IFLs/GPs configuration for ACC LPAR                          |
 # *+------------------------------------------------------------------------+
 
 # Important: Before running the 00_acc_install.yaml script, kindly review the README file located in
@@ -33,6 +37,12 @@
     # Note: Uncomment lun and wwpn when uploading for FCP disk
     lun: "{{ lun }}"
     wwpn: "{{ wwpn }}"
+    NW_FID: "{{ NW_FID }}"
+    NW_CHPID: "{{ NW_CHPID }}"
+    NW_PORT: "{{ NW_PORT }}"
+    NW_PREFIX: "{{ NW_PREFIX }}"
+    NW_VLANID: "{{ NW_VLANID }}"
+    NW_GW_IP: "{{ NW_GW_IP }}"
     USERNAME: "{{ USERNAME }}"
     PASSWORD: "{{ PASSWORD }}"
     HMC_USER: "{{ HMC_USER }}"
@@ -52,9 +62,11 @@
     ANSIBLE_TMPDIR: "{{ INSTALL_SCRIPT_PATH }}"
     HMC_KEY: "~/.ssh/id_rsa"
     STORAGE: "{{ STORAGE }}"
+    IFLS: "{{ IFLS }}"
+    GPS: "{{ GPS }}"
 
   pre_tasks:
-    - name: Reminder - Export credentials
+    - name: Reminder - Export credentials (HMC connected)
       ansible.builtin.pause:
         prompt: |
 
@@ -77,8 +89,33 @@
           Press Ctrl+C now to cancel if you haven't done this.
           The playbook will continue shortly.
         seconds: 5
+      when: hmc_connected | default(true) | bool
 
-    - name: Check required environment variables
+    - name: Reminder - Export credentials (HMC not connected)
+      ansible.builtin.pause:
+        prompt: |
+
+          Before running this playbook, make sure that:
+
+          - You have installed the required software packages
+          - You have created a python virtual environment 'venv' in the directory
+            "{{ INSTALL_SCRIPT_PATH }}"
+          - You have installed the required python packages in the
+            virtual environment
+          - The ACC LPAR is activated in SSC Installer mode and can be reached
+            by the IP address specified in the LPAR_IP variable in acc_env_vars.yaml file
+
+          Moreover, please export credentials:
+
+          export ACC_ADMIN_USER=<admin_username>
+          export ACC_ADMIN_DEFAULT_PASSWORD=<admin_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+      when: not (hmc_connected | default(true) | bool)
+
+    - name: Check required environment variables (HMC connected)
       vars:
         required_env_vars:
           - HMC_USER
@@ -88,7 +125,22 @@
 
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
-      when: lookup('env', item) == ""
+      when:
+        - lookup('env', item) == ""
+        - hmc_connected | default(true) | bool
+      loop: "{{ required_env_vars }}"
+
+    - name: Check required environment variables (HMC not connected)
+      vars:
+        required_env_vars:
+          - ACC_ADMIN_USER
+          - ACC_ADMIN_DEFAULT_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when:
+        - lookup('env', item) == ""
+        - not (hmc_connected | default(true) | bool)
       loop: "{{ required_env_vars }}"
 
   tasks:
@@ -96,16 +148,35 @@
       ansible.builtin.debug:
         msg: "{{ INSTALL_SCRIPT_PATH }}"
 
-    - name: Run the setup script to install ACC
-      ansible.builtin.shell: "./setup.sh"
+    - name: Run the hmc_connected_install.sh script to install ACC (HMC connected)
+      ansible.builtin.shell: "./hmc_connected_install.sh"
       args:
         chdir: "{{ INSTALL_SCRIPT_PATH }}"
-      register: setup_result
+      register: setup_result_connected
       changed_when: false
+      when: hmc_connected | default(true) | bool
+
+    - name: Run the hmc_not_connected_install.sh script to install ACC (HMC not connected)
+      ansible.builtin.shell: "./hmc_not_connected_install.sh"
+      args:
+        chdir: "{{ INSTALL_SCRIPT_PATH }}"
+      register: setup_result_not_connected
+      changed_when: false
+      when: not (hmc_connected | default(true) | bool)
+
+    - name: Consolidate setup_result
+      ansible.builtin.set_fact:
+        setup_result: >-
+          {{
+            (setup_result_connected
+              if (setup_result_connected is defined and not (setup_result_connected.skipped | default(false)))
+              else setup_result_not_connected)
+          }}
 
     - name: Split logs into lines
       ansible.builtin.set_fact:
         log_lines: "{{ setup_result.stdout.splitlines() }}"
+      when: setup_result is defined
 
     - name: Output each log line
       ansible.builtin.debug:
