@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -11,6 +11,8 @@
 # *|   - Introduced configurable user inputs for network                    |
 # *|     parameters (VLAN, FCP/DASD, OSA/NETH).                             |
 # *|   - Replaced acc_ip with acc_url                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for assigning two resource.
