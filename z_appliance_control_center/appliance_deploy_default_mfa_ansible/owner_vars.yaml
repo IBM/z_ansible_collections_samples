@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -8,23 +8,30 @@
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced acc_ip with acc_url                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 
 # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 acc_url: https://9.120.0.0:8081/api
 
-####### Admin credentails #######
+####### Admin credentials #######
+
+# These credentials are only required for creating the MFA secrets.
+# If you move the MFA secret generation to a separate playbook, then
+# you can remove these secrets and also the associated tasks in the
+# playbooks.
 
 # ACC LPAR's username (default admin username) (e.g., cc_admin)
 # Export before run: export ACC_ADMIN_USER=<your_admin_username>
 cc_admin_user: "{{ lookup('env', 'ACC_ADMIN_USER') }}"
 
-# Updated password for ACC LPAR (updated admin password) (e.g., "defaultPassw0rd1")
+# Updated password for ACC admin) (e.g., "defaultPassw0rd1")
 # Export before run: export ACC_ADMIN_PASSWORD=<your_new_password>
 cc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"
 
 
-####### Users(owner) #######
+####### Users (owner) #######
 
 # Specify the owner name for created owner (e.g., cc_owner)
 cc_owner_user: "cc_owner"
@@ -33,10 +40,18 @@ cc_owner_user: "cc_owner"
 cc_owner_email: "cc_owner@email.com"
 
 # Owner's old/default password (e.g., "defaultPassw0rd")
+# This is set by the ACC admin.
 # Export before run: export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
 cc_owner_default_password: "{{ lookup('env', 'ACC_OWNER_DEFAULT_PASSWORD') }}"
 
 # Owner's new password to update the old one (e.g., "defaultPassw0rd1")
+
+# Requirements:
+# Length: 15-128 characters
+# Valid characters: letters, digits, special characters (`-_#!@$%&?`)
+# Must have at least one lower case, one upper case, one digit, one special character
+# Must not include the username
+
 # Export before run: export ACC_OWNER_PASSWORD=<owner_new_password>
 cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"
 
@@ -144,6 +159,25 @@ app_memory: 51200
 ####### Appliance credential #######
 
 # Set Username for the appliance (used during appliance installation)
+
+# You must follow the [Secure Service Container user guide](https://www.ibm.com/docs/en/module_1707928542006/pdf/SC28-6971-01.pdf)
+# for setting up APP_USERNAME and APP_PASSWORD. At the moment, the guidelines are:
+# APP_USERNAME: This is the Administrator user ID in the SSC user guide and is to be
+# used as the default administrator user ID for the Secure Service Container partition.
+# This user ID has authority to perform any task that is available through the
+# Secure Service Container graphical user interface (GUI). An administrator user ID can
+# be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
+# 0 - 9, letters A - Z (upper or lower case), and the following special
+# characters: period (.), underscore (_), and hyphen (-). 
+# APP_PASSWORD: This is the Administrator password in the SSC user guide.
+# This password can have a minimum of 8 characters and a maximum of 256 characters.
+# An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
+# (upper or lower case), and the following special characters: hyphen (-),
+# underscore (_), exclamation (!), at (@), hash (#), dollar ($), percent (%), carat (^),
+# ampersand (&), asterisk (*), left parenthesis ((), right parenthesis ()), plus (+),
+# left brace ({), right brace (}), vertical bar (|), colon (:), less than (<),
+# greater than (>), question mark (?), and equals (=).
+
 # If you have not used ACC to install the appliance, then this is the username of the SSC LPAR.
 # Export before run: export APP_USERNAME=<appliance_username>
 app_username: "{{ lookup('env', 'APP_USERNAME') }}"
@@ -157,7 +191,7 @@ app_password: "{{ lookup('env', 'APP_PASSWORD') }}"
 ####### Available execution mode #######
 
 # . For default ACC (i.e, hmc_managed=true): "default", "prep_lpar_only", "appliance_only", "switch_to_installer"
-# . Standalone ACC (i.e, hmcmanaged=false): "appliance_only", "switch_to_installer"
+# . Standalone ACC (i.e, hmc_managed=false): "appliance_only", "switch_to_installer"
 execution_action: "default"
 
 
