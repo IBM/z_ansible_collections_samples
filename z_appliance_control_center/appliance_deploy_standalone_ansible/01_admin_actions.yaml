@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -9,6 +9,9 @@
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced acc_ip with acc_url and hmc_managed by acc_default_mode   |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Asking to update password before continuing                        |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
@@ -51,6 +54,11 @@
       private: false
       default: "yes"
 
+    - name: update_pass
+      prompt: "Do you want to update the admin password? If you have already, then please type no (yes/no)"
+      private: false
+      default: "yes"
+
   tasks:
     - name: 00 - Initialize ACC with Standalone mode
       ansible.builtin.uri:
@@ -85,7 +93,7 @@
         msg:
           - "{{ init_response.json }}"
 
-    - name: 02 - Update ACC-admin password (remove this if already done)
+    - name: 02 - Update ACC-admin password
       ansible.builtin.uri:
         url: "{{ acc_url }}/user"
         body:
@@ -96,6 +104,7 @@
         method: PUT
         return_content: true
         validate_certs: false
+        when: update_pass | lower == "yes"
 
     - name: 03 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
