@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -9,6 +9,9 @@
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced acc_ip with acc_url and hmc_managed by acc_default_mode   |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Asking to update password before continuing                        |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
@@ -50,6 +53,11 @@
       prompt: "Do you want to initialize ACC? If you have already, then please type no. (yes/no)"
       private: false
       default: "yes"
+    
+    - name: update_pass
+      prompt: "Do you want to update the admin password? If you have already, then please type no (yes/no)"
+      private: false
+      default: "yes"
 
   tasks:
     - name: 00 - Initialize ACC with Standalone mode with MFA
@@ -71,6 +79,7 @@
     - name: Print init response
       ansible.builtin.debug:
         var: init_response.json
+      when: run_init | lower == "yes"
 
     - name: 01 - Get Initialize status
       ansible.builtin.uri:
@@ -95,13 +104,15 @@
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
           - "{{ init_response.json.totp_secret }}"
+      when: run_init | lower == "yes"
 
     - name: Wait for user to generate OTP
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
+      when: run_init | lower == "yes"
 
-    - name: 02 - Update ACC-admin password (remove this if already done)
+    - name: 02 - Update ACC-admin password
       ansible.builtin.uri:
         url: "{{ acc_url }}/user"
         body:
@@ -114,10 +125,12 @@
         return_content: true
         validate_certs: false
       register: update_password_response
+      when: update_pass | lower == "yes"
 
     - name: Print password update response
       ansible.builtin.debug:
         var: update_password_response.json
+      when: update_pass | lower == "yes"
 
     - name: Show admin MFA secret
       ansible.builtin.debug:
@@ -125,6 +138,7 @@
           - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app"
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
+      when: update_pass | lower == "yes"
 
     # Note: The above tasks are intended for one-time execution.
     # Please comment them out after running once. when you want to generate access token
