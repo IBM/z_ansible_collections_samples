@@ -93,24 +93,25 @@ there in the standalone mode.
 
 #### Differences between Default and Standalone Mode
 
-Since ACC cannot communicate with the HMC in the standalone mode,
-therefore, it cannot send commands to the HMC. It is expected that the
-HMC-admin or the ACC-admin already bring the LPAR in the right state
-before continuing with ACC.
+Since the ACC cannot communicate with the HMC in standalone mode, it
+is expected that the HMC-admin or the ACC-admin configure the LPAR
+into a stable state before proceeding with further ACC actions.
 
-For example, to install and activate an appliance, standalone mode ACC can only use
-the IP of the LPAR. Thus, the HMC-admin or the ACC-admin has to perform
+For example, to install and activate an appliance, in standalone mode
+the ACC can only rely on using the IP address of the LPAR. Therefore
+the HMC-admin or the ACC-admin has to perform
 certain actions on the HMC beforehand. These actions include:
+
 - Updating the activation profile of the LPAR.
 - Activating the LPAR in SSC Installer mode.
-- Share the credentials (`Administrator user ID` and `Administrator password`)
-  with the appliance-owner.
+- Sharing the credentials (`Administrator user ID` and `Administrator password`
+of the SSC LPAR) with the appliance-owner.
 
 Afterwards, the appliance-owner can run the activate command via ACC.
 
 ![Standalone Installation Process](images/standalone_install.png)
 
-Similarly, deactivation of an LPAR can only be performed on the HMC if
+Similarly, deactivation of an LPAR must be performed on the HMC if
 ACC is in the standalone mode.
 
 #### Multi-Factor Authentication (MFA)

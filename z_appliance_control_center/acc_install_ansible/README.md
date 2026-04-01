@@ -9,7 +9,7 @@ In essence, there are 3 ways to install ACC:
 2. Use the provided ansible playbook `00_acc_install.yaml` to install ACC
    by sending commands from the control node (the machine that will run the
    `00_acc_install.yaml` playbook) to the HMC. This way is helpful in storing
-   the infrastructure information in form of variables and automated install of ACC.
+   the infrastructure information in the form of variables and automating the install of ACC.
    This way is recommended.
 3. Use the provided ansible playbook `00_acc_install.yaml` to install ACC
    on an already activated LPAR in SSC Installer mode. This way is helpful
@@ -26,6 +26,10 @@ run the commands.
 To install ACC, the following actions must be performed on the HMC
 and your control node.
 
+- On the IBM Z machine that will run ACC, the LPAR or partition
+  which will run ACC should already be created.
+  - For DPM based machines, be sure to connect the storage group to
+    the partition.
 - Download the ACC installation image from Fix Central and store it on your
   control node (i.e., your laptop).
 - Download this directory (`acc_install_ansible`) on
@@ -37,11 +41,11 @@ and your control node.
 - With `hmc_connected: true`, ensure that control node (your laptop) and ACC IP address have sufficient
   authority and are added to the appropriate HMC whitelist to allow for proper
   communication to the HMC.
-- With `hmc_connected: false`, login to HMC and perform appropriate actions like:
+- When `hmc_connected: false` has been set, be sure to login to HMC and perform the appropriate actions:
   - Ensure that in the HMC, the Secure Service Container (SSC) based ACC LPAR
-    activation profile is created and is updated with correct values of network
-    settings. (`chpid`, `prefix`, `fid`, etc.) and storage (initial 16 GB storage is required for ACC).
-  - For DPM based machine, also connect the storage group to the partition.
+    activation profile is created and updated with the correct network
+    settings (`chpid`, `prefix`, `fid`, etc.) and has been given
+    sufficient storage (initial 16 GB storage is required for ACC).
   - Activate the LPAR in SSC installer mode.
   - Provide the IP of the ACC LPAR to the `LPAR_IP` variable in the `acc_env_vars.yaml` file.
 
@@ -144,6 +148,7 @@ To set up the ACC, the following actions must be performed by the ACC-admin.
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
+  With `hmc_connected: false`, do not export the above `HMC_*`.
 
 - Set the ACC-admin's username and default password by using the `export`
   command in a terminal on your control node (laptop) to create the
@@ -158,10 +163,11 @@ To set up the ACC, the following actions must be performed by the ACC-admin.
   the `admin_password` is the ACC's `lpar_password`. These are the
   ACC's SSC LPAR's credentials. With `hmc_connected: true`, the playbook
   will automatically set the credentials of the LPAR and install ACC on the
-  LPAR. With `hmc_connected: false`, these credentials must be provided by
-  the HMC admin who has activated the LPAR in SSC Installer mode. These
-  credentials are equal to `Administrator user ID` and `Administrator password`
-  on the image activation profile on the HMC.
+  LPAR. With `hmc_connected: false`, these credentials
+  must be provided by the HMC admin who has activated the LPAR in SSC
+  Installer mode and they represent the `Administrator user ID` and
+  `Administrator password` configured in the image activation profile
+  on the HMC.
 
   These credentials are used by ACC-admin later as well, when initializing ACC.
   Moreover, the password must adhere to the following rules:
