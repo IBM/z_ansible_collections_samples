@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -13,6 +13,10 @@
 # *|   - Enhanced task monitoring by implementing dynamic                   |
 # *|     status polling until completion (Success/Failure).                 |
 # *|   - Replaced cc_url with acc_url                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Asking to update password before continuing                        |
+# *|   - Changed return code from 200 to 200,207                            |
 # *+------------------------------------------------------------------------+
 
 # Tested with OSA and FCP devices, on non-DPM mode machine.
@@ -104,6 +108,16 @@
       prompt: "Do you want to initialize ACC? If you have already, then please type no. (yes/no)"
       private: false
       default: "yes"
+    
+    - name: update_pass
+      prompt: "Do you want to update the admin password? If you have already, then please type no (yes/no)"
+      private: false
+      default: "yes"
+    
+    - name: update_owner_pass
+      prompt: "Do you want to update the owner password? If you have already, then please type no (yes/no)"
+      private: false
+      default: "yes"
 
   tasks:
 
@@ -138,6 +152,7 @@
       tags: admin
       ansible.builtin.debug:
         var: init_response.json
+      when: run_init | lower == "yes"
 
     - name: Show the temporary OTP secret for admin
       tags: admin
@@ -145,16 +160,21 @@
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
           - "{{ init_response.json.totp_secret }}"
-      when: mfa_enabled | bool
+      when:
+          - mfa_enabled | bool
+          - run_init | lower == "yes"
+
 
     - name: Wait for user to generate OTP from totp_secret
       tags: admin
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
-      when: mfa_enabled | bool
+      when:
+          - mfa_enabled | bool
+          - run_init | lower == "yes"
 
-    - name: 01 - Update ACC-admin password (remove this if already done)
+    - name: 01 - Update ACC-admin password
       tags: admin
       ansible.builtin.uri:
         url: "{{ acc_url }}/user"
@@ -168,11 +188,13 @@
         validate_certs: false
         return_content: true
       register: update_password_response
+      when: update_pass | lower == "yes"
 
     - name: Print password update response
       tags: admin
       ansible.builtin.debug:
         var: update_password_response.json
+      when: update_pass | lower == "yes"
 
     - name: Show admin MFA secret
       tags: admin
@@ -181,14 +203,19 @@
           - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_pass | lower == "yes"
+
 
     - name: Wait for user to generate admin OTP with mfa_secret
       tags: admin, retry
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above admin mfa_secret:"
       register: mfa_admin_otp_input
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_pass | lower == "yes"
 
     - name: 02 - Get authentication token from the ACC as admin
       tags: admin, retry
@@ -483,13 +510,18 @@
         return_content: true
         validate_certs: false
       register: totp_response
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
+      
 
     - name: Print create owner totp secret response
       tags: owner
       ansible.builtin.debug:
         var: totp_response.json
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
 
     - name: Show the temporary OTP secret for owner
       tags: owner
@@ -497,14 +529,18 @@
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update owner password:"
           - "{{ totp_response.json.secret }}"
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
 
     - name: Wait for user to generate OTP
       tags: owner
       ansible.builtin.pause:
         prompt: "Enter owner OTP generated from the above totp_secret:"
       register: otp_input
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
 
     - name: 07 - Update the password of ACC appliance-owner
       tags: owner
@@ -520,12 +556,15 @@
         validate_certs: false
         return_content: true
       register: owner_update_password_response
+      when: update_owner_pass | lower == "yes"
 
     - name: Print owner password update response
       tags: owner
       ansible.builtin.debug:
         var: owner_update_password_response.json
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
 
     - name: Show owner MFA secret
       tags: owner
@@ -534,14 +573,18 @@
           - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ owner_update_password_response.json.mfa_secret }}"
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
 
     - name: Wait for user to generate OTP for owner
       tags: owner, retry
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above owner mfa_secret:"
       register: mfa_owner_otp_input
-      when: mfa_enabled | bool
+      when: 
+        - mfa_enabled | bool
+        - update_owner_pass | lower == "yes"
 
     - name: 08 - Get authentication token from the ACC as appliance-owner
       tags: owner, retry
@@ -635,9 +678,15 @@
         headers:
           Authorization: "Bearer {{ access_token }}"
           Content-Type: application/json
-        status_code: 200
+        status_code: [200, 207]
         validate_certs: false
       register: response
+
+    - name: Debug message for partial failure (207)
+      tags: owner, install, retry
+      ansible.builtin.debug:
+        msg: "WARNING: Status code 207 received - one or more LPARs failed to perform the activation task"
+      when: response.status == 207
 
     - name: Printing the response for installation
       tags: owner, install, retry
@@ -660,8 +709,8 @@
             | map('dict2items')
             | flatten
             | map(attribute='value')
-            | selectattr('task_id', 'defined')
-            | map(attribute='task_id')
+            | selectattr('task-id', 'defined')
+            | map(attribute='task-id')
             | list
           }}
 

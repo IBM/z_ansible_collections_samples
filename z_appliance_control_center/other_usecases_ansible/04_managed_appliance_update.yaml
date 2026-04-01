@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -9,6 +9,9 @@
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced acc_ip with acc_url                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Changed return code from 200 to 200,207                            |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for appliance upgrade
@@ -196,8 +199,15 @@
           Authorization: "Bearer {{ access_token }}"
           Content-Type: application/json
         validate_certs: false
-        status_code: 200
+        status_code: [200, 207]
         dest: "{{ upgrade_fix_data }}"
+      register: upgrade_response
+
+    - name: Debug message for partial failure (207)
+      tags: owner, install
+      ansible.builtin.debug:
+        msg: "WARNING: Status code 207 received - one or more LPARs failed to perform the task"
+      when: upgrade_response.status == 207
 
     - name: Wait for 15 seconds
       ansible.builtin.pause:
