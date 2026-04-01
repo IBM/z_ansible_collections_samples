@@ -34,7 +34,6 @@
     LPAR: "{{ LPAR }}"
     DISK_ID: "{{ DISK_ID }}"
     IS_FCP: "{{ IS_FCP }}"
-    # Note: Uncomment lun and wwpn when uploading for FCP disk
     lun: "{{ lun }}"
     wwpn: "{{ wwpn }}"
     NW_FID: "{{ NW_FID }}"
