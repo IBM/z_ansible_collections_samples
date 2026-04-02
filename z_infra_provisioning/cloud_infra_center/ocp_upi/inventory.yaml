@@ -50,6 +50,8 @@ all:
       os_flavor_bootstrap: 'medium'
       os_flavor_master: 'medium'
       os_flavor_worker: 'medium'
+      # os_flavor_storage: 'medium'   # optional, defaults to os_flavor_worker if not set
+      # os_flavor_infra: 'medium'     # optional, defaults to os_flavor_worker if not set
 
       create_server_zone: ''
       os_control_nodes_number: 3

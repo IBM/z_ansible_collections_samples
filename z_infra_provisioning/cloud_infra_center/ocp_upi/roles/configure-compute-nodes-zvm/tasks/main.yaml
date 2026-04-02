@@ -139,7 +139,7 @@
   openstack.cloud.server:
     name: "{{ os_storage_server_name }}-{{ item }}"
     image: "{{ image_name }}"
-    flavor: "{{ os_flavor_worker }}"
+    flavor: "{{ os_flavor_storage | default(os_flavor_worker) }}"
     auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
@@ -158,7 +158,7 @@
   openstack.cloud.server:
     name: "{{ os_storage_server_name }}-{{ item }}"
     image: "{{ image_name }}"
-    flavor: "{{ os_flavor_worker }}"
+    flavor: "{{ os_flavor_storage | default(os_flavor_worker) }}"
     auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
@@ -202,7 +202,7 @@
 - name: 'Create the storage server with boot volume'
   openstack.cloud.server:
     name: "{{ os_storage_server_name }}-{{ item }}"
-    flavor: "{{ os_flavor_worker }}"
+    flavor: "{{ os_flavor_storage | default(os_flavor_worker) }}"
     boot_volume: "{{ os_storage_server_name }}-{{ item }}-boot"
     auto_ip: false
     availability_zone: "{{ create_server_zone }}"
@@ -224,7 +224,7 @@
   openstack.cloud.server:
     name: "{{ os_infra_server_name }}-{{ item }}"
     image: "{{ image_name }}"
-    flavor: "{{ os_flavor_worker }}"
+    flavor: "{{ os_flavor_infra | default(os_flavor_worker) }}"
     auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
@@ -243,7 +243,7 @@
   openstack.cloud.server:
     name: "{{ os_infra_server_name }}-{{ item }}"
     image: "{{ image_name }}"
-    flavor: "{{ os_flavor_worker }}"
+    flavor: "{{ os_flavor_infra | default(os_flavor_worker) }}"
     auto_ip: false
     availability_zone: "{{ create_server_zone }}"
     timeout: "{{ create_server_timeout|int * 60 }}"
@@ -287,7 +287,7 @@
 - name: 'Create the infra server with boot volume'
   openstack.cloud.server:
     name: "{{ os_infra_server_name }}-{{ item }}"
-    flavor: "{{ os_flavor_worker }}"
+    flavor: "{{ os_flavor_infra | default(os_flavor_worker) }}"
     boot_volume: "{{ os_infra_server_name }}-{{ item }}-boot"
     auto_ip: false
     availability_zone: "{{ create_server_zone }}"
