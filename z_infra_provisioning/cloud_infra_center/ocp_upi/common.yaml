@@ -32,6 +32,8 @@
     os_port_bootstrap: "{{ infra_id.stdout_lines[0] }}-bootstrap-port"
     os_port_master: "{{ infra_id.stdout_lines[0] }}-master-port"
     os_port_worker: "{{ infra_id.stdout_lines[0] }}-{{comp_name_suffix | default('worker')}}-port"
+    os_port_storage: "{{ infra_id.stdout_lines[0] }}-storage-port"
+    os_port_infra: "{{ infra_id.stdout_lines[0] }}-infra-port"
     # Security groups names
     os_sg_master: "{{ infra_id.stdout_lines[0] }}-master"
     os_sg_worker: "{{ infra_id.stdout_lines[0] }}-worker"
@@ -75,3 +77,31 @@
     os_compute_server_name: "{{ worker_name_prefix }}"
   when:
     - worker_name_prefix is defined
+
+- name: 'Storage server names with prefix'
+  ansible.builtin.set_fact:
+    os_storage_server_name: "{{ storage_name_prefix }}"
+    os_storage_nodes_number: 3
+  when:
+    - storage_name_prefix is defined
+
+- name: 'Storage server names without prefix'
+  ansible.builtin.set_fact:
+    os_storage_server_name: "{{ infra_id.stdout_lines[0] }}-storage"
+    os_storage_nodes_number: 0
+  when:
+    - storage_name_prefix is not defined
+
+- name: 'Infra server names with prefix'
+  ansible.builtin.set_fact:
+    os_infra_server_name: "{{ infra_name_prefix }}"
+    os_infra_nodes_number: 3
+  when:
+    - infra_name_prefix is defined
+
+- name: 'Infra server names without prefix'
+  ansible.builtin.set_fact:
+    os_infra_server_name: "{{ infra_id.stdout_lines[0] }}-infra"
+    os_infra_nodes_number: 0
+  when:
+    - infra_name_prefix is not defined

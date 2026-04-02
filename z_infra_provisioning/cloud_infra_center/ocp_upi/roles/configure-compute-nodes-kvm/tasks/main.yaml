@@ -114,3 +114,149 @@
     - disk_type == "scsi"
     - vm_type == "kvm"
     - volume_type_id is defined
+
+# ---- Storage nodes ----
+
+- name: 'Create the storage servers'
+  openstack.cloud.server:
+    name: "{{ os_storage_server_name }}-{{ item }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_worker }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_storage_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item }}"
+    meta: "{{ cluster_id_tag }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - vm_type == "kvm"
+    - volume_type_id is not defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Create storage boot volume'
+  openstack.cloud.volume:
+    state: present
+    name: "{{ os_storage_server_name }}-{{ item }}-boot"
+    image: "{{ image_name }}"
+    size: "{{ compute_flavor_size.stdout_lines[0] }}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Set storage volume bootable'
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_storage_server_name }}-{{ item }}-boot"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Create the storage server with boot volume'
+  openstack.cloud.server:
+    name: "{{ os_storage_server_name }}-{{ item }}"
+    flavor: "{{ os_flavor_worker }}"
+    boot_volume: "{{ os_storage_server_name }}-{{ item }}-boot"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_storage_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item }}"
+    meta: "{{ cluster_id_tag }}"
+    terminate_volume: true
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - vm_type == "kvm"
+    - volume_type_id is defined
+    - os_storage_nodes_number | int > 0
+
+# ---- Infra nodes ----
+
+- name: 'Create the infra servers'
+  openstack.cloud.server:
+    name: "{{ os_infra_server_name }}-{{ item }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_worker }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_infra_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_infra }}-{{ item }}"
+    meta: "{{ cluster_id_tag }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - vm_type == "kvm"
+    - volume_type_id is not defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Create infra boot volume'
+  openstack.cloud.volume:
+    state: present
+    name: "{{ os_infra_server_name }}-{{ item }}-boot"
+    image: "{{ image_name }}"
+    size: "{{ compute_flavor_size.stdout_lines[0] }}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Set infra volume bootable'
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_infra_server_name }}-{{ item }}-boot"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Create the infra server with boot volume'
+  openstack.cloud.server:
+    name: "{{ os_infra_server_name }}-{{ item }}"
+    flavor: "{{ os_flavor_worker }}"
+    boot_volume: "{{ os_infra_server_name }}-{{ item }}-boot"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_infra_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_infra }}-{{ item }}"
+    meta: "{{ cluster_id_tag }}"
+    terminate_volume: true
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - vm_type == "kvm"
+    - volume_type_id is defined
+    - os_infra_nodes_number | int > 0
+
+# ---- Approve CSR for storage and infra nodes ----
+
+- name: 'Waiting for approve storage CSR'
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/approve_worker.yaml"
+  vars:
+    workerid: "{{ os_storage_server_name }}-{{ item }}"
+    comp_name_suffix: "storage"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - os_storage_nodes_number | int > 0
+
+- name: 'Waiting for approve infra CSR'
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/approve_worker.yaml"
+  vars:
+    workerid: "{{ os_infra_server_name }}-{{ item }}"
+    comp_name_suffix: "infra"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - os_infra_nodes_number | int > 0
