@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -10,6 +10,9 @@
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced acc_ip with acc_url                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Asking to update password before continuing                        |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
@@ -17,6 +20,12 @@
   gather_facts: true
   vars_files:
     - owner_vars.yaml
+
+  vars_prompt:
+    - name: update_pass
+      prompt: "Do you want to update the owner password? If you have already, then please type no (yes/no)"
+      private: false
+      default: "yes"
 
   pre_tasks:
     - name: Reminder - Export appliance-owner credentials
@@ -85,23 +94,27 @@
         return_content: true
         validate_certs: false
       register: totp_response
+      when: update_pass | lower == "yes"
 
     - name: Print create owner totp secret response
       ansible.builtin.debug:
         var: totp_response.json
+      when: update_pass | lower == "yes"
 
     - name: Show the temparory OTP secret
       ansible.builtin.debug:
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update owner password:"
           - "{{ totp_response.json.secret }}"
+      when: update_pass | lower == "yes"
 
     - name: Wait for user to generate OTP
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
+      when: update_pass | lower == "yes"
 
-    - name: 02 - As an appliance-owner, update the password (remove this if already done)
+    - name: 02 - As an appliance-owner, update the password
       tags: owner
       ansible.builtin.uri:
         url: "{{ acc_url }}/user"
@@ -115,10 +128,12 @@
         return_content: true
         validate_certs: false
       register: update_password_response
+      when: update_pass | lower == "yes"
 
     - name: Print owner password update response
       ansible.builtin.debug:
         var: update_password_response.json
+      when: update_pass | lower == "yes"
 
     - name: Show owner MFA secret
       ansible.builtin.debug:
@@ -126,6 +141,7 @@
           - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
+      when: update_pass | lower == "yes"
 
     # Note: The above tasks are intended for one-time execution.
     # Please comment them out after running once. when you want to generate access token

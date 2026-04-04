@@ -11,6 +11,8 @@
 # *| [02.13.2026]                                                           |
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced hmc_url with hmc_ip                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for inserting HMC credentials

@@ -222,6 +222,9 @@ install the appliance. For that, perform the following actions as appliance-owne
 
   `appliance_username` and `appliance_passwords` are the credentials of the SSC LPAR (appliance)
   that will be installed by ACC.
+
+  Note: You will have to follow the administrator user id and password guidelines defined in the
+  [SSC user-guide](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=wsscpsms-changing-logon-settings-secure-service-container-partition-standard-mode-system).
 - `cd` to the directory `appliance_deploy_default_ansible`.
 - Modify the remaining owner variables not updated during [03 playbook execution](#appliance-installation---preparations---03_owner_actionsyaml) in the file `owner_vars.yaml`.
 
@@ -232,21 +235,27 @@ install the appliance. For that, perform the following actions as appliance-owne
   ```
 
 The above playbook with send the install command to ACC. ACC will take up to
-20 mins to install the appliance. Check the status of the appliances on HMC and wait for the playbook to complete succesfully.
+20 mins to install the appliance. Check the status of the appliances on HMC and wait for the playbook to complete successfully.
 
 Note that to pull logs for appliances, concurrent updates for appliances, upgrade, health check
 status, or ACC concurrent updates, use the playbooks located in:
 `other_usecases_ansible` directory.
 
-#### NOTE
+#### NOTES
 
-Make sure to run `03_owner_actions.yaml` before executing `04_install_flow.yaml`.
-The `03_owner_actions.yaml` playbook appends the `image_id`: <id> entry to the end of the `owner_vars.yaml` file.
-If you skip running `03_owner_actions.yaml`, you may encounter the following error:
+- Make sure to run `03_owner_actions.yaml` before executing `04_install_flow.yaml`.
+- The `03_owner_actions.yaml` playbook appends the `image_id`: <id> entry to the end of the `owner_vars.yaml` file.
+  If you skip running `03_owner_actions.yaml`, you may encounter the following error:
 
-```bash
-"msg": "The task includes an option with an undefined variable. 'image_id' is undefined"
-```
+  ```bash
+  "msg": "The task includes an option with an undefined variable. 'image_id' is undefined"
+  ```
 
-You can also manually add `image_id` variable to the `owner_vars.yaml` file, in case you
-do not want to re-run `03_owner_actions.yaml`.
+  You can also manually add `image_id` variable to the `owner_vars.yaml` file, in case you
+  do not want to re-run `03_owner_actions.yaml`.
+- To make sure that the appliance has been installed successfully and it is reachable,
+  the playbook `04_install_flow.yaml` tries to connect with the appliance and gather
+  its status. If the connection is not successful, the playbook
+  will print `FAILED - RETRYING: ...` message on the terminal, and then retry the connection
+  after a pause. Please let the playbook run and give enough time for the appliance to
+  install and boot-up. Afterwards, the playbook will run normally.

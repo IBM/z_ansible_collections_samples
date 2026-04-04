@@ -12,6 +12,8 @@
 # *|   - Tested with ACC 1.2.12                                             |
 # *|   - Replaced acc_ip with acc_url and hmc_url with hmc_ip               |
 # *|   - Increased the timeout to 180 seconds                               |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 - name: ACC playbook, to be run as an ACC-admin, for syncing ACC with the HMC.
   hosts: localhost

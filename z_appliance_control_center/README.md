@@ -91,6 +91,29 @@ be taken manually on the HMC before using ACC. As seen, the blue arrow that
 connected ACC with the network containing HMC in the default mode is no longer
 there in the standalone mode.
 
+#### Differences between Default and Standalone Mode
+
+Since the ACC cannot communicate with the HMC in standalone mode, it
+is expected that the HMC-admin or the ACC-admin configure the LPAR
+into a stable state before proceeding with further ACC actions.
+
+For example, to install and activate an appliance, in standalone mode
+the ACC can only rely on using the IP address of the LPAR. Therefore
+the HMC-admin or the ACC-admin has to perform
+certain actions on the HMC beforehand. These actions include:
+
+- Updating the activation profile of the LPAR.
+- Activating the LPAR in SSC Installer mode.
+- Sharing the credentials (`Administrator user ID` and `Administrator password`
+of the SSC LPAR) with the appliance-owner.
+
+Afterwards, the appliance-owner can run the activate command via ACC.
+
+![Standalone Installation Process](images/standalone_install.png)
+
+Similarly, deactivation of an LPAR must be performed on the HMC if
+ACC is in the standalone mode.
+
 #### Multi-Factor Authentication (MFA)
 
 Moreover, the ACC-admin can configure each of the above default and standalone
@@ -485,6 +508,18 @@ python -m pip install --user -r requirements.txt
 
 These playbooks are tested with different versions of ACC. Below is a
 brief change-log of these playbooks.
+
+### ACC version 1.2.12 to 1.2.13
+
+- Now the ACC installation using the `acc_install_ansible/00_acc_install.yaml`
+  does not require an already updated activation profile on the HMC. The
+  ACC-admin can directly set the disk, network and compute resources for
+  the ACC LPAR using the `acc_install_ansible/acc_env_vars.yaml` file.
+- ACC can be installed by either having the control node (e.g., your
+  laptop that runs the `acc_install_ansible/00_acc_install.yaml`)
+  connected to the HMC or not connected to the HMC. See the information
+  about `hmc_connected` variable in the `acc_install_ansible/acc_env_vars.yaml`
+  file.
 
 ### ACC version 1.2.10 to 1.2.12
 

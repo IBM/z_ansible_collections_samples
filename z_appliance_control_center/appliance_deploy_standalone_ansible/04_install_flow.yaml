@@ -1,5 +1,5 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
@@ -11,6 +11,9 @@
 # *|   - Enhanced task monitoring by implementing dynamic                   |
 # *|     status polling until completion (Success/Failure).                 |
 # *|   - Replaced acc_ip with acc_url                                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Changed return code from 200 to 200,207                            |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
@@ -162,9 +165,15 @@
         headers:
           Authorization: "Bearer {{ access_token }}"
           Content-Type: application/json
-        status_code: 200
+        status_code: [200, 207]
         validate_certs: false
       register: activate_response
+
+    - name: Debug message for partial failure (207)
+      tags: owner, install
+      ansible.builtin.debug:
+        msg: "WARNING: Status code 207 received - one or more LPARs failed to perform the activation task"
+      when: activate_response.status == 207
 
     - name: Printing the response
       tags: owner, install
@@ -186,8 +195,8 @@
             | map('dict2items')
             | flatten
             | map(attribute='value')
-            | selectattr('task_id', 'defined')
-            | map(attribute='task_id')
+            | selectattr('task-id', 'defined')
+            | map(attribute='task-id')
             | list
           }}
 
