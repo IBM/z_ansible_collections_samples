@@ -64,7 +64,7 @@
         method: PUT
         return_content: true
         validate_certs: false
-        when: update_pass | lower == "yes"
+      when: update_pass | lower == "yes"
 
     - name: 01 - Get authentication token from the ACC as appliance-owner
       tags: owner, install
