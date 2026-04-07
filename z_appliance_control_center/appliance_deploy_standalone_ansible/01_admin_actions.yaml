@@ -104,7 +104,7 @@
         method: PUT
         return_content: true
         validate_certs: false
-        when: update_pass | lower == "yes"
+      when: update_pass | lower == "yes"
 
     - name: 03 - Get authentication token from the ACC as admin
       ansible.builtin.uri:

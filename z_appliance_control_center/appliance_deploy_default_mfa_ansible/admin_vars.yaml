@@ -25,7 +25,6 @@
 # NOTE: Select the correct network card type based on system configuration:
 #   - CHPID, Port  -> choose OSA
 #   - FID          -> choose NETH
-# Incorrect selection will 
 ######################################################################################################
 
 
@@ -77,6 +76,12 @@ cc_admin_old_password: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"
 cc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"
 
 # Specify the owner name for the new Owner's creation (e.g., cc_owner)
+
+# Requirements:
+# - length should be in range [6,16]
+# - valid chars: ascii_lowercase, digits, '-' and '_'
+# - starts with ascii_lowercase
+# - ends with ascii_lowercase or digits
 cc_owner_user: "cc_owner"
 
 # Owner's email address (e.g., "cc_owner@email.com")
@@ -170,10 +175,12 @@ disk1_id: "0.0.5abc"
 is_fcp1: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
-wwpn1: "50050763070B46A6"
+# Should be 16 digits
+wwpn1: "50050760ab882d32"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
-lun1: "4016403900000000"
+# Should be 16 digits
+lun1: "401640831cef1d43"
 
 # Appliance IP address ( lpar ip)
 app_ip1: "9.120.100.200"
@@ -214,10 +221,12 @@ disk2_id: "0.0.5abc"
 is_fcp2: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
-wwpn2: "50050763"
+# Should be 16 digits
+wwpn1: "50050760ab882d32"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
-lun2: "4016403"
+# Should be 16 digits
+lun1: "401640831cef1d43"
 
 # Appliance IP address ( lpar ip)
 app_ip2: "9.120.100.200"
