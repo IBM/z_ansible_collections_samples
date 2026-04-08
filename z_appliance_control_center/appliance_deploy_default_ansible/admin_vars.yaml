@@ -227,10 +227,10 @@ wwpn1: "5000000000000001"
 lun1: "7000000000000001"
 
 # Appliance IP address ( lpar ip)
-app2_ip: "9.120.100.200"
+app2_ip: "9.x.x.x"
 
 # (IPv4/IPv6) gateway IP address
-gw2_ip: "9.120.100.1"
+gw2_ip: "9.x.x.x"
 
 # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382")
 chpid2: "d0"
