@@ -171,17 +171,17 @@ is_fcp1: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
 # Should be 16 digits
-wwpn1: "50050760ab882d32"
+wwpn1: "5000000000000001"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
 # Should be 16 digits
-lun1: "401640831cef1d43"
+lun1: "7000000000000001"
 
 # Appliance IP address ( lpar ip)
-app_ip1: "9.120.100.200"
+app_ip1: "9.x.x.x"
 
 # (IPv4/IPv6) gateway IP address
-gw1_ip: "9.120.100.1"
+gw1_ip: "9.x.x.x"
 
 # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382")
 chpid1: "d0"
@@ -216,17 +216,17 @@ is_fcp2: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
 # Should be 16 digits
-wwpn1: "50050760ab882d32"
+wwpn1: "5000000000000001"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
 # Should be 16 digits
-lun1: "401640831cef1d43"
+lun1: "7000000000000001"
 
 # Appliance IP address ( lpar ip)
-app_ip2: "9.120.100.200"
+app_ip2: "9.x.x.x"
 
 # (IPv4/IPv6) gateway IP address
-gw2_ip: "9.120.100.1"
+gw2_ip: "9.x.x.x"
 
 # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382")
 chpid2: "d0"
