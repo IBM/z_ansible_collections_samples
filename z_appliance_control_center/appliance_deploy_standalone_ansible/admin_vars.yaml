@@ -24,7 +24,6 @@
 # NOTE: Select the correct network card type based on system configuration:
 #   - CHPID, Port  -> choose OSA
 #   - FID          -> choose NETH
-# Incorrect selection will 
 ######################################################################################################
 
 
@@ -51,6 +50,12 @@ cc_admin_old_password: "{{ lookup('env', 'ACC_ADMIN_DEFAULT_PASSWORD') }}"
 cc_admin_password: "{{ lookup('env', 'ACC_ADMIN_PASSWORD') }}"
 
 # Specify the owner name for the new Owner's creation (e.g., cc_owner)
+
+# Requirements:
+# - length should be in range [6,16]
+# - valid chars: ascii_lowercase, digits, '-' and '_'
+# - starts with ascii_lowercase
+# - ends with ascii_lowercase or digits
 cc_owner_user: "cc_owner"
 
 # Owner's email address (e.g., "cc_owner@email.com")
@@ -156,16 +161,18 @@ disk1_id: "0.0.5abc"
 is_fcp1: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
-wwpn1: "500507"
+# Should be 16 digits
+wwpn1: "5000000000000001"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
-lun1: "4016400"
+# Should be 16 digits
+lun1: "7000000000000001"
 
 # Appliance IP address ( lpar ip)
-app1_ip: "9.120.100.200"
+app1_ip: "9.x.x.x"
 
 # (IPv4/IPv6) gateway IP address
-gw1_ip: "9.120.100.1"
+gw1_ip: "9.x.x.x"
 
 # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382")
 chpid1: "d0"
@@ -199,16 +206,18 @@ disk2_id: "0.0.5abc"
 is_fcp2: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
-wwpn2: "50050763070B46A6"
+# Should be 16 digits
+wwpn1: "5000000000000001"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
-lun2: "4016403900000000"
+# Should be 16 digits
+lun1: "7000000000000001"
 
 # Appliance IP address ( lpar ip)
-app2_ip: "9.120.100.200"
+app2_ip: "9.x.x.x"
 
 # (IPv4/IPv6) gateway IP address
-gw2_ip: "9.120.100.1"
+gw2_ip: "9.x.x.x"
 
 # Channel Path ID (CHPID), if CHIP ID (e.g. "d0") available else FID (e.g., "9382")
 chpid2: "d0"
