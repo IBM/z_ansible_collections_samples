@@ -236,9 +236,39 @@
   when:
     - os_storage_nodes_number | int > 0
 
+- name: 'Set storage server ports security group'
+  ansible.builtin.command:
+    cmd: "openstack port set --security-group {{ os_sg_worker }} {{ os_port_storage }}-{{ item }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - os_storage_nodes_number | int > 0
+
+- name: 'Set storage server ports additional security group'
+  ansible.builtin.command:
+    cmd: "openstack port set --security-group {{ add_secgroups }} {{ os_port_storage }}-{{ item }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - os_storage_nodes_number | int > 0
+    - add_secgroups is defined
+
 - name: 'Set infra node server ports tag'
   ansible.builtin.command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_infra }}-{{ item }}"
   with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
   when:
     - os_infra_nodes_number | int > 0
+
+- name: 'Set infra node server ports security group'
+  ansible.builtin.command:
+    cmd: "openstack port set --security-group {{ os_sg_worker }} {{ os_port_infra }}-{{ item }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - os_infra_nodes_number | int > 0
+
+- name: 'Set infra node server ports additional security group'
+  ansible.builtin.command:
+    cmd: "openstack port set --security-group {{ add_secgroups }} {{ os_port_infra }}-{{ item }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - os_infra_nodes_number | int > 0
+    - add_secgroups is defined
