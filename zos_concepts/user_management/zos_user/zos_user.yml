@@ -1,0 +1,528 @@
+###############################################################################
+# © Copyright IBM Corporation 2026
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_user to manage RACF user and group
+# profiles on z/OS using Red Hat Ansible Certified Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_user.yml
+#
+# Requirements:
+#   IBM z/OS core collection 2.0.0 or later.
+#
+###############################################################################
+
+###############################################################################
+# Playbook Overview:
+# This playbook demonstrates comprehensive RACF user and group management by
+# performing the following operations:
+#
+# 1. CREATE Operations:
+#    - Create basic user and group profiles with RACF defaults
+#    - Create user with multiple segments (TSO, OMVS, DFP, LANGUAGE, etc.)
+#    - Create group with multiple segments (DFP, OMVS)
+#
+# 2. UPDATE Operations:
+#    - Update user TSO attributes
+#    - Update group installation data
+#
+# 3. CONNECT Operations:
+#    - Connect user to group with default permissions
+#    - Connect user to group with special permissions
+#
+# 4. REMOVE Operations:
+#    - Remove user from group
+#
+# 5. PASSWORD Operations:
+#    - Create user profile for password management
+#    - Update user profile with password and set to NOEXPIRED
+#    - Create user for passphrase management
+#    - Update user profile with passphrase and set to NOEXPIRED
+#
+# 6. PURGE Operations:
+#    - PURGE user with dry-run mode (no_exec=true)
+#    - PURGE user with execution (removes user and all RACF references)
+#
+# 7. DELETE Operations:
+#    - Delete user profiles
+#    - Delete group profiles
+#
+# Configurable Variables:
+#   test_user_prefix: Prefix for test user IDs
+#                     Default: "TESTU"
+#                     Description: Used to create unique test user IDs
+#
+#   test_group_prefix: Prefix for test group names
+#                      Default: "TESTG"
+#                      Description: Used to create unique test group names
+#
+# Prerequisites:
+#   - User must have appropriate RACF permissions to create/modify profiles
+#   - IBM z/OS core collection 2.0.0 or later must be installed
+#   - RACF must be active on the target z/OS system
+#
+# Note: This playbook creates and deletes test profiles. Ensure you review
+#       the profile names to avoid conflicts with existing profiles.
+###############################################################################
+
+- name: Sample zos_user playbook for RACF user and group management
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    test_user_prefix: "TESTU"
+    test_group_prefix: "TESTG"
+    racf_db: "SYS1.RACF"
+    
+  tasks:
+    ###########################################################################
+    # CREATE OPERATIONS
+    ###########################################################################
+
+    # Create a basic user profile with RACF defaults.
+    - name: Create basic user profile
+      zos_user:
+        name: "{{ test_user_prefix }}001"
+        operation: create
+        scope: user
+      register: create_user_basic
+
+    - name: Display create_user_basic output
+      debug:
+        msg: "{{ create_user_basic }}"
+
+    # Idempotency check - running the same user create operation again should not change anything.
+    - name: Create basic user profile - idempotency check
+      zos_user:
+        name: "{{ test_user_prefix }}001"
+        operation: create
+        scope: user
+      register: create_user_idempotent
+
+    - name: Display idempotency check result
+      debug:
+        msg: "{{ create_user_idempotent }}"
+
+    # Create a basic group profile with RACF defaults.
+    - name: Create basic group profile
+      zos_user:
+        name: "{{ test_group_prefix }}001"
+        operation: create
+        scope: group
+      register: create_group_basic
+
+    - name: Display create_group_basic output
+      debug:
+        msg: "{{ create_group_basic }}"
+
+    # Create group with multiple segments configurations- General, OMVS, DFP
+    - name: Create group with multiple segments
+      zos_user:
+        name: "{{ test_group_prefix }}002"
+        operation: create
+        scope: group
+        # GENERAL attributes
+        general:
+          owner: "TSTU001"
+          installation_data: "Complete group profile"
+          model: "{{ test_group_prefix }}001"
+        # GROUP-specific attributes  
+        group:
+          superior_group: "SYS1"
+          terminal_access: true
+          universal_group: false
+        # DFP (Data Facility Product) attributes
+        dfp:
+          data_app_id: "TESTAPP"
+          data_class: "DCLAS001"
+          management_class: "MCLAS001"
+          storage_class: "SCLAS001"
+        # OMVS (Unix System Services) attributes  
+        omvs:
+          uid: custom
+          custom_uid: 1999
+      register: create_group_advanced
+
+    - name: Display create_group_advanced output
+      debug:
+        msg: "{{ create_group_advanced }}"
+
+    # Create a user profile with multiple segments - 
+    # GENERAL, DFP, LANGUAGE, TSO, OMVS, RESTRICTIONS, OPERATOR
+    - name: Create user with multiple segments
+      zos_user:
+        name: "{{ test_user_prefix }}002"
+        operation: create
+        scope: user
+        # General Attributes
+        general:
+          owner: "{{ test_group_prefix }}001"
+          user_name: "TEST USER NAME"
+          installation_data: "Test User"
+          model: "{{ test_user_prefix }}001"
+        # DFP (Data Facility Product) attributes  
+        dfp:
+          data_app_id: "TESTAPP"
+          data_class: "DCLAS001"
+          management_class: "MCLAS001"
+          storage_class: "SCLAS001"
+        # LANGUAGE attributes  
+        language:
+          primary: "ENU"
+          secondary: "JPN"
+        # TSO (Time Sharing Option) attributes  
+        tso:
+          account_num: "33000"
+          region_size: 16384
+          max_region_size: 32768
+          job_class: "A"
+          msg_class: "X"
+          sysout_class: "A"
+        # OMVS (Unix System Services) attributes  
+        omvs:
+          uid: auto
+          home: "/u/{{ test_user_prefix | lower }}002"
+          program: "/bin/bash"
+          nonshared_size: "10g"
+          shared_size: "10g"
+        # RESTRICTIONS attributes (logon time/day restrictions)  
+        restrictions:
+          days:
+            - "monday"
+            - "tuesday"
+            - "wednesday"
+            - "thursday"
+            - "friday"
+          time: "0900:1700"
+        # OPERATOR attributes (Extended MCS Console)  
+        operator:
+          authority: info
+          cmd_system: "MVS"
+          search_key: "TST0002"
+          migration_id: true
+          display:
+            - "jobnames"
+            - "sess"
+      register: create_user_advanced
+
+    - name: Display create_user_advanced output
+      debug:
+        msg: "{{ create_user_advanced }}"
+
+    ###########################################################################
+    # UPDATE OPERATIONS
+    ###########################################################################
+
+    # Update a group's installation data. Only the specified attributes
+    # will be changed; all other attributes remain unchanged.
+    - name: Update group installation data and data_app_id
+      zos_user:
+        name: "{{ test_group_prefix }}002"
+        operation: update
+        scope: group
+        general:
+          installation_data: "Updated installation data"
+        dfp:
+          data_app_id: "DEVAPP"  
+      register: update_group
+
+    - name: Display update_group output
+      debug:
+        msg: "{{ update_group }}"
+
+    # Update a user profile to update TSO attributes, secondary language and omvs
+    - name: Update user TSO attributes, secondary language and OMVS attributes
+      zos_user:
+        name: "{{ test_user_prefix }}002"
+        operation: update
+        scope: user
+        language:
+          secondary: "FRA"  
+        tso:
+          hold_class: "K"
+          job_class: "K"
+          msg_class: "K"
+          sysout_class: "K"
+          region_size: 2048
+          max_region_size: 4096
+        omvs:
+         shared_size: "11g"
+      register: update_user
+
+    - name: Display update_user output
+      debug:
+        msg: "{{ update_user }}"
+
+    ###########################################################################
+    # CONNECT OPERATIONS
+    ###########################################################################
+
+    # Connect user to group with default permissions
+    - name: Connect user to group
+      zos_user:
+        name: "{{ test_user_prefix }}001"
+        operation: connect
+        scope: user
+        connect:
+          group_name: "{{ test_group_prefix }}001"
+      register: connect_default
+
+    - name: Display connect_default output
+      debug:
+        msg: "{{ connect_default }}"
+
+    # Connect a user to a group with special permissions including:
+    # - CONNECT authority (can connect other users to the group)
+    # - ALTER universal access
+    # - Group account privileges
+    # - Group operations privileges
+    # - Auditor privileges
+    - name: Connect user with special permissions
+      zos_user:
+        name: "{{ test_user_prefix }}002"
+        operation: connect
+        scope: user
+        connect:
+          group_name: "{{ test_group_prefix }}002"
+          authority: connect
+          universal_access: alter
+          group_account: true
+          group_operations: true
+          auditor: true
+      register: connect_special
+
+    - name: Display connect_special output
+      debug:
+        msg: "{{ connect_special }}"
+
+    ###########################################################################
+    # REMOVE OPERATIONS
+    ###########################################################################
+
+    # Remove a user from a group. This disconnects the user from the group
+    # but does not delete the user or group profile.
+    - name: Remove user from group
+      zos_user:
+        name: "{{ test_user_prefix }}001"
+        operation: remove
+        scope: user
+        connect:
+          group_name: "{{ test_group_prefix }}001"
+      register: remove_user
+
+    - name: Display remove_user output
+      debug:
+        msg: "{{ remove_user }}"
+
+    ###########################################################################
+    # PASSWORD MANAGEMENT OPERATIONS
+    ###########################################################################
+
+    # Create user with random generated password (EXPIRED by default)
+    # Create a user with an encrypted password. The password is stored in
+    # Ansible Vault for security. By default, passwords are created as EXPIRED,
+    # requiring the user to change it on first logon.
+    #
+    # To create encrypted passwords:
+    # ansible-vault encrypt_string 'YourPassword' --name 'test_password'
+
+    - name: Set temporary user credentials
+      set_fact:
+      # DISCLAIMER: The password below is a hardcoded value used for 
+      # demonstration/testing purposes only. For production environments, 
+      # always use ansible-vault or a secure secret manager.
+        demo_password: "A@bc123D"
+
+    - name: Create user for password management
+      zos_user:
+        name: "{{ test_user_prefix }}003"
+        operation: create
+        scope: user
+        # password_mgmt:
+        #   password: "{{ demo_password }}"
+        omvs:
+          uid: auto
+      register: create_user_password
+
+    - name: Display create_user_password output
+      debug:
+        msg: "{{ create_user_password }}"
+
+    # Update user password to NOEXPIRED. This allows the user to logon
+    # without being forced to change the password.
+    - name: Update user profile with password and set to NOEXPIRED
+      zos_user:
+        name: "{{ test_user_prefix }}003"
+        operation: update
+        scope: user
+        password_mgmt:
+          password: "{{ demo_password }}"
+          expired: false
+      register: update_password_noexpired
+
+    - name: Display update_password_noexpired output
+      debug:
+        msg: "{{ update_password_noexpired }}"
+
+    - name: Set temporary user passphrase
+      set_fact:
+        # DISCLAIMER: The passphrase below is a hardcoded value used for 
+        # demonstration/testing purposes only. In a production environment, 
+        # this should be managed via ansible-vault or a secure secret store.
+        demo_passphrase: "MySecurePassphrase123"    
+
+    # Create a user with a passphrase. Passphrases can be longer than
+    # passwords (up to 100 characters) and provide enhanced security.
+    # By default, passphrases are created as EXPIRED.
+    - name: Create user for passphrase
+      zos_user:
+        name: "{{ test_user_prefix }}004"
+        operation: create
+        scope: user
+        # password_mgmt:
+        #   passphrase: "{{ demo_passphrase }}"
+        omvs:
+          uid: auto
+      register: create_user_passphrase
+
+    - name: Display create_user_passphrase output
+      debug:
+        msg: "{{ create_user_passphrase }}"
+
+    # Update a user's passphrase to NOEXPIRED.
+    - name: Update user profile with passphrase and set to NOEXPIRED
+      zos_user:
+        name: "{{ test_user_prefix }}004"
+        operation: update
+        scope: user
+        password_mgmt:
+          passphrase: "{{ demo_passphrase }}"
+          expired: false
+      register: update_passphrase_noexpired
+
+    - name: Display update_passphrase_noexpired output
+      debug:
+        msg: "{{ update_passphrase_noexpired }}"
+
+
+    # Demonstrate password validation - attempting to create a user with
+    # an invalid password (e.g., exceeding 8 characters or violating
+    # installation syntax rules) will fail.
+    - name: Attempt to create user with invalid password (expected to fail)
+      zos_user:
+        name: "{{ test_user_prefix }}005"
+        operation: create
+        scope: user
+        password_mgmt:
+          password: "TooLongPassword123"  # Exceeds 8 characters
+        omvs:
+          uid: auto
+      ignore_errors: yes
+      register: create_invalid_password
+
+    - name: Display create_invalid_password result
+      debug:
+        msg:
+          - "Operation status: {{ 'FAILED' if create_invalid_password.failed else 'SUCCESS' }}"
+          - "Error: {{ create_invalid_password.msg | default('N/A') }}"    
+
+    ###########################################################################
+    # PURGE OPERATIONS
+    ###########################################################################
+
+    # Create test user for PURGE demonstration
+    - name: Create test user for PURGE
+      zos_user:
+        name: "{{ test_user_prefix }}005"
+        operation: create
+        scope: user
+      register: create_purge_user
+
+    - name: Display create_purge_user output
+      debug:
+        msg: "{{ create_purge_user }}"
+
+    # PURGE with dry-run mode (no_exec=true)
+    - name: PURGE user with dry-run
+      zos_user:
+        name: "{{ test_user_prefix }}005"
+        database: "{{ racf_db }}"
+        operation: purge
+        scope: user
+        no_exec: true
+      register: purge_dryrun
+
+    - name: Display PURGE dry-run result
+      debug:
+        msg: "{{ purge_dryrun }}"
+
+    # PURGE with execution (removes user and all RACF references)
+    - name: PURGE user with execution
+      zos_user:
+        name: "{{ test_user_prefix }}005"
+        database: "{{ racf_db }}"
+        operation: purge
+        scope: user
+        no_exec: false
+      register: purge_execute
+
+    - name: Display PURGE execution result
+      debug:
+        msg: "{{ purge_execute }}"
+
+    # PURGE with execution (removes group and all RACF references)
+    - name: PURGE group with execution handling delinking(REMOVE user group connection)
+      zos_user:
+        name: "{{ test_group_prefix }}002"
+        database: "{{ racf_db }}"
+        operation: purge
+        scope: group
+        no_exec: false
+      register: purge_execute
+
+    - name: Display PURGE execution result
+      debug:
+        msg: "{{ purge_execute }}"    
+
+    ###########################################################################
+    # DELETE OPERATIONS - Cleanup
+    ###########################################################################
+
+    # Delete user profiles
+    - name: Delete user profiles
+      zos_user:
+        name: "{{ item }}"
+        operation: delete
+        scope: user
+      loop:
+        - "{{ test_user_prefix }}001"
+        - "{{ test_user_prefix }}002"
+        - "{{ test_user_prefix }}003"
+        - "{{ test_user_prefix }}004"
+      register: delete_users
+
+    - name: Display delete_users output
+      debug:
+        msg: "{{ delete_users }}"
+
+    # Delete group profiles
+    - name: Delete group profiles
+      zos_user:
+        name: "{{ item }}"
+        operation: delete
+        scope: group
+      loop:
+        - "{{ test_group_prefix }}001"
+      register: delete_groups
+
+    - name: Display delete_groups output
+      debug:
+        msg: "{{ delete_groups }}"
