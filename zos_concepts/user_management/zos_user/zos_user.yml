@@ -89,7 +89,7 @@
 
     # Create a basic user profile with RACF defaults.
     - name: Create basic user profile
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
         operation: create
         scope: user
@@ -101,7 +101,7 @@
 
     # Idempotency check - running the same user create operation again should not change anything.
     - name: Create basic user profile - idempotency check
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
         operation: create
         scope: user
@@ -113,7 +113,7 @@
 
     # Create a basic group profile with RACF defaults.
     - name: Create basic group profile
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}001"
         operation: create
         scope: group
@@ -125,7 +125,7 @@
 
     # Create group with multiple segments configurations- General, OMVS, DFP
     - name: Create group with multiple segments
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}002"
         operation: create
         scope: group
@@ -158,7 +158,7 @@
     # Create a user profile with multiple segments - 
     # GENERAL, DFP, LANGUAGE, TSO, OMVS, RESTRICTIONS, OPERATOR
     - name: Create user with multiple segments
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
         operation: create
         scope: user
@@ -224,7 +224,7 @@
     # Update a group's installation data. Only the specified attributes
     # will be changed; all other attributes remain unchanged.
     - name: Update group installation data and data_app_id
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}002"
         operation: update
         scope: group
@@ -240,7 +240,7 @@
 
     # Update a user profile to update TSO attributes, secondary language and omvs
     - name: Update user TSO attributes, secondary language and OMVS attributes
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
         operation: update
         scope: user
@@ -267,7 +267,7 @@
 
     # Connect user to group with default permissions
     - name: Connect user to group
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
         operation: connect
         scope: user
@@ -286,7 +286,7 @@
     # - Group operations privileges
     # - Auditor privileges
     - name: Connect user with special permissions
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
         operation: connect
         scope: user
@@ -310,7 +310,7 @@
     # Remove a user from a group. This disconnects the user from the group
     # but does not delete the user or group profile.
     - name: Remove user from group
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
         operation: remove
         scope: user
@@ -342,7 +342,7 @@
         demo_password: "A@bc123D"
 
     - name: Create user for password management
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}003"
         operation: create
         scope: user
@@ -359,7 +359,7 @@
     # Update user password to NOEXPIRED. This allows the user to logon
     # without being forced to change the password.
     - name: Update user profile with password and set to NOEXPIRED
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}003"
         operation: update
         scope: user
@@ -383,7 +383,7 @@
     # passwords (up to 100 characters) and provide enhanced security.
     # By default, passphrases are created as EXPIRED.
     - name: Create user for passphrase
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}004"
         operation: create
         scope: user
@@ -399,7 +399,7 @@
 
     # Update a user's passphrase to NOEXPIRED.
     - name: Update user profile with passphrase and set to NOEXPIRED
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}004"
         operation: update
         scope: user
@@ -417,7 +417,7 @@
     # an invalid password (e.g., exceeding 8 characters or violating
     # installation syntax rules) will fail.
     - name: Attempt to create user with invalid password (expected to fail)
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
         operation: create
         scope: user
@@ -440,7 +440,7 @@
 
     # Create test user for PURGE demonstration
     - name: Create test user for PURGE
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
         operation: create
         scope: user
@@ -452,7 +452,7 @@
 
     # PURGE with dry-run mode (no_exec=true)
     - name: PURGE user with dry-run
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
         database: "{{ racf_db }}"
         operation: purge
@@ -466,7 +466,7 @@
 
     # PURGE with execution (removes user and all RACF references)
     - name: PURGE user with execution
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
         database: "{{ racf_db }}"
         operation: purge
@@ -480,7 +480,7 @@
 
     # PURGE with execution (removes group and all RACF references)
     - name: PURGE group with execution handling delinking(REMOVE user group connection)
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}002"
         database: "{{ racf_db }}"
         operation: purge
@@ -498,7 +498,7 @@
 
     # Delete user profiles
     - name: Delete user profiles
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ item }}"
         operation: delete
         scope: user
@@ -515,7 +515,7 @@
 
     # Delete group profiles
     - name: Delete group profiles
-      zos_user:
+      ibm.ibm_zos_core.zos_user:
         name: "{{ item }}"
         operation: delete
         scope: group
