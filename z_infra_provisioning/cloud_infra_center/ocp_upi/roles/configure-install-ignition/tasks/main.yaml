@@ -81,7 +81,7 @@
 - name: Generate storage ignition
   ansible.builtin.script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_storage_nodes_number }}
   when:
-    - storage_name_prefix is defined
+    - storage_name_prefix is not defined
 
 - name: Generate infra ignition
   ansible.builtin.script: tools/generate-worker-ignition.sh {{ infra_id.stdout_lines[0] }} {{ os_infra_nodes_number }} {{ infra_name_prefix }}
