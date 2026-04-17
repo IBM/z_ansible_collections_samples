@@ -116,10 +116,16 @@
     # #######################################################################################
     # Display details of a running started task using started task name and other params.
     # #######################################################################################
-    - name: Extract task_id from captured output
+    - name: Get specific task by task_identifier
       set_fact:
-        sleep_jcl_task_id: "{{ start_out.tasks[0].task_id }}"
-        sleep_jcl_asidx: "{{ start_out.tasks[0].asidx }}"
+        filtered_task: "{{ start_out.tasks | selectattr('task_identifier', 'equalto', member_name) | first | default({}) }}"
+      when: start_out.tasks is defined
+
+    - name: Extract task_id and asid from specific task
+      set_fact:
+        sleep_jcl_task_id: "{{ filtered_task.task_id }}"
+        sleep_jcl_asidx: "{{ filtered_task.asidx }}"
+
     - name: "Display the status of started task '{{ member_name }}' using task ID '{{ sleep_jcl_task_id }}'"
       zos_started_task:
           state: displayed
@@ -189,10 +195,11 @@
     # Force a running started task using started task name and other params.
     # System started tasks like TSO, JES2, TCPIP, ICSF ..etc can be forced
     # #######################################################################################
-    - name: Forcefully terminate the ICSF started task without graceful shutdown
+    - name: Forcefully stop ICSF using ARM-style termination without address space destruction
       zos_started_task:
           state: forced
           job_name: ICSF
+          arm: True
           system_logs: True
           verbose: True
       register: force_out
