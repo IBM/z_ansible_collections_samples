@@ -100,5 +100,6 @@ all:
     # worker_name_prefix: '<worker-node-name>'
     # storage_name_prefix: '<storage-node-name>'   # if defined, 3 storage nodes will be created
     # infra_name_prefix: '<infra-node-name>'       # if defined, 3 infra nodes will be created
+    # bootstrap_secgroups: '<additional-secgroup>'  # optional, additional security group(s) for the bootstrap port only
     pullsecret: '<pull-secret>'
     sshkey: '<ssh-key>'

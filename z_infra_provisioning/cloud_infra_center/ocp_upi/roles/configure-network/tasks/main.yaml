@@ -100,7 +100,7 @@
   openstack.cloud.port:
     name: "{{ os_port_bootstrap }}"
     network: "{{ use_network_name }}"
-    security_groups: "{{ os_sg_master + ',' + add_secgroups if add_secgroups is defined else os_sg_master }}"
+    security_groups: "{{ os_sg_master + (',' + add_secgroups if add_secgroups is defined else '') + (',' + bootstrap_secgroups if bootstrap_secgroups is defined else '') }}"
     fixed_ips:
       - subnet_id: "{{ subnet_id.stdout }}"
         ip_address: "{{ os_bootstrap_ip }}"
@@ -163,7 +163,7 @@
   openstack.cloud.port:
     name: "{{ os_port_bootstrap }}"
     network: "{{ use_network_name }}"
-    security_groups: "{{ os_sg_master + ',' + add_secgroups if add_secgroups is defined else os_sg_master }}"
+    security_groups: "{{ os_sg_master + (',' + add_secgroups if add_secgroups is defined else '') + (',' + bootstrap_secgroups if bootstrap_secgroups is defined else '') }}"
     fixed_ips:
       - subnet_id: "{{ subnet_id.stdout }}"
   when:
