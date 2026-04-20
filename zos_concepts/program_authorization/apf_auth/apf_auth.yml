@@ -1,0 +1,89 @@
+- name: Authorize library in APF.
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  gather_facts: false
+  vars:
+    library: IBMUSER.EXAMPLE.APFTEST
+    prog_mem_list:
+      - PROG00
+      - PROG3A
+  tasks:
+
+    - name: Before running tasks, execute display command.
+      ansible.builtin.command:
+        cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
+      changed_when: false
+      register: cat_init
+      loop: "{{ prog_mem_list }}"
+
+    - name: Print output from previous display command for visual that is familiar to mainframe operators before making changes.
+      ansible.builtin.debug:
+        msg: "{{ result.stdout_lines }}"
+      loop: "{{ cat_init.results }}"
+      loop_control:
+        loop_var: result
+        label: "{{ result.item }}"
+
+    # - name: Allocate PDSE to use as an example, uncomment if needed.
+    #   ibm.ibm_zos_core.zos_data_set:
+    #     name: "{{ library }}"
+    #     type: pdse
+    #     record_format: fb
+    #     record_length: 80
+    #     block_size: 0
+    #     space_primary: 20
+    #     space_secondary: 10
+    #     space_type: cyl
+    #     state: present
+
+    - name: Ensure dynamic APF format.
+      ibm.ibm_zos_core.zos_apf:
+        operation: set_dynamic
+
+    - name: Check APF list format, fail when not 'DYAMIC'.
+      ibm.ibm_zos_core.zos_apf:
+        operation: check_format
+      register: format_check
+      failed_when: "'DYNAMIC' not in format_check.stdout_lines"
+
+    - name: Get APF list to ensure idempotency.
+      ibm.ibm_zos_core.zos_apf:
+        operation: list
+      register: apf_list
+
+    - name: Ensure library is in APF list across IPLs, skipping PROG00.
+      ibm.ibm_zos_core.zos_apf:
+        library: "{{ library }}"
+        sms: true
+        force_dynamic: true
+        persistent:
+          data_set_name: "SYS1.PARMLIB({{ item }})"
+      when: 
+        - library not in apf_list.stdout 
+        - item != 'PROG00'
+      loop: "{{ prog_mem_list }}"
+
+    - name: Check APF list for dataset to ensure it has been added.
+      ibm.ibm_zos_core.zos_apf:
+        operation: list
+      register: apf_list
+      failed_when: library not in apf_list.stdout
+
+    - name: Print APF list to terminal for visual verification.
+      ansible.builtin.debug:
+        var: apf_list.stdout
+
+    - name: After running tasks, execute display command.
+      ansible.builtin.command:
+        cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
+      changed_when: false
+      register: cat_end
+      loop: "{{ prog_mem_list }}"
+
+    - name: Print output from previous task for visual verification that is familiar to mainframe operators after making changes.
+      ansible.builtin.debug:
+        msg: "{{ result.stdout_lines }}"
+      loop: "{{ cat_end.results }}"
+      loop_control:
+        loop_var: result
+        label: "{{ result.item }}"
