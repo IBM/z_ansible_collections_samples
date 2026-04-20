@@ -17,7 +17,7 @@
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
-      retries: 30
+      retries: 60
       delay: 10
   rescue:
     - name: Approve CSR failed
@@ -34,7 +34,7 @@
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
-      retries: 30
+      retries: 60
       delay: 10
       when: comp_name_suffix | default('worker') != 'worker'
   rescue:
@@ -53,7 +53,7 @@
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
-      retries: 30
+      retries: 60
       delay: 10
       when: comp_name_suffix | default('worker') != 'worker'
   rescue:
