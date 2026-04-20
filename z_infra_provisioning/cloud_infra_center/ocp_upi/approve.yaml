@@ -37,6 +37,15 @@
       when:
         - os_storage_nodes_number | int > 0
 
+    - name: 'Apply infra label to storage nodes'
+      ansible.builtin.include_tasks: approve_worker.yaml
+      vars:
+        workerid: "{{ os_storage_server_name }}-{{ item }}"
+        comp_name_suffix: "infra"
+      with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+      when:
+        - os_storage_nodes_number | int > 0
+
     - name: 'Waiting for approve infra CSR'
       ansible.builtin.include_tasks: approve_worker.yaml
       vars:
