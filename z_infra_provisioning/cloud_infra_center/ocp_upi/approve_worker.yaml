@@ -30,7 +30,7 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
-        ./kubectl label node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}=true --kubeconfig auth/kubeconfig &> /dev/null
+        ./kubectl label node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}='' --kubeconfig auth/kubeconfig &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
@@ -49,7 +49,7 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
-        ./kubectl taint node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}=true  node-role.kubernetes.io/worker- --kubeconfig auth/kubeconfig &> /dev/null
+        ./kubectl taint node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}=''  node-role.kubernetes.io/worker- --kubeconfig auth/kubeconfig &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
