@@ -50,14 +50,22 @@ all:
       os_flavor_bootstrap: 'medium'
       os_flavor_master: 'medium'
       os_flavor_worker: 'medium'
+      # os_flavor_storage: 'medium'   # optional, defaults to os_flavor_worker if not set
+      # os_flavor_infra: 'medium'     # optional, defaults to os_flavor_worker if not set
 
       create_server_zone: ''
       os_control_nodes_number: 3
       os_compute_nodes_number: 3
+      # os_storage_nodes_number and os_infra_nodes_number are fixed to 3 when
+      # storage_name_prefix or infra_name_prefix are defined respectively
+      # os_storage_nodes_number: 3
+      # os_infra_nodes_number: 3
 
       # os_bootstrap_ip: '<bootstrap ip addr>'
       # os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
       # os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
+      # os_storage_ip: ['<storage0 ip addr>', '<storage1 ip addr>', '<storage2 ip addr>']
+      # os_infra_node_ip: ['<infra-node0 ip addr>', '<infra-node1 ip addr>', '<infra-node2 ip addr>']
 
       use_proxy: false
       # http_proxy: '<http-proxy>'
@@ -90,5 +98,8 @@ all:
     # bootstrap_name_prefix: '<bootstrap-node-name>'
     # master_name_prefix: '<master-node-name>'
     # worker_name_prefix: '<worker-node-name>'
+    # storage_name_prefix: '<storage-node-name>'   # if defined, 3 storage nodes will be created
+    # infra_name_prefix: '<infra-node-name>'       # if defined, 3 infra nodes will be created
+    # bootstrap_secgroups: '<additional-secgroup>'  # optional, additional security group(s) for the bootstrap port only
     pullsecret: '<pull-secret>'
     sshkey: '<ssh-key>'

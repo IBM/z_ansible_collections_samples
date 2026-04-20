@@ -132,3 +132,173 @@
   when:
     - disk_type == "scsi"
     - volume_type_id is defined
+
+# ---- Storage nodes ----
+
+- name: 'Create the storage servers'
+  openstack.cloud.server:
+    name: "{{ os_storage_server_name }}-{{ item }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_storage | default(os_flavor_worker) }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_storage_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "dasd"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Create the storage servers with default boot volume'
+  openstack.cloud.server:
+    name: "{{ os_storage_server_name }}-{{ item }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_storage | default(os_flavor_worker) }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_storage_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+    boot_from_volume: true
+    volume_size: "{{ compute_flavor_size.stdout_lines[0] }}"
+    terminate_volume: true
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Create storage boot volume'
+  openstack.cloud.volume:
+    state: present
+    name: "{{ os_storage_server_name }}-{{ item }}-boot"
+    image: "{{ image_name }}"
+    size: "{{ compute_flavor_size.stdout_lines[0] }}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Set storage volume bootable'
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_storage_server_name }}-{{ item }}-boot"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_storage_nodes_number | int > 0
+
+- name: 'Create the storage server with boot volume'
+  openstack.cloud.server:
+    name: "{{ os_storage_server_name }}-{{ item }}"
+    flavor: "{{ os_flavor_storage | default(os_flavor_worker) }}"
+    boot_volume: "{{ os_storage_server_name }}-{{ item }}-boot"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_storage_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+    terminate_volume: true
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_storage_nodes_number | int > 0
+
+# ---- Infra nodes ----
+
+- name: 'Create the infra servers'
+  openstack.cloud.server:
+    name: "{{ os_infra_server_name }}-{{ item }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_infra | default(os_flavor_worker) }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_infra_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_infra }}-{{ item }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "dasd"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Create the infra servers with default boot volume'
+  openstack.cloud.server:
+    name: "{{ os_infra_server_name }}-{{ item }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_infra | default(os_flavor_worker) }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_infra_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_infra }}-{{ item }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+    boot_from_volume: true
+    volume_size: "{{ compute_flavor_size.stdout_lines[0] }}"
+    terminate_volume: true
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Create infra boot volume'
+  openstack.cloud.volume:
+    state: present
+    name: "{{ os_infra_server_name }}-{{ item }}-boot"
+    image: "{{ image_name }}"
+    size: "{{ compute_flavor_size.stdout_lines[0] }}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Set infra volume bootable'
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ os_infra_server_name }}-{{ item }}-boot"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_infra_nodes_number | int > 0
+
+- name: 'Create the infra server with boot volume'
+  openstack.cloud.server:
+    name: "{{ os_infra_server_name }}-{{ item }}"
+    flavor: "{{ os_flavor_infra | default(os_flavor_worker) }}"
+    boot_volume: "{{ os_infra_server_name }}-{{ item }}-boot"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [os_infra_server_name, item | string, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_infra }}-{{ item }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+    terminate_volume: true
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+    - os_infra_nodes_number | int > 0

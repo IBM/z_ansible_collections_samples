@@ -100,7 +100,7 @@
   openstack.cloud.port:
     name: "{{ os_port_bootstrap }}"
     network: "{{ use_network_name }}"
-    security_groups: "{{ os_sg_master + ',' + add_secgroups if add_secgroups is defined else os_sg_master }}"
+    security_groups: "{{ os_sg_master + (',' + add_secgroups if add_secgroups is defined else '') + (',' + bootstrap_secgroups if bootstrap_secgroups is defined else '') }}"
     fixed_ips:
       - subnet_id: "{{ subnet_id.stdout }}"
         ip_address: "{{ os_bootstrap_ip }}"
@@ -131,11 +131,39 @@
   when:
     - not auto_allocated_ip
 
+- name: 'Create the storage server ports'
+  openstack.cloud.port:
+    name: "{{ os_port_storage }}-{{ item.0 }}"
+    network: "{{ use_network_name }}"
+    security_groups: "{{ os_sg_worker + ',' + add_secgroups if add_secgroups is defined else os_sg_worker }}"
+    fixed_ips:
+      - subnet_id: "{{ subnet_id.stdout }}"
+        ip_address: "{{ os_storage_ip[item.0] }}"
+  with_indexed_items: "{{ [os_port_storage] * os_storage_nodes_number }}"
+  when:
+    - not auto_allocated_ip
+    - os_storage_nodes_number | int > 0
+    - os_storage_ip is defined
+
+- name: 'Create the infra node server ports'
+  openstack.cloud.port:
+    name: "{{ os_port_infra }}-{{ item.0 }}"
+    network: "{{ use_network_name }}"
+    security_groups: "{{ os_sg_worker + ',' + add_secgroups if add_secgroups is defined else os_sg_worker }}"
+    fixed_ips:
+      - subnet_id: "{{ subnet_id.stdout }}"
+        ip_address: "{{ os_infra_node_ip[item.0] }}"
+  with_indexed_items: "{{ [os_port_infra] * os_infra_nodes_number }}"
+  when:
+    - not auto_allocated_ip
+    - os_infra_nodes_number | int > 0
+    - os_infra_node_ip is defined
+
 - name: 'Create the bootstrap server port'
   openstack.cloud.port:
     name: "{{ os_port_bootstrap }}"
     network: "{{ use_network_name }}"
-    security_groups: "{{ os_sg_master + ',' + add_secgroups if add_secgroups is defined else os_sg_master }}"
+    security_groups: "{{ os_sg_master + (',' + add_secgroups if add_secgroups is defined else '') + (',' + bootstrap_secgroups if bootstrap_secgroups is defined else '') }}"
     fixed_ips:
       - subnet_id: "{{ subnet_id.stdout }}"
   when:
@@ -163,6 +191,30 @@
   when:
     - auto_allocated_ip
 
+- name: 'Create the storage server ports'
+  openstack.cloud.port:
+    name: "{{ os_port_storage }}-{{ item.0 }}"
+    network: "{{ use_network_name }}"
+    security_groups: "{{ os_sg_worker + ',' + add_secgroups if add_secgroups is defined else os_sg_worker }}"
+    fixed_ips:
+      - subnet_id: "{{ subnet_id.stdout }}"
+  with_indexed_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - auto_allocated_ip
+    - os_storage_nodes_number | int > 0
+
+- name: 'Create the infra node server ports'
+  openstack.cloud.port:
+    name: "{{ os_port_infra }}-{{ item.0 }}"
+    network: "{{ use_network_name }}"
+    security_groups: "{{ os_sg_worker + ',' + add_secgroups if add_secgroups is defined else os_sg_worker }}"
+    fixed_ips:
+      - subnet_id: "{{ subnet_id.stdout }}"
+  with_indexed_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - auto_allocated_ip
+    - os_infra_nodes_number | int > 0
+
 - name: 'Set bootstrap port tag'
   ansible.builtin.command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_bootstrap }}"
@@ -176,3 +228,17 @@
   ansible.builtin.command:
     cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
   with_indexed_items: "{{ [os_port_worker] * os_compute_nodes_number }}"
+
+- name: 'Set storage server ports tag'
+  ansible.builtin.command:
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_storage }}-{{ item }}"
+  with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+  when:
+    - os_storage_nodes_number | int > 0
+
+- name: 'Set infra node server ports tag'
+  ansible.builtin.command:
+    cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_infra }}-{{ item }}"
+  with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+  when:
+    - os_infra_nodes_number | int > 0
