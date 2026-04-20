@@ -21,9 +21,27 @@
             echo $(./oc get nodes |grep 'worker-'|wc -l)
           register: csr_worker
           until: csr_worker.stdout | int == {{ os_compute_nodes_number }}
-          retries: 30
+          retries: 60
           delay: 10
       rescue:
         - name: Approve CSR failed
           ansible.builtin.debug:
             msg: 'Please approve all pending CSR manually via: oc get csr -o name | xargs oc adm certificate approve'
+
+    - name: 'Waiting for approve storage CSR'
+      ansible.builtin.include_tasks: approve_worker.yaml
+      vars:
+        workerid: "{{ os_storage_server_name }}-{{ item }}"
+        comp_name_suffix: "storage"
+      with_items: "{{ range(0, os_storage_nodes_number | int) | list }}"
+      when:
+        - os_storage_nodes_number | int > 0
+
+    - name: 'Waiting for approve infra CSR'
+      ansible.builtin.include_tasks: approve_worker.yaml
+      vars:
+        workerid: "{{ os_infra_server_name }}-{{ item }}"
+        comp_name_suffix: "infra"
+      with_items: "{{ range(0, os_infra_nodes_number | int) | list }}"
+      when:
+        - os_infra_nodes_number | int > 0
