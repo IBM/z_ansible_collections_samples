@@ -91,8 +91,8 @@
     - name: Create basic user profile
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
       register: create_user_basic
 
     - name: Display create_user_basic output
@@ -103,8 +103,8 @@
     - name: Create basic user profile - idempotency check
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
       register: create_user_idempotent
 
     - name: Display idempotency check result
@@ -115,8 +115,8 @@
     - name: Create basic group profile
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}001"
-        operation: create
-        scope: group
+        state: create
+        profile_type: group
       register: create_group_basic
 
     - name: Display create_group_basic output
@@ -127,10 +127,10 @@
     - name: Create group with multiple segments
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}002"
-        operation: create
-        scope: group
+        state: create
+        profile_type: group
         # GENERAL attributes
-        general:
+        base_segment:
           owner: "TSTU001"
           installation_data: "Complete group profile"
           model: "{{ test_group_prefix }}001"
@@ -160,10 +160,10 @@
     - name: Create user with multiple segments
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
         # General Attributes
-        general:
+        base_segment:
           owner: "{{ test_group_prefix }}001"
           user_name: "TEST USER NAME"
           installation_data: "Test User"
@@ -191,8 +191,10 @@
           uid: auto
           home: "/u/{{ test_user_prefix | lower }}002"
           program: "/bin/bash"
-          nonshared_size: "10g"
-          shared_size: "10g"
+          nonshared_size: 10
+          nonshared_size_unit: "g"
+          shared_size: 7
+          shared_size_unit: "g"
         # RESTRICTIONS attributes (logon time/day restrictions)  
         restrictions:
           days:
@@ -226,9 +228,9 @@
     - name: Update group installation data and data_app_id
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}002"
-        operation: update
-        scope: group
-        general:
+        state: update
+        profile_type: group
+        base_segment:
           installation_data: "Updated installation data"
         dfp:
           data_app_id: "DEVAPP"  
@@ -242,8 +244,8 @@
     - name: Update user TSO attributes, secondary language and OMVS attributes
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
-        operation: update
-        scope: user
+        state: update
+        profile_type: user
         language:
           secondary: "FRA"  
         tso:
@@ -269,8 +271,8 @@
     - name: Connect user to group
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
-        operation: connect
-        scope: user
+        state: connect
+        profile_type: user
         connect:
           group_name: "{{ test_group_prefix }}001"
       register: connect_default
@@ -288,13 +290,13 @@
     - name: Connect user with special permissions
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
-        operation: connect
-        scope: user
+        state: connect
+        profile_type: user
         connect:
           group_name: "{{ test_group_prefix }}002"
           authority: connect
           universal_access: alter
-          group_account: true
+          group_access: true
           group_operations: true
           auditor: true
       register: connect_special
@@ -312,8 +314,8 @@
     - name: Remove user from group
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}001"
-        operation: remove
-        scope: user
+        state: remove
+        profile_type: user
         connect:
           group_name: "{{ test_group_prefix }}001"
       register: remove_user
@@ -344,8 +346,8 @@
     - name: Create user for password management
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}003"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
         # password_mgmt:
         #   password: "{{ demo_password }}"
         omvs:
@@ -361,8 +363,8 @@
     - name: Update user profile with password and set to NOEXPIRED
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}003"
-        operation: update
-        scope: user
+        state: update
+        profile_type: user
         password_mgmt:
           password: "{{ demo_password }}"
           expired: false
@@ -385,8 +387,8 @@
     - name: Create user for passphrase
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}004"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
         # password_mgmt:
         #   passphrase: "{{ demo_passphrase }}"
         omvs:
@@ -401,8 +403,8 @@
     - name: Update user profile with passphrase and set to NOEXPIRED
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}004"
-        operation: update
-        scope: user
+        state: update
+        profile_type: user
         password_mgmt:
           passphrase: "{{ demo_passphrase }}"
           expired: false
@@ -419,8 +421,8 @@
     - name: Attempt to create user with invalid password (expected to fail)
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
         password_mgmt:
           password: "TooLongPassword123"  # Exceeds 8 characters
         omvs:
@@ -442,22 +444,22 @@
     - name: Create test user for PURGE
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
-        operation: create
-        scope: user
+        state: create
+        profile_type: user
       register: create_purge_user
 
     - name: Display create_purge_user output
       debug:
         msg: "{{ create_purge_user }}"
 
-    # PURGE with dry-run mode (no_exec=true)
+    # PURGE with dry-run mode (execute_clist=false)
     - name: PURGE user with dry-run
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
         database: "{{ racf_db }}"
-        operation: purge
-        scope: user
-        no_exec: true
+        state: purge
+        profile_type: user
+        execute_clist: false
       register: purge_dryrun
 
     - name: Display PURGE dry-run result
@@ -469,9 +471,9 @@
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}005"
         database: "{{ racf_db }}"
-        operation: purge
-        scope: user
-        no_exec: false
+        state: purge
+        profile_type: user
+        execute_clist: true
       register: purge_execute
 
     - name: Display PURGE execution result
@@ -483,9 +485,9 @@
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_group_prefix }}002"
         database: "{{ racf_db }}"
-        operation: purge
-        scope: group
-        no_exec: false
+        state: purge
+        profile_type: group
+        execute_clist: true
       register: purge_execute
 
     - name: Display PURGE execution result
@@ -500,8 +502,8 @@
     - name: Delete user profiles
       ibm.ibm_zos_core.zos_user:
         name: "{{ item }}"
-        operation: delete
-        scope: user
+        state: delete
+        profile_type: user
       loop:
         - "{{ test_user_prefix }}001"
         - "{{ test_user_prefix }}002"
@@ -517,8 +519,8 @@
     - name: Delete group profiles
       ibm.ibm_zos_core.zos_user:
         name: "{{ item }}"
-        operation: delete
-        scope: group
+        state: delete
+        profile_type: group
       loop:
         - "{{ test_group_prefix }}001"
       register: delete_groups
