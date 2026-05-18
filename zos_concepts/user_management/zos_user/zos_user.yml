@@ -45,7 +45,7 @@
 #    - Update user profile with passphrase and set to NOEXPIRED
 #
 # 6. PURGE Operations:
-#    - PURGE user with dry-run mode (no_exec=true)
+#    - PURGE user with dry-run mode (execute_clist=false)
 #    - PURGE user with execution (removes user and all RACF references)
 #
 # 7. DELETE Operations:
@@ -129,9 +129,9 @@
         name: "{{ test_group_prefix }}002"
         state: create
         profile_type: group
-        # GENERAL attributes
+        # Base Segment attributes
         base_segment:
-          owner: "TSTU001"
+          owner: "{{ test_user_prefix }}001"
           installation_data: "Complete group profile"
           model: "{{ test_group_prefix }}001"
         # GROUP-specific attributes  
@@ -148,7 +148,7 @@
         # OMVS (Unix System Services) attributes  
         omvs:
           uid: custom
-          custom_uid: 1999
+          custom_uid: 5739
       register: create_group_advanced
 
     - name: Display create_group_advanced output
@@ -156,16 +156,16 @@
         msg: "{{ create_group_advanced }}"
 
     # Create a user profile with multiple segments - 
-    # GENERAL, DFP, LANGUAGE, TSO, OMVS, RESTRICTIONS, OPERATOR
+    # BASE_SEGMENTS, DFP, LANGUAGE, TSO, OMVS, RESTRICTIONS, OPERATOR
     - name: Create user with multiple segments
       ibm.ibm_zos_core.zos_user:
         name: "{{ test_user_prefix }}002"
         state: create
         profile_type: user
-        # General Attributes
+        # Base Segment Attributes
         base_segment:
           owner: "{{ test_group_prefix }}001"
-          user_name: "TEST USER NAME"
+          display_name: "TEST USER NAME"
           installation_data: "Test User"
           model: "{{ test_user_prefix }}001"
         # DFP (Data Facility Product) attributes  
@@ -256,7 +256,8 @@
           region_size: 2048
           max_region_size: 4096
         omvs:
-         shared_size: "11g"
+         shared_size: 11
+         shared_size_unit: g
       register: update_user
 
     - name: Display update_user output
