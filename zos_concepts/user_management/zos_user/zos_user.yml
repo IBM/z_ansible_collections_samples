@@ -70,7 +70,7 @@
 #       the profile names to avoid conflicts with existing profiles.
 ###############################################################################
 
-- name: Sample zos_user playbook for RACF user and group management
+- name: Sample zos_user playbook for RACF user and group profile management
   hosts: zos_host
   collections:
     - "ibm.ibm_zos_core"
