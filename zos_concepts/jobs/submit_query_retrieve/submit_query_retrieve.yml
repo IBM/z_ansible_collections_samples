@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2024
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -18,7 +18,7 @@
 #  `data_set_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0 or later # FIXME - update to correct version.
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -130,7 +130,7 @@
     - name: Submit the JCL {{ data_set_name }}(MEM1)
       zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
-        location: data_set
+        remote_src: true
       register: result
       with_sequence: count=1
 
@@ -177,14 +177,14 @@
     # +-------------------------------------------------------------------------
 
     - name: Submit {{ job_name }} JCL located on target
-            in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
+        in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
-        location: uss
+        remote_src: true
       register: result
 
     - name: Response for submit {{ job_name }} JCL located on target
-            in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
+        in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       debug:
         msg:
           - "{{ result }}"
@@ -203,7 +203,7 @@
       register: result
 
     - name: Response for Query the submitted job {{ job_name }}
-            on USS target
+        on USS target
       debug:
         msg: "{{ result }}"
 
@@ -236,7 +236,7 @@
       register: result
 
     - name: Response for remove {{ job_name }} JCL and folder on
-            USS target
+        USS target
       debug:
         msg: "{{ result }}"
 
