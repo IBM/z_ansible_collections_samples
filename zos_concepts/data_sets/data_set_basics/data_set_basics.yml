@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2024
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 # This sample playbook demonstrates basic data set operations using modules
 # included in the Red Hat Ansible Certified  Content for IBM Z core collection.
@@ -16,7 +16,7 @@
 #  `data_set_name` and `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.2.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -32,7 +32,6 @@
 ###############################################################################
 
 ---
-
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
