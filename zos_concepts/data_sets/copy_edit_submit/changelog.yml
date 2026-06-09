@@ -54,6 +54,6 @@ releases:
     date: 2026-06-09
     changes:
       fixed:
-        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 breaking changes.
+        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
       minor:
         - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.

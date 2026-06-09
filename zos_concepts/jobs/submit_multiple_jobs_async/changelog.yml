@@ -14,8 +14,18 @@
 ################################################################################
 
 releases:
-    2025.05.30:
-        date: 2025-05-30
-        changes:
-            added:
-                - Released initial version
+  2025.05.30:
+    date: 2025-05-30
+    changes:
+      added:
+        - Released initial version
+  2026.06.09:
+    date: 2026-06-09
+    changes:
+      fixed:
+        - Rename option 'force' to 'replace' per ibm.ibm_zos_core:2.0.0 zos_copy breaking changes.
+        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+        - Rename option 'wait_time_s' to 'wait_time' per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+        - Update task to separate job IDs from async status output to use correct nested path for job_id.
+      minor:
+        - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
