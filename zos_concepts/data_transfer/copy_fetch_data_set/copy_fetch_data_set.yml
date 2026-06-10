@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2024
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -20,7 +20,7 @@
 #  refer to documentation or ansible-doc for those options.
 #
 # Requirements:
-#   IBM z/OS core collection 1.2.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -89,7 +89,6 @@
     - name: Fact `system_name` set with value
       debug:
         msg: "{{ system_name }}"
-
 
     # ##########################################################################
     # Modules zos_copy, zos_fetch, zos_data_set
@@ -161,7 +160,7 @@
         encoding:
           from: ISO8859-1
           to: "{{ target_charset }}"
-        force: true  
+        replace: true
       register: result
 
     - name: Response for copying

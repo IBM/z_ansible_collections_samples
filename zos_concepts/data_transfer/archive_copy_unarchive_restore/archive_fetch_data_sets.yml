@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023, 2024
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -26,7 +26,7 @@
 ###############################################################################
 
 - hosts: source
-  collections :
+  collections:
     - "ibm.ibm_zos_core"
   gather_facts: false
 
@@ -37,7 +37,7 @@
     archive_data_set: "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.ARCHIVE"
     remove_data_sets: true
 
-  environment: '{{ environment_vars }}'
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Create and copy content into data sets to archive.
@@ -84,10 +84,10 @@
         dest: "{{ archive_data_set }}"
         force: True
         format:
-          name: terse
-          format_options:
-            terse_pack: spack
-            use_adrdssu: True
+          type: terse
+          options:
+            spack: True
+            adrdssu: True
         remove: "{{ remove_data_sets }}"
         dest_data_set:
           space_primary: "{{ size_in_cyls.primary }}"
@@ -110,7 +110,7 @@
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ archive_data_set }}"
         dest: "{{ playbook_dir }}/"
-        is_binary: True
+        binary: True
         flat: True
       register: result
 
