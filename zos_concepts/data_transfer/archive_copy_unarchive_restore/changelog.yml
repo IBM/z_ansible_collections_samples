@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2023, 2024
+# Copyright (c) IBM Corporation 2023, 2026
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -26,18 +26,26 @@
 ################################################################################
 
 releases:
-    2023.09.01:
-        date: 2023-09-01
-        changes:
-            added:
-                - Released initial version
-    2024.04.11:
-        date: 2024-04-11
-        changes:
-            added:
-                - Update description of optional configurations.
-                - Update vars section to use more generic data set names.
-                - Add new host_vars files for 'source' and 'destination' target nodes.
-            fixed:
-                - Lower case zos_archive module option 'terse_pack' per ibm.ibm_zos_core:1.10.0 requirements.
-                - Lower case zos_archive module option 'space_type' per ibm.ibm_zos_core:1.10.0 requirements.
+  2023.09.01:
+    date: 2023-09-01
+    changes:
+      added:
+        - Released initial version
+  2024.04.11:
+    date: 2024-04-11
+    changes:
+      added:
+        - Update description of optional configurations.
+        - Update vars section to use more generic data set names.
+        - Add new host_vars files for 'source' and 'destination' target nodes.
+      fixed:
+        - Lower case zos_archive module option 'terse_pack' per ibm.ibm_zos_core:1.10.0 requirements.
+        - Lower case zos_archive module option 'space_type' per ibm.ibm_zos_core:1.10.0 requirements.
+  2026.06.10:
+    date: 2026-06-10
+    changes:
+      fixed:
+        - - Rename format options per ibm.ibm_zos_core:2.0.0 zos_archive breaking changes.
+        - Rename option 'is_binary' to 'binary' per ibm.ibm_zos_core:2.0.0 zos_fetch breaking changes.
+      minor:
+        - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
