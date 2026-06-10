@@ -24,7 +24,7 @@ names, authority, and the artifacts that will be created and cleaned up.
 > to understand the full scope of these changes.
 >
 > These changes are not compatible with earlier versions of the `ibm_zos_core` collection,
-> and since the earlier versions do not reach their end of life until March 2028,
+> and since the earlier versions do not reach their end of life until February 2028,
 > the sample playbooks compatible with the older versions will remain available.
 >
 > To support both the latest and prior versions of the collection:
@@ -34,7 +34,7 @@ names, authority, and the artifacts that will be created and cleaned up.
 > - The `ibm_zos_core-v1.16.0-samples` branch will reflect playbooks compatible with `ibm_zos_core` version 1.16.x or earlier.
 >   - Find this playbook on the `ibm_zos_core-v1.16.0-samples` branch: [here](https://github.com/IBM/z_ansible_collections_samples/tree/ibm_zos_core-v1.16.0-samples/zos_concepts/data_sets/copy_edit_submit).
 >
-> The `ibm_zos_core-v1.16.0-samples` branch will remain available until March 2028 but will not receive updates.
+> The `ibm_zos_core-v1.16.0-samples` branch will remain available until February 2028 but will not receive updates.
 
 ## Playbook Requirements
 
