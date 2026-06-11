@@ -39,7 +39,7 @@
             dds:
               - dd_data_set:
                   dd_name: archive
-                  data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
+                  data_set_name: "{{ archive_data_set_final.get('data_sets')[0].get('name') }}"
                   disposition: old
               - dd_input:
                   dd_name: sysin
@@ -77,11 +77,11 @@
             dds:
               - dd_data_set:
                   dd_name: sysut1
-                  data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
+                  data_set_name: "{{ archive_data_set_final.get('data_sets')[0].get('name') }}"
                   disposition: shr
               - dd_data_set:
                   dd_name: sysut2
-                  data_set_name: "{{ terse_data_set_final.get('names')[0] }}"
+                  data_set_name: "{{ terse_data_set_final.get('data_sets')[0].get('name') }}"
                   disposition: old
               - dd_output:
                   dd_name: sysprint
@@ -97,7 +97,7 @@
 
     - name: Determine name to use for target data set
       ansible.builtin.set_fact:
-        target_data_set: "{{ target_data_set if target_data_set is defined and target_data_set else terse_data_set_final.get('names')[0] }}"
+        target_data_set: "{{ target_data_set if target_data_set is defined and target_data_set else terse_data_set_final.get('data_sets')[0].get('name') }}"
       run_once: true
 
     - block:
@@ -122,11 +122,11 @@
   always:
     - name: Clean up archive data set
       ibm.ibm_zos_core.zos_data_set:
-        name: "{{ archive_data_set_final.get('names')[0] }}"
+        name: "{{ archive_data_set_final.get('data_sets')[0].get('name') }}"
         state: absent
       when: delete and archive_data_set_final is defined and archive_data_set_final|length > 0
     - name: Clean up terse data set
       ibm.ibm_zos_core.zos_data_set:
-        name: "{{ terse_data_set_final.get('names')[0] }}"
+        name: "{{ terse_data_set_final.get('data_sets')[0].get('name') }}"
         state: absent
       when: delete and terse_data_set_final is defined and terse_data_set_final|length > 0

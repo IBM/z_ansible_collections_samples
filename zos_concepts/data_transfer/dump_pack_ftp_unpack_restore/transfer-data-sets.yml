@@ -1,10 +1,10 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
 # Requirements:
-#     - IBM z/OS core collection 1.2.0 or later
+#     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
 - hosts: source_system
@@ -24,8 +24,8 @@
     - ibm.ibm_zos_core
   gather_facts: false
   vars:
-    PYZ: "{{ hostvars.destination.pyz }}"
-    ZOAU: "{{ hostvars.destination.zoau }}"
+    PYZ: "{{ hostvars.destination.PYZ }}"
+    ZOAU: "{{ hostvars.destination.ZOAU }}"
   environment: "{{ environment_vars }}"
 
   tasks:

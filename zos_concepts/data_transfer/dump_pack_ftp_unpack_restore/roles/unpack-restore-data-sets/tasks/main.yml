@@ -44,7 +44,7 @@
                   disposition: shr
               - dd_data_set:
                   dd_name: sysut2
-                  data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
+                  data_set_name: "{{ archive_data_set_final.get('data_sets')[0].get('name') }}"
                   disposition: old
               - dd_output:
                   dd_name: sysprint
@@ -66,7 +66,7 @@
             dds:
               - dd_data_set:
                   dd_name: source
-                  data_set_name: "{{ archive_data_set_final.get('names')[0] }}"
+                  data_set_name: "{{ archive_data_set_final.get('data_sets')[0].get('name') }}"
                   disposition: old
               - dd_input:
                   dd_name: sysin
@@ -87,7 +87,7 @@
   always:
     - name: Clean up archive data set
       ibm.ibm_zos_core.zos_data_set:
-        name: "{{ archive_data_set_final.get('names')[0] }}"
+        name: "{{ archive_data_set_final.get('data_sets')[0].get('name') }}"
         state: absent
       when: delete and archive_data_set_final is defined and archive_data_set_final|length > 0
     - name: Clean up terse data set
