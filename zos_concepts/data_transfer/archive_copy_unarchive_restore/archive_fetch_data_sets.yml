@@ -69,9 +69,9 @@
     # This section executes a DUMP using ADRDSSU and then archives it using terse
     # format in one task using zos_archive.
     # Options explanation:
-    # - The format option contains a number of sub-options including 'name' to
-    # specify the format type, 'format_options' which contains two sub-options
-    # terse_pack to specify SPACK or PACK and 'use_adrdsu' to specify whether
+    # - The format option contains a number of sub-options including 'type' to
+    # specify the format type, 'options' which contains two sub-options
+    # spack to specify SPACK or PACK and 'adrdssu' to specify whether
     # to execute a previous step to create and archive a dump data set.
     # - The 'remove' option which removes data sets from the systems upon a
     # successful archive operation.
@@ -101,9 +101,9 @@
     #########################################################################
     # This section fetches the data set from the source host to our controller
     # node.
-    # To avoid encoding/decoding the archive file, is_binary is set to True
+    # To avoid encoding/decoding the archive file, binary is set to True
     # when dealing with data set archives.
-    # The 'is_binary' option should always be set to 'True' when dealing with
+    # The 'binary' option should always be set to 'True' when dealing with
     # z/OS archives.
     #########################################################################
     - name: Fetch the data set into the controller

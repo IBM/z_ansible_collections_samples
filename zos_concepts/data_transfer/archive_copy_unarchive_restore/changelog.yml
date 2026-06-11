@@ -45,7 +45,7 @@ releases:
     date: 2026-06-10
     changes:
       fixed:
-        - - Rename format options per ibm.ibm_zos_core:2.0.0 zos_archive breaking changes.
+        - Rename format options per ibm.ibm_zos_core:2.0.0 zos_archive breaking changes.
         - Rename option 'is_binary' to 'binary' per ibm.ibm_zos_core:2.0.0 zos_fetch breaking changes.
       minor:
         - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
