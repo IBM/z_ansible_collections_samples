@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021, 2024
+# Copyright (c) IBM Corporation 2021, 2026
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -54,3 +54,8 @@ releases:
             fixed:
                 - Replace deprecated zos_encode module options 'from_encoding' and 'to_encoding' with new module option
                     'encoding' with sub-options 'to' and from'
+    2026.06.12:
+        date: 2026-06-12
+        changes:
+            minor:
+                - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
