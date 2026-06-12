@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2024
+# © Copyright IBM Corporation 2024, 2026
 ###############################################################################
 
 ###############################################################################
@@ -17,7 +17,7 @@
 #  permissions such as writing to the target directories or creating data sets.
 #
 # Requirements:
-#     - IBM z/OS core collection 1.11.0 or later
+#     - IBM z/OS core collection 2.0.0 or later
 #
 ###############################################################################
 
@@ -102,7 +102,7 @@
     - name: "Submit the JCL from the last generation {{ tmp_data_set }}(0)"
       zos_job_submit:
         src: "{{ tmp_data_set }}(0)"
-        location: data_set
+        remote_src: true
       register: result_submit
 
     - name: "Response from submitting JCL {{ tmp_data_set }}(0)"
