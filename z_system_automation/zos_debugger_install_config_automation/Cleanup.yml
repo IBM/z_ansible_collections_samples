@@ -1,0 +1,129 @@
+---
+- name: Remove Installation
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+    ######################################################
+
+    # remove files in zFS
+
+    # Delete temporary RELFILES directory
+    - name: Remove RELFILES
+      shell: rm -rf {{ remote_path_relfiles }}
+
+    # Stop the Debug Profile Service and Remote Debug Service
+    - name: stopping EQAPROF
+      ibm.ibm_zos_core.zos_operator:
+        cmd: P EQAPROF1
+
+    - name: stopping EQARMTD
+      ibm.ibm_zos_core.zos_operator:
+        cmd: P EQARMTD
+        wait_time_s: 5
+
+    # Test if a ZFS filesystem was created
+
+    - name: Filesystem {{ eqa_hlq }}.ZFS exists?
+      zos_stat:
+        name: "{{ eqa_hlq }}.ZFS"
+        type: aggregate
+      register: filesystem
+
+    # Unmount ZFS filesystem if it was created
+
+    - name: Unmount a filesystem if {{ eqa_hlq }}
+      zos_mount:
+        src: "{{ eqa_hlq }}.ZFS"
+        path: "{{ eqa_path_prefix }}usr/lpp/IBM/debug"
+        fs_type: zfs
+        state: unmounted
+      when: filesystem.stat.exists
+
+    # Delete debugger USS directories
+    - name: Remove Debugger files in zFS
+      shell: su -s root -c 'rm -rf {{ eqa_path_prefix }}usr/lpp/IBM/debug' ;
+             su -s root -c 'rm -rf {{ CFGDIR }}' ;
+             su -s root -c 'rm -rf {{ WRKDIR }}'
+
+    # remove STC userids and group
+
+    # Remove STCEQA, STCEQA2 users and STCGROUP
+    - name: Delete STC group and ids
+      zos_tso_command:
+        commands:
+          -  DELUSER STCEQA
+          -  DELUSER STCEQA2
+          -  DELGROUP STCGROUP
+        max_rc: 8
+
+    # remove started task PROCs
+
+    # Remove RACF profiles for EQAPROF and EQARMTD
+    - name: Delete started task PROCs
+
+      zos_tso_command:
+        commands:
+          -  RDELETE STARTED EQAPROF.*
+          -  RDELETE STARTED EQARMTD.*
+          -  SETROPTS RACLIST(STARTED) REFRESH
+        max_rc: 8
+
+    # remove SMP artifacts
+
+    # Delete all SMP/E and product datasets
+    - name: Remove Debugger files in MVS
+      zos_tso_command:
+        commands:
+          - DELETE '{{ smphlq }}.CSI'
+          - DELETE '{{ smphlq }}.SMPLOG'
+          - DELETE '{{ smphlq }}.SMPLOGA'
+          - DELETE '{{ smphlq }}.SMPLTS'
+          - DELETE '{{ smphlq }}.SMPMTS'
+          - DELETE '{{ smphlq }}.SMPPTS'
+          - DELETE '{{ smphlq }}.SMPSCDS'
+          - DELETE '{{ smphlq }}.SMPSTS'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F1'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F2'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F3'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F4'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F5'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F6'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F7'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F8'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F9'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F10'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.F11'
+          - DELETE '{{ zosmf_user }}.IBM.HADRH00.SMPMCS'
+          - DELETE '{{ zosmf_user }}.{{ ptf_file }}'
+          - DELETE '{{ eqa_hlq }}.AEQAEXEC'
+          - DELETE '{{ eqa_hlq }}.AEQAMENP'
+          - DELETE '{{ eqa_hlq }}.AEQAMENU'
+          - DELETE '{{ eqa_hlq }}.AEQAMOD'
+          - DELETE '{{ eqa_hlq }}.AEQAPENP'
+          - DELETE '{{ eqa_hlq }}.AEQAPENU'
+          - DELETE '{{ eqa_hlq }}.AEQASAMP'
+          - DELETE '{{ eqa_hlq }}.AEQASENP'
+          - DELETE '{{ eqa_hlq }}.AEQASENU'
+          - DELETE '{{ eqa_hlq }}.AEQATLIB'
+          - DELETE '{{ eqa_hlq }}.AEQAZFS'
+          - DELETE '{{ eqa_hlq }}.SEQAAUTH'
+          - DELETE '{{ eqa_hlq }}.SEQABMOD'
+          - DELETE '{{ eqa_hlq }}.SEQAEXEC'
+          - DELETE '{{ eqa_hlq }}.SEQALPA'
+          - DELETE '{{ eqa_hlq }}.SEQAMENP'
+          - DELETE '{{ eqa_hlq }}.SEQAMENU'
+          - DELETE '{{ eqa_hlq }}.SEQAMOD'
+          - DELETE '{{ eqa_hlq }}.SEQAPENP'
+          - DELETE '{{ eqa_hlq }}.SEQAPENU'
+          - DELETE '{{ eqa_hlq }}.SEQASAMP'
+          - DELETE '{{ eqa_hlq }}.SEQASENP'
+          - DELETE '{{ eqa_hlq }}.SEQASENU'
+          - DELETE '{{ eqa_hlq }}.SEQATLIB'
+          - DELETE '{{ eqa_hlq }}.ZFS'
+        max_rc: 8
+

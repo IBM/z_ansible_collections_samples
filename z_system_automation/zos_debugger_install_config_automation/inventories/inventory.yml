@@ -1,0 +1,6 @@
+source_system:
+  hosts:
+    zos_host:
+      ansible_host: <hostname>
+      ansible_user: <username>
+      ansible_port: <port>

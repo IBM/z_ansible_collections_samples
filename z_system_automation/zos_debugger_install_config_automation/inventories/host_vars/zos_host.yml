@@ -1,0 +1,22 @@
+---
+################################################################################
+
+# Python and ZOAU Paths
+PYZ: /usr/lpp/IBM/cyp/v3r12/pyz      # Python installation path
+ZOAU: /usr/lpp/IBM/zoautil            # ZOAU installation path
+
+
+zosmf_host: <hostname>
+zosmf_port: <port>
+zosmf_user: <username>
+zosmf_pass: <password>       # ⚠️ Change this or use Ansible Vault!
+
+
+# Ansible Python Interpreter
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
+
+# Privilege Escalation
+ansible_become_method: su
+ansible_become_password: "{{ zosmf_pass }}"
+ansible_become_user: root
+ansible_su_prompt_l10n: FSUM5019 Enter the password for {{ ansible_become_user }}  

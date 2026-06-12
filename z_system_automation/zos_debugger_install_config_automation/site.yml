@@ -1,0 +1,214 @@
+---
+# Main playbook to execute all z/OS Debugger installation and configuration playbooks in order
+# Usage: ansible-playbook site.yml -i inventories/inventory.yml -vvv
+
+- name: Execute z/OS Debugger Installation and Configuration
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    # Show installation start message
+    - name: Display start message
+      debug:
+        msg: "Starting z/OS Debugger installation and configuration process..."
+
+    # Announce cleanup step
+    - name: Step 1 - Cleanup
+      debug:
+        msg: "Executing Cleanup.yml..."
+
+- import_playbook: Cleanup.yml
+
+- name: Cleanup Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm cleanup finished
+    - name: Cleanup completed
+      debug:
+        msg: "✓ Cleanup completed successfully"
+
+- name: Step 2 - SMP Install
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce SMP/E installation step
+    - name: SMP Install starting
+      debug:
+        msg: "Executing SMPInstall.yml..."
+
+- import_playbook: SMPInstall.yml
+
+- name: SMP Install Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm SMP/E installation finished
+    - name: SMP Install completed
+      debug:
+        msg: "✓ SMP Install completed successfully"
+
+- name: Step 3 - PTF Install
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce PTF installation step
+    - name: PTF Install starting
+      debug:
+        msg: "Executing PTFInstall.yml..."
+
+- import_playbook: PTFInstall.yml
+
+- name: PTF Install Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm PTF installation finished
+    - name: PTF Install completed
+      debug:
+        msg: "✓ PTF Install completed successfully"
+
+- name: Step 4 - Configuration
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce configuration step
+    - name: Configuration starting
+      debug:
+        msg: "Executing Configuration.yml..."
+
+- import_playbook: Configuration.yml
+
+- name: Configuration Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm configuration finished
+    - name: Configuration completed
+      debug:
+        msg: "✓ Configuration completed successfully"
+
+- name: Step 5 - DPS Config
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce Debug Profile Service configuration step
+    - name: DPS Config starting
+      debug:
+        msg: "Executing DPSConfig.yml..."
+
+- import_playbook: DPSConfig.yml
+
+- name: DPS Config Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm DPS configuration finished
+    - name: DPS Config completed
+      debug:
+        msg: "✓ DPS Config completed successfully"
+
+- name: Step 6 - CICS Config
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce CICS configuration step
+    - name: CICS Config starting
+      debug:
+        msg: "Executing CICSConfig.yml..."
+
+- import_playbook: CICSConfig.yml
+
+- name: CICS Config Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm CICS configuration finished
+    - name: CICS Config completed
+      debug:
+        msg: "✓ CICS Config completed successfully"
+
+- name: Step 7 - Keystore Creation
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce keystore creation step
+    - name: Keystore Creation starting
+      debug:
+        msg: "Executing KeystoreCreation.yml..."
+
+- import_playbook: KeystoreCreation.yml
+
+- name: Keystore Creation Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm keystore creation finished
+    - name: Keystore Creation completed
+      debug:
+        msg: "✓ Keystore Creation completed successfully"
+
+- name: Step 8 - RDS Config
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce Remote Debug Service configuration step
+    - name: RDS Config starting
+      debug:
+        msg: "Executing RDSConfig.yml..."
+
+- import_playbook: RDSConfig.yml
+
+- name: RDS Config Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm RDS configuration finished
+    - name: RDS Config completed
+      debug:
+        msg: "✓ RDS Config completed successfully"
+
+- name: Step 9 - IMS Config
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Announce IMS configuration step
+    - name: IMS Config starting
+      debug:
+        msg: "Executing IMSConfig.yml..."
+
+- import_playbook: IMSConfig.yml
+
+- name: IMS Config Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Confirm IMS configuration finished
+    - name: IMS Config completed
+      debug:
+        msg: "✓ IMS Config completed successfully"
+
+- name: Installation Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Display final completion summary
+    - name: Display completion message
+      pause:
+        seconds: 1
+        prompt: |
+          ========================================
+          z/OS Debugger Installation Complete!
+          ========================================
+          All playbooks executed successfully:
+            ✓ Cleanup
+            ✓ SMP Install
+            ✓ PTF Install
+            ✓ Configuration
+            ✓ DPS Config
+            ✓ CICS Config
+            ✓ Keystore Creation
+            ✓ RDS Config
+            ✓ IMS Config
+          ========================================
+

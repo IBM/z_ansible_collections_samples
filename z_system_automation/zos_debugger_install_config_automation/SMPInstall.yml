@@ -1,0 +1,204 @@
+---
+- name: SMP Install
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+
+    # Create directory for installation files
+    - name: Ensure directory exists
+      ansible.builtin.file:
+        path: "{{ remote_path_relfiles }}"
+        state: directory
+        mode: '0755'
+
+    # Copy product pax file to z/OS
+    - name: Upload HADRH00 pax file
+      ansible.builtin.copy:
+        src: files/{{SMP_file}}
+        dest: "{{ remote_path_relfiles }}/{{SMP_file}}"
+        mode: '0644'
+
+    # Extract pax archive
+    - name: Extract SMP_file using pax
+      shell: pax -rvf {{SMP_file}}
+      args:
+        chdir: "{{ remote_path_relfiles }}"
+
+########################################################
+
+    # Submit job to unzip product files
+    - name: Step 1 - Unzip - UNZIP
+      zos_job_submit:
+        src: JCLS/UNZIP.jcl
+        location: local
+        use_template: true
+        wait_time_s: 300
+
+      register: response1
+
+    # Show the job ID for unzip step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 1 : {{ response1.job_id }}"
+
+########################################################
+
+    # Submit job to create SMP/E environment
+    - name: Step 2 - EQAWSMPE
+      zos_job_submit:
+        src: JCLS/EQAWSMPE.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response2
+
+    # Show the job ID for SMP/E setup
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 2 : {{ response2.job_id }}"
+
+#########################################################
+
+    # Submit job to receive product into SMP/E
+    - name: Step 3 - EQAWRECV
+      zos_job_submit:
+        src: JCLS/EQAWRECV.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response3
+
+    # Show the job ID for RECEIVE step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 3 : {{ response3.job_id }}"
+
+##########################################################
+
+    # Submit job to allocate target libraries
+    - name: Step 4 - EQAWALOC
+      zos_job_submit:
+        src: JCLS/EQAWALOC.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response4
+
+    # Show the job ID for allocation step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 4 : {{ response4.job_id }}"
+
+#######################################################
+#   Optionally run EQAWZFS to create and mount zFS/HFS file system
+
+    # Ask user if they want to create zFS file system
+    - name: Prompt for Step 5 execution
+      pause:
+        prompt: "Do you want to run Step 5 (EQAWZFS - create and mount zFS/HFS file system)? (yes/no)"
+      register: step5_response
+
+    # Set flag based on user response
+    - name: Set Step 5 execution flag
+      set_fact:
+        run_step5: "{{ step5_response.user_input | lower in ['yes', 'y'] }}"
+
+    # Submit job to create and mount zFS file system
+    - name: Step 5 - EQAWZFS
+      zos_job_submit:
+        src: JCLS/EQAWZFS.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+      register: response5
+      when: run_step5 | bool
+
+    # Show the job ID for zFS creation
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 5 : {{ response5.job_id }}"
+      when: run_step5 | bool
+
+    # Notify user that step was skipped
+    - name: Step 5 skipped message
+      debug:
+        msg: "Step 5 (EQAWZFS) skipped by user"
+      when: not (run_step5 | bool)
+
+#######################################################
+
+    # Submit job to create USS directories
+    - name: Step 6 - EQAWMKD
+      zos_job_submit:
+        src: JCLS/EQAWMKD.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response6
+
+    # Show the job ID for directory creation
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 6 : {{ response6.job_id }}"
+
+#######################################################
+
+    # Submit job to define DDDEF entries
+    - name: Step 7 - EQAWDDEF
+      zos_job_submit:
+        src: JCLS/EQAWDDEF.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response7
+
+    # Show the job ID for DDDEF step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 7 : {{ response7.job_id }}"
+
+#######################################################
+
+    # Submit job to apply product to target libraries
+    - name: Step 8 - EQAWAPLY
+      zos_job_submit:
+        src: JCLS/EQAWAPLY.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response8
+
+    # Show the job ID for APPLY step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 8 : {{ response8.job_id }}"
+
+########################################################
+
+    # Submit job to accept product into distribution libraries
+    - name: Step 9 - EQAWACPT
+      zos_job_submit:
+        src: JCLS/EQAWACPT.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+
+      register: response9
+
+    # Show the job ID for ACCEPT step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 9 : {{ response9.job_id }}"
+
+########################################################

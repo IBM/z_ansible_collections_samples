@@ -1,0 +1,67 @@
+# variables used in SMP installation
+
+# SMP/E Installation Configuration
+smphlq: IBMUSER.HADRH00              # High-level qualifier for SMP/E datasets
+volser: T50738                        # Volume for SMP/E CSI and control datasets
+tvol: T50735                          # Target volume for installed libraries
+dvol: T50731                          # Distribution volume for RELFILES
+eqa_hlq: EQAW.VHR0M0                 # High-level qualifier for debugger datasets
+eqa_path_prefix: "/u/ibmuser/"       # Base path for debugger files (must end with /)
+
+# --- PTF Installation Variables ---
+remote_path_relfiles: "/u/ibmuser/SMP/relfiles"  # Temporary RELFILES path
+ptf_file: IBM.HADRXXX.PTF####                     # PTF filename
+SMP_file: HADRXXX.pax.Z
+# variables used in Configuration.yml
+
+# --- Product Configuration Variables ---
+PARMLIB: USER.PARMLIB                 # PARMLIB dataset
+IFAPRDxx: "TZ"                          # IFAPRD member suffix, should be string
+registration: EQAWIFAT                # Registration template member
+
+# --- IVP Variables ---
+ivp_LNGPRFX: IGY.V6R4M0              # COBOL compiler HLQ
+ivp_LIBPRFX: CEE                      # Language Environment HLQ
+
+
+# variables used in DPSConfig.yml
+
+# --- DPS Configuration Variables ---
+PROCLIB: USER.PROCLIB                 # Started task PROCLIB
+DFHHLQ: DFH.V6R3M0.CICS              # CICS installation HLQ
+CFGDIR: /u/ibmuser/etc/debug         # Configuration directory
+WRKDIR: /u/ibmuser/var/debug         # Working directory
+JAVADIR: /usr/lpp/java/J17.0_64      # Java installation path
+liberty_dir: /usr/lpp/liberty_zos/current  # Liberty installation path
+liberty_port: ###03                  # Liberty server port
+
+
+# --- CICS Configuration Variables ---
+CSDPRFX: CICS61.CICS01               # CICS CSD dataset prefix
+dtcn_port: ###01                      # DTCN transaction port
+cics_region: CICS01                   # CICS region name
+port_internal: ###01                  # Internal debug port
+port_external_secure: ###02           # External secure debug port
+
+
+# variables used in IMSConfig.yml
+
+# --- IMS Configuration Variables ---
+ims_ceeopts: IMS1510.EQAW.CEEOPTS    # LE Options data set
+
+# variables used in RDSConfig.yml
+
+# --- RDS Configuration Variables ---
+EQARMTD_PATH: "{{ eqa_hlq }}.SEQASAMP(EQARMTD)"
+EQARMTSU_PATH: JCLS/EQARMTSU.jcl
+EQARMTD_LOCAL_PATH: JCLS/EQARMTD.jcl
+eqarmtd_local: files/eqarmtd.env
+eqarmtd_dest: /etc/debug/eqarmtd.env
+EQARMTD: SYS1.PROCLIB(EQARMTD)
+
+
+# variables used in KeystoreCreation.yml
+
+# --- Keystore Configuration ---
+keystore: true                        # Enable/disable SSL keystore creation
+

@@ -1,0 +1,26 @@
+---
+- hosts: zos_host
+  environment: "{{ environment_vars }}"
+  tasks:
+
+# Configure USERs and GROUPs
+    - name: Make IBMUSER a SURROGATE of ROOT
+      shell: |
+        tsocmd "RDEFINE SURROGAT BPX.SRV.ROOT UACC(NONE)"
+        tsocmd "PERMIT BPX.SRV.ROOT CLASS(SURROGAT) ID(IBMUSER) ACCESS(READ)"
+        tsocmd "SETROPTS RACLIST(SURROGAT) REFRESH"
+
+    - name: Prepare the use of AUTOUID/AUTOGID
+      shell: |
+        tsocmd "RDEFINE UNIXPRIV SHARED.IDS UACC(NONE)"
+        tsocmd "SETROPTS CLASSACT(UNIXPRIV) RACLIST(UNIXPRIV)"
+        tsocmd "SETROPTS RACLIST(UNIXPRIV) REFRESH"
+        tsocmd "RDEFINE FACILITY BPX.NEXT.USER APPLDATA('600/600')"
+        tsocmd "SETR REF RACLIST(FACILITY)"
+
+    - name: Prepare zOAU for opercmd
+      shell: |
+        tsocmd "RDEFINE OPERCMDS MVS.MCSOPER.ZOAU"
+        tsocmd "PERMIT MVS.MCSOPER.ZOAU CLASS(OPERCMDS) ID(IBMUSER) ACCESS(READ)"
+        tsocmd "SETROPTS CLASSACT(OPERCMDS) RACLIST(OPERCMDS)"
+        tsocmd "SETROPTS RACLIST(OPERCMDS) REFRESH"

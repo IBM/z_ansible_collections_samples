@@ -1,0 +1,82 @@
+---
+- name: PTF Install
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+
+    # Copy PTF file from local to z/OS dataset
+    - name: Copy PTF 
+      zos_copy:
+        src: files/{{ ptf_file }}
+        dest: "{{ zosmf_user }}.{{ ptf_file }}"
+        dest_data_set:
+          type: basic
+          space_primary: 200
+          space_secondary: 100
+          record_format: fb
+          record_length: 80
+          block_size: 27920
+          space_type: cyl
+        remote_src: false
+        is_binary: true
+
+#######################################################
+    
+    # Submit SMP/E RECEIVE job to load PTF
+    - name: Step 1  - RECEIVE
+      zos_job_submit:
+        src: JCLS/RECEIVE.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+        
+      register: response1
+
+    # Show the job ID for RECEIVE step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 1 : {{ response1.job_id }}"
+
+########################################################
+
+    # Submit SMP/E APPLY job to install PTF
+    - name: Step 2  - APPLY
+      zos_job_submit:
+        src: JCLS/APPLY.jcl
+        location: local
+        use_template: true
+        wait_time_s: 60
+        
+      register: response2
+
+    # Show the job ID for APPLY step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 2 : {{ response2.job_id }}"
+
+#######################################################
+
+    # Submit SMP/E ACCEPT job to finalize PTF
+    - name: Step 3  - ACCEPT
+      zos_job_submit:
+        src: JCLS/ACCEPT.jcl
+        location: local
+        use_template: true
+        max_rc: 4
+        wait_time_s: 60
+        
+      register: response3
+
+    # Show the job ID for ACCEPT step
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for Step 3 : {{ response3.job_id }}"
+
+########################################################
+
+
