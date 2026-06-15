@@ -1,3 +1,6 @@
+//******************************************************************************
+//* Copyright (c) IBM Corporation 2026
+//******************************************************************************
 //ACCEPT JOB CLASS=A,
 //     MSGCLASS=A,REGION=0M,MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //ACCEPT  EXEC PGM=GIMSMP,PARM='DATE=U',REGION=0M
