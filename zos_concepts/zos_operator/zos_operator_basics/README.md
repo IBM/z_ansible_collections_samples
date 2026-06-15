@@ -20,8 +20,8 @@ names, authority, and the artifacts that will be created and cleaned up.
 ## Playbook Requirements
 This playbook requires:
 
-- [IBM® z/OS® core collection 1.1.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
-- [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [IBM® z/OS® core collection 2.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+- [Ansible® 2.16 to 2.19](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Getting Started
 If you are unfamiliar with playbooks, you can review our
@@ -62,7 +62,7 @@ All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2020, 2026
 
 # License
 Licensed under [Apache License,
