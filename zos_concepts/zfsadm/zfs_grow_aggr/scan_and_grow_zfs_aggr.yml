@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2022, 2024
+# © Copyright IBM Corporation 2022, 2026
 ###############################################################################
 
 ###############################################################################
@@ -14,7 +14,7 @@
 #  ansible-playbook -i inventories scan_and_grow_zfs_aggr.yml
 #
 # Requirements:
-#   IBM z/OS core collection 1.2.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   aggr_growth_size -  this is the new size of the aggregates if grow is called.
