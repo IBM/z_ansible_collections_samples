@@ -1,0 +1,40 @@
+---
+# Sample playbook for the zhmc_crypto_attachment module of the ibm.ibm_zhmc collection:
+#
+# Attach named crypto adapters to a partition
+#
+# Command to run this playbook:
+# ansible-playbook -i inventory.yml -e hmc={myhmc} -e cpc={mycpc} -e partition={mypartition} module_crypto_attach_byname.yml
+
+- hosts:
+    - "{{ hmc | default('default') }}"  # HMC nickname from inventory entry
+  gather_facts: no
+  vars_files:
+    - vault.yml
+  vars:
+    cpc: MYCPC                          # Adjust or override with -e option
+    partition: sample-part-1            # Adjust or override with -e option
+    crypto_adapters: [CRYP00, CRYP01]   # Adjust
+    log_file: zhmc.log
+  collections:
+    - ibm.ibm_zhmc
+  tasks:
+
+    - name: "Ensure domains 2..max on crypto adapters {{ crypto_adapters }} are attached to partition {{ partition }}"
+      delegate_to: localhost
+      zhmc_crypto_attachment:
+        hmc_host: "{{ ansible_host }}"
+        hmc_auth: "{{ hmc_auth[inventory_hostname] }}"
+        cpc_name: "{{ cpc }}"
+        partition_name: "{{ partition }}"
+        state: attached
+        crypto_type: ep11
+        adapter_names: "{{ crypto_adapters }}"
+        domain_range: 2,-1
+        access_mode: usage
+        log_file: "{{ log_file | default(omit) }}"
+      register: result
+
+    - name: Print the result
+      ansible.builtin.debug:
+        var: result

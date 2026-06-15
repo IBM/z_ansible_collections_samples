@@ -1,6 +1,6 @@
 # I/O configuration of CPC CPCA
 
-From HMC: 10.11.12.13
+From HMC: HMC_HOST
 
 ## Basic CPC information
 

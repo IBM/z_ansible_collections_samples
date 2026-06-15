@@ -88,7 +88,7 @@
     executable: python3
 
 - name: Get security group
-  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f json | grep "secgroups" | awk -F ':' '{print$2}' | tr -d ','
+  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f value | grep "secgroups"  | awk -F ' ' '{print$2}'
   register:
     security_group
   failed_when: security_group.stdout == ""
@@ -99,7 +99,7 @@
   failed_when: "security_group.stdout_lines[0]|int < 3"
 
 - name: Get security group rule
-  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f json | grep "secgroup-rules" | awk -F ':' '{print$2}' | tr -d ','
+  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f value | grep "secgroup-rules" | awk -F ' ' '{print$2}'
   register:
     security_group_rule
   failed_when: security_group_rule.stdout == ""
@@ -110,7 +110,7 @@
   failed_when: "security_group_rule.stdout_lines[0]|int < 60"
 
 - name: Get server group quota
-  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -c server-groups -f value
+  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f value | grep "server-groups" | awk -F ' ' '{print$2}'
   register:
     server_group
   failed_when: server_group.stdout == ""

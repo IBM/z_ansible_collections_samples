@@ -31,7 +31,7 @@
     os_port_ingress: "{{ infra_id.stdout_lines[0] }}-ingress-port"
     os_port_bootstrap: "{{ infra_id.stdout_lines[0] }}-bootstrap-port"
     os_port_master: "{{ infra_id.stdout_lines[0] }}-master-port"
-    os_port_worker: "{{ infra_id.stdout_lines[0] }}-worker-port"
+    os_port_worker: "{{ infra_id.stdout_lines[0] }}-{{comp_name_suffix | default('worker')}}-port"
     # Security groups names
     os_sg_master: "{{ infra_id.stdout_lines[0] }}-master"
     os_sg_worker: "{{ infra_id.stdout_lines[0] }}-worker"
@@ -66,7 +66,7 @@
 
 - name: 'Worker server names without prefix'
   ansible.builtin.set_fact:
-    os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-worker"
+    os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-{{comp_name_suffix | default('worker')}}"
   when:
     - worker_name_prefix is not defined
 

@@ -60,15 +60,12 @@ for line in result.split("\n"):
         ip_address = re.search(r"ip_address='(.*?)'", parts[1]).group(1)
         mac_address = parts[2]
 
-        if "master" in host_name:
-            role = "master"
-            index = host_name.split("-")[-1]
-        elif "worker" in host_name:
-            role = "worker"
-            index = host_name.split("-")[-1]
-        elif "bootstrap" in host_name:
+        if "bootstrap" in host_name:
             role = "bootstrap"
             index = ""
+        else:
+            role = host_name.split("-")[-3]
+            index = host_name.split("-")[-1]
         if role == "bootstrap":
             template_line = f"  {role}:\n    mac: \"{mac_address}\"\n    ip: \"{ip_address}\"" 
         else:
