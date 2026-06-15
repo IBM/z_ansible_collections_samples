@@ -229,7 +229,7 @@ If you prefer more control or need to execute specific tasks only, you can run i
 
 ## Troubleshooting
 
-For common issues and detailed troubleshooting steps, please refer to the **[Troubleshooting Section](doc/User_Guide.md#troubleshooting)** in the User Guide.
+For common issues and detailed troubleshooting steps, please refer to the **[Troubleshooting Section](doc/Host_Installation_Automation_Complete_User_Guide.md#troubleshooting)** in the User Guide.
 
 ### Quick Troubleshooting Tips
 
@@ -241,7 +241,7 @@ For common issues and detailed troubleshooting steps, please refer to the **[Tro
 
 - **Port Conflicts:** Use `netstat -a | grep <port>` to check if ports are already in use
 
-For detailed diagnostic commands and solutions, see the [User Guide](doc/User_Guide.md#troubleshooting).
+For detailed diagnostic commands and solutions, see the [User Guide](doc/Host_Installation_Automation_Complete_User_Guide.md#troubleshooting).
 
 ## Additional Resources
 
@@ -256,7 +256,7 @@ For detailed diagnostic commands and solutions, see the [User Guide](doc/User_Gu
 
 ## Support
 
-For issues, questions, or contributions, please refer to the [User Guide](doc/User_Guide.md) or contact the development team.
+For issues, questions, or contributions, please refer to the [User Guide](doc/Host_Installation_Automation_Complete_User_Guide.md) or contact the development team.
 
 ---
 
