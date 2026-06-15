@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2022, 2024
+# © Copyright IBM Corporation 2022, 2026
 ###############################################################################
 
 ###############################################################################
@@ -13,7 +13,7 @@
 #  ansible-playbook -i inventories grow_zfs_aggregate.yml
 #
 # Requirements:
-#   IBM z/OS core collection 1.2.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 # Optional:
@@ -33,7 +33,6 @@
     mount_point: "/tmp/zfs_aggr"
     aggr_growth_size: 2000
   tasks:
-
     # ##########################################################################
     # Generate and set temporary data set name.
     # ##########################################################################

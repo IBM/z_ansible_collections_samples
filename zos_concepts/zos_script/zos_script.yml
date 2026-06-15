@@ -41,7 +41,7 @@
   environment: "{{ environment_vars }}"
 
   vars:
-    python_script_dir: "/u/omvsadm"
+    python_script_dir: "/u/user_name"
 
     use_custom_msg: True
     custom_msg: "This is a custom Hello World message!!"
