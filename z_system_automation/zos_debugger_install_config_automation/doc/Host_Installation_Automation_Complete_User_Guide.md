@@ -319,9 +319,9 @@ ssh -p ###22 userid@hostaddress
 
 ```bash
 # Clone repository
-git clone github.ibm.com/IBMDebug-Engine/Debug-Config-Automation
+git clone https://github.com/IBM/z_ansible_collections_samples.git
 
-cd Debug-Config-Automation
+cd z_ansible_collections_samples/z_system_automation/zos_debugger_install_config_automation
 ```
 
 #### Step 4: Edit Configuration files
@@ -355,9 +355,9 @@ This is the primary configuration file where you define all installation paramet
 ```yaml
 # SMP/E Installation Configuration
 smphlq: IBMUSER.HADRH00              # High-level qualifier for SMP/E datasets
-volser: T50738                        # Volume for SMP/E CSI and control datasets
-tvol: T50735                          # Target volume for installed libraries
-dvol: T50731                          # Distribution volume for RELFILES
+volser: T#####                        # Volume for SMP/E CSI and control datasets
+tvol: T#####                          # Target volume for installed libraries
+dvol: T#####                          # Distribution volume for RELFILES
 eqa_hlq: EQAW.VHR0M0                 # High-level qualifier for debugger datasets
 eqa_path_prefix: "/u/ibmuser/"       # Base path for debugger files (must end with /)
 ```
@@ -367,9 +367,9 @@ eqa_path_prefix: "/u/ibmuser/"       # Base path for debugger files (must end wi
 | Parameter | Description | Example | Notes |
 |-----------|-------------|---------|-------|
 | smphlq | HLQ for SMP/E datasets | IBMUSER.HADRH00 | Used for CSI, SMPLOG, etc. |
-| volser | Volume for SMP/E control | T50738 | Must have 100+ cylinders free |
-| tvol | Target library volume | T50735 | Must have 200+ cylinders free |
-| dvol | Distribution volume | T50731 | Must have 150+ cylinders free |
+| volser | Volume for SMP/E control | T##### | Must have 100+ cylinders free |
+| tvol | Target library volume | T##### | Must have 200+ cylinders free |
+| dvol | Distribution volume | T##### | Must have 150+ cylinders free |
 | eqa_hlq | Debugger dataset HLQ | EQAW.VHR0M0 | All debugger datasets use this |
 | eqa_path_prefix | zFS base path | /u/ibmuser/ | Must end with / |
 
@@ -382,9 +382,9 @@ eqa_path_prefix: "/u/ibmuser/"       # Base path for debugger files (must end wi
 
 # --- SMP/E Installation Variables ---
 smphlq: IBMUSER.HADRH00              # SMP/E dataset high-level qualifier
-volser: T50738                        # SMP/E control dataset volume
-tvol: T50735                          # Target library volume
-dvol: T50731                          # Distribution library volume
+volser: T#####                        # SMP/E control dataset volume
+tvol: T#####                          # Target library volume
+dvol: T#####                          # Distribution library volume
 eqa_hlq: EQAW.VHR0M0                 # Debugger dataset HLQ
 eqa_path_prefix: "/u/ibmuser/"       # zFS base path (must end with /)
 
@@ -459,8 +459,8 @@ source_system:
 ```yaml
 ---
 # Python and ZOAU Paths
-PYZ: /usr/lpp/IBM/cyp/v3r12/pyz      # Python installation path
-ZOAU: /usr/lpp/IBM/zoautil            # ZOAU installation path
+PYZ: <path_to_python_installation_on_zos_target>     # Python installation path
+ZOAU: <path_to_zoau_installation_on_zos_target>          # ZOAU installation path
 
 # z/OSMF Configuration
 zosmf_host: hostaddress
@@ -474,7 +474,7 @@ ansible_python_interpreter: "{{ PYZ }}/bin/python3"
 # Privilege Escalation
 ansible_become_method: su
 ansible_become_password: "{{ zosmf_pass }}"
-ansible_become_user: root
+ansible_become_user: < User with UID 0>     
 ansible_su_prompt_l10n: FSUM5019 Enter the password for {{ ansible_become_user }}
 ```
 
@@ -993,9 +993,9 @@ D PROG,APF
 **Expected Output:**
 
 ```
-EQAW.VHR0M0.SEQAAUTH,VOL=T50735
-EQAW.VHR0M0.SEQABMOD,VOL=T50735
-EQAW.VHR0M0.SEQAMOD,VOL=T50735
+EQAW.VHR0M0.SEQAAUTH,VOL=T#####
+EQAW.VHR0M0.SEQABMOD,VOL=T#####
+EQAW.VHR0M0.SEQAMOD,VOL=T#####
 ```
 
 #### 7. RACF Security Verification
@@ -1229,7 +1229,7 @@ TSO LISTDS 'EQAW.VHR0M0.SEQAAUTH'
 # Dataset must be on correct volume
 
 # 4. Manual APF authorization
-SETPROG APF,ADD,DSN=EQAW.VHR0M0.SEQAAUTH,VOL=T50735
+SETPROG APF,ADD,DSN=EQAW.VHR0M0.SEQAAUTH,VOL=T#####
 
 # 5. Make permanent in PROGxx
 # Add to SYS1.PARMLIB(PROGxx)
@@ -1297,7 +1297,7 @@ B37-04 SPACE ERROR
 
 ```bash
 # 1. Check volume space
-D U,VOL=T50735
+D U,VOL=T#####
 
 # 2. Free up space or use different volume
 # Update variables.yml with volume that has space
@@ -1469,9 +1469,9 @@ If you cannot resolve the issue:
 | Variable | Type | Default | Description | Required |
 |----------|------|---------|-------------|----------|
 | smphlq | String | IBMUSER.HADRH00 | SMP/E dataset HLQ | Yes |
-| volser | String | T50738 | SMP/E control volume | Yes |
-| tvol | String | T50735 | Target library volume | Yes |
-| dvol | String | T50731 | Distribution volume | Yes |
+| volser | String | T##### | SMP/E control volume | Yes |
+| tvol | String | T##### | Target library volume | Yes |
+| dvol | String | T##### | Distribution volume | Yes |
 | eqa_hlq | String | EQAW.VHR0M0 | Debugger dataset HLQ | Yes |
 | eqa_path_prefix | String | /u/ibmuser/ | zFS base path | Yes |
 | remote_path_relfiles | String | /u/ibmuser/SMP/relfiles | Temp RELFILES path | Yes |
