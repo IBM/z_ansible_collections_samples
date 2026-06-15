@@ -6,8 +6,8 @@ Using Ansible to install and configure the IBM z/OS Debugger
 
 For comprehensive installation instructions, configuration details, troubleshooting guides, and use case scenarios, please refer to the detailed documentation available in multiple formats:
 
-- **[User Guide (Markdown)](doc/User_Guide.md)** - Easy to read in GitHub/VS Code
-- **[User Guide (Word Document)](doc/User's%20Guide.docx)** - Downloadable DOCX format for offline reference
+- **[User Guide (Markdown)](doc/Host_Installation_Automation_Complete_User_Guide.md)** - Easy to read in GitHub/VS Code
+- **[User Guide (PDF Document)](doc/Host_Installation_Automation_User_Guide.pdf)** - Downloadable PDF format for offline reference
 
 ### What's in the User Guide?
 
@@ -23,7 +23,7 @@ The User Guide (available in both Markdown and DOCX formats) provides extensive 
 
 ### Quick Start
 
-For a quick start, follow the instructions below. For detailed information, consult the [User Guide](doc/User_Guide.md).
+For a quick start, follow the instructions below. For detailed information, consult the [User Guide](doc/Host_Installation_Automation_Complete_User_Guide.md).
 
 ## Prerequisites
 
