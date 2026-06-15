@@ -133,6 +133,13 @@ This playbook will interactively ask for the IP, username and password of the
 SSC LPAR of the appliance, from which logs are gathered. This means that this playbook can also be
 used for gathering logs from other appliances (e.g., SSA appliance).
 
+Note that this playbook waits and then asks the SSC appliance
+whether the alert is handled by the appliance. If the alert is not yet
+handled, the playbook will print `FAILED - RETRYING: ...` message on
+the terminal, and then retry the query after a pause. Please let the
+playbook run and give enough time for the appliance to handle the
+alert. Afterwards, the playbook will run normally.
+
 ## Pull SSA logs and Check Health Status | 05_managed_appliance_health_and_pull_logs.yaml
 
 - Run the playbook for health checking and pulling appliance (like SSA) logs:
@@ -143,6 +150,7 @@ used for gathering logs from other appliances (e.g., SSA appliance).
 ## ACC Appliance Update | 06_acc_appliance_update.yaml
 
 - Run the playbook to update the ACC appliance:
+
   ```bash
   ansible-playbook 06_acc_appliance_update.yaml
   ```
@@ -150,6 +158,65 @@ used for gathering logs from other appliances (e.g., SSA appliance).
 This playbook is different than `01_upgrade_flow.yaml`, because this playbook
 should be used to upgrade ACC itself. The `01_upgrade_flow.yaml` playbook is
 used to upgrade an appliance that is managed by ACC.
+
+Note that this playbook waits and then asks the ACC appliance
+to get ready for an update and also check its status after the update.
+If ACC appliance is not yet in the right state, the playbook will
+print `FAILED - RETRYING: ...` message on the terminal, and then retry
+the operations after a pause. Please let the
+playbook run and give enough time for the ACC appliance to handle the
+requests. Afterwards, the playbook will run normally.
+
+**Note**: If the ACC LPAR does not reboot as part of the appliance update process, be aware that the operating system messages shown for the ACC LPAR in the HMC may display stale ACC version information.
+
+With the [jq](https://jqlang.org/download/) package installed on your system, the following `curl` commands can be used to verify the ACC version:
+
+- Obtain zACI ACC_Admin Token
+
+  ```Linux
+  export ADMIN_TOKEN=$(curl -k -X 'POST' \
+    'https://{ACC_IP}/api/com.ibm.zaci.system/api-tokens' \
+    -H 'Accept: application/vnd.ibm.zaci.payload+json' \
+    -H 'zACI-API: com.ibm.zaci.system/1.0' \
+    -H 'Content-Type: application/vnd.ibm.zaci.payload+json;version=1.0' \
+    -d '{
+      "kind": "request",
+      "parameters": {
+        "user": "acc_admin_username",
+        "password": "acc_admin_password"
+       }
+     }' | jq -r '.parameters.token')
+  
+  ```
+
+  - Be sure to replace `{ACC_IP}` with the IP address of the ACC LPAR, and substitute `acc_admin_username` and `acc_admin_password` with the appropriate ACC administrator credentials.
+
+- Query ACC Status Information
+
+  ```Linux
+  curl -k -X "GET" \
+    "https://{ACC_IP}/api/com.ibm.zaci.system/appliance/" \
+    -H "Accept: application/vnd.ibm.zaci.payload+json" \
+    -H "zACI-API: com.ibm.zaci.system/1.0" \
+    -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+    -H "Content-Type: application/vnd.ibm.zaci.payload+json;version=1.0" | jq
+  ```
+
+- Sample Response:
+
+  ```Linux
+  {
+    "kind": "instance",
+    "self": "/api/com.ibm.zaci.system/appliance/",
+    "resource-name": "appliance",
+    "resource-version": "1.0",
+    "properties": {
+      "self": "/api/com.ibm.zaci.system/appliance",
+      "name": "zAppliance Control Center",
+      "description": "zAppliance Control center - zACC",
+      "version": "1.2.11",
+      ...
+  ```
 
 ## Set HMC Credentials (Daily Task) | 07_insert_hmc_creds.yaml
 
@@ -212,6 +279,13 @@ This playbook will help user to restart ACC, which can be helpful in certain con
 Note: This playbook will not deactivate and then activate the ACC LPAR. It will
 just send a restart signal to ACC appliance (similar to `reboot`).
 
+Note that this playbook waits and then checks the ACC appliance
+whether it is booted up or not. If the ACC appliance is not yet
+booted, the playbook will print `FAILED - RETRYING: ...` message on
+the terminal, and then retry the check after a pause. Please let the
+playbook run and give enough time for the ACC appliance to reboot.
+Afterwards, the playbook will run normally.
+
 ## Trigger and Collect Disruptive dumps from Appliance | 09_get_disruptive_dumps.yaml
 
 This playbook automates the process of triggering a disruptive dump on an SSC appliance
@@ -226,7 +300,15 @@ ansible-playbook 09_get_disruptive_dumps.yaml
 
 This playbook with interactively ask for the IP, username, password, reason for
 downloading dumps and file path where to download for gathering logs from any
-appliances (e.g., SSA appliance).
+appliances (e.g., SSA appliance). Afterwards, the appliance will
+reboot itself.
+
+Note that this playbook waits and then checks the SSC appliance
+whether it is booted up or not. If the SSC appliance is not yet
+booted, the playbook will print `FAILED - RETRYING: ...` message on
+the terminal, and then retry the check after a pause. Please let the
+playbook run and give enough time for the SSC appliance to reboot.
+Afterwards, the playbook will run normally.
 
 ## Unlock Appliances | 10_unlock_appliances.yaml | 11_unlock_each_appliance.yaml
 
@@ -270,6 +352,11 @@ To logout:
   ```bash
   ansible-playbook 12_logout_owner.yaml
   ```
+
+**Note**: In the ACC versions older than 1.2.12, the `/user/logout` API of
+ACC used `DELETE` instead of `POST`. If you are using ACC version older than
+1.2.12, then replace the `method: POST` with `method: DELETE` in the
+`04 - Logout appliance-owner` task.
 
 ## Appliance Restart via ACC | 13_restart_appliances.yaml
 

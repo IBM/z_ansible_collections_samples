@@ -1,8 +1,12 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Initial release                                                    |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 
 #####################################################################################################
@@ -24,16 +28,14 @@
 # Enable or disable Multi-Factor Authentication (true/false)
 mfa_enabled: false
 
-# IP of the ACC LPAR, used to create acc_url (e.g., 9.15.120.100)
-acc_ip: 9.15.150.200
+# IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
+acc_url: https://9.120.0.0:8081/api
 
-# This port is used to create acc_url (8081)
-acc_port: 8081
 
 ####### HMC #######
 
 # HMC host ip (e.g., 9.152.150.166)
-hmc_url: "9.0.0.0"
+hmc_ip: "9.0.0.0"
 
 # ACC-admin's user name on the HMC (e.g., export HMC_USER=<your_hmc_userid>)
 hmc_user: "{{ lookup('env', 'HMC_USER') }}"
@@ -130,7 +132,7 @@ lpar1_name: "CC10"
 # Network interface name for creating resource package (e.g., "interface1")
 interface1_name: "interface1"
 
-# Function ID (e.g., 00A5) used with the SSC network interface
+# Function ID (e.g., 00A5) used with the SSC network interface. Only applicable if Channel Path ID (CHPID) is not used
 fid1: "A123"
 
 # Network prefix length for creating resource package (e.g., 23)
@@ -146,6 +148,8 @@ chpid1: "xx"
 zport1: 0
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
+# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# communicate with the boot volume on the storage controller
 disk1_id: "0.0.5abc"
 
 # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
@@ -165,6 +169,26 @@ gw1_ip: "9.102.0.1"
 
 # Used in 03_acc_ssa_install_check to see if the appliances are functional
 
+# Credentials
+
+# You must follow the [Secure Service Container user guide](https://www.ibm.com/docs/en/module_1707928542006/pdf/SC28-6971-01.pdf)
+# for setting up SSA1_APP_USERNAME and SSA1_APP_PASSWORD. At the moment, the guidelines are:
+# SSA1_APP_USERNAME: This is the Administrator user ID in the SSC user guide and is to be
+# used as the default administrator user ID for the Secure Service Container partition.
+# This user ID has authority to perform any task that is available through the
+# Secure Service Container graphical user interface (GUI). An administrator user ID can
+# be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
+# 0 - 9, letters A - Z (upper or lower case), and the following special
+# characters: period (.), underscore (_), and hyphen (-). 
+# SSA1_APP_PASSWORD: This is the Administrator password in the SSC user guide.
+# This password can have a minimum of 8 characters and a maximum of 256 characters.
+# An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
+# (upper or lower case), and the following special characters: hyphen (-),
+# underscore (_), exclamation (!), at (@), hash (#), dollar ($), percent (%), carat (^),
+# ampersand (&), asterisk (*), left parenthesis ((), right parenthesis ()), plus (+),
+# left brace ({), right brace (}), vertical bar (|), colon (:), less than (<),
+# greater than (>), question mark (?), and equals (=).
+
 # SSA-1's user name (same as on the SSC LPAR)
 lpar1_admin_user: "{{ lookup('env', 'SSA1_APP_USERNAME') }}"
 
@@ -179,7 +203,7 @@ lpar2_name: "CC12"
 # Network interface name for creating resource package (e.g., "interface1")
 interface2_name: "interface2"
 
-# Function ID (e.g., 00A5) used with the SSC network interface
+# Function ID (e.g., 00A5) used with the SSC network interface. Only applicable if Channel Path ID (CHPID) is not used
 fid2: "A123"
 
 # Network prefix length for creating resource package (e.g., 23)
@@ -195,6 +219,8 @@ chpid2: "xx"
 zport2: 0
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
+# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# communicate with the boot volume on the storage controller
 disk2_id: "0.0.5abc"
 
 # Whether FCP disk is enabled or not, if TRUE then add wwpn and lun else False [e.g., wwpn: "50050763070B46A6", lun: "4016403900000000"  ]
@@ -213,6 +239,26 @@ app2_ip: "9.152.150.200"
 gw2_ip: "9.102.0.1"
 
 # Used in 03_acc_ssa_install_check to see if the appliances are functional
+
+# Credentials
+
+# You must follow the [Secure Service Container user guide](https://www.ibm.com/docs/en/module_1707928542006/pdf/SC28-6971-01.pdf)
+# for setting up SSA2_APP_USERNAME and SSA2_APP_PASSWORD. At the moment, the guidelines are:
+# SSA2_APP_USERNAME: This is the Administrator user ID in the SSC user guide and is to be
+# used as the default administrator user ID for the Secure Service Container partition.
+# This user ID has authority to perform any task that is available through the
+# Secure Service Container graphical user interface (GUI). An administrator user ID can
+# be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
+# 0 - 9, letters A - Z (upper or lower case), and the following special
+# characters: period (.), underscore (_), and hyphen (-). 
+# SSA2_APP_PASSWORD: This is the Administrator password in the SSC user guide.
+# This password can have a minimum of 8 characters and a maximum of 256 characters.
+# An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
+# (upper or lower case), and the following special characters: hyphen (-),
+# underscore (_), exclamation (!), at (@), hash (#), dollar ($), percent (%), carat (^),
+# ampersand (&), asterisk (*), left parenthesis ((), right parenthesis ()), plus (+),
+# left brace ({), right brace (}), vertical bar (|), colon (:), less than (<),
+# greater than (>), question mark (?), and equals (=).
 
 # SSA-2's user name (same as on the SSC LPAR)
 lpar2_admin_user: "{{ lookup('env', 'SSA2_APP_USERNAME') }}"

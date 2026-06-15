@@ -1,11 +1,17 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [10.17.2025]                                                           |
 # *|   - Tested with ACC 1.2.6                                              |
 # *|   - Initial release                                                    |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
 # *|   - Added checking of environment variables                            |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *|   - Replaced acc_ip with acc_url and hmc_managed by acc_default_mode   |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Asking to update password before continuing                        |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
@@ -47,13 +53,18 @@
       prompt: "Do you want to initialize ACC? If you have already, then please type no. (yes/no)"
       private: false
       default: "yes"
+    
+    - name: update_pass
+      prompt: "Do you want to update the admin password? If you have already, then please type no (yes/no)"
+      private: false
+      default: "yes"
 
   tasks:
     - name: 00 - Initialize ACC with Standalone mode with MFA
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/init"
+        url: "{{ acc_url }}/init"
         body:
-          hmc_managed: "{{ hmc_managed }}"
+          hmc_managed: "{{ acc_default_mode }}"
           mfa_enable: "{{ mfa_enabled }}"
           credentials:
             username: "{{ cc_admin_user }}"
@@ -68,12 +79,13 @@
     - name: Print init response
       ansible.builtin.debug:
         var: init_response.json
+      when: run_init | lower == "yes"
 
     - name: 01 - Get Initialize status
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/init"
+        url: "{{ acc_url }}/init"
         body:
-          hmc_managed: "{{ hmc_managed }}"
+          hmc_managed: "{{ acc_default_mode }}"
           credentials:
             username: "{{ cc_admin_user }}"
             password: "{{ cc_admin_old_password }}"
@@ -92,15 +104,17 @@
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
           - "{{ init_response.json.totp_secret }}"
+      when: run_init | lower == "yes"
 
     - name: Wait for user to generate OTP
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
+      when: run_init | lower == "yes"
 
-    - name: 02 - Update ACC-admin password (remove this if already done)
+    - name: 02 - Update ACC-admin password
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user"
+        url: "{{ acc_url }}/user"
         body:
           username: "{{ cc_admin_user }}"
           old_password: "{{ cc_admin_old_password }}"
@@ -111,10 +125,12 @@
         return_content: true
         validate_certs: false
       register: update_password_response
+      when: update_pass | lower == "yes"
 
     - name: Print password update response
       ansible.builtin.debug:
         var: update_password_response.json
+      when: update_pass | lower == "yes"
 
     - name: Show admin MFA secret
       ansible.builtin.debug:
@@ -122,6 +138,7 @@
           - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app"
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
+      when: update_pass | lower == "yes"
 
     # Note: The above tasks are intended for one-time execution.
     # Please comment them out after running once. when you want to generate access token
@@ -133,7 +150,7 @@
 
     - name: 03 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user/token"
+        url: "{{ acc_url }}/user/token"
         body:
           username: "{{ cc_admin_user }}"
           password: "{{ cc_admin_password }}"
@@ -156,7 +173,7 @@
     - name: 04 - Insert CPC information in ACC with dummy values (standalone mode)
       tags: admin
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cpcs"
+        url: "{{ acc_url }}/cpcs"
         timeout: 200
         method: POST
         body:
@@ -175,7 +192,7 @@
 
     - name: 05 - Get list of CPCs attached to the HMC
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cpcs"
+        url: "{{ acc_url }}/cpcs"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -189,7 +206,7 @@
 
     - name: 06 - Get CPC resources of CPC defined in admin_vars.yaml
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/cpcs/{{ z_machine_name }}/resource"
+        url: "{{ acc_url }}/cpcs/{{ z_machine_name }}/resource"
         method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -203,7 +220,7 @@
 
     - name: 07 - Create an appliance-owner using variables in admin_vars.yaml
       ansible.builtin.uri:
-        url: "{{ acc_ip }}/user"
+        url: "{{ acc_url }}/user"
         method: POST
         body:
           username: "{{ cc_owner_user }}"

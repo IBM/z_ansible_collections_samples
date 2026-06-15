@@ -5,6 +5,10 @@
 # *|   - Initial release                                                    |
 # *| [12.12.2025]                                                           |
 # *|   - Tested with ACC 1.2.10                                             |
+# *| [02.13.2026]                                                           |
+# *|   - Tested with ACC 1.2.12                                             |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
 # *+------------------------------------------------------------------------+
 
 import random
@@ -218,7 +222,7 @@ def initiate_action(session, set_image_profile):
 def get_cpc(session, cpc):
     client = zhmcclient.Client(session)
     cpcs = client.cpcs.list(filter_args={'name': cpc})
-    print(cpcs)
+    print(f"Received CPCs: {cpcs}")
     if len(cpcs) != 1:
         raise Exception(f"Expected 1 CPC, but got {len(cpcs)}.")
     cpc = cpcs[0]

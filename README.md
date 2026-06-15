@@ -75,6 +75,7 @@ often repeated and in need of automation.
   - [Run local and remote scripts inside Unix System Services in z/OS](zos_concepts/zos_script)
   - [Run REXX scripts and CLISTs with TSO commands](zos_concepts/tso_commands/scripts)
   - [Query attributes from data sets, aggregates, Generation Data Groups and Unix System Services files](zos_concepts/zos_stat)
+  - [Start, display, modify, stop, cancel and force z/OS started tasks](zos_concepts/zos_started_task)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)

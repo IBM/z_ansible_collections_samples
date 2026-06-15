@@ -1,0 +1,11 @@
+# Copyright (c) IBM Corporation 2025
+
+- name: Sample of identifying missing critical software updates for a software instance
+  hosts: "{{ nodes | default([]) }}"
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Get Missing Critical Updates
+      include_role:
+        name: zmf_swmgmt_identify_missing_critical_updates

@@ -1,0 +1,12 @@
+# default(..., true) treats empty strings as “unset.”
+nodes: "localhost"
+zmf_host: your.zosmf.instance.url.com
+zmf_port: 0000
+zmf_user: "{{ lookup('env', 'ZOSMF_USERNAME') | default(omit, true) }}" # omit if unset
+zmf_password: "{{ lookup('env', 'ZOSMF_PASSWORD') | default(omit, true) }}" # omit if unset
+software_instance_name: demo_instance_name 
+system_nickname: favorite_lpar 
+notes: 'Dummy note for the example' 
+swupdate_retrieve_response_file: /user/directory/on/running/system
+directory: /user/directory/on/zos
+swupdate_copy_response_file: /user/directory/on/running/system
