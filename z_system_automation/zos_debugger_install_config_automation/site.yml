@@ -1,4 +1,7 @@
 ---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
 # Main playbook to execute all z/OS Debugger installation and configuration playbooks in order
 # Usage: ansible-playbook site.yml -i inventories/inventory.yml -vvv
 
