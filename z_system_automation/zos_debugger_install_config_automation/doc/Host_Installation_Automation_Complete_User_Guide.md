@@ -354,24 +354,24 @@ This is the primary configuration file where you define all installation paramet
 
 ```yaml
 # SMP/E Installation Configuration
-smphlq: IBMUSER.HADRH00              # High-level qualifier for SMP/E datasets
+smphlq: <USERID>.HADRH00              # High-level qualifier for SMP/E datasets
 volser: T#####                        # Volume for SMP/E CSI and control datasets
 tvol: T#####                          # Target volume for installed libraries
 dvol: T#####                          # Distribution volume for RELFILES
 eqa_hlq: EQAW.VHR0M0                 # High-level qualifier for debugger datasets
-eqa_path_prefix: "/u/ibmuser/"       # Base path for debugger files (must end with /)
+eqa_path_prefix: "/u/<USERID>/"       # Base path for debugger files (must end with /)
 ```
 
 **Parameter Details:**
 
 | Parameter | Description | Example | Notes |
 |-----------|-------------|---------|-------|
-| smphlq | HLQ for SMP/E datasets | IBMUSER.HADRH00 | Used for CSI, SMPLOG, etc. |
+| smphlq | HLQ for SMP/E datasets | <USERID>.HADRH00 | Used for CSI, SMPLOG, etc. |
 | volser | Volume for SMP/E control | T##### | Must have 100+ cylinders free |
 | tvol | Target library volume | T##### | Must have 200+ cylinders free |
 | dvol | Distribution volume | T##### | Must have 150+ cylinders free |
 | eqa_hlq | Debugger dataset HLQ | EQAW.VHR0M0 | All debugger datasets use this |
-| eqa_path_prefix | zFS base path | /u/ibmuser/ | Must end with / |
+| eqa_path_prefix | zFS base path | /u/<USERID>/ | Must end with / |
 
 ###### Complete variables.yml Reference
 
@@ -381,15 +381,15 @@ eqa_path_prefix: "/u/ibmuser/"       # Base path for debugger files (must end wi
 # ============================================================================
 
 # --- SMP/E Installation Variables ---
-smphlq: IBMUSER.HADRH00              # SMP/E dataset high-level qualifier
+smphlq: <USERID>.HADRH00              # SMP/E dataset high-level qualifier
 volser: T#####                        # SMP/E control dataset volume
 tvol: T#####                          # Target library volume
 dvol: T#####                          # Distribution library volume
 eqa_hlq: EQAW.VHR0M0                 # Debugger dataset HLQ
-eqa_path_prefix: "/u/ibmuser/"       # zFS base path (must end with /)
+eqa_path_prefix: "/u/<USERID>/"       # zFS base path (must end with /)
 
 # --- PTF Installation Variables ---
-remote_path_relfiles: "/u/ibmuser/SMP/relfiles"  # Temporary RELFILES path
+remote_path_relfiles: "/u/<USERID>/SMP/relfiles"  # Temporary RELFILES path
 ptf_file: IBM.HADRXXX.PTF####                    # PTF filename
 
 # --- Product Configuration Variables ---
@@ -404,8 +404,8 @@ ivp_LIBPRFX: CEE                      # Language Environment HLQ
 # --- DPS Configuration Variables ---
 PROCLIB: USER.PROCLIB                 # Started task PROCLIB
 DFHHLQ: DFH.V6R3M0.CICS              # CICS installation HLQ
-CFGDIR: /u/ibmuser/etc/debug         # Configuration directory
-WRKDIR: /u/ibmuser/var/debug         # Working directory
+CFGDIR: /u/<USERID>/etc/debug         # Configuration directory
+WRKDIR: /u/<USERID>/var/debug         # Working directory
 JAVADIR: /usr/lpp/java/J17.0_64      # Java installation path
 liberty_dir: /usr/lpp/liberty_zos/current  # Liberty installation path
 liberty_port: ###00                   # Liberty server port
@@ -444,7 +444,7 @@ source_system:
   hosts:
     zos_host:
       ansible_host: hostaddress  # z/OS hostname or IP
-      ansible_user: ibmuser                       # SSH username
+      ansible_user: <USERID>                       # SSH username
       ansible_port: ###22                         # SSH port
 ```
 
@@ -465,7 +465,7 @@ ZOAU: <path_to_zoau_installation_on_zos_target>          # ZOAU installation pat
 # z/OSMF Configuration
 zosmf_host: hostaddress
 zosmf_port: ###22
-zosmf_user: IBMUSER
+zosmf_user: <USERID>
 zosmf_pass: your_password_here        # ⚠️ Change this or use Ansible Vault!
 
 # Ansible Python Interpreter
@@ -515,7 +515,7 @@ This way of execution will install and configure the debugger in one shot by run
 ##### Step 0: Initialize (Optional - Root Access)
 
 ```bash
-ansible-playbook initialise.yaml -i inventories/inventory.yml -vvv
+ansible-playbook initialize.yml -i inventories/inventory.yml -vvv
 ```
 
 **When to use:** Only if you need root access for certain operations.
@@ -546,7 +546,7 @@ Run individual playbooks for more control. See detailed steps below.
 ##### Step 0: Initialize (Optional - Root Access)
 
 ```bash
-ansible-playbook initialise.yaml -i inventories/inventory.yml -vvv
+ansible-playbook initialize.yml -i inventories/inventory.yml -vvv
 ```
 
 **When to use:** Only if you need root access for certain operations.
@@ -708,7 +708,7 @@ ansible-playbook CICSConfig.yml -i inventories/inventory.yml -vvv
 **Duration:** 5 minutes
 
 **Post-Configuration:** Add datasets to CICS DFHRPL:
-- IBMUSER.EQAIVP.LOADPDSE
+- <USERID>.EQAIVP.LOADPDSE
 - EQAW.VHR0M0.SEQAMOD
 - SYS1.MIGLIB
 - SYS1.SIEAMIGE
@@ -916,25 +916,25 @@ TSO LISTDS 'EQAW.VHR0M0.*'
 
 ```bash
 # On z/OS
-ls -la /u/ibmuser/usr/lpp/IBM/debugger
-ls -la /u/ibmuser/etc/debug
-ls -la /u/ibmuser/var/debug
+ls -la /u/<USERID>/usr/lpp/IBM/debugger
+ls -la /u/<USERID>/etc/debug
+ls -la /u/<USERID>/var/debug
 ```
 
 **Expected Directories:**
 
 ```
-/u/ibmuser/usr/lpp/IBM/debugger/
+/u/<USERID>/usr/lpp/IBM/debugger/
 ├── bin/
 ├── lib/
 └── samples/
 
-/u/ibmuser/etc/debug/
+/u/<USERID>/etc/debug/
 ├── eqaprof.env
 ├── server.xml
 └── dtcn.ports
 
-/u/ibmuser/var/debug/
+/u/<USERID>/var/debug/
 └── logs/
 ```
 
@@ -1075,8 +1075,8 @@ curl -k https://zos_hostname:###00/health
 
 ```bash
 # On z/OS
-tail -f /u/ibmuser/var/debug/logs/eqaprof.log
-tail -f /u/ibmuser/var/debug/logs/liberty.log
+tail -f /u/<USERID>/var/debug/logs/eqaprof.log
+tail -f /u/<USERID>/var/debug/logs/liberty.log
 ```
 
 **Look for:**
@@ -1118,16 +1118,16 @@ fatal: [zos_host]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect 
 
 ```bash
 # 1. Verify SSH connectivity manually
-ssh -p ###22 ibmuser@hostaddress
+ssh -p ###22 <USERID>@hostaddress
 
 # 2. Re-copy SSH key
-ssh-copy-id -p ###22 ibmuser@hostaddress
+ssh-copy-id -p ###22 <USERID>@hostaddress
 
 # 3. Check inventory.yml settings
 cat inventories/inventory.yml
 
 # 4. Test with verbose SSH
-ssh -vvv -p ###22 ibmuser@hostaddress
+ssh -vvv -p ###22 <USERID>@hostaddress
 ```
 
 #### Issue 2: Job Failed with RC > 0
@@ -1240,7 +1240,7 @@ SETPROG APF,ADD,DSN=EQAW.VHR0M0.SEQAAUTH,VOL=T#####
 **Symptom:**
 
 ```
-ICH408I USER(IBMUSER) NOT AUTHORIZED TO FACILITY CLASS
+ICH408I USER(<USERID>) NOT AUTHORIZED TO FACILITY CLASS
 ```
 
 **Solutions:**
@@ -1250,7 +1250,7 @@ ICH408I USER(IBMUSER) NOT AUTHORIZED TO FACILITY CLASS
 RLIST FACILITY EQA.* ALL
 
 # 2. Grant access
-PERMIT EQA.PROFILE.SERVER CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+PERMIT EQA.PROFILE.SERVER CLASS(FACILITY) ID(<USERID>) ACCESS(READ)
 SETROPTS RACLIST(FACILITY) REFRESH
 
 # 3. Verify access
@@ -1357,7 +1357,7 @@ telnet zos_hostname ###00
 # Ensure port ###00 is open
 
 # 5. Verify Liberty server is up
-tail -f /u/ibmuser/var/debug/logs/liberty.log
+tail -f /u/<USERID>/var/debug/logs/liberty.log
 
 # 6. Check SSL configuration if using HTTPS
 # Verify certificates are valid
@@ -1390,13 +1390,13 @@ netstat -a
 TSO LISTDS 'EQAW.VHR0M0.*'
 
 # 7. Directory contents
-ls -laR /u/ibmuser/usr/lpp/IBM/debugger
-ls -laR /u/ibmuser/etc/debug
-ls -laR /u/ibmuser/var/debug
+ls -laR /u/<USERID>/usr/lpp/IBM/debugger
+ls -laR /u/<USERID>/etc/debug
+ls -laR /u/<USERID>/var/debug
 
 # 8. Log files
-tail -100 /u/ibmuser/var/debug/logs/eqaprof.log
-tail -100 /u/ibmuser/var/debug/logs/liberty.log
+tail -100 /u/<USERID>/var/debug/logs/eqaprof.log
+tail -100 /u/<USERID>/var/debug/logs/liberty.log
 
 # 9. RACF information
 RLIST FACILITY EQA.* ALL
@@ -1444,7 +1444,7 @@ If you cannot resolve the issue:
 
 - `ansible.log` - Ansible execution log
 - z/OS SYSLOG - System messages
-- `/u/ibmuser/var/debug/logs/` - Debug server logs
+- `/u/<USERID>/var/debug/logs/` - Debug server logs
 
 #### 3. Collect Information:
 
@@ -1468,13 +1468,13 @@ If you cannot resolve the issue:
 
 | Variable | Type | Default | Description | Required |
 |----------|------|---------|-------------|----------|
-| smphlq | String | IBMUSER.HADRH00 | SMP/E dataset HLQ | Yes |
+| smphlq | String | <USERID>.HADRH00 | SMP/E dataset HLQ | Yes |
 | volser | String | T##### | SMP/E control volume | Yes |
 | tvol | String | T##### | Target library volume | Yes |
 | dvol | String | T##### | Distribution volume | Yes |
 | eqa_hlq | String | EQAW.VHR0M0 | Debugger dataset HLQ | Yes |
-| eqa_path_prefix | String | /u/ibmuser/ | zFS base path | Yes |
-| remote_path_relfiles | String | /u/ibmuser/SMP/relfiles | Temp RELFILES path | Yes |
+| eqa_path_prefix | String | /u/<USERID>/ | zFS base path | Yes |
+| remote_path_relfiles | String | /u/<USERID>/SMP/relfiles | Temp RELFILES path | Yes |
 | ptf_file | String | IBM.HADRH00.UO07312 | PTF filename | Yes |
 | PARMLIB | String | USER.PARMLIB | PARMLIB dataset | Yes |
 | IFAPRDxx | String | TZ | IFAPRD suffix | Yes |
@@ -1483,8 +1483,8 @@ If you cannot resolve the issue:
 | ivp_LIBPRFX | String | CEE | LE library HLQ | Yes |
 | PROCLIB | String | USER.PROCLIB | Started task PROCLIB | Yes |
 | DFHHLQ | String | DFH.V6R3M0.CICS | CICS HLQ | If using CICS |
-| CFGDIR | String | /u/ibmuser/etc/debug | Config directory | Yes |
-| WRKDIR | String | /u/ibmuser/var/debug | Work directory | Yes |
+| CFGDIR | String | /u/<USERID>/etc/debug | Config directory | Yes |
+| WRKDIR | String | /u/<USERID>/var/debug | Work directory | Yes |
 | JAVADIR | String | /usr/lpp/java/J17.0_64 | Java path | Yes |
 | liberty_dir | String | /usr/lpp/liberty_zos/current | Liberty path | Yes |
 | liberty_port | Integer | ###00 | Liberty port | Yes |
@@ -1514,13 +1514,13 @@ If you cannot resolve the issue:
 
 | Dataset Pattern | Purpose | Example |
 |----------------|---------|---------|
-| <smphlq>.CSI | SMP/E CSI | IBMUSER.HADRH00.CSI |
-| <smphlq>.SMPLOG | SMP/E log | IBMUSER.HADRH00.SMPLOG |
+| <smphlq>.CSI | SMP/E CSI | <USERID>.HADRH00.CSI |
+| <smphlq>.SMPLOG | SMP/E log | <USERID>.HADRH00.SMPLOG |
 | <eqa_hlq>.SEQAMOD | Load modules | EQAW.VHR0M0.SEQAMOD |
 | <eqa_hlq>.SEQASAMP | Samples | EQAW.VHR0M0.SEQASAMP |
 | <eqa_hlq>.SEQAAUTH | Authorized modules | EQAW.VHR0M0.SEQAAUTH |
-| <user>.IMS.CONFIG | IMS config | IBMUSER.IMS.CONFIG |
-| <user>.IMS.PROFILE | IMS profiles | IBMUSER.IMS.PROFILE |
+| <user>.IMS.CONFIG | IMS config | <USERID>.IMS.CONFIG |
+| <user>.IMS.PROFILE | IMS profiles | <USERID>.IMS.PROFILE |
 
 ### Appendix D: JCL Templates
 
@@ -1575,7 +1575,7 @@ Debug-Config-Automation-Bob-IMS-Config/
 ├── IMS_README.md                   # IMS-specific guide
 ├── variables.yml                    # Main configuration
 ├── site.yml                         # Master playbook
-├── initialise.yaml                  # Root surrogate setup
+├── initialize.yml                  # Root surrogate setup
 ├── Cleanup.yml                      # Cleanup playbook
 ├── SMPInstall.yml                  # SMP/E installation
 ├── PTFInstall.yml                  # PTF installation
