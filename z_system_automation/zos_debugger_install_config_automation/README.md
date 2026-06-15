@@ -30,7 +30,7 @@ For a quick start, follow the instructions below. For detailed information, cons
 Before running the automation scripts, make sure the following software and versions are installed:
 
 1. **Ansible** >= 2.18.7
-2. **Ansible IBM z/OS Core** >= 1.14.1
+2. **Ansible IBM z/OS Core** >= 1.14.1, < 2.0.0
 3. **Python** >= 3.1.x
 
 ## Setup
