@@ -1,4 +1,7 @@
 ---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
 - name: Debug Profile Service Configuration
   hosts: zos_host
   environment: "{{ environment_vars }}"
