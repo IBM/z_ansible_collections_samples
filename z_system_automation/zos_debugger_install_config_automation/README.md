@@ -11,7 +11,7 @@ For comprehensive installation instructions, configuration details, troubleshoot
 
 ### What's in the User Guide?
 
-The User Guide (available in both Markdown and DOCX formats) provides extensive documentation including:
+The User Guide (available in both Markdown and PDF formats) provides extensive documentation including:
 
 - **Complete Prerequisites** - Detailed software requirements, compatibility matrices, and system requirements
 - **Step-by-Step Installation** - Comprehensive setup instructions with examples
@@ -31,7 +31,7 @@ Before running the automation scripts, make sure the following software and vers
 
 1. **Ansible** >= 2.18.7
 2. **Ansible IBM z/OS Core** >= 1.14.1, < 2.0.0
-3. **Python** >= 3.1.x
+
 
 ## Setup
 
