@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023, 2024
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -20,7 +20,7 @@
 #  https://jinja.palletsprojects.com/en/latest/templates/.
 #
 # Requirements:
-#   IBM z/OS core collection 1.7.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #   Ansible Community General Collection
 #
 #   The ansible.cfg file for this playbook contains the setting stdout_callback = unixy
@@ -48,7 +48,7 @@
   collections:
     - "ibm.ibm_zos_core"
   gather_facts: false
-  environment: '{{ environment_vars }}'
+  environment: "{{ environment_vars }}"
 
   vars:
     # Paths for the first example.
@@ -120,7 +120,7 @@
         use_template: true
 
     - name: See the contents of {{ default_dataset_name }}.
-      ansible.builtin.command: "cat \"//'{{ default_dataset_name }}'\""
+      ansible.builtin.command: 'cat "//''{{ default_dataset_name }}''"'
 
     # For the third example, we'll make use of another temporary dataset,
     # but this time, we'll specify some options to change the markers Jinja
@@ -145,7 +145,7 @@
           variable_end_string: "))"
 
     - name: See the contents of {{ custom_dataset_name }}.
-      ansible.builtin.command: "cat \"//'{{ custom_dataset_name }}'\""
+      ansible.builtin.command: 'cat "//''{{ custom_dataset_name }}''"'
 
     # For the last example, we will be rendering records.j2 again, but
     # changing how whitespace is handled.
@@ -156,14 +156,14 @@
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/records.j2"
         dest: "{{ default_dataset_name }}"
-        force: true
+        replace: true
         use_template: true
         template_parameters:
           trim_blocks: false
           keep_trailing_newline: true
 
     - name: See the contents of {{ default_dataset_name }}. Note the blank lines.
-      ansible.builtin.command: "cat \"//'{{ default_dataset_name }}'\""
+      ansible.builtin.command: 'cat "//''{{ default_dataset_name }}''"'
 
     - name: Erase datasets.
       ibm.ibm_zos_core.zos_data_set:

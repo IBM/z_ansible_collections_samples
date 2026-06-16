@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023, 2024
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -19,7 +19,7 @@
 #  https://jinja.palletsprojects.com/en/latest/templates/.
 #
 # Requirements:
-#   IBM z/OS core collection 1.7.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
 #   sh_program_name - Job name for the first example.
@@ -43,7 +43,7 @@
   collections:
     - "ibm.ibm_zos_core"
   gather_facts: false
-  environment: '{{ environment_vars }}'
+  environment: "{{ environment_vars }}"
 
   vars:
     # Variables for first job (Executing a shell command)
@@ -75,24 +75,24 @@
     - name: Submit shell command job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/CMD.j2"
-        location: local
+        remote_src: false
         use_template: true
       register: job_output
 
     - name: Extracting ddnames from job output.
       set_fact:
-        job_ddnames: "{{ job_output.jobs[0].ddnames }}"
+        job_ddnames: "{{ job_output.jobs[0].dds }}"
 
     # By looking at the submitted JCL, we'll see how Jinja rendered
     # the template without introducing additional whitespace that
     # could cause syntax problems.
     - name: See job's submitted JCL.
       ansible.builtin.debug:
-        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
+        msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'JESJCL') }}"
 
     - name: See job output.
       ansible.builtin.debug:
-        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'STDOUT') }}"
+        msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'STDOUT') }}"
 
     # For the second example, some steps of the job will be rendered
     # using a loop block in the template. Like in the previous example,
@@ -103,7 +103,7 @@
     - name: Submit IEFBR14 job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/LOOP.j2"
-        location: local
+        remote_src: false
         use_template: true
         template_parameters:
           trim_blocks: true
@@ -112,11 +112,11 @@
 
     - name: Extracting ddnames from job output.
       set_fact:
-        job_ddnames: "{{ job_output.jobs[0].ddnames }}"
+        job_ddnames: "{{ job_output.jobs[0].dds }}"
 
     - name: See job's submitted JCL.
       ansible.builtin.debug:
-        msg: "{{ job_ddnames | selectattr('ddname', 'equalto', 'JESJCL') }}"
+        msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'JESJCL') }}"
 
     - name: See job output.
       ansible.builtin.debug:

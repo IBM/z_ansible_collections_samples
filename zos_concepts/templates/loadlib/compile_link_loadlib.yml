@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023, 2024
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -19,7 +19,7 @@
 #  https://jinja.palletsprojects.com/en/latest/templates/.
 #
 # Requirements:
-#   IBM z/OS core collection 1.7.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
 #   pgm_dataset - Dataset for the COBOL source used in this playbook.
@@ -32,7 +32,7 @@
   collections:
     - "ibm.ibm_zos_core"
   gather_facts: false
-  environment: '{{ environment_vars }}'
+  environment: "{{ environment_vars }}"
 
   vars:
     pgm_dataset: "ANSIBLE.COBOL.SRC"
@@ -68,8 +68,8 @@
     - name: Compile and link the COBOL code.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/COMPLINK.j2"
-        location: local
-        wait_time_s: 60
+        remote_src: false
+        wait_time: 60
         use_template: true
       register: comp_result
 

@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023, 2024
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -14,7 +14,7 @@
 #  ansible-playbook -i inventories run_rexx_and_clist.yml
 #
 # Requirements:
-#   IBM z/OS core collection 1.7.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
 #   script_data_set - Data set where the playbook will copy the REXX script to.
@@ -27,7 +27,7 @@
   collections:
     - "ibm.ibm_zos_core"
   gather_facts: false
-  environment: '{{ environment_vars }}'
+  environment: "{{ environment_vars }}"
 
   vars:
     script_data_set: "HLQ.USER.REXX"
