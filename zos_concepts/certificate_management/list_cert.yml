@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 - name: List certificates via TSO commands.
@@ -7,14 +7,14 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    cert_type: "{{ cert_type | default('SITE') }}" # CERTAUTH, SITE or USER
-    cert_label: "{{ cert_label | default('TESTSITE') }}"
-    owner_id: "{{ owner_id | default('') }}" # Only required if cert_type is USER
+    cert_type: "USER" # CERTAUTH, SITE or USER
+    cert_label: "TESTUSER"
+    owner_id: "IBMUSER" # Only required if cert_type is USER
 
   tasks:
     - name: List cert, print results whether it exists or not.
       block:
-        - name: 'Displaying cert {{ cert_label }}.'
+        - name: "Displaying cert {{ cert_label }}."
           vars:
             format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
@@ -25,4 +25,4 @@
       always:
         - name: Print results from list cert command.
           ansible.builtin.debug:
-            var: list_cert.output[0].content
+            var: list_cert.output[0].stdout
