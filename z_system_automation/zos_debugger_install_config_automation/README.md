@@ -2,6 +2,16 @@
 
 Using Ansible to install and configure the IBM z/OS Debugger
 
+## Version
+This would state the Playbook versions and the highlighted version number is the current version.
+
+| Version Number | Description |
+| -------------- | ----------- |
+| **v0.1.0**     | Initial public release with core Installation features|
+
+## Change Log
+'Initial Version'
+
 ## 📚 Documentation
 
 For comprehensive installation instructions, configuration details, troubleshooting guides, and use case scenarios, please refer to the detailed documentation available in multiple formats:
