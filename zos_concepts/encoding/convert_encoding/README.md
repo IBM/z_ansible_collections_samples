@@ -37,7 +37,7 @@ names, authority, and the artifacts that will be created and cleaned up.
 This playbook requires:
 
 - [IBM® z/OS® core collection 2.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
-- [Ansible® 2.16 to 2.19](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [ansible-core 2.16 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Configuration
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
