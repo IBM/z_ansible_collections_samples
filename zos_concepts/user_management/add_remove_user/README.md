@@ -63,7 +63,7 @@ You can skip the prerequisite check and run the `add-user.yml` or `remove-user` 
 
 ```bash
 ansible-playbook -i inventories add-user.yml
-ansible-playbook -i inventories add-user.yml
+ansible-playbook -i inventories remove-user.yml
 ```
 
 ## Getting Started: Ansible Tower

@@ -17,7 +17,7 @@
 - name: Assert desired userid is not in use
   ansible.builtin.fail:
     msg: "User ID {{ userid | upper }} is in use."
-  when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("stdout", [""])[0]'
+  when: listuser_response.output | length > 0 and "UNABLE TO LOCATE USER" not in (listuser_response.output[0].stdout | default([]))
 
 - name: Generate password
   ansible.builtin.set_fact:
