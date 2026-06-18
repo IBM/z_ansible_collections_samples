@@ -39,8 +39,10 @@ For a quick start, follow the instructions below. For detailed information, cons
 
 Before running the automation scripts, make sure the following software and versions are installed:
 
-1. **Ansible** >= 2.18.7
-2. **Ansible IBM z/OS Core** >= 1.14.1, < 2.0.0
+1. [ansible-core](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix) >= 2.18.7. (Ansible >= 11.0)
+2. [Ansible IBM z/OS Core](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/collection-requirements.html#collection-requirements) >= 1.14.1, < 2.0.0
+
+Software requirements will have additional dependencies such as Python, for the specific dependencies and versions, review the softwares requirements in the User Guide.
 
 
 ## Setup
