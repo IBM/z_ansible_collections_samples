@@ -1,23 +1,26 @@
 # Ansible z/OSMF URI Sample
+
 This sample playbook demonstrates basic use cases for invoking a REST API service,
 particularly the z/OSMF REST API services.
-
 
 It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
 
 ## Playbook Requirements
+
 This playbook requires:
 
-- [IBM® z/OS® core collection 1.2.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
-- [Ansible® 2.9 or 2.11](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [IBM® z/OS® core collection 2.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
+- [ansible-core 2.16 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - Access to the [z/OSMF REST API](https://www.ibm.com/docs/en/zos/2.4.0?topic=guide-using-zosmf-rest-services)
 
 ## Playbook Summary
+
 - [**uri-sample.yml**](uri-sample.yml) - Provides an example of how to invoke the z/OSMF REST API services with Ansible.
 
 ## Configuration
+
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
   information from the managed z/OS host.
   - To configure the inventory, review
@@ -38,43 +41,49 @@ This playbook requires:
     ```
 
 ## Walkthrough of uri-sample.yml
+
 The purpose of the `uri-sample` playbook is to showcase the ability to invoke a REST API service as well as give an example of creating, starting, and deleting workflows using the z/OSMF REST API service.
 
-
 This playbook will use the following operations:
-* Querying existing workflows
-* Creation of a workflow
-* Starting a workflow
-* Cancellation of a workflow
-* Deletion of a workflow
+
+- Querying existing workflows
+- Creation of a workflow
+- Starting a workflow
+- Cancellation of a workflow
+- Deletion of a workflow
 
 **Note:** to learn more about z/OSMF workflow services, visit [IBM Docs](https://www.ibm.com/docs/en/zos/2.4.0?topic=services-zosmf-workflow)
 
 <br>
 
 The `uri-sample` playbook starts by copying over the [sample_definition_file.xml](files/sample_definition_file.xml) (required for z/OSMF REST API service utilization) to the specified target folder, and has two outcomes after execution.
-* Running the playbook the **first** time will result in
-    * Creation of the **sample_workflow**
-    * Starting the **sample_workflow**
-* Running the playbook the **second** time will result in
-    * Cancellation of the **sample_workflow**
-    * Deletion of the **sample_workflow**
+
+- Running the playbook the **first** time will result in
+  - Creation of the **sample_workflow**
+  - Starting the **sample_workflow**
+- Running the playbook the **second** time will result in
+  - Cancellation of the **sample_workflow**
+  - Deletion of the **sample_workflow**
 
 ### Using Ansible Vault to Encrypt Passwords or Sensitive Data
-The `ZOSMF_PASS` variable is stored in plaintext as shown above in the *group_vars/all.yml* file. If desired, the `ZOSMF_PASS` can be encrypted in several different ways; we will walk through one of those ways.
+
+The `ZOSMF_PASS` variable is stored in plaintext as shown above in the _group_vars/all.yml_ file. If desired, the `ZOSMF_PASS` can be encrypted in several different ways; we will walk through one of those ways.
 
 For this short tutorial, we will encrypt the following variable.
+
 ```yaml
 ZOSMF_PASS: mysecretpassword
 ```
 
 In order to encrypt the password, we will run the following `ansible-vault` command in our terminal.
+
 ```bash
 ansible-vault encrypt_string mysecretpassword --ask-vault-pass
 ```
 
 This command will prompt you to enter a password that will be used to decrypt the sensitive information while running the playbook.
 After successfully selecting a password to encrypt the sensitive information, the command will produce a result similar to the following output.
+
 ```
 !vault |
   $ANSIBLE_VAULT;1.1;AES256
@@ -99,6 +108,7 @@ ZOSMF_PASS: !vault |
 ```
 
 ## Run the playbook
+
 This project has included a `site.yml` playbook that serves as the primary playbook
 that provides additional prerequisite checks then it invokes the `uri-sample.yml`
 playbook.
@@ -131,16 +141,20 @@ ansible-playbook -i inventories --ask-vault-pass site.yml
 ```
 
 # Changelog
+
 All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
-© Copyright IBM Corporation 2021
+
+© Copyright IBM Corporation 2021, 2026
 
 # License
+
 Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
+
 Please refer to the [support section](https://github.com/IBM/z_ansible_collections_samples/blob/master/README.md#support) for more
 details.

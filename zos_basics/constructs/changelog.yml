@@ -47,7 +47,7 @@ releases:
         - Lower case zos_job_submit module option 'location' per ibm.ibm_zos_core:1.10.0 requirements.
       removed:
         - Remove deprecated zos_job_submit module option 'wait'.
-  2026.06.09:
+  2026.06.18:
     date: 2026-06-18
     changes:
       fixed:
