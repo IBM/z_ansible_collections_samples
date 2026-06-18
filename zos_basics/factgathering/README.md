@@ -14,16 +14,16 @@ The provided `gather-facts.yml` playbook runs the zos fact gathering module
 demonstrate the available parameters.
 
 - First `zos_gather_facts` is called with the `ipl` gather_subset and a filter
-    set to `master*`. This matches 2 available facts both of which are printed
-    in the following step through the built in debug module. That next step
-    shows how collected facts can be accessed in the context of a playbook by
-    calling on the `ansible_facts` variable.
+  set to `master*`. This matches 2 available facts both of which are printed
+  in the following step through the built in debug module. That next step
+  shows how collected facts can be accessed in the context of a playbook by
+  calling on the `ansible_facts` variable.
 - Then the `zos_gather_facts` module is called with two gather_subsets specified
-    `cpu` and `iodf` and once more the built in debug module is called to print
-    out collected facts. The print step shows an alternate way to access those
-    facts.
+  `cpu` and `iodf` and once more the built in debug module is called to print
+  out collected facts. The print step shows an alternate way to access those
+  facts.
 - The final step in the playbook prints out all the collected facts which have
-    been added to the `ansible_facts` variable.
+  been added to the `ansible_facts` variable.
 
 # Caching facts
 
@@ -37,6 +37,7 @@ These can be configured in an `ansible.cfg` file, as regular environment
 variables, or in the command line where the playbook is called.
 
 In ansible.cfg, set values for:
+
 ```
 [inventory]
 cache_plugin=jsonfile
@@ -44,10 +45,12 @@ fact_caching_connection=<some_folder_location>
 ```
 
 As environment variables:
+
 - `export ANSIBLE_INVENTORY_CACHE_PLUGIN=jsonfile`
 - `export ANSIBLE_CACHE_PLUGIN_CONNECTION='<some_folder_location>'`
 
 In the command line, set values for:
+
 - `ANSIBLE_CACHE_PLUGIN=jsonfile`
 - `ANSIBLE_CACHE_PLUGIN_CONNECTION='<some_folder_location>'`
 
@@ -55,11 +58,13 @@ Example command to run playbook and output `ansible_facts` to a local json file.
 `ansible_facts` is the variable in which the playbook stores various gathered
 facts. It is also where any facts gathered by default through the builtin
 Ansible fact gathering are stored.
+
 ```
 ANSIBLE_CACHE_PLUGIN=jsonfile ANSIBLE_CACHE_PLUGIN_CONNECTION='<some_folder_location>' ansible-playbook -i inventories gather-facts.yml
 ```
 
 ## Additional resources for Ansible caching
+
 Caching `ansible_facts` is achieved through Ansible cache plugins.
 There are a number of cache plugins provided by Ansible and a custom
 cache plugin can also be specified. The documentation for calling upon
@@ -75,18 +80,21 @@ Some plugins implemented in Ansible:
 The full list of cache plugins can be found by following the steps in the
 section [here](https://docs.ansible.com/ansible/latest/plugins/cache.html#plugin-list).
 
-
 # Changelog
+
 All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
+
 © Copyright IBM Corporation 2023
 
 # License
+
 Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
+
 Please refer to the [support section](../../README.md#support) for
 more details.
