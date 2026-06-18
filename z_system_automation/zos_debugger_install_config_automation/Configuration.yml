@@ -1,0 +1,137 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
+- name: Enable Debugger
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+    ######################################################
+
+    # Registering z/OS Debugger
+
+    # Copy product registration member to PARMLIB
+    - name: Copy IFAPRDxx
+      command: dcp
+          {{ eqa_hlq }}.SEQASAMP({{ registration }})
+          {{ PARMLIB }}(IFAPRD{{ IFAPRDxx }})
+            
+    # Activate product registration in z/OS
+    - name: Enable product registration
+      zos_operator:
+        cmd: SET PROD={{ IFAPRDxx }}
+
+    #######################################
+
+    # Install SVC dynamically
+
+    # Add SEQAAUTH to APF authorized list
+    - name: APF authorize SEQAAUTH
+      zos_operator:
+        cmd: SETPROG APF,ADD,DSN={{ eqa_hlq }}.SEQAAUTH,VOL={{ tvol }}
+
+    # Add SEQABMOD to APF authorized list
+    - name: APF authorize SEQABMOD
+      zos_operator:
+        cmd: SETPROG APF,ADD,DSN={{ eqa_hlq }}.SEQABMOD,VOL={{ tvol }}
+
+    # Add SEQAMOD to APF authorized list
+    - name: APF authorize SEQAMOD
+      zos_operator:
+        cmd: SETPROG APF,ADD,DSN={{ eqa_hlq }}.SEQAMOD,VOL={{ tvol }}
+
+    # Submit JCL to install debugger SVC
+    - name: Install SVC
+      zos_job_submit:
+        src: JCLS/EQAWISVC.jcl
+        location: local
+        use_template: true
+
+      register: response
+
+    # Show the job ID for SVC installation
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for EQAWISVC : {{ response.job_id }}"
+
+    # Verify SVC installation status
+    - name: Display installed SVC
+      zos_tso_command:
+        commands:
+          - EX '{{ eqa_hlq }}.SEQAEXEC(EQADTSVC)'
+
+    #######################################
+
+    # Setup Authorized Debug Facility
+
+    # Create RACF profile for authorized debugging
+    - name: Establish a profile for the Authorized Debug Facility in the FACILITY class
+      zos_tso_command:
+        commands:
+          - RDEFINE FACILITY EQADTOOL.AUTHDEBUG UACC(NONE)
+        max_rc: 4
+
+    # Enable FACILITY class in RACF
+    - name: Activate the FACILITY class
+      zos_tso_command:
+        commands:
+          - SETROPTS GENERIC(FACILITY)
+
+    # Grant user access to authorized debug facility
+    - name: Give {{ zosmf_user }} READ permission to the profile
+      zos_tso_command:
+        commands:
+          - PERMIT EQADTOOL.AUTHDEBUG CLASS(FACILITY) ID({{ zosmf_user }}) ACCESS(READ)
+
+    # Refresh RACF FACILITY class
+    - name: Refresh the FACILITY class
+      zos_tso_command:
+        commands:
+          -  SETROPTS RACLIST(FACILITY) REFRESH
+
+    #######################################
+
+    # Run COBOL V6x IVT EQAWIVPT
+
+    # Submit COBOL V6 IVP job for batch testing
+    - name: EQAWIVPT
+      zos_job_submit:
+        src: JCLS/EQAWIVPT.jcl
+        location: local
+        use_template: true
+
+      register: response
+
+    # Show the job ID for IVP job
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for EQAWIVPT : {{ response.job_id }}"
+
+    #######################################
+
+    # Update PARMLIB members for next IPL
+
+    # Display manual steps for permanent configuration
+    - name: Manual customization instructions
+      pause:
+        prompt: "\nAdd SEQALPA to the PARMLIB(LPALSTxx) member:\n
+                 \t{{ eqa_hlq }}.SEQALPA({{ tvol }})\n
+                 \nAPF authorize the following libraries in the PARMLIB(PROGxx) member:\n
+                 \tAPF ADD DSNAME({{ eqa_hlq }}.SEQAAUTH) VOLUME({{ tvol }})\n
+                 \tAPF ADD DSNAME({{ eqa_hlq }}.SEQABMOD) VOLUME({{ tvol }})\n
+                 \tAPF ADD DSNAME({{ eqa_hlq }}.SEQAMOD) VOLUME({{ tvol }})\n
+                 \nAdd the following libraries to the LNKLST in the PARMLIB(PROGxx) member:\n
+                 \tLNKLST ADD DSN({{ eqa_hlq }}.SEQABMOD) VOL({{ tvol }})\n
+                 \tLNKLST ADD DSN({{ eqa_hlq }}.SEQAMOD) VOL({{ tvol }})\n
+                 \nRefresh the LNKLIST:\n
+                 \tSETPROG LINKLST,UPDATE,JOB=*\n
+                 \tF LLA,REFRESH\n
+                 \nHit any key to continue"
+    #######################################
+
+

@@ -1,0 +1,106 @@
+---
+- name: Remote Debug Service Configuration
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+
+  #########################################################
+
+    # Customize started task PROC
+
+    # Copy EQARMTD procedure to PROCLIB
+    - name: Copy {{ PROCLIB }}(EQARMTD)
+      zos_copy:
+        src: JCLS/EQARMTD.jcl
+        dest: "{{ PROCLIB }}(EQARMTD)"
+        use_template: true
+        force: true
+
+  ########################################################
+
+   # Customize configuration files
+
+
+    # Run RDS setup script to create configuration files
+    - name: Run EQARMTD configurations
+      raw: |
+            export SVRPATH="{{ eqa_path_prefix }}usr/lpp/IBM/debug"
+            export CFGDIR="{{ CFGDIR }}"
+            export WRKDIR="{{ WRKDIR }}"
+            {{ eqa_path_prefix }}usr/lpp/IBM/debug/bin/eqarmtsu.sh
+      become: true
+      timeout: 200
+  
+
+    # Set Java directory path in RDS environment file
+    - name: Updating java_dir in eqarmtd.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqarmtd.env"
+        replace: java_dir="{{ JAVADIR }}"
+        regexp: 'java_dir=.*'
+      become: true
+
+    # Set keystore password in RDS environment file
+    - name: Updating keystorePass in eqarmtd.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqarmtd.env"
+        replace: "keystorePass={{ keystore_password }}"
+        regexp: 'keystorePass=.*'
+      become: true
+
+    # Set keystore file path in RDS environment file
+    - name: Updating keystoreFile in eqarmtd.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqarmtd.env"
+        replace: "keystoreFile={{ keystoreFile }}"
+        regexp: 'keystoreFile=.*'
+      become: true
+
+    # Set internal port number in RDS environment file
+    - name: Updating port internal in eqarmtd.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqarmtd.env"
+        replace: port_internal="{{ port_internal }}"
+        regexp: 'port_internal=.*'
+      become: true
+
+    # Set external secure port number in RDS environment file
+    - name: Updating port external secure in eqarmtd.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqarmtd.env"
+        replace: port_external_secure="{{ port_external_secure }}"
+        regexp: 'port_external_secure=.*'
+      become: true
+
+  #########################################################
+
+    # RDS security definitions
+
+    # Create STCEQA2 user for RDS
+    - name: "Create STC group and id to run RDS"
+      zos_tso_command:
+        commands:
+          -   ADDUSER STCEQA2 DFLTGRP(STCGROUP) NOPASSWORD NAME('REMOTE DEBUG SERVICE') OMVS(AUTOUID HOME('/tmp') PROGRAM('/bin/sh')) DATA('IBM z/OS Debugger') 
+        max_rc: 8
+      
+    # Define EQARMTD as a started task in RACF
+    - name: "Define the EQARMTD started task"
+      zos_tso_command:
+        commands:
+          -   RDEFINE STARTED EQARMTD.* STDATA(USER(STCEQA2) GROUP(STCGROUP) TRUSTED(NO)) DATA('REMOTE DEBUG SERVICE') 
+          -   SETROPTS RACLIST(STARTED) REFRESH
+        max_rc: 8
+
+################################################################
+
+    # Start the Remote Debug Service
+    - name: starting EQARMTD command
+      ibm.ibm_zos_core.zos_operator:
+        cmd: S EQARMTD   
+
+
