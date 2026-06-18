@@ -1,15 +1,14 @@
-add-zos-user
-=========
+# add-zos-user
 
 Add a new user to a z/OS system.
 
-Requirements
-------------
+## Requirements
 
 - Ansible Collection `ibm.ibm_zos_core`
 
-Role Variables
---------------
+## Role Variables
+
+Update the role variables in the `zos_concepts/user_management/add_remove_user/roles/add-zos-user/defaults/main.yml` file.
 
 - ### **name**
 
@@ -46,7 +45,6 @@ Role Variables
 - ### **user_catalog**
 
   Specifies the user catalog entryname for which an alias will be defined.
-
 
 - ### **master_catalog**
 
@@ -249,24 +247,23 @@ Role Variables
   A list of groups to which the user should be added.
 
   Parameters:
-
   - **group**: Specifies a RACF-defined group. If you omit this operand, the user is connected to or modified in your current connect group.
 
   - **owner**: Specifies a RACF-defined user or group to be assigned as the owner of the connect profile. If you are creating a connection and you do not specify an owner, you are defined as the owner of the connect profile.
 
   - **authority**: Specifies the level of authority the user is to have in the group.
-  The valid group authority values are USE, CREATE, CONNECT, and JOIN. If you are creating a connection and omit AUTHORITY or enter it without a value, the default is USE. You cannot give a user a higher level of authority in the group than you have.
+    The valid group authority values are USE, CREATE, CONNECT, and JOIN. If you are creating a connection and omit AUTHORITY or enter it without a value, the default is USE. You cannot give a user a higher level of authority in the group than you have.
 
   Example:
 
   ```yaml
-    groups_to_connect:
-      - group: "PAYROLL"
-        owner: "PAYROLL"
-        authority: "USE"
-      - group: "RESEARCH"
-        owner: ""
-        authority: "CREATE"
+  groups_to_connect:
+    - group: "PAYROLL"
+      owner: "PAYROLL"
+      authority: "USE"
+    - group: "RESEARCH"
+      owner: ""
+      authority: "CREATE"
   ```
 
 - ### **resources_to_permit**
@@ -274,7 +271,6 @@ Role Variables
   A list of resources the user should be permitted to access.
 
   Parameters:
-
   - **profile**: Specifies the name of an existing discrete or generic profile whose access list you want to modify.
 
   - **authority**: Specifies the access authority you want to associate with the user being created. RACF sets the access authority in the standard access list. If you specify WHEN, RACF sets the access authority in the conditional access list. The valid access authorities are NONE, EXECUTE (for DATASET, PROGRAM, or APPCTP class only), READ, UPDATE, CONTROL, and ALTER.
@@ -284,7 +280,7 @@ Role Variables
   Example:
 
   ```yaml
-    resources_to_permit:
+  resources_to_permit:
     - profile: "WJE10.DEPT2.DATA"
       authority: "UPDATE"
       id: "SYSPROG"
@@ -298,7 +294,6 @@ Role Variables
   A list of any templates on control node that should be evaluated and copied to the z/OS host.
 
   Parameters:
-
   - **src**: Specifies the absolute or relative path to the template on the Ansible control node. Relative paths are relative to playbook runners current working directory.
 
   - **dest**: Specifies the destination data set or unix path on the z/OS host. This is where the template contents are copied to after evaluation.
@@ -306,11 +301,11 @@ Role Variables
   Example:
 
   ```yaml
-    templates_to_copy:
-      - src: "../templates/profile.j2"
-        dest: "/u/{{ userid }}/.profile"
-      - src: "../templates/datatemplate.j2"
-        dest: "{{ userid }}.private.somedata"
+  templates_to_copy:
+    - src: "../templates/profile.j2"
+      dest: "/u/{{ userid }}/.profile"
+    - src: "../templates/datatemplate.j2"
+      dest: "{{ userid }}.private.somedata"
   ```
 
 - ### **files_to_copy**
@@ -318,27 +313,25 @@ Role Variables
   A list of any files on control node that should be copied to the z/OS host.
 
   Parameters:
-
   - **src**: Specifies the absolute or relative path to the file on the Ansible control node. Relative paths are relative to playbook runners current working directory.
 
-  - **dest**:      Specifies the destination data set or unix path on the z/OS host. This is where the file is copied.
+  - **dest**: Specifies the destination data set or unix path on the z/OS host. This is where the file is copied.
 
   Example:
 
   ```yaml
-    files_to_copy:
-      - src: "../files/profile.txt"
-        dest: "/u/{{ userid }}/.profile"
-      - src: "../files/datafinal.txt"
-        dest: "{{ userid }}.private.mydata"
+  files_to_copy:
+    - src: "../files/profile.txt"
+      dest: "/u/{{ userid }}/.profile"
+    - src: "../files/datafinal.txt"
+      dest: "{{ userid }}.private.mydata"
   ```
 
 - ### **target_charset**
 
   Specifies the character set any copied templates and files should be converted to.
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - hosts: all
@@ -353,17 +346,14 @@ Example Playbook
         name: add-zos-user
 ```
 
-License
--------
+## License
 
-Copyright (c) IBM Corporation 2020 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+Copyright (c) IBM Corporation 2026 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-Author Information
-------------------
+## Author Information
 
 - Blake Becker blake.becker@ibm.com, [@blakeinate](https://github.com/blakeinate)
 
-Copyright
----------
+## Copyright
 
-© Copyright IBM Corporation 2020
+© Copyright IBM Corporation 2020, 2026
