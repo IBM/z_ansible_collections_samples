@@ -1,5 +1,5 @@
 ---
-# Copyright (c) IBM Corporation 2020
+# Copyright (c) IBM Corporation 2020, 2026
 
 # tasks file for remove-zos-user
 - name: Set omvs_home_directory if not set
@@ -13,12 +13,12 @@
   register: listuser_response
   failed_when: false
 
-- when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
+- when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("stdout", [""])[0]'
   block:
     - name: Remove user from groups, assign new owner for group data sets
       ibm.ibm_zos_core.zos_tso_command:
         commands: "{{ lookup('template', '../templates/remove-from-group.j2') }}"
-      with_items: '{{ listuser_response.get("output", [{}])[0].get("content", [""]) | user_groups }}'
+      with_items: '{{ listuser_response.get("output", [{}])[0].get("stdout", [""]) | user_groups }}'
 
     - name: Delete user data sets
       ansible.builtin.command: "drm {{ userid | upper }}.**"
