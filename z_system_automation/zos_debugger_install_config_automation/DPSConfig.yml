@@ -1,0 +1,167 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
+- name: Debug Profile Service Configuration
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+
+#########################################################
+
+    # Customize started task PROC
+
+    # Copy EQAPROF procedure to PROCLIB
+    - name: Copy {{ PROCLIB }}(EQAPROF)
+      zos_copy:
+        src: JCLS/EQAPROF.jcl
+        dest: "{{ PROCLIB }}(EQAPROF)"
+        use_template: true
+        force: true
+
+#########################################################
+ 
+    # Customize configuration files
+
+    # Submit job to create DPS configuration files
+    - name: EQAPRFSU
+      zos_job_submit:
+        src: JCLS/EQAPRFSU.jcl
+        location: local
+        use_template: true
+        
+      register: response
+
+    # Show the job ID for configuration setup
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for EQAPRFSU : {{ response.job_id }}"
+
+    # Set Java directory path in DPS environment file
+    - name: Updating java_dir in eqaprof.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqaprof.env"
+        replace: java_dir="{{ JAVADIR }}"
+        regexp: 'java_dir=.*'
+
+    # Set Liberty directory path in DPS environment file
+    - name: Updating liberty_dir in eqaprof.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqaprof.env"
+        replace: liberty_dir="{{ liberty_dir }}"
+        regexp: 'liberty_dir=.*'
+
+    # Set Liberty server port in DPS environment file
+    - name: Updating port in eqaprof.env
+      zos_replace:
+        target: "{{ CFGDIR }}/eqaprof.env"
+        replace: port="{{ liberty_port }}"
+        regexp: 'port=.*'
+
+    # Enable SAF basic authentication for DPS
+    - name: Enable Basic Authentication
+      zos_replace:
+        target: "{{ CFGDIR }}/eqaprof.env"
+        replace: safBasicIsEnabled=true
+        regexp: safBasicIsEnabled=false
+
+    # Fix sample file bug by commenting out keystorePassFile
+    - name: TODO this is a bug in the eqaprof.env sample that needs to be fixed
+      zos_replace:
+        target: "{{ CFGDIR }}/eqaprof.env"
+        replace: ' #keystorePassFile'
+        regexp: ' keystorePassFile'
+
+    # Add CICS DTCN port configuration
+    - name: Add DTCN TCPIPSERVICE port to dtcn.ports
+      zos_lineinfile:
+        src: "{{ CFGDIR }}/dtcn.ports"
+        insertafter: EOF
+        line: '{{ cics_region }}:{{ dtcn_port }}'
+
+#########################################################
+
+    # DPS security definitions
+
+    # Enable FACILITY class in RACF
+    - name: Activate FACILITY class
+      zos_tso_command:
+        commands:
+          -   SETROPTS GENERIC(FACILITY)
+          -   SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)
+
+    # Enable SURROGAT class in RACF
+    - name: Activate SURROGAT class
+      zos_tso_command:
+        commands:
+          -    SETROPTS GENERIC(SURROGAT)
+          -    SETROPTS CLASSACT(SURROGAT) RACLIST(SURROGAT)
+
+    # Enable STARTED class and define default profile
+    - name: Activate started task definitions
+      zos_tso_command:
+        commands:
+          -   SETROPTS GENERIC(STARTED)
+          -   RDEFINE STARTED ** STDATA(USER(=MEMBER) GROUP(STCGROUP) TRACE(YES))
+          -   SETROPTS CLASSACT(STARTED) RACLIST(STARTED)
+        max_rc: 4
+    
+    # Create STCGROUP and STCEQA user for DPS
+    - name: Create STC group and id to run DPS
+      zos_tso_command:
+        commands:
+          -  ADDGROUP STCGROUP OMVS(AUTOGID) DATA('GROUP WITH OMVS SEGMENT FOR STARTED TASKS')
+          -  ADDUSER STCEQA DFLTGRP(STCGROUP) NOPASSWORD NAME('DEBUG PROFILE SERVER') OMVS(AUTOUID HOME('/tmp') PROGRAM('/bin/sh') ASSIZEMAX(2147483647) ) DATA('IBM z/OS Debugger')
+
+    # Define EQAPROF as a started task in RACF
+    - name: Define the EQAPROF started task.
+      zos_tso_command:
+        commands:
+          -  RDEFINE STARTED EQAPROF.* STDATA(USER(STCEQA) GROUP(STCGROUP) TRUSTED(NO)) DATA('DEBUG PROFILE SERVICE')
+          -  SETROPTS RACLIST(STARTED) REFRESH
+
+################################################################
+    
+    # Secured https communications
+
+    # Set ownership and permissions for SSL keystore
+    - name: Change keystore file permissions
+      raw:  "chown STCEQA:STCGROUP {{ CFGDIR }}/keystore.p12 && chmod 640 {{ CFGDIR }}/keystore.p12"
+      become: true
+
+################################################################
+
+    # Define EQAPROF as a secure z/OS UNIX server and enable it to switch user context 
+
+    # Grant STCEQA permission to be a secure server
+    - name: BPX.SERVER
+      zos_tso_command:
+        commands:
+          -  RDEFINE FACILITY BPX.SERVER UACC(NONE)
+          -  PERMIT BPX.SERVER CLASS(FACILITY) ID(STCEQA) ACCESS(UPDATE) 
+          -  SETROPTS RACLIST(FACILITY) REFRESH
+        max_rc: 4
+
+    # Grant STCEQA surrogate authority for user switching
+    - name: BPX.SRV.** Surrogate
+      zos_tso_command:
+        commands:
+          -  RDEFINE SURROGAT BPX.SRV.** UACC(NONE)
+          -  PERMIT BPX.SRV.** CLASS(SURROGAT) ID(STCEQA) ACCESS(READ)
+          -  SETROPTS RACLIST(SURROGAT) REFRESH
+        max_rc: 4
+
+################################################################
+
+ 
+    # Start the Debug Profile Service
+    - name: starting EQAPROF command
+      ibm.ibm_zos_core.zos_operator:
+        cmd: S EQAPROF
+
+

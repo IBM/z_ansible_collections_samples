@@ -1,0 +1,25 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
+################################################################################
+
+# Python and ZOAU Paths
+PYZ: <path_to_python_installation_on_zos_target>      # Python installation path
+ZOAU: <path_to_zoau_installation_on_zos_target>           # ZOAU installation path
+
+
+zosmf_host: <hostname>
+zosmf_port: <port>
+zosmf_user: <username>
+zosmf_pass: <password>       # ⚠️ Change this or use Ansible Vault!
+
+
+# Ansible Python Interpreter
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"
+
+# Privilege Escalation
+ansible_become_method: su
+ansible_become_password: "{{ zosmf_pass }}"
+ansible_become_user: < User with UID 0>
+ansible_su_prompt_l10n: FSUM5019 Enter the password for {{ ansible_become_user }}  
