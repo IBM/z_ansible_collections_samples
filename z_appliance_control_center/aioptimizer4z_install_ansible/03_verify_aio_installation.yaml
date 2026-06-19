@@ -1,0 +1,120 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| [30.04.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Initial release                                                    |
+# *+------------------------------------------------------------------------+
+
+- name: Verify IBM AI Optimizer for IBM Z and IBM Linux ONE Application Installation
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - env_vars_aiopt.yaml
+  vars:
+    aio_base_url: "https://{{ app1_ip }}/api/com.ibm.zaci.system"
+
+  tasks:
+    - name: Extract ACC IP from URL
+      ansible.builtin.set_fact:
+        acc_ip: "{{ acc_url | urlsplit('hostname') }}"
+
+    - name: 00 - Check if ACC appliance is operational
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}/api/com.ibm.zaci.system/appliance/is-operational"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        validate_certs: false
+        status_code: 204
+      register: acc_status
+
+    - name: Display ACC status
+      ansible.builtin.debug:
+        msg: "✅ ACC appliance is operational"
+      when: acc_status.status == 204
+
+    - name: Fail if ACC appliance is not operational
+      ansible.builtin.fail:
+        msg: "❌ ACC is not operational"
+      when: acc_status.status != 204
+
+    - name: 01 - Check if AI Optimizer appliance is operational
+      ansible.builtin.uri:
+        url: "{{ aio_base_url }}/appliance/is-operational"
+        method: GET
+        headers:
+          zaci-api: "com.ibm.zaci.system/1.0"
+          accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        validate_certs: false
+        status_code: 204
+      register: aio_status
+
+    - name: Display AI Optimizer status
+      ansible.builtin.debug:
+        msg: "✅ AI Optimizer appliance is operational at {{ app1_ip }}"
+      when: aio_status.status == 204
+
+    - name: Fail if AI Optimizer appliance is not operational
+      ansible.builtin.fail:
+        msg: "❌ AI Optimizer appliance is not operational"
+      when: aio_status.status != 204
+
+    - name: 02 - Get authentication token from AI Optimizer appliance
+      ansible.builtin.uri:
+        url: "{{ aio_base_url }}/api-tokens"
+        method: POST
+        headers:
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          zACI-API: "com.ibm.zaci.system/1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ app_username }}"
+            password: "{{ app_password }}"
+        validate_certs: false
+        return_content: true
+        body_format: json
+      register: aio_auth_response
+
+    - name: Fail if AI Optimizer did not response properly
+      ansible.builtin.fail:
+        msg: "❌ AI Optimizer appliance authentication failed"
+      when: aio_auth_response.status != 200
+
+    - name: Extract the AI Optimizer admin token
+      ansible.builtin.set_fact:
+        aio_admin_token: "{{ aio_auth_response.json.parameters.token }}"
+
+    - name: Display authentication success
+      ansible.builtin.debug:
+        msg: "✅ Successfully authenticated to AI Optimizer appliance"
+
+    - name: Final verification summary
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "AI Optimizer Installation Verification"
+          - "=========================================="
+          - "ACC IP: {{ acc_ip }}"
+          - "AI Optimizer Appliance IP: {{ app1_ip }}"
+          - "LPAR Name: {{ lpar1_name }}"
+          - "Hostname: {{ hostname }}-{{ lpar1_name | lower }}"
+          - ""
+          - "Status:"
+          - "  ✅ ACC is operational"
+          - "  ✅ AI Optimizer appliance is operational"
+          - "  ✅ Authentication successful"
+          - ""
+          - "Next Steps:"
+          - "1. Access the AI Optimizer UI at: https://{{ app1_ip }}"
+          - "2. Login with username: {{ app_username }}"
+          - "3. Navigate to 'Deploy LLM' to verify Spyre cards"
+          - "4. Select GPU cards - available Spyre cards will be shown"
+          - "5. Deploy your first LLM model"
+          - "=========================================="
+          - ""
+          - "✅ AI Optimizer installation verification PASSED"
+          - ""
+          - "Note: Spyre card availability can be verified through the UI while deploying LLMs (Deploy LLM > Select GPU cards section)"
