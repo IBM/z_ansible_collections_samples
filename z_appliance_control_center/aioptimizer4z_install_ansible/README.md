@@ -15,10 +15,12 @@ Follow the complete ACC/SSA installation flow diagram:
 ![SSA Installation Flow](../images/ssa_install.png)
 
 Refer to the [SSA Deployment Ansible Playbooks](../ssa_deploy_ansible/README.md) for detailed instructions on:
-- Installing ACC/SSA LPAR
-- Initializing ACC
-  - For example, setting up HMC integration (default mode) or CPC configuration (standalone mode)
-- Performing admin credentials
+- Installing ACC LPAR
+- Initializing ACC Appliance
+- Configuring ACC Admin Credentials
+- Setting up HMC integration (default mode) or CPC configuration (standalone mode)
+- Configuring SSA Owner Credentials
+- Installing SSA LPAR(s)
 
 #### Verify ACC/SSA Installation
 
@@ -28,15 +30,14 @@ Before proceeding with AI Optimizer installation, verify that ACC and SSA are pr
    - Verify the ACC and SSA LPARs are activated and operational on the HMC
    - Ensure network connectivity to the ACC and SSA LPAR works
 
-2. **Validate ACC and SSA are Healthy:**
+2. **Validate ACC and SSA Health:**
    - Switch to the directory `ssa_deploy_ansible`.
    - Update the variables in the `env_vars.yaml` file.
    - Run the automated SSA verification playbook ([03_acc_ssa_install_check.yaml](../ssa_deploy_ansible/03_acc_ssa_install_check.yaml)):
      ```bash
      ansible-playbook 03_acc_ssa_install_check.yaml
      ```
-   If both ACC and SSA are healthy and the Spyre cards are working, then it
-   is expected that the above playbook runs without any failures.
+   If both ACC and SSA are healthy and the Spyre cards are working as expected, the above playbook will complete without failure.
 
 3. **Test ACC UI Login:**
    - Access ACC UI at `https://<ACC_IP>:8081`
@@ -64,14 +65,14 @@ Install IBM AI Optimizer for IBM Z and IBM Linux ONE in default mode where ACC c
 
 - **ACC/SSA must be installed, configured, and verified** (see Step 1 above)
 - AI Optimizer LPAR must be **deactivated** on HMC before execution
-- **Important:** If the playbook must be re-run due to task failures, comment out successfully completed tasks:
+- **Important:** If the playbook must be re-run due to task failures, any of the following tasks that might have completed successful on previous playbook execution, **MUST** be commented out within the playbook. Failing to do so will lead to further playbook failures:
   ```linux
    01 - Create an appliance-owner in ACC for IBM AI Optimizer for IBM Z and IBM Linux ONE Application appliance
    02 - Assign resources in ACC to the IBM AI Optimizer for IBM Z and IBM Linux ONE appliance-owner created in step 01
    04 - Update the password of IBM AI Optimizer for IBM Z and IBM Linux ONE Application appliance-owner
    06 - Upload the IBM AI Optimizer for IBM Z and IBM Linux ONE Application appliance image to the ACC
   ```
-- **Note:** If error occurs during/after task 06, use retry tag:
+- **Note:** If an error occurs during or after task 06, use the `retry` tag to skip all the tasks listed above in the playbook without needing to comment them out:
   ```bash
   ansible-playbook 01_install_aio_default.yaml -t retry
   ```

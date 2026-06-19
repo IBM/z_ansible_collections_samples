@@ -670,13 +670,18 @@
           {{
             poll_status.results
             | selectattr('json.action-status', 'match', '(?i)fail|error')
-            | map(attribute='item')
             | list
           }}
+
     - name: Fail play if any task failed
       tags: retry
       ansible.builtin.fail:
-        msg: "❌ One or more ACC install tasks failed. Failed Task IDs: {{ acc_failed_tasks }}"
+        msg: |
+          ❌ One or more ACC install tasks failed.
+          {% for task in acc_failed_tasks %}
+          Task ID: {{ task.item }}
+          Status: {{ task.json }}
+          {% endfor %}
       when: acc_failed_tasks | length > 0
 
     - name: "Success message if both completed"

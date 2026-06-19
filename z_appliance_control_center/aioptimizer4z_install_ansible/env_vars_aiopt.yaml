@@ -6,10 +6,11 @@
 # *+------------------------------------------------------------------------+
 
 #####################################################################################################
-# NOTE: If you uncomment any variables in the vars file, make sure to uncomment the corresponding
-# sections in the scripts as well. Please review the script thoroughly before running it.
-# Do not comment any variables here it may fail the playbook if the variable is not applicable
-# just skip changing to right values
+# NOTE: If you uncomment any variables in the vars file, be sure to uncomment the corresponding
+# sections that reference those variables in the scripts. Please review the script thoroughly before execution.
+# 
+# Do not comment out any variables in this file as it may trigger a playbook failure. If a variable is not applicable it
+# can be safley ignored.
 ######################################################################################################
 
 # Variables used for installing IBM AI Optimizer for IBM Z and IBM Linux ONE Application
@@ -24,8 +25,8 @@
 # # Enable or disable Multi-Factor Authentication (true/false)
 mfa_enabled: false
 
-# IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
-acc_url: https://9.120.0.0:8081/api
+# IP of the ACC LPAR (e.g., "https://9.x.x.x:8081/api")
+acc_url: https://9.x.x.x:8081/api
 
 ####### Users #######
 
@@ -142,10 +143,10 @@ wwpn1: "500570B46A6"
 lun1: "40164000"
 
 # Appliance IP address for IBM AI Optimizer for IBM Z and IBM Linux ONE Application lpar
-app1_ip: "9.15.50.200"
+app1_ip: "9.x.x.x"
 
 # (IPv4/IPv6) gateway IP address
-gw1_ip: "9.102.0.1"
+gw1_ip: "9.x.x.x"
 
 ################################################################################
 # From the HMC, select the LPAR you’re working with. In the Tasks panel,
@@ -176,7 +177,7 @@ min_ifls: 2
 
 # Number of memory, Minimum memory required by the appliance (e.g., 51200)
 
-min_memory: 307200
+min_memory: 358400
 
 ####### Install #######
 
@@ -196,7 +197,7 @@ app_cores: 2
 
 # Memory (in MB) allocated for the appliance.
 # This value represents the memory assigned to appliance LPAR.
-app_memory: 307200
+app_memory: 358400
 
 # Hostname to assign to the installed image
 # Keep in mind, the LPAR name will be appended as a suffix to this hostname during installation.
