@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 - name: Search for expiring certificate and renew it.
@@ -7,16 +7,16 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    cert_label: "{{ cert_label | default('TESTSITE') }}"
-    cert_type: "{{ cert_type | default('SITE') }}" # CERTAUTH, SITE, or USER
-    sign_with: "{{ sign_with | default('Self') }}" # CERTAUTH, SITE or Self
-    sign_label: "{{ sign_label | default('') }}" # Only required if sign_with is not 'Self'
-    owner_id: "{{ owner_id | default('IBMUSER') }}"
-    keyring: "{{ keyring | default('SharedRing1') }}"
-    new_expiry_date: "{{ new_expiry_date | default('2030-01-01') }}"
+    cert_label: "TESTUSER"
+    cert_type: "USER" # CERTAUTH, SITE, or USER
+    sign_with: "Self" # CERTAUTH, SITE or Self
+    sign_label: "" # Only required if sign_with is not 'Self'
+    owner_id: "IBMUSER"
+    keyring: "SharedRing1"
+    new_expiry_date: "2030-01-01"
 
     cert_found: false
-    today: ''
+    today: ""
 
   tasks:
     - name: Run health check via operator command.
@@ -35,15 +35,15 @@
       tags: search_and_renew, search, search_hc
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
-        location: LOCAL
-        wait_time_s: 60
+        remote_src: false
+        wait_time: 60
       register: hc_job_output
 
-    - name: 'Search report for {{ cert_label }}.'
+    - name: "Search report for {{ cert_label }}."
       tags: search_and_renew, search, search_hc
       ansible.builtin.set_fact:
         cert_found: true
-      with_items: "{{ hc_job_output.jobs.0.ddnames }}"
+      with_items: "{{ hc_job_output.jobs[0].dds }}"
       when: item.content is search(cert_label)
 
     - name: Print whether or not certificate is expiring.

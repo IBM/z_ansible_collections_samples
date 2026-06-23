@@ -1,11 +1,10 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2024
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
 # This sample playbook demonstrates how to perform encoding conversions on USS
-# using modules included in the Red Hat Ansible Certified  Content for
-# IBM Z core collection.
+# using modules included in the IBM z/OS core collection.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
@@ -22,7 +21,7 @@
 #  `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -207,6 +206,10 @@
       debug:
         msg: "{{ result }}"
 
+    # +----------------------------------------------------------------------------------------------------------
+    # | The display method below requires the Ansible controller to be able to process EBCDIC data.
+    # | You should comment out the display and response tasks if your controller is unable to process EBCDIC.
+    # +----------------------------------------------------------------------------------------------------------
     - name: Display a series of USS files contents in {{ tgt_tmp_dir }}/encode
       command: "cat {{ tgt_tmp_dir }}/encode/{{ item }}.txt"
       with_sequence: count=4

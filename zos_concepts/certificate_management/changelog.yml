@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021,2022
+# Copyright (c) IBM Corporation 2021,2026
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -26,29 +26,41 @@
 ################################################################################
 
 releases:
-    2024.03.29:
-        date: 2024-03-29
-        changes:
-            added:
-                - task descriptions to individual TSO commands for clarity
-                - playbook descriptions
-                - handlers for setropts refresh only when needed
-                - checks for idempotency (i.e. check if cert exists before trying to create it)
-            removed:
-                - roles (issue_racf_cmd, issue_operator_cmd, issue_tso_cmd, print_hc_buffer, send_template)
-                - mvs raw versions of playbooks
-                - create certauth, site and user cert playbooks in favor of one unified playbook to cover all three
-            fixed:
-                - syntax errors / best practices suggestions
-                - various other quality of life fixes
-                - HZSPRINT print job priority causing playbook to fail
-            minor:
-                - changed default variable values
-                - use racdcert rollover command in search_and_renew playbook
-            summary:
-                - fixed, simplified and tested playbooks for current version of collections
-    2021.09.03:
-        date: 2020-10-01
-        changes:
-            added:
-                - Released initial version
+  2021.09.03:
+    date: 2020-10-01
+    changes:
+      added:
+        - Released initial version
+  2024.03.29:
+    date: 2024-03-29
+    changes:
+      added:
+        - task descriptions to individual TSO commands for clarity
+        - playbook descriptions
+        - handlers for setropts refresh only when needed
+        - checks for idempotency (i.e. check if cert exists before trying to create it)
+      removed:
+        - roles (issue_racf_cmd, issue_operator_cmd, issue_tso_cmd, print_hc_buffer, send_template)
+        - mvs raw versions of playbooks
+        - create certauth, site and user cert playbooks in favor of one unified playbook to cover all three
+      fixed:
+        - syntax errors / best practices suggestions
+        - various other quality of life fixes
+        - HZSPRINT print job priority causing playbook to fail
+      minor:
+        - changed default variable values
+        - use racdcert rollover command in search_and_renew playbook
+      summary:
+        - fixed, simplified and tested playbooks for current version of collections
+  2026.06.17:
+    date: 2026-06-17
+    changes:
+      fixed:
+        - Updated playbooks to use rc for check if keyring exists.
+        - Changed outdated search_perms.option 'content' variable to 'stdout' in health_checker_security.yml.
+        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+        - Rename option 'wait_time_s' to 'wait_time' per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+        - Rename return value "ddnames" to 'dds' per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+      minor:
+        - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
+        - Changed formatting for playbook variables to avoid recursive Jinja2 template calls if variables are undefined.

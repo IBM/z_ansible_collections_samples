@@ -1,15 +1,14 @@
-remove-zos-user
-=========
+# remove-zos-user
 
 Remove a user from a z/OS system.
 
-Requirements
-------------
+## Requirements
 
 - Ansible Collection `ibm.ibm_zos_core`
 
-Role Variables
---------------
+## Role Variables
+
+Update the role variables in the `zos_concepts/user_management/add_remove_user/roles/remove-zos-user/defaults/main.yml` file.
 
 - ### **userid**
 
@@ -47,7 +46,6 @@ Role Variables
 
   Specifies the name of the data set to be used when removing ZFS data set.
 
-
 - ### **bpxprm_data_set**
 
   Specifies the data set which contains BPXPRMxx members to modify.
@@ -69,8 +67,7 @@ Role Variables
 
   Specifies the character set any copied templates and files should be converted to.
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - hosts: all
@@ -85,17 +82,14 @@ Example Playbook
         name: remove-zos-user
 ```
 
-License
--------
+## License
 
 Copyright (c) IBM Corporation 2020 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-Author Information
-------------------
+## Author Information
 
 - Blake Becker blake.becker@ibm.com, [@blakeinate](https://github.com/blakeinate)
 
-Copyright
----------
+## Copyright
 
 © Copyright IBM Corporation 2020

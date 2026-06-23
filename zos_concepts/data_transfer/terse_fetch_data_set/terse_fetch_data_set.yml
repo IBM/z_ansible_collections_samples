@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021, 2023
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -21,7 +21,7 @@
 #  permissions such as writing the the target directories or creating data sets.
 #
 # Requirements:
-#     - IBM z/OS core collection 1.2.0 or later
+#     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
 ---
@@ -30,7 +30,6 @@
     - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
-
 
   tasks:
     # ##########################################################################
@@ -55,19 +54,30 @@
             space_type: cyl
             record_length: 1024
           register: tmp_ds
-          failed_when: tmp_ds is not defined or tmp_ds.get('names', [])|length == 0
+          failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', [])|length == 0
 
     - name: Get the result of temp data set creation
       debug:
         var: tmp_ds
 
     - set_fact:
-        tmp_data_set: "{{ tmp_ds.get('names')[0] }}"
+        tmp_data_set: "{{ tmp_ds.get('data_sets')[0].name }}"
+
+    # ##################################################################################################
+    # Uncomment to generate a temporary archive data set name if you do not specify one in zos_host.yml
+    # ##################################################################################################
+    # - name: Create a temporary archive data set name
+    #   command: "mvstmp {{ ansible_user | upper }}"
+    #   register: archive_data_set
+
+    # - name: Save temporary archive data set name
+    #   set_fact:
+    #     archive_data_set: "{{ archive_data_set.stdout }}"
 
     - name: Insert text into the data set
       zos_lineinfile:
         src: "{{ tmp_data_set }}"
-        insertbefore: BOF
+        before: BOF
         line: this is a test line to avoid errors trying to archive an empty data set
 
     - name: Create an archive with terse
@@ -75,7 +85,7 @@
         src: "{{ tmp_data_set }}"
         dest: "{{ archive_data_set }}"
         format:
-          name: terse
+          type: terse
       register: terse_response
 
     - name: Get the result of temp data set creation
@@ -91,7 +101,7 @@
         src: "{{ archive_data_set }}"
         dest: "{{ playbook_dir }}/"
         flat: true
-        is_binary: true
+        binary: true
       register: result
 
     - name: Result of fetching tersed PDS to the local machine
@@ -102,7 +112,7 @@
       zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
-      when: temp_data_set is defined and temp_data_set.names|length > 0
+      when: temp_data_set is defined and temp_data_set.data_sets|length > 0
 
     - name: "Fetch {{ tmp_data_set }} to local machine"
       zos_fetch:

@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -20,7 +20,7 @@
 #  ansible-playbook -i inventories copy-sort-fetch.yml
 #
 # Requirements:
-#     - IBM z/OS core collection 1.2.0 or later
+#     - IBM z/OS core collection 2.0.0 or later
 #     - Git for z/OS
 # vars:
 #   git_repo:
@@ -52,17 +52,17 @@
     - ibm.ibm_zos_core
   gather_facts: false
   vars:
-    git_repo: "git://github.com/IBM/z_ansible_collections_samples.git"
-    git_branch: "playbook/2926/zos_apf"
+    git_repo: "git@github.com:IBM/z_ansible_collections_samples.git"
+    git_branch: "main"
     checkout_dir: "{{ home_dir }}/git_checkout/z_ansible_collections_samples"
     file_name: "{{ checkout_dir }}/zos_concepts/program_authorization/git_apf/roles/list-load/files/list.bom"
     persistent_ds:
-      data_set_name: "APFTEST.SYS1.PARMLIB(PROG00)"
+      target: "APFTEST.SYS1.PARMLIB(PROG00)"
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Get home directory
-      shell: "echo \"$HOME\" "
+      shell: "echo $HOME | sed 's:/*$::'"
       register: result
     - name: Set home_dir path
       set_fact:
@@ -77,7 +77,7 @@
       include_role:
         name: list-load
     - name: Create persistent dataset if not exist
-      shell: "dls `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` > /dev/null 2>&1 || dtouch `echo \"{{ persistent_ds['data_set_name'] }}\" | sed s'/(.*)$//'` }}"
+      shell: 'dls `echo "{{ persistent_ds.target }}" | sed s''/(.*)$//''` > /dev/null 2>&1 || dtouch `echo "{{ persistent_ds.target }}" | sed s''/(.*)$//''`'
     - name: APF add delta list
       include_role:
         name: apf-add

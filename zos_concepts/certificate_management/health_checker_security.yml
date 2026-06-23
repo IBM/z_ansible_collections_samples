@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 - name: Setup Health Checker security.
@@ -7,7 +7,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    user_id: "{{ user_id | default('IBMUSER') }}"
+    owner_id: "IBMUSER"
   tasks:
     - name: Get sysname.
       ansible.builtin.command:
@@ -67,38 +67,37 @@
 
     - name: Check if the given user has correct permissions, set them correctly if they don't.
       block:
-        - name: 'Search for existing permissions for the given user. Fail out to rescue if not set correctly.'
+        - name: "Search for existing permissions for the given user. Fail out to rescue if not set correctly."
           ibm.ibm_zos_core.zos_tso_command:
             commands: "SEARCH USER({{ user_id }}) CLASS(XFACILIT)"
           register: search_perms
           changed_when: false
           failed_when:
-            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
-            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
-            - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
+            - search_perms.output[0].stdout | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
+            - search_perms.output[0].stdout | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
+            - search_perms.output[0].stdout | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
 
       rescue:
-
         - name: Print the given user's current permissions.
           ansible.builtin.debug:
-            msg: "{{ search_perms.output[0].content }}"
+            msg: "{{ search_perms.output[0].stdout }}"
 
-        - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ user_id }}.'
+        - name: "Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ user_id }}."
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) ID({{ user_id }}) ACCESS(READ)"
-          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
+          when: search_perms.output[0].stdout | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
           notify: Setropts refresh
 
-        - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ user_id }}.'
+        - name: "Permit update access for HZS.<sysname>.*.*.RUN to {{ user_id }}."
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ user_id }}) ACCESS(UPDATE)"
-          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
+          when: search_perms.output[0].stdout | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
           notify: Setropts refresh
 
-        - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ user_id }}.'
+        - name: "Permit read access for HZS.<sysname>.*.*.QUERY to {{ user_id }}."
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ user_id }}) ACCESS(READ)"
-          when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
+          when: search_perms.output[0].stdout | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
           notify: Setropts refresh
 
   handlers:

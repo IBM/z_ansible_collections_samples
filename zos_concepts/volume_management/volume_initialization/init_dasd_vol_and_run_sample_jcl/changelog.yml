@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2023, 2024
+# Copyright (c) IBM Corporation 2023, 2026
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -26,15 +26,22 @@
 ################################################################################
 
 releases:
-    2023.01.23:
-        date: 2023-01-23
-        changes:
-            added:
-                - Released initial version
-    2024.04.10:
-        date: 2024-04-10
-        changes:
-            fixed:
-                - Lower case zos_data_set module option 'space_type' per ibm.ibm_zos_core:1.10.0 requirements.
-                - Lower case zos_mount module option 'fs_type' per ibm.ibm_zos_core:1.10.0 requirements.
-                - Lower case zos_job_submit module option 'location' per ibm.ibm_zos_core:1.10.0 requirements.
+  2023.01.23:
+    date: 2023-01-23
+    changes:
+      added:
+        - Released initial version
+  2024.04.10:
+    date: 2024-04-10
+    changes:
+      fixed:
+        - Lower case zos_data_set module option 'space_type' per ibm.ibm_zos_core:1.10.0 requirements.
+        - Lower case zos_mount module option 'fs_type' per ibm.ibm_zos_core:1.10.0 requirements.
+        - Lower case zos_job_submit module option 'location' per ibm.ibm_zos_core:1.10.0 requirements.
+  2026.06.18:
+    date: 2026-06-18
+    changes:
+      fixed:
+        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+      minor:
+        - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.

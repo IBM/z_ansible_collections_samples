@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 - name: Check if cert and keyring already exist. If not, create them and then run health check via TSO and operator commands.
@@ -7,17 +7,17 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: "{{ owner_id | default('IBMUSER') }}"
-    cert_label: "{{ cert_label | default('TESTSITE') }}"
-    cert_type: "{{ cert_type }}" # CERTAUTH, SITE, or USER
-    sign_with: "{{ sign_with | default('Self') }}" # CERTAUTH, SITE, or Self
-    sign_label: "{{ sign_label | default('') }}" # Only required if sign_with is not 'Self'
-    ou: "{{ ou | default('ANSIBLE CORE') }}"
-    cn: "{{ cn }}" # Will default to FQDN, if undefined.
-    country: "{{ country | default('US') }}"
-    expiry_date: "{{ expiry_date | default('2030-01-01') }}"
-    keyring: "{{ keyring | default('SharedRing1') }}"
-    check_name: "{{ check_name | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
+    owner_id: "IBMUSER"
+    cert_label: "TESTUSER"
+    cert_type: "USER" # Options: CERTAUTH, SITE, or USER
+    sign_with: "Self" # Options: CERTAUTH, SITE, or Self
+    sign_label: "" # Only required if sign_with is not 'Self'
+    ou: "ANSIBLE CORE"
+    cn: "FQDE" # Common name - will default to FQDN, if undefined.
+    country: "US"
+    expiry_date: "2030-01-01"
+    keyring: "SharedRing1"
+    check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
 
   tasks:
     - name: Check if keyring to be created already exists.
@@ -33,7 +33,7 @@
         commands:
           - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
           - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-      when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"
+      when: "keyring_check.output[0].rc != 0"
 
     - name: Get hostname to use as common name variable, if undefined.
       when: cn is undefined
@@ -69,7 +69,8 @@
               {{ " SIGNWITH(" + sign_with + " LABEL('" + sign_label + "')) " if sign_with != "Self" else " " }}
             format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}')
+            commands:
+              RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}')
               OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ format_sign_with }}{{ format_expiration }}
           notify: Setropts refresh
 
@@ -83,7 +84,8 @@
           vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}')
+            commands:
+              RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}')
               RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
           notify: Setropts refresh
 
