@@ -6,10 +6,13 @@
 # *| [12.12.2025]                                                             |
 # *|   - Tested with ACC 1.2.10                                               |
 # *|   - Renamed 11_get_disruptive_dumps.yaml to 09_get_disruptive_dumps.yaml |
-# *| [02.13.2026]                                                           |
-# *|   - Tested with ACC 1.2.12                                             |
-# *| [04.02.2026]                                                           |
-# *|   - Tested with ACC 1.2.13                                             |
+# *| [02.13.2026]                                                             |
+# *|   - Tested with ACC 1.2.12                                               |
+# *| [04.02.2026]                                                             |
+# *|   - Tested with ACC 1.2.13                                               |
+# *| [06.26.2026]                                                             |
+# *|   - Tested with ACC 1.2.14                                               |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+--------------------------------------------------------------------------+
 
 - name: ACC Playbook - Trigger disruptive dump and collect logs from appliance
@@ -66,6 +69,10 @@
     - name: Extract the token
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: Display playbook execution information
+      ansible.builtin.include_tasks:
+        file: common_display_execution_info.yaml
 
     - name: 01 - Trigger disruptive dump
       ansible.builtin.uri:

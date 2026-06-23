@@ -14,6 +14,9 @@
 # *|   - Increased the timeout to 180 seconds                               |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 - name: ACC playbook, to be run as an ACC-admin, for syncing ACC with the HMC.
   hosts: localhost
@@ -31,52 +34,6 @@
       ansible.builtin.debug:
         msg: "{{ acc_url }}"
 
-    - name: Get Initialize status
-      ansible.builtin.uri:
-        url: "{{ acc_url }}/init"
-        method: GET
-        return_content: true
-        validate_certs: false
-      register: get_init_response
-
-    - name: Print init response
-      ansible.builtin.debug:
-        var: get_init_response.json
-
-    - name: Set ACC mode fact
-      ansible.builtin.set_fact:
-        acc_mode: "{{ get_init_response.json.mode }}"
-
-    - name: Print detected ACC mode
-      ansible.builtin.debug:
-        msg: "ACC is running in '{{ acc_mode }}' mode."
-
-    - name: Reminder - Export HMC credentials
-      when: acc_mode == "default"
-      ansible.builtin.pause:
-        prompt: |
-          Before running this playbook, please export HMC credentials:
-
-          export HMC_USER=<enter_HMC_username>
-          export HMC_PASSWORD=<enter_HMC_password>
-
-          Press Ctrl+C now to cancel if you haven't done this.
-          The playbook will continue shortly.
-        seconds: 5
-
-    - name: Check required environment variables
-      vars:
-        required_env_vars:
-          - HMC_USER
-          - HMC_PASSWORD
-
-      ansible.builtin.fail:
-        msg: "Missing required environment variable: {{ item }}"
-      when:
-        - acc_mode == "default"
-        - lookup('env', item) == ""
-      loop: "{{ required_env_vars }}"
-
   vars_prompt:
     - name: cc_admin_user
       prompt: "Enter ACC-admin's username"
@@ -87,11 +44,10 @@
       private: true
 
   tasks:
-
     - name: 00 - Check MFA is enabled or not
       ansible.legacy.pause:
         prompt: "Do you have MFA enabled? (yes/no)"
-        echo: yes
+        echo: true
       register: mfa_enabled_input
 
     - name: 01 - Set MFA enabled
@@ -102,7 +58,7 @@
       when: mfa_enabled
       ansible.legacy.pause:
         prompt: "Enter MFA OTP generated for admin:"
-      register: mfa_otp_input
+      register: mfa_admin_otp_input
 
     - name: 03 - Get authentication token from the ACC as admin
       tags: admin
@@ -122,6 +78,67 @@
       tags: admin
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 03a - Get Initialize status
+      tags: admin
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/init"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+        return_content: true
+        validate_certs: false
+      register: get_init_response
+
+    - name: Print init response
+      tags: admin
+      ansible.builtin.debug:
+        var: get_init_response.json
+
+    - name: Set ACC mode fact
+      tags: admin
+      ansible.builtin.set_fact:
+        acc_mode: "{{ get_init_response.json.mode }}"
+
+    - name: Print detected ACC mode
+      tags: admin
+      ansible.builtin.debug:
+        msg: "ACC is running in '{{ acc_mode }}' mode."
+
+    - name: Reminder - Export HMC credentials
+      tags: admin
+      when: acc_mode == "default"
+      ansible.builtin.pause:
+        prompt: |
+          ACC is running in DEFAULT mode.
+          Before continuing, please export HMC credentials:
+
+          export HMC_USER=<enter_HMC_username>
+          export HMC_PASSWORD=<enter_HMC_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables for default mode
+      tags: admin
+      vars:
+        required_env_vars:
+          - HMC_USER
+          - HMC_PASSWORD
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when:
+        - acc_mode == "default"
+        - lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+    - name: Display ACC about information
+      ansible.builtin.debug:
+        var: about_response.json
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: common_display_info.yaml
 
     - name: 04 - Set HMC configuration in the ACC
       tags: admin

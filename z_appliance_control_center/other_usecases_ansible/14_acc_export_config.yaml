@@ -1,0 +1,124 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| ACC Configuration Export Playbook                                      |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Added network configuration for ACC LPAR                           |
+# *|   - Added IFLs/GPs configuration for ACC LPAR                          |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *+------------------------------------------------------------------------+
+
+- name: Export ACC appliance configuration
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - export_import_vars.yaml
+
+  vars_prompt:
+    - name: ssc_ip
+      prompt: "Enter your SSC LPAR's (ACC) IP"
+      private: false
+
+    - name: app_username
+      prompt: "Enter your SSC LPAR's (ACC) username"
+      private: false
+
+    - name: app_password
+      prompt: "Enter your SSC LPAR's (ACC) password"
+      private: true
+
+  vars:
+    appliance_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
+
+  tasks:
+    - name: Get authentication token from ACC
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/api-tokens"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ app_username }}"
+            password: "{{ app_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Set access token
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: Display playbook execution information
+      ansible.builtin.include_tasks:
+        file: common_display_execution_info.yaml
+
+    - name: Ensure export directory exists
+      ansible.builtin.file:
+        path: "{{ export_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Generate timestamp
+      ansible.builtin.set_fact:
+        export_timestamp: "{{ ansible_date_time.iso8601_basic }}"
+
+    - name: Build export filename
+      ansible.builtin.set_fact:
+        export_file: "{{ lpar_name }}_ACC_config_{{ export_timestamp }}.data"
+
+    - name: Display important disclaimer before export
+      ansible.legacy.pause:
+        prompt: |
+
+          ⚠️  IMPORTANT DISCLAIMER:
+          Images uploaded to ACC are not retained as part of the config export and should be re-uploaded
+          after configuration restore.
+
+          Press ENTER to continue with the export or Ctrl+C to abort...
+
+    - name: Export appliance configuration using curl
+      ansible.builtin.shell: |
+        curl -k -X POST \
+          "{{ appliance_url }}/appliance-configuration/export" \
+          -H "zACI-API: com.ibm.zaci.system/1.0" \
+          -H "Accept: application/octet-stream" \
+          -H "Content-Type: application/vnd.ibm.zaci.payload+json;version=1.0" \
+          -H "Authorization: Bearer {{ access_token }}" \
+          -d '{"kind":"request","parameters":{"description":"ACC configuration export"}}' \
+          --output "{{ export_dir }}/{{ export_file }}" \
+          --max-time 1200 \
+          --connect-timeout 30
+      register: export_result
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+      # noqa command-instead-of-module command-instead-of-shell
+
+    - name: Verify export file was created and has content
+      ansible.builtin.stat:
+        path: "{{ export_dir }}/{{ export_file }}"
+      register: export_file_stat
+
+    - name: Check if export was successful
+      ansible.legacy.fail:
+        msg: "Export failed - file was not created or is empty"
+      when: not export_file_stat.stat.exists or export_file_stat.stat.size == 0
+
+    - name: Display export file size
+      ansible.builtin.debug:
+        msg: "Export completed successfully. File size: {{ (export_file_stat.stat.size / 1024 / 1024) | round(2) }} MB"
+
+    - name: Show export file location
+      ansible.builtin.debug:
+        msg:
+          - "Configuration exported to {{ export_dir }}/{{ export_file }}"
+          - ""
+          - "IMPORTANT: Please save this file to a secure location."
+          - "You will need this file to revert back ACC in case of failures or to restore configuration."

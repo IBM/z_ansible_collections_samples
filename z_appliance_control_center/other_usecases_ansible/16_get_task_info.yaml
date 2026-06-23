@@ -1,21 +1,14 @@
 # *+------------------------------------------------------------------------+
-# *| © Copyright IBM Corp. 2025                                             |
-# *| [02.13.2026]                                                           |
-# *|   - Tested with ACC 1.2.12                                             |
-# *|   - Initial release                                                    |
-# *|   - With older ACC versions, replace the 'method: POST' by             |
-# *|     'method: DELETE'                                                   |
-# *|   - Replaced acc_ip with acc_url                                       |
+# *| © Copyright IBM Corp. 2026                                             |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *|   - Initial release                                                    |
 # *| [06.26.2026]                                                           |
 # *|   - Tested with ACC 1.2.14                                             |
 # *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
-# This playbook is tested and updated with ACC version 1.2.12
-
-- name: ACC playbook, run by appliance-owner user, to logout the user
+- name: ACC playbook, run by ACC-owner, to get task information
   hosts: localhost
   gather_facts: true
   vars_files:
@@ -23,10 +16,9 @@
 
   pre_tasks:
     - name: Reminder - Export appliance-owner credentials
-      ansible.legacy.pause:
+      ansible.builtin.pause:
         prompt: |
-          This playbook is tested and updated with ACC version 1.2.12,
-          Before running this playbook, please export appliance-owner credentials:
+          Before running this playbook, please export credentials:
 
           export ACC_OWNER_PASSWORD=<owner_password>
 
@@ -45,30 +37,14 @@
       loop: "{{ required_env_vars }}"
 
   tasks:
-    - name: 00 - Check MFA is enabled or not
-      ansible.builtin.pause:
-        prompt: "Do you have MFA enabled? (yes/no):"
-      register: mfa_enabled_input
-
-    - name: 01 - Set MFA enabled
-      ansible.legacy.set_fact:
-        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
-
-    - name: 02 - Prompt for OTP if MFA is enabled
-      when: mfa_enabled
-      ansible.builtin.pause:
-        prompt: "Enter MFA OTP generated for owner:"
-      register: mfa_otp_input
-
-    - name: 03 - Get authentication token from the ACC as owner
-      tags: owner
+    - name: 00 - Get authentication token from the ACC as appliance-owner
+      tags: owner, install
       ansible.builtin.uri:
         url: "{{ acc_url }}/user/token"
         method: POST
         body:
           username: "{{ cc_owner_user }}"
           password: "{{ cc_owner_password }}"
-          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
         body_format: json
         return_content: true
         validate_certs: false
@@ -76,24 +52,28 @@
 
     - name: Extract the token
       tags: owner, install
-      ansible.legacy.set_fact:
+      ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
     - name: Display execution info and ACC about information
       ansible.builtin.include_tasks:
         file: common_display_info.yaml
 
-    - name: 04 - Logout appliance-owner
+    - name: Enter the task ID
+      ansible.builtin.pause:
+        prompt: "Enter the task ID (integer):"
+      register: task_id
+
+    - name: Get task status from ACC
       ansible.builtin.uri:
-        url: "{{ acc_url }}/user/logout"
-        method: POST
+        url: "{{ acc_url }}/tasks/{{ task_id.user_input | trim }}/status"
+        method: GET
         headers:
           Authorization: "Bearer {{ access_token }}"
-        status_code: 200
         validate_certs: false
-      register: logout_response
+        return_content: true
+      register: task_status_response
 
-    - name: Printing the response of logout
-      ansible.legacy.debug:
-        msg:
-          - "{{ logout_response.json }}"
+    - name: Display task status response
+      ansible.builtin.debug:
+        var: task_status_response.json

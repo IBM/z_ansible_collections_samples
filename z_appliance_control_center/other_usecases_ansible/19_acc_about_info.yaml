@@ -1,0 +1,59 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Initial release                                                    |
+# *|   - Added execution timestamp and ACC about info display               |
+# *+------------------------------------------------------------------------+
+
+- name: ACC playbook to get ACC about information (supports ACC-admin and appliance-owner)
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - owner_vars.yaml
+
+  vars_prompt:
+    - name: cc_username
+      prompt: "Enter your ACC username (admin or owner)"
+      private: false
+
+    - name: cc_password
+      prompt: "Enter your ACC password"
+      private: true
+
+  tasks:
+    - name: 00 - Check if MFA is enabled
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no)"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.builtin.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA OTP:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_username }}"
+          password: "{{ cc_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: 04 - Extract the token
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: common_display_info.yaml

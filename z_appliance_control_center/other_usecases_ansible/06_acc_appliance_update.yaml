@@ -10,6 +10,9 @@
 # *|   - Added mandatory wait before checking if appliance rebooted         |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for ACC appliance update
@@ -40,7 +43,123 @@
   vars:
     appliance_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
   tasks:
-    - name: 00 - Get authentication token from the ACC as appliance-owner
+    - name: 00 - Validate update bundle file format
+      block:
+        - name: Check if update bundle file exists
+          ansible.builtin.stat:
+            path: "{{ update_bundle_path }}"
+          register: bundle_file_stat
+
+        - name: Fail if bundle file does not exist
+          ansible.builtin.fail:
+            msg: |
+              ❌ Update bundle file not found: {{ update_bundle_path }}
+
+              Please verify:
+              - The file path is correct
+              - You have read permissions for the file
+          when: not bundle_file_stat.stat.exists
+
+        - name: Check file type and content
+          ansible.builtin.shell: |
+            file "{{ update_bundle_path }}"
+          register: file_type_check
+          failed_when: false
+          changed_when: false
+
+        - name: Check if file is PGP/GPG encrypted (valid update bundle)
+          ansible.builtin.shell: |
+            set -o pipefail
+            file "{{ update_bundle_path }}" | grep -iE "(PGP|GPG).*encrypted"
+          args:
+            executable: /bin/bash
+          register: pgp_check
+          failed_when: false
+          changed_when: false
+
+        - name: Check if file contains image indicators
+          ansible.builtin.shell: |
+            set -o pipefail
+            file "{{ update_bundle_path }}" | grep -iE "(acc_image|\.img|image\.img)"
+          register: image_check
+          failed_when: false
+          changed_when: false
+
+        - name: Fail if file is an image file (not update bundle)
+          ansible.builtin.fail:
+            msg: |
+              ❌ INVALID FILE: This is an ACC image file, not an update bundle!
+
+              File: {{ update_bundle_path | basename }}
+              Type: {{ file_type_check.stdout }}
+
+              ⚠️  CRITICAL ERROR: You provided an ACC appliance IMAGE file.
+              This playbook requires a PGP-encrypted UPDATE BUNDLE, not an image.
+
+              What you provided:
+              - File contains: acc_image.img (this is a disk image)
+              - Format: Gzip compressed disk image
+              - Purpose: For fresh ACC installation, not updates
+
+              What this playbook needs:
+              - PGP RSA encrypted TAR archive
+              - File name pattern: update_bundle_*.tar or update-bundle-*.tar
+              - Contains: Encrypted update packages and metadata
+
+              Example of CORRECT file:
+              ✅ /path/to/update_bundle_1.2.13.tar
+
+              Example of WRONG file (what you provided):
+              ❌ {{ update_bundle_path | basename }}
+
+              Solution:
+              1. Obtain the correct UPDATE BUNDLE (not image) from your build system
+              2. Update bundles are PGP encrypted TAR files
+              3. For image-based deployment, use a different playbook
+
+              The playbook will now exit to save your time.
+          when: image_check.rc == 0
+
+        - name: Fail if file is not PGP/GPG encrypted
+          ansible.builtin.fail:
+            msg: |
+              ❌ INVALID UPDATE BUNDLE: File is not PGP/GPG encrypted!
+
+              File: {{ update_bundle_path | basename }}
+              Type: {{ file_type_check.stdout }}
+
+              ⚠️  ACC update bundles MUST be PGP/GPG RSA encrypted.
+
+              Expected file signature:
+              - "PGP RSA encrypted session key" or "GPG encrypted data"
+              - Encrypted TAR archive
+
+              Your file signature:
+              - {{ file_type_check.stdout }}
+
+              Common issues:
+              1. Using unencrypted TAR files
+              2. Using image files (.img, .img.gz)
+              3. Using wrong file from build artifacts
+              4. File corruption during download
+
+              Solution:
+              - Obtain a properly PGP/GPG-encrypted update bundle
+              - Verify file with: file <bundle_path>
+              - Should show: "PGP RSA encrypted session key" or "GPG encrypted data"
+
+              The playbook will now exit.
+          when: pgp_check.rc != 0
+
+        - name: Display bundle validation success
+          ansible.builtin.debug:
+            msg: |
+              ✅ Update bundle validation passed
+              File: {{ update_bundle_path }}
+              Size: {{ (bundle_file_stat.stat.size / 1024 / 1024) | round(2) }} MB
+              Type: {{ file_type_check.stdout }}
+
+    - name: 01 - Get authentication token from the ACC as appliance-owner
       ansible.builtin.uri:
         url: "{{ appliance_url }}/api-tokens"
         method: POST

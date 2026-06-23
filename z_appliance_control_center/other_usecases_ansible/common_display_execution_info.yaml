@@ -1,0 +1,16 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| Common task for displaying playbook execution information only.        |
+# *| This file is included by other playbooks for reusability.              |
+# *+------------------------------------------------------------------------+
+
+- name: Display playbook execution information
+  ansible.builtin.debug:
+    msg:
+      - "=========================================="
+      - "Playbook Execution Information"
+      - "=========================================="
+      - "Run Date: {{ ansible_facts['date_time']['date'] }}"
+      - "Run Time: {{ ansible_facts['date_time']['time'] }} {{ ansible_facts['date_time']['tz'] }}"
+      - "Timestamp: {{ ansible_facts['date_time']['iso8601'] }}"
+      - "=========================================="

@@ -10,19 +10,34 @@
 # *|   - Tested with ACC 1.2.12                                             |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook to reboot SSC appliance (ACC)
   hosts: localhost
   gather_facts: true
+  vars_files:
+    - admin_vars.yaml
 
   vars_prompt:
     - name: "ssc_ip"
       prompt: "Enter SSC LPAR's (ACC) IP"
       private: false
+
+    - name: cc_admin_user
+      prompt: "Enter ACC-admin's username"
+      private: false
+
+    - name: cc_admin_password
+      prompt: "Enter ACC-admin's password"
+      private: true
+
     - name: "lpar_username"
       prompt: "Enter SSC LPAR's (ACC) username"
       private: false
+
     - name: "lpar_password"
       prompt: "Enter SSC LPAR's (ACC) password"
       private: true
@@ -30,8 +45,79 @@
   vars:
     api_base_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
 
+  pre_tasks:
+    - name: Prepare ACC URL
+      tags: admin
+      ansible.builtin.set_fact:
+        acc_url: "https://{{ ssc_ip }}:{{ acc_port }}/api"
+
+    - name: Printing the ACC url
+      tags: admin
+      ansible.builtin.debug:
+        msg: "{{ acc_url }}"
+
   tasks:
-    - name: 00 - Get authentication token from the SSC LPAR
+    - name: 00 - Check MFA is enabled or not
+      ansible.legacy.pause:
+        prompt: "Do you have MFA enabled? (yes/no)"
+        echo: true
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.legacy.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.legacy.pause:
+        prompt: "Enter MFA OTP generated for admin:"
+      register: mfa_admin_otp_input
+
+    - name: 03 - Get authentication token from the ACC as admin
+      tags: admin
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/user/token"
+        body:
+          username: "{{ cc_admin_user }}"
+          password: "{{ cc_admin_password }}"
+          otp: "{{ (mfa_admin_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        method: POST
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Extract the admin token
+      tags: admin
+      ansible.builtin.set_fact:
+        admin_access_token: "{{ auth_response.json.access_token }}"
+
+    - name: 04 - Check for in-progress tasks in ACC
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/cluster/tasks?status=Inprogress"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ admin_access_token }}"
+          Accept: "application/json"
+        validate_certs: false
+        return_content: true
+        status_code: 200
+      register: tasks_response
+      failed_when: false
+
+    - name: Display in-progress tasks if any exist
+      when: tasks_response.json | length > 0
+      ansible.builtin.debug:
+        msg: "{{ tasks_response.json }}"
+
+    - name: Fail if tasks are in progress
+      when: tasks_response.json | length > 0
+      ansible.builtin.fail:
+        msg: |
+          ⚠️ WARNING: Tasks are currently in progress in ACC
+          ACC restart cannot be performed while tasks are in progress. Please wait for the in progress tasks to complete before restarting ACC.
+
+    - name: 05 - Get authentication token from the SSC LPAR
       ansible.builtin.uri:
         url: "{{ api_base_url }}/api-tokens"
         method: POST
@@ -52,6 +138,10 @@
     - name: Extract the token
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: Display playbook execution information
+      ansible.builtin.include_tasks:
+        file: common_display_execution_info.yaml
 
     - name: 01 - Reboot the SSC appliance
       ansible.builtin.uri:
