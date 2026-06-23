@@ -73,6 +73,12 @@ mode of ACC, where ACC can communicate with the HMC.
   export HMC_PASSWORD=<enter_HMC_password>
   ```
 
+  **Optional:** During playbook execution, you will be prompted to set an HMC credential
+  expiry time. Enter a number between 1-14 to set credentials to expire after that many
+  days. On leaving empty we do not pass credential expiry time and hence ACC takes the
+  default expiry of 1 day. This enhances security by ensuring credentials are refreshed
+  regularly.
+
 - Export the previously set default appliance-owner password and additionally set and export
   a new password for the appliance-owner. Keep in mind, the ACC API will be used to set the
   new password for appliance-owner. Therefore, be sure you are following the password
