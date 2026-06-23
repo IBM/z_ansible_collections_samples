@@ -28,6 +28,12 @@ their control node.
   export HMC_PASSWORD=<enter_HMC_password>
   ```
 
+  **Optional:** During playbook execution, you will be prompted to set an HMC credential
+  expiry time. Enter a number between 1-14 to set credentials to expire after that many
+  days. On leaving empty we do not pass credential expiry time and hence ACC takes the
+  default expiry of 1 day. This enhances security by ensuring credentials are refreshed
+  regularly.
+
 - Export the ACC-admin username and default password. Additionally, set and
   export a new password for the ACC admin and a default password for the ACC
   owner. Keep in mind, the ACC API will be used to set these new passwords for
