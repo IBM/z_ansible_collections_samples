@@ -1,6 +1,6 @@
 # Apply ptf using Using Ansible
 
-This project provides sample playbooks and roles which can be used to perform SMPE operations.
+This project provides sample playbooks and roles which can be used to perform SMP/E operations.
 
 It is a good practice to review the playbook sample contents before executing
 them. It will help you understand the requirements in terms of space, location,

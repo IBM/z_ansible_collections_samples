@@ -30,7 +30,7 @@ This playbook requires:
 
 - [IBM® z/OS® core collection 2.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [ansible-core 2.16 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- Git for z/OS through [IBM Open Enterprise Foundation for z/OS](https://www.ibm.com/products/open-enterprise-foundation-zos) or [Rocket Software](https://www.rocketsoftware.com/product-categories/mainframe/git-for-zos)
+- Git for z/OS through [IBM Open Enterprise Foundation for z/OS](https://www.ibm.com/products/open-enterprise-foundation-zos)
 
 ## Configuration
 
