@@ -10,7 +10,28 @@
 # *|   - Replaced acc_ip with acc_url                                       |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
 # *+------------------------------------------------------------------------+
+
+###########################################################################################
+# Important Notes:  FAST ACTIVATE
+#
+# 1. Fast activate only works for LPARs that have been previously activated and then
+#    deactivated. ACC uses the preserved data from the last activation.
+#
+# 2. No image_id, cores, memory, processor_type, processor_usage, hostname, username,
+#    or password parameters are needed - these are all retrieved from preserved state.
+#
+# 3. The execution_action is automatically determined:
+#    - "default" for preserved (deactivated) LPARs
+#    - "appliance_only" for active LPARs in installer mode
+#
+# 4. The install parameter is always set to False for fast activate.
+#
+# 5. Set image_match_check to true (recommended) to ensure the preserved image matches
+#    the current image in the system, or false to skip validation.
+###########################################################################################
 
 # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 acc_url: https://9.120.0.0:8081/api
@@ -152,6 +173,14 @@ app_cores: 2
 # This value represents the memory assigned to each appliance LPAR.
 app_memory: 51200
 
+# image_match_check
+# Controls whether to verify that the preserved image matches the current image.
+# - true: Validates that the image used during previous activation matches the
+#         current image in the ACC. Recommended for safety.
+# - false: Skips image validation.
+# Default: true
+image_match_check: true
+
 ####### Appliance credential #######
 
 # Set Username for the appliance (used during appliance installation)
@@ -164,7 +193,7 @@ app_memory: 51200
 # Secure Service Container graphical user interface (GUI). An administrator user ID can
 # be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
 # 0 - 9, letters A - Z (upper or lower case), and the following special
-# characters: period (.), underscore (_), and hyphen (-). 
+# characters: period (.), underscore (_), and hyphen (-).
 # APP_PASSWORD: This is the Administrator password in the SSC user guide.
 # This password can have a minimum of 8 characters and a maximum of 256 characters.
 # An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
@@ -213,7 +242,7 @@ execution_action: "appliance_only"
 # otherwise set it to "general-purpose" for central processors
 # Set processor_type for the LPAR (used during image installation)
 # Keep in mind, the processor type defined here correlates to the min_ifl value defined earlier.
-#   - For example, if min_ifls is set to 2 and processor_type is "ifl", then 2 IFLs will be assigned as the minimum for the appliance. 
+#   - For example, if min_ifls is set to 2 and processor_type is "ifl", then 2 IFLs will be assigned as the minimum for the appliance.
 #     If min_ifls is set to 2 and processor_type is "general-purpose", then 2 gps will be assigned as the minimum for the appliance.
 processor_type: "general-purpose"
 
