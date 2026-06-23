@@ -1,0 +1,49 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
+- name: IMS Configuration
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+    #######################################
+
+    # Create LE Options file
+    # Create Language Environment options dataset for IMS
+    - name: Create LE Options file {{ ims_ceeopts }}
+      zos_data_set:
+        name: "{{ ims_ceeopts }}"
+        type: seq
+        state: present
+
+    #######################################
+
+    # Add TEST runtime option
+    # Add TEST option to enable debugging in IMS
+    - name: Add TEST runtime option to {{ ims_ceeopts }}
+      zos_lineinfile:
+        src: "{{ ims_ceeopts }}"
+        insertafter: EOF
+        line: 'TEST'
+
+    #######################################
+
+    # Define Debugger to IMS
+    # Display manual configuration steps for IMS
+    - name: Execution instructions
+      pause:
+        prompt: |
+          z/OS Debugger requires that the JCL used to start a message region or BMP has the following definitions:
+
+            {{ eqa_hlq }}.SEQAMOD in DD STEPLIB
+            //CEEOPTS  DD DSN={{ ims_ceeopts }},DISP=SHR
+
+          Hit Enter key to continue
+    #######################################
+
+

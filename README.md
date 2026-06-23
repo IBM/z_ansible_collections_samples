@@ -75,6 +75,7 @@ often repeated and in need of automation.
   - [Run local and remote scripts inside Unix System Services in z/OS](zos_concepts/zos_script)
   - [Run REXX scripts and CLISTs with TSO commands](zos_concepts/tso_commands/scripts)
   - [Query attributes from data sets, aggregates, Generation Data Groups and Unix System Services files](zos_concepts/zos_stat)
+  - [Start, display, modify, stop, cancel and force z/OS started tasks](zos_concepts/zos_started_task)
 - Integrating Existing Automation
   - [Job Control Language](zos_concepts/jobs) (JCL)
     - [Submit Batch Jobs, Query and Retrieve Job Output](zos_concepts/jobs/submit_query_retrieve)
@@ -116,6 +117,7 @@ often repeated and in need of automation.
     - [Enable IMS catalog and managed ACBs](zos_subsystems/ims/enable_catalog_macb)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
+  - [z/OS Debugger Installation and Configuration Automation](z_system_automation/zos_debugger_install_config_automation)
 - Security
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
@@ -159,7 +161,7 @@ Licensed under
 [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
-This project is supported by the community though
+This project is supported by the community through
 [Git issues](https://github.com/IBM/z_ansible_collections_samples/issues).
 
 The repository admins and content owners will engage directly with users on

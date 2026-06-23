@@ -1,0 +1,31 @@
+# by default this playbook will take backups of /u/<<user>> directory and <<user>>.** datasets.
+# If there ia any other directory or dataset which does not belongs to defaults, those need to be added in below config.
+backup_datasets: true # If true then datasets backup will happen. Keep false if datasets backup is not needed.
+backup_folders: true # If true then folders backup will happen. Keep false if folders backup is not needed.
+restore_datasets: true # If true then datasets will be restored from backup.. Keep false if datasets restore is not needed.
+restore_folders: true # If true then folders will be restored from backup. Keep false if folders restore is not needed
+days_to_backup_files: 6 # mention the number of days from which files backup need to be taken
+folders_to_backup:
+  -  /u/suren
+  # -  /usr/local
+datasets_to_backup:
+  - omvsadm.test.**
+  - ansible.test.**
+backup_dir_local: ./tmp/ # The local folder to where backup files need to be copied while taking backup and from where files need to be collected while restoring. only files should be copied so make sure to add trailing slash(/)
+backup_dir_remote: /tmp/backup_data # The temporary directory which will be used as a working dir and gets deleted after process.
+
+# Required environment variables in USS to execute Ansible tasks
+environment_vars:
+  _BPXK_AUTOCVT: "ON"
+  ZOAU_HOME: "{{ ZOAU }}"
+  PYTHONPATH: "{{ ZOAU }}/lib/3.12"
+  LIBPATH: "{{ ZOAU }}/lib:{{ PYZ }}/lib:/lib:/usr/lib:."
+  PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+  _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+  _TAG_REDIR_ERR: "txt"
+  _TAG_REDIR_IN: "txt"
+  _TAG_REDIR_OUT: "txt"
+  LANG: "C"
+  PYTHONSTDINENCODING: "cp1047"
+
+
