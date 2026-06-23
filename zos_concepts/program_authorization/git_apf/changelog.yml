@@ -41,8 +41,12 @@ releases:
         - Updated host_vars, group_vars and inventory
       removed:
         - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
-  2026.06.18:
-    date: 2026-06-18
+  2026.06.23:
+    date: 2026-06-23
     changes:
+      fixed:
+        - Updated list_diff function to match return value format of zos_apf module.
+        - Rename option 'persistent.data_set_name' to 'persistent.target' per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
       minor:
         - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
+        - Updated sample GitHub variables to current working versions in prog_auth.yml.

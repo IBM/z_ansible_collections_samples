@@ -9,4 +9,4 @@
     batch: "{{ add_list }}"
     force_dynamic: true
     persistent:
-      target: "{{ persistent_ds }}"
+      target: "{{ persistent_ds.target }}"
