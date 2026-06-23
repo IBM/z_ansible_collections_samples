@@ -11,6 +11,8 @@
 # *|     hmc_managed by acc_default_mode                                    |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
 # *+------------------------------------------------------------------------+
 
 #####################################################################################################
@@ -27,7 +29,6 @@
 #   - FID          -> choose NETH
 ######################################################################################################
 
-
 # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 acc_url: https://9.120.0.0:8081/api
 
@@ -35,7 +36,6 @@ acc_url: https://9.120.0.0:8081/api
 
 # Initialize the ACC with default mode (acc_default_mode: true) or standalone mode (acc_default_mode: false)
 acc_default_mode: true
-
 
 ####### HMC access #######
 
@@ -49,7 +49,6 @@ hmc_user: "{{ lookup('env', 'HMC_USER') }}"
 # ACC-admin's password on the HMC (e.g., passw0rd123)
 # Export before run: export HMC_PASSWORD=<your_hmc_password>
 hmc_password: "{{ lookup('env', 'HMC_PASSWORD') }}"
-
 
 ####### Users #######
 
@@ -95,9 +94,7 @@ cc_owner_email: "cc_owner@email.com"
 # Export before run: export ACC_OWNER_DEFAULT_PASSWORD=<owner_default_password>
 cc_owner_default_password: "{{ lookup('env', 'ACC_OWNER_DEFAULT_PASSWORD') }}" # Specify default password for Owner's creation (e.g., "defaultP@ssw0rd")
 
-
 ####### Resources that are assigned to the appliance-owner #######
-
 
 ###########################################################################################
 # A *resource package* is a bundle of hardware resources assigned to a
@@ -110,7 +107,7 @@ cc_owner_default_password: "{{ lookup('env', 'ACC_OWNER_DEFAULT_PASSWORD') }}" #
 # the owner_vars file will be drawn from the total resources specified in the resource package.
 # ------------------------------------------------------------------------------
 #
-# The SSA appliance requires at least 2 IFLs and a minimum of 51200 (in MB) per LPAR. 
+# The SSA appliance requires at least 2 IFLs and a minimum of 51200 (in MB) per LPAR.
 # For better performance, more resource can be assigned depending on the expected workload.
 #
 # Memory should always be a multiple of 1024 (1 GB).
@@ -130,7 +127,6 @@ package_gps: 6
 
 # Memory allocated for resource creation (in MB): depends on the CPC's customerStorageAvailable, it should be multiple of 1024.
 package_memory_mb: 163840
-
 
 ################################################################################
 # How to use this configuration file for Resource Package creation
@@ -165,7 +161,7 @@ prefix1: 23
 vlan1_id: 300
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
-# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# Note: When using FCP this variable represents the LPAR's FCP device number used to
 # communicate with the boot volume on the storage controller
 disk1_id: "0.0.5abc"
 
@@ -192,7 +188,6 @@ chpid1: "d0"
 # Port number for the lpar (0 or 1), if CHIP ID available then only port can be added
 zport1: 0
 
-
 ####### Second LPAR Configuration #######
 
 # Logical partition (LPAR) name for resource assignment (e.g., "BLUEC1") should be valid SSA lpar name
@@ -211,7 +206,7 @@ prefix2: 23
 vlan2_id: 30
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
-# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# Note: When using FCP this variable represents the LPAR's FCP device number used to
 # communicate with the boot volume on the storage controller
 disk2_id: "0.0.5abc"
 
@@ -220,11 +215,11 @@ is_fcp2: false
 
 # World Wide Port Name (WWPN) To be added only when is_fcp is true
 # Should be 16 digits
-wwpn1: "5000000000000001"
+wwpn2: "5000000000000001"
 
 # Logical Unit Number (LUN) To be added only when is_fcp is true
 # Should be 16 digits
-lun1: "7000000000000001"
+lun2: "7000000000000001"
 
 # Appliance IP address ( lpar ip)
 app2_ip: "9.x.x.x"
