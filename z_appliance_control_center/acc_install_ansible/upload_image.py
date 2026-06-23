@@ -68,17 +68,24 @@ def upload_zfab_image(api_token: str, disk: str, image_file: str) -> tuple[int, 
         url += f"&lun={lun}&wwpn={wwpn}"
         print(f"UPLOAD URL for FCP disk:: {url}")
 
+    # Regenerate the token to avoid token expiration
+    rc, latest_token, _ = get_api_token()
+    if rc != HTTPStatus.OK:
+        print(f"Bad rc from get_api_token: {rc}")
+        sys.exit(1)
+    print("Successfully regenerated API token before install")
+
     with open(image_file, 'rb') as payload:
         res = requests.post(
-            url, 
-            data=payload, 
+            url,
+            data=payload,
             verify=os.environ.get("VERIFY_CERT", "false").lower() == "true",
             headers={
                 "Accept": "application/vnd.ibm.zaci.payload+json;version=1.0",
                 'Content-type': "application/octet-stream",
                 'Zaci-Api': 'com.ibm.zaci.system/1.0',
-                'Authorization': f"Bearer {api_token}"
-            }, 
+                'Authorization': f"Bearer {latest_token}"
+            },
             # increased the timeout for upload image to 40 mins for safer side
             timeout=40*60
         )
