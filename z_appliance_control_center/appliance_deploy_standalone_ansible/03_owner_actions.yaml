@@ -13,6 +13,9 @@
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Asking to update password before continuing                        |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-owner, for ACC-owner actions
@@ -89,6 +92,11 @@
       tags: owner, install
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: ../other_usecases_ansible/common_display_info.yaml
+
 
     - name: 02 - Upload appliance image to the ACC as owner
       tags: owner
