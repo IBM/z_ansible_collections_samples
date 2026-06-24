@@ -16,6 +16,11 @@ These sample playbooks:
 - In these playbooks, the MFA enablement done during the
   initialization of ACC.
 
+### Features
+
+- **Execution Timestamp and ACC About Info Display**: All playbooks (`01_admin_actions.yaml`, `02a_assign_1_lpar.yaml`, `02b_assign_2_lpar.yaml`, `03_owner_actions.yaml`, `04_install_flow.yaml`) now display execution timestamp and ACC about information at the start of execution for better tracking and debugging.
+- **Fast Activate Support**: The `04_install_flow.yaml` playbook now supports fast activate mode for quick reactivation of previously deactivated appliances.
+
 ## Setting Up ACC - 01_admin_actions.yaml
 
 To set up the ACC, the following actions must be performed by the ACC-admin on
@@ -235,6 +240,26 @@ Note: To generate the access token for the owner, provide the OTP when prompted 
 Use the last saved mfa_secret of owner to generate this OTP through your authenticator app.
 When the command prompt requests an OTP, enter the OTP generated using the saved mfa_secret.
 
+### Activation Mode Selection
+
+The playbook now supports two activation modes:
+
+1. **INSTALL/ACTIVATE (Regular Mode)**:
+   - Install a new image or activate with new configuration
+   - Requires: image_id, cores, memory, processor settings, hostname, username, password
+   - Uses: `/cluster/activate` endpoint
+
+2. **FAST ACTIVATE (Quick Reactivation)**:
+   - Reactivate previously deactivated appliances
+   - Uses preserved configuration from last activation
+   - Requires: Only LPAR names and image_match_check boolean value (default = True)
+   - Uses: `/cluster/inactive-appliance/fast-activate` endpoint
+   - **Note**: For fast activate mode, only `ACC_OWNER_PASSWORD` is required. `APP_USERNAME` and `APP_PASSWORD` are not needed as the preserved configuration is used.
+
+When you run the playbook, you will be prompted to select the activation mode (1 or 2).
+
+### Installation Steps
+
 - In case the admin has only assigned a single LPAR using the
   `02a_assign_1_lpar.yaml` playbook, then remove the second LPAR's details in
   task `01 - As owner, install and activate the image` of `04_install_flow.yaml`.
@@ -251,15 +276,11 @@ When the command prompt requests an OTP, enter the OTP generated using the saved
   ```
 
   Note that you will have to remove any trailing commas in the JSON object.
-- Export the newly set appliance-owner password in a terminal on your control node (laptop):
+
+- **For INSTALL/ACTIVATE mode**, export the newly set appliance-owner password and appliance credentials:
 
   ```bash
   export ACC_OWNER_PASSWORD=<owner_new_password>
-  ```
-
-- Export and set a new username and password to be used for the appliance LPAR(s):
-
-  ```bash
   export APP_USERNAME=<appliance_username>
   export APP_PASSWORD=<appliance_password>
   ```
@@ -267,10 +288,18 @@ When the command prompt requests an OTP, enter the OTP generated using the saved
   `appliance_username` and `appliance_passwords` are the credentials of the SSC LPAR (appliance)
   that will be installed by ACC.
 
-    Note: You will have to follow the administrator user id and password guidelines defined in the
+  Note: You will have to follow the administrator user id and password guidelines defined in the
   [SSC user-guide](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=wsscpsms-changing-logon-settings-secure-service-container-partition-standard-mode-system).
+
+- **For FAST ACTIVATE mode**, only export the appliance-owner password:
+
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_new_password>
+  ```
+
 - `cd` to the directory `appliance_deploy_default_mfa_ansible`.
 - Modify the variables in the file `owner_vars.yaml`.
+  - For fast activate mode, you can optionally set `image_match_check` variable (default is `true`).
 
 - Run the playbook:
 
@@ -278,7 +307,7 @@ When the command prompt requests an OTP, enter the OTP generated using the saved
   ansible-playbook 04_install_flow.yaml
   ```
 
-The above playbook with send the install command to ACC. ACC will take up to
+The above playbook will send the install command to ACC. ACC will take up to
 20 mins to install the appliance. Check the status of the appliances on HMC and wait for the playbook to complete successfully.
 
 Note that to pull logs for appliances, concurrent updates for appliances, upgrade, health check
