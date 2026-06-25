@@ -25,6 +25,22 @@ The use cases here cover the `default` mode of ACC, with or without MFA enabled.
 If MFA is enabled by the ACC-admin, ensure that you save the admin's and
 owner's `mfa_secret`s.
 
+### Features
+
+- **Execution Timestamp and ACC About Info Display**: Multiple playbooks in this directory now display execution timestamp and ACC about information at the start of execution for better tracking and debugging. This includes:
+  - `00_resource_scan.yaml`
+  - `01_upgrade_flow.yaml`
+  - `02_sync_cpc_lpars.yaml`
+  - `04_managed_appliance_update.yaml`
+  - `05_managed_appliance_health_and_pull_logs.yaml`
+  - `07_insert_hmc_creds.yaml`
+  - `10_unlock_appliances.yaml`
+  - `12_logout_owner.yaml`
+  - `13_restart_appliances.yaml`
+  - `16_get_task_info.yaml`
+  - `19_acc_about_info.yaml`
+  - `20_get_preserved_appliance_info.yaml`
+
 ## Preparation
 
 - Almost all the playbooks here require that ACC and the appliances under

@@ -21,6 +21,10 @@ playbooks `01_admin_actions.yaml`, `02b_assign_2_lpar.yaml`,
 If you have a clear separation of roles in your organization, it is better to
 use the playbooks in the `appliance_deploy_*` directories.
 
+### Features
+
+- **Execution Timestamp and ACC About Info Display**: All playbooks (`01_ssa_install_e2e_default.yaml`, `02_ssa_install_e2e_standalone.yaml`, `04_unlock_ssa_after_hmc_install.yaml`) now display execution timestamp and ACC about information at the start of execution for better tracking and debugging.
+
 ## SSA Installation (Default Mode) | 01_ssa_install_e2e_default.yaml
 
 To install 2x SSAs after a fresh install of ACC, you can run this playbook.

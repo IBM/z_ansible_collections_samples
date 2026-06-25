@@ -19,6 +19,7 @@
 # *|   - Updated task ID extraction to support both 'task-id' and           |
 # *|     'task_id' formats for backward/forward compatibility               |
 # *|   - Added automatic rollback debug messages when activation fails      |
+# *|   - Added optional HMC credential expiry support                       |
 # *+------------------------------------------------------------------------+
 
 # Tested with OSA and FCP devices, on non-DPM mode machine.
@@ -821,6 +822,13 @@
             | map(attribute='json.lpar')
             | list
           }}
+        acc_failed_task_details: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='json')
+            | list
+          }}
 
     - name: Debug message - Automatic rollback information
       ansible.builtin.debug:
@@ -831,6 +839,11 @@
           Failed Task IDs: {{ acc_failed_tasks }}
 
           NOTE: ACC is handling the rollback of LPAR(s) {{ acc_failed_lpars | join(', ') }} in the background.
+      when: acc_failed_tasks | length > 0
+
+    - name: "FAILED - Task Details"
+      ansible.builtin.debug:
+        var: acc_failed_task_details
       when: acc_failed_tasks | length > 0
 
     - name: Fail play if any task failed
