@@ -17,7 +17,7 @@
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
-      retries: 30
+      retries: 60
       delay: 10
   rescue:
     - name: Approve CSR failed
@@ -30,11 +30,11 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
-        ./kubectl label node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}=true --kubeconfig auth/kubeconfig &> /dev/null
+        ./kubectl label node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}='' --kubeconfig auth/kubeconfig &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
-      retries: 30
+      retries: 60
       delay: 10
       when: comp_name_suffix | default('worker') != 'worker'
   rescue:
@@ -49,11 +49,11 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
-        ./kubectl taint node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}=true  node-role.kubernetes.io/worker- --kubeconfig auth/kubeconfig &> /dev/null
+        ./kubectl taint node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}=''  node-role.kubernetes.io/worker- --kubeconfig auth/kubeconfig &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
       until: result.stdout.find(workerid) != -1
-      retries: 30
+      retries: 60
       delay: 10
       when: comp_name_suffix | default('worker') != 'worker'
   rescue:
