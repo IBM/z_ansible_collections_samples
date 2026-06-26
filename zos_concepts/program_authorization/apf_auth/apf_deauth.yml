@@ -1,0 +1,71 @@
+- name: Deauthorize library in APF.
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  gather_facts: false
+  vars:
+    library: IBMUSER.EXAMPLE.APFTEST
+    prog_mem_list:
+      - PROG00
+      - PROG3A
+  tasks:
+
+    - name: Before running tasks, execute display command.
+      ansible.builtin.command:
+        cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
+      changed_when: false
+      register: cat_init
+      loop: "{{ prog_mem_list }}"
+
+    - name: Print output from previous display command for visual that is familiar to mainframe operators before making changes.
+      ansible.builtin.debug:
+        msg: "{{ result.stdout_lines }}"
+      loop: "{{ cat_init.results }}"
+      loop_control:
+        loop_var: result
+        label: "{{ result.item }}"
+
+    - name: Ensure dynamic APF format.
+      ibm.ibm_zos_core.zos_apf:
+        operation: set_dynamic
+
+    - name: Get APF list to ensure idempotency.
+      ibm.ibm_zos_core.zos_apf:
+        operation: list
+      register: apf_list
+
+    - name: Remove library from APF list, skipping PROG00.
+      ibm.ibm_zos_core.zos_apf:
+        library: "{{ library }}"
+        sms: true
+        state: absent
+        persistent:
+          data_set_name: "SYS1.PARMLIB({{ item }})"
+      when: 
+        - library in apf_list.stdout 
+        - item != 'PROG00'
+      loop: "{{ prog_mem_list }}"
+
+    - name: Check APF list for dataset to ensure it has been removed.
+      ibm.ibm_zos_core.zos_apf:
+        operation: list
+      register: apf_list
+      failed_when: library in apf_list.stdout
+
+    - name: Print APF list to terminal for visual verification.
+      ansible.builtin.debug:
+        var: apf_list.stdout
+
+    - name: After running tasks, execute display command.
+      ansible.builtin.command:
+        cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
+      changed_when: false
+      register: cat_end
+      loop: "{{ prog_mem_list }}"
+
+    - name: Print output from previous task for visual verification that is familiar to mainframe operators after making changes.
+      ansible.builtin.debug:
+        msg: "{{ result.stdout_lines }}"
+      loop: "{{ cat_end.results }}"
+      loop_control:
+        loop_var: result
+        label: "{{ result.item }}"
