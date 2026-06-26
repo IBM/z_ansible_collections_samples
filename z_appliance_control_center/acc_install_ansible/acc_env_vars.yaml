@@ -43,7 +43,6 @@ HMC_USER: "{{ lookup('env', 'HMC_USER') }}"
 # Set Your hmc password (e.g,. export HMC_PASSWORD=<enter_hmc_password>)
 HMC_PASSWORD: "{{ lookup('env', 'HMC_PASSWORD') }}"
 
-
 ####### LPAR Credentials #######
 # Use during image installation
 # If this machine which will run the ansible playbook for ACC install
@@ -96,7 +95,7 @@ LPAR: "CC12"
 LPAR_IP: "9.x.x.x"
 
 # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
-# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# Note: When using FCP this variable represents the LPAR's FCP device number used to
 # communicate with the boot volume on the storage controller
 DISK_ID: "<enter_disk_id>"
 
@@ -135,7 +134,7 @@ NW_NAME: "net0"
 NW_FID: ""
 
 # CHPID
-# For DPM mode machines, provide channel-path-id 
+# For DPM mode machines, provide channel-path-id
 NW_CHPID: "d0"
 
 # Port

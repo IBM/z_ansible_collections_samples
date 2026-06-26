@@ -1,0 +1,256 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2025                                             |
+# *| ACC Configuration Restore Playbook                                     |
+# *| Includes post-import reboot & operational checks                       |
+# *| [04.02.2026]                                                           |
+# *|   - Tested with ACC 1.2.13                                             |
+# *|   - Added network configuration for ACC LPAR                           |
+# *|   - Added IFLs/GPs configuration for ACC LPAR                          |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *+------------------------------------------------------------------------+
+
+- name: Restore ACC appliance configuration
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - export_import_vars.yaml
+
+  vars_prompt:
+    - name: ssc_ip
+      prompt: "Enter your SSC LPAR's (ACC) IP"
+      private: false
+
+    - name: app_username
+      prompt: "Enter your SSC LPAR's (ACC) username"
+      private: false
+
+    - name: app_password
+      prompt: "Enter your SSC LPAR's (ACC) password"
+      private: true
+
+    - name: import_file
+      prompt: "Enter full path of the exported configuration file"
+      private: false
+
+  vars:
+    appliance_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
+
+  tasks:
+    # ---------------------------------------------------------------------
+    # Validate input file
+    # ---------------------------------------------------------------------
+    - name: Verify import file exists
+      ansible.builtin.stat:
+        path: "{{ import_file }}"
+      register: import_file_stat
+
+    - name: Fail if file does not exist
+      ansible.legacy.fail:
+        msg: "Configuration file not found: {{ import_file }}"
+      when: not import_file_stat.stat.exists
+
+    # ---------------------------------------------------------------------
+    # Authentication
+    # ---------------------------------------------------------------------
+    - name: Get authentication token from ACC
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/api-tokens"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ app_username }}"
+            password: "{{ app_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: Set access token
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.parameters.token }}"
+
+    - name: Display playbook execution information
+      ansible.builtin.include_tasks:
+        file: common_display_execution_info.yaml
+
+    # ---------------------------------------------------------------------
+    # Display import file information
+    # ---------------------------------------------------------------------
+    - name: Display import file information
+      ansible.builtin.debug:
+        msg:
+          - "Import file: {{ import_file }}"
+          - "Filename: {{ import_file | basename }}"
+
+    - name: Read import file header to extract metadata
+      ansible.builtin.command:
+        cmd: head -n 3 "{{ import_file }}"
+      register: import_file_header
+      changed_when: false
+
+    - name: Extract and parse JSON metadata from import file
+      ansible.builtin.set_fact:
+        import_metadata: "{{ (import_file_header.stdout_lines[1] | regex_search(\"Comment: '(.+)'$\", '\\1'))[0] | from_json }}"
+
+    - name: Display import file metadata
+      ansible.builtin.debug:
+        msg:
+          - "=== Import File Metadata ==="
+          - "Comment: {{ import_metadata.comment }}"
+          - "Date: {{ import_metadata.date }}"
+          - "Message Type: {{ import_metadata.message_type }}"
+          - "============================"
+
+    - name: Display important disclaimer before import
+      ansible.legacy.pause:
+        prompt: |
+
+          ⚠️  IMPORTANT DISCLAIMER:
+          Images uploaded to ACC are not retained as part of the config export and should be re-uploaded
+          after configuration restore.
+
+          Press ENTER to continue with the import or Ctrl+C to abort...
+
+    - name: Pause before importing configuration
+      ansible.legacy.pause:
+        seconds: 10
+        prompt: "Pausing for 10 seconds before importing configuration..."
+
+    # ---------------------------------------------------------------------
+    # Import configuration (binary upload)
+    # ---------------------------------------------------------------------
+    - name: Import appliance configuration
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/appliance-configuration/import?apply_now=true"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/octet-stream"
+          Authorization: "Bearer {{ access_token }}"
+        body_format: raw
+        src: "{{ import_file }}"
+        status_code: [200, 202, 204]
+        validate_certs: false
+        timeout: 1200
+      register: import_response
+
+    - name: Show import response
+      ansible.builtin.debug:
+        var: import_response
+
+    # ---------------------------------------------------------------------
+    # Post-import reboot / operational checks
+    # ---------------------------------------------------------------------
+    - name: Short wait to allow appliance restart to begin
+      ansible.legacy.pause:
+        seconds: 5
+
+    - name: Wait until appliance becomes operational after import
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/appliance/is-operational"
+        method: GET
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ access_token }}"
+        return_content: false
+        validate_certs: false
+      register: is_operational_response
+      failed_when: is_operational_response.status not in [-1, 204]
+      retries: 30
+      delay: 10
+      until: is_operational_response.status == 204
+
+    - name: Confirm appliance is operational
+      ansible.builtin.debug:
+        msg: "ACC appliance is operational after configuration restore"
+
+    # ---------------------------------------------------------------------
+    # Re-authenticate after restart
+    # ---------------------------------------------------------------------
+    - name: Re-authenticate after appliance restart
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/api-tokens"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ app_username }}"
+            password: "{{ app_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: post_reboot_auth
+
+    - name: Update access token after reboot
+      ansible.builtin.set_fact:
+        access_token: "{{ post_reboot_auth.json.parameters.token }}"
+
+    # ---------------------------------------------------------------------
+    # Post-process appliance update
+    # ---------------------------------------------------------------------
+    # This upgrade workflow requires ACC 1.2.10 and above
+    - name: Trigger post-process appliance update
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/appliance-update/post-process"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ access_token }}"
+        return_content: true
+        validate_certs: false
+        status_code: [200, 202]
+      register: post_process_trigger_response
+
+    - name: Show post-process trigger response
+      ansible.builtin.debug:
+        var: post_process_trigger_response
+
+    - name: Wait for post-process update to complete
+      ansible.builtin.uri:
+        url: "{{ appliance_url }}/appliance-update/post-process/status"
+        method: GET
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+          Authorization: "Bearer {{ access_token }}"
+        return_content: true
+        validate_certs: false
+      register: post_update_status
+      until: post_update_status.json.parameters.status in [0, 3, 5]
+      retries: 30
+      delay: 10
+
+    - name: Fail if post-process update failed
+      ansible.legacy.fail:
+        msg: "Post-process update failed with status code {{ post_update_status.json.parameters.status }}"
+      when: post_update_status.json.parameters.status == 4
+
+    - name: Show post-process progress
+      ansible.builtin.debug:
+        msg: "Post-process status code: {{ post_update_status.json.parameters.status }}"
+      when: post_update_status.json.parameters.status in [1, 2]
+
+    - name: Show complete post-process update status
+      ansible.builtin.debug:
+        var: post_update_status
+
+    - name: Post-process update completed successfully
+      ansible.builtin.debug:
+        msg: "Post-process update completed with status code {{ post_update_status.json.parameters.status }}"

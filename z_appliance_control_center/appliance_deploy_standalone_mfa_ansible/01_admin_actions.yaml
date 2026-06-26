@@ -12,6 +12,9 @@
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Asking to update password before continuing                        |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC Standalone playbook, run by ACC-admin, for ACC-admin actions
@@ -53,7 +56,7 @@
       prompt: "Do you want to initialize ACC? If you have already, then please type no. (yes/no)"
       private: false
       default: "yes"
-    
+
     - name: update_pass
       prompt: "Do you want to update the admin password? If you have already, then please type no (yes/no)"
       private: false
@@ -169,6 +172,10 @@
     - name: Extract the admin token
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: ../other_usecases_ansible/common_display_info.yaml
 
     - name: 04 - Insert CPC information in ACC with dummy values (standalone mode)
       tags: admin

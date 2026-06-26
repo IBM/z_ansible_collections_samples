@@ -1,0 +1,122 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *|   - Extracted from 03_pull_ssc_logs.yaml for reusability               |
+# *|   - Tasks for pulling SSC/appliance logs                               |
+# *+------------------------------------------------------------------------+
+
+# This task file is not meant to be executed directly. It is automatically called
+# by the following playbooks when run as appliance admin:
+# - other_usecases_ansible/03_pull_ssc_logs.yaml
+# - other_usecases_ansible/18_gather_acc_logs.yaml
+
+# Expected variables:
+# - ssc_ip: SSC LPAR IP address
+# - lpar_username: SSC LPAR username
+# - lpar_password: SSC LPAR password
+# - reason: Reason for creating logs
+# - log_destination: Destination path for the log file
+
+- name: Set API base URL
+  ansible.builtin.set_fact:
+    api_base_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
+
+- name: Get authentication token from the SSC LPAR
+  ansible.builtin.uri:
+    url: "{{ api_base_url }}/api-tokens"
+    method: POST
+    headers:
+      Accept: "application/vnd.ibm.zaci.payload+json"
+      Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+      zACI-API: "com.ibm.zaci.system/1.0"
+    body:
+      kind: "request"
+      parameters:
+        user: "{{ lpar_username }}"
+        password: "{{ lpar_password }}"
+    validate_certs: false
+    return_content: true
+    body_format: json
+  register: ssc_auth_response
+  failed_when: false
+
+- name: Check SSC authentication success
+  ansible.builtin.fail:
+    msg: "SSC authentication failed. Please check your appliance credentials."
+  when: ssc_auth_response.status != 200
+
+- name: Extract the SSC token
+  ansible.builtin.set_fact:
+    ssc_access_token: "{{ ssc_auth_response.json.parameters.token }}"
+
+- name: Send an alert to SSC to create logs
+  ansible.builtin.uri:
+    url: "{{ api_base_url }}/alerts"
+    method: POST
+    headers:
+      Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+      Accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+      Authorization: "Bearer {{ ssc_access_token }}"
+      zACI-API: "com.ibm.zaci.system/1.0"
+    body:
+      kind: "request"
+      parameters:
+        reason: "Testing alerts because of: {{ reason }}"
+        diag_info: "concurrent"
+    validate_certs: false
+    return_content: true
+    body_format: json
+    status_code: 202
+  register: alert_response
+  failed_when: false
+
+- name: Check alert creation success
+  ansible.builtin.fail:
+    msg: "Failed to create alert on SSC appliance."
+  when: alert_response.status != 202
+
+- name: Extract the alert UUID
+  ansible.builtin.set_fact:
+    alert_uuid: "{{ alert_response.json.parameters.self | regex_search('[0-9a-fA-F-]{36}') }}"
+
+- name: Display extracted UUID
+  ansible.builtin.debug:
+    var: alert_uuid
+
+- name: Wait till alert is handled by SSC
+  ansible.builtin.uri:
+    url: "{{ api_base_url }}/alerts/{{ alert_uuid }}"
+    method: GET
+    headers:
+      Accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
+      Authorization: "Bearer {{ ssc_access_token }}"
+      zACI-API: "com.ibm.zaci.system/1.0"
+    validate_certs: false
+    return_content: false
+    body_format: json
+    status_code: 200
+  register: alert_info
+  until: alert_info.status == 200
+  retries: 60
+  delay: 10
+  failed_when: alert_info.status not in [200, 202]
+
+- name: Display information about the alert
+  ansible.builtin.debug:
+    var: alert_info.json
+
+- name: Download diagnostic info as binary log
+  ansible.builtin.uri:
+    url: "{{ api_base_url }}/alerts/{{ alert_uuid }}/diag-info"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ ssc_access_token }}"
+      zACI-API: "com.ibm.zaci.system/1.0"
+      Accept: "application/octet-stream"
+    validate_certs: false
+    status_code: 200
+    timeout: 180
+    dest: "{{ log_destination }}"
+  register: ssc_download_result

@@ -148,7 +148,7 @@
         msg: "{{ INSTALL_SCRIPT_PATH }}"
 
     - name: Run the hmc_connected_install.sh script to install ACC (HMC connected)
-      ansible.builtin.shell: "./hmc_connected_install.sh"
+      ansible.builtin.command: "./hmc_connected_install.sh"
       args:
         chdir: "{{ INSTALL_SCRIPT_PATH }}"
       register: setup_result_connected
@@ -156,7 +156,7 @@
       when: hmc_connected | default(true) | bool
 
     - name: Run the hmc_not_connected_install.sh script to install ACC (HMC not connected)
-      ansible.builtin.shell: "./hmc_not_connected_install.sh"
+      ansible.builtin.command: "./hmc_not_connected_install.sh"
       args:
         chdir: "{{ INSTALL_SCRIPT_PATH }}"
       register: setup_result_not_connected

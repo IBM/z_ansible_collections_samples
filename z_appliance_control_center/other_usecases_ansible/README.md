@@ -15,10 +15,31 @@ These playbooks can be used for:
 - Unlocking appliances
 - Restarting ACC
 - Logging out of ACC
+- Exporting ACC configuration
+- Restoring ACC configuration (post-process task, available from ACC version 1.2.10 and above)
+- Gathering comprehensive ACC logs (tasks, history, audit, about, and appliance logs)
+- Getting ACC about information
+
 
 The use cases here cover the `default` mode of ACC, with or without MFA enabled.
 If MFA is enabled by the ACC-admin, ensure that you save the admin's and
 owner's `mfa_secret`s.
+
+### Features
+
+- **Execution Timestamp and ACC About Info Display**: Multiple playbooks in this directory now display execution timestamp and ACC about information at the start of execution for better tracking and debugging. This includes:
+  - `00_resource_scan.yaml`
+  - `01_upgrade_flow.yaml`
+  - `02_sync_cpc_lpars.yaml`
+  - `04_managed_appliance_update.yaml`
+  - `05_managed_appliance_health_and_pull_logs.yaml`
+  - `07_insert_hmc_creds.yaml`
+  - `10_unlock_appliances.yaml`
+  - `12_logout_owner.yaml`
+  - `13_restart_appliances.yaml`
+  - `16_get_task_info.yaml`
+  - `19_acc_about_info.yaml`
+  - `20_get_preserved_appliance_info.yaml`
 
 ## Preparation
 
@@ -61,22 +82,76 @@ playbook might delete all your unsaved data.
 To upgrade or update an appliance, perform the following actions as
 appliance-owner.
 
-- Download the appliance image you want to install to your control node (e.g., 
-  your laptop).
-- Modify the location of that image file for upgrade in the `owner_vars.yaml` file.
-  - Specifically, change the `image_path` variable.
-  - This image is used for both upgrade and concurrent/fix update.
-  - The variable `image_type` denotes the kind of update:
-    - Set the `image_type` variable to `image` for upgrade.
-      - Run the playbook for appliance upgrade:
-        ```bash
-        ansible-playbook 01_upgrade_flow.yaml
-        ```
-    - Set the `image_type` variable to `fix` for concurrent update.
-      - Run the playbook for appliance concurrent :
-        ```bash
-        ansible-playbook 04_managed_appliance_update.yaml
-        ```
+### 01_upgrade_flow.yaml
+
+Use `01_upgrade_flow.yaml` when you want to perform a full appliance upgrade
+using an uploaded image.
+
+- Download the appliance image you want to install to your control node.
+- Update `owner_vars.yaml`:
+  - `image_path`: path to the upgrade image file
+  - `package_name`: resource package that owns the target appliance
+  - `lpar_name`: target LPAR name
+  - `acc_url`: ACC API endpoint
+- Export the required environment variable:
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_password>
+  ```
+- Run the playbook:
+  ```bash
+  ansible-playbook 01_upgrade_flow.yaml
+  ```
+
+Behavior of this playbook:
+- Prompts for MFA OTP if MFA is enabled.
+- Uploads the image to ACC.
+- If the same image already exists for the current owner, the playbook lets you:
+  - continue with an existing uploaded image, or
+  - stop and re-run after deleting/changing the image
+- If you continue with an existing image, the playbook lists all available images
+  and asks you to select the image ID interactively.
+- Sends the cluster upgrade request using the selected/uploaded image ID.
+- Saves the upgrade response body to the path configured by
+  `upgrade_appliance_data`.
+- Saves response headers to:
+  `{{ upgrade_appliance_data }}.headers`
+- Fails the playbook if ACC returns HTTP `400`, while still preserving the
+  downloaded response for inspection.
+- Prints a warning if ACC returns HTTP `207`.
+
+### 04_managed_appliance_update.yaml
+
+Use `04_managed_appliance_update.yaml` when you want to apply a concurrent
+update/fix bundle to an existing appliance.
+
+- Update `owner_vars.yaml`:
+  - `update_bundle_path`: path to the update bundle file
+  - `package_name`: resource package that owns the target appliance
+  - `lpar_name`: target LPAR name
+  - `acc_url`: ACC API endpoint
+- Export the required environment variables:
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_password>
+  ```
+- Run the playbook:
+  ```bash
+  ansible-playbook 04_managed_appliance_update.yaml
+  ```
+
+Behavior of this playbook:
+- Prompts for MFA OTP if MFA is enabled.
+- Uploads the fix/update bundle to ACC.
+- Detects HTML error responses from the upload step and fails with a clearer
+  message for invalid requests or authentication problems.
+- If the same image already exists for the current owner, the playbook lets you:
+  - continue with an existing uploaded image, or
+  - stop and re-run after deleting/changing the image
+- If you continue with an existing image, the playbook lists all available images
+  and asks you to select the image ID interactively.
+- Unlocks quota for discovered running appliances by prompting for username and password interactively for each appliance.
+- Starts the concurrent update using the selected/uploaded image ID.
+- Saves the update response ZIP to the path configured by `upgrade_fix_data`.
+- Prints a warning if ACC returns HTTP `207`.
 
 ## Sync ACC with HMC | 02_sync_cpc_lpars.yaml
 
@@ -132,6 +207,8 @@ ansible-playbook 02_sync_cpc_lpars.yaml
 This playbook will interactively ask for the IP, username and password of the
 SSC LPAR of the appliance, from which logs are gathered. This means that this playbook can also be
 used for gathering logs from other appliances (e.g., SSA appliance).
+
+**Note**: This playbook now uses the reusable `17_tasks_pull_ssc_logs.yaml` tasks file, which contains the core log gathering logic. This same tasks file is also used by `18_gather_acc_logs.yaml` for consistency.
 
 Note that this playbook waits and then asks the SSC appliance
 whether the alert is handled by the appliance. If the alert is not yet
@@ -235,6 +312,14 @@ For this purpose:
   ```bash
     ansible-playbook 07_insert_hmc_creds.yaml
   ```
+
+### Optional: HMC Credential Expiry
+
+This playbook now supports an optional parameter to set an expiry time for HMC credentials.
+When prompted during playbook execution:
+
+- **Enter a number between 1-14** to set the HMC credentials to expire after that many days
+- **Leave empty** (press Enter) - on leaving empty we do not pass credential expiry time and hence ACC takes the default expiry of 1 day
 
 ### Caution:
 
@@ -376,3 +461,205 @@ To restart the appliances, follow the procedure:
   ```bash
   ansible-playbook 13_restart_appliances.yaml
   ```
+
+## Export ACC Configuration | 14_acc_export_config.yaml
+
+This playbook allows the ACC administrator to export the current ACC configuration
+to a file. The exported configuration can be used to restore ACC to a previous
+state in case of failures or to migrate configuration to another ACC instance.
+
+The playbook will:
+- Authenticate with ACC using admin credentials
+- Export the ACC configuration
+- Save the configuration file with a timestamp in the filename
+- Display the export location with a security reminder
+
+**Important**: The exported configuration file should be saved to a secure location
+as it may contain sensitive information. You will need this file to restore ACC
+configuration in case of failures.
+
+To export ACC configuration:
+
+- Update the variables in `export_import_vars.yaml`:
+  - Set the `export_dir` to specify where the configuration file should be saved
+  - Set the `lpar_name` if needed for your environment
+- Run the playbook:
+  ```bash
+  ansible-playbook 14_acc_export_config.yaml
+  ```
+- The playbook will prompt for:
+  - ACC IP address
+  - ACC admin username
+  - ACC admin password
+
+The exported file will be saved with a timestamp in the format:
+`{LPAR_NAME}_ACC_config_{TIMESTAMP}.data`
+
+## Restore ACC Configuration | 15_acc_restore_config.yaml
+
+This playbook allows the ACC administrator to restore a previously exported ACC
+configuration. This is useful for:
+- Recovering from configuration errors
+- Restoring ACC after a failure
+- Migrating configuration between ACC instances
+
+The playbook will:
+- Validate that the import file exists
+- Display import file information including filename with timestamp
+- Extract and display metadata from the import file (comment, date, message type)
+- Pause for 10 seconds before importing to allow review
+- Import the configuration and apply it
+- Wait for ACC to restart and become operational
+- Re-authenticate after the restart
+- Post-install script is executed after the config import(available from ACC 1.2.10 and above)
+
+**Important**: Restoring configuration will overwrite the current ACC configuration
+and restart the ACC appliance. Ensure you have a backup of the current configuration
+before proceeding.
+
+To restore ACC configuration:
+
+- Ensure you have a previously exported configuration file
+- Run the playbook:
+  ```bash
+  ansible-playbook 15_acc_restore_config.yaml
+  ```
+- The playbook will prompt for:
+  - ACC IP address
+  - ACC admin username
+  - ACC admin password
+  - Full path to the exported configuration file
+
+The playbook will display the import file metadata and pause for 10 seconds before proceeding with the import, giving you time to verify the correct file is being used.
+
+## Gather Comprehensive ACC Logs | 18_gather_acc_logs.yaml
+
+This playbook provides a unified solution for gathering all ACC-related logs and information in a single execution. It automatically detects the user role (ACC-admin or appliance-owner) and collects appropriate logs based on permissions.
+
+**Code Reuse**: Both this playbook and `03_pull_ssc_logs.yaml` use the same `17_tasks_pull_ssc_logs.yaml` tasks file for appliance log gathering. This ensures:
+- Single source of truth for log gathering logic
+- Consistent behavior across playbooks
+- Easier maintenance and bug fixes
+
+The playbook gathers:
+- **Tasks log**: Last n tasks from ACC
+- **History log**: Last n history operations from ACC
+- **About information**: ACC version and configuration details
+- **Audit logs**: Available only for ACC-admin users
+- **Appliance logs**: Available only for ACC-admin users (requires appliance credentials)
+
+All logs are organized in a timestamped directory structure:
+```
+acc_logs/
+└── acc_logs_YYYYMMDD_HHMMSS/
+    ├── tasks.log
+    ├── history.log
+    ├── about.log
+    ├── audit_logs/
+    │   └── audit_logs_YYYYMMDD_HHMMSS.zip
+    ├── app_logs/
+    │   └── ssc_YYYYMMDD_HHMMSS.gz
+    └── SUMMARY.txt
+```
+
+### Features
+
+- **Uses vars file**: Reads ACC URL from `owner_vars.yaml` (consistent with other playbooks)
+- **Interactive prompts**: Minimal prompts for credentials and parameters
+- **Role-based access**: Automatically detects user role and adjusts log collection
+- **MFA support**: Handles Multi-Factor Authentication if enabled
+- **Graceful error handling**: Skips tasks that fail due to insufficient permissions
+- **Comprehensive summary**: Generates a summary file with collection status
+
+### Prerequisites
+
+Before running the playbook, ensure you have configured `owner_vars.yaml` with the `acc_url` variable (e.g., `https://9.152.150.225:8081/api`)
+
+### Usage
+
+Run the playbook:
+```bash
+ansible-playbook 18_gather_acc_logs.yaml
+```
+
+The playbook will interactively prompt for:
+1. ACC username (ACC-admin or appliance-owner)
+2. ACC password
+3. Number of recent tasks to retrieve (default: 100)
+4. Number of recent history operations to retrieve (default: 100)
+5. MFA OTP (if MFA is enabled)
+6. Appliance credentials (if ACC-admin and wants to gather appliance logs)
+
+### Role-Based Behavior
+
+**For ACC-admin users:**
+- Collects all logs including audit logs
+- Optionally collects appliance diagnostic logs (requires appliance credentials)
+- Full access to all ACC APIs
+
+**For appliance-owner users:**
+- Collects tasks, history, and about information
+- Skips audit logs (requires admin privileges)
+- Skips appliance logs (requires admin privileges)
+
+### Notes
+
+- The playbook creates a new timestamped directory for each execution
+- Failed API calls are handled gracefully and logged in the summary
+- Appliance log collection may take several minutes as it waits for the appliance to generate diagnostic information
+- All logs are saved in JSON format for easy parsing and analysis
+
+### Example Output
+
+After successful execution, you'll see:
+```
+========================================
+Log collection completed successfully!
+========================================
+
+All logs have been saved to: ./acc_logs/acc_logs_20260520_123045
+
+Files collected:
+✓ about.log
+✓ tasks.log (100 tasks)
+✓ history.log (100 operations)
+✓ audit_logs/audit_logs_20260520_123045.zip
+✓ app_logs/ssc_20260520_123045.gz
+
+See SUMMARY.txt for details.
+```
+
+### Troubleshooting
+
+- If authentication fails, verify your credentials and try again
+- If MFA is enabled, ensure you enter the OTP within the validity period
+- For appliance log collection, ensure the appliance is accessible and credentials are correct
+- Check the SUMMARY.txt file for detailed status of each log collection operation
+
+### Replaces Previous Playbooks
+
+This comprehensive playbook consolidates functionality from:
+- Individual ssc log pull playbook - Now included inside app_logs
+- Individual about info playbook - Now included as about.log
+
+You can continue using the individual playbooks if you only need specific information, but this playbook provides a complete diagnostic package in one execution.
+
+## About Information of ACC | 19_acc_about_info.yaml
+
+This playbook allows both ACC-admin and appliance-owner to query the ACC `/about` API and
+display server version and build information.
+
+To get ACC about information:
+
+- Run the playbook:
+  ```bash
+  ansible-playbook 19_acc_about_info.yaml
+  ```
+- The playbook will prompt for:
+  - ACC username (admin or owner)
+  - ACC password
+  - MFA status (yes/no)
+  - OTP (if MFA is enabled)
+
+The playbook prints the full response returned by the ACC `/about` API.
+

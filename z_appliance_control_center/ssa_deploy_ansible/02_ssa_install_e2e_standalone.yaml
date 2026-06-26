@@ -13,6 +13,13 @@
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Asking to update password before continuing                        |
 # *|   - Changed return code from 200 to 200,207                            |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *|   - Updated task ID extraction to support both 'task-id' and           |
+# *|     'task_id' formats for backward/forward compatibility               |
+# *|   - Added automatic rollback debug messages when activation fails      |
+# *|   - Added optional HMC credential expiry support                       |
 # *+------------------------------------------------------------------------+
 
 # Tested with OSA and FCP devices, on non-DPM mode machine.
@@ -99,19 +106,18 @@
       prompt: "Do you want to initialize ACC? If you have already, then please type no. (yes/no)"
       private: false
       default: "yes"
-    
+
     - name: update_pass
       prompt: "Do you want to update the admin password? If you have already, then please type no (yes/no)"
       private: false
       default: "yes"
-    
+
     - name: update_owner_pass
       prompt: "Do you want to update the owner password? If you have already, then please type no (yes/no)"
       private: false
       default: "yes"
 
   tasks:
-
     - name: Prepare execution_action
       tags: retry
       ansible.builtin.set_fact:
@@ -152,8 +158,8 @@
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update admin password:"
           - "{{ init_response.json.totp_secret }}"
       when:
-          - mfa_enabled | bool
-          - run_init | lower == "yes"
+        - mfa_enabled | bool
+        - run_init | lower == "yes"
 
     - name: Wait for user to generate OTP from totp_secret
       tags: admin
@@ -161,8 +167,8 @@
         prompt: "Enter OTP generated from the above totp_secret:"
       register: otp_input
       when:
-          - mfa_enabled | bool
-          - run_init | lower == "yes"
+        - mfa_enabled | bool
+        - run_init | lower == "yes"
 
     - name: 01 - Update ACC-admin password (remove this if already done)
       tags: admin
@@ -193,7 +199,7 @@
           - "Admin Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ update_password_response.json.mfa_secret }}"
-      when: 
+      when:
         - mfa_enabled | bool
         - update_pass | lower == "yes"
 
@@ -202,9 +208,7 @@
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above admin mfa_secret:"
       register: mfa_admin_otp_input
-      when: 
-        - mfa_enabled | bool
-        - update_pass | lower == "yes"
+      when: mfa_enabled | bool
 
     - name: 02 - Get authentication token from the ACC as admin
       tags: admin, retry
@@ -224,6 +228,10 @@
       tags: admin, retry
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: ../other_usecases_ansible/common_display_info.yaml
 
     - name: 03 - Insert CPC information in ACC with dummy values (standalone mode)
       tags: admin
@@ -322,7 +330,6 @@
                 - For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
                 - For DASD disk, the 'wwpn' and 'lun' values are not required
 
-                
         - name: Enter boot disk type for 1st LPAR [DASD/FCP]
           ansible.builtin.pause:
             prompt: "Enter boot disk type for LPAR {{ lpar1_name }}: (DASD/FCP)"
@@ -489,7 +496,7 @@
         return_content: true
         validate_certs: false
       register: totp_response
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -497,7 +504,7 @@
       tags: owner
       ansible.builtin.debug:
         var: totp_response.json
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -507,7 +514,7 @@
         msg:
           - "Please copy this TOTP secret and generate OTP using any authenticator app to update owner password:"
           - "{{ totp_response.json.secret }}"
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -516,7 +523,7 @@
       ansible.builtin.pause:
         prompt: "Enter owner OTP generated from the above totp_secret:"
       register: otp_input
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -540,7 +547,7 @@
       tags: owner
       ansible.builtin.debug:
         var: owner_update_password_response.json
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -551,7 +558,7 @@
           - "Owner Password updated successfully. The following is your MFA secret. Paste this into your authenticator app."
           - ---- **** IMPORTANT ****: This secret will be displayed only once. Please save it securely. ----:"
           - "{{ owner_update_password_response.json.mfa_secret }}"
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -560,7 +567,7 @@
       ansible.builtin.pause:
         prompt: "Enter OTP generated from the above owner mfa_secret:"
       register: mfa_owner_otp_input
-      when: 
+      when:
         - mfa_enabled | bool
         - update_owner_pass | lower == "yes"
 
@@ -750,12 +757,17 @@
             response.json
             | dict2items
             | map(attribute='value')
+            | select('mapping')
             | map('dict2items')
             | flatten
             | map(attribute='value')
-            | selectattr('task-id', 'defined')
-            | map(attribute='task-id')
+            | select('mapping')
+            | map('dict2items')
+            | flatten
+            | selectattr('key', 'in', ['task-id', 'task_id'])
+            | map(attribute='value')
             | list
+            | default([])
           }}
 
     - name: Print extracted task IDs
@@ -784,15 +796,15 @@
         headers:
           Authorization: "Bearer {{ access_token }}"
         validate_certs: false
-        return_content: yes
+        return_content: true
       loop: "{{ task_ids }}"
       loop_control:
         label: "Task {{ item }}"
       register: poll_status
-      retries: 45       # max retries
-      delay: 40         # wait between retries
+      retries: 45 # max retries
+      delay: 40 # wait between retries
       until: poll_status.json["action-status"] in ["Success", "Failed"]
-      failed_when: false 
+      failed_when: false
 
     - name: Evaluate all task results
       ansible.builtin.set_fact:
@@ -803,12 +815,47 @@
             | map(attribute='item')
             | list
           }}
+        acc_failed_lpars: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='json.lpar')
+            | list
+          }}
+        acc_failed_task_details: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='json')
+            | list
+          }}
+
+    - name: Debug message - Automatic rollback information
+      ansible.builtin.debug:
+        msg: |
+          ⚠️  ACTIVATION FAILED - AUTOMATIC ROLLBACK IN PROGRESS ⚠️
+
+          One or more activation tasks have failed.
+          Failed Task IDs: {{ acc_failed_tasks }}
+
+          NOTE: ACC is handling the rollback of LPAR(s) {{ acc_failed_lpars | join(', ') }} in the background.
+      when: acc_failed_tasks | length > 0
+
+    - name: "FAILED - Task Details"
+      ansible.builtin.debug:
+        var: acc_failed_task_details
+      when: acc_failed_tasks | length > 0
+
     - name: Fail play if any task failed
       ansible.builtin.fail:
-        msg: "❌ One or more ACC install tasks failed. Failed Task IDs: {{ acc_failed_tasks }}"
+        msg: |
+          ❌ One or more ACC install tasks failed.
+          Failed Task IDs: {{ acc_failed_tasks }}.
+          ACC has automatically rolled back LPAR(s)
+          {{ acc_failed_lpars | join(', ') }}
+          to deactivate state.
       when: acc_failed_tasks | length > 0
-   
+
     - name: "Success message if both completed"
       ansible.builtin.debug:
         msg: "✅ Both tasks finished successfully or one succeeded and the other failed."
-

@@ -14,6 +14,13 @@
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Changed return code from 200 to 200,207                            |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *|   - Updated task ID extraction to support both 'task-id' and           |
+# *|     'task_id' formats for backward/forward compatibility               |
+# *|   - Added automatic rollback debug messages when activation fails.     |
+# *|   - Added support for fast activate mode                               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-owner, for ACC-owner actions
@@ -23,10 +30,48 @@
     - owner_vars.yaml
 
   pre_tasks:
-    - name: Reminder - Export appliance-owner credentials
+    - name: Prompt user to select activation mode
       ansible.builtin.pause:
         prompt: |
-          Before running this playbook, please export credentials:
+
+          ╔════════════════════════════════════════════════════════════════╗
+          ║          ACC Appliance Activation Mode Selection               ║
+          ╚════════════════════════════════════════════════════════════════╝
+
+          Please select the activation mode:
+
+          1. INSTALL/ACTIVATE (Regular Mode)
+             - Install a new image or activate with new configuration
+             - Requires: image_id, cores, memory, processor settings,
+                        hostname, username, password
+             - Uses: /cluster/activate endpoint
+
+          2. FAST ACTIVATE (Quick Reactivation)
+             - Reactivate previously deactivated appliances
+             - Uses preserved configuration from last activation
+             - Requires: Only LPAR names and image_match_check boolean value(default = True)
+             - Uses: /cluster/inactive-appliance/fast-activate endpoint
+
+          Enter your choice (1 or 2)
+      register: mode_selection
+
+    - name: Set activation mode based on user input
+      ansible.builtin.set_fact:
+        use_fast_activate: "{{ mode_selection.user_input | trim == '2' }}"
+
+    - name: Display selected mode
+      ansible.builtin.debug:
+        msg: |
+          {% if use_fast_activate %}
+          ✅ Selected: FAST ACTIVATE mode
+          {% else %}
+          ✅ Selected: INSTALL/ACTIVATE mode
+          {% endif %}
+
+    - name: Reminder - Export appliance-owner credentials (Install Mode)
+      ansible.builtin.pause:
+        prompt: |
+          Before continuing, please export credentials:
 
           export ACC_OWNER_PASSWORD=<owner_new_password>
           export APP_USERNAME=<appliance_username>
@@ -35,8 +80,24 @@
           Press Ctrl+C now to cancel if you haven't done this.
           The playbook will continue shortly.
         seconds: 5
+      when: not use_fast_activate
 
-    - name: Check required environment variables
+    - name: Reminder - Export appliance-owner credentials (Fast Activate Mode)
+      ansible.builtin.pause:
+        prompt: |
+          Before continuing, please export credentials:
+
+          export ACC_OWNER_PASSWORD=<owner_new_password>
+
+          Note: Fast activate mode uses preserved configuration.
+          APP_USERNAME and APP_PASSWORD are not required.
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+      when: use_fast_activate
+
+    - name: Check required environment variables (Install Mode)
       vars:
         required_env_vars:
           - ACC_OWNER_PASSWORD
@@ -45,8 +106,13 @@
 
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
-      when: lookup('env', item) == ""
+      when: lookup('env', item) == "" and not use_fast_activate
       loop: "{{ required_env_vars }}"
+
+    - name: Check required environment variables (Fast Activate Mode)
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: ACC_OWNER_PASSWORD"
+      when: lookup('env', 'ACC_OWNER_PASSWORD') == "" and use_fast_activate
 
   tasks:
     - name: Wait for user to generate OTP using Owner mfa secret
@@ -73,13 +139,33 @@
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: ../other_usecases_ansible/common_display_info.yaml
+
+
+    - name: Display mode information
+      ansible.builtin.debug:
+        msg: |
+          {% if use_fast_activate %}
+          🚀 Running in FAST ACTIVATE mode
+          - Using preserved configuration from previous activation
+          - Endpoint: /cluster/inactive-appliance/fast-activate
+          {% else %}
+          📦 Running in INSTALL/ACTIVATE mode
+          - Using image_id: {{ image_id }}
+          - Endpoint: /cluster/activate
+          {% endif %}
+
     - name: Printing the image ID
       tags: owner, install
       ansible.builtin.debug:
         msg: "{{ image_id }}"
+      when: not use_fast_activate
 
-    - name: 01 - As owner, install and activate the image
+    - name: 01 - As owner, install and activate the image (Regular Mode)
       tags: owner
+      when: not use_fast_activate
       ansible.builtin.uri:
         url: "{{ acc_url }}/cluster/activate"
         method: POST
@@ -117,6 +203,40 @@
         validate_certs: false
       register: activate_response
 
+    - name: 01 - As owner, fast activate the appliance from preserved state (Fast Activate Mode)
+      tags: owner, fast_activate
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/cluster/inactive-appliance/fast-activate"
+        method: POST
+        body: |
+          {
+            "{{ package_name }}":
+            {
+              "lpars": [
+                  {
+                    "name": "{{ lpar1_name }}",
+                    "image_match_check": {{ image_match_check | default(true) }}
+                  },
+                  {
+                    "name": "{{ lpar2_name }}",
+                    "image_match_check": {{ image_match_check | default(true) }}
+                  }
+                ]
+              }
+            }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        status_code: [200, 207]
+        validate_certs: false
+      when: use_fast_activate
+      register: fast_activate_response
+
+    - name: Set activate_response for unified processing
+      ansible.builtin.set_fact:
+        activate_response: "{{ fast_activate_response if use_fast_activate else activate_response }}"
+
     - name: Debug message for partial failure (207)
       tags: owner, install
       ansible.builtin.debug:
@@ -140,12 +260,17 @@
             activate_response.json
             | dict2items
             | map(attribute='value')
+            | select('mapping')
             | map('dict2items')
             | flatten
             | map(attribute='value')
-            | selectattr('task-id', 'defined')
-            | map(attribute='task-id')
+            | select('mapping')
+            | map('dict2items')
+            | flatten
+            | selectattr('key', 'in', ['task-id', 'task_id'])
+            | map(attribute='value')
             | list
+            | default([])
           }}
 
     - name: Print extracted task IDs
@@ -172,15 +297,15 @@
         headers:
           Authorization: "Bearer {{ access_token }}"
         validate_certs: false
-        return_content: yes
+        return_content: true
       loop: "{{ task_ids }}"
       loop_control:
         label: "Task {{ item }}"
       register: poll_status
-      retries: 45       # max retries
-      delay: 40         # wait between retries
+      retries: 45 # max retries
+      delay: 40 # wait between retries
       until: poll_status.json["action-status"] in ["Success", "Failed"]
-      failed_when: false 
+      failed_when: false
 
     - name: Evaluate all task results
       ansible.builtin.set_fact:
@@ -191,11 +316,45 @@
             | map(attribute='item')
             | list
           }}
+        acc_failed_lpars: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='json.lpar')
+            | list
+          }}
+        acc_failed_task_details: >-
+          {{
+            poll_status.results
+            | selectattr('json.action-status', 'match', '(?i)fail|error')
+            | map(attribute='json')
+            | list
+          }}
+
+    - name: Debug message - Automatic rollback information
+      ansible.builtin.debug:
+        msg: |
+          ⚠️  {{ 'FAST ACTIVATE' if use_fast_activate else 'ACTIVATION' }} FAILED - AUTOMATIC ROLLBACK IN PROGRESS ⚠️
+
+          One or more activation tasks have failed.
+          Failed Task IDs: {{ acc_failed_tasks }}
+
+          NOTE: ACC is handling the rollback of LPAR(s) {{ acc_failed_lpars | join(', ') }} in the background.
+      when: acc_failed_tasks | length > 0
+
+    - name: "FAILED - Task Details"
+      ansible.builtin.debug:
+        var: acc_failed_task_details
+      when: acc_failed_tasks | length > 0
+
     - name: Fail play if any task failed
       ansible.builtin.fail:
-        msg: "❌ One or more ACC install tasks failed. Failed Task IDs: {{ acc_failed_tasks }}"
+        msg: >-
+          ❌ One or more ACC install tasks failed. Failed Task IDs:
+          {{ acc_failed_tasks }}. ACC has automatically rolled back
+          LPAR(s) {{ acc_failed_lpars | join(', ') }} to deactivate state.
       when: acc_failed_tasks | length > 0
-   
+
     - name: "Success message if both completed"
       ansible.builtin.debug:
         msg: "✅ Both tasks finished successfully or one succeeded and the other failed."

@@ -21,6 +21,10 @@ playbooks `01_admin_actions.yaml`, `02b_assign_2_lpar.yaml`,
 If you have a clear separation of roles in your organization, it is better to
 use the playbooks in the `appliance_deploy_*` directories.
 
+### Features
+
+- **Execution Timestamp and ACC About Info Display**: All playbooks (`01_ssa_install_e2e_default.yaml`, `02_ssa_install_e2e_standalone.yaml`, `04_unlock_ssa_after_hmc_install.yaml`) now display execution timestamp and ACC about information at the start of execution for better tracking and debugging.
+
 ## SSA Installation (Default Mode) | 01_ssa_install_e2e_default.yaml
 
 To install 2x SSAs after a fresh install of ACC, you can run this playbook.
@@ -72,6 +76,12 @@ mode of ACC, where ACC can communicate with the HMC.
   export HMC_USER=<enter_HMC_username>
   export HMC_PASSWORD=<enter_HMC_password>
   ```
+
+  **Optional:** During playbook execution, you will be prompted to set an HMC credential
+  expiry time. Enter a number between 1-14 to set credentials to expire after that many
+  days. On leaving empty we do not pass credential expiry time and hence ACC takes the
+  default expiry of 1 day. This enhances security by ensuring credentials are refreshed
+  regularly.
 
 - Export the previously set default appliance-owner password and additionally set and export
   a new password for the appliance-owner. Keep in mind, the ACC API will be used to set the

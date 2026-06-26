@@ -11,6 +11,9 @@
 # *|   - acc_ip extracted from acc_url automatically                        |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run as ACC-admin, to get sanity check of ACC and SSAs install
@@ -63,7 +66,7 @@
     - name: Extract IP from URL
       ansible.builtin.set_fact:
         acc_ip: "{{ acc_url | urlsplit('hostname') }}"
-        
+
     - name: 00 - Check if ACC appliance is operational
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}/api/com.ibm.zaci.system/appliance/is-operational"

@@ -10,11 +10,15 @@
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Renamed the output file name                                       |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *|   - Refactored to include reusable tasks in 17_tasks_pull_ssc_logs.yaml|
 # *+------------------------------------------------------------------------+
 
-- name: ACC playbook, to get logs from appliances, decryptable only by IBM
+- name: ACC playbook, to get logs from appliances
   hosts: localhost
-  gather_facts: false
+  gather_facts: true
   vars_prompt:
     - name: "ssc_ip"
       prompt: "Enter your SSC LPAR's IP"
@@ -30,90 +34,17 @@
       private: false
 
   vars:
-    api_base_url: "https://{{ ssc_ip }}/api/com.ibm.zaci.system"
+    log_destination: "/tmp/ssc_{{ '%Y-%m-%d_%H:%M:%S' | strftime }}.gz"
 
   tasks:
-    - name: 00 - Get authentication token from the SSC LPAR
-      ansible.builtin.uri:
-        url: "{{ api_base_url }}/api-tokens"
-        method: POST
-        headers:
-          Accept: "application/vnd.ibm.zaci.payload+json"
-          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
-          zACI-API: "com.ibm.zaci.system/1.0"
-        body:
-          kind: "request"
-          parameters:
-            user: "{{ lpar_username }}"
-            password: "{{ lpar_password }}"
-        validate_certs: false
-        return_content: true
-        body_format: json
-      register: auth_response
+    - name: Display playbook execution information
+      ansible.builtin.include_tasks:
+        file: common_display_execution_info.yaml
 
-    - name: Extract the token
-      ansible.builtin.set_fact:
-        access_token: "{{ auth_response.json.parameters.token }}"
+    - name: Include SSC log pulling tasks
+      ansible.builtin.include_tasks:
+        file: 17_tasks_pull_ssc_logs.yaml
 
-    - name: 01 - Send an alert to SSC to create logs
-      ansible.builtin.uri:
-        url: "{{ api_base_url }}/alerts"
-        method: POST
-        headers:
-          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
-          Accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
-          Authorization: "Bearer {{ access_token }}"
-          zACI-API: "com.ibm.zaci.system/1.0"
-        body:
-          kind: "request"
-          parameters:
-            reason: "Testing alerts because of: {{ reason }}"
-            diag_info: "concurrent"
-        validate_certs: false
-        return_content: true
-        body_format: json
-        status_code: 202
-      register: alert_response
-
-    - name: Extract the alert UUID
-      ansible.builtin.set_fact:
-        alert_uuid: "{{ alert_response.json.parameters.self | regex_search('[0-9a-fA-F-]{36}') }}"
-
-    - name: Display extracted UUID
+    - name: Display log download location
       ansible.builtin.debug:
-        var: alert_uuid
-
-    - name: 02 - Wait till alert is handled by SSC
-      ansible.builtin.uri:
-        url: "{{ api_base_url }}/alerts/{{ alert_uuid }}"
-        method: GET
-        headers:
-          Accept: "application/vnd.ibm.zaci.payload+json;version=1.0"
-          Authorization: "Bearer {{ access_token }}"
-          zACI-API: "com.ibm.zaci.system/1.0"
-        validate_certs: false
-        return_content: false
-        body_format: json
-        status_code: 200
-      register: alert_info
-      until: alert_info.status == 200
-      retries: 60
-      delay: 10
-      failed_when: alert_info.status not in [200, 202]
-
-    - name: Display information about the alert
-      ansible.builtin.debug:
-        var: alert_info.json
-
-    - name: 03 - Download diagnostic info as binary log at /tmp/ssc_<date>_<time>.gz
-      ansible.builtin.uri:
-        url: "{{ api_base_url }}/alerts/{{ alert_uuid }}/diag-info"
-        method: GET
-        headers:
-          Authorization: "Bearer {{ access_token }}"
-          zACI-API: "com.ibm.zaci.system/1.0"
-          Accept: "application/octet-stream"
-        validate_certs: false
-        status_code: 200
-        timeout: 180
-        dest: "/tmp/ssc_{{ '%Y-%m-%d_%H:%M:%S' | strftime }}.gz" # destination file format eg: /tmp/ssc_2026-03-06_02:30:49.gz
+        msg: "SSC logs downloaded successfully at location: {{ log_destination }}"

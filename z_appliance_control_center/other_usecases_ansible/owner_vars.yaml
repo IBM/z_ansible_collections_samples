@@ -10,11 +10,12 @@
 # *|   - Replaced acc_ip with acc_url                                       |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
 # *+------------------------------------------------------------------------+
 
 # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 acc_url: https://9.120.0.0:8081/api
-
 
 ####### Users #######
 
@@ -27,7 +28,6 @@ cc_owner_email: "cc_owner@email.com"
 # Owner's password (e.g., "defaultPassw0rd1")
 cc_owner_password: "{{ lookup('env', 'ACC_OWNER_PASSWORD') }}"
 
-
 ####### Resources that are assigned to the appliance-owner #######
 
 # Already created Resource package name (e.g., "RP01")
@@ -35,7 +35,6 @@ package_name: "RP16"
 
 # LPAR name for resource assignment (e.g., "BLUEC1") should be valid lpar name in which "image" will be installed
 lpar_name: "CC16"
-
 
 ####### Image #######
 
@@ -95,7 +94,6 @@ image_type: "image"
 # This is the fix type of image
 image_fix_type: "fix"
 
-
 ####### Image install #######
 
 # ***************************************************************************
@@ -124,7 +122,6 @@ app_cores: 2
 # Amount of memory (in MB) allocated for the image
 app_memory: 51200
 
-
 ####### Appliance credential #######
 
 # Set Username for the appliance (used during appliance installation)
@@ -146,14 +143,13 @@ app_password: "{{ lookup('env', 'APP_PASSWORD') }}"
 
 execution_action: "default"
 
-
 ####### Download zip files #######
 
 # The location where the upgrade ZIP file is downloaded
-upgrade_appliance_data: "{{ lookup('env','HOME') }}/Downloads/upgrade_data_{{ ansible_date_time.epoch }}.zip"
+upgrade_appliance_data: "{{ lookup('env','HOME') }}/Downloads/upgrade_data_{{ ansible_facts['date_time']['epoch'] }}.zip"
 
 # The location where the concurrent update ZIP file is downloaded
-upgrade_fix_data: "{{ lookup('env','HOME') }}/Downloads/upgrade_fixes_data_{{ ansible_date_time.epoch }}.zip"
+upgrade_fix_data: "{{ lookup('env','HOME') }}/Downloads/upgrade_fixes_data_{{ ansible_facts['date_time']['epoch'] }}.zip"
 
 # # The location where the ssa log files is downloaded
 ssa_logs: "{{ lookup('env','HOME') }}/Downloads/download_logs_{{ ansible_date_time.epoch }}.zip"
