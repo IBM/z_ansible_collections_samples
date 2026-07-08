@@ -445,13 +445,13 @@
       zos_job_output:
         job_id: "{{submit_job_id}}"
       register: job_output_result
-      when: job_sub_result_production is defined and job_sub_result_production
+      when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
     - name: Result for get job output for job ID {{submit_job_id}}
       debug:
         msg: "{{ job_output_result }}"
-      when: job_sub_result_production is defined and job_sub_result_production
+      when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
     ############################################################################
@@ -462,13 +462,13 @@
       zos_job_query:
         job_id: "{{submit_job_id}}"
       register: job_query_result
-      when: job_sub_result_production is defined and job_sub_result_production
+      when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
     - name: Result for query job ID {{submit_job_id}}
       debug:
         msg: "{{ job_query_result }}"
-      when: job_sub_result_production is defined and job_sub_result_production
+      when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
     ############################################################################
