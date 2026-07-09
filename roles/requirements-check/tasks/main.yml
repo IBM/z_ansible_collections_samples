@@ -17,7 +17,7 @@
 
 - name: DEBUG(-v) List of supported Ansible versions for this playbook
   ansible.builtin.set_fact:
-    runtime_ansible_req: "{{ runtime_ansible_req | default([]) }} +[ '{{ item }}.n' ]"
+    runtime_ansible_req: "{{ (runtime_ansible_req | default([])) + [item + '.n'] }}"
   loop: "{{requires_ansible_version}}"
 
 - name: Ansible requirement check ensuring the Ansible runtime version meets the playbook requirement
@@ -69,11 +69,13 @@
     label: "{{ item.msg }}"
   when: result_collection_status.results | selectattr('msg', 'contains', 'FAIL') | list | length > 0
 
-- ansible.builtin.fail:
+- name: Fail if collection requirement not met
+  ansible.builtin.fail:
     msg: "{{result_collection_status_msg}}"
   when: result_collection_status_failed is defined and result_collection_status_failed
 
-- ansible.builtin.fail:
+- name: Fail if Ansible version requirement not met
+  ansible.builtin.fail:
     msg: "{{result_ansible_check.msg}}"
   when: result_ansible_check.msg is regex("FAIL")
 # - name: DEBUG(-v) Display if Ansible collection version for this playbook requirement passed
