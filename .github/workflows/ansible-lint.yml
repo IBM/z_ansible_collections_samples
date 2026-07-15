@@ -26,7 +26,11 @@ jobs:
         run: |
           failed=()
           for dir in ${{ github.workspace }}/*/; do
-            echo "=== Entering: $dir ==="
+            echo ""
+            echo "==============================================="
+            echo "  Entering: $dir"
+            echo "==============================================="
+            echo ""
             if (cd "$dir" && ansible-lint *); then
               echo "[PASS] $dir"
             else
