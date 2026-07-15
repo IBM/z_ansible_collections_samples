@@ -47,7 +47,7 @@
         file: "{{ tempfile_1.path }}"
 
     - name: Attempt to run ping command using newly discovered
-      ansible.builtin.ping:
+      ansible.builtin.ping: {}
       vars:
         ansible_python_interpreter: "{{ item.get('interpreter') }}"
       environment: "{{ environment_vars }}"
