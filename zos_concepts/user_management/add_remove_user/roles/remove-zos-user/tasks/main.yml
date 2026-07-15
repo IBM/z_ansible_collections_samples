@@ -64,7 +64,7 @@
     state: absent
 
 - name: Remove persistent mount
-  when: bpxprm_member is defined and bpxprm_member | length > 0
+  when: bpxprm_member is defined and bpxprm_member
   block:
     - name: Generate tempfile to hold BPXPRMxx
       ansible.builtin.tempfile:
