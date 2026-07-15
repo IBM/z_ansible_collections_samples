@@ -15,5 +15,14 @@ jobs:
         with:
           requirements: collections/requirements.yml
 
+      - name: Install ansible-lint
+        run: pip install ansible-lint
+
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v6.22.2
+        env:
+          ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
+        run: |
+          for dir in ${{ github.workspace }}/*/; do
+            echo "=== Entering: $dir ==="
+            (cd "$dir" && ansible-lint *)
+          done
