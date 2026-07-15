@@ -42,5 +42,4 @@
       vars:
         rexx_name: 'IEFJOBS.j2'
         max_rc: 0
-
       when: iefjobs == "create"

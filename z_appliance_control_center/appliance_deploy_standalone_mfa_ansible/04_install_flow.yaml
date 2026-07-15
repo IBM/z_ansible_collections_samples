@@ -87,7 +87,6 @@
           - ACC_OWNER_PASSWORD
           - APP_USERNAME
           - APP_PASSWORD
-
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
       when: lookup('env', item) == ""

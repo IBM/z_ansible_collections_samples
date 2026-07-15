@@ -121,7 +121,6 @@
           - HMC_PASSWORD
           - ACC_ADMIN_USER
           - ACC_ADMIN_DEFAULT_PASSWORD
-
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
       when:
@@ -134,7 +133,6 @@
         required_env_vars:
           - ACC_ADMIN_USER
           - ACC_ADMIN_DEFAULT_PASSWORD
-
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
       when:

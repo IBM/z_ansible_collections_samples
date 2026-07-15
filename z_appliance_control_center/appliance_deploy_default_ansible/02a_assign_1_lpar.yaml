@@ -42,7 +42,6 @@
         required_env_vars:
           - ACC_ADMIN_USER
           - ACC_ADMIN_PASSWORD
-
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
       when: lookup('env', item) == ""

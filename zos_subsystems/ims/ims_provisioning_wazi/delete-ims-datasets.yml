@@ -87,8 +87,6 @@
             name: ims_proclib
           vars:
             delete: true
-
-
       always:
         - name: Delete the temporary provision files directory
           file:

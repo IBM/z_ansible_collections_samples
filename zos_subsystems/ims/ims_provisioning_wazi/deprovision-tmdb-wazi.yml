@@ -20,7 +20,6 @@
 
         - include_role:
             name: deprovision_ims
-
       always:
         - name: Delete the temporary provision files directory
           file:

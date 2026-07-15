@@ -47,7 +47,6 @@
           - SSA1_APP_PASSWORD
           - SSA2_APP_USERNAME
           - SSA2_APP_PASSWORD
-
       ansible.builtin.fail:
         msg: "Missing required environment variable: {{ item }}"
       when: lookup('env', item) == ""

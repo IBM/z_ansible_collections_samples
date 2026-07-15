@@ -39,7 +39,6 @@
 
       - include_role:
           name: monitor_ims
-
       always:
         - name: Delete the temporary provision files directory
           file:
