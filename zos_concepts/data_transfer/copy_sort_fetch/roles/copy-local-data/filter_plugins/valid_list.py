@@ -1,5 +1,5 @@
 ################################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2026
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ################################################################################
 
@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 def valid_list(input_list):
-    return input_list and type(input_list) == list and len(input_list) != 0
+    return input_list and isinstance(input_list, list) and len(input_list) != 0
 
 
 class FilterModule(object):
