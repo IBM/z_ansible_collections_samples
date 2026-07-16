@@ -7,7 +7,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    user_id: "IBMUSER"
+    user_id: "{{ user_id | default('IBMUSER') }}"
   tasks:
     - name: Get sysname.
       ansible.builtin.command:

@@ -7,8 +7,8 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: "IBMUSER"
-    keyring: "'SharedRing1"
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    keyring: "{{ keyring | default('SharedRing1') }}"
 
   tasks:
     - name: Check if keyring already exists and create it if it doesn't.

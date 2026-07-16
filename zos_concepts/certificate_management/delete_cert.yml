@@ -7,9 +7,9 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: "IBMUSER"
-    cert_type: "USER" # Options: CERTAUTH, SITE, or USER
-    cert_label: "TESTUSER"
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    cert_type: "{{ cert_type | default('USER') }}" # Options: CERTAUTH, SITE, or USER
+    cert_label: "{{ cert_label | default('TESTUSER') }}"
     check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
 
   tasks:

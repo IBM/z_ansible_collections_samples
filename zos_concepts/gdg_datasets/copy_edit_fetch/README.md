@@ -1,16 +1,18 @@
 # Create, add, edit, copy and fetch with Generation data group
+
 This playbook demonstrates how to create, edit, copy and fetch
 Generation Data Groups (GDG) and Generation Datasets (GDS).
 
 This playbook uses:
-  - collection:
-    - ibm.ibm_zos_core
-  - modules:
-    - zos_copy
-    - zos_data_set
-    - zos_fetch
-    - zos_blockinfile
-    - zos_lineinfile
+
+- collection:
+  - ibm.ibm_zos_core
+- modules:
+  - zos_copy
+  - zos_data_set
+  - zos_fetch
+  - zos_blockinfile
+  - zos_lineinfile
 
 It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
@@ -18,9 +20,8 @@ names, authority, and the artifacts that will be created and cleaned up.
 
 > [!IMPORTANT]
 > The release of `ibm_zos_core` collection version 2.0.0 introduced option
-> and return value changes to modules. See the porting
-> guide in the release notes
-> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
+> and return value changes to modules. See the migration guide
+> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/migration/migration.html))
 > to understand the full scope of these changes.
 >
 > These changes are not compatible with earlier versions of the `ibm_zos_core` collection,
@@ -39,10 +40,12 @@ names, authority, and the artifacts that will be created and cleaned up.
 ## Playbook Requirements
 
 This playbook requires:
+
 - [IBM® z/OS® core collection 2.0.0 or later](https://galaxy.ansible.com/ibm/ibm_zos_core)
 - [ansible-core 2.16 or later](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Configuration
+
 - Configure the included [inventory.yml](inventories/inventory.yml) with the
   information from the managed z/OS host.
   - Review [inventory documentation](../../../docs/share/zos_core/configure_inventory.md)
@@ -73,16 +76,20 @@ ansible-playbook -i inventories copy_edit_fetch.yml
 ```
 
 # Changelog
+
 All changes are maintained chronologically by date found in the
 [changelog](changelog.yml).
 
 # Copyright
+
 © Copyright IBM Corporation 2024, 2026
 
 # License
+
 Licensed under [Apache License,
 Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 # Support
+
 Please refer to the [support section](../../../README.md#support) for more
 details.

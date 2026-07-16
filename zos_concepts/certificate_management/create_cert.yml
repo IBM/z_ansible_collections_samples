@@ -7,17 +7,17 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: "IBMUSER"
-    cert_label: "TESTUSER"
-    cert_type: "USER" # Options: CERTAUTH, SITE, or USER
-    sign_with: "Self" # Options: CERTAUTH, SITE, or Self
-    sign_label: "" # Only required if sign_with is not 'Self'
-    ou: "ANSIBLE CORE"
-    cn: "FQDE" # Common name - will default to FQDN, if undefined.
-    country: "US"
-    expiry_date: "2030-01-01"
-    keyring: "SharedRing1"
-    check_name: "IBMRACF,RACF_CERTIFICATE_EXPIRATION"
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    cert_label: "{{ cert_label | default('TESTSITE') }}"
+    cert_type: "{{ cert_type }}" # Options: CERTAUTH, SITE, or USER
+    sign_with: "{{ sign_with | default('Self') }}" # Options: CERTAUTH, SITE, or Self
+    sign_label: "{{ sign_label | default('') }}" # Only required if sign_with is not 'Self'
+    ou: "{{ ou | default('ANSIBLE CORE') }}"
+    cn: "{{ cn }}" # Common name - will default to FQDN, if undefined.
+    country: "{{ country | default('US') }}"
+    expiry_date: "{{ expiry_date | default('2030-01-01') }}"
+    keyring: "{{ keyring | default('SharedRing1') }}"
+    check_name: "{{ check_name | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
   tasks:
     - name: Check if keyring to be created already exists.

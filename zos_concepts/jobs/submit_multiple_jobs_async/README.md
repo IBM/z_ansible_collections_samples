@@ -23,9 +23,8 @@ names, authority, and the artifacts that will be created and cleaned up.
 
 > [!IMPORTANT]
 > The release of `ibm_zos_core` collection version 2.0.0 introduced option
-> and return value changes to modules. See the porting
-> guide in the release notes
-> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
+> and return value changes to modules. See the migration guide
+> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/migration/migration.html))
 > to understand the full scope of these changes.
 >
 > These changes are not compatible with earlier versions of the `ibm_zos_core` collection,

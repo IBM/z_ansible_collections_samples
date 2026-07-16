@@ -17,9 +17,8 @@ names, authority, and the artifacts that will be created and cleaned up.
 
 > [!IMPORTANT]
 > The release of `ibm_zos_core` collection version 2.0.0 introduced option
-> and return value changes to modules. See the porting
-> guide in the release notes
-> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/release_notes.html#porting-guide))
+> and return value changes to modules. See the migration guide
+> ([here](https://ibm.github.io/z_ansible_collections_doc/ibm_zos_core/docs/source/migration/migration.html))
 > to understand the full scope of these changes.
 >
 > These changes are not compatible with earlier versions of the `ibm_zos_core` collection,
@@ -36,11 +35,13 @@ names, authority, and the artifacts that will be created and cleaned up.
 > The `ibm_zos_core-v1.16.0-samples` branch will remain available until February 2028 but will not receive updates.
 
 ## Playbook Summary
+
 - [**transfer-data-sets.yml**](transfer-data-sets.yml) - Handles full transfer process: dump, pack, FTP, unpack and restore.
 - [**dump-pack-ftp.yml**](dump-pack-ftp.yml) - Handles transfer of data sets: dump, pack and FTP.
 - [**unpack-restore**](unpack-restore.yml) - Handles unpack and restore of data sets from a terse of a data set dump.
 
 ## Role Summary
+
 - [**dump-pack-ftp-data-sets**](roles/dump-pack-ftp-data-sets/README.md) - Holds tasks related to transfer of data sets: dump, pack and FTP.
 - [**unpack-restore-data-sets**](roles/unpack-restore-data-sets/README.md) - Holds tasks related to unpack and restore of data sets from a terse of a data set dump.
 - [**get-estimated-size-of-data-sets**](roles/get-estimated-size-of-data-sets/README.md) - Estimates the total amount of storage space used by one or more data sets.

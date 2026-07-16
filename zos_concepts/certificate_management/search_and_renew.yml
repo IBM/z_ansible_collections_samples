@@ -7,13 +7,13 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    cert_label: "TESTUSER"
-    cert_type: "USER" # CERTAUTH, SITE, or USER
-    sign_with: "Self" # CERTAUTH, SITE or Self
-    sign_label: "" # Only required if sign_with is not 'Self'
-    owner_id: "IBMUSER"
-    keyring: "SharedRing1"
-    new_expiry_date: "2030-01-01"
+    cert_label: "{{ cert_label | default('TESTSITE') }}"
+    cert_type: "{{ cert_type | default('SITE') }}" # Options: CERTAUTH, SITE, or USER
+    sign_with: "{{ sign_with | default('Self') }}" # Options: CERTAUTH, SITE or Self
+    sign_label: "{{ sign_label | default('') }}" # Only required if sign_with is not 'Self'
+    owner_id: "{{ owner_id | default('IBMUSER') }}"
+    keyring: "{{ keyring | default('SharedRing1') }}"
+    new_expiry_date: "{{ new_expiry_date | default('2030-01-01') }}"
 
     cert_found: false
     today: ""
