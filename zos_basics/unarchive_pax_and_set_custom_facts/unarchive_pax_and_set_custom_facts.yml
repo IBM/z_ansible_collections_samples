@@ -53,7 +53,7 @@
   # '/etc/ansible/facts.d/'. The 'fact_path' keyword is used to specify a
   # different directory.
   ##############################################################################
-  gather_facts: True
+  gather_facts: true
   fact_path: "{{ remote_facts_dir }}"
 
   tasks:
@@ -64,12 +64,12 @@
     # unecessarily repeat copy operations and at worst delete important files.
     ##############################################################################
     - name: Remove target directory for new-zoau to ensure clean build.
-      file:
+      ansible.builtin.file:
         name: "{{ new_zoau_target_dir }}"
         state: absent
 
     - name: Create target directory for new-zoau.
-      file:
+      ansible.builtin.file:
         name: "{{ new_zoau_target_dir }}"
         state: directory
 
@@ -100,7 +100,7 @@
         ZOAU_PYTHONPATH: "{{ new_zoau_target_dir }}lib/3.11"
 
     - name: Print the facts set in the previous task.
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ ZOAU }}"
           - "{{ ZOAU_PYTHONPATH }}"
@@ -126,7 +126,7 @@
       register: zoaversion_str
 
     - name: Print the results of the call to zoaversion.
-      debug:
+      ansible.builtin.debug:
         var: zoaversion_str.stdout
 
     ##############################################################################
@@ -155,7 +155,7 @@
           date_last_updated: "{{ now(utc=true,fmt='%Y-%m-%d') }}"
 
     - name: Print the updated zoau dict before writing to file.
-      debug:
+      ansible.builtin.debug:
         var: new_zoau_facts
 
     - name: Update the 'zoau.fact' file to persist the updates for future users.

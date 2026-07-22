@@ -77,7 +77,7 @@
         all_pgms_list: "{{ ansible_local.keys() | list }}"
 
     - name: Print the list of all programs.
-      debug:
+      ansible.builtin.debug:
         var: all_pgms_list
 
     ##############################################################################

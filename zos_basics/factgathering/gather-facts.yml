@@ -16,8 +16,7 @@
 #
 ###############################################################################
 
-- name: z/OS Gather Facts Sample Playbook
-  hosts: zos_host
+- hosts: zos_host
 
   environment: "{{ environment_vars }}"
 

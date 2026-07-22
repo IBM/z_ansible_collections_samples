@@ -35,7 +35,7 @@
 
   tasks:
     - name: Ensure target directory exists.
-      file:
+      ansible.builtin.file:
         path: "{{ remote_facts_dir }}"
         state: directory
 
