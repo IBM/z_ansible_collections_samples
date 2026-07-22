@@ -65,8 +65,6 @@
 
 - name: Sample zos_started_task playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -82,7 +80,7 @@
     # in this playbook.
     # #######################################################################################
     - name: "Copy sample JCL containing sleep command to '{{ member_name }}' member"
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ jcl_file }}"
         dest: "{{ usr_proclib }}({{ member_name }})"
         replace: True
@@ -96,16 +94,17 @@
     # #######################################################################################
     # Start a started task using PDS Member name which contains JCL to run as a started task.
     # #######################################################################################
-    - name: " Start a started task with JCL stored in '{{ member_name }}', ensuring to wait the full 30 seconds,
-            assign a reusable ASID, and have output written to system logs"
-      zos_started_task:
-          state: started
-          member: "{{ member_name }}"
-          reusable_asid: True
-          wait_time: 30
-          wait_full_time: True
-          system_logs: True
-          verbose: True
+    - name:
+        " Start a started task with JCL stored in '{{ member_name }}', ensuring to wait the full 30 seconds,
+        assign a reusable ASID, and have output written to system logs"
+      ibm.ibm_zos_core.zos_started_task:
+        state: started
+        member: "{{ member_name }}"
+        reusable_asid: True
+        wait_time: 30
+        wait_full_time: True
+        system_logs: True
+        verbose: True
       register: start_out
 
     - name: print start_out
@@ -127,11 +126,11 @@
         sleep_jcl_asidx: "{{ filtered_task.asidx }}"
 
     - name: "Display the status of started task '{{ member_name }}' using task ID '{{ sleep_jcl_task_id }}'"
-      zos_started_task:
-          state: displayed
-          task_id: "{{ sleep_jcl_task_id }}"
-          system_logs: True
-          verbose: True
+      ibm.ibm_zos_core.zos_started_task:
+        state: displayed
+        task_id: "{{ sleep_jcl_task_id }}"
+        system_logs: True
+        verbose: True
       register: display_out
 
     - name: print display_out
@@ -143,10 +142,10 @@
     # Cancel a running started task using a started task name and other params.
     # #######################################################################################
     - name: "Cancel the started task '{{ member_name }}' using its address space identifier {{ sleep_jcl_asidx }}"
-      zos_started_task:
-          state: cancelled
-          job_name: "{{ member_name }}"
-          asidx: "{{ sleep_jcl_asidx }}"
+      ibm.ibm_zos_core.zos_started_task:
+        state: cancelled
+        job_name: "{{ member_name }}"
+        asidx: "{{ sleep_jcl_asidx }}"
       register: cancel_out
 
     - name: print cancel_out
@@ -159,14 +158,14 @@
     # System started tasks like VLF can be modified using list of params 'replace', 'nn=02'
     # #######################################################################################
     - name: Modify 'VLF' started task to replace configuration for class 02 by specifying additional parameters.
-      zos_started_task:
-          state: modified
-          job_name: VLF
-          parameters:
-            - "REPLACE"
-            - "NN=02"
-          system_logs: True
-          verbose: True
+      ibm.ibm_zos_core.zos_started_task:
+        state: modified
+        job_name: VLF
+        parameters:
+          - "REPLACE"
+          - "NN=02"
+        system_logs: True
+        verbose: True
       register: modify_out
 
     - name: print modify_out
@@ -179,11 +178,11 @@
     # System started task like VLF can be stopped.
     # #######################################################################################
     - name: Stop the started task 'VLF'
-      zos_started_task:
-          state: stopped
-          job_name: VLF
-          verbose: True
-          system_logs: True
+      ibm.ibm_zos_core.zos_started_task:
+        state: stopped
+        job_name: VLF
+        verbose: True
+        system_logs: True
       register: stop_out
 
     - name: print stop_out
@@ -196,12 +195,12 @@
     # System started tasks like TSO, JES2, TCPIP, ICSF ..etc can be forced
     # #######################################################################################
     - name: Forcefully stop ICSF using ARM-style termination without address space destruction
-      zos_started_task:
-          state: forced
-          job_name: ICSF
-          arm: True
-          system_logs: True
-          verbose: True
+      ibm.ibm_zos_core.zos_started_task:
+        state: forced
+        job_name: ICSF
+        arm: True
+        system_logs: True
+        verbose: True
       register: force_out
 
     - name: print force_out
@@ -213,7 +212,7 @@
     # Delete PDS member 'SLEEPJCL' which got created for testing purpose
     # #######################################################################################
     - name: "Remove PDS Member {{ member_name }}"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ usr_proclib }}({{ member_name }})"
         state: absent
         type: member
@@ -222,27 +221,27 @@
     # Start default started task 'ICSF' which got stopped in previous steps
     # #######################################################################################
     - name: Start the started task 'ICSF' which got stopped in previous steps
-      zos_started_task:
-          state: started
-          member_name: ICSF
-          system_logs: True
-          verbose: True
+      ibm.ibm_zos_core.zos_started_task:
+        state: started
+        member_name: ICSF
+        system_logs: True
+        verbose: True
       register: start_out
 
     - name: print start_out
       debug:
         msg:
           - "{{ start_out }}"
-    
+
     # #######################################################################################
     # Start default started task 'VLF' under MSTR subsystem which got stopped in previous steps
     # #######################################################################################
     - name: Start the started task 'VLF' under MSTR subsystem which got stopped in previous steps
-      zos_started_task:
-          state: started
-          member_name: VLF
-          subsystem: MSTR
-          system_logs: True
+      ibm.ibm_zos_core.zos_started_task:
+        state: started
+        member_name: VLF
+        subsystem: MSTR
+        system_logs: True
       register: start_out
 
     - name: print start_out

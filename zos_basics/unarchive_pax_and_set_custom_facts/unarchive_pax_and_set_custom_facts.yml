@@ -30,8 +30,6 @@
 
 - name: Sample zoau pax installation playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
 
   environment: "{{ environment_vars }}"
 
@@ -81,7 +79,7 @@
     # remote system. The 'zos_unarchive' module can unpackage local archives too.
     ##############################################################################
     - name: Unpackage zoau pax file.
-      zos_unarchive:
+      ibm.ibm_zos_core.zos_unarchive:
         src: "{{ path_to_new_zoau_pax }}"
         dest: "{{ new_zoau_target_dir }}"
         remote_src: true
@@ -161,7 +159,7 @@
         var: new_zoau_facts
 
     - name: Update the 'zoau.fact' file to persist the updates for future users.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         content: "{{ new_zoau_facts | to_nice_json }}"
         dest: "{{ remote_facts_dir }}/zoau.fact"
         replace: true

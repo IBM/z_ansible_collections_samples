@@ -210,10 +210,10 @@
     # | The display method below requires the Ansible controller to be able to process EBCDIC data.
     # | You should comment out the display and response tasks if your controller is unable to process EBCDIC.
     # +----------------------------------------------------------------------------------------------------------
-    - name: Display a series of USS files contents in {{ tgt_tmp_dir }}/encode
-      command: "cat {{ tgt_tmp_dir }}/encode/{{ item }}.txt"
-      with_sequence: count=4
-      register: result
+    # - name: Display a series of USS files contents in {{ tgt_tmp_dir }}/encode
+    #   command: "cat {{ tgt_tmp_dir }}/encode/{{ item }}.txt"
+    #   with_sequence: count=4
+    #   register: result
 
     - name: Response for display a series of USS files contents
         in {{ tgt_tmp_dir }}/encode

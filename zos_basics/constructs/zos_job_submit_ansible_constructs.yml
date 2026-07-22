@@ -77,8 +77,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -385,7 +383,7 @@
     # Submit a job when --tags "mode_production"
     ############################################################################
     - name: Convert a local JCL file to IBM-037 and submit the job
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/HELLO.jcl"
         remote_src: false
         encoding:
@@ -442,7 +440,7 @@
     # --tags "mode_production"
     ############################################################################
     - name: Get job output for job ID {{submit_job_id}}
-      zos_job_output:
+      ibm.ibm_zos_core.zos_job_output:
         job_id: "{{submit_job_id}}"
       register: job_output_result
       when: job_sub_result_production is defined and not job_sub_result_production.failed
@@ -459,7 +457,7 @@
     # --tags "mode_production"
     ############################################################################
     - name: Query the submitted job ID {{submit_job_id}}
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{submit_job_id}}"
       register: job_query_result
       when: job_sub_result_production is defined and not job_sub_result_production.failed

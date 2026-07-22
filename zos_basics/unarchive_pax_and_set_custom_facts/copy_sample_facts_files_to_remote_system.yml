@@ -27,8 +27,6 @@
 ---
 - name: Copy local facts stored in static files to remote system.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   environment: "{{ environment_vars }}"
   gather_facts: false
 
@@ -42,7 +40,7 @@
         state: directory
 
     - name: Copy local *.fact files to remote z/OS system.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/facts.d/"
         dest: "{{ remote_facts_dir }}"
         replace: true # to ensure the set up is clean.

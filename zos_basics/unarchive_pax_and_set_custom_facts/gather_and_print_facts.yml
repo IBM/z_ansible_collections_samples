@@ -32,8 +32,6 @@
 ---
 - name: Gather and print static Ansible facts.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   environment: "{{ environment_vars }}"
   vars:
     remote_facts_dir: /path/to/facts/
