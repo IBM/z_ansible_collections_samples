@@ -32,6 +32,7 @@
     - ibm.ibm_zos_core
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
+    output_path: "{{ playbook_dir }}"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -103,12 +104,12 @@
         - name: Fetch the sorted data set back to controller
           zos_fetch:
             src: "{{ dest_tmp_data_set }}"
-            dest: "{{ playbook_dir }}/SortedSalaryData.txt"
+            dest: "{{ output_path }}/SortedSalaryData.txt"
             flat: true
 
         - name: Add column headers back to the sorted file
           lineinfile:
-            path: "{{ playbook_dir }}/SortedSalaryData.txt"
+            path: "{{ output_path }}/SortedSalaryData.txt"
             line: "{{ column_headers }}"
             insertbefore: BOF
           delegate_to: localhost

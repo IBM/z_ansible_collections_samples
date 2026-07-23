@@ -31,6 +31,7 @@
   vars:
     mount_point: "/tmp/zfs_aggr"
     aggr_growth_size: 2000
+    output_path: "{{ playbook_dir }}/"
 
   tasks:
     # ##########################################################################
@@ -138,7 +139,7 @@
     - name: "Fetch {{ trace_back_data_set }} to the local controller."
       zos_fetch:
         src: "{{ trace_back_data_set_mem }}"
-        dest: "{{ playbook_dir }}/"
+        dest: "{{ output_path }}"
       register: fetch_result
 
     - name: "Result of Fetch {{ trace_back_data_set_mem }} to the local machine."

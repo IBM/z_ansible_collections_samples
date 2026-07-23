@@ -30,6 +30,8 @@
     - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
+  vars:
+    output_path: "{{ playbook_dir }}"
 
   tasks:
     # ##########################################################################
@@ -64,15 +66,15 @@
         tmp_data_set: "{{ tmp_ds.get('data_sets')[0].name }}"
 
     # ##################################################################################################
-    # Uncomment to generate a temporary archive data set name if you do not specify one in zos_host.yml
+    # Generate a temporary archive data set name if you do not specify one in zos_host.yml
     # ##################################################################################################
-    # - name: Create a temporary archive data set name
-    #   command: "mvstmp {{ ansible_user | upper }}"
-    #   register: archive_data_set
+    - name: Create a temporary archive data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: archive_data_set
 
-    # - name: Save temporary archive data set name
-    #   set_fact:
-    #     archive_data_set: "{{ archive_data_set.stdout }}"
+    - name: Save temporary archive data set name
+      set_fact:
+        archive_data_set: "{{ archive_data_set.stdout }}"
 
     - name: Insert text into the data set
       zos_lineinfile:
@@ -99,7 +101,7 @@
     - name: "Fetch the tersed data set {{ archive_data_set }} to the local machine"
       zos_fetch:
         src: "{{ archive_data_set }}"
-        dest: "{{ playbook_dir }}/"
+        dest: "{{ output_path }}/"
         flat: true
         binary: true
       register: result
@@ -117,7 +119,7 @@
     - name: "Fetch {{ tmp_data_set }} to local machine"
       zos_fetch:
         src: "{{ tmp_data_set }}"
-        dest: "{{ playbook_dir }}/"
+        dest: "{{ output_path }}/"
         flat: true
         encoding:
           from: IBM-1047

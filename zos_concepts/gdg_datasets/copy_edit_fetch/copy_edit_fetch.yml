@@ -28,6 +28,8 @@
     - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
+  vars:
+    output_path: "{{ playbook_dir }}/"
 
   tasks:
     # ##########################################################################
@@ -129,7 +131,7 @@
         marker_end: " End of log time {{ time }} "
         insertbefore: BOF
         state: present
-        block: "{{ log_output | default('No log output available', true) }}"
+        block: "{{ log_output | default('No log output available', true) | regex_replace('[^\\x20-\\x7E\\n]', '') }}"
 
     - name: "Copy from the current generation of {{ tmp_data_set1 }} to the last Generation of {{ tmp_data_set2 }}"
       zos_copy:
@@ -147,7 +149,7 @@
     - name: "Fetch {{ tmp_data_set2 }}(0) to the local controller"
       zos_fetch:
         src: "{{ tmp_data_set2 }}(0)"
-        dest: "{{ playbook_dir }}/"
+        dest: "{{ output_path }}"
       register: fetch_result
 
     - name: "Result of Fetch {{ tmp_data_set2 }}(0) to the local machine"

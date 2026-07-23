@@ -12,6 +12,7 @@
 from pathlib import Path
 import pytest
 import subprocess
+import shutil
 
 from helpers import (
     ansible_env,
@@ -24,9 +25,32 @@ from helpers import (
 _TEST_DIR = Path(__file__).parent.resolve()
 _ZOS_CONCEPTS_DIR = _TEST_DIR.parent
 
-# site.yml playbooks include the requirements-check role; skip them when the
-# collection is not installed.
-_SITE_PLAYBOOKS = {
+_FILES_DIR = _TEST_DIR / "files"
+_FILE_GENERATION_PLAYBOOKS =  {
+    _ZOS_CONCEPTS_DIR / "data_transfer" / "copy_sort_fetch" / "site.yml",
+    _ZOS_CONCEPTS_DIR / "data_transfer" / "terse_fetch_data_set" / "site.yml",
+    _ZOS_CONCEPTS_DIR / "gdg_datasets" / "copy_edit_fetch" / "site.yml",
+    _ZOS_CONCEPTS_DIR / "zfsadm" / "grow_zfs_fetch_trace_back" / "site.yml",
+}
+
+_INVENTORIES_DEFAULT = _TEST_DIR / "inventories"
+_INVENTORIES_DATA_TRANSFER = _TEST_DIR / "inventories_data_transfer"
+_INVENTORY_OVERRIDES: dict[Path, Path] = {
+    _ZOS_CONCEPTS_DIR / "data_transfer" / "archive_copy_unarchive_restore": _INVENTORIES_DATA_TRANSFER,
+    _ZOS_CONCEPTS_DIR / "data_transfer" / "dump_pack_ftp_unpack_restore":    _INVENTORIES_DUMP_PACK_FTP,
+}
+
+_EXTRA_VARS: dict[Path, str] = {
+    _ZOS_CONCEPTS_DIR / "zos_script" / "site.yml":
+        "python_script_dir=/u/omvsadm",
+    _ZOS_CONCEPTS_DIR / "zos_stat" / "site.yml":
+        f"jcl_file={_ZOS_CONCEPTS_DIR / 'zos_stat' / 'files' / 'HELLO.jcl'}",
+    _ZOS_CONCEPTS_DIR / "volume_management" / "volume_initialization" / "init_dasd_vol_and_run_sample_jcl" / "site.yml":
+        '{"vol_unit": "01A0", "new_volser": "ABC123"}',
+    _ZOS_CONCEPTS_DIR / "user_management" / "add_remove_user" / "site.yml":
+        '{"name": "testusr", "userid": "TESTU8", "user_catalog": "VCATQAV"}',
+}
+_SITE_PLAYBOOKS: set[Path] = {
     _ZOS_CONCEPTS_DIR / "data_sets" / "copy_edit_submit" / "site.yml",
     _ZOS_CONCEPTS_DIR / "data_sets" / "data_set_basics" / "site.yml",
     _ZOS_CONCEPTS_DIR / "data_transfer" / "archive_copy_unarchive_restore" / "site.yml",
@@ -37,8 +61,8 @@ _SITE_PLAYBOOKS = {
     _ZOS_CONCEPTS_DIR / "encoding" / "convert_encoding" / "site.yml",
     _ZOS_CONCEPTS_DIR / "gdg_datasets" / "copy_edit_fetch" / "site.yml",
     _ZOS_CONCEPTS_DIR / "gdg_datasets" / "create_copy_submit" / "site.yml",
-    _ZOS_CONCEPTS_DIR / "jobs" / "submit_multiple_jobs_async" / "site.yml",
     _ZOS_CONCEPTS_DIR / "jobs" / "submit_query_retrieve" / "site.yml",
+    _ZOS_CONCEPTS_DIR / "jobs" / "submit_multiple_jobs_async" / "site.yml",
     _ZOS_CONCEPTS_DIR / "manipulate_text" / "site.yml",
     _ZOS_CONCEPTS_DIR / "program_authorization" / "git_apf" / "site.yml",
     _ZOS_CONCEPTS_DIR / "rest_apis" / "site.yml",
@@ -61,6 +85,32 @@ _SITE_PLAYBOOKS = {
 }
 
 # ---------------------------------------------------------------------------
+# Helper functions
+# ---------------------------------------------------------------------------
+def _resolve_inventory(playbook_path: Path) -> Path:
+    for prefix, inventory in _INVENTORY_OVERRIDES.items():
+        if prefix in playbook_path.parents:
+            return inventory
+    return _INVENTORIES_DEFAULT
+
+# ---------------------------------------------------------------------------
+# Session-scoped fixure to create and remove files directory
+# ---------------------------------------------------------------------------
+@pytest.fixture(scope="session", autouse=True)
+def require_collection():
+    # Skip when the collection is not installed (site.yml uses requirements-check role).
+    if not collection_installed():
+        pytest.skip(
+            "ibm.ibm_zos_core not installed; skipping all site.yml playbook tests.",
+            allow_module_level=True,
+        )
+def files_dir():
+    _FILES_DIR.mkdir(exist_ok=True)
+    yield
+    if _FILES_DIR.is_dir():
+            shutil.rmtree(_FILES_DIR)
+
+# ---------------------------------------------------------------------------
 # Test
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize(
@@ -79,27 +129,18 @@ def test_playbook_run(playbook_path: Path) -> None:
         )
 
     # Set inventory
-    if (_ZOS_CONCEPTS_DIR / "data_transfer" / "archive_copy_unarchive_restore") in playbook_path.parents:
-        inventory = _TEST_DIR / "inventories_data_transfer"
-    elif (_ZOS_CONCEPTS_DIR / "data_transfer" / "dump_pack_ftp_unpack_restore") in playbook_path.parents:
-        inventory = _TEST_DIR / "inventories_data_transfer"
-    else:
-        inventory = _TEST_DIR / "inventories"
+    inventory = _resolve_inventory(playbook_path)
 
     # Build playbook run command
     command = ["ansible-playbook", "-i", inventory, str(playbook_path)]
 
-    # Custom commands
-    if playbook_path == _ZOS_CONCEPTS_DIR / "zos_script" / "site.yml":
-        command.extend(["-e", "python_script_dir=/u/omvsadm"])
-    elif playbook_path == _ZOS_CONCEPTS_DIR / "zos_stat" / "site.yml":
-        jcl_file = _ZOS_CONCEPTS_DIR / "zos_stat" / "files" / "HELLO.jcl"
-        command.extend(["-e", f"jcl_file={jcl_file}"])
-    elif playbook_path == _ZOS_CONCEPTS_DIR / "volume_management" / "volume_initialization" / "init_dasd_vol_and_run_sample_jcl" / "site.yml":
-        command.extend(["-e", '{"vol_unit": "01A0", "new_volser": "ABC123"}'])
-    elif playbook_path == _ZOS_CONCEPTS_DIR / "user_management" / "add_remove_user" / "site.yml":
-        command.extend(["-e", '{"name": "testusr", "userid": "TESTU8", "user_catalog": "VCATQAV"}'])
+    # Set custom variables for playbook run
+    if extra_vars := _EXTRA_VARS.get(playbook_path):
+        command.extend(["-e", extra_vars])
 
+    if playbook_path in _OUTPUT_PATH_PLAYBOOKS:
+        command.extend(["-e", f"output_path={_FILES_DIR}"])
+        
     # Set ansible configuration file
     cfg_path = playbook_path.parent / "ansible.cfg"
     if not cfg_path.exists():
