@@ -71,7 +71,7 @@
     # +-------------------------------------------------------------------------
 
     - name: Query actionable messages on system {{ system_name }}
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: result_zos_operator_action_pre_query
 
@@ -96,7 +96,7 @@
 
     - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
         system {{ system_name }}
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "DUMP COMM=('test dump')"
       register: result_zos_operator
       when: bool_zos_operator_action_continue
@@ -108,7 +108,7 @@
       when: bool_zos_operator_action_continue
 
     - name: Query actionable messages on system {{ system_name }}
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: result_zos_operator_action_query
       when: bool_zos_operator_action_continue
@@ -134,7 +134,7 @@
       when: bool_zos_operator_action_continue and filtered_zos_operator_action_query is defined and  (filtered_zos_operator_action_query | length == 1)
 
     - name: Reply to operator action with "end"
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "{{ reply_num}}end"
       register: result_zos_operator_end
       when: bool_zos_operator_action_continue and reply_num is defined
@@ -145,7 +145,7 @@
       when: bool_zos_operator_action_continue and result_zos_operator_end is defined and reply_num is defined
 
     - name: Verify actionable message on system {{ system_name }} is canceled
-      zos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: results_zos_operator_action_query_verify
       when: bool_zos_operator_action_continue

@@ -39,7 +39,7 @@
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
 
     # ##########################################################################
@@ -97,7 +97,7 @@
     # ##########################################################################
 
     - name: "Shrink zFS aggregate data set {{ zfs_data_set }} on track size."
-      ibm.ibm_zos_core.zfs_resize:
+      ibm.ibm_zos_core.zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size_on_m }}"
         space_type: m
@@ -111,7 +111,7 @@
       ibm.ibm_zos_core.zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size }}"
-        verbose: True
+        verbose: true
       register: shrink_output
 
     - name: Echo shrink_output.
