@@ -72,16 +72,13 @@
 
 - name: Sample zos_user playbook for RACF user and group profile management
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
-
   vars:
     test_user_prefix: "TESTU"
     test_group_prefix: "TESTG"
     racf_db: "SYS1.RACF"
-    
+
   tasks:
     ###########################################################################
     # CREATE OPERATIONS
@@ -96,7 +93,7 @@
       register: create_user_basic
 
     - name: Display create_user_basic output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_user_basic }}"
 
     # Idempotency check - running the same user create operation again should not change anything.
@@ -108,7 +105,7 @@
       register: create_user_idempotent
 
     - name: Display idempotency check result
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_user_idempotent }}"
 
     # Create a basic group profile with RACF defaults.
@@ -120,7 +117,7 @@
       register: create_group_basic
 
     - name: Display create_group_basic output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_group_basic }}"
 
     # Create group with multiple segments configurations- General, OMVS, DFP
@@ -134,7 +131,7 @@
           owner: "{{ test_user_prefix }}001"
           installation_data: "Complete group profile"
           model: "{{ test_group_prefix }}001"
-        # GROUP-specific attributes  
+        # GROUP-specific attributes
         group:
           superior_group: "SYS1"
           terminal_access: true
@@ -145,17 +142,17 @@
           data_class: "DCLAS001"
           management_class: "MCLAS001"
           storage_class: "SCLAS001"
-        # OMVS (Unix System Services) attributes  
+        # OMVS (Unix System Services) attributes
         omvs:
           uid: custom
           custom_uid: 5739
       register: create_group_advanced
 
     - name: Display create_group_advanced output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_group_advanced }}"
 
-    # Create a user profile with multiple segments - 
+    # Create a user profile with multiple segments -
     # BASE_SEGMENTS, DFP, LANGUAGE, TSO, OMVS, RESTRICTIONS, OPERATOR
     - name: Create user with multiple segments
       ibm.ibm_zos_core.zos_user:
@@ -168,17 +165,17 @@
           display_name: "TEST USER NAME"
           installation_data: "Test User"
           model: "{{ test_user_prefix }}001"
-        # DFP (Data Facility Product) attributes  
+        # DFP (Data Facility Product) attributes
         dfp:
           data_app_id: "TESTAPP"
           data_class: "DCLAS001"
           management_class: "MCLAS001"
           storage_class: "SCLAS001"
-        # LANGUAGE attributes  
+        # LANGUAGE attributes
         language:
           primary: "ENU"
           secondary: "JPN"
-        # TSO (Time Sharing Option) attributes  
+        # TSO (Time Sharing Option) attributes
         tso:
           account_num: "33000"
           region_size: 16384
@@ -186,7 +183,7 @@
           job_class: "A"
           msg_class: "X"
           sysout_class: "A"
-        # OMVS (Unix System Services) attributes  
+        # OMVS (Unix System Services) attributes
         omvs:
           uid: auto
           home: "/u/{{ test_user_prefix | lower }}002"
@@ -195,7 +192,7 @@
           nonshared_size_unit: "g"
           shared_size: 7
           shared_size_unit: "g"
-        # RESTRICTIONS attributes (logon time/day restrictions)  
+        # RESTRICTIONS attributes (logon time/day restrictions)
         restrictions:
           days:
             - "monday"
@@ -204,7 +201,7 @@
             - "thursday"
             - "friday"
           time: "0900:1700"
-        # OPERATOR attributes (Extended MCS Console)  
+        # OPERATOR attributes (Extended MCS Console)
         operator:
           authority: info
           cmd_system: "MVS"
@@ -216,7 +213,7 @@
       register: create_user_advanced
 
     - name: Display create_user_advanced output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_user_advanced }}"
 
     ###########################################################################
@@ -233,11 +230,11 @@
         base_segment:
           installation_data: "Updated installation data"
         dfp:
-          data_app_id: "DEVAPP"  
+          data_app_id: "DEVAPP"
       register: update_group
 
     - name: Display update_group output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ update_group }}"
 
     # Update a user profile to update TSO attributes, secondary language and omvs
@@ -247,7 +244,7 @@
         state: update
         profile_type: user
         language:
-          secondary: "FRA"  
+          secondary: "FRA"
         tso:
           hold_class: "K"
           job_class: "K"
@@ -256,12 +253,12 @@
           region_size: 2048
           max_region_size: 4096
         omvs:
-         shared_size: 11
-         shared_size_unit: g
+          shared_size: 11
+          shared_size_unit: g
       register: update_user
 
     - name: Display update_user output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ update_user }}"
 
     ###########################################################################
@@ -279,7 +276,7 @@
       register: connect_default
 
     - name: Display connect_default output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ connect_default }}"
 
     # Connect a user to a group with special permissions including:
@@ -303,7 +300,7 @@
       register: connect_special
 
     - name: Display connect_special output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ connect_special }}"
 
     ###########################################################################
@@ -322,7 +319,7 @@
       register: remove_user
 
     - name: Display remove_user output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ remove_user }}"
 
     ###########################################################################
@@ -338,10 +335,10 @@
     # ansible-vault encrypt_string 'YourPassword' --name 'test_password'
 
     - name: Set temporary user credentials
-      set_fact:
-      # DISCLAIMER: The password below is a hardcoded value used for 
-      # demonstration/testing purposes only. For production environments, 
-      # always use ansible-vault or a secure secret manager.
+      ansible.builtin.set_fact:
+        # DISCLAIMER: The password below is a hardcoded value used for
+        # demonstration/testing purposes only. For production environments,
+        # always use ansible-vault or a secure secret manager.
         demo_password: "A@bc123D"
 
     - name: Create user for password management
@@ -356,7 +353,7 @@
       register: create_user_password
 
     - name: Display create_user_password output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_user_password }}"
 
     # Update user password to NOEXPIRED. This allows the user to logon
@@ -372,15 +369,15 @@
       register: update_password_noexpired
 
     - name: Display update_password_noexpired output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ update_password_noexpired }}"
 
     - name: Set temporary user passphrase
-      set_fact:
-        # DISCLAIMER: The passphrase below is a hardcoded value used for 
-        # demonstration/testing purposes only. In a production environment, 
+      ansible.builtin.set_fact:
+        # DISCLAIMER: The passphrase below is a hardcoded value used for
+        # demonstration/testing purposes only. In a production environment,
         # this should be managed via ansible-vault or a secure secret store.
-        demo_passphrase: "MySecurePassphrase123"    
+        demo_passphrase: "MySecurePassphrase123"
 
     # Create a user with a passphrase. Passphrases can be longer than
     # passwords (up to 100 characters) and provide enhanced security.
@@ -397,7 +394,7 @@
       register: create_user_passphrase
 
     - name: Display create_user_passphrase output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_user_passphrase }}"
 
     # Update a user's passphrase to NOEXPIRED.
@@ -412,9 +409,8 @@
       register: update_passphrase_noexpired
 
     - name: Display update_passphrase_noexpired output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ update_passphrase_noexpired }}"
-
 
     # Demonstrate password validation - attempting to create a user with
     # an invalid password (e.g., exceeding 8 characters or violating
@@ -425,17 +421,17 @@
         state: create
         profile_type: user
         password_mgmt:
-          password: "TooLongPassword123"  # Exceeds 8 characters
+          password: "TooLongPassword123" # Exceeds 8 characters
         omvs:
           uid: auto
-      ignore_errors: yes
+      ignore_errors: true
       register: create_invalid_password
 
     - name: Display create_invalid_password result
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Operation status: {{ 'FAILED' if create_invalid_password.failed else 'SUCCESS' }}"
-          - "Error: {{ create_invalid_password.msg | default('N/A') }}"    
+          - "Error: {{ create_invalid_password.msg | default('N/A') }}"
 
     ###########################################################################
     # PURGE OPERATIONS
@@ -450,7 +446,7 @@
       register: create_purge_user
 
     - name: Display create_purge_user output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_purge_user }}"
 
     # PURGE with dry-run mode (execute_clist=false)
@@ -464,7 +460,7 @@
       register: purge_dryrun
 
     - name: Display PURGE dry-run result
-      debug:
+      ansible.builtin.debug:
         msg: "{{ purge_dryrun }}"
 
     # PURGE with execution (removes user and all RACF references)
@@ -478,7 +474,7 @@
       register: purge_execute
 
     - name: Display PURGE execution result
-      debug:
+      ansible.builtin.debug:
         msg: "{{ purge_execute }}"
 
     # PURGE with execution (removes group and all RACF references)
@@ -492,8 +488,8 @@
       register: purge_execute
 
     - name: Display PURGE execution result
-      debug:
-        msg: "{{ purge_execute }}"    
+      ansible.builtin.debug:
+        msg: "{{ purge_execute }}"
 
     ###########################################################################
     # DELETE OPERATIONS - Cleanup
@@ -513,7 +509,7 @@
       register: delete_users
 
     - name: Display delete_users output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ delete_users }}"
 
     # Delete group profiles
@@ -527,5 +523,5 @@
       register: delete_groups
 
     - name: Display delete_groups output
-      debug:
+      ansible.builtin.debug:
         msg: "{{ delete_groups }}"

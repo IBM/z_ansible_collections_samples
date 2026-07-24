@@ -41,7 +41,7 @@
   vars:
     python_script_dir: "/u/user_name"
 
-    use_custom_msg: True
+    use_custom_msg: true
     custom_msg: "This is a custom Hello World message!!"
     some_num: 3
     fav_programming_languages:

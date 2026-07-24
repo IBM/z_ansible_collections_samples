@@ -83,11 +83,11 @@
       ibm.ibm_zos_core.zos_copy:
         src: "{{ jcl_file }}"
         dest: "{{ usr_proclib }}({{ member_name }})"
-        replace: True
+        replace: true
       register: copy_out
 
-    - name: print copy_out
-      debug:
+    - name: Print copy_out
+      ansible.builtin.debug:
         msg:
           - "{{ copy_out }}"
 
@@ -100,15 +100,15 @@
       ibm.ibm_zos_core.zos_started_task:
         state: started
         member: "{{ member_name }}"
-        reusable_asid: True
+        reusable_asid: true
         wait_time: 30
-        wait_full_time: True
-        system_logs: True
-        verbose: True
+        wait_full_time: true
+        system_logs: true
+        verbose: true
       register: start_out
 
-    - name: print start_out
-      debug:
+    - name: Print start_out
+      ansible.builtin.debug:
         msg:
           - "{{ start_out }}"
 
@@ -116,12 +116,12 @@
     # Display details of a running started task using started task name and other params.
     # #######################################################################################
     - name: Get specific task by task_identifier
-      set_fact:
+      ansible.builtin.set_fact:
         filtered_task: "{{ start_out.tasks | selectattr('task_identifier', 'equalto', member_name) | first | default({}) }}"
       when: start_out.tasks is defined
 
     - name: Extract task_id and asid from specific task
-      set_fact:
+      ansible.builtin.set_fact:
         sleep_jcl_task_id: "{{ filtered_task.task_id }}"
         sleep_jcl_asidx: "{{ filtered_task.asidx }}"
 
@@ -129,12 +129,12 @@
       ibm.ibm_zos_core.zos_started_task:
         state: displayed
         task_id: "{{ sleep_jcl_task_id }}"
-        system_logs: True
-        verbose: True
+        system_logs: true
+        verbose: true
       register: display_out
 
-    - name: print display_out
-      debug:
+    - name: Print display_out
+      ansible.builtin.debug:
         msg:
           - "{{ display_out }}"
 
@@ -148,8 +148,8 @@
         asidx: "{{ sleep_jcl_asidx }}"
       register: cancel_out
 
-    - name: print cancel_out
-      debug:
+    - name: Print cancel_out
+      ansible.builtin.debug:
         msg:
           - "{{ cancel_out }}"
 
@@ -164,12 +164,12 @@
         parameters:
           - "REPLACE"
           - "NN=02"
-        system_logs: True
-        verbose: True
+        system_logs: true
+        verbose: true
       register: modify_out
 
-    - name: print modify_out
-      debug:
+    - name: Print modify_out
+      ansible.builtin.debug:
         msg:
           - "{{ modify_out }}"
 
@@ -181,12 +181,12 @@
       ibm.ibm_zos_core.zos_started_task:
         state: stopped
         job_name: VLF
-        verbose: True
-        system_logs: True
+        verbose: true
+        system_logs: true
       register: stop_out
 
-    - name: print stop_out
-      debug:
+    - name: Print stop_out
+      ansible.builtin.debug:
         msg:
           - "{{ stop_out }}"
 
@@ -198,13 +198,13 @@
       ibm.ibm_zos_core.zos_started_task:
         state: forced
         job_name: ICSF
-        arm: True
-        system_logs: True
-        verbose: True
+        arm: true
+        system_logs: true
+        verbose: true
       register: force_out
 
-    - name: print force_out
-      debug:
+    - name: Print force_out
+      ansible.builtin.debug:
         msg:
           - "{{ force_out }}"
 
@@ -224,12 +224,12 @@
       ibm.ibm_zos_core.zos_started_task:
         state: started
         member_name: ICSF
-        system_logs: True
-        verbose: True
+        system_logs: true
+        verbose: true
       register: start_out
 
-    - name: print start_out
-      debug:
+    - name: Print start_out
+      ansible.builtin.debug:
         msg:
           - "{{ start_out }}"
 
@@ -241,10 +241,10 @@
         state: started
         member_name: VLF
         subsystem: MSTR
-        system_logs: True
+        system_logs: true
       register: start_out
 
-    - name: print start_out
-      debug:
+    - name: Print start_out
+      ansible.builtin.debug:
         msg:
           - "{{ start_out }}"

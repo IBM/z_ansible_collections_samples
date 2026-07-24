@@ -45,8 +45,6 @@
 
 - name: Sample zos_copy template playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -108,7 +106,7 @@
       register: tmp_dest_ds
 
     - name: Set fact `default_dataset_name`.
-      set_fact:
+      ansible.builtin.set_fact:
         default_dataset_name: "{{ tmp_dest_ds.stdout }}"
 
     # Just as with the file, we only need to specify use_template
@@ -130,7 +128,7 @@
       register: tmp_dest_ds
 
     - name: Set fact `custom_dataset_name`.
-      set_fact:
+      ansible.builtin.set_fact:
         custom_dataset_name: "{{ tmp_dest_ds.stdout }}"
 
     # We'll change the default markers for a variable substitution, which are

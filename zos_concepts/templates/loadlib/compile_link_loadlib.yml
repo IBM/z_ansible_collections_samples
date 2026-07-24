@@ -29,8 +29,6 @@
 
 - name: Sample zos_job_submit template playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 

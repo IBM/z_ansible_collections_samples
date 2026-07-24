@@ -26,8 +26,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -49,7 +47,7 @@
     # ##########################################################################
     - block:
         - name: Create a temporary data set
-          zos_data_set:
+          ibm.ibm_zos_core.zos_data_set:
             type: seq
             space_primary: 5
             space_secondary: 1
@@ -59,31 +57,31 @@
           failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', [])|length == 0
 
     - name: Get the result of temp data set creation
-      debug:
+      ansible.builtin.debug:
         var: tmp_ds
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.get('data_sets')[0].name }}"
 
     # ##################################################################################################
     # Generate a temporary archive data set name if you do not specify one in zos_host.yml
     # ##################################################################################################
     - name: Create a temporary archive data set name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: archive_data_set
 
     - name: Save temporary archive data set name
-      set_fact:
+      ansible.builtin.set_fact:
         archive_data_set: "{{ archive_data_set.stdout }}"
 
     - name: Insert text into the data set
-      zos_lineinfile:
+      ibm.ibm_zos_core.zos_lineinfile:
         src: "{{ tmp_data_set }}"
         before: BOF
         line: this is a test line to avoid errors trying to archive an empty data set
 
     - name: Create an archive with terse
-      zos_archive:
+      ibm.ibm_zos_core.zos_archive:
         src: "{{ tmp_data_set }}"
         dest: "{{ archive_data_set }}"
         format:
@@ -91,15 +89,15 @@
       register: terse_response
 
     - name: Get the result of temp data set creation
-      debug:
+      ansible.builtin.debug:
         var: temp_data_set
 
     - name: Get the output of terse execution
-      debug:
+      ansible.builtin.debug:
         var: terse_response
 
     - name: "Fetch the tersed data set {{ archive_data_set }} to the local machine"
-      zos_fetch:
+      ibm.ibm_zos_core.zos_fetch:
         src: "{{ archive_data_set }}"
         dest: "{{ output_path }}/"
         flat: true
@@ -107,17 +105,17 @@
       register: result
 
     - name: Result of fetching tersed PDS to the local machine
-      debug:
+      ansible.builtin.debug:
         var: result
 
     - name: "Remove the temporary data set {{ archive_data_set }}"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
       when: temp_data_set is defined and temp_data_set.data_sets|length > 0
 
     - name: "Fetch {{ tmp_data_set }} to local machine"
-      zos_fetch:
+      ibm.ibm_zos_core.zos_fetch:
         src: "{{ tmp_data_set }}"
         dest: "{{ output_path }}/"
         flat: true
@@ -127,10 +125,10 @@
       register: result
 
     - name: "Result of fetching {{ tmp_data_set }} to local machine"
-      debug:
+      ansible.builtin.debug:
         var: result
 
     - name: "Delete data set {{ tmp_data_set }}"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}"
         state: absent
