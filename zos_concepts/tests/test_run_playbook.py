@@ -6,13 +6,17 @@
 # Requirements
 # ------------
 # - ibm.ibm_zos_core collection (>= 2.0.0) must be installed locally.
+# - Update the inventory files with your z/OS system configuration variables.
 #
+# Run pytest
+# ------------
+# pytest zos_concepts/tests/test_run_playbook.py
 ###############################################################################
 
 from pathlib import Path
 import pytest
 import subprocess
-import shutil
+import tempfile
 
 from helpers import (
     ansible_env,
@@ -37,7 +41,7 @@ _INVENTORIES_DEFAULT = _TEST_DIR / "inventories"
 _INVENTORIES_DATA_TRANSFER = _TEST_DIR / "inventories_data_transfer"
 _INVENTORY_OVERRIDES: dict[Path, Path] = {
     _ZOS_CONCEPTS_DIR / "data_transfer" / "archive_copy_unarchive_restore": _INVENTORIES_DATA_TRANSFER,
-    _ZOS_CONCEPTS_DIR / "data_transfer" / "dump_pack_ftp_unpack_restore":    _INVENTORIES_DUMP_PACK_FTP,
+    _ZOS_CONCEPTS_DIR / "data_transfer" / "dump_pack_ftp_unpack_restore":    _INVENTORIES_DATA_TRANSFER,
 }
 
 _EXTRA_VARS: dict[Path, str] = {
@@ -94,7 +98,7 @@ def _resolve_inventory(playbook_path: Path) -> Path:
     return _INVENTORIES_DEFAULT
 
 # ---------------------------------------------------------------------------
-# Session-scoped fixure to create and remove files directory
+# Session-scoped fixures
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope="session", autouse=True)
 def require_collection():
@@ -104,11 +108,12 @@ def require_collection():
             "ibm.ibm_zos_core not installed; skipping all site.yml playbook tests.",
             allow_module_level=True,
         )
+
+# Create temporary directory for generated files
+@pytest.fixture(scope="session", autouse=True)
 def files_dir():
-    _FILES_DIR.mkdir(exist_ok=True)
-    yield
-    if _FILES_DIR.is_dir():
-            shutil.rmtree(_FILES_DIR)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        yield Path(tmpdir)
 
 # ---------------------------------------------------------------------------
 # Test
@@ -118,15 +123,8 @@ def files_dir():
     sorted(_SITE_PLAYBOOKS),
     ids=[str(p.relative_to(_ZOS_CONCEPTS_DIR)) for p in sorted(_SITE_PLAYBOOKS)],
 )
-def test_playbook_run(playbook_path: Path) -> None:
+def test_playbook_run(playbook_path: Path, files_dir: Path) -> None:
     """Run a site.yml playbook against a real z/OS host and assert exit code 0."""
-
-    # Skip when the collection is not installed (site.yml uses requirements-check role).
-    if not collection_installed():
-        pytest.skip(
-            f"{playbook_path.name} uses the requirements-check role which "
-            "depends on ibm.ibm_zos_core. Install the collection to run this test."
-        )
 
     # Set inventory
     inventory = _resolve_inventory(playbook_path)
@@ -138,14 +136,17 @@ def test_playbook_run(playbook_path: Path) -> None:
     if extra_vars := _EXTRA_VARS.get(playbook_path):
         command.extend(["-e", extra_vars])
 
-    if playbook_path in _OUTPUT_PATH_PLAYBOOKS:
-        command.extend(["-e", f"output_path={_FILES_DIR}"])
+    # Set temporary files directory
+    output_path = files_dir
+    if playbook_path in _FILE_GENERATION_PLAYBOOKS:
+        command.extend(["-e", f"output_path={output_path}"])
         
     # Set ansible configuration file
     cfg_path = playbook_path.parent / "ansible.cfg"
     if not cfg_path.exists():
         cfg_path = None
 
+    # Run playbook command
     result = subprocess.run(
         command,
         capture_output=True,

@@ -4,6 +4,7 @@ exclude_paths:
   - zos_concepts/data_transfer/dump_pack_ftp_unpack_restore/roles/*/tests/test.yml
   - zos_concepts/program_authorization/git_apf/roles/*/tests/test.yml
   - zos_concepts/user_management/add_remove_user/roles/*/tests/test.yml
+  
   - zos_subsystems/ims/ims_cobol_deploy/roles/*/tests/test.yml
   - zos_subsystems/ims/ims_provisioning/roles/*/tests/test.yml
   - zos_subsystems/wlp/roles/*/tests/test.yml
