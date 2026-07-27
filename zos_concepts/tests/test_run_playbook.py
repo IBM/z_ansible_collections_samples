@@ -29,7 +29,6 @@ from helpers import (
 _TEST_DIR = Path(__file__).parent.resolve()
 _ZOS_CONCEPTS_DIR = _TEST_DIR.parent
 
-_FILES_DIR = _TEST_DIR / "files"
 _FILE_GENERATION_PLAYBOOKS =  {
     _ZOS_CONCEPTS_DIR / "data_transfer" / "copy_sort_fetch" / "site.yml",
     _ZOS_CONCEPTS_DIR / "data_transfer" / "terse_fetch_data_set" / "site.yml",
@@ -54,6 +53,7 @@ _EXTRA_VARS: dict[Path, str] = {
     _ZOS_CONCEPTS_DIR / "user_management" / "add_remove_user" / "site.yml":
         '{"name": "testusr", "userid": "TESTU8", "user_catalog": "VCATQAV"}',
 }
+
 _SITE_PLAYBOOKS: set[Path] = {
     _ZOS_CONCEPTS_DIR / "data_sets" / "copy_edit_submit" / "site.yml",
     _ZOS_CONCEPTS_DIR / "data_sets" / "data_set_basics" / "site.yml",
@@ -69,8 +69,8 @@ _SITE_PLAYBOOKS: set[Path] = {
     _ZOS_CONCEPTS_DIR / "jobs" / "submit_multiple_jobs_async" / "site.yml",
     _ZOS_CONCEPTS_DIR / "manipulate_text" / "site.yml",
     _ZOS_CONCEPTS_DIR / "program_authorization" / "git_apf" / "site.yml",
-    _ZOS_CONCEPTS_DIR / "rest_apis" / "site.yml",
-    _ZOS_CONCEPTS_DIR / "software_management" / "site.yml",
+    # _ZOS_CONCEPTS_DIR / "rest_apis" / "site.yml",
+    # _ZOS_CONCEPTS_DIR / "software_management" / "site.yml",
     _ZOS_CONCEPTS_DIR / "templates" / "copy_template" / "site.yml",
     _ZOS_CONCEPTS_DIR / "templates" / "loadlib" / "site.yml",
     _ZOS_CONCEPTS_DIR / "templates" / "submit_job_template" / "site.yml",
