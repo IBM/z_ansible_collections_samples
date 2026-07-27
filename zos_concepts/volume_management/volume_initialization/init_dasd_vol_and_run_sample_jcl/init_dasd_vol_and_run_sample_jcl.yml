@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023, 2026
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -20,6 +21,7 @@
 #
 # Requirements:
 #   IBM z/OS core collection 2.0.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
 #   vol_unit - this is the unit address (device number) of the target device.
@@ -32,8 +34,11 @@
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
+  environment: "{{ environment_vars }}"
 
   vars:
+    vol_unit: "volume_unit_address"
+    new_volser: "volume_serial_name"
     vol_unit: "volume_unit_address"
     new_volser: "volume_serial_name"
     mount_point: "/tmp/sample"
@@ -79,9 +84,11 @@
       ibm.ibm_zos_core.zos_volume_init:
         address: "{{ vol_unit }}"
         verify_offline: false
+        verify_offline: false
         volid: "{{ new_volser }}"
         index: true
         sms_managed: false
+        verify_volume_empty: false
         verify_volume_empty: false
       register: output
 
@@ -123,6 +130,7 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ mount_point }}/HELLO.jcl"
         remote_src: true
+        remote_src: true
       register: result
 
     - name: Setting fact `job_id` for id of job submitted above.
@@ -139,6 +147,7 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
+    # Un-comment the following line to pause playbook execution before artifacts
     # Un-comment the following line to pause playbook execution before artifacts
     # are cleaned up in the next tasks.
     # - pause:

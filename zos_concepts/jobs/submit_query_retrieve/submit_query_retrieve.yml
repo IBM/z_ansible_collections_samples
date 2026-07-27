@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020, 2026
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -18,6 +19,7 @@
 #  `data_set_name`.
 #
 # Requirements:
+#   IBM z/OS core collection 2.0.0 or later
 #   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
@@ -129,6 +131,7 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
         remote_src: true
+        remote_src: true
       register: result
       with_sequence: count=1
 
@@ -178,6 +181,7 @@
         in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
+        remote_src: true
         remote_src: true
       register: result
 

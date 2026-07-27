@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020, 2026
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -21,6 +22,7 @@
 #  permissions such as writing the the target directories or creating data sets.
 #
 # Requirements:
+#     - IBM z/OS core collection 2.0.0 or later
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
@@ -55,6 +57,7 @@
             record_length: 1024
           register: tmp_ds
           failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', [])|length == 0
+          failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', [])|length == 0
 
     - name: Get the result of temp data set creation
       ansible.builtin.debug:
@@ -78,6 +81,7 @@
       ibm.ibm_zos_core.zos_lineinfile:
         src: "{{ tmp_data_set }}"
         before: BOF
+        before: BOF
         line: this is a test line to avoid errors trying to archive an empty data set
 
     - name: Create an archive with terse
@@ -85,6 +89,7 @@
         src: "{{ tmp_data_set }}"
         dest: "{{ archive_data_set }}"
         format:
+          type: terse
           type: terse
       register: terse_response
 
@@ -102,6 +107,7 @@
         dest: "{{ output_path }}/"
         flat: true
         binary: true
+        binary: true
       register: result
 
     - name: Result of fetching tersed PDS to the local machine
@@ -112,6 +118,7 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
+      when: temp_data_set is defined and temp_data_set.data_sets|length > 0
       when: temp_data_set is defined and temp_data_set.data_sets|length > 0
 
     - name: "Fetch {{ tmp_data_set }} to local machine"

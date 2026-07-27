@@ -17,12 +17,15 @@
 - hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Copy definition file over to target host
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/{{ ZOSMF_DEFINITION_FILE }}"
         dest: "{{ ZOSMF_DEST_FOLDER }}"
+        replace: true
+        binary: true
         replace: true
         binary: true
 

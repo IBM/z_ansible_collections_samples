@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2024, 2026
+# © Copyright IBM Corporation 2024, 2026
 ###############################################################################
 
 ###############################################################################
@@ -18,6 +19,7 @@
 #  permissions such as writing the the target directories or creating data sets.
 #
 # Requirements:
+#     - IBM z/OS core collection 2.0.0 or later
 #     - IBM z/OS core collection 2.0.0 or later
 #
 ###############################################################################

@@ -1,10 +1,13 @@
 ################################################################################
 # © Copyright IBM Corporation 2024, 2026
 ################################################################################
+# © Copyright IBM Corporation 2024, 2026
+################################################################################
 
 ################################################################################
 # This playbook copies static files containing sample facts over to the remote
 # target z/OS system using Red Hat Ansible Certified Content for IBM Z.
+# Run this playbook to set up or reset the remote system in preparation for
 # Run this playbook to set up or reset the remote system in preparation for
 # running the gather_and_print_facts.yml or
 # the unarchive_pax_and_set_custom_facts.yml playbooks.
@@ -17,10 +20,12 @@
 #
 # Requirements:
 #   IBM z/OS core collection 2.0.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
 #   remote_facts_dir - Path to remote directory which contains static files
 #                      in which local facts are stored as json or ini.
+#
 #
 ################################################################################
 

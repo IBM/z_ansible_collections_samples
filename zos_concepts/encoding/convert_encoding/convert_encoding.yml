@@ -1,9 +1,11 @@
 ###############################################################################
 # © Copyright IBM Corporation 2020, 2026
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
 # This sample playbook demonstrates how to perform encoding conversions on USS
+# using modules included in the IBM z/OS core collection.
 # using modules included in the IBM z/OS core collection.
 #
 # Usage:
@@ -21,6 +23,7 @@
 #  `system_name`.
 #
 # Requirements:
+#   IBM z/OS core collection 2.0.0 or later
 #   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:

@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023, 2026
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -36,6 +37,7 @@
     remove_data_sets: true
 
   environment: "{{ environment_vars }}"
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Create and copy content into data sets to archive.
@@ -67,6 +69,9 @@
     # This section executes a DUMP using ADRDSSU and then archives it using terse
     # format in one task using zos_archive.
     # Options explanation:
+    # - The format option contains a number of sub-options including 'type' to
+    # specify the format type, 'options' which contains two sub-options
+    # spack to specify SPACK or PACK and 'adrdssu' to specify whether
     # - The format option contains a number of sub-options including 'type' to
     # specify the format type, 'options' which contains two sub-options
     # spack to specify SPACK or PACK and 'adrdssu' to specify whether
@@ -123,3 +128,4 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
+

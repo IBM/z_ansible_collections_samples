@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023, 2026
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -19,6 +20,7 @@
 #  https://jinja.palletsprojects.com/en/latest/templates/.
 #
 # Requirements:
+#   IBM z/OS core collection 2.0.0 or later.
 #   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
@@ -41,6 +43,7 @@
 - name: Sample zos_job_submit template playbook.
   hosts: zos_host
   gather_facts: false
+  environment: "{{ environment_vars }}"
   environment: "{{ environment_vars }}"
 
   vars:
@@ -74,6 +77,7 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/CMD.j2"
         remote_src: false
+        remote_src: false
         use_template: true
       register: job_output
 
@@ -87,9 +91,11 @@
     - name: See job's submitted JCL.
       ansible.builtin.debug:
         msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'JESJCL') }}"
+        msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'JESJCL') }}"
 
     - name: See job output.
       ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'STDOUT') }}"
         msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'STDOUT') }}"
 
     # For the second example, some steps of the job will be rendered
@@ -101,6 +107,7 @@
     - name: Submit IEFBR14 job using a local template.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/LOOP.j2"
+        remote_src: false
         remote_src: false
         use_template: true
         template_parameters:
@@ -114,6 +121,7 @@
 
     - name: See job's submitted JCL.
       ansible.builtin.debug:
+        msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'JESJCL') }}"
         msg: "{{ job_ddnames | selectattr('dd_name', 'equalto', 'JESJCL') }}"
 
     - name: See job output.
