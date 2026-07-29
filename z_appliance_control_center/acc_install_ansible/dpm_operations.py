@@ -11,6 +11,9 @@
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Added network configuration for ACC LPAR                           |
 # *|   - Added IFLs/GPs configuration for ACC LPAR                          |
+# *| [07.28.2026]                                                           |
+# *|   - Tested with ACC 1.2.15                                             |
+# *|   - Setting host name of the ACC LPAR                                  |
 # *+------------------------------------------------------------------------+
 
 import sys
@@ -161,7 +164,8 @@ def update_partition_properties(cpc, lpar_name: str):
     user = os.environ.get("USERNAME")
     password = os.environ.get("PASSWORD")
     gw_ip = os.environ.get("NW_GW_IP")
-    properties = { "ssc-host-name" : "acchost",
+    hostname = os.environ.get("LPAR_HOSTNAME") or "acchost"
+    properties = { "ssc-host-name" : hostname,
                                 'ssc-boot-selection': 'installer',
                                 'initial-memory': storage,
                                 'ssc-master-userid':user,

@@ -187,6 +187,16 @@ credentials are stored in ACC as an encrypted memory buffer, which is flushed
 every 24 hours. Therefore, ACC-admin must again provide these credentials to
 the ACC.
 
+**HMC Credential Expiry (ACC 1.2.14+)**: Starting from ACC version 1.2.14, the ACC-admin can optionally configure an expiry period for HMC credentials when inserting them into ACC. This allows the credentials to be automatically cleared after a specified number of days (1-14 days), providing enhanced security control. The ACC-admin can:
+
+- Set the expiry period using the `days_to_clear_hmc_creds` parameter when calling the `/api/config/hmcconfig` endpoint
+- Check the credential validity and expiry time using the `/api/about` endpoint, which returns:
+  - `hmc_credential_validity_days`: Number of days remaining until credentials expire
+  - `hmc_credential_clears_at`: Timestamp when credentials will be cleared
+- Use the playbooks `07_insert_hmc_creds.yaml` in the `other_usecases_ansible` directory to manage HMC credentials with expiry
+
+If no expiry is set, the default behavior of clearing credentials every 24 hours remains unchanged.
+
 #### ACC-Admin and Appliance-Owner Credentials
 
 The default ACC-admin credentials correspond to the ACC LPAR credentials. These default credentials must be updated using the [update password](https://www.ibm.com/docs/en/systems-hardware/zsystems/9175-ME1?topic=reference-user-management#api_reference__title__3) ACC API endpoint. These credentials must be updated before issuing any other ACC API requests.
@@ -262,6 +272,7 @@ use-cases for:
 - Pulling SSA logs and Checking health status of SSA
 - Syncing LPARs
 - Install checks for ACC and SSA
+- Exporting and restoring ACC configuration
 
 Please read the `README.md` file in the appropriate playbook directory before proceeding.
 
@@ -313,12 +324,14 @@ This directory is used for other use cases associated with ACC and appliances.
 
 | File | Purpose |
 |:---------|:--------|
-| `env_vars.yaml` | This file contains variables used by the environment, e.g., to install 2x SSAs |
 | `owner_vars.yaml` | This file contains variables used by the appliance owners regarding their appliances |
-| `acc_ssa_install_check_vars.yaml` | This file contains variables used for checking ACC and 2x SSA installations |
-| `00_resource_scan.yaml`| Appliance owner can use this playbook to gather information about the resources assigned and consumed by the owner |
+| `admin_vars.yaml` | This file contains variables used by the ACC administrator |
+| `export_import_vars.yaml` | This file contains variables used by the export and restore configuration playbooks (e.g., `export_dir`) |
+| `common_display_info.yaml` | Shared tasks file that displays playbook execution timestamp and ACC about information; included by multiple playbooks |
+| `common_display_execution_info.yaml` | Shared tasks file that displays playbook execution timestamp only; included by `common_display_info.yaml` |
+| `00_resource_scan.yaml` | Appliance owner can use this playbook to gather information about the resources assigned and consumed by the owner |
 | `01_upgrade_flow.yaml` | Appliance owner can use this playbook to upgrade an appliance, which will format the disk and install a new appliance |
-| `02_sync_cpc_lpars.yaml` | ACC administrator can use this playbook to sync the state of the CPCs on the HMC, and LPARs. |
+| `02_sync_cpc_lpars.yaml` | ACC administrator can use this playbook to sync the state of the CPCs on the HMC, and LPARs |
 | `03_pull_ssc_logs.yaml` | ACC administrator can use this playbook to pull logs out of an SSC appliance like ACC |
 | `04_managed_appliance_update.yaml` | Appliance owner can use this playbook to update currently running appliances |
 | `05_managed_appliance_health_and_pull_logs.yaml` | Appliance owner can use this playbook to gather health status of the appliances and pull their logs |
@@ -327,9 +340,17 @@ This directory is used for other use cases associated with ACC and appliances.
 | `08_restart_acc.yaml` | ACC administrator can use this playbook to restart ACC |
 | `09_get_disruptive_dumps.yaml` | This playbook can be used by the ACC administrator to pull disruptive dumps/logs out of the appliances |
 | `10_unlock_appliances.yaml` | This playbook can be used by the appliance owners to unlock their appliances |
-| `11_unlock_each_appliances.yaml` | This playbook can be used in conjunction with `10_unlock_appliances.yaml` |
+| `11_unlock_each_appliance.yaml` | This playbook can be used in conjunction with `10_unlock_appliances.yaml` to unlock each appliance individually |
 | `12_logout_owner.yaml` | The appliance-owner can use this playbook to logout of ACC |
 | `13_restart_appliances.yaml` | The appliance-owner can use this playbook to restart appliances that are managed by ACC |
+| `14_acc_export_config.yaml` | ACC administrator can use this playbook to export ACC configuration to a file for backup or migration purposes |
+| `15_acc_restore_config.yaml` | ACC administrator can use this playbook to restore a previously exported ACC configuration |
+| `16_get_task_info.yaml` | Appliance owner can use this playbook to query the status of a specific task by its ID |
+| `17_tasks_pull_ssc_logs.yaml` | Shared tasks file (not run directly) for pulling SSC/appliance logs; reused by `03_pull_ssc_logs.yaml` and `18_gather_acc_logs.yaml` |
+| `18_gather_acc_logs.yaml` | Unified playbook for gathering all ACC-related logs (tasks, history, audit, about, and appliance logs) in a single execution; role-aware |
+| `19_acc_about_info.yaml` | ACC administrator or appliance owner can use this playbook to query ACC version and build information via the `/about` API |
+| `20_get_preserved_appliance_info.yaml` | Appliance owner can use this playbook to retrieve preserved information for an inactive appliance |
+| `export_data/` | Directory where exported ACC configuration files are stored (created by `14_acc_export_config.yaml`) |
 
 ## ACC Features and Limitations
 
@@ -499,7 +520,7 @@ Thats it. Ansible-lint should run and block you from commit locally if there are
 If pre-commit is previously installed and a reinstall is required:
 
 ```Linux
-pre-commit clean   
+pre-commit clean
 pre-commit uninstall
 python -m pip install --user -r requirements.txt
 ```
@@ -508,6 +529,21 @@ python -m pip install --user -r requirements.txt
 
 These playbooks are tested with different versions of ACC. Below is a
 brief change-log of these playbooks.
+
+### ACC version 1.2.15
+
+- ACC-admin can now set the hostname of the ACC LPAR via the `LPAR_HOSTNAME` variable in
+  `acc_install_ansible/acc_env_vars.yaml`. The hostname is used when generating a Certificate
+  Signing Request (CSR), allowing a Fully Qualified Domain Name (FQDN) to be specified for
+  use in the resulting certificate.
+
+### ACC version 1.2.13 to 1.2.14
+
+- All playbooks now display execution timestamp and ACC about information at the start of execution.
+- `07_insert_hmc_creds.yaml` and `01_admin_actions.yaml` (default and MFA variants) now support optional HMC credential expiry.
+- New playbooks added to `other_usecases_ansible`: `16_get_task_info.yaml`, `17_tasks_pull_ssc_logs.yaml`, `18_gather_acc_logs.yaml`, `19_acc_about_info.yaml`, `20_get_preserved_appliance_info.yaml`.
+- `03_pull_ssc_logs.yaml` refactored to use the shared `17_tasks_pull_ssc_logs.yaml` tasks file, also used by `18_gather_acc_logs.yaml`.
+- Install flow playbooks updated to handle both `task-id` and `task_id` response formats and display rollback debug messages on activation failure.
 
 ### ACC version 1.2.12 to 1.2.13
 

@@ -61,8 +61,9 @@ owner's `mfa_secret`s.
   ```
 - `cd` to the directory `other_usecases_ansible`.
 - Modify the variables in the file `owner_vars.yaml`.
-  - Change the `acc_ip` in the `owner_vars.yaml` file to point to the right
-    IP address. Change this IP and port to the one that should be serving ACC APIs.
+  - Change the `acc_url` in the `owner_vars.yaml` file to point to the right
+    IP address and port. Change this to the URL that should be serving ACC APIs
+    (e.g., `https://9.111.155.222:8081/api`).
 
 ## Updating the Appliances - 01_upgrade_flow.yaml | 04_managed_appliance_update.yaml
 
@@ -532,6 +533,56 @@ To restore ACC configuration:
 
 The playbook will display the import file metadata and pause for 10 seconds before proceeding with the import, giving you time to verify the correct file is being used.
 
+## Get Task Information | 16_get_task_info.yaml
+
+This playbook allows the appliance-owner to query the status of a specific ACC task by its ID.
+
+To get task information:
+
+- Export the appliance-owner password on your control node:
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_password>
+  ```
+- Run the playbook:
+  ```bash
+  ansible-playbook 16_get_task_info.yaml
+  ```
+- The playbook will prompt for:
+  - The task ID (integer) to query
+
+The playbook prints the full status response returned by the ACC `/tasks/{id}/status` API.
+
+## Pull SSC Appliance Logs | 17_tasks_pull_ssc_logs.yaml
+
+This is a **shared tasks file**, not a standalone playbook — it is not meant to be run directly with `ansible-playbook`. It is included by the following playbooks to handle SSC/appliance log collection:
+
+- `03_pull_ssc_logs.yaml` — pulls logs from a single named SSC appliance
+- `18_gather_acc_logs.yaml` — calls this file as part of a broader, role-aware log collection
+
+By centralizing the log-pull logic here, both callers share a single implementation, making bug fixes and behavior changes apply consistently across both playbooks.
+
+### What it does
+
+Given a target SSC appliance, the tasks file:
+
+1. Authenticates against the SSC LPAR API and extracts a bearer token
+2. Sends a `POST /alerts` request with `diag_info: concurrent` to trigger diagnostic log creation
+3. Polls `GET /alerts/{uuid}` until the alert is handled (up to 60 retries, 10 s apart)
+4. Downloads the resulting diagnostic archive via `GET /alerts/{uuid}/diag-info` to a temporary path
+5. Moves the archive to the caller-supplied `log_destination` path (timestamped `.gz` file)
+
+### Expected variables
+
+The following variables must be set by the calling playbook before including this tasks file:
+
+| Variable | Description |
+|---|---|
+| `ssc_ip` | IP address of the SSC LPAR |
+| `lpar_username` | SSC LPAR username |
+| `lpar_password` | SSC LPAR password |
+| `reason` | Reason string embedded in the alert request |
+| `log_destination` | Full destination path for the downloaded log archive (e.g., `/tmp/ssc_2026-07-28_12:00:00.gz`) |
+
 ## Gather Comprehensive ACC Logs | 18_gather_acc_logs.yaml
 
 This playbook provides a unified solution for gathering all ACC-related logs and information in a single execution. It automatically detects the user role (ACC-admin or appliance-owner) and collects appropriate logs based on permissions.
@@ -663,3 +714,29 @@ To get ACC about information:
 
 The playbook prints the full response returned by the ACC `/about` API.
 
+## Get Preserved Appliance Information | 20_get_preserved_appliance_info.yaml
+
+This playbook allows the appliance-owner to retrieve preserved information for inactive appliances. It is useful when an appliance is no longer active but its configuration or state data needs to be inspected.
+
+The playbook supports:
+- Fetching preserved information for a **single named resource package** or for **all resource packages**
+- Optionally filtering by specific LPAR names within the resource package(s)
+
+To get preserved appliance information:
+
+- Export the appliance-owner password on your control node:
+  ```bash
+  export ACC_OWNER_PASSWORD=<owner_password>
+  ```
+- Run the playbook:
+  ```bash
+  ansible-playbook 20_get_preserved_appliance_info.yaml
+  ```
+- The playbook will prompt for:
+  - Resource package name (or `all` to query all packages — default: `all`)
+  - MFA status (yes/no)
+  - OTP (if MFA is enabled)
+  - Whether to filter by specific LPARs (yes/no)
+  - LPAR names (comma-separated, if filtering is selected)
+
+The playbook prints the full preserved information response from the ACC `/cluster/inactive-appliance/preserved-info` API.

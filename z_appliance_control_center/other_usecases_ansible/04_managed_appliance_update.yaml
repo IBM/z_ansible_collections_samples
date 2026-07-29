@@ -258,9 +258,9 @@
             Status: {{ 'Locked' if app.is_locked else 'Unlocked' }}
           {% endfor %}
 
-    - name: 09 - Unlock appliances one by one
+    - name: "09 - Unlock the target appliance (lpar_name: {{ lpar_name }})"
       ansible.builtin.include_tasks: 11_unlock_each_appliance.yaml
-      loop: "{{ quotas_response.json }}"
+      loop: "{{ quotas_response.json | selectattr('name', 'equalto', lpar_name) | list }}"
       loop_control:
         loop_var: appliance
 

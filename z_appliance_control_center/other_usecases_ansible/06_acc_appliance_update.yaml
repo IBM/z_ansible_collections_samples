@@ -419,6 +419,11 @@
               until: is_operational_response.status in [204]
               when: reboot_value
 
+            - name: Wait for API to finish initialising after reboot
+              ansible.builtin.wait_for:
+                timeout: 30
+              when: reboot_value
+
             - name: Fetch authentication token from the ACC after reboot
               ansible.builtin.uri:
                 url: "{{ appliance_url }}/api-tokens"
@@ -435,7 +440,13 @@
                 body_format: json
                 return_content: true
                 validate_certs: false
+                status_code: 200
               register: auth_response
+              retries: 3
+              delay: 15
+              until: auth_response.status == 200
+              failed_when: false
+              when: reboot_value
 
             - name: Extract the token from response
               ansible.builtin.set_fact:

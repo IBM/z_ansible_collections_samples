@@ -118,5 +118,15 @@
     validate_certs: false
     status_code: 200
     timeout: 180
-    dest: "{{ log_destination }}"
+    dest: "/tmp/ssc_temp_{{ alert_uuid }}.gz"
   register: ssc_download_result
+
+- name: Set final log destination with current timestamp
+  when: log_destination is not defined
+  ansible.builtin.set_fact:
+    log_destination: "/tmp/ssc_{{ '%Y-%m-%d_%H:%M:%S' | strftime }}.gz"
+
+- name: Move temp file to final destination with timestamp
+  ansible.builtin.command:
+    cmd: "mv /tmp/ssc_temp_{{ alert_uuid }}.gz {{ log_destination }}"
+  changed_when: true

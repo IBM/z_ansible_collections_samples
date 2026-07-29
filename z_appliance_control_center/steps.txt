@@ -1,0 +1,7 @@
+git checkout main
+git fetch upstream
+git pull upstream main
+git push origin main
+git checkout acc
+git merge main
+git push -u origin acc

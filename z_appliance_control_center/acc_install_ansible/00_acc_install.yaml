@@ -16,6 +16,9 @@
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Added network configuration for ACC LPAR                           |
 # *|   - Added IFLs/GPs configuration for ACC LPAR                          |
+# *| [07.28.2026]                                                           |
+# *|   - Tested with ACC 1.2.15                                             |
+# *|   - Setting host name of the ACC LPAR                                  |
 # *+------------------------------------------------------------------------+
 
 # Important: Before running the 00_acc_install.yaml script, kindly review the README file located in
@@ -50,19 +53,20 @@
     ACTION: "{{ ACTION }}"
     HTTP_SCHEME: https
     LOCAL_SERVER_IP: localhost
-    LOCAL_SERVER_PORT: 9988
-    LOCAL_SSH_PORT: 9989
-    VERIFY_CERT: false
+    LOCAL_SERVER_PORT: "9988"
+    LOCAL_SSH_PORT: "9989"
+    VERIFY_CERT: "false"
     GATEWAY_USER: "fpc-gw"
-    HTTPS_PORT: 443
-    SSH_PORT: 23
-    D_PORT: 0
-    IS_PRIVATE: false
+    HTTPS_PORT: "443"
+    SSH_PORT: "23"
+    D_PORT: "0"
+    IS_PRIVATE: "false"
     ANSIBLE_TMPDIR: "{{ INSTALL_SCRIPT_PATH }}"
     HMC_KEY: "~/.ssh/id_rsa"
     STORAGE: "{{ STORAGE }}"
     IFLS: "{{ IFLS }}"
     GPS: "{{ GPS }}"
+    LPAR_HOSTNAME: "{{ LPAR_HOSTNAME }}"
 
   pre_tasks:
     - name: Reminder - Export credentials (HMC connected)

@@ -11,6 +11,9 @@
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Added network configuration for ACC LPAR                           |
 # *|   - Added IFLs/GPs configuration for ACC LPAR                          |
+# *| [07.28.2026]                                                           |
+# *|   - Tested with ACC 1.2.15                                             |
+# *|   - Setting host name of the ACC LPAR                                  |
 # *+------------------------------------------------------------------------+
 
 # Variables used for installing ACC
@@ -94,6 +97,13 @@ LPAR: "CC12"
 # activation profile of the LPAR
 LPAR_IP: "9.x.x.x"
 
+# Hostname for the ACC LPAR (e.g., "zfwssc16.de.ibm.com")
+# To use the default hostname (acchost), either leave LPAR_HOSTNAME as an empty string "" or do not set it
+# If set, then the value must meet the following requirements:
+#  - must be 1-64 characters using only: a-z, A-Z, 0-9, period (.), hyphen (-),
+#  - no consecutive period(.), no trailing/leading period(.)
+LPAR_HOSTNAME: ""
+
 # Disk identifier (e.g., "5f47" start with 0.0) for installing image on lpar disk
 # Note: When using FCP this variable represents the LPAR's FCP device number used to
 # communicate with the boot volume on the storage controller
@@ -141,7 +151,7 @@ NW_CHPID: "d0"
 NW_PORT: 0
 
 # Prefix
-NW_PREFIX: 24
+NW_PREFIX: 23
 
 # VLAN ID
 # If not used, then NW_VLANID variable empty ""

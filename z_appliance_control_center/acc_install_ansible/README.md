@@ -195,6 +195,15 @@ To set up the ACC, the following actions must be performed by the ACC-admin.
       an error.
     - Note that the IFLs or GPs on the ACC LPAR are shared, and they
       use an initial processing weight of `10`.
+  - Optionally, set the `LPAR_HOSTNAME` variable for the ACC LPAR in the `acc_env_vars.yaml`
+    - If setting a custom `LPAR_HOSTNAME`, the value must meet the following requirements:
+      - 1–64 characters in length
+      - Valid characters: letters (a–z, A–Z), digits (0–9), periods (`.`), and hyphens (`-`)
+      - No consecutive periods (`..`)
+      - No leading or trailing periods (`.`)
+    - To use the default hostname (`acchost`), either leave `LPAR_HOSTNAME` as an empty
+      string `""` or do not set it.
+
 - Run the following playbook to install ACC:
   ```bash
   ansible-playbook ./acc_install_ansible/00_acc_install.yaml
@@ -234,6 +243,7 @@ reference):
 - `ssc-master-pw`
 - `ssc-gateway-info`
 - `ssc-network-info`
+- `ssc-host-name`
 
 Therefore, it is possible that old settings on the LPAR are still
 intact after running these scripts. Therefore, the caller must take

@@ -8,7 +8,7 @@
 #####################################################################################################
 # NOTE: If you uncomment any variables in the vars file, be sure to uncomment the corresponding
 # sections that reference those variables in the scripts. Please review the script thoroughly before execution.
-# 
+#
 # Do not comment out any variables in this file as it may trigger a playbook failure. If a variable is not applicable it
 # can be safley ignored.
 ######################################################################################################

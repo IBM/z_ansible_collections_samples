@@ -11,6 +11,9 @@
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Added network configuration for ACC LPAR                           |
 # *|   - Added IFLs/GPs configuration for ACC LPAR                          |
+# *| [07.28.2026]                                                           |
+# *|   - Tested with ACC 1.2.15                                             |
+# *|   - Setting host name of the ACC LPAR                                  |
 # *+------------------------------------------------------------------------+
 
 import sys
@@ -169,6 +172,9 @@ def set_image_activation_profile(cpc, profile_name: str):
         'ssc-gateway-info': gw_ip_info,
         'ssc-network-info': ssc_nw
     }
+    # Set hostname only if provided; omitting it leaves the existing HMC value unchanged
+    hostname = os.environ.get("LPAR_HOSTNAME") or "acchost"
+    properties['ssc-host-name'] = hostname
     
     # Add storage if specified
     if storage > 0:
