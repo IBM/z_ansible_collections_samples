@@ -60,7 +60,6 @@
 #
 # Notes:
 #   * If you do not run with Ansible 2.16 or later, you will encounter an
-#   * If you do not run with Ansible 2.16 or later, you will encounter an
 #     error similar to this:
 #       "Invalid data passed to 'loop', it requires a list, got this
 #        instead: {{ submit_job_list | community.general.json_query('ddnames[*].ddname') }}.
