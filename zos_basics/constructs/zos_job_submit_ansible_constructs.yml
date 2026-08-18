@@ -55,7 +55,6 @@
 # Requirements:
 #   1) IBM® z/OS® core collection 2.0.0 or later
 #   2) ansible-core 2.16 or later
-#   1) IBM® z/OS® core collection 2.0.0 or later
 #   2) ansible-core 2.16 or later
 #   3) jmespath (`pip install jmespath`)
 #
