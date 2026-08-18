@@ -188,7 +188,6 @@
               record_count: "15"
               stepname: JES2
             - byte_count: "1191"
-            - byte_count: "1191"
               content:
                 - " ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021"
                 - " IEFA111I HELLO IS USING THE FOLLOWING JOB RELATED SETTINGS:"
