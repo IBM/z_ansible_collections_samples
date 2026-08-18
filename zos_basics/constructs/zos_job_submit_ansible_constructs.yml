@@ -619,7 +619,6 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/HELLO.jcl"
         remote_src: false
-        remote_src: false
         encoding:
           from: ISO8859-1
           to: IBM-037
