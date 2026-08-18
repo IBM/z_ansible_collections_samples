@@ -148,7 +148,6 @@
               record_count: "17"
               stepname: JES2
             - byte_count: "696"
-            - byte_count: "696"
               content:
                 - "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260"
                 - "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             "
