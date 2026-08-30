@@ -16,8 +16,8 @@ exclude_paths:
   - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-compute-nodes.yaml
   - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-control-plane.yaml
 
-  # OCP UPI roles/playbooks that depend on openstack.cloud collection (not installed in CI)
-  # or reference common.yaml task files that do not exist in the repository
+  # OCP UPI playbooks/roles that use openstack.cloud (not installed offline)
+  # or reference common.yaml files that do not exist in the repository
   - z_infra_provisioning/cloud_infra_center/ocp_upi/add-new-compute-node.yaml
   - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-bootstrap.yaml
   - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-controls.yaml
@@ -80,6 +80,7 @@ skip_list:
   - yaml[too-many-spaces]
   - yaml[trailing-spaces]
   - yaml[truthy]
-  - load-failure[filenotfounderror]
+
+warn_list:
   - syntax-check[unknown-module]
   - syntax-check[specific]
