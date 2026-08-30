@@ -1,2 +1,0 @@
-# Keep in sync with lowest ansible version in requirements.txt and minimum-constraints.txt
-requires_ansible: ">=2.9"

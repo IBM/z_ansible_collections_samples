@@ -1,1 +1,0 @@
-baremetal_inspect.py

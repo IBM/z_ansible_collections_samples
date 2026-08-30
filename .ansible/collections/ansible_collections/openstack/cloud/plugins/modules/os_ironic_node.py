@@ -1,1 +1,0 @@
-baremetal_node_action.py

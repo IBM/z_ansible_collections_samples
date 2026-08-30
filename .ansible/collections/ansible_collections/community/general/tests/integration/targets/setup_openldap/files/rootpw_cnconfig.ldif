@@ -1,4 +1,0 @@
-dn: olcDatabase={0}config,cn=config
-changetype: modify
-replace: olcRootPW
-olcRootPW: "Test1234!"

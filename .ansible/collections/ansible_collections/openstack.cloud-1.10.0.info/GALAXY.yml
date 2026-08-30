@@ -1,8 +1,0 @@
-download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/openstack-cloud-1.10.0.tar.gz
-format_version: 1.0.0
-name: cloud
-namespace: openstack
-server: https://galaxy.ansible.com/api/
-signatures: []
-version: 1.10.0
-version_url: /api/content/published/v3/plugin/ansible/content/published/collections/index/openstack/cloud/versions/1.10.0/
