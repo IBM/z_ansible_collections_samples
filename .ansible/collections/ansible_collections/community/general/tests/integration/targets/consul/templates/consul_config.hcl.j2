@@ -1,0 +1,14 @@
+{#
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+#}
+# {{ ansible_managed }}
+server = true
+pid_file = "{{ remote_dir }}/consul.pid"
+ports {
+  http = 8500
+  https = 8501
+}
+key_file = "{{ remote_dir }}/privatekey.pem"
+cert_file = "{{ remote_dir }}/cert.pem"

@@ -1,0 +1,14 @@
+---
+plugin: servicenow.itsm.now
+table: cmdb_ci_server
+strict: false
+
+instance:
+  timeout: 1200
+
+compose:
+  ansible_host: ip_address
+
+sysparm_query: nameSTARTSWITHmy-vm-
+sysparm_limit: 5
+...

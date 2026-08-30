@@ -28,4 +28,4 @@
     - vm_type == "kvm"
 - import_playbook: destroy-files.yaml
 - import_playbook: destroy-bastion.yaml
-  when: use_internal_bastion is true
+  when: use_internal_bastion == true

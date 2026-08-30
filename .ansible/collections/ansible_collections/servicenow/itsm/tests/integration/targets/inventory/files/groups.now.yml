@@ -1,0 +1,14 @@
+---
+plugin: servicenow.itsm.now
+
+table: cmdb_ci_vm_instance
+columns:
+  - state
+
+groups:
+  active_OS0_servers: >-
+    guest_os_fullname == "OS0"
+    and state not in ("Off")
+    
+compose:
+  ansible_host: ip_address

@@ -1,0 +1,14 @@
+---
+plugin: servicenow.itsm.now
+table: cmdb_ci_ec2_instance
+enhanced: false
+columns:
+  - location.name
+  - location.street
+compose:
+  ansible_host: fqdn
+  location: location
+  location_name: lookup('ansible.builtin.vars', 'location.name')
+  street: lookup('ansible.builtin.vars', 'location.street')
+
+strict: true

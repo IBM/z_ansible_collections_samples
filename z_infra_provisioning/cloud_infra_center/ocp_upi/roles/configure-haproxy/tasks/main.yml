@@ -22,8 +22,8 @@
 - name: Install haproxy
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
-  ansible.builtin.dnf:
+  become_method: sudo
+  ansible.builtin.yum:
     name:
       - haproxy
       # - libsemanage-python
@@ -36,7 +36,7 @@
 - name: Create /etc/haproxy
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.file:
     path: /etc/haproxy
     state: directory
@@ -44,7 +44,7 @@
 - name: Create /etc/haproxy/haproxy.cfg
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.template:
     src: etc/haproxy/haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
@@ -54,9 +54,9 @@
 - name: Allow http traffic
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
-    ansible.builtin.service: http
+    service: http
     permanent: true
     zone: public
     state: enabled
@@ -66,9 +66,9 @@
 - name: Allow http traffic
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
-    ansible.builtin.service: http
+    service: http
     permanent: true
     zone: internal
     state: enabled
@@ -78,9 +78,9 @@
 - name: Allow https traffic
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
-    ansible.builtin.service: https
+    service: https
     permanent: true
     zone: public
     state: enabled
@@ -90,9 +90,9 @@
 - name: Allow https traffic
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
-    ansible.builtin.service: https
+    service: https
     permanent: true
     zone: internal
     state: enabled
@@ -102,7 +102,7 @@
 - name: Allow traffic at port 443
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
     port: 443/tcp
     permanent: true
@@ -117,7 +117,7 @@
 - name: Allow traffic at port 6443
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
     port: 6443/tcp
     permanent: true
@@ -132,7 +132,7 @@
 - name: Allow traffic at port 22623
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.posix.firewalld:
     port: 22623/tcp
     permanent: true
@@ -147,13 +147,13 @@
 - name: Allow selinux for haproxy
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.shell: setsebool -P haproxy_connect_any=1
 
 # - name: start haproxy
 #   become: yes
 #   become_user: root
-#   become_method: ansible.builtin.sudo
+#   become_method: sudo
 #   service:
 #     name: haproxy
 #     state: started
@@ -162,7 +162,7 @@
 - name: Restart haproxy
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.service:
     name: haproxy
     state: restarted
@@ -170,7 +170,7 @@
 - name: Restart firewalld
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.service:
     name: firewalld
     state: restarted
@@ -178,7 +178,7 @@
 - name: Check if haproxy is running
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.service:
     name: haproxy
     state: started
@@ -186,7 +186,7 @@
 - name: Check if firewalld is running
   become: true
   become_user: root
-  become_method: ansible.builtin.sudo
+  become_method: sudo
   ansible.builtin.service:
     name: firewalld
     state: started

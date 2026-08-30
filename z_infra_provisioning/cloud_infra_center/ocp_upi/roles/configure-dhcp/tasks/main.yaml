@@ -24,13 +24,13 @@
     path: /etc/dhcp/dhcpd.conf
 
 - name: Install DHCP server package
-  ansible.builtin.package:
+  package:
     name: dhcp-server.s390x
     state: present
   become: true
 
 - name: Configure dhcpd.conf file
-  ansible.builtin.template:
+  template:
     src: etc/dhcp/dhcpd.conf.j2
     dest: /etc/dhcp/dhcpd.conf
 
@@ -54,7 +54,7 @@
   ansible.builtin.shell:
     cmd: sed -i "s|cic_subnet_mask|{{ netmask_result }}|g" /etc/dhcp/dhcpd.conf
 
-- name: Restart dhcpd
-  ansible.builtin.service:
+- name: restart dhcpd
+  service:
     name: dhcpd
     state: restarted

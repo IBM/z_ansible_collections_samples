@@ -1,0 +1,15 @@
+plugins/modules/cmci_get.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/cmci_action.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/cmci_create.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/cmci_delete.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/cmci_update.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/global_catalog.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/local_catalog.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/local_request_queue.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/td_intrapartition.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/aux_temp_storage.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/aux_trace.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/csd.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/transaction_dump.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/region_jcl.py validate-modules:missing-gplv3-license # Licence is Apache-2.0
+plugins/modules/stop_region.py validate-modules:missing-gplv3-license # Licence is Apache-2.0

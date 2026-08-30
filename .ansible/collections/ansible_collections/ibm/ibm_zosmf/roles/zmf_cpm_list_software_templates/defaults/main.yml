@@ -1,0 +1,7 @@
+# Copyright (c) IBM Corporation 2021
+
+---
+# defaults file for zmf_cpm_list_software_templates
+
+# The value for property zmf_port identifies the port number that z/OSMF uses. Default port number is 443.
+zmf_port: 443

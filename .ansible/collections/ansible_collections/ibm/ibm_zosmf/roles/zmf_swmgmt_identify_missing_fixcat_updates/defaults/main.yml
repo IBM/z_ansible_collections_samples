@@ -1,0 +1,6 @@
+# Copyright (c) IBM Corporation 2023
+
+---
+# defaults file for zmf_swmgmt_identify_missing_fixcat_updates
+async_thread_check_times: 60
+async_thread_check_delay: 1

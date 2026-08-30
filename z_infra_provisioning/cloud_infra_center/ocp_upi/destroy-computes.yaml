@@ -61,3 +61,4 @@
         cmd: "openstack server delete {{ os_compute_server_name }}-{{ item }}"
       loop: "{{compute_index}}"
       when: compute_index is defined
+      

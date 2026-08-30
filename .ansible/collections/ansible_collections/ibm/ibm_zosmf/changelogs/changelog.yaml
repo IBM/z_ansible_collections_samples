@@ -1,0 +1,61 @@
+ancestor: null
+releases:
+  1.0.1:
+    fragments:
+    - 1.0.1.yaml
+    modules:
+    - description: Authenticate with z/OSMF server
+      name: zmf_authenticate
+      namespace: ''
+    - description: Operate z/OS workflows
+      name: zmf_workflow
+      namespace: ''
+    objects:
+      role:
+      - description: Role manages a provisioned z/OS software instance
+        name: zmf_cpm_manage_software_instance
+        namespace: null
+      - description: Role provisions a z/OS software service
+        name: zmf_cpm_provision_software_service
+        namespace: null
+      - description: Role removes a z/OS software instance
+        name: zmf_cpm_remove_software_instance
+        namespace: null
+      - description: Role completes a z/OS workflow
+        name: zmf_workflow_complete
+        namespace: null
+    release_date: '2021-06-18'
+  1.1.0:
+    fragments:
+    - 1.1.0.yaml
+    modules:
+    - description: Automate z/OS security requirements validation and provision
+      name: zmf_sca
+      namespace: ''
+    objects:
+      role:
+      - description: Role creates a z/OS software instance
+        name: zmf_cpm_create_software_instance
+        namespace: null
+      - description: Role get specific z/OS software instance
+        name: zmf_cpm_get_software_instance
+        namespace: null
+      - description: Role lists all published z/OS software templates
+        name: zmf_cpm_list_software_templates
+        namespace: null
+    release_date: '2022-01-18'
+  1.2.0:
+    changes:
+      major_changes:
+      - Updated module `zmf_sca` which adds support for the security requirements
+        provision.
+    modules:
+    - description: Automate z/OS security requirements validation and provision
+      name: zmf_sca
+      namespace: ''
+    release_date: '2022-07-18'
+  1.2.1:
+    changes:
+      major_changes:
+      - Removed dependency on Requests library for Python on the control node.
+    release_date: '2022-08-31'

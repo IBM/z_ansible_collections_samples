@@ -1,0 +1,34 @@
+################################################################################
+# Copyright (c) IBM Corporation 2024
+################################################################################
+
+# #############################################################################
+# Description
+# Support for this feature was first added in ansible-core 2.12 so that
+# ansible-test configured with desirable changes. This is an optional
+# configuration, but when used, must be placed in "tests/config.yml"
+# relative to the base of the collection. This configuration only
+# applies to modules and module_utils.
+#
+# See additional example -
+#  https://github.com/ansible/ansible/blob/devel/test/lib/ansible_test/config/config.yml
+#
+# Options
+# modules         - required
+# python_requires - required
+#   - 'default'   - All Python versions supported by Ansible.
+#                   This is the default value if no configuration is provided.
+# - 'controller'  - All Python versions supported by the Ansible controller.
+#                   This indicates the modules/module_utils can only run on the controller.
+#                   Intended for use only with modules/module_utils that depend on
+#                   ansible-connection, which only runs on the controller.
+#                   Unit tests for modules/module_utils will be permitted to import any
+#                   Ansible code, instead of only module_utils.
+# - SpecifierSet  - A PEP 440 specifier set indicating the supported Python versions.
+#                   This is only needed when modules/module_utils do not support all
+#                   Python versions supported by Ansible. It is not necessary to exclude
+#                   versions which Ansible does not support, as this will be done automatically.
+# #############################################################################
+
+modules:
+  python_requires: '>=3.9'

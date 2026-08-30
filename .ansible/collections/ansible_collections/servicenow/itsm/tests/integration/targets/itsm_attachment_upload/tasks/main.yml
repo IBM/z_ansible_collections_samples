@@ -1,0 +1,161 @@
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    #############################################
+    ######     Attachment Upload Tests     ######
+    #############################################
+
+    - name: Create test incident with attachment
+      servicenow.itsm.incident:
+        caller: admin
+        state: new
+        short_description: Test incident
+        impact: low
+        urgency: low
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file1.txt"
+      register: test_incident
+
+    - ansible.builtin.assert:
+        that:
+          - test_incident is changed
+          - test_incident.record.state == "new"
+          - test_incident.record.impact == "low"
+          - test_incident.record.urgency == "low"
+          - test_incident.record.attachments | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - test_incident.record.attachments | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e"]
+
+    - name: Upload existing attachment (no change)
+      servicenow.itsm.attachment_upload:
+        table_name: incident
+        table_sys_id: "{{ test_incident.record.sys_id }}"
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file1.txt"
+            name: sample_file1.txt
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+          - result.diff.before | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.diff.after | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.diff.before | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e"]
+          - result.diff.after | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e"]
+          - result.records | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.records | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e"]
+
+    - name: Upload new attachment - check_mode
+      servicenow.itsm.attachment_upload: &attachment-upload
+        table_name: incident
+        table_sys_id: "{{ test_incident.record.sys_id }}"
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file2.txt"
+            name: sample_file2.txt
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &attachment-upload-assert
+        that:
+          - result is changed
+          - result.diff.before | map(attribute="file_name") | sort | list == []
+          - result.diff.after | map(attribute="file_name") | sort | list == ["sample_file2.txt"]
+          - result.diff.before | map(attribute="hash") | sort | list == []
+          - result.diff.after | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.records | map(attribute="file_name") | sort | list == ["sample_file2.txt"] # we return only records in question and not all the records on the table
+          - result.records | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+
+    - name: Upload new attachment
+      servicenow.itsm.attachment_upload: *attachment-upload
+      register: result
+
+    - ansible.builtin.assert: *attachment-upload-assert
+
+    - name: Upload new attachment - idempotence
+      servicenow.itsm.attachment_upload: *attachment-upload
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+          - result.diff.before | map(attribute="file_name") | sort | list == ["sample_file2.txt"]
+          - result.diff.after | map(attribute="file_name") | sort | list == ["sample_file2.txt"]
+          - result.diff.before | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.diff.after | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.records | map(attribute="file_name") | sort | list == ["sample_file2.txt"]
+          - result.records | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+
+    - name: Update an existing attachment
+      servicenow.itsm.attachment_upload:
+        table_name: incident
+        table_sys_id: "{{ test_incident.record.sys_id }}"
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file2.txt"
+            name: sample_file1.txt
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed
+          - result.diff.before | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.diff.after | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.diff.before | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e"]
+          - result.diff.after | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.records | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.records | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+
+    - name: Upload existing and new attachment
+      servicenow.itsm.attachment_upload:
+        table_name: incident
+        table_sys_id: "{{ test_incident.record.sys_id }}"
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file2.txt"
+            name: sample_file1.txt
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file1.txt"
+            name: sample_file
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed
+          - result.diff.before | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - result.diff.after | map(attribute="file_name") | sort | list == ["sample_file", "sample_file1.txt"]
+          - result.diff.before | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.diff.after | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.records | map(attribute="file_name") | sort | list == ["sample_file", "sample_file1.txt"]
+          - result.records | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+
+    - name: Upload existing, new and attachment to be updated
+      servicenow.itsm.attachment_upload:
+        table_name: incident
+        table_sys_id: "{{ test_incident.record.sys_id }}"
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file1.txt"
+            name: sample_file1.txt # to be updated
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file2.txt"
+            name: sample_file2.txt # no update
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_upload/res/sample_file2.txt"
+            name: sample_file3.txt # new
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed
+          - result.diff.before | map(attribute="file_name") | sort | list == ["sample_file1.txt", "sample_file2.txt"]
+          - result.diff.after | map(attribute="file_name") | sort | list == ["sample_file1.txt", "sample_file2.txt", "sample_file3.txt"]
+          - result.diff.before | map(attribute="hash") | sort | list == ["f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.diff.after | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+          - result.records | map(attribute="file_name") | sort | list == ["sample_file1.txt", "sample_file2.txt", "sample_file3.txt"]
+          - result.records | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902", "f52a678046a6f06e5fca54b4c535b210f29cbaf1134f2b75197cf47078621902"]
+
+    - name: Delete incident attachment
+      servicenow.itsm.incident:
+        number: "{{ test_incident.record.number }}"
+        state: absent
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed

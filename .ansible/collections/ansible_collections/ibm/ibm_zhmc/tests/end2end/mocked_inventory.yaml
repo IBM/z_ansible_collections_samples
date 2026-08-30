@@ -1,0 +1,49 @@
+---
+# HMC inventory file with mocked HMCs for end2end tests run by GitHub Actions
+#
+# This file defines only mocked HMCs (using the zhmcclient mock
+# support) for the purpose of end2end tests against these HMCs.
+# The file must have the format defined in
+# zhmcclient/testutils/hmc_inventory_file.py of the python-zhmcclient project.
+#
+# HMC inventory files conform to the format of HMC inventory files in YAML
+# format and define specific additional variables for HMCs.
+#
+# Brief description of the HMC inventory file format:
+#
+#   all:  # the top-level HMC group
+#     hosts:
+#       <hmc_name>:  # DNS hostname, IP address, or nickname of HMC
+#         description: <string>
+#         contact: <string>
+#         access_via: <string>
+#         ansible_host: <host>  # if real HMC and nickname is used
+#         mock_file: <path_name>  # if mocked HMC
+#         cpcs:
+#           <cpc_name>:
+#             <prop_name>: <prop_value>
+#         <var_name>: <var_value>  # additional variables for HMC
+#     vars:
+#       <var_name>: <var_value>  # additional variables for all HMCs in group
+#     children:
+#       <group_name>:  # a child HMC group
+#         hosts: ...  # variables are inherited from parent group
+#         vars: ...
+#         children: ...
+
+all:
+  hosts:
+    mocked_hmc_z14:
+      description: "Mocked HMC with z14 in classic mode and z14 in DPM mode"
+      mock_file: "mocked_hmc_z14.yaml"
+      cpcs:
+        CPC1:
+          machine_type: "3906"
+          dpm_enabled: false
+        CPC2:
+          machine_type: "3906"
+          dpm_enabled: true
+  children:
+    default:
+      hosts:
+        mocked_hmc_z14:

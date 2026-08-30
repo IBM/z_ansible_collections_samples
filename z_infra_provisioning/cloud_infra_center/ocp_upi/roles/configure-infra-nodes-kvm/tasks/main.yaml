@@ -47,7 +47,7 @@
   ansible.builtin.shell:
     cmd: openstack configuration show -c auth.project_name -f value
   register: icic_proj
-
+  
 - name: 'Get image name for kvm'
   ansible.builtin.set_fact:
     image_name: icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}
@@ -71,12 +71,14 @@
     - vm_type == "kvm"
     - volume_type_id is not defined
 
+
 - name: 'Convert infra node flavor from value into number'
   ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_infra }} -c disk -f value"
   register: infra_flavor_size
   when:
     - disk_type == "scsi"
+
 
 - name: 'Create infra boot volume'
   openstack.cloud.volume:

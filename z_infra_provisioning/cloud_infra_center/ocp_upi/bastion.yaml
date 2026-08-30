@@ -26,6 +26,6 @@
   hosts: bastion
   tasks:
     - name: 'Get Network physical_network'
-      ansible.builtin.include_role:
+      include_role:
         name: configure-dhcp
       when: hostvars['localhost']['physical_network'] == "macvtap0"

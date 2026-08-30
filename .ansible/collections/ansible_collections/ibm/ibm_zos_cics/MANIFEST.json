@@ -1,0 +1,42 @@
+{
+ "collection_info": {
+  "namespace": "ibm",
+  "name": "ibm_zos_cics",
+  "version": "2.1.0",
+  "authors": [
+   "Stewart Francis",
+   "Tom Latham",
+   "Sophie Green",
+   "Ya Qing Chen",
+   "Andrew Twydell"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "ibm",
+   "z",
+   "zos",
+   "z_os",
+   "cics",
+   "cmci",
+   "infrastructure"
+  ],
+  "description": "The Red Hat Ansible Certified Content for IBM Z CICS collection includes connection plugins, action plugins, modules and sample playbooks to automate tasks for CICS",
+  "license": [
+   "Apache-2.0"
+  ],
+  "license_file": null,
+  "dependencies": {},
+  "repository": "https://github.com/ansible-collections/ibm_zos_cics",
+  "documentation": "https://ibm.github.io/z_ansible_collections_doc",
+  "homepage": "https://www.ibm.com/support/z-content-solutions/ansible/",
+  "issues": "https://github.com/ansible-collections/ibm_zos_cics/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "71084998ae174891a07336b8551af300da3e18aa8ca2a9073b1795f9d9bc8dcf",
+  "format": 1
+ },
+ "format": 1
+}

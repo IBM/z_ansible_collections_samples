@@ -1,0 +1,25 @@
+---
+plugin: servicenow.itsm.now
+table: cmdb_ci_ec2_instance
+
+columns:
+  - state
+  - environment
+  - fqdn
+  - ip_address
+
+compose:
+  ansible_host: fqdn
+  name: name
+  ip_address: ip_address
+  env: environment
+
+groups:
+  production: |
+    environment == "Production"
+
+  development: |
+    environment == "Development"
+
+  os_OS1: |
+    guest_os_fullname == "OS1"

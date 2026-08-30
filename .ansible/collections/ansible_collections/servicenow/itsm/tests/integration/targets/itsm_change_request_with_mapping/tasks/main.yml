@@ -1,0 +1,94 @@
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  vars:
+    mapping:
+      change_request:
+        category:
+          1: "category 1"
+          2: "category 2"
+
+  block:
+    - name: Create first category
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: post
+        data:
+          name: change_request
+          element: category
+          value: 1
+          label: category 1
+      register: first_category
+    
+    - set_fact:
+        first_category: "{{ first_category.record.sys_id }}"
+    
+    - name: Create second category
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: post
+        data:
+          name: change_request
+          element: category
+          value: 2
+          label: category 2
+      register: second_category
+    
+    - set_fact:
+        second_category: "{{ second_category.record.sys_id }}"
+
+    - name: Create change_request 
+      servicenow.itsm.change_request:
+        change_request_mapping: "{{ mapping.change_request }}"
+        requested_by: admin
+        state: new
+        type: standard
+        template: Clear BGP sessions on a Cisco router - 1
+        priority: low
+        risk: low
+        impact: low
+        short_description: some short description
+        category: category 1
+      register: chg_request
+
+    - ansible.builtin.assert:
+        that:
+          - chg_request is changed
+          - chg_request.record.state == "new"
+          - chg_request.record.type == "standard"
+          - chg_request.record.priority == "low"
+          - chg_request.record.risk == "low"
+          - chg_request.record.impact == "low"
+          - chg_request.record.category == "category 1"
+    
+    - name: Update change_request with new category
+      servicenow.itsm.change_request:
+        change_request_mapping: "{{ mapping.change_request }}"
+        number: "{{ chg_request.record.number }}"
+        category: category 2
+    
+    - name: Get change_request 
+      servicenow.itsm.change_request_info:
+        change_request_mapping: "{{ mapping.change_request }}"
+        number: "{{ chg_request.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].category == "category 2"
+    
+    - name: Delete change_request
+      servicenow.itsm.change_request:
+        sys_id: "{{ chg_request.record.sys_id }}"
+        state: absent
+    
+    - name: Delete change_request choices
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: delete
+        sys_id: "{{ item }}"
+      loop:
+        - first_category
+        - second_category

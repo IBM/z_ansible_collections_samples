@@ -1,0 +1,98 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+---
+# tasks file for zmf_cpm_manage_software_instance
+
+- name: "Read instance record"
+  block:
+    - name: "Read from json file path"
+      set_fact:
+        instance_record: "{{ lookup('file', instance_info_json_path) | from_json }}"
+
+    # Support input_vars to be provided via playbook. If input_vars isn't set then set default below
+    - name: "Set input_vars as fact"
+      set_fact:
+        input_vars: "[]"
+      when: input_vars is not defined
+
+    - name: "Perform action <{{ instance_action_name }}> on {{ instance_record['registry-info']['object-id'] }}"
+      uri:
+        url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/provisioning/rest/1.0/scr/\
+              {{ instance_record['registry-info']['object-id'] }}/actions/{{ instance_action_name }}"
+        return_content: true
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        method: POST
+        status_code: "200"
+        validate_certs: false
+        body_format: json
+        body: '{"input-variables":{{ input_vars }}}'
+      delegate_to: localhost
+      register: action_results
+
+    - name: "Get action <{{ instance_action_name }}> progress status"
+      uri:
+        url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf\
+            /provisioning/rest/1.0/scr\
+            /{{ instance_record['registry-info']['object-id'] }}\
+            /actions/{{ action_results.json['action-id'] }}"
+        return_content: true
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        method: GET
+        status_code: "200"
+        validate_certs: false
+      delegate_to: localhost
+      register: action_status_result
+      until: ('json' in action_status_result) and (action_status_result.json.state == "complete" or action_status_result.json.state == "failed")
+      retries: "{{ api_polling_retry_count }}"
+      delay: "{{ api_polling_interval_seconds }}"
+
+    - name: "Display action failure information"
+      fail:
+        msg: "Action <{{ instance_action_name }}> progress status: {{ action_status_result.json.state }} "
+      when: action_status_result.json.state == "failed"
+
+    - name: "Get updated instance information for {{ instance_record['registry-info']['object-id'] }}"
+      uri:
+        url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/provisioning/rest/1.0/scr/{{ instance_record['registry-info']['object-id'] }}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: full_instance_json
+      when: action_status_result.json.state == "complete"
+      delegate_to: localhost
+
+    - name: "Update local copy of instance information"
+      block:
+        - name: Update fully provisioned instance information to local
+          copy:
+            content: '{ "registry-info" : {{ full_instance_json.json | default("") | to_nice_json(indent=2) }}}'
+            dest: '{{ instance_info_json_path }}'
+            mode: '0644'
+          delegate_to: localhost
+
+    - name: "Display instance record file path"
+      debug:
+        msg: "Instance record updated at: {{ instance_info_json_path }}"
+
+    - name: "Display action performed and complete status"
+      debug:
+        msg: "Action <{{ instance_action_name }}> final status: {{ action_status_result.json.state }}"
+      when: action_status_result.json.state == "complete"

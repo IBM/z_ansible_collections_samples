@@ -1,0 +1,566 @@
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  vars:
+    assignment_groups:
+      py3.9-ansible-2.15: network
+      py3.10-ansible-2.15: software
+      py3.11-ansible-2.15: hardware
+      py3.12-ansible-2.15: IT Securities CAB
+      py3.9-ansible-2.16: Help Desk
+      py3.10-ansible-2.16: Openspace
+      py3.11-ansible-2.16: Problem Solving
+      py3.12-ansible-2.16: LDAP Admins
+      py3.9-ansible-2.18: IT Securities
+      py3.10-ansible-2.18: IT Finance CAB
+      py3.11-ansible-2.18: Network CAB Managers
+      py3.12-ansible-2.18: Service Desk
+
+  block:
+    - name: Create test change_request - check mode
+      servicenow.itsm.change_request: &create-change_request
+        requested_by: admin
+        state: new
+        type: standard
+        template: Clear BGP sessions on a Cisco router - 1
+        priority: low
+        risk: low
+        impact: low
+        short_description: some short description
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_change_request/res/sample_file.txt"
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &create-change_request-result
+        that:
+          - result is changed
+          - result.record.state == "new"
+          - result.record.type == "standard"
+          - result.record.priority == "low"
+          - result.record.risk == "low"
+          - result.record.impact == "low"
+          - result.record.attachments | length != 0
+          - result.record.attachments[0].file_name == "sample_file.txt"
+
+
+    - name: Create test change_request
+      servicenow.itsm.change_request: *create-change_request
+      register: test_result
+
+    - name: Copy test_result into result
+      set_fact:
+        result: "{{ test_result }}"
+
+    - ansible.builtin.assert: *create-change_request-result
+
+
+    - name: Make sure change_request exists
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].type == "standard"
+          - result.records[0].priority == "low"
+          - result.records[0].risk == "low"
+          - result.records[0].impact == "low"
+          - "'Resend the complete BGP table to neighboring routers' in result.records[0].description"
+
+
+    - name: Update change_request with same priority, risk and impact - unchanged
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        priority: low
+        risk: low
+        impact: low
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Update state to scheduled without assignment_group - should throw an error
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: scheduled
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'state is scheduled but all of the following are missing: assignment_group' in result.msg"
+
+
+    - name: Attempt to put the change request on hold without specifying the reason
+      servicenow.itsm.change_request:
+        number: "{{ test_result.record.number }}"
+        on_hold: true
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'on_hold is True but all of the following are missing: hold_reason'"
+
+
+    - name: Update change_request - check mode
+      servicenow.itsm.change_request: &update-change_request
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: scheduled
+        assignment_group: network
+        priority: high
+        risk: high
+        impact: high
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &update-change_request-result
+        that:
+          - result is changed
+          - result.record.state == "scheduled"
+          - result.record.priority == "high"
+          - result.record.risk == "high"
+          - result.record.impact == "high"
+
+
+    - name: Update change_request
+      servicenow.itsm.change_request: *update-change_request
+
+    - ansible.builtin.assert: *update-change_request-result
+
+
+    - name: Make sure change_request was updated
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "scheduled" 
+          - result.records[0].priority == "high"
+          - result.records[0].risk == "high"
+          - result.records[0].impact == "high"
+
+
+    - name: Update change_request with same params - unchanged
+      servicenow.itsm.change_request: *update-change_request
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Update change_request state to implement - check mode
+      servicenow.itsm.change_request: &update-change_request-state-implement
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: implement
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &update-change_request-state-result-implement
+        that:
+          - result is changed
+          - result.record.state == "implement"
+
+
+    - name: Update change_request state to implement
+      servicenow.itsm.change_request: *update-change_request-state-implement
+
+    - ansible.builtin.assert: *update-change_request-state-result-implement
+
+
+    - name: Make sure state of change_request was updated
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "implement" 
+
+
+    - name: Update change_request with same state - unchanged
+      servicenow.itsm.change_request: *update-change_request-state-implement
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Update change_request state to review - check mode
+      servicenow.itsm.change_request: &update-change_request-state-review
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: review
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &update-change_request-state-result-review
+        that:
+          - result is changed
+          - result.record.state == "review"
+
+
+    - name: Update change_request state to review
+      servicenow.itsm.change_request: *update-change_request-state-review
+
+    - ansible.builtin.assert: *update-change_request-state-result-review
+
+
+    - name: Make sure state of change_request was updated
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "review" 
+
+
+    - name: Update change_request with same state - unchanged
+      servicenow.itsm.change_request: *update-change_request-state-review
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Fail to close the change
+      servicenow.itsm.change_request:
+        number: "{{ test_result.record.number }}"
+        state: closed
+      ignore_errors: true
+      register: result
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'close_code' in result.msg"
+          - "'close_notes' in result.msg"
+
+
+    - name: Update change_request state to closed - check mode
+      servicenow.itsm.change_request: &update-change_request-state-closed
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: closed
+        close_code: successful
+        close_notes: Done testing
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &update-change_request-state-result-closed
+        that:
+          - result is changed
+          - result.record.state == "closed"
+
+
+    - name: Update change_request state to closed
+      servicenow.itsm.change_request: *update-change_request-state-closed
+
+    - ansible.builtin.assert: *update-change_request-state-result-closed
+
+
+    - name: Get change_request info by sysparm query - state and close_notes
+      servicenow.itsm.change_request_info:
+        query:
+         - state: = closed
+           close_notes: = Done testing
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].state == "closed"
+          - result.records[0].close_notes == "Done testing"
+
+
+    - name: Make sure change_request state was updated and is in closed state
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "closed"
+          - result.records[0].close_code == "successful"
+          - result.records[0].close_notes == "Done testing"
+
+
+    - name: Get specific change request info by sysparm query
+      servicenow.itsm.change_request_info:
+        query:
+         - number: = {{ test_result.record.number }}
+           state: = closed
+           close_code: = successful
+           close_notes: = Done testing
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 1
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "closed"
+          - result.records[0].close_code == "successful"
+          - result.records[0].close_notes == "Done testing"
+
+
+    - name: Update change_request with same state - unchanged
+      servicenow.itsm.change_request: *update-change_request-state-closed
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+    - name: Test bad parameter combinator (number + query)
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+        query:
+         - short_description: LIKE Oracle
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'parameters are mutually exclusive: number|query' in result.msg"
+
+
+    - name: Test invalid operator detection
+      servicenow.itsm.change_request_info:
+        query:
+         - short_description: LIKEE Oracle
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'Invalid condition' in result.msg"
+
+
+    - name: Get change_request info by sysparm query - short_description
+      servicenow.itsm.change_request_info:
+        query:
+         - short_description: LIKE some
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - "'some' in result.records[0].short_description"
+
+
+    - name: Test unary operator with argument detection
+      servicenow.itsm.change_request_info:
+        query:
+         - short_description: ISEMPTY SAP
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'Operator ISEMPTY does not take any arguments' in result.msg"
+
+
+    - name: Test sysparm query unary operator - short_description
+      servicenow.itsm.change_request_info:
+        query:
+         - short_description: ISNOTEMPTY
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].short_description != ""
+
+    - name: Delete change_request - check mode
+      servicenow.itsm.change_request: &delete-change_request
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: absent
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &delete-change_request-result
+        that:
+          - result is changed
+
+
+    - name: Delete change_request
+      servicenow.itsm.change_request: *delete-change_request
+
+    - ansible.builtin.assert: *delete-change_request-result
+
+
+    - name: Make sure change_request is absent
+      servicenow.itsm.change_request_info:
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 0
+
+
+    - name: Delete change_request - unchanged
+      servicenow.itsm.change_request: *delete-change_request
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    # Test closing the change_request with assignment_group sys_id
+    - name: Create test change_request to be used in testing assignment_group sys_id
+      servicenow.itsm.change_request:
+        requested_by: admin
+        state: new
+        type: standard
+        template: Clear BGP sessions on a Cisco router - 1
+        priority: low
+        risk: low
+        impact: low
+      register: test_result
+      
+    # To avoid clashes between run we need to choose a new assignment_group for each python/ansible combination
+    - set_fact:
+        instance: "py{{ ansible_facts.python.version.major }}.{{ ansible_facts.python.version.minor }}-ansible-{{ ansible_version.major }}.{{ ansible_version.minor }}"
+
+    - debug: var=instance
+
+    - name: Update test change_request to scheduled
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: scheduled
+        assignment_group: "{{ assignment_groups[instance] | default('network') }}"
+        priority: high
+        risk: high
+        impact: high
+
+
+    - name: Update change_request state to implement
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: implement
+   
+
+    - name: Update change_request state to review
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ test_result.record.number }}"
+        state: review
+      register: result
+
+    - ansible.builtin.debug:
+        var: result.record
+
+
+    - name: Close change_request using assignment_group sys_id
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ result.record.number }}"
+        state: closed
+        close_code: successful
+        assignment_group_id: "{{ result.record.assignment_group }}"
+        close_notes: "Closed using assignment_group_id"
+  
+
+    - name: Make sure change_request state was updated and is in closed state
+      servicenow.itsm.change_request_info:
+        number: "{{ result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].state == "closed"
+
+
+    - name: Delete change_request 
+      servicenow.itsm.change_request:
+        requested_by: admin
+        number: "{{ result.records[0].number }}"
+        state: absent
+
+
+    - name: Update category choices
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: post
+        data:
+          name: change_request
+          element: category
+          value: 1
+          label: hardware
+      register: change_request_category
+
+    - set_fact:
+        solved_remotely_choice: "{{ change_request_category.record.sys_id }}"
+
+    - name: Create change_request 
+      servicenow.itsm.change_request:
+        requested_by: admin
+        state: new
+        type: standard
+        template: Clear BGP sessions on a Cisco router - 1
+        priority: low
+        risk: low
+        impact: low
+        short_description: some short description
+        category: Software
+      register: chg_request
+
+    - ansible.builtin.assert:
+        that:
+          - chg_request is changed
+          - chg_request.record.state == "new"
+          - chg_request.record.type == "standard"
+          - chg_request.record.priority == "low"
+          - chg_request.record.risk == "low"
+          - chg_request.record.impact == "low"
+          - chg_request.record.category == "Software"
+    
+    - name: Update change_request with new option
+      servicenow.itsm.change_request:
+        number: "{{ chg_request.record.number }}"
+        category: hardware
+    
+    - name: Get change_request 
+      servicenow.itsm.change_request_info:
+        number: "{{ chg_request.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].category == "hardware"
+    
+    - name: Delete change_request
+      servicenow.itsm.change_request:
+        sys_id: "{{ chg_request.record.sys_id }}"
+        state: absent
+    
+    - name: Delete change_request choices
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: delete
+        sys_id: "{{ solved_remotely_choice }}"

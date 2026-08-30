@@ -1,0 +1,370 @@
+# Copyright (c) IBM Corporation 2026
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+- name: "Z/OS | Check ZOAU installation and version"
+  ansible.builtin.command:
+    cmd: "zoaversion -c"
+  register: gather_diagnostics_managed_zoaversion
+  changed_when: false
+  ignore_errors: true
+
+- name: "Z/OS | Debug: Check ZOAU installation"
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: 'zoaversion -c' command failed (rc={{ gather_diagnostics_managed_zoaversion.rc }}).
+      This often means ZOAU is not installed or not in the user's PATH.
+  when: gather_diagnostics_managed_zoaversion.rc | default(0) != 0
+
+- name: "Z/OS | Gather Python version"
+  ansible.builtin.command:
+    cmd: "python3 --version"
+  register: gather_diagnostics_managed_python_version
+  changed_when: false
+  ignore_errors: true
+
+- name: "Z/OS | Debug: Check Python installation"
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: 'python3 --version' command failed (rc={{ gather_diagnostics_managed_python_version.rc }}).
+      This often means Python 3 is not installed or not in the user's PATH.
+  when: gather_diagnostics_managed_python_version.rc | default(0) != 0
+
+- name: "Z/OS | Gather system locale"
+  ansible.builtin.command:
+    cmd: "locale"
+  register: gather_diagnostics_managed_locale
+  changed_when: false
+  ignore_errors: true
+
+- name: "Z/OS | Gather environment variables"
+  ansible.builtin.command:
+    cmd: "env"
+  register: gather_diagnostics_managed_env
+  changed_when: false
+  ignore_errors: true
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Gather system facts"
+  block:
+    - name: "Z/OS | Gather Ansible facts using zos_gather_facts"
+      ibm.ibm_zos_core.zos_gather_facts:
+        gather_subset:
+          - ipl
+          - sys
+          - cpu
+          - iodf
+      register: gather_diagnostics_zos_facts
+  rescue:
+    - name: "Z/OS | Fallback: Attempt to get IPL info via zinfo shell command"
+      ansible.builtin.command: "zinfo -a"
+      register: gather_diagnostics_zos_facts_fallback
+      changed_when: false
+      ignore_errors: true
+
+- name: "Z/OS | List installed pip packages"
+  ansible.builtin.command:
+    cmd: "python3 -m pip list"
+  register: gather_diagnostics_managed_pip_list
+  changed_when: false
+  ignore_errors: true
+
+- name: "Z/OS | Gather user limits"
+  ansible.builtin.command:
+    cmd: "ulimit -a"
+  register: gather_diagnostics_managed_ulimit
+  changed_when: false
+  ignore_errors: true
+
+- name: "Z/OS | Gather user's OMVS segment"
+  ansible.builtin.shell:
+    cmd: "tsocmd \"lu $(whoami) omvs\""
+  register: gather_diagnostics_managed_omvs_segment
+  changed_when: false
+  ignore_errors: true
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Extract paths from environment variables"
+  ansible.builtin.set_fact:
+    gather_diagnostics_zoau_home_path: >-
+      {{ (gather_diagnostics_managed_env.stdout_lines
+         | select('match', '^(ZOAU_HOME|ZOAU)=')
+         | first
+         | default('=not_found')
+         | split('='))[1] }}
+    gather_diagnostics_python_exe_path: >-
+      {{ (gather_diagnostics_managed_env.stdout_lines
+         | select('match', '^_=.*/v3r[0-9]{1,2}/pyz/bin/python')
+         | first
+         | default('=not_found')
+         | split('='))[1] }}
+  when: gather_diagnostics_managed_env.stdout_lines is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Determine Python home from executable path"
+  ansible.builtin.set_fact:
+    gather_diagnostics_python_home_path: "{{ (gather_diagnostics_python_exe_path | ansible.builtin.dirname) | ansible.builtin.dirname }}"
+  when: gather_diagnostics_python_exe_path is defined and gather_diagnostics_python_exe_path != 'not_found'
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Check ZOAU home mount status (df)"
+  ansible.builtin.command:
+    cmd: "df -P {{ gather_diagnostics_zoau_home_path }}"
+  register: gather_diagnostics_managed_df_zoau
+  changed_when: false
+  ignore_errors: true
+  when: gather_diagnostics_zoau_home_path is defined and gather_diagnostics_zoau_home_path != 'not_found'
+
+- name: "Z/OS | Check APF bits in ZOAU bin directory"
+  ansible.builtin.command:
+    cmd: "ls -laE {{ gather_diagnostics_zoau_home_path }}/bin"
+  register: gather_diagnostics_managed_bin_apf_bits
+  changed_when: false
+  ignore_errors: true
+  when: gather_diagnostics_zoau_home_path is defined and gather_diagnostics_zoau_home_path != 'not_found'
+
+- name: "Z/OS | Check Python home mount status (df)"
+  ansible.builtin.command:
+    cmd: "df -P {{ gather_diagnostics_python_home_path }}"
+  register: gather_diagnostics_managed_df_python
+  changed_when: false
+  ignore_errors: true
+  when: gather_diagnostics_python_home_path is defined and gather_diagnostics_python_home_path != 'not_found'
+
+- name: "Z/OS | OPTIONAL: Gather operator command output"
+  when: gather_diagnostics_gather_syslog
+  block:
+    - name: "Run MVS operator command 'D A,L'"
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "D A,L"
+      register: gather_diagnostics_managed_operator_output
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+    - name: "Run MVS operator command 'D OMVS,LIMITS'"
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "D OMVS,LIMITS"
+      register: gather_diagnostics_managed_omvs_limits
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+    - name: "Run MVS operator command 'D OMVS,OPTIONS'"
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "D OMVS,OPTIONS"
+      register: gather_diagnostics_managed_omvs_options
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+  rescue:
+    - name: "Note: Operator command failed"
+      ansible.builtin.debug:
+        msg: "The 'zos_operator' command failed. This may be due to 'gather_diagnostics_gather_syslog' being true but the user lacking operator authority."
+
+- name: "Z/OS | Gather SSH configuration files"
+  when: gather_diagnostics_gather_ssh_config
+  block:
+    - name: "Z/OS | Gather user's ~/.ssh/rc"
+      ansible.builtin.command: "cat ~/.ssh/rc"
+      register: gather_diagnostics_managed_ssh_rc
+      changed_when: false
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+    - name: "Z/OS | Gather system /etc/ssh/sshrc"
+      ansible.builtin.command: "cat /etc/ssh/sshrc"
+      register: gather_diagnostics_managed_etc_ssh_rc
+      changed_when: false
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+    - name: "Z/OS | Gather system /etc/ssh/ssh_config"
+      ansible.builtin.command: "cat /etc/ssh/ssh_config"
+      register: gather_diagnostics_managed_etc_ssh_config
+      changed_when: false
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+    - name: "Z/OS | Gather system /etc/ssh/sshd_config"
+      ansible.builtin.command: "cat /etc/ssh/sshd_config"
+      register: gather_diagnostics_managed_etc_sshd_config
+      changed_when: false
+      ignore_errors: true
+      no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+  rescue:
+    - name: "SSH config file gathering failed"
+      ansible.builtin.debug:
+        msg: "The attempt to gather SSH config files failed. This may be due to permission issues or files not existing."
+
+# --- DISPLAY MANAGED NODE RESULTS ---
+
+- name: "Z/OS | --- RESULTS (sensitive data is hidden if gather_diagnostics_save_managed_node_log=false) ---"
+  ansible.builtin.debug:
+    msg: "Starting z/OS managed node diagnostics display"
+
+- name: "Z/OS | ZOAU Version"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_zoaversion.stdout
+  when: gather_diagnostics_managed_zoaversion is defined
+
+- name: "Z/OS | Python Version (stdout)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_python_version.stdout
+  when: gather_diagnostics_managed_python_version is defined and gather_diagnostics_managed_python_version.stdout != ""
+
+- name: "Z/OS | Python Version (stderr)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_python_version.stderr
+  when: gather_diagnostics_managed_python_version is defined and gather_diagnostics_managed_python_version.stderr != ""
+
+- name: "Z/OS | Locale"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_locale.stdout_lines
+  when: gather_diagnostics_managed_locale is defined
+
+- name: "Z/OS | Environment"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_env.stdout_lines
+  when: gather_diagnostics_managed_env is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Core Facts"
+  ansible.builtin.debug:
+    var: gather_diagnostics_zos_facts.ansible_facts
+  when: gather_diagnostics_zos_facts is defined and gather_diagnostics_zos_facts.ansible_facts is defined
+
+- name: "Z/OS | Core Facts (Fallback)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_zos_facts_fallback.stdout_lines
+  when: gather_diagnostics_zos_facts_fallback is defined
+
+- name: "Z/OS | Pip List"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_pip_list.stdout_lines
+  when: gather_diagnostics_managed_pip_list is defined
+
+- name: "Z/OS | User Limits"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_ulimit.stdout_lines
+  when: gather_diagnostics_managed_ulimit is defined
+
+- name: "Z/OS | OMVS Segment"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_omvs_segment.stdout_lines
+  when: gather_diagnostics_managed_omvs_segment is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | ZOAU Path Mount Status"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_df_zoau.stdout_lines
+  when: gather_diagnostics_managed_df_zoau is defined and gather_diagnostics_managed_df_zoau.stdout_lines is defined
+
+- name: "Z/OS | ZOAU apf attributes"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_bin_apf_bits.stdout_lines
+  when: gather_diagnostics_managed_bin_apf_bits is defined and gather_diagnostics_managed_bin_apf_bits.stdout_lines is defined
+
+- name: "Z/OS | Python Path Mount Status"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_df_python.stdout_lines
+  when: gather_diagnostics_managed_df_python is defined and gather_diagnostics_managed_df_python.stdout_lines is defined
+
+- name: "Z/OS | Operator Output (D A,L)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_operator_output.content
+  when: gather_diagnostics_managed_operator_output is defined and gather_diagnostics_managed_operator_output.content is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Operator Output (D OMVS,LIMITS)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_omvs_limits.content
+  when: gather_diagnostics_managed_omvs_limits is defined and gather_diagnostics_managed_omvs_limits.content is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Operator Output (D OMVS,OPTIONS)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_omvs_options.content
+  when: gather_diagnostics_managed_omvs_options is defined and gather_diagnostics_managed_omvs_options.content is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | User ~/.ssh/rc"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_ssh_rc.stdout_lines
+  when: gather_diagnostics_gather_ssh_config and gather_diagnostics_managed_ssh_rc is defined and gather_diagnostics_managed_ssh_rc.rc is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | System /etc/ssh/sshrc"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_etc_ssh_rc.stdout_lines
+  when: gather_diagnostics_gather_ssh_config and gather_diagnostics_managed_etc_ssh_rc is defined and gather_diagnostics_managed_etc_ssh_rc.rc is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | System /etc/ssh/ssh_config"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_etc_ssh_config.stdout_lines
+  when: >-
+    gather_diagnostics_gather_ssh_config and
+    gather_diagnostics_managed_etc_ssh_config is defined and
+    gather_diagnostics_managed_etc_ssh_config.rc is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | System /etc/ssh/sshd_config"
+  ansible.builtin.debug:
+    var: gather_diagnostics_managed_etc_sshd_config.stdout_lines
+  when: >-
+    gather_diagnostics_gather_ssh_config and
+    gather_diagnostics_managed_etc_sshd_config is defined and
+    gather_diagnostics_managed_etc_sshd_config.rc is defined
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Consolidate all results into one variable"
+  ansible.builtin.set_fact:
+    gather_diagnostics_managed_results:
+      zoau_version: "{{ gather_diagnostics_managed_zoaversion.stdout | default('N/A') }}"
+      zoau_version_stderr: "{{ gather_diagnostics_managed_zoaversion.stderr | default('N/A') }}"
+      python_version: "{{ gather_diagnostics_managed_python_version.stdout | default('N/A') }}"
+      python_version_stderr: "{{ gather_diagnostics_managed_python_version.stderr | default('N/A') }}"
+      locale: "{{ gather_diagnostics_managed_locale.stdout_lines | default('N/A') }}"
+      environment: "{{ gather_diagnostics_managed_env.stdout_lines | default('N/A') }}"
+      zos_facts: "{{ gather_diagnostics_zos_facts.ansible_facts | default('N/A') }}"
+      zos_facts_fallback: "{{ gather_diagnostics_zos_facts_fallback.stdout_lines | default('N/A') }}"
+      pip_list: "{{ gather_diagnostics_managed_pip_list.stdout_lines | default('N/A') }}"
+      user_limits: "{{ gather_diagnostics_managed_ulimit.stdout_lines | default('N/A') }}"
+      omvs_segment: "{{ gather_diagnostics_managed_omvs_segment.stdout_lines | default('N/A') }}"
+      df_zoau_path: "{{ gather_diagnostics_managed_df_zoau.stdout_lines | default('N/A') }}"
+      zoau_bin_attributes: "{{ gather_diagnostics_managed_bin_apf_bits.stdout_lines | default('N/A') }}"
+      df_python_path: "{{ gather_diagnostics_managed_df_python.stdout_lines | default('N/A') }}"
+      operator_d_a_l: "{{ gather_diagnostics_managed_operator_output.content | default('N/A', true) }}"
+      operator_d_omvs_limits: "{{ gather_diagnostics_managed_omvs_limits.content | default('N/A', true) }}"
+      operator_d_omvs_options: "{{ gather_diagnostics_managed_omvs_options.content | default('N/A', true) }}"
+      ssh_rc_content: "{{ gather_diagnostics_managed_ssh_rc.stdout_lines | default('N/A', true) }}"
+      etc_ssh_rc_content: "{{ gather_diagnostics_managed_etc_ssh_rc.stdout_lines | default('N/A', true) }}"
+      etc_ssh_config_content: "{{ gather_diagnostics_managed_etc_ssh_config.stdout_lines | default('N/A', true) }}"
+      etc_sshd_config_content: "{{ gather_diagnostics_managed_etc_sshd_config.stdout_lines | default('N/A', true) }}"
+  no_log: "{{ not gather_diagnostics_save_managed_node_log }}"
+
+- name: "Z/OS | Ensure output directory exists on control node"
+  ansible.builtin.file:
+    path: "{{ gather_diagnostics_output_dir }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  when: gather_diagnostics_managed_results is defined and gather_diagnostics_save_managed_node_log
+
+- name: "Z/OS | Save managed node results to a YAML file on the control node"
+  ansible.builtin.copy:
+    dest: "{{ gather_diagnostics_output_dir }}/gather_diagnostics_report_managed_node_{{ inventory_hostname }}.yml"
+    content: "{{ gather_diagnostics_managed_results | to_nice_yaml }}"
+    mode: '0644'
+  delegate_to: localhost
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  when: gather_diagnostics_managed_results is defined and gather_diagnostics_save_managed_node_log

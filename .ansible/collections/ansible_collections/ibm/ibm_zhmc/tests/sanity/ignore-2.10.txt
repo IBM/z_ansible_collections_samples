@@ -1,0 +1,41 @@
+plugins/modules/zhmc_adapter.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_adapter_list.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_crypto_attachment.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_cpc.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_cpc_list.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_hba.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_nic.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_partition.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_partition_list.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_lpar.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_lpar_list.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_password_rule.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_password_rule_list.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_user_role.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_user_role_list.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_storage_group.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_storage_group_attachment.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_storage_volume.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_user.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/zhmc_virtual_function.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/module_utils/common.py pylint:raise-missing-from
+plugins/modules/zhmc_crypto_attachment.py pylint:raise-missing-from
+plugins/modules/zhmc_hba.py pylint:raise-missing-from
+plugins/modules/zhmc_nic.py pylint:raise-missing-from
+plugins/modules/zhmc_partition.py pylint:raise-missing-from
+plugins/modules/zhmc_user.py pylint:raise-missing-from
+plugins/modules/zhmc_user_role.py pylint:raise-missing-from
+plugins/modules/zhmc_virtual_function.py pylint:raise-missing-from
+plugins/modules/zhmc_adapter.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_cpc.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_crypto_attachment.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_hba.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_nic.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_partition.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_lpar.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_password_rule.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_user_role.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_storage_group.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_storage_volume.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_user.py validate-modules:return-syntax-error  # Missing type on generic {property}
+plugins/modules/zhmc_virtual_function.py validate-modules:return-syntax-error  # Missing type on generic {property}

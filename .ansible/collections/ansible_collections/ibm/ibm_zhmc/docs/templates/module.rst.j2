@@ -1,0 +1,218 @@
+{# ------------------------------------------------------------------------ #}
+{# © Copyright IBM Corporation 2020                                         #}
+{# ------------------------------------------------------------------------ #}
+
+:github_url: https://github.com/ansible-collections/ibm_zos_core/blob/dev/plugins/modules/{{ module }}.py
+
+.. _{{ module }}_module:
+
+{# ------------------------------------------------------------------------ #}
+{# Generate the title based on the module name and doc description          #}
+{# ------------------------------------------------------------------------ #}
+
+{% set title = module + ' -- ' + short_description | rst_ify %}
+{{ title }}
+{{ '=' * title | length }}
+
+{# Disble this syle formatting in leu of list style #}
+{#    {%   for desc in description %}
+    {{ desc | rst_ify }}
+
+    {%   endfor %}
+#}
+
+{# ------------------------------------------------------------------------ #}
+{# Generate top level links                                                 #}
+{# ------------------------------------------------------------------------ #}
+
+.. contents::
+   :local:
+   :depth: 1
+
+{# ------------------------------------------------------------------------ #}
+{# Generate the synopsis based on the doc description                       #}
+{# ------------------------------------------------------------------------ #}
+
+Synopsis
+--------
+{% if description -%}
+
+{%   for desc in description %}
+- {{ desc | rst_ify }}
+{%   endfor %}
+
+{% endif %}
+
+{# ------------------------------------------------------------------------ #}
+{# Generate the requirements based on the doc requirements                  #}
+{# ------------------------------------------------------------------------ #}
+{% if requirements -%}
+
+Requirements
+------------
+
+{%   for req in requirements %}
+- {{ req | rst_ify }}
+{%   endfor %}
+{% endif %}
+
+{# ------------------------------------------------------------------------ #}
+{# Parse options and format function                                        #}
+{# ------------------------------------------------------------------------ #}
+
+{% macro option_generation(opts, level) %}
+{# Control the order of options: true: ordered by name; false: keep source order #}
+{%   set sorted = false %}
+{%   for name, spec in (opts | dictsort if sorted else opts.items()) if not name.startswith('_') %}
+
+{{ "  " * level }}{{ name }}
+{%     for para in spec.description %}
+  {{ "  " * level }}{{ para | rst_ify }}
+
+{%     endfor %}
+  {{ "  " * level }}| **required**: {{ spec.required | default("False") }}
+  {{ "  " * level }}| **type**: {{ spec.type | default("str") }}
+{%     if spec.elements %}
+  {{ "  " * level }}| **elements**: {{ spec.elements }}
+{%     endif %}
+{%     if spec.default %}
+  {{ "  " * level }}| **default**: {{ spec.default }}
+{%     endif %}
+{%     if spec.choices %}
+  {{ "  " * level }}| **choices**: {{ ", ".join(spec.choices) }}
+{%     endif %}
+
+{%     if spec.suboptions %}
+{{ option_generation(spec.suboptions, level + 1) }}
+{%     endif %}
+{%   endfor %}
+{% endmacro %}
+
+{# ------------------------------------------------------------- #}
+{# Generate the options doc                                      #}
+{# ------------------------------------------------------------- #}
+
+{% if options -%}
+Parameters
+----------
+
+{{ option_generation(options, 0) }}
+{% endif %}
+
+{# ------------------------------------------------------------- #}
+{# Generate the sample doc                                       #}
+{# ------------------------------------------------------------- #}
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+{{ examples | indent(3, True) }}
+
+
+{# ------------------------------------------------------------- #}
+{# Generate the notes doc                                        #}
+{# ------------------------------------------------------------- #}
+
+{% if notes -%}
+Notes
+-----
+
+.. note::
+{%   for note in notes %}
+   {{ note | rst_ify }}
+
+{%   endfor %}
+{% endif %}
+
+{# ------------------------------------------------------------- #}
+{# Generate the set also doc                                     #}
+{# ------------------------------------------------------------- #}
+
+{% if seealso -%}
+See Also
+--------
+
+.. seealso::
+
+{% for item in seealso %}
+   - :ref:`{{ item.module }}_module`
+{% endfor %}
+{% endif %}
+
+{# ------------------------------------------------------------- #}
+{# Return doc macro                                              #}
+{# ------------------------------------------------------------- #}
+
+{% macro result_generation(results, level) %}
+{%   for entry in results %}
+{%     set _description  = results[entry].description %}
+{%     set _returned     = results[entry].returned %}
+{%     set _type         = results[entry].type %}
+{%     set _elements     = results[entry].elements %}
+{%     set _contains     = results[entry].contains %}
+{%     set _sample       = results[entry].sample %}
+
+{{ "  " * level }}{{ entry }}
+{%     if _description is iterable and _description is not string %}
+{%       for _para in _description %}
+  {{ "  " * level }}{{ _para | rst_ify }}
+
+{%       endfor %}
+{%     else %}
+  {{ "  " * level }}{{ _description | rst_ify }}
+
+{%     endif %}
+{%     if _returned %}
+  {{ "  " * level }}| **returned**: {{ _returned }}
+{%     endif %}
+{%     if _type %}
+  {{ "  " * level }}| **type**: {{ _type }}
+{%     endif %}
+{%     if _elements %}
+  {{ "  " * level }}| **elements**: {{ _elements }}
+{%     endif %}
+{%     if _sample %}
+{%       if _sample.sample1 %}
+  {{ "  " * level }}| **sample**:
+{%         for _samplex in _sample %}
+{%           if _type != 'str' and _type != 'int' %}
+
+  {{ "  " * level }}  .. code-block:: json
+
+  {{ "  " * level }}      {{ _sample[_samplex] | tojson(4) | indent(2*level+8) }}
+{%           else %}
+
+  {{ "  " * level }}  {{ _sample[_samplex] }}
+{%           endif %}
+{%         endfor %}
+
+{%       else %}
+{%         if _type != 'str' and _type != 'int' %}
+  {{ "  " * level }}| **sample**:
+
+  {{ "  " * level }}  .. code-block:: json
+
+  {{ "  " * level }}      {{ _sample | tojson(4) | indent(2*level+8) }}
+{%         else %}
+  {{ "  " * level }}| **sample**: {{ _sample }}
+{%         endif %}
+{%       endif %}
+{%     endif %}
+{%     if _contains %}
+{{ result_generation(_contains, level + 1) }}
+{%     endif %}
+{%   endfor %}
+{% endmacro %}
+
+{# ------------------------------------------------------------- #}
+{# Generate the return values doc                                #}
+{# ------------------------------------------------------------- #}
+
+{% if returndocs %}
+Return Values
+-------------
+
+{{ result_generation(returndocs, 0) }}
+{% endif %}

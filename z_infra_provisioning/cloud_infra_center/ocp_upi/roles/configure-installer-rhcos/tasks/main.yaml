@@ -202,6 +202,7 @@
     - icic_rhcos_count.stdout | int != 1
     - volume_type_id is not defined
 
+
 - name: Upload RHCOS image to ICIC glance
   openstack.cloud.image:
     name: 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'

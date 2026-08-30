@@ -1,0 +1,48 @@
+---
+- name: "Query job {{ job_status_id }}"
+  ibm.ibm_zos_core.zos_job_query:
+    job_name: "*"
+    owner: "*"
+    job_id: "{{ job_status_id }}"
+  register: job_status_query_result
+  ignore_errors: true
+
+- name: Normalize return values
+  ansible.builtin.set_fact:
+    job_status_jobs_list: "{{ job_status_query_result.jobs }}"
+  when: job_status_query_result is defined and job_status_query_result.jobs is defined and (job_status_query_result.jobs | length > 0)
+
+- name: "Extract ret_code.msg from job with ID {{ job_status_id }}"
+  ansible.builtin.set_fact:
+    job_status_code: >-
+      {% set rc = job_status_jobs_list[0].ret_code | default({}) %}
+      {% if rc is mapping %}
+        {% if rc.msg is defined and rc.msg is not none and rc.msg | string != '' %}
+          {{ rc.msg | string | trim }}
+        {% elif rc.msg_txt is defined and rc.msg_txt is not none and rc.msg_txt | string != '' %}
+          {{ rc.msg_txt | string | trim }}
+        {% elif rc.message is defined and rc.message is not none and rc.message | string != '' %}
+          {{ rc.message | string | trim }}
+        {% else %}
+          UNKNOWN
+        {% endif %}
+      {% else %}
+        {{ rc | string | trim }}
+      {% endif %}
+    job_status_is_active: "{{ 'AC' in (job_status_jobs_list[0].ret_code.msg | default('')) }}"
+
+- name: Clean job_status_code value
+  ansible.builtin.set_fact:
+    job_status_code: "{{ job_status_code | trim }}"
+
+- name: "Verify job is found - {{ job_status_id }}"
+  ansible.builtin.set_fact:
+    job_status_code: "JOB_NOT_FOUND"
+    job_status_is_active: "JOB_NOT_FOUND"
+  when: job_status_query_result is failed or job_status_jobs_list is not defined or job_status_jobs_list | length == 0
+
+- name: "Display job status and active status from job with id {{ job_status_id }}"
+  ansible.builtin.debug:
+    msg:
+      job_status_code: "{{ job_status_code }}"
+      job_status_is_active: "{{ job_status_is_active }}"

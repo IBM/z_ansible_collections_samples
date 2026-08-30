@@ -1,0 +1,8 @@
+download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/ibm-ibm_zos_core-2.0.0.tar.gz
+format_version: 1.0.0
+name: ibm_zos_core
+namespace: ibm
+server: https://galaxy.ansible.com/api/
+signatures: []
+version: 2.0.0
+version_url: /api/content/published/v3/plugin/ansible/content/published/collections/index/ibm/ibm_zos_core/versions/2.0.0/

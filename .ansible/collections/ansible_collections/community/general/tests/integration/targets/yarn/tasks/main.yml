@@ -1,0 +1,23 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Yarn package manager integration tests
+# Copyright (c) 2018 David Gunter, <david.gunter@tivix.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# ============================================================
+
+- include: run.yml
+  vars:
+    nodejs_version: '{{ item.node_version }}'
+    nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_system|lower }}-x{{ ansible_userspace_bits }}'
+    yarn_version: '{{ item.yarn_version }}'
+  with_items:
+    - {node_version: 4.8.0, yarn_version: 1.6.0}  # Lowest compatible nodejs version
+    - {node_version: 8.0.0, yarn_version: 1.6.0}
+  when:
+    - not (ansible_os_family == 'Alpine')  # TODO

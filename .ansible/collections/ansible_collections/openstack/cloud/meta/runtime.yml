@@ -1,0 +1,613 @@
+requires_ansible: ">=2.8"
+action_groups:
+  openstack:
+    - address_scope
+    - auth
+    - baremetal_inspect
+    - baremetal_inspect
+    - baremetal_node
+    - baremetal_node
+    - baremetal_node_action
+    - baremetal_node_action
+    - baremetal_node_info
+    - baremetal_port_info
+    - baremetal_port
+    - catalog_endpoint
+    - catalog_service
+    - catalog_service
+    - coe_cluster
+    - coe_cluster_template
+    - compute_flavor
+    - compute_flavor
+    - compute_flavor
+    - compute_flavor_info
+    - compute_flavor_info
+    - compute_service_info
+    - compute_service_info
+    - config
+    - config
+    - dns_zone
+    - dns_zone_info
+    - endpoint
+    - endpoint
+    - federation_idp
+    - federation_idp
+    - federation_idp_info
+    - federation_idp_info
+    - federation_mapping
+    - federation_mapping
+    - federation_mapping_info
+    - federation_mapping_info
+    - floating_ip
+    - floating_ip_info
+    - group_assignment
+    - group_assignment
+    - host_aggregate
+    - host_aggregate
+    - identity_domain
+    - identity_domain
+    - identity_domain_info
+    - identity_domain_info
+    - identity_group
+    - identity_group
+    - identity_group_info
+    - identity_group_info
+    - identity_role
+    - identity_role
+    - identity_user
+    - identity_user
+    - identity_user_info
+    - identity_user_info
+    - image
+    - image_info
+    - keypair
+    - keypair_info
+    - keystone_federation_protocol
+    - keystone_federation_protocol_info
+    - lb_listener
+    - lb_listener
+    - lb_member
+    - lb_member
+    - lb_pool
+    - lb_pool
+    - loadbalancer
+    - network
+    - networks_info
+    - object
+    - object_container
+    - port
+    - port_info
+    - project
+    - project_access
+    - project_info
+    - quota
+    - recordset
+    - role_assignment
+    - role_assignment
+    - router
+    - routers_info
+    - security_group
+    - security_group_info
+    - security_group_rule
+    - security_group_rule_info
+    - server
+    - server_action
+    - server_group
+    - server_info
+    - server_metadata
+    - server_volume
+    - stack
+    - subnet
+    - subnets_info
+    - subnet_pool
+    - volume
+    - volume_backup
+    - volume_backup_info
+    - volume_info
+    - volume_snapshot
+    - volume_snapshot_info
+  os:
+    - auth
+    - baremetal_inspect
+    - baremetal_inspect
+    - baremetal_node
+    - baremetal_node
+    - baremetal_node_action
+    - baremetal_node_action
+    - catalog_endpoint
+    - catalog_service
+    - catalog_service
+    - coe_cluster
+    - coe_cluster_template
+    - compute_flavor
+    - compute_flavor
+    - compute_flavor
+    - compute_flavor_info
+    - compute_flavor_info
+    - config
+    - config
+    - dns_zone
+    - dns_zone
+    - endpoint
+    - endpoint
+    - federation_idp
+    - federation_idp
+    - federation_idp_info
+    - federation_idp_info
+    - federation_mapping
+    - federation_mapping
+    - federation_mapping_info
+    - federation_mapping_info
+    - floating_ip
+    - group_assignment
+    - group_assignment
+    - host_aggregate
+    - host_aggregate
+    - identity_domain
+    - identity_domain
+    - identity_domain_info
+    - identity_domain_info
+    - identity_group
+    - identity_group
+    - identity_group_info
+    - identity_group_info
+    - identity_role
+    - identity_role
+    - identity_user
+    - identity_user
+    - identity_user_info
+    - identity_user_info
+    - image
+    - image_info
+    - keypair
+    - keypair_info
+    - keystone_federation_protocol
+    - keystone_federation_protocol_info
+    - lb_listener
+    - lb_listener
+    - lb_member
+    - lb_member
+    - lb_pool
+    - lb_pool
+    - loadbalancer
+    - network
+    - networks_info
+    - object
+    - object_container
+    - port
+    - port_info
+    - project
+    - project_access
+    - project_info
+    - quota
+    - recordset
+    - role_assignment
+    - role_assignment
+    - router
+    - routers_info
+    - security_group
+    - security_group_info
+    - security_group_rule
+    - security_group_rule_info
+    - server
+    - server_action
+    - server_group
+    - server_info
+    - server_metadata
+    - server_volume
+    - stack
+    - subnet
+    - subnets_info
+    - volume
+    - volume_backup
+    - volume_backup_info
+    - volume_info
+    - volume_snapshot
+    - volume_snapshot_info
+    - os_auth
+    - os_client_config
+    - os_client_config
+    - os_coe_cluster
+    - os_coe_cluster_template
+    - os_endpoint
+    - os_flavor
+    - os_flavor_info
+    - os_flavor_info
+    - os_floating_ip
+    - os_group
+    - os_group
+    - os_group_info
+    - os_group_info
+    - os_image
+    - os_image_info
+    - os_ironic
+    - os_ironic
+    - os_ironic_inspect
+    - os_ironic_inspect
+    - os_ironic_node
+    - os_ironic_node
+    - os_keypair
+    - os_keystone_domain
+    - os_keystone_domain
+    - os_keystone_domain_info
+    - os_keystone_domain_info
+    - os_keystone_endpoint
+    - os_keystone_endpoint
+    - os_keystone_federation_protocol
+    - os_keystone_federation_protocol_info
+    - os_keystone_identity_provider
+    - os_keystone_identity_provider
+    - os_keystone_identity_provider_info
+    - os_keystone_identity_provider_info
+    - os_keystone_mapping
+    - os_keystone_mapping
+    - os_keystone_mapping_info
+    - os_keystone_mapping_info
+    - os_keystone_role
+    - os_keystone_role
+    - os_keystone_service
+    - os_keystone_service
+    - os_listener
+    - os_listener
+    - os_loadbalancer
+    - os_member
+    - os_member
+    - os_network
+    - os_networks_info
+    - os_nova_flavor
+    - os_nova_flavor
+    - os_nova_host_aggregate
+    - os_nova_host_aggregate
+    - os_object
+    - os_pool
+    - os_pool
+    - os_port
+    - os_port_info
+    - os_project
+    - os_project_access
+    - os_project_info
+    - os_quota
+    - os_recordset
+    - os_router
+    - os_routers_info
+    - os_security_group
+    - os_security_group_rule
+    - os_server
+    - os_server_action
+    - os_server_group
+    - os_server_info
+    - os_server_metadata
+    - os_server_volume
+    - os_stack
+    - os_subnet
+    - os_subnets_info
+    - os_user
+    - os_user
+    - os_user_group
+    - os_user_group
+    - os_user_info
+    - os_user_info
+    - os_user_role
+    - os_user_role
+    - os_volume
+    - os_volume_snapshot
+    - os_zone
+    - os_zone
+
+plugin_routing:
+  modules:
+    os_auth:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.auth
+      redirect: openstack.cloud.auth
+    os_client_config:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.config
+      redirect: openstack.cloud.config
+    os_coe_cluster:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.coe_cluster
+      redirect: openstack.cloud.coe_cluster
+    os_coe_cluster_template:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.coe_cluster_template
+      redirect: openstack.cloud.coe_cluster_template
+    os_endpoint:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.catalog_endpoint
+      redirect: openstack.cloud.catalog_endpoint
+    os_flavor:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.compute_flavor
+      redirect: openstack.cloud.compute_flavor
+    os_flavor_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.compute_flavor_info
+      redirect: openstack.cloud.compute_flavor_info
+    os_floating_ip:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.floating_ip
+      redirect: openstack.cloud.floating_ip
+    os_group:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_group
+      redirect: openstack.cloud.identity_group
+    os_group_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_group_info
+      redirect: openstack.cloud.identity_group_info
+    os_image:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.image
+      redirect: openstack.cloud.image
+    os_image_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.image_info
+      redirect: openstack.cloud.image_info
+    os_ironic:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.baremetal_node
+      redirect: openstack.cloud.baremetal_node
+    os_ironic_inspect:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.baremetal_inspect
+      redirect: openstack.cloud.baremetal_inspect
+    os_ironic_node:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.baremetal_node_action
+      redirect: openstack.cloud.baremetal_node_action
+    os_keypair:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.keypair
+      redirect: openstack.cloud.keypair
+    os_keystone_domain:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_domain
+      redirect: openstack.cloud.identity_domain
+    os_keystone_domain_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_domain_info
+      redirect: openstack.cloud.identity_domain_info
+    os_keystone_endpoint:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.endpoint
+      redirect: openstack.cloud.endpoint
+    os_keystone_federation_protocol:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.keystone_federation_protocol
+      redirect: openstack.cloud.keystone_federation_protocol
+    os_keystone_federation_protocol_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.keystone_federation_protocol_info
+      redirect: openstack.cloud.keystone_federation_protocol_info
+    os_keystone_identity_provider:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.federation_idp
+      redirect: openstack.cloud.federation_idp
+    os_keystone_identity_provider_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.federation_idp_info
+      redirect: openstack.cloud.federation_idp_info
+    os_keystone_mapping:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.federation_mapping
+      redirect: openstack.cloud.federation_mapping
+    os_keystone_mapping_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.federation_mapping_info
+      redirect: openstack.cloud.federation_mapping_info
+    os_keystone_role:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_role
+      redirect: openstack.cloud.identity_role
+    os_keystone_service:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.catalog_service
+      redirect: openstack.cloud.catalog_service
+    os_listener:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.lb_listener
+      redirect: openstack.cloud.lb_listener
+    os_loadbalancer:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.loadbalancer
+      redirect: openstack.cloud.loadbalancer
+    os_member:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.lb_member
+      redirect: openstack.cloud.lb_member
+    os_network:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.network
+      redirect: openstack.cloud.network
+    os_networks_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.networks_info
+      redirect: openstack.cloud.networks_info
+    os_nova_flavor:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.compute_flavor
+      redirect: openstack.cloud.compute_flavor
+    os_nova_host_aggregate:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.host_aggregate
+      redirect: openstack.cloud.host_aggregate
+    os_object:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.object
+      redirect: openstack.cloud.object
+    os_pool:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.lb_pool
+      redirect: openstack.cloud.lb_pool
+    os_port:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.port
+      redirect: openstack.cloud.port
+    os_port_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.port_info
+      redirect: openstack.cloud.port_info
+    os_project:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.project
+      redirect: openstack.cloud.project
+    os_project_access:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.project_access
+      redirect: openstack.cloud.project_access
+    os_project_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.project_info
+      redirect: openstack.cloud.project_info
+    os_quota:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.quota
+      redirect: openstack.cloud.quota
+    os_recordset:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.recordset
+      redirect: openstack.cloud.recordset
+    os_router:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.router
+      redirect: openstack.cloud.router
+    os_routers_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.routers_info
+      redirect: openstack.cloud.routers_info
+    os_security_group:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.security_group
+      redirect: openstack.cloud.security_group
+    os_security_group_rule:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.security_group_rule
+      redirect: openstack.cloud.security_group_rule
+    os_server:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.server
+      redirect: openstack.cloud.server
+    os_server_action:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.server_action
+      redirect: openstack.cloud.server_action
+    os_server_group:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.server_group
+      redirect: openstack.cloud.server_group
+    os_server_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.server_info
+      redirect: openstack.cloud.server_info
+    os_server_metadata:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.server_metadata
+      redirect: openstack.cloud.server_metadata
+    os_server_volume:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.server_volume
+      redirect: openstack.cloud.server_volume
+    os_stack:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.stack
+      redirect: openstack.cloud.stack
+    os_subnet:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.subnet
+      redirect: openstack.cloud.subnet
+    os_subnets_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.subnets_info
+      redirect: openstack.cloud.subnets_info
+    os_user:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_user
+      redirect: openstack.cloud.identity_user
+    os_user_group:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.group_assignment
+      redirect: openstack.cloud.group_assignment
+    os_user_info:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.identity_user_info
+      redirect: openstack.cloud.identity_user_info
+    os_user_role:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.role_assignment
+      redirect: openstack.cloud.role_assignment
+    os_volume:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.volume
+      redirect: openstack.cloud.volume
+    os_volume_snapshot:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.volume_snapshot
+      redirect: openstack.cloud.volume_snapshot
+    os_zone:
+      deprecation:
+        removal_date: 2021-12-12
+        warning_text: os_ prefixed module names are deprecated, use openstack.cloud.dns_zone
+      redirect: openstack.cloud.dns_zone

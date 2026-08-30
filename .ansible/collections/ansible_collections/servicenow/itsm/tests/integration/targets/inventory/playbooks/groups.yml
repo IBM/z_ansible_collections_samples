@@ -1,0 +1,42 @@
+---
+- name: Test named groups
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - block:
+        - name: Create imaginary VMs
+          servicenow.itsm.configuration_item:
+            name: my-vm-{{ item }}
+            sys_class_name: cmdb_ci_vm_instance
+            ip_address: 10.1.0.{{ item }}
+            other:
+              state: "{{ (item % 4 == 0) | ansible.builtin.ternary('on', 'off') }}"
+              guest_os_fullname: "{{ (item < 105) | ansible.builtin.ternary('OS0', 'OS1') }}"
+          loop: "{{ range(100, 110) }}"
+          register: vms
+
+        - name: Reload inventory
+          ansible.builtin.meta: refresh_inventory
+
+        - ansible.builtin.debug:
+            var: groups
+
+        - ansible.builtin.assert:
+            that:
+              - groups | length == 3
+              - "'active_OS0_servers' in groups"
+              - groups["active_OS0_servers"] | length == 2
+              - hostvars["my-vm-100"].state == "On"
+              - hostvars["my-vm-100"].ansible_host == "10.1.0.100"
+              - hostvars["my-vm-104"].state == "On"
+              - hostvars["my-vm-104"].ansible_host == "10.1.0.104"
+
+      always:
+        - name: Delete VMs
+          servicenow.itsm.configuration_item:
+            state: absent
+            sys_id: "{{ item.record.sys_id }}"
+          loop: "{{ vms.results }}"
+          loop_control:
+            label: "{{ item.record.name }}"

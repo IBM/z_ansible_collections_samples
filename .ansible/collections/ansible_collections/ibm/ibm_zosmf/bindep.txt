@@ -1,0 +1,8 @@
+################################################################################
+# © Copyright IBM Corporation 2021
+################################################################################
+# This file maintains a list of any binary dependencies needed by this
+# Collection. At this time there are no binary dependencies.
+# For more information on Bindep,
+# see https://docs.opendev.org/opendev/bindep/latest/readme.html
+################################################################################

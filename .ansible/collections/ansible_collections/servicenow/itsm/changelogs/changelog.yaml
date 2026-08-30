@@ -1,0 +1,451 @@
+ancestor: null
+releases:
+  1.0.0:
+    fragments:
+    - initial.release.yml
+    modules:
+    - description: Manage ServiceNow change requests
+      name: change_request
+      namespace: ''
+    - description: List ServiceNow change requests
+      name: change_request_info
+      namespace: ''
+    - description: Manage ServiceNow configuration items
+      name: configuration_item
+      namespace: ''
+    - description: List ServiceNow configuration item
+      name: configuration_item_info
+      namespace: ''
+    - description: Manage ServiceNow incidents
+      name: incident
+      namespace: ''
+    - description: List ServiceNow incidents
+      name: incident_info
+      namespace: ''
+    - description: Manage ServiceNow problems
+      name: problem
+      namespace: ''
+    - description: List ServiceNow problems
+      name: problem_info
+      namespace: ''
+    plugins:
+      inventory:
+      - description: Inventory source for ServiceNow table records.
+        name: now
+        namespace: null
+    release_date: '2021-04-07'
+  1.1.0:
+    changes:
+      bugfixes:
+      - now - check instance host value before making REST call from the Client (https://github.com/ansible-collections/servicenow.itsm/pull/79).
+      minor_changes:
+      - Added new query module utility to filter results in info modules (https://github.com/ansible-collections/servicenow.itsm/issues/66).
+      - Added query parameter to change request info module
+      - Added query parameter to configuration item info module
+      - Added query parameter to incident info module
+      - Added query parameter to problem info module
+      - Added support for ``refresh_token`` in login mechanism (https://github.com/ansible-collections/servicenow.itsm/issues/63).
+      release_summary: v1.1.0 release for ServiceNow ITSM collection.
+    fragments:
+    - filter_results.yml
+    - inventory_host.yml
+    - refresh_token.yml
+    - release_1_1_0.yml
+    release_date: '2021-06-23'
+  1.2.0:
+    changes:
+      bugfixes:
+      - change_request - validates on_hold with its respective field instead of a
+        non-existent "on_hold" state when requiring a hold_reason (https://github.com/ansible-collections/servicenow.itsm/pull/86).
+      - client - Lowercase all header dict keys on Response initialization for better
+        consistency across Python versions. Fix tests and table client accordingly
+        (https://github.com/ansible-collections/servicenow.itsm/pull/98).
+      - now - add support for constructed feature in inventory plugin (https://github.com/ansible-collections/servicenow.itsm/issues/35).
+      deprecated_features:
+      - now inventory plugin - deprecate non constructed features (https://github.com/ansible-collections/servicenow.itsm/pull/97).
+      minor_changes:
+      - attachments - Add a client for attachment management. Add support for attachments
+        in change_request, configuration_item, incident and problem modules, including
+        their info counterparts. (https://github.com/ansible-collections/servicenow.itsm/pull/91)
+      release_summary: 'This is the minor release of the ``servicenow.itsm`` collection.
+
+        This changelog contains all changes to the modules in this collection that
+
+        have been added after the release of ``servicenow.itsm`` 1.1.0.'
+    fragments:
+    - 1.2.yml
+    - attachments.yaml
+    - change-request-change-on-hold-validation.yaml
+    - deprecate_non_constructed_inventory_features.yaml
+    - lowercase-response-headers.yaml
+    - now_construct_inventory.yml
+    modules:
+    - description: Manage ServiceNow configuration items in batch mode
+      name: configuration_item_batch
+      namespace: ''
+    release_date: '2021-09-08'
+  1.3.0:
+    changes:
+      minor_changes:
+      - client - Changed the base URL path of the HTTP client for all requests from
+        `/api/now` to `/`
+      - now - Enhance inventory with additional groups from CMDB relations (https://github.com/ansible-collections/servicenow.itsm/issues/108).
+      - table.py - add change_request and configuration item search options.
+      release_summary: 'This is the minor release of the ``servicenow.itsm`` collection.
+
+        This changelog contains all changes to the modules in this collection that
+
+        have been added after the release of ``servicenow.itsm`` 1.2.0.
+
+        '
+    fragments:
+    - 1.3.yml
+    - change_request_task.yaml
+    - client-change-base-path.yaml
+    - enhanced-inventory.yaml
+    modules:
+    - description: Manage ServiceNow change request tasks
+      name: change_request_task
+      namespace: ''
+    - description: List ServiceNow change request tasks
+      name: change_request_task_info
+      namespace: ''
+    - description: Manage ServiceNow problem tasks
+      name: problem_task
+      namespace: ''
+    - description: List ServiceNow problem tasks
+      name: problem_task_info
+      namespace: ''
+    release_date: '2022-03-18'
+  1.3.1:
+    changes:
+      release_summary: 'This is the patch release of the ``servicenow.itsm`` collection.
+
+        '
+    fragments:
+    - 1.3.1.yml
+    release_date: '2022-03-23'
+  1.3.2:
+    changes:
+      release_summary: 'This is the patch release of the ``servicenow.itsm`` collection.
+
+        '
+    fragments:
+    - 1.3.2.yml
+    release_date: '2022-03-23'
+  1.3.3:
+    changes:
+      release_summary: 'This is the patch release of the ``servicenow.itsm`` collection.
+
+        '
+    fragments:
+    - 1.3.3.yml
+    release_date: '2022-03-24'
+  1.4.0:
+    changes:
+      minor_changes:
+      - added ignore.txt for Ansible 2.14 devel branch.
+      - now - Updated documents to make clear how AND OR queries operate.
+      - now - fix mapped attributes in now modules.
+      - now - fix validate-modules errors in now inventory plugins.
+      - now - inventory plugin updated to support ``refresh_token`` and ``grant_type``
+        (https://github.com/ansible-collections/servicenow.itsm/issues/168).
+      release_summary: 'This is the minor release of the ``servicenow.itsm`` collection.
+
+        '
+    fragments:
+    - 1.4.0.yml
+    - ignore_2.14.yml
+    - inventory_grant.yaml
+    - mapping.yml
+    - now_inv_docs.yaml
+    - validate.yml
+    release_date: '2022-05-12'
+  2.0.0:
+    changes:
+      breaking_changes:
+      - configuration_item - Added name as a unique identifier. This means that the
+        idempotence is based on name, while previously there was no idempotence (except
+        for sys_id). When state=present if a configuration item with given name does
+        not exist, the item is created. If it already exists, it is updated. (https://github.com/ansible-collections/servicenow.itsm/pull/192)
+      - plugins/inventory/now.py - Removed parameters ``ansible_host_source``, ``named_groups``
+        and ``group_by`` (https://github.com/ansible-collections/servicenow.itsm/pull/213).
+      bugfixes:
+      - modules/problem.py - Uses I(API for Red Hat Ansible Automation Platform Certified
+        Content Collection) Scripted REST API Service for transitioning problem state
+        in case of Table API fails.
+      minor_changes:
+      - Attachment integration tests - Add missing register variables (https://github.com/ansible-collections/servicenow.itsm/pull/194)
+      - TableClient - Remove hardcoded value of sysparm_exclude_reference_link when
+        querying on table api.
+      - \*_info modules - Added additional module parameter sysparm_display_value
+        to all info modules, which, if set to either true or all, enables the user
+        to see the values of sys_tags.
+      - \*_info modules - Added field sysparm_query, which represents an encoded query
+        string used to filter the results as an alternative to C(query) (https://github.com/ansible-collections/servicenow.itsm/pull/190).
+      - api - Added module api, which essentially codifies the ServiceNow REST API
+        explorer in Ansible-native way for POST, PATCH and DELETE operations.
+      - api - Enhanced api module with template processing capabilities as an alternative
+        to its data parameter for creating or updating a resource (https://github.com/ansible-collections/servicenow.itsm/pull/201).
+      - api_info - Added module api_info, which essentially codifies the ServiceNow
+        REST API explorer in Ansible-native way for retrieving records (GET operations).
+      - attachment integration tests - Adapt integration tests for attachment module
+        due to changes on PR 192 (https://github.com/ansible-collections/servicenow.itsm/pull/193)
+      - configuration_batch_item - now returns result instead only if something was
+        changed or not.
+      - configuration_item_info - Added option name to simplify queries based on that
+        parameter.
+      - module_utils/attachments.py - Add ``get_attachment`` and ``save_attachment``
+        (https://github.com/ansible-collections/servicenow.itsm/pull/186).
+      - module_utils/problem.py - Added problem client for requesting problem state
+        updates from the I(API for Red Hat Ansible Automation Platform Certified Content
+        Collection) Scripted REST API Service.
+      - module_utils/util.py - Added optional Boolean parameter C(implicit) to C(get_mapper)
+        function to provide default values for missing keys in the mapping.
+      - modules/problem.py - Added module parameters validation to match the mapping
+        specification.
+      - modules/problem.py - Added optional module parameter C(base_api_path) to control
+        the URI prefix of the endpoint exposed by the I(API for Red Hat Ansible Automation
+        Platform Certified Content Collection) Scripted REST API Service.
+      - now - Added field sysparm_query, which represents an encoded query string
+        used to filter the results as an alternative to C(query) (https://github.com/ansible-collections/servicenow.itsm/pull/190).
+      - test_api - Remove unused import which caused sanity error. (https://github.com/ansible-collections/servicenow.itsm/pull/204)
+      release_summary: This is the major release of the ``servicenow.itsm`` collection.
+    fragments:
+    - 179_encode_servicenow_rest_api_module_in_ansible.yml
+    - 180_enhance_api_module_by_adding_field_template.yml
+    - 184_fix_default_exclude_reference_link.yml
+    - 188_control_sysparm_display_value_in_info_modules.yml
+    - 190_add_alternative_way_to_filter_results.yml
+    - 2.0.0.release_summary.yml
+    - 71_configuration_item_implement_idempotence.yml
+    - adapt_attachment_integration_tests.yml
+    - attachment_integration_tests_missing_register_variables.yml
+    - attachments.yaml
+    - configuration_batch_item_return_value.yml
+    - inventory_remove_deprecated_options.yml
+    - problem_management.yaml
+    - test-attachment.yaml
+    - test_api_remove_unused_import.yml
+    modules:
+    - description: Manage ServiceNow POST, PATCH and DELETE requests
+      name: api
+      namespace: ''
+    - description: Manage ServiceNow GET requests
+      name: api_info
+      namespace: ''
+    - description: a module that users can use to download attachment using sys_id
+      name: attachment
+      namespace: ''
+    release_date: '2022-09-21'
+  2.1.0:
+    changes:
+      bugfixes:
+      - inventory plugin - sysparm_query attribute is taken into account.
+      - mapping - When creating custom mapping, one can list unknown fields and map
+        them to values. Before the fix there was a bug, where one could only rename
+        fields inside mapping.
+      minor_changes:
+      - api - Added parameter query_params to api module (https://github.com/ansible-collections/servicenow.itsm/pull/225).
+      - inventory plugin - Plugin now supports mapping of reference fields inside
+        'compose' block.
+      release_summary: 'This is the minor release of the ``servicenow.itsm`` collection.
+
+        This changelog contains all changes to the modules in this collection that
+
+        have been added after the release of ``servicenow.itsm`` 2.0.0.
+
+        '
+    fragments:
+    - api_query_params.yml
+    - inventory_plugin_bugfix.yml
+    - inventory_plugin_reference_fields.yml
+    - problem_mapping_bugix.yml
+    - release_2_1_0.yml
+    release_date: '2023-01-31'
+  2.2.0:
+    changes:
+      minor_changes:
+      - Added attachment_upload module (https://github.com/ansible-collections/servicenow.itsm/pull/248).
+      release_summary: 'This is the minor release of the ``servicenow.itsm`` collection.
+
+        This changelog contains all changes to the modules in this collection that
+
+        have been added after the release of ``servicenow.itsm`` 2.1.0.
+
+        '
+    fragments:
+    - attachment_upload_module.yaml
+    - release_2_2_0.yml
+    modules:
+    - description: Upload attachment to the selected table
+      name: attachment_upload
+      namespace: ''
+    release_date: '2023-05-09'
+  2.3.0:
+    changes:
+      bugfixes:
+      - Fix issue with attachment_upload module not working properly (https://github.com/ansible-collections/servicenow.itsm/pull/260).
+      - now - use correct environment variable for SN_CLIENT_SECRET (https://github.com/ansible-collections/servicenow.itsm/issues/261).
+      minor_changes:
+      - Add validate_certs option to instance (https://github.com/ansible-collections/servicenow.itsm/pull/264).
+      - Added option to pass OAuth2 access token previously obtained from ServiceNow
+        (https://github.com/ansible-collections/servicenow.itsm/pull/272).
+      release_summary: 'This is the minor release of the ``servicenow.itsm`` collection.
+
+        This changelog contains all changes to the modules in this collection that
+
+        have been added after the release of ``servicenow.itsm`` 2.2.0.
+
+        '
+    fragments:
+    - 261_fix_env_variable.yml
+    - attachment_upload_module_bugfix.yml
+    - client_access_token.yaml
+    - client_validate_certs.yaml
+    - release_2_3_0.yml
+    release_date: '2023-07-25'
+  2.4.0:
+    changes:
+      bugfixes:
+      - change_request - allow query assignment_group by sys_id (https://github.com/ansible-collections/servicenow.itsm/issues/295)
+      - change_request_task - allow query assignment_group by sys_id (https://github.com/ansible-collections/servicenow.itsm/issues/295)
+      - change_request_task - remove duplicate option 'testing' from 'type' argument_spec.
+      - configuration_item_info - allow user to specify limited return fields for
+        the specified configuration item (https://github.com/ansible-collections/servicenow.itsm/pull/208).
+      - incident - allow incident_mapping for close_code parameter.
+      - now - added missing SN_SYSPARM_QUERY environment variable (https://github.com/ansible-collections/servicenow.itsm/issues/293).
+      - table_client - Fix 'KeyError' exception when fetching records by sys_id and
+        add `must_have` arguments (https://github.com/ansible-collections/servicenow.itsm/pull/306)
+      minor_changes:
+      - Updated release script for servicenow collection.
+      - api - added custom headers and api path to the given request (https://github.com/ansible-collections/servicenow.itsm/pull/239).
+      - use get_record_by_sys_id instead of get_record in methods update, delete (https://github.com/ansible-collections/servicenow.itsm/pull/307).
+    fragments:
+    - api.yml
+    - cclose_code.yml
+    - change_request.yml
+    - change_request_task.yml
+    - change_request_task_assignment_group.yml
+    - client_api_path.yml
+    - configuration_item_info_return_fields.yml
+    - now_env_sysparm_query.yml
+    - table_client.yml
+    - update_prepare_release.yml
+    release_date: '2024-03-07'
+  2.5.0:
+    changes:
+      bugfixes:
+      - now - Fix crash when SN_TIMEOUT is set because is it passed as string instead
+        of a number (https://github.com/ansible-collections/servicenow.itsm/pull/348).
+      minor_changes:
+      - Added option to allow changing sysparm_limit for table query (https://github.com/ansible-collections/servicenow.itsm/pull/309).
+      - 'Included integration tests and instances targeting the following ServiceNow
+        releases: Washington, Vancouver, Utah, Tokyo'
+      - api - allow `api` module to make request outside `Table API` namespace(https://github.com/ansible-collections/servicenow.itsm/pull/314).
+      - api_info - allow `api_info` module to make request outside `Table API` namespace(https://github.com/ansible-collections/servicenow.itsm/pull/314).
+      - change_request - allow change_request_mapping for category parameter (https://github.com/ansible-collections/servicenow.itsm/issues/266).
+      - client - allow user to pass a `object_hook` function to rest client for custom
+        decoding of the json response(https://github.com/ansible-collections/servicenow.itsm/pull/316).
+      - configuration_item_relations - add module to add and remove relations between
+        configuration items.
+      - configuration_item_relations_info - add module retrieve relations of a configuration
+        item.
+      - now - add cache support for the inventory plugin (https://github.com/ansible-collections/servicenow.itsm/pull/315).
+      - now.py - replace "." in reference field column name to "_" in host variable
+      release_summary: Introduce generic API client, test against all current releases
+        of ServiceNow, and introduce support for Event-Driven Ansible Notification
+        Service (aka EDA NS) application
+    fragments:
+    - api.yml
+    - api_info.yml
+    - change_request_category.yml
+    - ci_relations.yml
+    - ci_relations_info.yml
+    - client_object_hook.yml
+    - inventory.yml
+    - inventory_timeout.yml
+    - more_test_instances.yml
+    - no_dot_var.yml
+    - release_summary.yml
+    - sysparm_limit.yml
+    modules:
+    - description: Manage ServiceNow relations between configuration items
+      name: configuration_item_relations
+      namespace: ''
+    - description: Retreive ServiceNow relations of configuration items
+      name: configuration_item_relations_info
+      namespace: ''
+    release_date: '2024-04-25'
+  2.6.0:
+    changes:
+      bugfixes:
+      - now - Fix crash of inventory when query is present (https://github.com/ansible-collections/servicenow.itsm/issues/361).
+      minor_changes:
+      - Added check for records(sys_id) that are already processed with reference
+        records
+      - Raise Ansible runtime version to 2.15.0 in accordance with Ansible Lifecycle
+        policy. This implies dropping Python 3.9 from the test matrix as well.
+      - ServiceNow returns duplicated records causing error at line referenced.pop("sys_id")
+      - Update authors in galaxy.yml
+      release_summary: Introduce service_catalog modules; fix inventory crash bug
+        and improve performance by handling duplicate records better
+    fragments:
+    - galaxy_update.yml
+    - handle_duplicate_records.yml
+    - inventory_bug.yml
+    - release_summary.yml
+    - workflow_update.yml
+    modules:
+    - description: Manage ServiceNow service catalog cart
+      name: service_catalog
+      namespace: ''
+    - description: List ServiceNow service catalogs along with categories and items
+      name: service_catalog_info
+      namespace: ''
+    release_date: '2024-05-23'
+  2.6.1:
+    changes:
+      bugfixes:
+      - docs - Documentation generated for 2.6.0 was incorrect due to maintainer error.
+        This updates the documentation to be correct and consistent.
+      release_summary: Fix incorrect documentation shipped with 2.6.0
+    fragments:
+    - fix_documentation.yml
+    - release_summary.yml
+    release_date: '2024-05-29'
+  2.6.2:
+    changes:
+      bugfixes:
+      - Correct submit_order endpoint for issue
+      deprecated_features:
+      - tests - Drop sanity test override matrix, as the inherited job now has the
+        correct excludes
+      - tests - Drop testing of Tokyo, as it is no longer supported by ServiceNow
+      release_summary: Fix issue with service_catalog endpoint and remove SNOW Tokyo
+        from test matrix
+    fragments:
+    - fix_service_catalog_enndpoint.yml
+    - release_summary.yml
+    - remove_sanity_test_matrix.yml
+    - remove_tokyo.yml
+    release_date: '2024-08-29'
+  2.6.3:
+    changes:
+      release_summary: Fix docs issue with 2.6.2 release
+    fragments:
+    - release_summary.yml
+    release_date: '2024-08-29'
+  2.7.0:
+    changes:
+      minor_changes:
+      - inventory - allow inventory to aggregate multiple hostvars for the same host.
+        (https://github.com/ansible-collections/servicenow.itsm/pull/408)
+      - tests - Add ServiceNow Xanadu release to test matrix
+      release_summary: Add optional aggregation feature to inventory; add ServiceNow
+        Xanadu to integration test matrix
+    fragments:
+    - add_xanadu.yaml
+    - inventory_aggregation.yml
+    - release_summary.yml
+    release_date: '2024-10-03'

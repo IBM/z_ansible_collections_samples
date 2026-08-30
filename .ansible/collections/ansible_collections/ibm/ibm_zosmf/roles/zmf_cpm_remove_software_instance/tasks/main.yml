@@ -1,0 +1,32 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+---
+# tasks file for zmf_cpm_remove_software_instance
+
+- name: Read from json file path
+  set_fact:
+    instance_record: "{{ lookup('file', instance_info_json_path) | from_json }}"
+
+- name: "Remove instance {{ instance_record['registry-info']['object-id'] }}"
+  uri:
+    url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/provisioning/rest/1.0/scr/{{ instance_record['registry-info']['object-id'] }}"
+    return_content: true
+    user: "{{ zmf_user | trim }}"
+    password: "{{ zmf_password | trim }}"
+    force_basic_auth: true
+    headers:
+      Host: "{{ zmf_host }}"
+      Origin: "https://{{ zmf_host }}"
+    method: DELETE
+    status_code: 204, 404
+    validate_certs: false
+    body_format: json
+    body: "{}"
+  delegate_to: localhost
+
+- name: Clean instance record file
+  file:
+    state: absent
+    path: "{{ instance_info_json_path }}"
+  delegate_to: localhost

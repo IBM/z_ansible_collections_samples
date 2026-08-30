@@ -1,0 +1,41 @@
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    ###################################################################
+    ######     Attachment redirected to attachemnt_info test     ######
+    ###################################################################
+
+    - name: Create test incident with attachment
+      servicenow.itsm.incident:
+        caller: admin
+        state: new
+        short_description: Test incident
+        impact: low
+        urgency: low
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_attachment_info/res/sample_file1.txt"
+      register: test_incident
+
+    - ansible.builtin.assert:
+        that:
+          - test_incident.record.attachments | map(attribute="file_name") | sort | list == ["sample_file1.txt"]
+          - test_incident.record.attachments | map(attribute="hash") | sort | list == ["6f2b0dec698566114435a23f15dcac848a40e1fd3e0eda4afe24a663dda23f2e"]
+
+    - ansible.builtin.set_fact:
+        attachment_sys_id: "{{test_incident.record.attachments[0].sys_id }}"
+
+    - ansible.builtin.debug:
+        var: attachment_sys_id
+
+    - name: Get last attachment with redirected module name
+      servicenow.itsm.attachment:
+        dest: /tmp/sn-attachment
+        sys_id: "{{ attachment_sys_id }}"
+
+    - name: Get last attachment with new module name
+      servicenow.itsm.attachment_info:
+        dest: /tmp/sn-attachment
+        sys_id: "{{ attachment_sys_id }}"

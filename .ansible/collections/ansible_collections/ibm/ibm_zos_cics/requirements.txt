@@ -1,0 +1,5 @@
+# (c) Copyright IBM Corp. 2020,2023
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+requests==2.32.3
+xmltodict==0.12.0
+urllib3==1.26.18

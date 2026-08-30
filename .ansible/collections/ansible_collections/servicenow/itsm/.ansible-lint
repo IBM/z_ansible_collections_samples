@@ -1,0 +1,10 @@
+---
+exclude_paths:
+    - .cache/
+    - .github/
+    - tests/
+    - scripts/prepare_release.yml
+    - changelogs/changelog.yaml
+    - changelogs/config.yaml
+    - plugins/inventory/now.py
+    - plugins/modules/attachment_info.py

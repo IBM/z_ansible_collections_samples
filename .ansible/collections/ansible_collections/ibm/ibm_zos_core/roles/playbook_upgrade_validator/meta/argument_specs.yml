@@ -1,0 +1,24 @@
+argument_specs:
+  main:
+    short_description: Build a report to migrate playbooks to v2.0.0
+    description:
+      - Validates one or more Ansible playbooks against IBM z/OS Core migration rules.
+      - Reports removed, renamed, and type-changed parameters and response fields.
+      - Reported task line numbers rely on task names and may be ambiguous when duplicate task names are used within a playbook.
+    options:
+      playbook_upgrade_validator_playbook_path:
+        type: str
+        required: true
+        description:
+          - Path to a single Ansible playbook file or a directory containing playbooks to validate.
+      playbook_upgrade_validator_output_path:
+        type: str
+        required: false
+        description:
+          - Path to the output JSON file where validation results are saved.
+          - When not provided, the role writes to C({{ playbook_dir }}/logs/migration_report.json).
+      playbook_upgrade_validator_ignore_response_params:
+        type: bool
+        required: false
+        description:
+          - Indicates whether response parameter changes should be omitted from the report.

@@ -1,0 +1,12 @@
+[flake8]
+max-line-length = 160
+extend-ignore =
+    # E203: whitespace before ':'. Black laces spaces around ':' as suggested
+    # by PEP8.
+    E203
+per-file-ignores =
+    # E402: module level import not at top of file. Ansible modules follow a
+    # somewhat different convention here because DOCUMENTATION, EXAMPLES, and
+    # RETRUN module variables contain documentation.
+    plugins/modules/*:E402
+    plugins/inventory/*:E402

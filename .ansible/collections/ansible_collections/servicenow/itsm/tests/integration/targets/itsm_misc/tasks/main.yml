@@ -1,0 +1,25 @@
+---
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    - name: Make sure timeout setting is enforced
+      servicenow.itsm.incident_info:
+        instance:
+          timeout: 0.01
+      register: result
+      ignore_errors: true
+    - ansible.builtin.assert: &timeout-assertions
+        that:
+          - result is failed
+          - "'timed out' in result.msg"
+
+    - name: Make sure timeout setting is enforced (env var)
+      servicenow.itsm.incident_info:
+      environment:
+        SN_TIMEOUT: 0.01
+      register: result
+      ignore_errors: true
+    - ansible.builtin.assert: *timeout-assertions

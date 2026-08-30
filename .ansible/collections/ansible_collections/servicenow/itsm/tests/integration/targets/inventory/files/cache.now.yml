@@ -1,0 +1,16 @@
+---
+plugin: servicenow.itsm.now
+table: cmdb_ci_ec2_instance
+strict: false
+cache: True
+cache_plugin: ansible.builtin.jsonfile
+cache_timeout: 3600
+cache_connection: /tmp/cache
+cache_prefix: now
+
+columns:
+  - sys_id
+  - name
+  - fqdn
+
+sysparm_query: nameSTARTSWITHmy-vm-

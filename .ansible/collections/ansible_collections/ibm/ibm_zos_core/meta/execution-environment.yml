@@ -1,0 +1,14 @@
+################################################################################
+# © Copyright IBM Corporation 2021
+################################################################################
+# This file creates an alias for file 'requirements.txt' which is used
+# to manage any python dependencies needed by this Collection to run effectively
+# on an Ansible controller.
+################################################################################
+
+---
+version: 1
+
+dependencies:
+  python: requirements.txt
+  system: bindep.txt

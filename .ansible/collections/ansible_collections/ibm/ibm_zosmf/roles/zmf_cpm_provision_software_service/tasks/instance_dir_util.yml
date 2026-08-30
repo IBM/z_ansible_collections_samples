@@ -1,0 +1,23 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+---
+
+- name: Get instance record directory
+  stat:
+    path: "{{ instance_record_dir }}/{{ inventory_hostname }}"
+  connection: local
+  register: target_dir
+
+- name: "Check {{ instance_record_dir }}/{{ inventory_hostname }} status"
+  debug:
+    msg: "{{ instance_record_dir }}/{{ inventory_hostname }} exists"
+  when: target_dir.stat.exists
+
+- name: "Create {{ instance_record_dir }}/{{ inventory_hostname }} when not exist"
+  file:
+    path: "{{ instance_record_dir }}/{{ inventory_hostname }}"
+    state: directory
+    mode: '0755'
+  connection: local
+  when: not target_dir.stat.exists

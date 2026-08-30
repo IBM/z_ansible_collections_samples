@@ -1,0 +1,51 @@
+---
+name: all_green
+
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:  # yamllint disable-line rule:truthy
+  pull_request_target:
+    types:
+      - opened
+      - labeled
+      - unlabeled
+      - reopened
+      - synchronize
+    branches:
+      - main
+      - 'stable-*'
+    tags:
+      - '*'
+
+jobs:
+  safe-to-test:
+    if: ${{ github.event.label.name == 'safe to test' }} || ${{ github.event.action != 'labeled' }}
+    uses: ansible-network/github_actions/.github/workflows/safe-to-test.yml@main
+  linters:
+    uses: ./.github/workflows/linters.yml  # use the callable linters job to run tests
+  sanity:
+    uses: ./.github/workflows/sanity.yml  # use the callable sanity job to run tests
+  units:
+    uses: ./.github/workflows/units.yml  # use the callable units job to run tests
+  integrations:
+    uses: ./.github/workflows/integration.yml
+    secrets: inherit
+    needs:
+      - safe-to-test
+  all_green:
+    if: ${{ always() }}
+    needs:
+      - linters
+      - sanity
+      - units
+      - integrations
+    runs-on: ubuntu-latest
+    steps:
+      - run: >-
+          python -c "assert set([
+          '${{ needs.linters.result }}',
+          '${{ needs.sanity.result }}',
+          '${{ needs.units.result }}'
+          ]) == {'success'}"

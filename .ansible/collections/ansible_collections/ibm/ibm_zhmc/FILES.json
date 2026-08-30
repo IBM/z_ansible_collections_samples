@@ -1,0 +1,768 @@
+{
+ "files": [
+  {
+   "name": ".",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "requirements.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "faa4c0cd2a0dfb1145966024eae69725704e8f897f136ff1fb3094e8bd43eb8b",
+   "format": 1
+  },
+  {
+   "name": "docs",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "docs/source",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "docs/source/index.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c59437fdc021bd4aa57b7e3304bac98c597935d14ac59d0229e37c29f9e4b53c",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5190ac8e2f772961139e417375bdb249dfd43d58da83de85ce25d6d51b26a390",
+   "format": 1
+  },
+  {
+   "name": "docs/source/installation.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a1dad8bf12fb5d2d4ee593e5290f4b297482f0814a012c9dba8beee72d44a904",
+   "format": 1
+  },
+  {
+   "name": "docs/source/requirements.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "6c08b9ec9aa2d6896660a0a5b16da1858051ca7e0bd0e3a8ed735476371a810b",
+   "format": 1
+  },
+  {
+   "name": "docs/source/conf.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "336de78d91ed4e67f9c023cb348065e6c3b041cba0fd51a0874441770bb009ad",
+   "format": 1
+  },
+  {
+   "name": "docs/source/release_notes.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "be23ffe92f66a73581f3542533a80841ccb07fb5569fe73506ba2350bb65ebfc",
+   "format": 1
+  },
+  {
+   "name": "docs/source/versioning.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a0e21d7ff4eeed64094b8f16ce50d9e08cf940bb5d79b5afdfcf3f5b1c1c5643",
+   "format": 1
+  },
+  {
+   "name": "docs/source/playbooks.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "1aca09e04798456fb1de74c9cebb91f954f1b4a3bfb7eaa7213b30a02c8e5cb8",
+   "format": 1
+  },
+  {
+   "name": "docs/source/development.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "af08a55d65e22b4d7ae3850c52d33d51ed086d2e6866863c185f6c708ea37ac5",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_nic.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "664c780318366216b2c6bc3a47a707115b6724a8c90c1f4e187453b8d8cc4e44",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_partition.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ae0e1f69eaa1c10df151e5f1eeb7589ffba1aafdcf2e4ee64016aa0211432821",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_partition_list.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ffac82bbf0cbe7da29023f550ce6ba40257ef0ca1569e6564e6ca851f4149496",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_adapter_list.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "1c38310ba4f6aaab6c9715d50ef560c8e88b962b21037f5b682b5cae7c357dc9",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_storage_volume.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "67fd5d4a248c667a7fed1b8306c067c9da2d97aa69fea7aa7ade3061d40907b5",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_cpc_list.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "b832802ff1103777413c1505181402cc202098d3b6fabe7fcd811cdafc818d15",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_hba.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "20f7ab9463e7958f32ae56f59acf754c5df1e504699ce276cf9dbe221f0a7036",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_virtual_function.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "40625abb5a4ff810eed00ad0180ca913591d9450a05cfa7d071e4a1085a357d5",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_password_rule_list.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "cbe90537c34d03a6d0d77519e9f8c771bdb9d7a5ba83f546fac1b6a839de1e51",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_crypto_attachment.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "4b451f7eb99280e56fbc0c63279e17e2727945549f586a2380410c2357da1960",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_lpar_list.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "0b1caf7665d021d9f48bd3e0744d77c3834d1a7006481d94998b98aab4596407",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_user_role.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "27ddd72ff6b909be9d6e723d7e1955971962abcaae7760166e44ec9829cff44d",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_user.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "08a8541df8bc601b11859de76e135b1bd49df4502f89264bfbc9ce20d505d73c",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_lpar.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "75f0f76b1dd6e70c84b904b77aca013349bbeacfd5299d3664dfabe1e8fc98b6",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_storage_group_attachment.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "78508e4204e5ddb345b2b8cc2958a554772421edfa22b1630f7a1a81c0a85fc8",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_storage_group.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "171503cb6ab3f495293200b6b5d2520b0ca62e00d42d2301c2a1fbc951281346",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_adapter.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a917f73f33b0d69c1e2aa181d0fbe0e0b50de58b07bd505736ddf567f7a3956c",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_user_role_list.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c3ce583f98f33709fdcf09bac62564bd7f2c6f2d1d9b2231afc1b4fee2bb9fe3",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_cpc.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "cb99a85e51c6b65858f174da074bb79fc3937c453a9ca82e688f5791fb1b2d20",
+   "format": 1
+  },
+  {
+   "name": "docs/source/modules/zhmc_password_rule.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a14e72baece99c9c54fceffe128e70ca022b85078ee65a7eb0a13863ba4170c4",
+   "format": 1
+  },
+  {
+   "name": "docs/source/requirements_managed.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "8ff3668d8dadc04470e3d8ab59015de2ed95cfa0b4a8409d3f44620cae2d0262",
+   "format": 1
+  },
+  {
+   "name": "docs/source/community_guides.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ac3f722789d81c56141351fc857a10fdc9bf23a3679e3058eea51257981fe7da",
+   "format": 1
+  },
+  {
+   "name": "docs/source/bibliography.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "945ade35a777337d4265fc414ca86dc36b46151cea12b0e36c55197ed8df32df",
+   "format": 1
+  },
+  {
+   "name": "docs/ansible_content.rst",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "7d30e831ccb71b0285916fe0fe780ef4f8a29e8143460dccaf49031a202992ad",
+   "format": 1
+  },
+  {
+   "name": "docs/templates",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "docs/templates/module.rst.j2",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "35e5cc4bdf8f5c547ba3abe7cf14d7e041ccc63585332f40ba90e0014e4b20d0",
+   "format": 1
+  },
+  {
+   "name": "bindep.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "99e592785f19fb6ccd0441c0152fedb698d7da178eac197afe1c76186f69b34c",
+   "format": 1
+  },
+  {
+   "name": "collections",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "collections/requirements.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "990829ee69e0718c56d8f3804553c5dbfb78af31dd51dafa2096830dbe7813e0",
+   "format": 1
+  },
+  {
+   "name": "meta",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "meta/runtime.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "d7c2920ff633fd544209041430ced46be5064394cdcd4d9909d4d8213cdcbed1",
+   "format": 1
+  },
+  {
+   "name": "tests",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "tests/sanity",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "tests/sanity/ignore-2.11.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "06bc8027d07b106cb615e90d671d81eeed1bd85899a6525ac64224bfc3c774aa",
+   "format": 1
+  },
+  {
+   "name": "tests/sanity/ignore-2.10.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "6de8307023e8bbdff43beafde607d255cc88d781ae601196c3de2eb6ac34d1c2",
+   "format": 1
+  },
+  {
+   "name": "tests/sanity/ignore-2.13.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "06bc8027d07b106cb615e90d671d81eeed1bd85899a6525ac64224bfc3c774aa",
+   "format": 1
+  },
+  {
+   "name": "tests/sanity/ignore-2.12.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "06bc8027d07b106cb615e90d671d81eeed1bd85899a6525ac64224bfc3c774aa",
+   "format": 1
+  },
+  {
+   "name": "tests/sanity/ignore-2.14.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "053ea6a2f6c3b4224c40a1166fe058ac9f60f320a2fa3014c5ae578d93487452",
+   "format": 1
+  },
+  {
+   "name": "tests/sanity/ignore-2.9.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "cecc5ec7f78486147732f2d0133893d343ec9db3703875e2fafd6187a5bab2e8",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_user_role_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5f2265a4fac3cc37201047d129a8321ce8011db4605ae2b43d3c2afbc952b231",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/mocked_vault.yaml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "31a9da5b47fb65aad47c13f7ffa68a0326f406749079994c6d482bb3304f013c",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_user.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "753e4a529c0e4cdc941cf884b8c9d81fb9ec1935647fbe52dae3047864dbb8bb",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/mocked_inventory.yaml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e7112a7c1110f81027a211bde1e75d89a0014feb384d7a9cab36d9b7857e1ae0",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/__init__.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "7f91edd7e7de0c63fce9c24eff89f08f14d0fdd6449e3ad840d2316e584a0145",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/utils.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "0d052eff87bafd5988e2a3d7ea933080b9b418ec61ad7aa39a533ef7562da601",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_password_rule.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "af1b54893c16a889432a4ca7969fafe257367bb1be7ec900bcf00f7a11d0cf88",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_lpar_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5d796cf118226fbdc10b5c6a15f172fd05c1d97c508cb84657cad16a0ada3fb4",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_adapter_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "8c5516cd8dd00557df6b7d78ea1dbac4a7e08b807201eacc2f6da11c3d5320bb",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/mocked_hmc_z14.yaml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "1f8252b5071af51bb8b00283d553d0ac092107c586a28ae917292350c83c5ae6",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_partition.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "1b4913d09109355c536131fc820b5894411cd39257a9178d4bf1e6853e03c4f3",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_user_role.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ffc02bb7bd8b632366e64baceaab699f4f5c9845b960d6d135f55f7af1c55b6d",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_partition_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "7e7e838e243748c7d681cd45d9947811c2ae3a62932c539964ee5e762980ebf0",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_cpc_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a9fd5ffaa0e39991bc1f7310dfc91e6ad8d34621fb4f61e6219a9262e3c635e0",
+   "format": 1
+  },
+  {
+   "name": "tests/end2end/test_zhmc_password_rule_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "42c5cd7cd76cd3d81a52c39d7e68abd9245ecba30a91c840126b7c40941df430",
+   "format": 1
+  },
+  {
+   "name": "tests/unit",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "tests/unit/test_hba.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a4b46758c38f20ddfdffa1c407993cb45d158cf3a28d045918081ff4969dea46",
+   "format": 1
+  },
+  {
+   "name": "tests/unit/test_partition.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "0d1d8556ffa3185dbbd36af7b57da5ed8f8b9c396d913ed8d71032233b1e3096",
+   "format": 1
+  },
+  {
+   "name": "tests/unit/test_virtual_function.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "b91ccf3908ce84266ecc6ef068a8abb665ee1a9ffc130e553c977180af07bec2",
+   "format": 1
+  },
+  {
+   "name": "tests/unit/test_nic.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "f5cc266d456a696ca0bbbe060471a44e8aab219f1e12c46ea922bc369432d181",
+   "format": 1
+  },
+  {
+   "name": "tests/function",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "tests/function/__init__.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "7f91edd7e7de0c63fce9c24eff89f08f14d0fdd6449e3ad840d2316e584a0145",
+   "format": 1
+  },
+  {
+   "name": "tests/function/test_func_lpar.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "98e7f849bbe57d5200dce96ed71f406209f8845580109bc954536d6e6863a421",
+   "format": 1
+  },
+  {
+   "name": "tests/function/func_utils.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "86be301566337d1fa874dd95f16ad9764808a04dd0b2718ef6fa3de6014e9dea",
+   "format": 1
+  },
+  {
+   "name": "tests/function/test_func_cpc.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "10f387f0cfa721d3c73bf368ecd5b80be0d091a29761ffcaf8eaadb027b56241",
+   "format": 1
+  },
+  {
+   "name": "tests/function/test_func_partition.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "71364177bb7a8b0678fc3f0ff67d33ab229b14bcc38a7602dcb7e33c75c75eb4",
+   "format": 1
+  },
+  {
+   "name": "plugins",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/__init__.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "format": 1
+  },
+  {
+   "name": "plugins/module_utils",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/module_utils/__init__.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "format": 1
+  },
+  {
+   "name": "plugins/module_utils/common.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "94212ab243af5f40854c7a15056f8841af627fd4b8a3661ed774a85b3daa3217",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_lpar.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "6de2366896d2b9bdcd58acc2e55b7765a7e576ed894290d3a124df8b843d4c91",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_cpc_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "dade22e63626513ebdaee6e2394ec74c196f2235f36b3f353173a1a54236c309",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_crypto_attachment.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "32a564367862efb69f3c766941c79c4e6b560ff7abdcc78067d913b3c2f89f4f",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_user_role_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "9eeb5e505848050fedfe02e534f30a4989729679b6ebcc1d989ea209cade3055",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/__init__.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_lpar_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "882f59070e6bfacd4f9582ba7afca9a388419695f3d268da4af3b9334609f7ab",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_storage_volume.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "cce967d45ebf81d0f10331978648002685cd0b43366ba7932a1563ae546f613b",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_partition_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e8bd135f7180040fa174a9e8783c87de85cab0d240c7210b2183854335adc968",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_user.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "33b4d3a9fd71ea49773a39a8dfe8dbbfbc97690b2dc4e121d2e0bcf4f901dccc",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_user_role.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "85e350335c415ebd55f3f38758c6f3b643880acf315cc2b83b8ecea6a419dc4c",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_storage_group_attachment.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "20045681e514dbaffe2d3fb5d234c3beef7b6383074c915904442d5000abb4fe",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_password_rule_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "455a8f94f74906523311b5299c20d84721b7799fd7a4466ddcbd04b53110eccb",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_virtual_function.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "8eb0ef18ca891ebcf4bd49da78d7d25381e677a5d2b72fc6307a6f4ee6183cba",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_adapter.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "cae36e534260bf9ffc90b8ee10b4457eff254e5c8f0ce1833d30c4abbbe5525e",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_storage_group.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "14260068f721ec9db1d1d11fab4a8ea3c3e09f11e8fb966b58ef2b1181b2fe08",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_adapter_list.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "36c0e5605d9379c4897fafce616e1c7d7355343e81edd453b93b4d7f4413be19",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_partition.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "d758266880fa67ef0968968f4b48fe26dc4054d14e0a3fa07ff7eefe5d72c46d",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_password_rule.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e6f8c5af956382c277fdd61f8d48225863009b6b37f4fa8427a2196fa0d1ecb2",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_nic.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c4b88a1c42f975b5541981aad61ade6b17cefac57399ef9a6f9f48474488232d",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_hba.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "b3548abf71962f8787eb207b993d3ca9b513c955c3fd36f90548e00e811a7771",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/zhmc_cpc.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "b43a2619c7ec35453da6fffd94b711ab355f58052f1a7eee463ff83a8db5a693",
+   "format": 1
+  },
+  {
+   "name": "README.md",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e7d6f60163b0f83e0798c0c3f02bde101cefa8deaf9f28373f726b8e5e5f1eb8",
+   "format": 1
+  },
+  {
+   "name": "ansible-constraints.txt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "2d47b9ffb78d1765798f170166359efa919a7390954e3367629d867ddd088480",
+   "format": 1
+  }
+ ],
+ "format": 1
+}

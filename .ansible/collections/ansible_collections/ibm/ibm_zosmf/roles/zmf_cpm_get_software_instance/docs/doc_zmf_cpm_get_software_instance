@@ -1,0 +1,123 @@
+# Copyright (c) IBM Corporation 2021
+
+
+DOCUMENTATION = r"""
+role: zmf_cpm_get_software_instance
+short_description: Role get specific z/OS software instance
+description:
+    - >
+      The B(IBM z/OSMF collection) provides an Ansible role, referred to as
+      B(zmf_cpm_get_software_instance), to obtain a specific software instance
+      defined in the B(IBM Cloud Provisioning and Management (CP&M)) software
+      instances registry.
+author:
+    - Hiren Shah (@shreeji818)
+options:
+    zmf_host:
+        description:
+            - >
+              Hostname of the z/OSMF server, specified in the inventory file
+              or vars file.
+        required: True
+        type: str
+    zmf_port:
+        description:
+            - >
+              Port number of the z/OSMF server.
+              If z/OSMF is not using the default port, you need to specify
+              value for this parameter in the inventory file or vars file.
+        required: False
+        type: str
+        default: 443
+    zmf_user:
+        description:
+            - User name to be used for authenticating with the z/OSMF server.
+            - >
+              This variable can be specified in the inventory file or vars
+              file, or prompted when playbook is run.
+        required: True
+        type: str
+    zmf_password:
+        description:
+            - Password to be used for authenticating with z/OSMF server.
+            - >
+              This variable can be specified in the inventory file or vars
+              file, or prompted when playbook is run.
+        required: True
+        type: str
+    instance_record_dir:
+        description:
+            - >
+              Directory path that the provisioning role uses to record
+              the software instance and associated data (in JSON format).
+            - >
+              On many system default value C("/tmp") used for this variable
+              may not be acceptable because C("/tmp") directory can be
+              transient on the system.
+              In such cases it is recommended to specify non-default value for
+              this variable.
+              This variable can be specified in the inventory file or vars
+              file.
+        required: False
+        type: str
+        default: /tmp
+    external_name:
+        description:
+            - >
+              The external name associated with the previously created software
+              instance in Cloud Provisioning and Management software registry.
+        required: True
+        type: str
+notes:
+    - >
+      The given example assumes that you have an inventory file
+      I(inventory.yml) and host vars I(sampleHost.yml) with appropriate values
+      to identify the target z/OSMF server end point.
+    - >
+      When playbooks completes, a message shown in following example is
+      displayed, C("msg": "Instance record saved at: /tmp/xxx/xxx.json").
+      This message includes a file path and file name where the instance specific data of
+      of requested software instance is returned. User can obtain specific property from this
+      file using json_query.
+    
+"""
+
+EXAMPLES = r"""
+- name: sample of retrieving software instance from registry
+  hosts: sampleHost
+  gather_facts: no
+  collections: 
+    - ibm.ibm_zosmf
+
+  vars:
+    - name: instance_info_json_path
+    
+  tasks: 
+    - include_role:
+        name: zmf_cpm_get_software_instance
+      vars:
+        external_software_name: "<fill-me>"
+
+    - name: Obtain Variable Value
+      vars:
+           instance_info_json: "{{lookup('file', instance_info_json_path)}}"
+
+      set_fact:
+    
+         VAR1: "{{ instance_info_json['registry-info'] | json_query('variables[?name == `<fill-me>`]') | join(' ') }}"
+
+    - name: Display VAR1 value
+      debug:
+          msg: "VAR1 Value is : {{ VAR1.value }}"
+
+"""
+
+# Roles don't return anything.
+# But RETURN block must be defined for doc extraction tooling to avoid error.
+# The content in RETURN block will not be display in doc-site.
+RETURN = r"""
+changed:
+    description: Indicates if any change is made during the role operation.
+    returned: always
+    type: bool
+"""

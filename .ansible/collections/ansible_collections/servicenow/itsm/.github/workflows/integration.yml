@@ -1,0 +1,10 @@
+---
+name: integration_tests
+
+on: [workflow_call]  # allow this workflow to be called from other workflows
+
+jobs:
+  integration_sources:
+    uses: ./.github/workflows/integration_source.yml
+    secrets: inherit
+    

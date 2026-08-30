@@ -1,0 +1,64 @@
+host: ec33002a.vmec.svl.ibm.com
+user: omvsadm
+python_path: /python/3.8.3.ptf1/usr/lpp/IBM/cyp/v3r8/pyz/bin/python3
+environment:
+  _BPXK_AUTOCVT: "ON"
+  _CEE_RUNOPTS: "'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)'"
+  _TAG_REDIR_ERR: txt
+  _TAG_REDIR_IN: txt
+  _TAG_REDIR_OUT: txt
+  LANG: C
+  ZOAU_ROOT: "/zoau/v1.0.3-ptf2"
+  ZOAU_HOME: "/zoau/v1.0.3-ptf2"
+  LIBPATH: "/zoau/v1.0.3-ptf2/lib:/python/3.8.3.ptf1/usr/lpp/IBM/cyp/v3r8/pyz/lib:/lib:/usr/lib:."
+  ZOAUTIL_DIR: "/zoau/v1.0.3-ptf2"
+  PYTHONPATH: "/zoau/v1.0.3-ptf2/lib"
+  PATH: "/zoau/v1.0.3-ptf2/bin:/python/3.8.3.ptf1/usr/lpp/IBM/cyp/v3r8/pyz/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin"
+  STEPLIB: IMSTESTL.IMS1.SDFSRESL #'IMSBLD.I15RTSMM.COMRESL1'
+extra_args:
+    JOB_CARD: |-
+      //ANSIBLE JOB 'testing',
+      //  CLASS=H,MSGLEVEL=(1,1),REGION=0M,
+      //  MSGCLASS=H,NOTIFY=&SYSUID
+
+# host: ec01105a.vmec.svl.ibm.com
+# user: omvsadm
+# python_path: /usr/lpp/izoda/v110/anaconda/bin/python3.6
+# environment:
+#   MANPATH: /usr/man/%L
+#   FFI_LIB: "/usr/lpp/izoda/v110/anaconda/lib/ffi"
+#   RELEASE_NAME: python-2017-04-12
+#   CURL_CA_BUNDLE: "/usr/lpp/izoda/v110/anaconda/etc/ssl/cacert.pem"
+#   RELEASE_DIR: /usr/lpp/rsusr/python27/python-2017-04-12-py27
+#   RELEASE_TYPE: py27
+#   LIBPATH: "/usr/lpp/izoda/v110/anaconda/lib:/usr/lpp/zoautil/v100/lib:/lib:/usr/lib:."
+#   NLSPATH: /usr/lib/nls/msg/%L/%N
+#   MAIL: /usr/mail/OMVSADM
+#   _: /bin/env
+#   STEPLIB: IMSBLD.I15RTSMM.COMRESL1
+#   TERMINFO: "/usr/lpp/izoda/v110/anaconda/share/terminfo"
+#   ZOAU_ROOT: "/usr/lpp/zoautil/v100"
+#   ZOAUTIL_DIR: "/usr/lpp/zoautil/v100"
+#   PYTHONPATH: "/usr/lpp/izoda/v110/anaconda/lib:/usr/lpp/zoautil/v100/lib:/lib:/usr/lib"
+#   PKG_CONFIG_PATH: "/usr/lpp/izoda/v110/anaconda/lib/pkgconfig:/usr/lpp/izoda/v110/anaconda/share/pkgconfig"
+#   PYTHON_HOME: "/usr/lpp/izoda/v110/anaconda"
+#   _BPXK_JOBLOG: STDERR
+#   # environment variables for mvsutils/mvscmd
+#   _BPXK_AUTOCVT: ON
+#   _CEE_RUNOPTS: '"FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"'
+#   _TAG_REDIR_ERR: txt
+#   _TAG_REDIR_IN: txt
+#   _TAG_REDIR_OUT: txt
+#   TOOLS_ROOT: "/usr/lpp/rsusr/ported"
+#   GIT_SHELL: "/usr/lpp/rsusr/ported/bin/bash"
+#   GIT_EXEC_PATH: "/usr/lpp/rsusr/ported/libexec/git-core"
+#   GIT_TEMPLATE_DIR: "/usr/lpp/rsusr/ported/share/git-core/templates"
+#   PATH: "/usr/lpp/zoautil/v100/bin:/usr/lpp/rsusr/ported/bin:/bin:/var/bin:/usr/lpp/java/J8.0/bin:/usr/lpp/izoda/v110/anaconda/bin"
+#   # Java environment
+#   JAVA_HOME: /usr/lpp/java/java180/J8.0_64
+# extra_args:
+#     STEPLIB: IMSNEW.DIPTI.IM00.SDFSRESL
+#     JOB_CARD: |-
+#       //ANSIBLE JOB 'testing',
+#       //  CLASS=H,MSGLEVEL=(1,1),REGION=0M,
+#       //  MSGCLASS=H,NOTIFY=&SYSUID

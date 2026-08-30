@@ -1,0 +1,15 @@
+tests/functional/modules/ims_psb_gen/combination/data/PWMGAT.psb no-smart-quotes # IBM-1047 encoding not recognized
+tests/functional/modules/ims_psb_gen/uss_file/data/PWMGAT.psb no-smart-quotes # IBM-1047 encoding not recognized
+tests/functional/modules/ims_psb_gen/uss_file/data/psbgen01 no-smart-quotes # IBM-1047 encoding not recognized
+tests/functional/modules/ims_psb_gen/combination/data/psbgen01 no-smart-quotes # IBM-1047 encoding not recognized
+tests/functional/modules/ims_dbd_gen/uss_file/data/WMGAT.dbd no-smart-quotes # IBM-1047 encoding not recognized
+tests/functional/modules/ims_dbd_gen/uss_file/data/dbdgen02 no-smart-quotes # IBM-1047 encoding not recognized
+tests/helpers/ztest.py pylint:syntax-error # known ansible-test issue
+playbook.sh shebang # ignore unexpected non-module shebang
+tests/run.sh shebang # ignore unexpected non-module shebang
+plugins/modules/ims_dbd_gen.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/ims_psb_gen.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/ims_acb_gen.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/ims_command.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0
+plugins/modules/ims_acb_gen.py validate-modules:doc-choices-do-not-match-spec # we use our own checking for validation argument case.
+plugins/modules/ims_dbrc.py validate-modules:missing-gplv3-license # Licensed under Apache 2.0

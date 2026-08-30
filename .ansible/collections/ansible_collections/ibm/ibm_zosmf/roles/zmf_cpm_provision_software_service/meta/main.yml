@@ -1,0 +1,21 @@
+# Copyright (c) IBM Corporation 2021
+
+---
+galaxy_info:
+  author: Hiren Shah <hiren@us.ibm.com>, Allen Zhou <xiao-yu.zhou@ibm.com>
+  description: Perform provision of z/OSMF CP&M instance
+  company: IBM
+  min_ansible_version: 2.9
+  galaxy_tags:
+    - ibm
+    - z
+    - zos
+    - zosmf
+    - cpm
+  license:
+    - Apache-2.0
+  platforms:
+    - name: GenericLinux
+      versions:
+        - all
+dependencies: []

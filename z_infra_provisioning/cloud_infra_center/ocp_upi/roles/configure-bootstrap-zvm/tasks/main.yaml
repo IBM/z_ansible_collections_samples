@@ -72,6 +72,7 @@
   when:
     - disk_type == "scsi"
 
+
 - name: 'Create the bootstrap server with default boot volume'
   openstack.cloud.server:
     name: "{{ os_bootstrap_server_name }}"

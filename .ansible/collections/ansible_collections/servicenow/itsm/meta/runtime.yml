@@ -1,0 +1,11 @@
+---
+requires_ansible: ">=2.15.0"
+
+plugin_routing:
+  modules:
+    attachment:
+      redirect: servicenow.itsm.attachment_info
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: Attachment will be removed in a future release of this
+                      collection. Use attachment_info instead.

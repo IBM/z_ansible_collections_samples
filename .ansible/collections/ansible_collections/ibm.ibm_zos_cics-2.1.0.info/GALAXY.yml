@@ -1,0 +1,8 @@
+download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/ibm-ibm_zos_cics-2.1.0.tar.gz
+format_version: 1.0.0
+name: ibm_zos_cics
+namespace: ibm
+server: https://galaxy.ansible.com/api/
+signatures: []
+version: 2.1.0
+version_url: /api/content/published/v3/plugin/ansible/content/published/collections/index/ibm/ibm_zos_cics/versions/2.1.0/

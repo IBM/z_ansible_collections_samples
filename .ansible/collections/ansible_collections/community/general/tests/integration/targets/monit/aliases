@@ -1,0 +1,14 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+azp/posix/2
+destructive
+needs/target/setup_epel
+skip/osx
+skip/macos
+skip/freebsd
+skip/aix
+skip/python2.6  # python-daemon package used in integration tests requires >=2.7
+skip/rhel  # FIXME
+unstable  # TODO: the tests fail a lot; 'unstable' only requires them to pass when the module itself has been modified

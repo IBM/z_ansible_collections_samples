@@ -1,0 +1,1406 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+notifications: true
+automerge: true
+files:
+  plugins/:
+    supershipit: quidame
+  changelogs/: {}
+  changelogs/fragments/:
+    support: community
+  $actions:
+    labels: action
+  $actions/iptables_state.py:
+    maintainers: quidame
+  $actions/shutdown.py:
+    maintainers: nitzmahone samdoran aminvakil
+  $becomes/:
+    labels: become
+  $becomes/doas.py:
+    maintainers: $team_ansible_core
+  $becomes/dzdo.py:
+    maintainers: $team_ansible_core
+  $becomes/ksu.py:
+    maintainers: $team_ansible_core
+  $becomes/machinectl.py:
+    maintainers: $team_ansible_core
+  $becomes/pbrun.py:
+    maintainers: $team_ansible_core
+  $becomes/pfexec.py:
+    maintainers: $team_ansible_core
+  $becomes/pmrun.py:
+    maintainers: $team_ansible_core
+  $becomes/sesu.py:
+    maintainers: nekonyuu
+  $becomes/sudosu.py:
+    maintainers: dagwieers
+  $caches/:
+    labels: cache
+  $caches/memcached.py: {}
+  $caches/pickle.py:
+    maintainers: bcoca
+  $caches/redis.py: {}
+  $caches/yaml.py:
+    maintainers: bcoca
+  $callbacks/:
+    labels: callbacks
+  $callbacks/cgroup_memory_recap.py: {}
+  $callbacks/context_demo.py: {}
+  $callbacks/counter_enabled.py: {}
+  $callbacks/dense.py:
+    maintainers: dagwieers
+  $callbacks/diy.py:
+    maintainers: theque5t
+  $callbacks/elastic.py:
+    keywords: apm observability
+    maintainers: v1v
+  $callbacks/hipchat.py: {}
+  $callbacks/jabber.py: {}
+  $callbacks/log_plays.py: {}
+  $callbacks/loganalytics.py:
+    maintainers: zhcli
+  $callbacks/logdna.py: {}
+  $callbacks/logentries.py: {}
+  $callbacks/logstash.py:
+    maintainers: ujenmr
+  $callbacks/mail.py:
+    maintainers: dagwieers
+  $callbacks/nrdp.py:
+    maintainers: rverchere
+  $callbacks/null.py: {}
+  $callbacks/opentelemetry.py:
+    keywords: opentelemetry observability
+    maintainers: v1v
+  $callbacks/say.py:
+    keywords: brew cask darwin homebrew macosx macports osx
+    labels: macos say
+    maintainers: $team_macos
+    notify: chris-short
+  $callbacks/selective.py: {}
+  $callbacks/slack.py: {}
+  $callbacks/splunk.py: {}
+  $callbacks/sumologic.py:
+    labels: sumologic
+    maintainers: ryancurrah
+  $callbacks/syslog_json.py:
+    maintainers: imjoseangel
+  $callbacks/unixy.py:
+    labels: unixy
+    maintainers: akatch
+  $callbacks/yaml.py: {}
+  $connections/:
+    labels: connections
+  $connections/chroot.py: {}
+  $connections/funcd.py:
+    maintainers: mscherer
+  $connections/iocage.py: {}
+  $connections/jail.py:
+    maintainers: $team_ansible_core
+  $connections/lxc.py: {}
+  $connections/lxd.py:
+    labels: lxd
+    maintainers: mattclay
+  $connections/qubes.py:
+    maintainers: kushaldas
+  $connections/saltstack.py:
+    labels: saltstack
+    maintainers: mscherer
+  $connections/zone.py:
+    maintainers: $team_ansible_core
+  $doc_fragments/:
+    labels: docs_fragments
+  $doc_fragments/hpe3par.py:
+    labels: hpe3par
+    maintainers: farhan7500 gautamphegde
+  $doc_fragments/hwc.py:
+    labels: hwc
+    maintainers: $team_huawei
+  $doc_fragments/nomad.py:
+    maintainers: chris93111
+  $doc_fragments/xenserver.py:
+    labels: xenserver
+    maintainers: bvitnik
+  $filters/counter.py:
+    maintainers: keilr
+  $filters/crc32.py:
+    maintainers: jouir
+  $filters/dict.py:
+    maintainers: felixfontein
+  $filters/dict_kv.py:
+    maintainers: giner
+  $filters/from_csv.py:
+    maintainers: Ajpantuso
+  $filters/groupby_as_dict.py:
+    maintainers: felixfontein
+  $filters/hashids.py:
+    maintainers: Ajpantuso
+  $filters/hashids_decode.yml:
+    maintainers: Ajpantuso
+  $filters/hashids_encode.yml:
+    maintainers: Ajpantuso
+  $filters/jc.py:
+    maintainers: kellyjonbrazil
+  $filters/json_query.py: {}
+  $filters/lists_mergeby.py:
+    maintainers: vbotka
+  $filters/random_mac.py: {}
+  $filters/time.py:
+    maintainers: resmo
+  $filters/to_days.yml:
+    maintainers: resmo
+  $filters/to_hours.yml:
+    maintainers: resmo
+  $filters/to_milliseconds.yml:
+    maintainers: resmo
+  $filters/to_minutes.yml:
+    maintainers: resmo
+  $filters/to_months.yml:
+    maintainers: resmo
+  $filters/to_seconds.yml:
+    maintainers: resmo
+  $filters/to_time_unit.yml:
+    maintainers: resmo
+  $filters/to_weeks.yml:
+    maintainers: resmo
+  $filters/to_years.yml:
+    maintainers: resmo
+  $filters/unicode_normalize.py:
+    maintainers: Ajpantuso
+  $filters/version_sort.py:
+    maintainers: ericzolf
+  $inventories/:
+    labels: inventories
+  $inventories/cobbler.py:
+    maintainers: opoplawski
+  $inventories/gitlab_runners.py:
+    maintainers: morph027
+  $inventories/icinga2.py:
+    maintainers: BongoEADGC6
+  $inventories/linode.py:
+    keywords: linode dynamic inventory script
+    labels: cloud linode
+    maintainers: $team_linode
+  $inventories/lxd.py:
+    maintainers: conloos
+  $inventories/nmap.py: {}
+  $inventories/online.py:
+    maintainers: remyleone
+  $inventories/opennebula.py:
+    keywords: opennebula dynamic inventory script
+    labels: cloud opennebula
+    maintainers: feldsam
+  $inventories/proxmox.py:
+    maintainers: $team_virt ilijamt
+  $inventories/scaleway.py:
+    labels: cloud scaleway
+    maintainers: $team_scaleway
+  $inventories/stackpath_compute.py:
+    maintainers: shayrybak
+  $inventories/virtualbox.py: {}
+  $inventories/xen_orchestra.py:
+    maintainers: ddelnano shinuza
+  $lookups/:
+    labels: lookups
+  $lookups/bitwarden.py:
+    maintainers: lungj
+  $lookups/cartesian.py: {}
+  $lookups/chef_databag.py: {}
+  $lookups/collection_version.py:
+    maintainers: felixfontein
+  $lookups/consul_kv.py: {}
+  $lookups/credstash.py: {}
+  $lookups/cyberarkpassword.py:
+    labels: cyberarkpassword
+    notify: cyberark-bizdev
+  $lookups/dependent.py:
+    maintainers: felixfontein
+  $lookups/dig.py:
+    labels: dig
+    maintainers: jpmens
+  $lookups/dnstxt.py:
+    maintainers: jpmens
+  $lookups/dsv.py:
+    ignore: amigus
+    maintainers: delineaKrehl tylerezimmerman
+  $lookups/etcd.py:
+    maintainers: jpmens
+  $lookups/etcd3.py:
+    maintainers: eric-belhomme
+  $lookups/filetree.py:
+    maintainers: dagwieers
+  $lookups/flattened.py: {}
+  $lookups/hiera.py:
+    maintainers: jparrill
+  $lookups/keyring.py: {}
+  $lookups/lastpass.py: {}
+  $lookups/lmdb_kv.py:
+    maintainers: jpmens
+  $lookups/manifold.py:
+    labels: manifold
+    maintainers: galanoff
+  $lookups/merge_variables.py:
+    maintainers: rlenferink m-a-r-k-e
+  $lookups/onepass:
+    labels: onepassword
+    maintainers: samdoran
+  $lookups/onepassword.py:
+    maintainers: azenk scottsb
+  $lookups/onepassword_raw.py:
+    maintainers: azenk scottsb
+  $lookups/passwordstore.py: {}
+  $lookups/random_pet.py:
+    maintainers: Akasurde
+  $lookups/random_string.py:
+    maintainers: Akasurde
+  $lookups/random_words.py:
+    maintainers: konstruktoid
+  $lookups/redis.py:
+    maintainers: $team_ansible_core jpmens
+  $lookups/revbitspss.py:
+    maintainers: RevBits
+  $lookups/shelvefile.py: {}
+  $lookups/tss.py:
+    ignore: amigus
+    maintainers: delineaKrehl tylerezimmerman
+  $module_utils/:
+    labels: module_utils
+  $module_utils/deps.py:
+    maintainers: russoz
+  $module_utils/gconftool2.py:
+    labels: gconftool2
+    maintainers: russoz
+  $module_utils/gitlab.py:
+    keywords: gitlab source_control
+    labels: gitlab
+    maintainers: $team_gitlab
+    notify: jlozadad
+  $module_utils/hwc_utils.py:
+    keywords: cloud huawei hwc
+    labels: huawei hwc_utils networking
+    maintainers: $team_huawei
+  $module_utils/identity/keycloak/keycloak.py:
+    maintainers: $team_keycloak
+  $module_utils/identity/keycloak/keycloak_clientsecret.py:
+    maintainers: $team_keycloak fynncfchen johncant
+  $module_utils/ipa.py:
+    labels: ipa
+    maintainers: $team_ipa
+  $module_utils/jenkins.py:
+    labels: jenkins
+    maintainers: russoz
+  $module_utils/manageiq.py:
+    labels: manageiq
+    maintainers: $team_manageiq
+  $module_utils/memset.py:
+    labels: cloud memset
+  $module_utils/mh/:
+    labels: module_helper
+    maintainers: russoz
+  $module_utils/module_helper.py:
+    labels: module_helper
+    maintainers: russoz
+  $module_utils/net_tools/pritunl/:
+    maintainers: Lowess
+  $module_utils/oracle/oci_utils.py:
+    labels: cloud
+    maintainers: $team_oracle
+  $module_utils/pipx.py:
+    labels: pipx
+    maintainers: russoz
+  $module_utils/puppet.py:
+    labels: puppet
+    maintainers: russoz
+  $module_utils/pure.py:
+    labels: pure pure_storage
+    maintainers: $team_purestorage
+  $module_utils/redfish_utils.py:
+    labels: redfish_utils
+    maintainers: $team_redfish
+  $module_utils/remote_management/lxca/common.py:
+    maintainers: navalkp prabhosa
+  $module_utils/scaleway.py:
+    labels: cloud scaleway
+    maintainers: $team_scaleway
+  $module_utils/ssh.py:
+    maintainers: russoz
+  $module_utils/storage/hpe3par/hpe3par.py:
+    maintainers: farhan7500 gautamphegde
+  $module_utils/utm_utils.py:
+    labels: utm_utils
+    maintainers: $team_e_spirit
+  $module_utils/wdc_redfish_utils.py:
+    labels: wdc_redfish_utils
+    maintainers: $team_wdc
+  $module_utils/xenserver.py:
+    labels: xenserver
+    maintainers: bvitnik
+  $module_utils/xfconf.py:
+    labels: xfconf
+    maintainers: russoz
+  $modules/aerospike_migrations.py:
+    maintainers: Alb0t
+  $modules/airbrake_deployment.py:
+    ignore: bpennypacker
+    labels: airbrake_deployment
+    maintainers: phumpal
+  $modules/aix:
+    keywords: aix efix lpar wpar
+    labels: aix
+    maintainers: $team_aix
+  $modules/aix_lvol.py:
+    maintainers: adejoux
+  $modules/alerta_customer.py:
+    maintainers: cwollinger
+  $modules/ali_:
+    maintainers: xiaozhu36
+  $modules/alternatives.py:
+    ignore: DavidWittman jiuka
+    labels: alternatives
+    maintainers: mulby
+  $modules/ansible_galaxy_install.py:
+    maintainers: russoz
+  $modules/apache2_mod_proxy.py:
+    maintainers: oboukili
+  $modules/apache2_module.py:
+    ignore: robinro
+    maintainers: berendt n0trax
+  $modules/apk.py:
+    ignore: kbrebanov
+    labels: apk
+    maintainers: tdtrask
+  $modules/apt_repo.py:
+    maintainers: obirvalger
+  $modules/apt_rpm.py:
+    maintainers: evgkrsk
+  $modules/archive.py:
+    maintainers: bendoh
+  $modules/atomic_:
+    maintainers: krsacme
+  $modules/atomic_container.py:
+    maintainers: giuseppe krsacme
+  $modules/awall.py:
+    maintainers: tdtrask
+  $modules/beadm.py:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: beadm solaris
+    maintainers: $team_solaris
+  $modules/bearychat.py:
+    maintainers: tonyseek
+  $modules/bigpanda.py:
+    maintainers: hkariti
+  $modules/bitbucket_:
+    maintainers: catcombo
+  $modules/bower.py:
+    maintainers: mwarkentin
+  $modules/bundler.py:
+    maintainers: thoiberg
+  $modules/bzr.py:
+    maintainers: andreparames
+  $modules/campfire.py:
+    maintainers: fabulops
+  $modules/capabilities.py:
+    maintainers: natefoo
+  $modules/cargo.py:
+    maintainers: radek-sprta
+  $modules/catapult.py:
+    maintainers: Jmainguy
+  $modules/circonus_annotation.py:
+    maintainers: NickatEpic
+  $modules/cisco_webex.py:
+    maintainers: drew-russell
+  $modules/clc_:
+    maintainers: clc-runner
+  $modules/cloud_init_data_facts.py:
+    maintainers: resmo
+  $modules/cloudflare_dns.py:
+    labels: cloudflare_dns
+    maintainers: mgruener
+  $modules/cobbler_:
+    maintainers: dagwieers
+  $modules/composer.py:
+    ignore: resmo
+    maintainers: dmtrs
+  $modules/consul:
+    ignore: colin-nolan
+    maintainers: $team_consul
+  $modules/copr.py:
+    maintainers: schlupov
+  $modules/cpanm.py:
+    maintainers: fcuny russoz
+  $modules/cronvar.py:
+    maintainers: dougluce
+  $modules/crypttab.py:
+    maintainers: groks
+  $modules/datadog_downtime.py:
+    maintainers: Datadog
+  $modules/datadog_event.py:
+    ignore: arturaz
+    labels: datadog_event
+    maintainers: n0ts
+  $modules/datadog_monitor.py:
+    ignore: skornehl
+  $modules/dconf.py:
+    maintainers: azaghal
+  $modules/deploy_helper.py:
+    maintainers: ramondelafuente
+  $modules/dimensiondata_network.py:
+    labels: dimensiondata_network
+    maintainers: aimonb tintoy
+  $modules/dimensiondata_vlan.py:
+    maintainers: tintoy
+  $modules/discord.py:
+    maintainers: cwollinger
+  $modules/django_manage.py:
+    ignore: scottanderson42 tastychutney
+    labels: django_manage
+    maintainers: russoz
+  $modules/dnf_versionlock.py:
+    maintainers: moreda
+  $modules/dnsimple.py:
+    maintainers: drcapulet
+  $modules/dnsimple_info.py:
+    maintainers: edhilgendorf
+  $modules/dnsmadeeasy.py:
+    maintainers: briceburg
+  $modules/dpkg_divert.py:
+    maintainers: quidame
+  $modules/easy_install.py:
+    maintainers: mattupstate
+  $modules/ejabberd_user.py:
+    maintainers: privateip
+  $modules/elasticsearch_plugin.py:
+    maintainers: ThePixelDeveloper samdoran
+  $modules/emc_vnx_sg_member.py:
+    maintainers: remixtj
+  $modules/etcd3.py:
+    ignore: vfauth
+    maintainers: evrardjp
+  $modules/facter.py:
+    labels: facter
+    maintainers: $team_ansible_core gamethis
+  $modules/filesize.py:
+    maintainers: quidame
+  $modules/filesystem.py:
+    labels: filesystem
+    maintainers: pilou- abulimov quidame
+  $modules/flatpak.py:
+    maintainers: $team_flatpak
+  $modules/flatpak_remote.py:
+    maintainers: $team_flatpak
+  $modules/flowdock.py:
+    ignore: mcodd
+  $modules/gandi_livedns.py:
+    maintainers: gthiemonge
+  $modules/gconftool2.py:
+    labels: gconftool2
+    maintainers: Akasurde kevensen
+  $modules/gconftool2_info.py:
+    labels: gconftool2
+    maintainers: russoz
+  $modules/gem.py:
+    labels: gem
+    maintainers: $team_ansible_core johanwiren
+  $modules/git_config.py:
+    maintainers: djmattyg007 mgedmin
+  $modules/github_:
+    maintainers: stpierre
+  $modules/github_deploy_key.py:
+    maintainers: bincyber
+  $modules/github_issue.py:
+    maintainers: Akasurde
+  $modules/github_key.py:
+    ignore: erydo
+    labels: github_key
+    maintainers: erydo
+  $modules/github_release.py:
+    maintainers: adrianmoisey
+  $modules/github_repo.py:
+    maintainers: atorrescogollo
+  $modules/gitlab_:
+    keywords: gitlab source_control
+    maintainers: $team_gitlab
+    notify: jlozadad
+  $modules/gitlab_branch.py:
+    maintainers: paytroff
+  $modules/gitlab_project_variable.py:
+    maintainers: markuman
+  $modules/gitlab_runner.py:
+    maintainers: SamyCoenen
+  $modules/gitlab_user.py:
+    maintainers: LennertMertens stgrace
+  $modules/grove.py:
+    maintainers: zimbatm
+  $modules/gunicorn.py:
+    maintainers: agmezr
+  $modules/hana_query.py:
+    maintainers: rainerleber
+  $modules/haproxy.py:
+    maintainers: ravibhure Normo
+  $modules/heroku_collaborator.py:
+    maintainers: marns93
+  $modules/hg.py:
+    maintainers: yeukhon
+  $modules/hipchat.py:
+    maintainers: pb8226 shirou
+  $modules/homebrew.py:
+    ignore: ryansb
+    keywords: brew cask darwin homebrew macosx macports osx
+    labels: homebrew macos
+    maintainers: $team_macos andrew-d
+    notify: chris-short
+  $modules/homebrew_cask.py:
+    ignore: ryansb
+    keywords: brew cask darwin homebrew macosx macports osx
+    labels: homebrew_ macos
+    maintainers: $team_macos enriclluelles
+    notify: chris-short
+  $modules/homebrew_tap.py:
+    ignore: ryansb
+    keywords: brew cask darwin homebrew macosx macports osx
+    labels: homebrew_ macos
+    maintainers: $team_macos
+    notify: chris-short
+  $modules/homectl.py:
+    maintainers: jameslivulpi
+  $modules/honeybadger_deployment.py:
+    maintainers: stympy
+  $modules/hpilo_:
+    ignore: dagwieers
+    maintainers: haad
+  $modules/hponcfg.py:
+    ignore: dagwieers
+    maintainers: haad
+  $modules/htpasswd.py:
+    labels: htpasswd
+    maintainers: $team_ansible_core
+  $modules/hwc_:
+    keywords: cloud huawei hwc
+    maintainers: $team_huawei huaweicloud
+  $modules/ibm_sa_:
+    maintainers: tzure
+  $modules/icinga2_feature.py:
+    maintainers: nerzhul
+  $modules/icinga2_host.py:
+    maintainers: t794104
+  $modules/idrac_:
+    ignore: jose-delarosa
+    maintainers: $team_redfish
+  $modules/ilo_:
+    ignore: jose-delarosa
+    maintainers: $team_redfish
+  $modules/imc_rest.py:
+    labels: cisco
+    maintainers: dagwieers
+  $modules/imgadm.py:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris
+  $modules/infinity.py:
+    maintainers: MeganLiu
+  $modules/influxdb_:
+    maintainers: kamsz
+  $modules/influxdb_query.py:
+    maintainers: resmo
+  $modules/influxdb_user.py:
+    maintainers: zhhuta
+  $modules/influxdb_write.py:
+    maintainers: resmo
+  $modules/ini_file.py:
+    maintainers: jpmens noseka1
+  $modules/installp.py:
+    keywords: aix efix lpar wpar
+    labels: aix installp
+    maintainers: $team_aix kairoaraujo
+  $modules/interfaces_file.py:
+    labels: interfaces_file
+    maintainers: obourdon hryamzik
+  $modules/ip_netns.py:
+    maintainers: bregman-arie
+  $modules/ipa_:
+    maintainers: $team_ipa
+  $modules/ipa_pwpolicy.py:
+    maintainers: adralioh
+  $modules/ipa_service.py:
+    maintainers: cprh
+  $modules/ipa_vault.py:
+    maintainers: jparrill
+  $modules/ipify_facts.py:
+    maintainers: resmo
+  $modules/ipinfoio_facts.py:
+    maintainers: akostyuk
+  $modules/ipmi_:
+    maintainers: bgaifullin cloudnull
+  $modules/iptables_state.py:
+    maintainers: quidame
+  $modules/ipwcli_dns.py:
+    maintainers: cwollinger
+  $modules/irc.py:
+    maintainers: jpmens sivel
+  $modules/iso_create.py:
+    maintainers: Tomorrow9
+  $modules/iso_customize.py:
+    maintainers: ZouYuhua
+  $modules/iso_extract.py:
+    maintainers: dagwieers jhoekx ribbons
+  $modules/jabber.py:
+    maintainers: bcoca
+  $modules/java_cert.py:
+    maintainers: haad absynth76
+  $modules/java_keystore.py:
+    maintainers: Mogztter quidame
+  $modules/jboss.py:
+    labels: jboss
+    maintainers: $team_jboss jhoekx
+  $modules/jenkins_build.py:
+    maintainers: brettmilford unnecessary-username
+  $modules/jenkins_job.py:
+    maintainers: sermilrod
+  $modules/jenkins_job_info.py:
+    maintainers: stpierre
+  $modules/jenkins_plugin.py:
+    maintainers: jtyr
+  $modules/jenkins_script.py:
+    maintainers: hogarthj
+  $modules/jira.py:
+    ignore: DWSR
+    labels: jira
+    maintainers: Slezhuk tarka pertoft
+  $modules/kdeconfig.py:
+    maintainers: smeso
+  $modules/kernel_blacklist.py:
+    maintainers: matze
+  $modules/keycloak_:
+    maintainers: $team_keycloak
+  $modules/keycloak_authentication.py:
+    maintainers: elfelip Gaetan2907
+  $modules/keycloak_client_rolemapping.py:
+    maintainers: Gaetan2907
+  $modules/keycloak_clientscope.py:
+    maintainers: Gaetan2907
+  $modules/keycloak_clientsecret_info.py:
+    maintainers: fynncfchen johncant
+  $modules/keycloak_clientsecret_regenerate.py:
+    maintainers: fynncfchen johncant
+  $modules/keycloak_group.py:
+    maintainers: adamgoossens
+  $modules/keycloak_identity_provider.py:
+    maintainers: laurpaum
+  $modules/keycloak_realm.py:
+    maintainers: kris2kris
+  $modules/keycloak_realm_info.py:
+    maintainers: fynncfchen
+  $modules/keycloak_role.py:
+    maintainers: laurpaum
+  $modules/keycloak_user_federation.py:
+    maintainers: laurpaum
+  $modules/keycloak_user_rolemapping.py:
+    maintainers: bratwurzt
+  $modules/keyring.py:
+    maintainers: ahussey-redhat
+  $modules/keyring_info.py:
+    maintainers: ahussey-redhat
+  $modules/kibana_plugin.py:
+    maintainers: barryib
+  $modules/launchd.py:
+    maintainers: martinm82
+  $modules/layman.py:
+    maintainers: jirutka
+  $modules/lbu.py:
+    maintainers: kunkku
+  $modules/ldap_attrs.py:
+    maintainers: drybjed jtyr noles
+  $modules/ldap_entry.py:
+    maintainers: jtyr
+  $modules/ldap_passwd.py:
+    maintainers: KellerFuchs jtyr
+  $modules/ldap_search.py:
+    maintainers: eryx12o45 jtyr
+  $modules/librato_annotation.py:
+    maintainers: Sedward
+  $modules/linode:
+    maintainers: $team_linode
+  $modules/linode.py:
+    maintainers: zbal
+  $modules/listen_ports_facts.py:
+    maintainers: ndavison
+  $modules/lldp.py:
+    ignore: andyhky
+    labels: lldp
+  $modules/locale_gen.py:
+    maintainers: AugustusKling
+  $modules/logentries.py:
+    ignore: ivanvanderbyl
+    labels: logentries
+  $modules/logentries_msg.py:
+    maintainers: jcftang
+  $modules/logstash_plugin.py:
+    maintainers: nerzhul
+  $modules/lvg.py:
+    maintainers: abulimov
+  $modules/lvol.py:
+    maintainers: abulimov jhoekx zigaSRC unkaputtbar112
+  $modules/lxc_container.py:
+    maintainers: cloudnull
+  $modules/lxca_:
+    maintainers: navalkp prabhosa
+  $modules/lxd_:
+    ignore: hnakamur
+  $modules/lxd_profile.py:
+    maintainers: conloos
+  $modules/lxd_project.py:
+    maintainers: we10710aa
+  $modules/macports.py:
+    ignore: ryansb
+    keywords: brew cask darwin homebrew macosx macports osx
+    labels: macos macports
+    maintainers: $team_macos jcftang
+    notify: chris-short
+  $modules/mail.py:
+    maintainers: dagwieers
+  $modules/make.py:
+    maintainers: LinusU
+  $modules/manageiq_:
+    labels: manageiq
+    maintainers: $team_manageiq
+  $modules/manageiq_alert_profiles.py:
+    maintainers: elad661
+  $modules/manageiq_alerts.py:
+    maintainers: elad661
+  $modules/manageiq_group.py:
+    maintainers: evertmulder
+  $modules/manageiq_policies_info.py:
+    maintainers: russoz $team_manageiq
+  $modules/manageiq_tags_info.py:
+    maintainers: russoz $team_manageiq
+  $modules/manageiq_tenant.py:
+    maintainers: evertmulder
+  $modules/mas.py:
+    maintainers: lukasbestle mheap
+  $modules/matrix.py:
+    maintainers: jcgruenhage
+  $modules/mattermost.py:
+    maintainers: bjolivot
+  $modules/maven_artifact.py:
+    ignore: chrisisbeef
+    labels: maven_artifact
+    maintainers: tumbl3w33d turb
+  $modules/memset_:
+    ignore: glitchcrab
+  $modules/mksysb.py:
+    labels: aix mksysb
+    maintainers: $team_aix
+  $modules/modprobe.py:
+    ignore: stygstra
+    labels: modprobe
+    maintainers: jdauphant mattjeffery
+  $modules/monit.py:
+    labels: monit
+    maintainers: dstoflet brian-brazil snopoke
+  $modules/mqtt.py:
+    maintainers: jpmens
+  $modules/mssql_db.py:
+    labels: mssql_db
+    maintainers: vedit Jmainguy kenichi-ogawa-1988
+  $modules/mssql_script.py:
+    labels: mssql_script
+    maintainers: kbudde
+  $modules/nagios.py:
+    maintainers: tbielawa tgoetheyn
+  $modules/netcup_dns.py:
+    maintainers: nbuchwitz
+  $modules/newrelic_deployment.py:
+    ignore: mcodd
+  $modules/nexmo.py:
+    maintainers: sivel
+  $modules/nginx_status_info.py:
+    maintainers: resmo
+  $modules/nictagadm.py:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris SmithX10
+  $modules/nmcli.py:
+    maintainers: alcamie101
+  $modules/nomad_:
+    maintainers: chris93111
+  $modules/nosh.py:
+    maintainers: tacatac
+  $modules/npm.py:
+    ignore: chrishoffman
+    labels: npm
+    maintainers: shane-walker xcambar
+  $modules/nsupdate.py:
+    maintainers: nerzhul
+  $modules/ocapi_command.py:
+    maintainers: $team_wdc
+  $modules/ocapi_info.py:
+    maintainers: $team_wdc
+  $modules/oci_vcn.py:
+    maintainers: $team_oracle rohitChaware
+  $modules/odbc.py:
+    maintainers: john-westcott-iv
+  $modules/office_365_connector_card.py:
+    maintainers: marc-sensenich
+  $modules/ohai.py:
+    labels: ohai
+    maintainers: $team_ansible_core
+    ignore: mpdehaan
+  $modules/omapi_host.py:
+    maintainers: amasolov nerzhul
+  $modules/one_:
+    maintainers: $team_opennebula
+  $modules/one_host.py:
+    maintainers: rvalle
+  $modules/oneandone_:
+    maintainers: aajdinov edevenport
+  $modules/onepassword_info.py:
+    maintainers: Rylon
+  $modules/oneview_:
+    maintainers: adriane-cardozo fgbulsoni tmiotto
+  $modules/oneview_datacenter_info.py:
+    maintainers: aalexmonteiro madhav-bharadwaj ricardogpsf soodpr
+  $modules/oneview_fc_network.py:
+    maintainers: fgbulsoni
+  $modules/oneview_fcoe_network.py:
+    maintainers: fgbulsoni
+  $modules/online_:
+    maintainers: remyleone
+  $modules/open_iscsi.py:
+    maintainers: srvg
+  $modules/openbsd_pkg.py:
+    ignore: ryansb
+    keywords: doas dragonfly freebsd iocage jail netbsd openbsd opnsense pfsense
+    labels: bsd openbsd_pkg
+    maintainers: $team_bsd eest
+  $modules/opendj_backendprop.py:
+    maintainers: dj-wasabi
+  $modules/openwrt_init.py:
+    maintainers: agaffney
+  $modules/opkg.py:
+    maintainers: skinp
+  $modules/osx_defaults.py:
+    keywords: brew cask darwin homebrew macosx macports osx
+    labels: macos osx_defaults
+    maintainers: $team_macos notok
+    notify: chris-short
+  $modules/ovh_:
+    maintainers: pascalheraud
+  $modules/ovh_monthly_billing.py:
+    maintainers: fraff
+  $modules/pacemaker_cluster.py:
+    maintainers: matbu
+  $modules/packet_:
+    maintainers: nurfet-becirevic t0mk
+  $modules/packet_device.py:
+    maintainers: baldwinSPC t0mk teebes
+  $modules/packet_sshkey.py:
+    maintainers: t0mk
+  $modules/pacman.py:
+    ignore: elasticdog
+    labels: pacman
+    maintainers: elasticdog indrajitr tchernomax jraby
+  $modules/pacman_key.py:
+    labels: pacman
+    maintainers: grawlinson
+  $modules/pagerduty.py:
+    ignore: bpennypacker
+    labels: pagerduty
+    maintainers: suprememoocow thaumos
+  $modules/pagerduty_alert.py:
+    maintainers: ApsOps
+  $modules/pagerduty_change.py:
+    maintainers: adamvaughan
+  $modules/pagerduty_user.py:
+    maintainers: zanssa
+  $modules/pam_limits.py:
+    ignore: usawa
+    labels: pam_limits
+    maintainers: giovannisciortino
+  $modules/pamd.py:
+    maintainers: kevensen
+  $modules/parted.py:
+    maintainers: ColOfAbRiX rosowiecki jake2184
+  $modules/pear.py:
+    ignore: jle64
+    labels: pear
+  $modules/pids.py:
+    maintainers: saranyasridharan
+  $modules/pingdom.py:
+    maintainers: thaumos
+  $modules/pip_package_info.py:
+    maintainers: bcoca matburt maxamillion
+  $modules/pipx.py:
+    maintainers: russoz
+  $modules/pipx_info.py:
+    maintainers: russoz
+  $modules/pkg5:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: pkg5 solaris
+    maintainers: $team_solaris mavit
+  $modules/pkgin.py:
+    labels: pkgin solaris
+    maintainers: $team_solaris L2G jasperla szinck martinm82
+  $modules/pkgng.py:
+    ignore: bleader
+    keywords: doas dragonfly freebsd iocage jail netbsd openbsd opnsense pfsense
+    labels: bsd pkgng
+    maintainers: $team_bsd bleader
+  $modules/pkgutil.py:
+    labels: pkgutil solaris
+    maintainers: $team_solaris dermute
+  $modules/pmem.py:
+    maintainers: mizumm
+  $modules/portage.py:
+    ignore: sayap
+    labels: portage
+    maintainers: Tatsh wltjr
+  $modules/portinstall.py:
+    ignore: ryansb
+    keywords: doas dragonfly freebsd iocage jail netbsd openbsd opnsense pfsense
+    labels: bsd portinstall
+    maintainers: $team_bsd berenddeboer
+  $modules/pritunl_:
+    maintainers: Lowess
+  $modules/profitbricks:
+    maintainers: baldwinSPC
+  $modules/proxmox:
+    keywords: kvm libvirt proxmox qemu
+    labels: proxmox virt
+    maintainers: $team_virt
+  $modules/proxmox.py:
+    ignore: skvidal
+    maintainers: UnderGreen
+  $modules/proxmox_disk.py:
+    maintainers: castorsky
+  $modules/proxmox_kvm.py:
+    ignore: skvidal
+    maintainers: helldorado
+  $modules/proxmox_nic.py:
+    maintainers: Kogelvis
+  $modules/proxmox_tasks_info:
+    maintainers: paginabianca
+  $modules/proxmox_template.py:
+    ignore: skvidal
+    maintainers: UnderGreen
+  $modules/pubnub_blocks.py:
+    maintainers: parfeon pubnub
+  $modules/pulp_repo.py:
+    maintainers: sysadmind
+  $modules/puppet.py:
+    labels: puppet
+    maintainers: nibalizer emonty
+  $modules/pushbullet.py:
+    maintainers: willybarro
+  $modules/pushover.py:
+    maintainers: weaselkeeper wopfel
+  $modules/python_requirements_info.py:
+    ignore: ryansb
+    maintainers: willthames
+  $modules/rax:
+    ignore: ryansb sivel
+  $modules/rax.py:
+    maintainers: omgjlk sivel
+  $modules/rax_cbs.py:
+    maintainers: claco
+  $modules/rax_cbs_attachments.py:
+    maintainers: claco
+  $modules/rax_cdb.py:
+    maintainers: jails
+  $modules/rax_cdb_database.py:
+    maintainers: jails
+  $modules/rax_cdb_user.py:
+    maintainers: jails
+  $modules/rax_clb.py:
+    maintainers: claco
+  $modules/rax_clb_nodes.py:
+    maintainers: neuroid
+  $modules/rax_clb_ssl.py:
+    maintainers: smashwilson
+  $modules/rax_files.py:
+    maintainers: angstwad
+  $modules/rax_files_objects.py:
+    maintainers: angstwad
+  $modules/rax_identity.py:
+    maintainers: claco
+  $modules/rax_mon_alarm.py:
+    maintainers: smashwilson
+  $modules/rax_mon_check.py:
+    maintainers: smashwilson
+  $modules/rax_mon_entity.py:
+    maintainers: smashwilson
+  $modules/rax_mon_notification.py:
+    maintainers: smashwilson
+  $modules/rax_mon_notification_plan.py:
+    maintainers: smashwilson
+  $modules/rax_network.py:
+    maintainers: claco omgjlk
+  $modules/rax_queue.py:
+    maintainers: claco
+  $modules/read_csv.py:
+    maintainers: dagwieers
+  $modules/redfish_:
+    ignore: jose-delarosa
+    maintainers: $team_redfish TSKushal
+  $modules/redhat_subscription.py:
+    labels: redhat_subscription
+    maintainers: barnabycourt alikins kahowell
+  $modules/redis.py:
+    maintainers: slok
+  $modules/redis_data.py:
+    maintainers: paginabianca
+  $modules/redis_data_incr.py:
+    maintainers: paginabianca
+  $modules/redis_data_info.py:
+    maintainers: paginabianca
+  $modules/redis_info.py:
+    maintainers: levonet
+  $modules/rhevm.py:
+    ignore: skvidal
+    keywords: kvm libvirt proxmox qemu
+    labels: rhevm virt
+    maintainers: $team_virt TimothyVandenbrande
+  $modules/rhn_channel.py:
+    labels: rhn_channel
+    maintainers: vincentvdk alikins $team_rhn
+  $modules/rhn_register.py:
+    labels: rhn_register
+    maintainers: jlaska $team_rhn
+  $modules/rhsm_release.py:
+    maintainers: seandst
+  $modules/rhsm_repository.py:
+    maintainers: giovannisciortino
+  $modules/riak.py:
+    maintainers: drewkerrigan jsmartin
+  $modules/rocketchat.py:
+    ignore: ramondelafuente
+    labels: rocketchat
+    maintainers: Deepakkothandan
+  $modules/rollbar_deployment.py:
+    maintainers: kavu
+  $modules/rpm_ostree_pkg.py:
+    maintainers: dustymabe Akasurde
+  $modules/rundeck_acl_policy.py:
+    maintainers: nerzhul
+  $modules/rundeck_job_executions_info.py:
+    maintainers: phsmith
+  $modules/rundeck_job_run.py:
+    maintainers: phsmith
+  $modules/rundeck_project.py:
+    maintainers: nerzhul
+  $modules/runit.py:
+    maintainers: jsumners
+  $modules/sap_task_list_execute:
+    maintainers: rainerleber
+  $modules/sapcar_extract.py:
+    maintainers: RainerLeber
+  $modules/say.py:
+    maintainers: $team_ansible_core
+    ignore: mpdehaan
+  $modules/scaleway_:
+    maintainers: $team_scaleway
+  $modules/scaleway_compute_private_network.py:
+    maintainers: pastral
+  $modules/scaleway_container.py:
+     maintainers: Lunik
+  $modules/scaleway_container_info.py:
+     maintainers: Lunik
+  $modules/scaleway_container_namespace.py:
+    maintainers: Lunik
+  $modules/scaleway_container_namespace_info.py:
+    maintainers: Lunik
+  $modules/scaleway_container_registry.py:
+    maintainers: Lunik
+  $modules/scaleway_container_registry_info.py:
+    maintainers: Lunik
+  $modules/scaleway_database_backup.py:
+    maintainers: guillaume_ro_fr
+  $modules/scaleway_function.py:
+    maintainers: Lunik
+  $modules/scaleway_function_info.py:
+    maintainers: Lunik
+  $modules/scaleway_function_namespace.py:
+    maintainers: Lunik
+  $modules/scaleway_function_namespace_info.py:
+    maintainers: Lunik
+  $modules/scaleway_image_info.py:
+    maintainers: Spredzy
+  $modules/scaleway_ip_info.py:
+    maintainers: Spredzy
+  $modules/scaleway_organization_info.py:
+    maintainers: Spredzy
+  $modules/scaleway_private_network.py:
+    maintainers: pastral
+  $modules/scaleway_security_group.py:
+    maintainers: DenBeke
+  $modules/scaleway_security_group_info.py:
+    maintainers: Spredzy
+  $modules/scaleway_security_group_rule.py:
+    maintainers: DenBeke
+  $modules/scaleway_server_info.py:
+    maintainers: Spredzy
+  $modules/scaleway_snapshot_info.py:
+    maintainers: Spredzy
+  $modules/scaleway_volume.py:
+    ignore: hekonsek
+    labels: scaleway_volume
+  $modules/scaleway_volume_info.py:
+    maintainers: Spredzy
+  $modules/sefcontext.py:
+    maintainers: dagwieers
+  $modules/selinux_permissive.py:
+    maintainers: mscherer
+  $modules/selogin.py:
+    maintainers: bachradsusi dankeder jamescassell
+  $modules/sendgrid.py:
+    maintainers: makaimc
+  $modules/sensu_:
+    maintainers: dmsimard
+  $modules/sensu_check.py:
+    maintainers: andsens
+  $modules/sensu_silence.py:
+    maintainers: smbambling
+  $modules/sensu_subscription.py:
+    maintainers: andsens
+  $modules/seport.py:
+    maintainers: dankeder
+  $modules/serverless.py:
+    ignore: ryansb
+  $modules/shutdown.py:
+    maintainers: nitzmahone samdoran aminvakil
+  $modules/sl_vm.py:
+    maintainers: mcltn
+  $modules/slack.py:
+    maintainers: ramondelafuente
+  $modules/slackpkg.py:
+    maintainers: KimNorgaard
+  $modules/smartos_image_info.py:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris
+  $modules/snap.py:
+    labels: snap
+    maintainers: angristan vcarceler
+  $modules/snap_alias.py:
+    labels: snap
+    maintainers: russoz
+  $modules/snmp_facts.py:
+    maintainers: ogenstad ujwalkomarla
+  $modules/solaris_zone.py:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris pmarkham
+  $modules/sorcery.py:
+    maintainers: vaygr
+  $modules/spectrum_device.py:
+    maintainers: orgito
+  $modules/spectrum_model_attrs.py:
+    maintainers: tgates81
+  $modules/spotinst_aws_elastigroup.py:
+    maintainers: talzur
+  $modules/ss_3par_cpg.py:
+    maintainers: farhan7500 gautamphegde
+  $modules/ssh_config.py:
+    maintainers: gaqzi Akasurde
+  $modules/stackdriver.py:
+    maintainers: bwhaley
+  $modules/stacki_host.py:
+    labels: stacki_host
+    maintainers: bsanders bbyhuy
+  $modules/statsd.py:
+    maintainers: mamercad
+  $modules/statusio_maintenance.py:
+    maintainers: bhcopeland
+  $modules/sudoers.py:
+    maintainers: JonEllis
+  $modules/supervisorctl.py:
+    maintainers: inetfuture mattupstate
+  $modules/svc.py:
+    maintainers: bcoca
+  $modules/svr4pkg.py:
+    labels: solaris svr4pkg
+    maintainers: $team_solaris brontitall
+  $modules/swdepot.py:
+    keywords: hp-ux
+    labels: hpux swdepot
+    maintainers: $team_hpux melodous
+  $modules/swupd.py:
+    labels: swupd
+    maintainers: hnanni albertomurillo
+  $modules/syslogger.py:
+    maintainers: garbled1
+  $modules/syspatch.py:
+    maintainers: precurse
+  $modules/sysrc.py:
+    maintainers: dlundgren
+  $modules/sysupgrade.py:
+    maintainers: precurse
+  $modules/taiga_issue.py:
+    maintainers: lekum
+  $modules/telegram.py:
+    maintainers: tyouxa loms lomserman
+  $modules/terraform.py:
+    ignore: ryansb
+    maintainers: m-yosefpor rainerleber
+  $modules/timezone.py:
+    maintainers: indrajitr jasperla tmshn
+  $modules/twilio.py:
+    maintainers: makaimc
+  $modules/typetalk.py:
+    maintainers: tksmd
+  $modules/udm_:
+    maintainers: keachi
+  $modules/ufw.py:
+    labels: ufw
+    maintainers: ahtik ovcharenko pyykkis
+    notify: felixfontein
+  $modules/uptimerobot.py:
+    maintainers: nate-kingsley
+  $modules/urpmi.py:
+    maintainers: pmakowski
+  $modules/utm_:
+    keywords: sophos utm
+    maintainers: $team_e_spirit
+  $modules/utm_ca_host_key_cert.py:
+    maintainers: stearz
+  $modules/utm_ca_host_key_cert_info.py:
+    maintainers: stearz
+  $modules/utm_network_interface_address.py:
+    maintainers: steamx
+  $modules/utm_network_interface_address_info.py:
+    maintainers: steamx
+  $modules/utm_proxy_auth_profile.py:
+    keywords: sophos utm
+    maintainers: $team_e_spirit stearz
+  $modules/utm_proxy_exception.py:
+    keywords: sophos utm
+    maintainers: $team_e_spirit RickS-C137
+  $modules/vdo.py:
+    maintainers: rhawalsh bgurney-rh
+  $modules/vertica_:
+    maintainers: dareko
+  $modules/vexata_:
+    maintainers: vexata
+  $modules/vmadm.py:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris
+  $modules/wakeonlan.py:
+    maintainers: dagwieers
+  $modules/wdc_:
+    ignore: jose-delarosa
+    maintainers: $team_redfish
+  $modules/wdc_redfish_command.py:
+    maintainers: $team_wdc
+  $modules/wdc_redfish_info.py:
+    maintainers: $team_wdc
+  $modules/webfaction_:
+    maintainers: quentinsf
+  $modules/xattr.py:
+    labels: xattr
+    maintainers: bcoca
+  $modules/xbps.py:
+    maintainers: dinoocch the-maldridge
+  $modules/xcc_:
+    maintainers: panyy3 renxulei
+  $modules/xenserver_:
+    maintainers: bvitnik
+  $modules/xenserver_facts.py:
+    ignore: andyhky ryansb
+    labels: xenserver_facts
+    maintainers: caphrim007 cheese
+  $modules/xfconf.py:
+    labels: xfconf
+    maintainers: russoz jbenden
+  $modules/xfconf_info.py:
+    labels: xfconf
+    maintainers: russoz
+  $modules/xfs_quota.py:
+    maintainers: bushvin
+  $modules/xml.py:
+    ignore: magnus919
+    labels: m:xml xml
+    maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
+  $modules/yarn.py:
+    ignore: chrishoffman verkaufer
+  $modules/yum_versionlock.py:
+    maintainers: gyptazy aminvakil
+  $modules/zfs:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris
+  $modules/zfs.py:
+    maintainers: johanwiren
+  $modules/zfs_delegate_admin.py:
+    maintainers: natefoo
+  $modules/znode.py:
+    maintainers: treyperry
+  $modules/zpool_facts:
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+    labels: solaris
+    maintainers: $team_solaris
+  $modules/zypper.py:
+    ignore: dirtyharrycallahan robinro
+    labels: zypper
+    maintainers: $team_suse
+  $modules/zypper_repository.py:
+    ignore: matze
+    labels: zypper
+    maintainers: $team_suse
+  $tests/a_module.py:
+    maintainers: felixfontein
+#########################
+  tests/:
+    labels: tests
+  tests/integration:
+    labels: integration
+    support: community
+  tests/unit/:
+    labels: unit
+    support: community
+  tests/utils/:
+    labels: unit
+    maintainers: gundalow
+macros:
+  actions: plugins/action
+  becomes: plugins/become
+  caches: plugins/cache
+  callbacks: plugins/callback
+  cliconfs: plugins/cliconf
+  connections: plugins/connection
+  doc_fragments: plugins/doc_fragments
+  filters: plugins/filter
+  inventories: plugins/inventory
+  lookups: plugins/lookup
+  module_utils: plugins/module_utils
+  modules: plugins/modules
+  terminals: plugins/terminal
+  tests: plugins/test
+  team_ansible_core:
+  team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
+  team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
+  team_consul: sgargan
+  team_cyberark_conjur: jvanderhoof ryanprior
+  team_e_spirit: MatrixCrawler getjack
+  team_flatpak: JayKayy oolongbrothers
+  team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman metanovii sh0shin nejch lgatellier suukit
+  team_hpux: bcoca davx8342
+  team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
+  team_ipa: Akasurde Nosmoht fxfitz justchris1
+  team_jboss: Wolfant jairojunior wbrefvem
+  team_keycloak: eikef ndclt
+  team_linode: InTheCloudDan decentral1se displague rmcintosh Charliekenney23 LBGarber
+  team_macos: Akasurde kyleabenson martinm82 danieljaouen indrajitr
+  team_manageiq: abellotti cben gtanzillo yaacov zgalor dkorn evertmulder
+  team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha sganesh-infoblox privateip
+  team_opennebula: ilicmilan meerkampdvv rsmontero xorel nilsding
+  team_oracle: manojmeda mross22 nalsaber
+  team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
+  team_redfish: mraineri tomasg2012 xmadsen renxulei rajeevkallur bhavya06 jyundt
+  team_rhn: FlossWare alikins barnabycourt vritant
+  team_scaleway: remyleone abarbare
+  team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
+  team_suse: commel evrardjp lrupp toabctl AnderEnder alxgu andytom sealor
+  team_virt: joshainglis karmab tleguern Thulium-Drake Ajpantuso
+  team_wdc: mikemoerk

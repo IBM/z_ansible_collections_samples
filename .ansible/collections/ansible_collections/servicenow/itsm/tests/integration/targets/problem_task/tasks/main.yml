@@ -1,0 +1,133 @@
+---
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    - name: Create a problem
+      servicenow.itsm.problem:
+        short_description: my-problem
+        state: new
+      register: problem
+
+    - ansible.builtin.assert:
+        that:
+          - problem is changed
+          - problem.record.state == "new"
+          - problem.record.short_description == "my-problem"
+
+
+    - name: Retrieve problem task records
+      servicenow.itsm.problem_task_info:
+      register: initial
+
+
+    - name: Create a problem task (check mode)
+      servicenow.itsm.problem_task: &problem-task-create
+        state: new
+        type: general
+        source_problem: "{{ problem.record.number }}"
+        short_description: my-problem-task
+        priority: low
+      check_mode: true
+      register: problem_task
+
+    - ansible.builtin.assert: &problem-task-create-assertions
+        that:
+          - problem_task is changed
+          - problem_task.record.state == "new"
+          - problem_task.record.short_description == "my-problem-task"
+
+
+    - name: Create a problem task
+      servicenow.itsm.problem_task: *problem-task-create
+      register: problem_task
+  
+    - ansible.builtin.assert: *problem-task-create-assertions
+
+
+    - name: Verify that a new record was created
+      servicenow.itsm.problem_task_info:
+        sys_id: "{{ problem_task.record.sys_id }}"
+      register: result
+  
+    - ansible.builtin.assert:
+        that:
+          - result.records.0.short_description == "my-problem-task"
+
+
+    - name: Change state of a problem task (check mode)
+      servicenow.itsm.problem_task: &problem-task-change
+        state: assess
+        type: general
+        sys_id: "{{ problem_task.record.sys_id }}"
+        assigned_to: problem.admin
+        source_problem: "{{ problem.record.number }}"
+        short_description: my-problem-task
+        priority: low
+      check_mode: true
+      register: problem_task
+
+    - ansible.builtin.assert: &problem-task-change-assertions
+        that:
+          - problem_task is changed
+          - problem_task.record.state == "assess"
+          - problem_task.record.short_description == "my-problem-task"
+
+
+    - name: Change state of a problem task
+      servicenow.itsm.problem_task: *problem-task-change
+      register: problem_task
+  
+    - ansible.builtin.assert: *problem-task-change-assertions
+
+
+    - name: Verify that state was changed
+      servicenow.itsm.problem_task_info:
+        sys_id: "{{ problem_task.record.sys_id }}"
+      register: result
+  
+    - ansible.builtin.assert:
+        that:
+          - result.records.0.state == "assess"
+          - result.records.0.short_description == "my-problem-task"
+
+
+    - name: Delete a problem task (check mode)
+      servicenow.itsm.problem_task: &problem-task-delete
+        state: absent
+        sys_id: "{{ problem_task.record.sys_id }}"
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &problem-task-delete-assertions
+        that:
+          - result is changed
+
+
+    - name: Delete a problem task
+      servicenow.itsm.problem_task: *problem-task-delete
+      register: result
+  
+    - ansible.builtin.assert: *problem-task-delete-assertions
+
+
+    - name: Verify that a record was deleted
+      servicenow.itsm.problem_task_info:
+      register: result
+  
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == initial.records | length
+
+
+    - name: Delete a problem
+      servicenow.itsm.problem:
+        state: absent
+        sys_id: "{{ problem.record.sys_id }}"
+      register: problem
+
+    - ansible.builtin.assert:
+        that:
+          - problem is changed

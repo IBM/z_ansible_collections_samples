@@ -1,0 +1,105 @@
+# Copyright (c) IBM Corporation 2026
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+argument_specs:
+  main:
+    short_description: Gathers diagnostic data from z/OS managed nodes and the control node
+    description:
+      - >-
+        The B(gather_diagnostics) role gathers a comprehensive set of diagnostic facts from both the z/OS managed node
+        and the Ansible control node.
+      - >-
+        B(Managed Node (z/OS):) Gathers ZOAU version, Python version, locale, environment variables, user limits,
+        pip packages, z/OS system facts, OMVS segment, filesystem mount status, ZOAU APF attributes, and optionally
+        SSH configuration files and operator command output.
+      - >-
+        B(Control Node:) Gathers Ansible version, SSH version, Ansible config, locale, installed collections,
+        environment, and system facts.
+      - >-
+        This role can create separate YAML report files for the z/OS node
+        (C(gather_diagnostics_report_managed_node_<hostname>.yml)) and the control node
+        (C(gather_diagnostics_report_control.yml)) in the specified output directory.
+      - >-
+        Facts are set on the respective hosts: C(gather_diagnostics_managed_results) on the z/OS host and
+        C(gather_diagnostics_control_results) on localhost.
+
+    author:
+      - Rohitash Goyal (@Rohitcodes28)
+      - Ketan Kelkar (@ketankelkar)
+
+    options:
+      gather_diagnostics_gather_control:
+        description:
+          - Controls whether the role gathers diagnostic facts from the Ansible control node.
+        type: bool
+        required: false
+        default: true
+
+      gather_diagnostics_gather_managed_node:
+        description:
+          - Controls whether the role gathers diagnostic facts from the z/OS managed node.
+        type: bool
+        required: false
+        default: true
+
+      gather_diagnostics_save_control_log:
+        description:
+          - >-
+            Controls whether the role creates a YAML report file for the control node and hides sensitive data
+            (C(no_log=true)) from the console for control node tasks.
+        type: bool
+        required: false
+        default: true
+
+      gather_diagnostics_save_managed_node_log:
+        description:
+          - >-
+            Controls whether the role creates a YAML report file for the z/OS managed node and hides sensitive data
+            (C(no_log=true)) from the console for z/OS tasks.
+        type: bool
+        required: false
+        default: true
+
+      gather_diagnostics_gather_syslog:
+        description:
+          - >-
+            Controls whether the role attempts to run authorized MVS operator commands (C(D A,L), C(D OMVS,LIMITS),
+            C(D OMVS,OPTIONS)) to gather system activity.
+          - Requires operator authority.
+        type: bool
+        required: false
+        default: true
+
+      gather_diagnostics_gather_ssh_config:
+        description:
+          - >-
+            Controls whether to gather contents of ~/.ssh/rc, /etc/ssh/sshrc, /etc/ssh/ssh_config, and
+            /etc/ssh/sshd_config from the z/OS managed node.
+          - Disabled by default to avoid exposing sensitive security configurations.
+        type: bool
+        required: false
+        default: false
+
+      gather_diagnostics_output_dir:
+        description:
+          - Directory where diagnostic report files are created.
+          - In AAP, defaults to the artifacts directory. In standalone mode, defaults to the control node's home directory.
+        type: str
+        required: false
+
+      gather_diagnostics_environment_vars:
+        description:
+          - Dictionary of environment variables to set for z/OS tasks.
+          - Empty by default to allow test cases and playbooks to define their own.
+        type: dict
+        required: false
+        default: {}

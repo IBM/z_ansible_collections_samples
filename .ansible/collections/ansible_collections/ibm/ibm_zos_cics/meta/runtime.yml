@@ -1,0 +1,25 @@
+---
+requires_ansible: ">=2.15.0"
+action_groups:
+  cmci_group:
+    - cmci_action
+    - cmci_create
+    - cmci_delete
+    - cmci_get
+    - cmci_update
+  cmci:
+    - cmci_action
+    - cmci_create
+    - cmci_delete
+    - cmci_get
+    - cmci_update
+  region:
+    - aux_temp_storage
+    - aux_trace
+    - csd
+    - region_jcl
+    - global_catalog
+    - local_catalog
+    - local_request_queue
+    - td_intrapartition
+    - transaction_dump

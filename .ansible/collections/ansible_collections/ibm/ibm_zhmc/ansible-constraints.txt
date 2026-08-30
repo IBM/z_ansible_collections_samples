@@ -1,0 +1,42 @@
+# Pip constraints file for testing of the project.
+#
+# Make sure that the constraints defined in this file are consistent with
+# the versions specified in minimum-constraints.txt and requirements.txt.
+
+
+# Ansible versions to test on
+
+# Starting with Python 3.9, ansible 4 is needed.
+# The sanity check of ansible 4 supports Python only up to 3.9, so Python 3.10 requires ansible 5.
+# The sanity check of ansible 5 supports Python only up to 3.10, so Python 3.11 requires ansible 6.
+ansible>=2.9.1,<2.10; python_version == '2.7'  # sanity test is not run here
+ansible>=2.9.1,<2.10; python_version == '3.5'  # ansible 2.9 (= core)
+ansible>=2.9.1,<3.0; python_version == '3.6'   # ansible 2.10 (= core)
+ansible>=2.9.1,<5.0; python_version == '3.7'   # ansible 4 / ansible-core 2.11
+ansible>=2.9.1,<6.0; python_version == '3.8'   # ansible 5 / ansible-core 2.12
+ansible>=4.0.0,<7.0; python_version == '3.9'   # ansible 6 / ansible-core 2.13
+ansible>=5.0.1,<8.0; python_version == '3.10'  # ansible 7 / ansible-core 2.14
+ansible>=7.0.0; python_version >= '3.11'       # ansible 7+ / ansible-core 2.14+
+
+
+# Indirect dependencies are not specified in this file, unless needed to solve versioning issues:
+
+# Jinja2 is used by ansible/ansible-core and by ansible-doc-extractor.
+# The module.rst.j2 template used by ansible-doc-extractor uses the 'tojson' filter added in Jinja2 2.9
+# Ansible 6 requires Jinja2>=3.0
+# Python 3.10 requires Jinja>=2.11
+Jinja2>=2.9; python_version <= '3.8'   # ansible <= 5
+Jinja2>=3.0; python_version >= '3.9'   # ansible >= 6
+
+# MarkupSafe is used by Jinja2
+# Jinja2 3.0 requires MarkupSafe>=2.0
+MarkupSafe>=1.1.0; python_version <= '3.8'   # ansible <= 5
+MarkupSafe>=2.0.0; python_version >= '3.9'   # ansible >= 6
+
+
+# Direct dependencies for development (must be consistent with dev-requirements.txt)
+
+# ansible-test
+yamllint==1.25.0
+pathspec==0.8.0
+rstcheck==3.3.1; python_version <= '3.9'  # ansible <= 2.10 (on minimum package levels)

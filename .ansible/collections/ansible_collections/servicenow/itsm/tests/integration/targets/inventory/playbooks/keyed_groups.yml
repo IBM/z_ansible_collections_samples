@@ -1,0 +1,43 @@
+---
+- name: Test automatic grouping
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - block:
+        - name: Create imaginary VMs
+          servicenow.itsm.configuration_item:
+            name: my-vm-{{ item }}
+            sys_class_name: cmdb_ci_ec2_instance
+            ip_address: 10.1.0.{{ item }}
+            environment: "{{ (item % 2 == 0) | ansible.builtin.ternary('development', 'production') }}"
+            other:
+              guest_os_fullname: "{{ (item < 105) | ansible.builtin.ternary('OS0', 'OS1') }}"
+          loop: "{{ range(100, 110) }}"
+          register: vms
+
+        - name: Reload inventory
+          ansible.builtin.meta: refresh_inventory
+
+        - ansible.builtin.debug:
+            var: groups
+
+        - ansible.builtin.assert:
+            that:
+              - groups | length == 5
+              - "'Production' in groups"
+              - "groups['Production'] | length == 3"
+              - "'Development' in groups"
+              - "groups['Development'] | length == 2"
+              - "'OS1' in groups"
+              - "groups['OS1'] | length == 5"
+              - "'OS0' not in groups"
+
+      always:
+        - name: Delete VMs
+          servicenow.itsm.configuration_item:
+            state: absent
+            sys_id: "{{ item.record.sys_id }}"
+          loop: "{{ vms.results }}"
+          loop_control:
+            label: "{{ item.record.name }}"

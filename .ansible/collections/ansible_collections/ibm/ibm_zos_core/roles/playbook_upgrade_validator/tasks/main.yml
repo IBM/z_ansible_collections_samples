@@ -1,0 +1,75 @@
+---
+- name: Set Python path from ansible_playbook_python when available
+  ansible.builtin.set_fact:
+    playbook_upgrade_validator_python_path: "{{ ansible_playbook_python }}"
+  when: ansible_playbook_python is defined
+
+- name: Fallback to which python3 when ansible_playbook_python is unavailable
+  ansible.builtin.raw: /usr/bin/which python3
+  delegate_to: localhost
+  register: playbook_upgrade_validator_python_path_lookup
+  ignore_errors: true
+  changed_when: false
+  when: playbook_upgrade_validator_python_path is not defined
+
+- name: Normalize Python path from lookup result
+  ansible.builtin.set_fact:
+    playbook_upgrade_validator_python_path: >-
+      {{
+        playbook_upgrade_validator_python_path | default(
+          (playbook_upgrade_validator_python_path_lookup.stdout | default('')) | trim
+        )
+      }}
+  when:
+    - playbook_upgrade_validator_python_path is not defined
+    - playbook_upgrade_validator_python_path_lookup is defined
+
+- name: Fail when control node Python cannot be resolved
+  ansible.builtin.fail:
+    msg: >-
+      Unable to determine a Python interpreter for the control node for the
+      playbook_upgrade_validator role. Ensure ansible_playbook_python is
+      available or that python3 is present in PATH on localhost.
+  when:
+    - playbook_upgrade_validator_python_path is not defined or not playbook_upgrade_validator_python_path
+
+- name: Load migration changes from JSON file
+  ansible.builtin.set_fact:
+    playbook_upgrade_validator_data: "{{ lookup('file', 'dependency_config.json') | from_json }}"
+  delegate_to: localhost
+
+- name: Create logs directory when playbook_upgrade_validator_output_path is not defined
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/logs"
+    state: directory
+    mode: '0755'
+  when: playbook_upgrade_validator_output_path is not defined
+
+- name: Set playbook_upgrade_validator_output_path variable if it was not defined
+  ansible.builtin.set_fact:
+    playbook_upgrade_validator_output_path: "{{ playbook_dir }}/logs/migration_report.json"
+  when: playbook_upgrade_validator_output_path is not defined
+
+- name: Set playbook_upgrade_validator_ignore_response_params variable if it was not defined
+  ansible.builtin.set_fact:
+    playbook_upgrade_validator_ignore_response_params: false
+  when: playbook_upgrade_validator_ignore_response_params is not defined
+
+- name: Run playbook upgrade validator to list migration changes
+  ansible.builtin.command:
+    cmd: >
+      "{{ playbook_upgrade_validator_python_path }}" "{{ role_path }}/files/playbook_upgrade_validator.py"
+      --playbook_path "{{ playbook_upgrade_validator_playbook_path }}"
+      --output_path "{{ playbook_upgrade_validator_output_path }}"
+      {% if playbook_upgrade_validator_ignore_response_params %}
+      --ignore_response_params
+      {% endif %}
+      --migration_map '{{ playbook_upgrade_validator_data | to_json }}'
+  register: playbook_upgrade_validator_result
+  delegate_to: localhost
+  changed_when: false
+
+- name: Print path where validation results are stored
+  ansible.builtin.debug:
+    msg: "Results saved to file: {{ playbook_upgrade_validator_output_path }}"
+  delegate_to: localhost

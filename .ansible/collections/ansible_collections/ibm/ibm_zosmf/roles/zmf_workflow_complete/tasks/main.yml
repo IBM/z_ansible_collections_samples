@@ -1,0 +1,118 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+---
+- name: Initialize final_result
+  set_fact:
+    final_result: {'workflow_name': "{{ workflow_name }}"}
+
+- name: Check whether a workflow instance with the given name already exists
+  ibm.ibm_zosmf.zmf_workflow:
+    state: "existed"
+    zmf_host: "{{ zmf_host }}"
+    zmf_port: "{{ zmf_port | default(-1) }}"
+    zmf_user: "{{ zmf_user | default() }}"
+    zmf_password: "{{ zmf_password | default() }}"
+    zmf_crt: "{{ zmf_crt | default() }}"
+    zmf_key: "{{ zmf_key | default() }}"
+    workflow_name: "{{ workflow_name }}"
+    workflow_file: "{{ workflow_file | default() }}"
+    workflow_host: "{{ inventory_hostname | default() }}"
+    workflow_owner: "{{ workflow_owner | default() }}"
+    workflow_file_system: "{{ workflow_file_system | default() }}"
+    workflow_vars_file: "{{ workflow_vars_file | default() }}"
+    workflow_vars: "{{ workflow_vars | default({}) }}"
+    workflow_resolve_global_conflict_by_using: "{{ workflow_resolve_global_conflict_by_using | default('global') }}"
+    workflow_comments: "{{ workflow_comments | default() }}"
+    workflow_assign_to_owner: "{{ workflow_assign_to_owner | default(True) }}"
+    workflow_access_type: "{{ workflow_access_type | default('Public') }}"
+    workflow_account_info: "{{ workflow_account_info | default() }}"
+    workflow_job_statement: "{{ workflow_job_statement | default() }}"
+    workflow_delete_completed_jobs: "{{ workflow_delete_completed_jobs | default(False) }}"
+  delegate_to: localhost
+  register: compare_result
+  when: not force_complete
+
+- name: Delete the existing workflow instance if force complete or it has different definition file, variables or properties
+  ibm.ibm_zosmf.zmf_workflow:
+    state: "deleted"
+    zmf_host: "{{ zmf_host }}"
+    zmf_port: "{{ zmf_port | default(-1) }}"
+    zmf_user: "{{ zmf_user | default() }}"
+    zmf_password: "{{ zmf_password | default() }}"
+    zmf_crt: "{{ zmf_crt | default() }}"
+    zmf_key: "{{ zmf_key | default() }}"
+    workflow_name: "{{ workflow_name }}"
+    workflow_key: "{{ compare_result.workflow_key | default() }}"
+  delegate_to: localhost
+  register: delete_result
+  when: (force_complete) or (compare_result.workflow_key and not compare_result.same_workflow_instance)
+
+- name: Reset workflow_key if the existing workflow instance is deleted
+  set_fact:
+    compare_result: {'workflow_key':'', 'completed':false}
+  when: ('skipped' not in delete_result) and (delete_result.deleted)
+
+- name: Create the workflow instance if not exist and start it
+  ibm.ibm_zosmf.zmf_workflow:
+    state: "started"
+    zmf_host: "{{ zmf_host }}"
+    zmf_port: "{{ zmf_port | default(-1) }}"
+    zmf_user: "{{ zmf_user | default() }}"
+    zmf_password: "{{ zmf_password | default() }}"
+    zmf_crt: "{{ zmf_crt | default() }}"
+    zmf_key: "{{ zmf_key | default() }}"
+    workflow_name: "{{ workflow_name }}"
+    workflow_file: "{{ workflow_file | default() }}"
+    workflow_host: "{{ inventory_hostname | default() }}"
+    workflow_owner: "{{ workflow_owner | default() }}"
+    workflow_file_system: "{{ workflow_file_system | default() }}"
+    workflow_vars_file: "{{ workflow_vars_file | default() }}"
+    workflow_vars: "{{ workflow_vars | default({}) }}"
+    workflow_resolve_global_conflict_by_using: "{{ workflow_resolve_global_conflict_by_using | default('global') }}"
+    workflow_comments: "{{ workflow_comments | default() }}"
+    workflow_assign_to_owner: "{{ workflow_assign_to_owner | default(True) }}"
+    workflow_access_type: "{{ workflow_access_type | default('Public') }}"
+    workflow_account_info: "{{ workflow_account_info | default() }}"
+    workflow_job_statement: "{{ workflow_job_statement | default() }}"
+    workflow_delete_completed_jobs: "{{ workflow_delete_completed_jobs | default(False) }}"
+    workflow_resolve_conflict_by_using: "{{ workflow_resolve_conflict_by_using | default('outputFileValue') }}"
+    workflow_step_name: "{{ workflow_step_name | default() }}"
+    workflow_perform_subsequent: "{{ workflow_perform_subsequent | default(True) }}"
+    workflow_notification_url: "{{ workflow_notification_url | default() }}"
+    workflow_key: "{{ compare_result.workflow_key | default() }}"
+  delegate_to: localhost
+  register: start_result
+  when: (force_complete) or ('completed' not in compare_result) or (not compare_result.completed)
+
+- name: Periodically check status of the workflow instance and return final result
+  ibm.ibm_zosmf.zmf_workflow:
+    state: "check"
+    zmf_host: "{{ zmf_host }}"
+    zmf_port: "{{ zmf_port | default(-1) }}"
+    zmf_user: "{{ zmf_user | default() }}"
+    zmf_password: "{{ zmf_password | default() }}"
+    zmf_crt: "{{ zmf_crt | default() }}"
+    zmf_key: "{{ zmf_key | default() }}"
+    workflow_key: "{{ start_result.workflow_key | default(compare_result.workflow_key) }}"
+  delegate_to: localhost
+  register: result
+  until: (result is failed) or (not result.waiting)
+  retries: "{{ complete_check_times }}"
+  delay: "{{ complete_check_delay }}"
+
+- name: Update final_result
+  set_fact:
+    final_result: "{{ final_result | combine({\
+                   'workflow_name': result.workflow_name, \
+                   'workflow_key': start_result.workflow_key | default(compare_result.workflow_key), \
+                   'completed': result.completed, \
+                   'msg': result.message}) }}"
+
+- name: Fail if the workflow instance is not completed
+  fail:
+    msg: "{{ result.message }}"
+  when: not result.completed
+
+- name: Return final_result
+  debug: var=final_result

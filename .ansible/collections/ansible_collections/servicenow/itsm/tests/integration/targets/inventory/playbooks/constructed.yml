@@ -1,0 +1,68 @@
+---
+- name: Test constructed options
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - block:
+        - name: Create imaginary VMs
+          servicenow.itsm.configuration_item:
+            name: i{{ item }}
+            sys_class_name: cmdb_ci_ec2_instance
+            ip_address: 10.1.0.{{ item }}
+            environment: "{{ (item % 2 == 0) | ansible.builtin.ternary('development', 'production') }}"
+            other:
+              fqdn: f{{ item }}.example.com
+              guest_os_fullname: "{{ (item < 106) | ansible.builtin.ternary('OS0', 'OS1') }}"
+              vm_inst_id: i{{ item }}
+          loop: "{{ range(101, 109) | list }}"
+          register: vms
+
+        - name: Reload inventory
+          ansible.builtin.meta: refresh_inventory
+
+        - name: Make sure we have all expected groups
+          ansible.builtin.assert:
+            that:
+              - groups.all | length == 8  # Also includes all and ungrouped
+              - groups.ungrouped | length == 0
+              - groups.development | sort | list == ["i102", "i104", "i106", "i108"]
+              - groups.production | sort | list == ["i101", "i103",  "i105", "i107"]
+              - groups.os_OS1 | sort | list == ["i106", "i107", "i108"]
+              - "'OS0' not in groups"
+
+        - name: Check i106
+          ansible.builtin.assert:
+            that:
+              - hostvars.i106.inventory_hostname == "i106"
+              - hostvars.i106.ansible_host == "f106.example.com"
+              - hostvars.i106.name == "i106"
+              - hostvars.i106.ip_address == "10.1.0.106"
+              - hostvars.i106.env == "Development"
+
+        - name: Check i107
+          ansible.builtin.assert:
+            that:
+              - hostvars.i107.inventory_hostname == "i107"
+              - hostvars.i107.ansible_host == "f107.example.com"
+              - hostvars.i107.name == "i107"
+              - hostvars.i107.ip_address == "10.1.0.107"
+              - hostvars.i107.env == "Production"
+
+        - name: Check i108
+          ansible.builtin.assert:
+            that:
+              - hostvars.i108.inventory_hostname == "i108"
+              - hostvars.i108.ansible_host == "f108.example.com"
+              - hostvars.i108.name == "i108"
+              - hostvars.i108.ip_address == "10.1.0.108"
+              - hostvars.i108.env == "Development"
+
+      always:
+        - name: Delete VMs
+          servicenow.itsm.configuration_item:
+            state: absent
+            sys_id: "{{ item.record.sys_id }}"
+          loop: "{{ vms.results }}"
+          loop_control:
+            label: "{{ item.record.name }}"

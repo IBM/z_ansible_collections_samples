@@ -1,0 +1,91 @@
+---
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    - name: Retrieve all ci linux server cmdb
+      servicenow.itsm.api_info:
+        api_path: "api/now/cmdb/instance/cmdb_ci_linux_server"
+      register: initial
+
+    - name: Create test ci - check mode
+      servicenow.itsm.api: &cmdb-ci-create-data
+        api_path: "api/now/cmdb/instance/cmdb_ci_linux_server"
+        action: post
+        data:
+          attributes:
+            name: "linux99"
+            firewall_status: "intranet"
+          source: "ServiceNow"
+      register: server
+
+    - ansible.builtin.debug:
+        var: server
+
+    - name: Create test ci
+      servicenow.itsm.api: *cmdb-ci-create-data
+      register: server
+
+    - ansible.builtin.assert:
+        that:
+          - server is changed
+
+    - name: Update test ci -- check mode
+      servicenow.itsm.api: &cmdb-ci-update-data
+        api_path: "api/now/cmdb/instance/cmdb_ci_linux_server"
+        action: patch
+        sys_id: "{{ server.record.attributes.sys_id }}"
+        data:
+          attributes:
+            cpu_name: "i5"
+          source: "ServiceNow"
+      register: updated_server
+      check_mode: true
+    - ansible.builtin.assert: &update-server-assertion-data
+        that:
+          - updated_server is changed
+          - updated_server.record.attributes.cpu_name == 'i5'
+    
+    - name: Update test ci 
+      servicenow.itsm.api: *cmdb-ci-update-data
+      register: first_server
+    - ansible.builtin.assert: *update-server-assertion-data
+
+    - name: Get relation type "Used by"
+      servicenow.itsm.api_info:
+        resource: cmdb_rel_type
+        sysparm_query: nameLIKEUsed
+      register: relations
+
+    - name: Create another ci
+      servicenow.itsm.api: 
+        api_path: "api/now/cmdb/instance/cmdb_ci_linux_server"
+        action: post
+        data:
+          attributes:
+            name: "linux100"
+            firewall_status: "intranet"
+          source: "ServiceNow"
+      register: another_server
+
+    - name: Create relation between first and second server
+      servicenow.itsm.api:
+        api_path: "{{ 'api/now/cmdb/instance/cmdb_ci_linux_server/' + first_server.record.attributes.sys_id + '/relation'}}"
+        action: post
+        data:
+          inbound_relations:
+            - target: "{{ another_server.record.attributes.sys_id }}"
+              type: "{{ relations.record[0].sys_id }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.record.inbound_relations | length == 1
+
+    - ansible.builtin.debug:
+        var: "{{ item }}"
+      loop:
+        - first_server.record.attributes.sys_id
+        - result.record.inbound_relations[0].sys_id

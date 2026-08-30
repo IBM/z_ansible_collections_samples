@@ -1,0 +1,2 @@
+# This file contains ignores rule violations for ansible-lint
+changelogs/changelog.yaml yaml[indentation]

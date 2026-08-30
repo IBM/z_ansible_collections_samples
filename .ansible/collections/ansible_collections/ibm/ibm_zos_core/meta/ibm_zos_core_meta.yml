@@ -1,0 +1,10 @@
+name: ibm_zos_core
+version: "2.0.0"
+managed_requirements:
+    -
+        name: "IBM Open Enterprise SDK for Python"
+        version: ">=3.12"
+    -
+        name: "Z Open Automation Utilities"
+        version:
+            - ">=1.4.0"

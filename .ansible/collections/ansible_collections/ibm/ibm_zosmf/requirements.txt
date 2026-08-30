@@ -1,0 +1,7 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# This file maintains a list of any python dependencies needed by this
+# collection to run effectively on an Ansible controller.
+# For more information on requirements files,
+# see https://pip.pypa.io/en/latest/user_guide/#requirements-files

@@ -1,0 +1,19 @@
+---
+plugin: servicenow.itsm.now
+
+table: cmdb_ci_ec2_instance
+columns:
+  - name
+  - ip_address
+  - vm_inst_id
+
+keyed_groups:
+  - key: environment
+    prefix: ""
+    separator: ""
+  - key: guest_os_fullname
+    prefix: ""
+    separator: ""
+
+query:
+  - guest_os_fullname: = OS1

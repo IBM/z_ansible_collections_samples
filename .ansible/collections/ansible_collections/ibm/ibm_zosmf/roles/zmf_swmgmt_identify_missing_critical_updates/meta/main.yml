@@ -1,0 +1,21 @@
+# Copyright (c) IBM Corporation 2023
+
+---
+galaxy_info:
+  author: Taylor Digilio <Taylor.Digilio@ibm.com>
+  description: Ansible role to complete the Software Management Missing Critical Updates Report REST API for a software instance.
+  company: IBM
+  min_ansible_version: 2.9
+  galaxy_tags:
+    - ibm
+    - z
+    - zos
+    - zosmf
+    - softwaremanagement
+  license:
+    - Apache-2.0
+  platforms:
+    - name: GenericLinux
+      versions:
+        - all
+dependencies: []

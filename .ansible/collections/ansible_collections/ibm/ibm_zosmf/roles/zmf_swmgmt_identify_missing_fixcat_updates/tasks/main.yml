@@ -1,0 +1,190 @@
+# Copyright (c) IBM Corporation 2023
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+---
+# Tasks file for zmf_swmgmt_identify_missing_fixcat_updates play.
+
+# Create a variable for the missing fixcat updates response content.
+- name: Initialize the container for the missing fixcat updates response content
+  set_fact:
+    missing_fixcat_updates_response: ""
+
+# Set the request content body as an empty dictionary.
+- name: "No request content specified for missing fixcat updates operation, using empty request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{}'
+  when: remote_zmf_user is not defined and remote_zmf_password is not defined and proxy_zmf_user is not defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfuid in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is not defined and proxy_zmf_user is not defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfuid and zosmfpw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}",
+ "zosmfpw":"{{ remote_zmf_password }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is defined and proxy_zmf_user is not defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfuid and proxyuid in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}",
+ "proxyuid":"{{ proxy_zmf_user }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is not defined and proxy_zmf_user is defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfuid and proxypw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}",
+ "proxypw":"{{ proxy_zmf_password }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is not defined and proxy_zmf_user is not defined and proxy_zmf_password is defined
+
+- name: "Including zosmfuid, zosmfpw, and proxyuid in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}",
+ "zosmfpw":"{{ remote_zmf_password }}", "proxyuid":"{{ proxy_zmf_user }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is defined and proxy_zmf_user is defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfuid, zosmfpw, and proxypw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}",
+ "zosmfpw":"{{ remote_zmf_password }}", "proxypw":"{{ proxy_zmf_password }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is defined and proxy_zmf_user is not defined and proxy_zmf_password is defined
+
+- name: "Including zosmfpw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfpw":"{{ remote_zmf_password }}"}'
+  when: remote_zmf_password is defined and remote_zmf_user is not defined and proxy_zmf_user is not defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfpw and proxyuid in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfpw":"{{ remote_zmf_password }}",
+  "proxyuid":"{{ proxy_zmf_user }}"}'
+  when: remote_zmf_user is not defined and remote_zmf_password is defined and proxy_zmf_user is defined and proxy_zmf_password is not defined
+
+- name: "Including zosmfpw and proxypw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfpw":"{{ remote_zmf_password }}",
+  "proxypw":"{{ proxy_zmf_password }}"}'
+  when: remote_zmf_user is not defined and remote_zmf_password is defined and proxy_zmf_user is not defined and proxy_zmf_password is defined
+
+- name: "Including proxyuid in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"proxyuid":"{{ proxy_zmf_user }}"}'
+  when: proxy_zmf_user is defined and remote_zmf_user is not defined and remote_zmf_password is not defined and proxy_zmf_password is not defined
+
+- name: "Including proxyuid and proxypw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"proxyuid":"{{ proxy_zmf_user }}",
+  "proxypw":"{{ proxy_zmf_password }}"}'
+  when: remote_zmf_user is not defined and remote_zmf_password is not defined and proxy_zmf_user is defined and proxy_zmf_password is defined
+
+- name: "Including proxypw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"proxypw":"{{ proxy_zmf_password }}"}'
+  when: proxy_zmf_password is defined and proxy_zmf_user is not defined and remote_zmf_user is not defined and remote_zmf_password is not defined
+
+- name: "Including zosmfuid, zosmfpw, proxyuid, and proxypw in the request content body"
+  set_fact:
+    missing_fixcat_updates_request_body: '{"zosmfuid":"{{ remote_zmf_user }}",
+ "zosmfpw":"{{ remote_zmf_password }}", "proxyuid":"{{ proxy_zmf_user }}", "proxypw":"{{ proxy_zmf_password }}"}'
+  when: remote_zmf_user is defined and remote_zmf_password is defined and proxy_zmf_user is defined and proxy_zmf_password is defined
+
+- name: "Set the zmf_port if specified"
+  set_fact:
+    zmf_host: '{{ zmf_host }}:{{ zmf_port }}'
+  when: zmf_port is defined and ':' not in zmf_host
+
+########################################################################################
+# URI MODULE #1: Start a missing fixcat updates async request for a software instance. #
+########################################################################################
+
+# Start the missing fixcat updates asynchronous operation.
+- name: "Determining the missing fixcat software updates for software instance <{{ software_instance_name }}>"
+  uri:
+    url: "https://{{ zmf_host }}/zosmf/swmgmt/swi/{{ system_nickname }}/{{ software_instance_name }}/missingfixcatupdates"
+    return_content: true
+    user: "{{ zmf_user | trim }}"
+    password: "{{ zmf_password | trim }}"
+    force_basic_auth: true
+    headers:
+      Host: "{{ zmf_host }}"
+      Origin: "https://{{ zmf_host }}"
+    method: POST
+    status_code: 202, 404
+    validate_certs: false
+    body_format: json
+    body: "{{ missing_fixcat_updates_request_body }}"
+  delegate_to: localhost
+  register: missing_fixcat_updates_response
+
+# Save the missing fixcat updates operation's response in a file.
+- name: Write the results for the missing fixcat updates operation to a JSON file
+  block:
+    # Create a variable for the missing fixcat updates status monitor URL.
+    - name: Set the missing fixcat updates status monitor URL
+      set_fact:
+        missing_fixcat_updates_status_monitor_url: "{{ missing_fixcat_updates_response.json['statusurl'] }}"
+      when: missing_fixcat_updates_response.status == 202
+
+    # Issue a failure message when user does not have the APAR with the report APIs installed on their system.
+    - name: Display Missing Fixcat Updates REST API failure information
+      fail:
+        msg: "There was an error encountered during Missing Fixcat Updates REST API execution. Its possible the host
+        system is missing required APAR PH47050 which contains the software instance report REST APIs. Otherwise the
+        specified software instance was not found. These are the failure
+        details: {{ missing_fixcat_updates_response.json }}"
+      when: missing_fixcat_updates_response.status == 404
+
+    # Issue a failure message and stop the playbook.
+    - name: Display the missing fixcat updates action failure information
+      fail:
+        msg: "Missing Fixcat Updates failure details: {{ missing_fixcat_updates_response }} "
+      when: missing_fixcat_updates_response.status != 202
+
+################################################################################
+# URI MODULE #2: Check the status of the missing fixcat updates async request. #
+################################################################################
+
+# Wait for the asynchronous thread to finish and return a response.
+- name: "Poll the status monitor URL of the missing fixcat updates operation every {{ async_thread_check_delay }}
+second(s) until it is finished or maximum {{ async_thread_check_times }} poll(s) reached"
+  uri:
+    url: "{{ missing_fixcat_updates_status_monitor_url }}"
+    method: GET
+    user: "{{ zmf_user | trim }}"
+    password: "{{ zmf_password | trim }}"
+    force_basic_auth: true
+    headers:
+      Host: "{{ zmf_host }}"
+      Origin: "https://{{ zmf_host }}"
+    status_code: 200
+    validate_certs: false
+    return_content: true
+  register: missing_fixcat_updates_response
+  delegate_to: localhost
+  # This task's URL will be called repeatedly either until the "until" condition is met (request failed or
+  # request completed) or the request still isn't finished after the specified "complete_check_times" attempts.
+  until: (missing_fixcat_updates_response is failed) or (missing_fixcat_updates_response.json['status'] == 'complete')
+  retries: "{{ async_thread_check_times }}"
+  delay: "{{ async_thread_check_delay }}"
+
+# Save the missing fixcat updates operation's response in a file.
+- name: Write the results for the missing fixcat updates operation to a JSON file
+  block:
+    # Perform the copy of the missing fixcat updates response to the file.
+    - name: "Copy the missing fixcat updates results to JSON file <{{ missing_fixcat_updates_response_file }}>"
+      copy:
+        content: '{{ missing_fixcat_updates_response.json | default("") | to_nice_json(indent=2) }}'
+        dest: '{{ missing_fixcat_updates_response_file }}'
+        mode: '0644'
+      delegate_to: localhost
+
+    # Save the response content into a local variable.
+    - name: Create a variable to hold the value of the missing fixcat updates results
+      set_fact:
+        missing_fixcat_updates_response_json: "{{ missing_fixcat_updates_response.json }}"
+
+# Show the path to the missing fixcat updates REST API results file.
+- name: Display the path to the file containing the results from the missing fixcat updates operation
+  debug:
+    msg: "Output filename= {{ missing_fixcat_updates_response_file }}"

@@ -1,0 +1,100 @@
+# Copyright (c) IBM Corporation 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+---
+# tasks file for zmf_cpm_create_software_instance
+
+- name: Instance record directory
+  include_tasks: instance_dir_util.yml
+  run_once: true
+
+- name: Read from json file path
+  set_fact:
+    instance_variable_record: "[]"
+  when: instance_var_json_path is not defined
+
+- name: "Read from json file path"
+  set_fact:
+    instance_variable_record: "{{ lookup('file', instance_var_json_path) | from_json }}"
+  when: instance_var_json_path is defined
+
+- name: Set instance_state as fact
+  set_fact:
+    instance_state: "provisioned"
+  when: instance_state is not defined
+
+# Allow zmf_cs_body to be set in previous tasks. If zmf_body isn't set then set default below
+
+- name: Set zmf_cs_body as fact
+  set_fact:
+    zmf_cs_body: '{
+      "system": "{{ system_name }}","sysplex": "{{ sysplex_name }}",
+      "registry-type": "general","external-name": "{{ external_name }}",
+      "type": "{{ software_type }}",
+      "vendor": "{{ vendor_name }}","version": "{{ product_version }}",
+      "description": "{{ instance_description }}","owner": "{{ instance_owner }}",
+      "provider": "{{ instance_provider }}","state": "{{ instance_state }}",
+      "actions": [ {"name" : "deprovision", "type": "instructions",
+             "instructions" : "perform this action to deprovision"} ],
+      "variables":{{ instance_variable_record }}
+      }'
+  when: zmf_cs_body is not defined
+
+- name: "Create instance {{ external_name }}"
+  uri:
+    url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/provisioning/rest/1.0/scr/"
+    return_content: true
+    user: "{{ zmf_user | trim }}"
+    password: "{{ zmf_password | trim }}"
+    force_basic_auth: true
+    headers:
+      Host: "{{ zmf_host }}"
+      Origin: "https://{{ zmf_host }}"
+    method: POST
+    status_code: "201"
+    validate_certs: false
+    body_format: json
+    body: "{{ zmf_cs_body }}"
+  delegate_to: localhost
+  register: create_results
+
+- name: Set full_instance_json as fact
+  set_fact:
+    full_instance_json: ""
+
+- name: Get provisioned instance information
+  uri:
+    url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/provisioning/rest/1.0/scr/{{ create_results.json['object-id'] }}"
+    method: GET
+    user: "{{ zmf_user | trim }}"
+    password: "{{ zmf_password | trim }}"
+    force_basic_auth: true
+    headers:
+      Host: "{{ zmf_host }}"
+      Origin: "https://{{ zmf_host }}"
+    status_code: "200"
+    validate_certs: false
+    return_content: true
+  register: full_instance_json
+  delegate_to: localhost
+
+- name: Update instance information
+  block:
+    - name: Update fully provisioned instance information to local
+      copy:
+        content: '{ "registry-info" : {{ full_instance_json.json | default("") | to_nice_json(indent=2) }}}'
+        dest: "{{ instance_record_dir }}/{{ inventory_hostname }}/{{ external_name }}-{{ create_results.json['object-name'] }}.json"
+        mode: '0644'
+      delegate_to: localhost
+
+    - name: Set variable for instance json file path
+      set_fact:
+        zosmf_instance_info: "{{ full_instance_json.json }}"
+        instance_info_json_path: "{{ instance_record_dir }}/{{ inventory_hostname }}/{{ external_name }}-\
+                                  {{ create_results.json['object-name'] }}.json"
+
+- name: Display instance record file path
+  debug:
+    msg: "Instance record saved at: {{ instance_record_dir }}/{{ inventory_hostname }}/{{ external_name }}-\
+          {{ create_results.json['object-name'] }}.json"
+  run_once: true

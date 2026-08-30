@@ -1,0 +1,50 @@
+---
+- name: Test cache options
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - block:
+        - name: Create imaginary VMs
+          servicenow.itsm.configuration_item:
+            name: my-vm-{{ item }}
+            sys_class_name: cmdb_ci_ec2_instance
+            ip_address: 10.1.0.{{ item }}
+            environment: production
+            other:
+              fqdn: f{{ item }}.example.com
+              guest_os_fullname: OS0
+              vm_inst_id: i{{ item }}
+          loop: "{{ range(101, 109) | list }}"
+          register: vms
+
+        - name: Reload inventory
+          ansible.builtin.meta: refresh_inventory
+        
+        - ansible.builtin.debug:
+            var: groups
+
+        - name: Make sure we have all expected groups
+          ansible.builtin.assert:
+            that:
+              - groups["all"] | length == 8
+        
+        - name: Reload inventory from cache
+          ansible.builtin.meta: refresh_inventory
+        
+        - ansible.builtin.debug:
+            var: groups
+
+        - name: Make sure we have all expected groups
+          ansible.builtin.assert:
+            that:
+              - groups["all"] | length == 8
+
+      always:
+        - name: Delete VMs
+          servicenow.itsm.configuration_item:
+            state: absent
+            sys_id: "{{ item.record.sys_id }}"
+          loop: "{{ vms.results }}"
+          loop_control:
+            label: "{{ item.record.name }}"

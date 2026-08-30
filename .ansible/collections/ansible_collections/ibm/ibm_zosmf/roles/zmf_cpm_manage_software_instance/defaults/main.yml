@@ -1,0 +1,12 @@
+# Copyright (c) IBM Corporation 2021
+
+---
+# defaults file for zmf_cpm_manage_software_instance
+
+# The value for property api_polling_retry_count identifies max times of status polling before task fail and exit
+api_polling_retry_count: 50
+# The value for property api_polling_interval_seconds identifies interval in seconds between each
+# api_polling_retry_count polling
+api_polling_interval_seconds: 10
+# The value for the zmf_port property identifies the port number that z/OSMF uses. Default port number is 443.
+zmf_port: 443

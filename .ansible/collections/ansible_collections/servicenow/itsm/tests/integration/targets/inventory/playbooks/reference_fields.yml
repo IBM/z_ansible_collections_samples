@@ -1,0 +1,77 @@
+---
+- name: Make sure we get back all and ungrouped groups by default
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - block:
+        - name: Create test location
+          servicenow.itsm.api:
+            resource: cmn_location
+            action: post
+            query_params:
+              sysparm_input_display_value: true
+            data:
+              city: "Some city"
+              street: "Some street"
+              name: "Name of location"
+              country: "Some country"
+          register: test_location
+
+        - name: Print created country
+          ansible.builtin.debug:
+            var: test_location.record.sys_id
+
+        - name: Create imaginary VMs
+          servicenow.itsm.configuration_item:
+            name: i{{ item }}
+            sys_class_name: cmdb_ci_ec2_instance
+            ip_address: 10.1.0.{{ item }}
+            environment: "{{ (item % 2 == 0) | ansible.builtin.ternary('development', 'production') }}"
+            other:
+              fqdn: f{{ item }}.example.com
+              guest_os_fullname: "{{ (item < 106) | ansible.builtin.ternary('OS0', 'OS1') }}"
+              vm_inst_id: i{{ item }}
+              location: "{{ test_location.record.sys_id }}"
+          loop: "{{ range(101, 103) | list }}"
+          register: vms
+
+        - name: Reload inventory
+          ansible.builtin.meta: refresh_inventory
+
+        - name: Print all hostvars
+          ansible.builtin.debug:
+            var: hostvars
+
+        - name: Check i101
+          ansible.builtin.assert:
+            that:
+              - hostvars.i101.inventory_hostname == "i101"
+              - hostvars.i101.ansible_host == "f101.example.com"
+              - hostvars.i101.street == "Some street"
+              - hostvars.i101.location_name == "Name of location"
+              - hostvars.i101.location == "Name of location"
+
+        - name: Check i107
+          ansible.builtin.assert:
+            that:
+              - hostvars.i102.inventory_hostname == "i102"
+              - hostvars.i102.ansible_host == "f102.example.com"
+              - hostvars.i102.street == "Some street"
+              - hostvars.i102.location_name == "Name of location"
+              - hostvars.i102.location == "Name of location"
+
+      always:
+        - name: Delete location
+          servicenow.itsm.api:
+            resource: cmn_location
+            action: delete
+            sys_id: "{{ test_location.record.sys_id }}"
+
+        - name: Delete VMs
+          servicenow.itsm.configuration_item:
+            state: absent
+            sys_id: "{{ item.record.sys_id }}"
+          loop: "{{ vms.results }}"
+          loop_control:
+            label: "{{ item.record.name }}"

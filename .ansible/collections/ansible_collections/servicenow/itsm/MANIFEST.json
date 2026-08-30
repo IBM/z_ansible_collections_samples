@@ -1,0 +1,35 @@
+{
+ "collection_info": {
+  "namespace": "servicenow",
+  "name": "itsm",
+  "version": "2.7.0",
+  "authors": [
+   "Cosmin Tupangiu <ctupangi@redhat.com>",
+   "Martin Jackson <mhjacks@redhat.com>",
+   "Abhijeet Kasurde <akasurde@redhat.com>",
+   "XLAB Steampunk <steampunk@xlab.si>"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "servicenow",
+   "application",
+   "infrastructure"
+  ],
+  "description": "Ansible Collection for interacting with ServiceNow ITSM",
+  "license": [],
+  "license_file": "LICENSE",
+  "dependencies": {},
+  "repository": "https://github.com/ansible-collections/servicenow.itsm",
+  "documentation": null,
+  "homepage": "https://github.com/ansible-collections/servicenow.itsm",
+  "issues": "https://github.com/ansible-collections/servicenow.itsm/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "6c92aa7990b808550be39df1ca558e8429895a98bd2b80cfca7172dfd376e8b5",
+  "format": 1
+ },
+ "format": 1
+}

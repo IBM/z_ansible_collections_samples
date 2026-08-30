@@ -1,0 +1,52 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: install apache via apt
+  apt:
+    name: "{{item}}"
+    state: present
+  when: "ansible_os_family == 'Debian'"
+  with_items:
+    - apache2
+    - libapache2-mod-evasive
+
+- name: install apache via zypper
+  community.general.zypper:
+    name: apache2
+    state: present
+  when: "ansible_os_family == 'Suse'"
+
+- name: test apache2_module
+  block:
+    - name: get list of enabled modules
+      shell: apache2ctl -M | sort
+      register: modules_before
+    - name: include only on supported systems
+      include: actualtest.yml
+  always:
+    - name: get list of enabled modules
+      shell: apache2ctl -M | sort
+      register: modules_after
+    - name: modules_before
+      debug:
+        var: modules_before
+    - name: modules_after
+      debug:
+        var: modules_after
+    - name: ensure that all test modules are disabled again
+      assert:
+        that: modules_before.stdout == modules_after.stdout
+  when: ansible_os_family in ['Debian', 'Suse']
+  # centos/RHEL does not have a2enmod/a2dismod
+
+- name: include misleading warning test
+  include: 635-apache2-misleading-warning.yml
+  when: ansible_os_family in ['Debian']
+  # Suse has mpm_event module compiled within the base apache2

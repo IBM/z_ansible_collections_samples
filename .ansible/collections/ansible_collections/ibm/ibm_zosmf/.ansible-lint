@@ -1,0 +1,4 @@
+skip_list:
+  - experimental
+  - name[template]
+  - fqcn[action-core]

@@ -1,0 +1,11 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+pytest==5.3.0
+pytest_mock==1.12.1
+mock==3.0.5
+ansible==2.9.6
+pytest-ansible==2.2.2
+oyaml==0.9
+shellescape==3.8.1
+pylint>=2.5

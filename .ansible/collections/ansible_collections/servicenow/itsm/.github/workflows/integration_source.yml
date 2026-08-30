@@ -1,0 +1,196 @@
+name: Integration tests, dependencies from source
+on:
+  workflow_call:
+    inputs:
+      collection_pre_install:
+        required: false
+        type: string
+        default: ""
+      matrix_exclude:
+        # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
+        # 2.14 supports Python 3.9-3.11
+        # 2.15 supports Python 3.9-3.11
+        # 2.16 supports Python 3.10-3.12
+        # https://docs.ansible.com/ansible/devel/roadmap/ROADMAP_2_17.html
+        # milestone is 2.17 until after 2.17 branches from devel
+        # devel is 2.17 until 2024-04-01
+        default: >-
+          [
+            {
+              "ansible-version": "stable-2.14",
+              "python-version": "3.12"
+            },
+            {
+              "ansible-version": "stable-2.15",
+              "python-version": "3.12"
+            },
+            {
+              "ansible-version": "stable-2.17",
+              "python-version": "3.9"
+            },
+            {
+              "ansible-version": "stable-2.17",
+              "python-version": "3.10"
+            },
+            {
+              "ansible-version": "milestone",
+              "python-version": "3.10"
+            },
+            {
+              "ansible-version": "devel",
+              "python-version": "3.10"
+            },
+          ]
+        required: false
+        type: string
+
+jobs:
+  integration_source:
+    env:
+      PY_COLORS: "1"
+      source_directory: "./source"
+      collection_base_dir: "/home/runner/collections"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible-version:
+          - stable-2.15
+          - stable-2.16
+          - stable-2.17
+          - milestone
+          - devel
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+        servicenow-version:
+          - "utah"
+          - "vancouver"
+          - "washington"
+          - "xanadu"
+        include:
+          - servicenow-version: "utah"
+            sn_host_secret: SN_HOST_UTAH
+            sn_username_secret: SN_USERNAME_UTAH
+            sn_password_secret: SN_PASSWORD_UTAH
+          - servicenow-version: "vancouver"
+            sn_host_secret: SN_HOST_VANCOUVER
+            sn_username_secret: SN_USERNAME_VANCOUVER
+            sn_password_secret: SN_PASSWORD_VANCOUVER
+          - servicenow-version: "washington"
+            sn_host_secret: SN_HOST_WASHINGTON
+            sn_username_secret: SN_USERNAME_WASHINGTON
+            sn_password_secret: SN_PASSWORD_WASHINGTON
+          - servicenow-version: "xanadu"
+            sn_host_secret: SN_HOST_XANADU
+            sn_username_secret: SN_USERNAME_XANADU
+            sn_password_secret: SN_PASSWORD_XANADU
+        exclude: ${{ fromJSON(inputs.matrix_exclude) }}
+    continue-on-error: ${{ matrix.ansible-version == 'devel' }}
+
+    name: "py${{ matrix.python-version }} / ${{ matrix.ansible-version }} / ${{ matrix.servicenow-version }}"
+    steps:
+      - name: Checkout the collection repository
+        uses: ansible-network/github_actions/.github/actions/checkout_dependency@main
+        with:
+          path: ${{ env.source_directory }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: "0"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install ansible-core (${{ matrix.ansible-version }})
+        run: python3 -m pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz --disable-pip-version-check
+
+      - name: Pre install collections dependencies first so the collection install does not
+        run: ansible-galaxy collection install --pre ${{ inputs.collection_pre_install }} -p ${{ env.collection_base_dir }}
+        if: inputs.collection_pre_install != ''
+
+      - name: Read collection metadata from galaxy.yml
+        id: identify
+        uses: ansible-network/github_actions/.github/actions/identify_collection@main
+        with:
+          source_path: ${{ env.source_directory }}
+
+      - name: Build and install the collection
+        uses: ansible-network/github_actions/.github/actions/build_install_collection@main
+        with:
+          install_python_dependencies: true
+          source_path: ${{ env.source_directory }}
+          collection_path: ${{ steps.identify.outputs.collection_path }}
+          tar_file: ${{ steps.identify.outputs.tar_file }}
+          ansible_version: ${{ matrix.ansible-version }}
+
+      - name: Print the ansible version
+        run: ansible --version
+
+      - name: Print the python dependencies
+        run: python3 -m pip list
+
+      - name: Create integration_config.yml
+        env:
+          SN_HOST: ${{ secrets[matrix.sn_host_secret] }}
+          SN_USERNAME: ${{ secrets[matrix.sn_username_secret] }}
+          SN_PASSWORD: ${{ secrets[matrix.sn_password_secret] }}
+        run: |
+          touch ${{ steps.identify.outputs.collection_path }}/tests/integration/integration_config.yml
+          echo "sn_host: '${{ env.SN_HOST }}'" >> ${{ steps.identify.outputs.collection_path }}/tests/integration/integration_config.yml
+          echo "sn_username: '${{ env.SN_USERNAME }}'" >> ${{ steps.identify.outputs.collection_path }}/tests/integration/integration_config.yml
+          echo "sn_password: '${{ env.SN_PASSWORD }}'" >> ${{ steps.identify.outputs.collection_path }}/tests/integration/integration_config.yml
+          echo "collection_base_dir: '${{ steps.identify.outputs.collection_path }}'" >> ${{ steps.identify.outputs.collection_path }}/tests/integration/integration_config.yml
+
+      - name: Run itsm_api integration tests
+        run: ansible-test integration itsm_api
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_api_generic integration tests
+        run: ansible-test integration itsm_api_generic
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_attachment integration tests
+        run: ansible-test integration itsm_attachment
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_attachment_info integration tests
+        run: ansible-test integration itsm_attachment_info
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_attachment_upload integration tests
+        run: ansible-test integration itsm_attachment_upload
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_change_request integration tests
+        run: ansible-test integration itsm_change_request
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_change_request_task integration tests
+        run: ansible-test integration itsm_change_request_task
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_change_request_with_mapping integration tests
+        run: ansible-test integration itsm_change_request_with_mapping
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_configuration_item integration tests
+        run: ansible-test integration itsm_configuration_item
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_configuration_item_batch integration tests
+        run: ansible-test integration itsm_configuration_item_batch
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+
+      - name: Run itsm_configuration_item_relations integration tests
+        run: ansible-test integration itsm_configuration_item_relations
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+      
+      - name: Run itsm_service_catalog_info integration tests
+        run: ansible-test integration itsm_service_catalog_info
+        working-directory: ${{ steps.identify.outputs.collection_path }}
+      
+      - name: Run itsm_service_catalog integration tests
+        run: ansible-test integration itsm_service_catalog
+        working-directory: ${{ steps.identify.outputs.collection_path }}

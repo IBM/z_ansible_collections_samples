@@ -1,0 +1,324 @@
+# Copyright (c) IBM Corporation 2026
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+DOCUMENTATION = r"""
+role: gather_diagnostics
+short_description: Gathers diagnostic data from z/OS managed nodes and the control node
+description:
+    - >
+      The B(gather_diagnostics) role gathers a comprehensive set of diagnostic facts
+      from both the z/OS managed node and the Ansible control node.
+    - >
+      B(Managed Node (z/OS):) Gathers ZOAU version, Python version, locale,
+      environment variables, user limits, pip packages, z/OS system facts,
+      OMVS segment, filesystem mount status, ZOAU APF attributes, and optionally
+      SSH configuration files and operator command output.
+    - >
+      B(Control Node:) Gathers Ansible version, SSH version, Ansible config,
+      locale, installed collections, environment, and system facts.
+    - >
+      This role can create separate YAML report files for the z/OS node
+      (C(gather_diagnostics_report_managed_node_<hostname>.yml)) and the control node
+      (C(gather_diagnostics_report_control.yml)) in the specified output directory.
+    - >
+      Facts are set on the respective hosts: C(gather_diagnostics_managed_results)
+      on the z/OS host and C(gather_diagnostics_control_results) on localhost.
+author:
+    - Rohitash Goyal (@Rohitcodes28)
+    - Ketan Kelkar (@ketankelkar)
+notes:
+    - >
+      When C(gather_diagnostics_gather_syslog) is C(True), the user must have operator authority
+      to execute MVS operator commands. If the user lacks authority, these tasks
+      will fail but the role will continue with other diagnostic gathering.
+    - >
+      SSH configuration file gathering (C(gather_diagnostics_gather_ssh_config)) is disabled by default
+      to avoid exposing sensitive security configurations. Enable only when needed
+      for troubleshooting SSH connectivity issues.
+    - >
+      Diagnostic files are written to the control node. By default, files are
+      saved to the home directory or AAP artifacts directory. Use C(gather_diagnostics_output_dir)
+      to specify an alternate location with sufficient disk space.
+options:
+    gather_diagnostics_gather_control:
+        description:
+            - >
+              Controls whether the role gathers diagnostic facts from the
+              Ansible control node.
+        required: False
+        type: bool
+        default: True
+    gather_diagnostics_gather_managed_node:
+        description:
+            - >
+              Controls whether the role gathers diagnostic facts from the
+              z/OS managed node.
+        required: False
+        type: bool
+        default: True
+    gather_diagnostics_save_control_log:
+        description:
+            - >
+              Controls whether the role creates a YAML report file for the
+              control node and hides sensitive data (C(no_log=true))
+              from the console for control node tasks.
+        required: False
+        type: bool
+        default: True
+    gather_diagnostics_save_managed_node_log:
+        description:
+            - >
+              Controls whether the role creates a YAML report file for the
+              z/OS managed node and hides sensitive data (C(no_log=true))
+              from the console for z/OS tasks.
+        required: False
+        type: bool
+        default: True
+    gather_diagnostics_gather_syslog:
+        description:
+            - >
+              Controls whether the role attempts to run authorized MVS operator
+              commands (C(D A,L), C(D OMVS,LIMITS), C(D OMVS,OPTIONS)) to gather
+              system activity. Requires operator authority.
+        required: False
+        type: bool
+        default: True
+    gather_diagnostics_gather_ssh_config:
+        description:
+            - >
+              Controls whether to gather contents of ~/.ssh/rc, /etc/ssh/sshrc,
+              /etc/ssh/ssh_config, and /etc/ssh/sshd_config from the z/OS managed node.
+        required: False
+        type: bool
+        default: False
+    gather_diagnostics_output_dir:
+        description:
+            - >
+              Directory where diagnostic report files are created.
+              In AAP, defaults to the artifacts directory. In standalone mode,
+              defaults to the control node's home directory.
+        required: False
+        type: str
+    gather_diagnostics_environment_vars:
+        description:
+            - >
+              Dictionary of environment variables to set for z/OS tasks.
+              Empty by default to allow test cases and playbooks to define their own.
+        required: False
+        type: dict
+        default: {}
+"""
+
+EXAMPLES = r"""
+- name: Run gather_diagnostics to gather z/OS and control node diagnostics (default)
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+
+- name: Run gather_diagnostics and print all sensitive data to console (no log file)
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+      vars:
+        gather_diagnostics_save_control_log: false
+        gather_diagnostics_save_managed_node_log: false
+
+- name: Run gather_diagnostics and not execute operator commands
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+      vars:
+        gather_diagnostics_gather_syslog: false
+
+- name: Run gather_diagnostics and collect SSH configuration files
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+      vars:
+        gather_diagnostics_gather_ssh_config: true
+
+- name: Run gather_diagnostics only for z/OS node diagnostics
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+      vars:
+        gather_diagnostics_gather_control: false
+
+- name: Run gather_diagnostics only for control node diagnostics
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+      vars:
+        gather_diagnostics_gather_managed_node: false
+
+- name: Run gather_diagnostics with custom output directory
+  hosts: zos_host
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: gather_diagnostics
+      vars:
+        gather_diagnostics_output_dir: /tmp/diagnostics
+"""
+
+# Roles don't return anything.
+# But RETURN block must be defined for doc extraction tooling to avoid error.
+# The content in RETURN block will not be display in doc-site.
+RETURN = r"""
+changed:
+    description: Indicates if any change is made during the role operation.
+    returned: always
+    type: bool
+gather_diagnostics_managed_results:
+    description: >
+        A fact set on the managed host containing all gathered diagnostic data.
+        This data is also written to a YAML file on the control node if
+        C(gather_diagnostics_save_managed_node_log) is C(True).
+    returned: always
+    type: dict
+    contains:
+        zoau_version:
+            description: The standard output of the `zoaversion -c` command.
+            type: str
+        zoau_version_stderr:
+            description: The standard error of the `zoaversion -c` command.
+            type: str
+        python_version:
+            description: The standard output from `python3 --version`.
+            type: str
+        python_version_stderr:
+            description: The standard error from `python3 --version`.
+            type: str
+        locale:
+            description: A list of locale settings from the `locale` command.
+            type: list
+        environment:
+            description: A list of environment variables from the `env` command.
+            type: list
+        zos_facts:
+            description: A dictionary of z/OS facts from `zos_gather_facts`.
+            type: dict
+        zos_facts_fallback:
+            description: The output of the `zinfo` fallback command. Returned if `zos_gather_facts` fails.
+            type: list
+        pip_list:
+            description: A list of installed packages from `python3 -m pip list`.
+            type: list
+        user_limits:
+            description: A list of user limits from the `ulimit -a` command.
+            type: list
+        omvs_segment:
+            description: The output of the `tsocmd "lu $(whoami) omvs"` command.
+            type: list
+        df_zoau_path:
+            description: The mount status of the ZOAU home directory from `df -P`.
+            type: list
+        zoau_bin_attributes:
+            description: The output of `ls -laE` on the ZOAU bin directory showing APF attributes.
+            type: list
+        df_python_path:
+            description: The mount status of the Python home directory from `df -P`.
+            type: list
+        operator_d_a_l:
+            description: >
+                The output of the MVS operator command `D A,L`,
+                or 'N/A' if C(gather_diagnostics_gather_syslog) is C(False).
+            type: list
+        operator_d_omvs_limits:
+            description: >
+                The output of the MVS operator command `D OMVS,LIMITS`,
+                or 'N/A' if C(gather_diagnostics_gather_syslog) is C(False).
+            type: list
+        operator_d_omvs_options:
+            description: >
+                The output of the MVS operator command `D OMVS,OPTIONS`,
+                or 'N/A' if C(gather_diagnostics_gather_syslog) is C(False).
+            type: list
+        ssh_rc_content:
+            description: >
+                The contents of ~/.ssh/rc file,
+                or 'N/A' if C(gather_diagnostics_gather_ssh_config) is C(False) or file doesn't exist.
+            type: list
+        etc_ssh_rc_content:
+            description: >
+                The contents of /etc/ssh/sshrc file,
+                or 'N/A' if C(gather_diagnostics_gather_ssh_config) is C(False) or file doesn't exist.
+            type: list
+        etc_ssh_config_content:
+            description: >
+                The contents of /etc/ssh/ssh_config file,
+                or 'N/A' if C(gather_diagnostics_gather_ssh_config) is C(False) or file doesn't exist.
+            type: list
+        etc_sshd_config_content:
+            description: >
+                The contents of /etc/ssh/sshd_config file,
+                or 'N/A' if C(gather_diagnostics_gather_ssh_config) is C(False) or file doesn't exist.
+            type: list
+
+gather_diagnostics_control_results:
+    description: >
+        A fact set on the control node containing all control node
+        diagnostic data. This data is also written to a YAML file on the
+        control node if C(gather_diagnostics_save_control_log) is C(True).
+    returned: when C(gather_diagnostics_gather_control) is C(True)
+    type: dict
+    contains:
+        ansible_version:
+            description: The output of the `ansible --version` command.
+            type: str
+        ssh_version:
+            description: The output of the `ssh -V` command.
+            type: str
+        ansible_config_all:
+            description: A list of all Ansible configuration settings from `ansible-config dump`.
+            type: list
+        ansible_config_changed:
+            description: A list of changed Ansible configuration settings from `ansible-config dump --only-changed`.
+            type: list
+        locale:
+            description: A list of locale settings from the control node.
+            type: list
+        collections:
+            description: A list of installed Ansible collections from `ansible-galaxy collection list`.
+            type: list
+        environment:
+            description: A list of environment variables from the control node.
+            type: list
+        control_facts:
+            description: A dictionary of facts from the control node gathered via `ansible.builtin.setup`.
+            type: dict
+"""

@@ -1,0 +1,357 @@
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  vars:
+    mapping:
+      incident:
+        impact:
+          1: "high"
+          2: "medium"
+          3: "low"
+        urgency:
+          1: "high"
+          2: "medium"
+          3: "low"
+        state:
+          1: "new"
+          2: "in_progress"
+          3: "on_hold"
+          6: "resolved"
+          7: "closed"
+          8: "canceled"
+        hold_reason:
+          "": ""
+          1: "awaiting_caller"
+          3: "awaiting_problem"
+          4: "awaiting_vendor"
+          5: "awaiting_change"
+        close_code:
+          "solved_unknown": "Solved Unknown"
+
+  block:
+    - name: Create incident choices
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: post
+        data:
+          name: incident
+          element: close_code
+          value: solved_unknown
+          label: Solved Unknown
+      register: incident_choices
+
+    - set_fact:
+        solved_remotely_choice: "{{ incident_choices.record.sys_id }}"
+
+    - name: Create test incident - check mode
+      servicenow.itsm.incident: &create-incident
+        incident_mapping: "{{ mapping.incident }}"
+        caller: admin
+        state: new
+        short_description: Test incident
+        impact: low
+        urgency: low
+        attachments:
+          - path: "{{ collection_base_dir }}/tests/integration/targets/itsm_incident_with_mapping/res/sample_file.txt"
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &create-incident-result
+        that:
+          - result is changed
+          - result.record.state == "new"
+          - result.record.impact == "low"
+          - result.record.urgency == "low"
+          - result.record.attachments | length != 0
+          - result.record.attachments[0].file_name == "sample_file.txt"
+
+    - name: Create test incident
+      servicenow.itsm.incident: *create-incident
+      register: test_result
+
+    - name: Copy test_result into result for assertion
+      set_fact:
+        result: "{{ test_result }}"
+
+    - ansible.builtin.assert: *create-incident-result
+
+
+    - name: Make sure incident exists
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "new"
+          - result.records[0].impact == "low"
+          - result.records[0].urgency == "low"
+
+
+    - name: Update incident with same urgency and impact - unchanged
+      servicenow.itsm.incident:
+        incident_mapping: "{{ mapping.incident }}"
+        caller: admin
+        number: "{{ test_result.record.number }}"
+        impact: low
+        urgency: low
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Update incident - check mode
+      servicenow.itsm.incident: &update-incident
+        incident_mapping: "{{ mapping.incident }}"
+        caller: admin
+        number: "{{ test_result.record.number }}"
+        state: in_progress
+        impact: high
+        urgency: high
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &update-incident-result
+        that:
+          - result is changed
+          - result.record.state == "in_progress"
+          - result.record.impact == "high"
+          - result.record.urgency == "high"
+
+
+    - name: Update incident
+      servicenow.itsm.incident: *update-incident
+
+    - ansible.builtin.assert: *update-incident-result
+
+
+    - name: Make sure incident was updated
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "in_progress"
+          - result.records[0].impact == "high"
+          - result.records[0].urgency == "high"
+
+
+    - name: Update incident with same params - unchanged
+      servicenow.itsm.incident: *update-incident
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Fail closing incident without required data
+      servicenow.itsm.incident:
+        incident_mapping: "{{ mapping.incident }}"
+        number: "{{ test_result.record.number }}"
+        state: closed
+      ignore_errors: true
+      register: result
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'close_code' in result.msg"
+          - "'close_notes' in result.msg"
+
+    - name: Update incident choices
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: post
+        data:
+          name: incident
+          element: close_code
+          value: 9
+          label: Solved Unknown
+      register: incident_choices
+
+    - set_fact:
+        solved_remotely_choice: "{{ incident_choices.record.sys_id }}"
+
+    - name: Update incident state - check mode
+      servicenow.itsm.incident: &update-incident-state
+        incident_mapping: "{{ mapping.incident }}"
+        caller: admin
+        number: "{{ test_result.record.number }}"
+        state: resolved
+        close_code: Solved Unknown
+        close_notes: Done testing
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &update-incident-state-result
+        that:
+          - result is changed
+          - result.record.state == "resolved"
+          - result.record.close_code == "Solved Unknown"
+          - result.record.close_notes == "Done testing"
+
+
+    - name: Update incident
+      servicenow.itsm.incident: *update-incident-state
+
+    - ansible.builtin.assert: *update-incident-state-result
+
+
+    - name: Get specific incident info by sysparm query
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        query:
+         - caller: = admin
+           number: = {{ test_result.record.number }}
+           state: = resolved
+           close_code: = Solved Unknown
+           close_notes: = Done testing
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 1
+          - result.records[0].caller_id != ""
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "resolved"
+          - result.records[0].close_code == "Solved Unknown"
+          - result.records[0].close_notes == "Done testing"
+
+
+    - name: Make sure incident state was updated
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].number == test_result.record.number
+          - result.records[0].state == "resolved"
+          - result.records[0].close_code == "Solved Unknown"
+          - result.records[0].close_notes == "Done testing"
+
+
+    - name: Get incident info by sysparm query - close_notes and state
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        query:
+         - close_notes: LIKE Done testing
+           state: = resolved
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].close_notes == "Done testing"
+          - result.records[0].state == "resolved"
+
+
+    - name: Update incident with same state - unchanged
+      servicenow.itsm.incident: *update-incident-state
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+    - name: Test bad parameter combinator (number + query)
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        number: "{{ test_result.record.number }}"
+        query:
+         - short_description: LIKE SAP
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'parameters are mutually exclusive: number|query' in result.msg"
+
+
+    - name: Test invalid operator detection
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        query:
+         - short_description: LIKEE SAP
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'Invalid condition' in result.msg"
+
+
+    - name: Get incident info by sysparm query - short_description
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        query:
+         - short_description: STARTSWITH Test
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - "'Test' in result.records[0].short_description"
+
+
+    - name: Test unary operator with argument detection
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        query:
+         - short_description: ISEMPTY SAP
+      ignore_errors: true
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is failed
+          - "'Operator ISEMPTY does not take any arguments' in result.msg"
+
+
+    - name: Delete incident choices
+      servicenow.itsm.api:
+        resource: sys_choice
+        action: delete
+        sys_id: "{{ solved_remotely_choice }}"
+
+
+    - name: Delete incident - check mode
+      servicenow.itsm.incident: &delete-incident
+        incident_mapping: "{{ mapping.incident }}"
+        caller: admin
+        number: "{{ test_result.record.number }}"
+        state: absent
+      check_mode: true
+      register: result
+
+    - ansible.builtin.assert: &delete-incident-result
+        that:
+          - result is changed
+
+
+    - name: Delete incident
+      servicenow.itsm.incident: *delete-incident
+
+    - ansible.builtin.assert: *delete-incident-result
+
+
+    - name: Make sure incident is absent
+      servicenow.itsm.incident_info:
+        incident_mapping: "{{ mapping.incident }}"
+        number: "{{ test_result.record.number }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 0

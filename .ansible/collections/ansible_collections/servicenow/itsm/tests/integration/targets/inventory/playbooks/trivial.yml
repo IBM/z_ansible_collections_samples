@@ -1,0 +1,11 @@
+---
+- name: Make sure we get back all and ungrouped groups by default
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - ansible.builtin.assert:
+        that:
+          - groups | length == 2
+          - "'all' in groups"
+          - "'ungrouped' in groups"

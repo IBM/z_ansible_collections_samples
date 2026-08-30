@@ -1,0 +1,67 @@
+# Copyright (c) IBM Corporation 2020, 2026
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+DOCUMENTATION = r"""
+role: job_status
+short_description: Query a job for status and execution state
+description:
+    - >-
+        The B(job_status) role queries a particular job with a given C(job_status_id) and parses the response
+        to return the job status and whether the job is currently running.
+author:
+    - Marcel Gutierrez (@AndreMarcel99)
+options:
+    job_status_id:
+        description:
+            - The job ID assigned to the target job.
+            - Expected format is C(STC), C(JOB), or C(TSU) followed by up to 5 digits,
+                or C(S), C(J), or C(T) followed by 7 digits for IDs over 99,999.
+            - Value can include the asterisk (C(*)) as a wildcard, but only job
+                information from the first match is returned.
+        required: True
+        type: str
+"""
+
+EXAMPLES = r"""
+- name: Query job status of job with ID 'STC00001'
+  hosts: sampleHost
+  gather_facts: no
+  collections:
+    - ibm.ibm_zos_core
+  tasks:
+    - include_role:
+        name: job_status
+      vars:
+        job_status_id: STC00001
+"""
+
+# Roles don't return anything.
+# But RETURN block must be defined for doc extraction tooling to avoid error.
+# The content in RETURN block will not be display in doc-site.
+RETURN = r"""
+changed:
+    description: Indicates if any change is made during the role operation.
+    returned: always
+    type: bool
+msg:
+    description: Two variables that contain the information return by the role.
+    returned: always
+    type: dict
+    contains:
+        job_status_is_active:
+            description: Boolean value that return if the job is running.
+            returned: always
+            type: bool
+        job_status_code:
+            description: Value of the current status of the job.
+            returned:
+            type: str
+"""

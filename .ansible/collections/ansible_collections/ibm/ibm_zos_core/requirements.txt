@@ -1,0 +1,9 @@
+################################################################################
+# © Copyright IBM Corporation 2021
+################################################################################
+# This file maintains a list of any python dependencies needed by this
+# Collection to run effectively on an Ansible controller.
+# At this time there are no python dependencies.
+# For more information on requirements files,
+# see https://pip.pypa.io/en/latest/user_guide/#requirements-files
+################################################################################

@@ -1,0 +1,207 @@
+---
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    - name: Register instance in ServiceNow
+      servicenow.itsm.configuration_item:
+        name: "{{ 'demo_ec2_' + lookup('password', '/dev/null chars=ascii_letters,digit length=8') | lower }}"
+        sys_class_name: cmdb_ci_ec2_instance
+        ip_address: 1.1.1.1
+        other:
+          vm_inst_id: 10
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci is changed
+          - ci.record.ip_address == "1.1.1.1"
+          - ci.record.vm_inst_id == "10"
+
+
+    - name: Update existing CMDB -- check mode --
+      servicenow.itsm.configuration_item_batch: &update_cmdb
+        sys_class_name: cmdb_ci_ec2_instance
+        id_column_set: vm_inst_id
+        dataset:
+          - instance_id: "{{ lookup('password', '/dev/null chars=ascii_letters,digit length=8') | lower }}"
+            public_ip_address: 10.10.10.10
+            tags:
+              Name: instance_10
+        map:
+          vm_inst_id: instance_id
+          ip_address: public_ip_address
+          name: tags.Name
+      check_mode: true
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci is changed
+
+    - name: Update existing CMDB
+      servicenow.itsm.configuration_item_batch: *update_cmdb
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci is changed
+
+
+    - name: Configuration item info
+      servicenow.itsm.configuration_item_info:
+        sys_class_name: cmdb_ci_ec2_instance
+        query:
+          - vm_inst_id: "= {{ ci.records_raw[0].vm_inst_id }}"
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci.records[0].ip_address == "10.10.10.10"
+          - ci.records[0].name == "instance_10"
+
+
+    - name: Delete a configuration item
+      servicenow.itsm.configuration_item:
+        sys_id: "{{ ci.records[0].sys_id }}"
+        state: absent
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed
+
+
+    - name: Update CMDB with data from AWS
+      servicenow.itsm.configuration_item_batch: &state_check_params
+        sys_class_name: cmdb_ci_ec2_instance
+        id_column_set: vm_inst_id
+        dataset:
+          - instance_id: "{{ lookup('password', '/dev/null chars=ascii_letters,digit length=8') | lower }}"
+            public_ip_address: 1.2.3.4
+            tags:
+              Name: my_name
+          - instance_id: "{{ lookup('password', '/dev/null chars=ascii_letters,digit length=8') | lower }}"
+            public_ip_address: 4.3.2.1
+            tags:
+              Name: other_name
+        map:
+          vm_inst_id: instance_id
+          ip_address: public_ip_address
+          name: tags.Name
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci is changed
+
+
+    - name: Configuration item info
+      servicenow.itsm.configuration_item_info:
+        sys_class_name: cmdb_ci_ec2_instance
+        query:
+          - vm_inst_id: "= {{ ci.records_raw[0].vm_inst_id }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 1
+          - result.records[0].ip_address in ('1.2.3.4','4.3.2.1') 
+    
+    - name: Configuration item info
+      servicenow.itsm.configuration_item_info:
+        sys_class_name: cmdb_ci_ec2_instance
+        query:
+          - vm_inst_id: "= {{ ci.records_raw[1].vm_inst_id }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 1
+          - result.records[0].ip_address in ('1.2.3.4','4.3.2.1') 
+
+
+    - name: Update CMDB with different data
+      servicenow.itsm.configuration_item_batch:
+        sys_class_name: cmdb_ci_ec2_instance
+        id_column_set: vm_inst_id
+        dataset:
+          - instance_id: "{{ ci.records_raw[0].vm_inst_id }}"
+            public_ip_address: 1.1.1.1
+            tags:
+              Name: my_name
+          - instance_id: "{{ ci.records_raw[1].vm_inst_id }}"
+            public_ip_address: 2.2.2.2
+            tags:
+              Name: other_name
+        map:
+          vm_inst_id: instance_id | string
+          ip_address: public_ip_address
+          name: tags.Name
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci is changed
+
+
+    - name: Configuration item info
+      servicenow.itsm.configuration_item_info:
+        sys_class_name: cmdb_ci_ec2_instance
+        query:
+          - vm_inst_id: "= {{ ci.records_raw[0].vm_inst_id }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 1
+          - result.records[0].ip_address in ('1.1.1.1','2.2.2.2') 
+
+
+    - name: Delete a configuration item
+      servicenow.itsm.configuration_item:
+        sys_id: "{{ result.records[0].sys_id }}"
+        state: absent
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed
+    
+    - name: Configuration item info
+      servicenow.itsm.configuration_item_info:
+        sys_class_name: cmdb_ci_ec2_instance
+        query:
+          - vm_inst_id: "= {{ ci.records_raw[1].vm_inst_id }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length == 1
+          - result.records[0].ip_address in ('1.1.1.1','2.2.2.2') 
+
+
+    - name: Delete a configuration item
+      servicenow.itsm.configuration_item:
+        sys_id: "{{ result.records[0].sys_id }}"
+        state: absent
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result is changed
+
+
+    - name: Configuration item info
+      servicenow.itsm.configuration_item_info:
+        sys_class_name: cmdb_ci_ec2_instance
+        query:
+          - vm_inst_id: "= {{ ci.records_raw[0].vm_inst_id }}"
+          - vm_inst_id: "= {{ ci.records_raw[1].vm_inst_id }}"
+      register: ci
+
+    - ansible.builtin.assert:
+        that:
+          - ci.records | length == 0

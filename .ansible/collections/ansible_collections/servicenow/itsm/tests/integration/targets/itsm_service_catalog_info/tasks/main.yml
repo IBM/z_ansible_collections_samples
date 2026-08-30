@@ -1,0 +1,71 @@
+---
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    - name: Get all catalogs
+      servicenow.itsm.service_catalog_info:
+      register: catalogs
+
+    - debug: var=catalogs
+    - ansible.builtin.assert:
+        that:
+          - catalogs | length > 1
+    
+    - name: Get one catalog only
+      servicenow.itsm.service_catalog_info:
+        categories: true
+        sys_id: "{{ catalogs.records[0].sys_id }}"
+      register: catalog
+
+    - ansible.builtin.assert:
+        that:
+          - catalog.records | length == 1
+          - catalog.records[0].categories | length > 0
+          - catalog.records[0].sn_items | length == 0
+    
+    - name: Get one catalog with categories and items
+      servicenow.itsm.service_catalog_info:
+        categories: true
+        items_info: brief
+        sys_id: "{{ catalogs.records[0].sys_id }}"
+      register: catalog
+
+    - ansible.builtin.assert:
+        that:
+          - catalog.records | length == 1
+          - catalog.records[0].categories | length > 0
+          - catalog.records[0].sn_items is defined
+          - catalog.records[0].sn_items | length > 0
+    
+    - name: Get one catalog with item filtered -- should return none --
+      servicenow.itsm.service_catalog_info:
+        categories: false
+        items_info: brief
+        items_query: some_not_existent_field
+        sys_id: "{{ catalogs.records[0].sys_id }}"
+      register: catalog
+
+    - ansible.builtin.assert:
+        that:
+          - catalog.records | length == 1
+          - catalog.records[0].categories | length == 0
+          - catalog.records[0].sn_items is defined
+          - catalog.records[0].sn_items | length == 0
+    
+    - name: Get one catalog with categoies and items -- full info --
+      servicenow.itsm.service_catalog_info:
+        categories: true
+        items_info: full
+        sys_id: "{{ catalogs.records[0].sys_id }}"
+      register: catalog
+
+    - ansible.builtin.assert:
+        that:
+          - catalog.records | length == 1
+          - catalog.records[0].categories | length > 0
+          - catalog.records[0].sn_items is defined
+          - catalog.records[0].sn_items | length > 0
+          - catalog.records[0].sn_items[0].variables | length > 0

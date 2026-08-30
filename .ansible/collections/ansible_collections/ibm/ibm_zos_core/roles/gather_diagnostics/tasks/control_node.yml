@@ -1,0 +1,136 @@
+# Copyright (c) IBM Corporation 2026
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+- name: "CONTROL | Gather Ansible version"
+  ansible.builtin.command: ansible --version
+  register: gather_diagnostics_control_ansible_version
+  changed_when: false
+  ignore_errors: true
+
+- name: "CONTROL | Gather SSH client version"
+  ansible.builtin.command: ssh -V
+  register: gather_diagnostics_control_ssh_version
+  changed_when: false
+  ignore_errors: true
+
+- name: "CONTROL | Gather Ansible config (all)"
+  ansible.builtin.command: ansible-config dump
+  register: gather_diagnostics_control_ansible_config_dump
+  changed_when: false
+  ignore_errors: true
+
+- name: "CONTROL | Gather Ansible config (only changed)"
+  ansible.builtin.command: ansible-config dump --only-changed
+  register: gather_diagnostics_control_ansible_config_changed
+  changed_when: false
+  ignore_errors: true
+
+- name: "CONTROL | Gather system locale"
+  ansible.builtin.command: locale
+  register: gather_diagnostics_control_locale
+  changed_when: false
+  ignore_errors: true
+
+- name: "CONTROL | List installed Ansible collections"
+  ansible.builtin.command: ansible-galaxy collection list
+  register: gather_diagnostics_control_galaxy_list
+  changed_when: false
+  ignore_errors: true
+
+- name: "CONTROL | Gather environment variables"
+  ansible.builtin.command: env
+  register: gather_diagnostics_control_env
+  changed_when: false
+  ignore_errors: true
+  no_log: "{{ not gather_diagnostics_save_control_log }}"
+
+- name: "CONTROL | Gather Ansible facts"
+  ansible.builtin.setup:
+  register: gather_diagnostics_control_setup_facts
+  ignore_errors: true
+
+# --- DISPLAY CONTROL NODE RESULTS ---
+
+- name: "CONTROL | Ansible Version"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_ansible_version.stdout
+  when: gather_diagnostics_control_ansible_version.stdout is defined
+
+- name: "CONTROL | SSH Version"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_ssh_version.stderr
+  when: gather_diagnostics_control_ssh_version.stderr is defined
+
+- name: "CONTROL | Ansible Config (all)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_ansible_config_dump.stdout_lines
+  when: gather_diagnostics_control_ansible_config_dump.stdout_lines is defined
+
+- name: "CONTROL | Ansible Config (changed only)"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_ansible_config_changed.stdout_lines
+  when: gather_diagnostics_control_ansible_config_changed.stdout_lines is defined
+
+- name: "CONTROL | Locale"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_locale.stdout_lines
+  when: gather_diagnostics_control_locale.stdout_lines is defined
+
+- name: "CONTROL | Collections"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_galaxy_list.stdout_lines
+  when: gather_diagnostics_control_galaxy_list.stdout_lines is defined
+
+- name: "CONTROL | Environment"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_env.stdout_lines
+  when: gather_diagnostics_control_env.stdout_lines is defined
+  no_log: "{{ not gather_diagnostics_save_control_log }}"
+
+- name: "CONTROL | Core Facts"
+  ansible.builtin.debug:
+    var: gather_diagnostics_control_setup_facts.ansible_facts
+  when: gather_diagnostics_control_setup_facts.ansible_facts is defined
+
+# --- LOG FILE GENERATION ---
+
+- name: "CONTROL | Consolidate all results into one variable"
+  ansible.builtin.set_fact:
+    gather_diagnostics_control_results:
+      ansible_version: "{{ gather_diagnostics_control_ansible_version.stdout | default('N/A') }}"
+      ssh_version: "{{ gather_diagnostics_control_ssh_version.stderr | default('N/A') }}"
+      ansible_config_all: "{{ gather_diagnostics_control_ansible_config_dump.stdout_lines | default('N/A') }}"
+      ansible_config_changed: "{{ gather_diagnostics_control_ansible_config_changed.stdout_lines | default('N/A') }}"
+      locale: "{{ gather_diagnostics_control_locale.stdout_lines | default('N/A') }}"
+      collections: "{{ gather_diagnostics_control_galaxy_list.stdout_lines | default('N/A') }}"
+      environment: "{{ gather_diagnostics_control_env.stdout_lines | default('N/A') }}"
+      control_facts: "{{ gather_diagnostics_control_setup_facts.ansible_facts | default('N/A') }}"
+  no_log: "{{ not gather_diagnostics_save_control_log }}"
+
+- name: "CONTROL | Ensure output directory exists"
+  ansible.builtin.file:
+    path: "{{ gather_diagnostics_output_dir }}"
+    state: directory
+    mode: '0755'
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  when: (gather_diagnostics_control_results is defined) and gather_diagnostics_save_control_log
+
+- name: "CONTROL | Save control node results to a YAML file"
+  ansible.builtin.copy:
+    dest: "{{ gather_diagnostics_output_dir }}/gather_diagnostics_report_control.yml"
+    content: "{{ gather_diagnostics_control_results | to_nice_yaml }}"
+    mode: '0644'
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  when: (gather_diagnostics_control_results is defined) and gather_diagnostics_save_control_log
+
+# Made with Bob

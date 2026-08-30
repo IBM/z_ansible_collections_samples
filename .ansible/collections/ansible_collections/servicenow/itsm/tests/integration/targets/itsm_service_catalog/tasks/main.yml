@@ -1,0 +1,131 @@
+---
+- environment:
+    SN_HOST: "{{ sn_host }}"
+    SN_USERNAME: "{{ sn_username }}"
+    SN_PASSWORD: "{{ sn_password }}"
+
+  block:
+    - name: Set fact user passowrd
+      ansible.builtin.set_fact:
+        password: "demo_password"
+
+    - name: Create random user
+      servicenow.itsm.api:
+        resource: sys_user
+        action: post
+        query_params:
+          sysparm_input_display_value: true
+        data:
+          user_name: "{{ 'demo_username_' + lookup('password', '/dev/null chars=ascii_letters,digit length=8') | lower }}"
+          user_password: "{{ password }}"
+          first_name: "first_name"
+          last_name: Demouser
+          department: IT
+          email: "demo_username@example.com"
+          title: Demo user
+      register: user
+
+    - name: Get all catalogs
+      servicenow.itsm.service_catalog_info:
+      environment:
+        SN_USERNAME: "{{ user.record.user_name }}"
+        SN_PASSWORD: "{{ password }}"
+      register: catalogs
+
+    - ansible.builtin.set_fact:
+        service_catalog: "{{ item }}"
+      when: item.title == "Service Catalog"
+      loop: "{{ catalogs.records }}"
+
+    - name: Get Service Catalog with item filter
+      servicenow.itsm.service_catalog_info:
+        categories: false
+        items_info: full
+        items_query: New Email Account
+        sys_id: "{{ service_catalog.sys_id }}"
+      environment:
+        SN_USERNAME: "{{ user.record.user_name }}"
+        SN_PASSWORD: "{{ password }}"
+      register: result
+        
+    - debug:
+        var: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records | length > 0
+        
+    - name: Create new email account
+      servicenow.itsm.service_catalog:
+        action: order_now
+        items:
+          - sys_id: "{{ result.records[0].sn_items[0].sys_id }}"
+            requested_for: abraham.lincoln
+            variables:
+              new_email: test@example.com
+      environment:
+        SN_USERNAME: "{{ user.record.user_name }}"
+        SN_PASSWORD: "{{ password }}"
+      register: email_request
+
+    - ansible.builtin.assert:
+        that:
+          - email_request is defined
+
+    - name: Get Service Catalog Ipad items
+      servicenow.itsm.service_catalog_info:
+        categories: false
+        items_info: full
+        items_query: Ipad
+        sys_id: "{{ service_catalog.sys_id }}"
+      environment:
+        SN_USERNAME: "{{ user.record.user_name }}"
+        SN_PASSWORD: "{{ password }}"
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.records[0].sn_items | length > 0
+
+    - name: Add 2 Ipads to cart and check it out
+      servicenow.itsm.service_catalog:
+        action: checkout
+        items:
+          - sys_id: "{{ result.records[0].sn_items[0].sys_id }}"
+            requested_for: abraham.lincoln
+            quantity: 2
+      environment:
+        SN_USERNAME: "{{ user.record.user_name }}"
+        SN_PASSWORD: "{{ password }}"
+      register: ipad_request
+
+    - debug: var=ipad_request
+
+    - ansible.builtin.assert:
+        that:
+          - ipad_request is defined
+
+    - name: Add 2 Ipads to cart and submit the order
+      servicenow.itsm.service_catalog:
+        action: submit_order
+        items:
+          - sys_id: "{{ result.records[0].sn_items[0].sys_id }}"
+            requested_for: abraham.lincoln
+            quantity: 2
+      environment:
+        SN_USERNAME: "{{ user.record.user_name }}"
+        SN_PASSWORD: "{{ password }}"
+      register: ipad_request_2
+
+    - debug: var=ipad_request_2
+
+    - ansible.builtin.assert:
+        that:
+          - ipad_request_2 is defined
+
+  always:
+    - name: Delete user
+      servicenow.itsm.api:
+        resource: sys_user
+        action: delete
+        sys_id: "{{ user.record.sys_id }}"
