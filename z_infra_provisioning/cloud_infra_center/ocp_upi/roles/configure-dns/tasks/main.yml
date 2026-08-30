@@ -133,7 +133,7 @@
   become_method: ansible.builtin.sudo
   ansible.posix.firewalld:
     permanent: true
-    service: dns
+    ansible.builtin.service: dns
     state: enabled
     zone: "{{ item }}"
   with_items:

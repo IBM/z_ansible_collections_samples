@@ -71,14 +71,12 @@
     - vm_type == "kvm"
     - volume_type_id is not defined
 
-
 - name: 'Convert storage node flavor from value into number'
   ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
   register: storage_flavor_size
   when:
     - disk_type == "scsi"
-
 
 - name: 'Create storage boot volume'
   openstack.cloud.volume:

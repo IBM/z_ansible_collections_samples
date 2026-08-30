@@ -44,7 +44,6 @@
   ansible.builtin.command:
     cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_worker }} "
 
-
 - name: 'Create the storage security group'
   openstack.cloud.security_group:
     name: "{{ os_sg_storage }}"

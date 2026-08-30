@@ -103,7 +103,7 @@
     - vm_type == "zvm"
   register: create_master
   failed_when:
-    - create_master.failed == true
+    - create_master.failed is true
     - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master | string'
 
 - name: 'Convert master flavor from value into number'
@@ -143,7 +143,7 @@
     - volume_type_id is not defined
   register: create_master
   failed_when:
-    - create_master.failed == true
+    - create_master.failed is true
     - '"ValueError: dictionary update sequence element #0 has length 1; 2 is required" not in create_master | string'
 
 - name: Create control boot volume

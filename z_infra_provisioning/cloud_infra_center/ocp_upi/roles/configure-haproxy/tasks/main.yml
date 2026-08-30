@@ -56,7 +56,7 @@
   become_user: root
   become_method: ansible.builtin.sudo
   ansible.posix.firewalld:
-    service: http
+    ansible.builtin.service: http
     permanent: true
     zone: public
     state: enabled
@@ -68,7 +68,7 @@
   become_user: root
   become_method: ansible.builtin.sudo
   ansible.posix.firewalld:
-    service: http
+    ansible.builtin.service: http
     permanent: true
     zone: internal
     state: enabled
@@ -80,7 +80,7 @@
   become_user: root
   become_method: ansible.builtin.sudo
   ansible.posix.firewalld:
-    service: https
+    ansible.builtin.service: https
     permanent: true
     zone: public
     state: enabled
@@ -92,7 +92,7 @@
   become_user: root
   become_method: ansible.builtin.sudo
   ansible.posix.firewalld:
-    service: https
+    ansible.builtin.service: https
     permanent: true
     zone: internal
     state: enabled

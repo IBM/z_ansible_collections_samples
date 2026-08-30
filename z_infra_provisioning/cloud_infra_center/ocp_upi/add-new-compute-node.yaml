@@ -234,7 +234,7 @@
 - hosts: localhost
   tasks:
     - name: 'Get new worker name list'
-      command: /usr/bin/python3
+      ansible.builtin.command: /usr/bin/python3
       args:
         stdin: |
           import yaml
@@ -251,12 +251,11 @@
 - hosts: bastion
   tasks:
     - name: Modify dns & haproxy on bastion
-      include_tasks: modify-bastion.yaml
+      ansible.builtin.include_tasks: modify-bastion.yaml
       vars:
         worker_name: "{{ item.split(':')[0] }}"
         worker_ip: "{{ item.split(':')[-1] }}"
         cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
       with_items: "{{ hostvars['localhost']['workers_list'] }}"
       when:
-        - use_internal_bastion == true
-
+        - use_internal_bastion is true

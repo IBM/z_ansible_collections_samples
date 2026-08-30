@@ -71,14 +71,12 @@
     - vm_type == "kvm"
     - volume_type_id is not defined
 
-
 - name: 'Convert infra node flavor from value into number'
   ansible.builtin.command:
     cmd: "openstack flavor show {{ os_flavor_infra }} -c disk -f value"
   register: infra_flavor_size
   when:
     - disk_type == "scsi"
-
 
 - name: 'Create infra boot volume'
   openstack.cloud.volume:
