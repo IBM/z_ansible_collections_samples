@@ -14,7 +14,7 @@
   ansible.builtin.script: tools/modify-bastion.py
   args:
     executable: python3
-    
+
 - name: 'Get Nodes IP, MAC address and store into yaml file'
   ansible.builtin.script: tools/modify-dhcp.py
   args:

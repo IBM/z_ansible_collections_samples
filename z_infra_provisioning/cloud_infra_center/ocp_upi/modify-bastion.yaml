@@ -78,7 +78,7 @@
   ansible.builtin.service:
     name: named-chroot
     state: started
-    
+
 - name: Restart HAProxy.service
   ansible.builtin.service:
     name: haproxy.service

@@ -12,7 +12,7 @@
   vars:
     workerid: "{{ item.1 }}-{{ item.0 }}"
     worker_type: "storage"
-  when: os_storage_nodes_number > 0 
+  when: os_storage_nodes_number > 0
   with_indexed_items: "{{ [os_storage_server_name] * os_storage_nodes_number }}"
 
 - name: 'Update infra node label and taint'
@@ -20,5 +20,5 @@
   vars:
     workerid: "{{ item.1 }}-{{ item.0 }}"
     worker_type: "infra"
-  when: os_infra_nodes_number > 0 
+  when: os_infra_nodes_number > 0
   with_indexed_items: "{{ [os_infra_server_name] * os_infra_nodes_number }}"
