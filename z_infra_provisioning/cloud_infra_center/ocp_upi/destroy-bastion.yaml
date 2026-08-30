@@ -24,15 +24,15 @@
   gather_facts: false
   tasks:
     - name: 'Check whether use internal bastion'
-      set_fact:
+      ansible.builtin.set_fact:
         use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
 
     - name: 'Set fact of domain info'
-      set_fact:
+      ansible.builtin.set_fact:
         cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
 
     - name: 'Validate master exits'
-      ansible.builtin.shell: | 
+      ansible.builtin.shell: |
         count=$(grep -c 'master' /var/named/{{ cluster_domain_name  }}.zone)
         echo $count
       register: master_exists_count
@@ -47,25 +47,25 @@
       with_items: "{{ master_ln.stdout_lines }}"
       when:
         - master_exists_count.stdout | int > 0
-        - use_internal_bastion == true
+        - use_internal_bastion is true
 
     - name: Remove bastion dns info with masters
       ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /var/named/{{ cluster_domain_name  }}.zone
       with_items: "{{ master_ln.stdout_lines }}"
       when:
         - master_exists_count.stdout | int > 0
-        - use_internal_bastion == true
+        - use_internal_bastion is true
 
     - name: 'Check whether use internal bastion'
-      set_fact:
+      ansible.builtin.set_fact:
         use_internal_bastion: "{{ hostvars['localhost']['use_internal_bastion'] }}"
 
     - name: 'Set fact of domain info'
-      set_fact:
+      ansible.builtin.set_fact:
         cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
 
     - name: 'Validate worker exits'
-      ansible.builtin.shell: | 
+      ansible.builtin.shell: |
         count=$(grep -c 'worker' /var/named/{{ cluster_domain_name  }}.zone)
         echo $count
       register: worker_exist_count
@@ -80,7 +80,7 @@
       with_items: "{{ worker_ln.stdout_lines }}"
       when:
         - worker_exist_count.stdout | int > 0
-        - use_internal_bastion == true
+        - use_internal_bastion is true
 
     - name: Remove bastion dns info with workers
       ansible.builtin.shell: sed -i '/{{ item.split(' ')[0] }}/d' /var/named/{{ cluster_domain_name  }}.zone

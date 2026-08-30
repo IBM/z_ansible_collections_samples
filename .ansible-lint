@@ -16,6 +16,29 @@ exclude_paths:
   - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-compute-nodes.yaml
   - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-control-plane.yaml
 
+  # OCP UPI roles/playbooks that depend on openstack.cloud collection (not installed in CI)
+  # or reference common.yaml task files that do not exist in the repository
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/add-new-compute-node.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-bootstrap.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-controls.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-network.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-volumes.yaml
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-bootstrap-kvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-bootstrap-zvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-compute-nodes-kvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-compute-nodes-zvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-control-plane-kvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-control-plane-zvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-infra-nodes-kvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-infra-nodes-zvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-installer-rhcos/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-network/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-node-labels/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-pre-check/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-security-groups/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-storage-nodes-kvm/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-storage-nodes-zvm/
+
 skip_list:
   - args[module]
   - command-instead-of-module

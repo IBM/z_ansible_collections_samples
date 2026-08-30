@@ -26,7 +26,7 @@
 ---
 - name: Copy cluster-template.yaml file to bastion
   hosts: bastion
-  gather_facts: no
+  gather_facts: false
   vars:
     local_yaml_file: ./cluster-template.yaml
     remote_yaml_file: /tmp/cluster-template.yaml
@@ -35,26 +35,26 @@
 
   tasks:
     - name: Copy the YAML file from localhost to hostA
-      copy:
+      ansible.builtin.copy:
         src: "{{ local_yaml_file }}"
         dest: "{{ remote_yaml_file }}"
       delegate_to: localhost
-      
+
     - name: Read the YAML file on hostA
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ remote_yaml_file }}"
       register: yaml_file_content
 
     - name: Parse YAML content
-      set_fact:
+      ansible.builtin.set_fact:
         yaml_data: "{{ yaml_file_content.content | b64decode | from_yaml }}"
 
     - name: Extract worker names under infra
-      set_fact:
+      ansible.builtin.set_fact:
         worker_names: "{{ yaml_data.cluster_nodes.infra.keys() | list }}"
 
     - name: Print worker names
-      debug:
+      ansible.builtin.debug:
         msg: "Worker names: {{ worker_names }}"
 
     - name: 'Add new worker to ocp4-router-http'
@@ -84,5 +84,3 @@
       ansible.builtin.service:
         name: haproxy
         state: started
-
-  

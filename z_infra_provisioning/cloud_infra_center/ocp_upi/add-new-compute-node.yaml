@@ -247,7 +247,7 @@
     - set_fact:
         workers_list: "{{ item.split(',') }}"
       with_items: "{{ works_list_results.stdout_lines }}"
-  
+
 - hosts: bastion
   tasks:
     - name: Modify dns & haproxy on bastion
@@ -256,7 +256,7 @@
         worker_name: "{{ item.split(':')[0] }}"
         worker_ip: "{{ item.split(':')[-1] }}"
         cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
-      with_items: "{{ hostvars['localhost']['workers_list'] }}" 
+      with_items: "{{ hostvars['localhost']['workers_list'] }}"
       when:
         - use_internal_bastion == true
 
