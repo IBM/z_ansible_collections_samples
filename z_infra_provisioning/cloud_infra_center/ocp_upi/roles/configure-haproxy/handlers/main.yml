@@ -19,7 +19,7 @@
 - name: Turn on haproxy_connect_any
   become: true
   become_user: root
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.posix.seboolean:
     name: haproxy_connect_any
     state: true
@@ -29,7 +29,7 @@
 - name: Restart haproxy
   become: true
   become_user: root
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.builtin.service:
     name: haproxy.service
     state: restarted
@@ -39,7 +39,7 @@
 - name: Restart firewalld.service
   become: true
   become_user: root
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.builtin.service:
     name: firewalld.service
     state: restarted

@@ -80,7 +80,3 @@ skip_list:
   - yaml[too-many-spaces]
   - yaml[trailing-spaces]
   - yaml[truthy]
-
-warn_list:
-  - syntax-check[unknown-module]
-  - syntax-check[specific]
