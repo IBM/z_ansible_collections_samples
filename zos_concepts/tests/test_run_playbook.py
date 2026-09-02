@@ -6,7 +6,8 @@
 # Requirements
 # ------------
 # - ibm.ibm_zos_core collection (>= 2.0.0) must be installed locally.
-# - Update the inventory files with your z/OS system configuration variables.
+# - Supply inventory files with your z/OS system configuration variables to
+#   _INVENTORIES_DEFAULT and _INVENTORIES_DATA_TRANSFER variables.
 #
 # Run pytest
 # ------------
@@ -37,6 +38,7 @@ _FILE_GENERATION_PLAYBOOKS =  {
 }
 
 _INVENTORIES_DEFAULT = _TEST_DIR / "inventories"
+# Data transfer playbooks use different inventory file variables
 _INVENTORIES_DATA_TRANSFER = _TEST_DIR / "inventories_data_transfer"
 _INVENTORY_OVERRIDES: dict[Path, Path] = {
     _ZOS_CONCEPTS_DIR / "data_transfer" / "archive_copy_unarchive_restore": _INVENTORIES_DATA_TRANSFER,

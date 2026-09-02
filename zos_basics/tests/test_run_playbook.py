@@ -6,7 +6,8 @@
 # Requirements
 # ------------
 # - ibm.ibm_zos_core collection (>= 2.0.0) must be installed locally.
-# - Update the inventory files with your z/OS system configuration variables.
+# - Supply inventory files with your z/OS system configuration variables to
+#   _INVENTORIES_DEFAULT variables.
 #
 # Run pytest
 # ------------
