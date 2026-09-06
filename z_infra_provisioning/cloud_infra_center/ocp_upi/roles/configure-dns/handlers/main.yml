@@ -19,7 +19,7 @@
 - name: Restart named-chroot.service
   become: true
   become_user: root
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.builtin.service:
     name: named-chroot.service
     state: restarted
@@ -29,7 +29,7 @@
 - name: Restart firewalld.service
   become: true
   become_user: root
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.builtin.service:
     name: firewalld.service
     state: restarted

@@ -11,14 +11,19 @@
 # tasks file for configure-installer-and-image
 
 - name: 'Import common yaml'
-  ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../common.yaml"
+
+- name: Get icic project name
+  ansible.builtin.shell:
+    cmd: openstack configuration show -c auth.project_name -f value
+  register: icic_proj
 
 - name: Check if {{ local_rhcos_image }} is a URL
-  set_fact:
+  ansible.builtin.set_fact:
     is_url: "{{ local_rhcos_image.startswith('https://') }}"
 
 - name: Download and uncompress the RHCOS image if {{ local_rhcos_image }} is a URL
-  shell: |
+  ansible.builtin.shell: |
     if [ -f "rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw" ]; then
       rm -f "rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw"
     fi
@@ -31,15 +36,15 @@
     - is_url
 
 - name: Fail if download or uncompress fails if {{ local_rhcos_image }} is a URL
-  fail:
+  ansible.builtin.fail:
     msg: "Failed to download or uncompress the file from the URL: {{ local_rhcos_image }}"
-  when: 
-    - is_url 
+  when:
+    - is_url
     - vm_type == "zvm"
     - download_uncompress_result.rc != 0
 
 - name: Download and uncompress the RHCOS image if {{ local_rhcos_image }} is a file path
-  shell: |
+  ansible.builtin.shell: |
      gunzip -c "{{ local_rhcos_image }}" > "rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw"
   register: copy_uncompress_result
   ignore_errors: true
@@ -48,15 +53,15 @@
     - not is_url
 
 - name: Fail if copy or uncompress fails if {{ local_rhcos_image }} is a file path
-  fail:
+  ansible.builtin.fail:
     msg: "Failed to copy or uncompress the file from the path: {{ local_rhcos_image }}. Error: {{ copy_uncompress_result.stderr }}"
-  when: 
-    - not is_url 
+  when:
+    - not is_url
     - vm_type == "zvm"
     - copy_uncompress_result.rc != 0
-    
+
 - name: Download and uncompress the RHCOS image if {{ local_rhcos_image }} is a URL
-  shell: |
+  ansible.builtin.shell: |
     if [ -f "rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2" ]; then
       rm -f "rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2"
     fi
@@ -69,15 +74,15 @@
     - is_url
 
 - name: Fail if download or uncompress fails if {{ local_rhcos_image }} is a URL
-  fail:
+  ansible.builtin.fail:
     msg: "Failed to download or uncompress the file from the URL: {{ local_rhcos_image }}"
-  when: 
-    - is_url 
+  when:
+    - is_url
     - vm_type == "kvm"
     - download_uncompress_result.rc != 0
 
 - name: Download and uncompress the RHCOS image if {{ local_rhcos_image }} is a file path
-  shell: |
+  ansible.builtin.shell: |
      gunzip -c "{{ local_rhcos_image }}" > "rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2"
   register: copy_uncompress_result
   ignore_errors: true
@@ -86,37 +91,82 @@
     - not is_url
 
 - name: Fail if copy or uncompress fails if {{ local_rhcos_image }} is a file path
-  fail:
+  ansible.builtin.fail:
     msg: "Failed to copy or uncompress the file from the path: {{ local_rhcos_image }}. Error: {{ copy_uncompress_result.stderr }}"
-  when: 
+  when:
     - not is_url
     - vm_type == "kvm"
     - copy_uncompress_result.rc != 0
 
 - name: Upload RHCOS image to ICIC glance
-  ansible.builtin.command:
-    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=SCSI --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+  openstack.cloud.image:
+    name: 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'
+    container_format: bare
+    disk_format: raw
+    state: present
+    filename: 'rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw'
+    properties:
+      disk_type: SCSI
+      architecture: s390x
+      os_name: Linux
+      os_version: 'RHCO{{ openshift_version }}'
+      os_distro: 'RHCOS{{ openshift_version }}'
+      hypervisor_type: zvm
   when:
     - vm_type == "zvm"
     - disk_type == "scsi"
 
 - name: Upload RHCOS image to ICIC glance
-  ansible.builtin.command:
-    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=raw  --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=ZVM --property disk_type=DASD --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+  openstack.cloud.image:
+    name: 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'
+    container_format: bare
+    disk_format: raw
+    state: present
+    filename: 'rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.raw'
+    properties:
+      disk_type: DASD
+      architecture: s390x
+      os_name: Linux
+      os_version: 'RHCO{{ openshift_version }}'
+      os_distro: 'RHCOS{{ openshift_version }}'
+      hypervisor_type: zvm
   when:
     - vm_type == "zvm"
     - disk_type == "dasd"
 
 - name: Upload RHCOS image to ICIC glance
-  ansible.builtin.command:
-    cmd: openstack image create --tag {{ cluster_id_tag }} --disk-format=qcow2 --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2 icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+  openstack.cloud.image:
+    name: 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'
+    container_format: bare
+    disk_format: qcow2
+    state: present
+    filename: 'rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2'
+    properties:
+      disk_type: DASD
+      architecture: s390x
+      os_name: Linux
+      os_version: 'RHCO{{ openshift_version }}'
+      os_distro: 'RHCOS{{ openshift_version }}'
+      hypervisor_type: kvm
   when:
     - vm_type == "kvm"
+    - disk_type == "dasd"
     - volume_type_id is not defined
 
 - name: Upload RHCOS image to ICIC glance
-  ansible.builtin.command:
-    cmd: openstack image create --tag {{ cluster_id_tag }} --property disk_type=SCSI --disk-format=qcow2 --property architecture=s390x --property os_name=Linux --property os_version=RHCOS{{ openshift_version }} --property os_distro=RHCOS{{ openshift_version }} --property hypervisor_type=kvm --file=rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2 icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+  openstack.cloud.image:
+    name: 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'
+    container_format: bare
+    disk_format: qcow2
+    state: present
+    filename: 'rhcos-{{ openshift_version }}.{{ openshift_minor_version }}-s390x.qcow2'
+    properties:
+      disk_type: SCSI
+      architecture: s390x
+      os_name: Linux
+      os_version: 'RHCO{{ openshift_version }}'
+      os_distro: 'RHCOS{{ openshift_version }}'
+      hypervisor_type: kvm
   when:
     - vm_type == "kvm"
-    - volume_type_id is defined
+    - disk_type == "scsi"
