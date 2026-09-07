@@ -32,6 +32,8 @@ exclude_paths:
   - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-infra-nodes-kvm/
   - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-infra-nodes-zvm/
   - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-installer-rhcos/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-installer-rhcos-local/
+  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-install-ignition/
   - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-network/
   - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-node-labels/
   - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-pre-check/
