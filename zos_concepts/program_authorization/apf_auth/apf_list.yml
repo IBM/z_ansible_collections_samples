@@ -1,0 +1,14 @@
+- name: List APF authorized libraries.
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  gather_facts: false
+  tasks:
+
+    - name: Get APF list.
+      ibm.ibm_zos_core.zos_apf:
+        operation: list
+      register: apf_list
+
+    - name: Print APF list.
+      ansible.builtin.debug:
+        var: apf_list.stdout
