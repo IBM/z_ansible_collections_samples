@@ -18,6 +18,11 @@
     cmd: openstack configuration show -c auth.project_name -f value
   register: icic_proj
 
+- name: Get icic project name
+  ansible.builtin.shell:
+    cmd: openstack configuration show -c auth.project_name -f value
+  register: icic_proj
+
 - name: Check if {{ local_rhcos_image }} is a URL
   ansible.builtin.set_fact:
     is_url: "{{ local_rhcos_image.startswith('https://') }}"
