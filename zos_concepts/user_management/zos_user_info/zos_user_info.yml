@@ -1,0 +1,210 @@
+###############################################################################
+# © Copyright IBM Corporation 2026
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_user_info to retrieve RACF user
+# and group profile information on z/OS using Red Hat Ansible Certified
+# Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_user_info.yml
+#
+# Requirements:
+#   IBM z/OS core collection 2.1.0 or later.
+#
+###############################################################################
+
+###############################################################################
+# Playbook Overview:
+# This playbook demonstrates comprehensive RACF profile information retrieval
+# by performing the following operations:
+#
+# 1. USER PROFILE INFORMATION:
+#    - Retrieve basic user profile information (base segment only)
+#    - Retrieve user profile with TSO segment
+#    - Retrieve user profile with OMVS segment
+#    - Retrieve user profile with multiple segments (TSO, OMVS, DFP, LANGUAGE, OPERPARM)
+#    - Retrieve user profile with all available segments
+#
+# 2. GROUP PROFILE INFORMATION:
+#    - Retrieve basic group profile information (base segment only)
+#    - Retrieve group profile with OMVS segment
+#    - Retrieve group profile with multiple segments (DFP, OMVS, OVM, CSDATA)
+#
+# 3. MISSING or INVALID PROFILE ERROR HANDLING:
+#    - Demonstrate handling of non-existent profiles
+#    - Demonstrate handling of invalid profiles(profile name exceeding 8 characters)
+#
+# Configurable Variables:
+#   test_user_id: User ID to retrieve information for
+#                 Default: Uses the current user (ansible_user)
+#                 Description: RACF user ID that exists on the system
+#
+#   test_group_name: Group name to retrieve information for
+#                    Default: "SYS1"
+#                    Description: RACF group name that exists on the system
+#
+# Prerequisites:
+#   - User must have appropriate RACF permissions to list profiles
+#   - IBM z/OS core collection 2.1.0 or later must be installed
+#   - RACF must be active on the target z/OS system
+#   - The specified user and group profiles must exist
+#
+# Note: This is an info module that does not make any changes to the system.
+#       It only retrieves and displays profile information.
+###############################################################################
+
+- name: Sample zos_user_info playbook for RACF profile information retrieval
+  hosts: zos_host
+  collections:
+    - "ibm.ibm_zos_core"
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    test_user_id: "{{ ansible_user | upper }}"
+    test_group_name: "SYS1"
+    
+  tasks:
+    ###########################################################################
+    # USER PROFILE INFORMATION RETRIEVAL
+    ###########################################################################
+
+    - name: Display test configuration
+      debug:
+        msg:
+          - "Testing with user: {{ test_user_id }}"
+          - "Testing with group: {{ test_group_name }}"
+
+    # Retrieve basic user profile information (base segment only).
+    # This includes user attributes like USER-ID, NAME, DEFAULT-GROUP,
+    # OWNER, CREATED, PASSDATE, ATTRIBUTES, and group connections.
+    - name: Get basic user profile information
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_user_id }}"
+        profile_type: user
+      register: user_basic_info
+
+    # Retrieve user profile with TSO segment.
+    # TSO segment contains Time Sharing Option attributes like ACCTNUM,
+    # PROC, SIZE, MAXSIZE, JOBCLASS, MSGCLASS, SYSOUTCLASS, etc.
+    - name: Get user profile information with TSO segment
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_user_id }}"
+        profile_type: user
+        segments:
+          - tso
+      register: user_tso_info
+
+    # Retrieve user profile with OMVS segment.
+    # OMVS segment contains Unix System Services attributes like UID,
+    # HOME directory, PROGRAM (shell), and resource limits.
+    - name: Get user profile information with OMVS segment
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_user_id }}"
+        profile_type: user
+        segments:
+          - omvs
+      register: user_omvs_info
+
+    # Retrieve user profile with multiple commonly used segments.
+    # This demonstrates retrieving TSO, OMVS, DFP, OPERP' and LANGUAGE segments
+    # in a single call for comprehensive user information.
+    - name: Get user profile with multiple segments
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_user_id }}"
+        profile_type: user
+        segments:
+          - tso
+          - omvs
+          - dfp
+          - lang
+          - operparm
+      register: user_multi_info
+
+    # Retrieve user profile with all available segments.
+    # This demonstrates retrieving all possible user segments including
+    # specialized segments like OPERPARM, CICS, DCE, EIM, etc.
+    - name: Get user profile with all segments
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_user_id }}"
+        profile_type: user
+        segments:
+          - dfp
+          - tso
+          - omvs
+          - operparm
+          - lang
+          - csdata
+          - cics
+          - dce
+          - eim
+          - ovm
+          - netview
+          - nds
+          - lnotes
+          - workattr
+          - proxy
+          - kerb
+      register: user_all_info
+
+    ###########################################################################
+    # GROUP PROFILE INFORMATION RETRIEVAL
+    ###########################################################################
+
+    # Retrieve basic group profile information (base segment only).
+    # This includes group attributes like OWNER, CREATED, SUPERIOR GROUP,
+    # INSTALLATION DATA, SUBGROUPS, and connected users.
+    - name: Get basic group profile information
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_group_name }}"
+        profile_type: group
+      register: group_basic_info
+
+    # Retrieve group profile with OMVS segment.
+    # OMVS segment for groups contains the group's GID (Group ID).
+    - name: Get group profile information with OMVS segment
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_group_name }}"
+        profile_type: group
+        segments:
+          - omvs
+      register: group_omvs_info
+
+    # Retrieve group profile with multiple segments.
+    # Valid segments for groups are: DFP, OMVS, OVM, and CSDATA.
+    - name: Get group profile with multiple segments
+      ibm.ibm_zos_core.zos_user_info:
+        name: "{{ test_group_name }}"
+        profile_type: group
+        segments:
+          - dfp
+          - omvs
+          - ovm
+          - csdata
+      register: group_multi_info
+
+    ###########################################################################
+    # ERROR HANDLING DEMONSTRATIONS
+    ###########################################################################
+
+    # Demonstrate handling of non-existent user profile.
+    # The module will fail with an appropriate error message and rc!=0.
+    - name: Attempt to get non-existent user profile (expected to fail)
+      ibm.ibm_zos_core.zos_user_info:
+        name: "NONEXIST"
+        profile_type: user
+      ignore_errors: yes
+      register: nonexistent_user
+
+    # Demonstrate handling of invalid group profile name.
+    - name: Attempt to get invalid group profile (expected to fail)
+      ibm.ibm_zos_core.zos_user_info:
+        name: "INVALID_NAME"
+        profile_type: group
+      ignore_errors: yes
+      register: nonexistent_group
