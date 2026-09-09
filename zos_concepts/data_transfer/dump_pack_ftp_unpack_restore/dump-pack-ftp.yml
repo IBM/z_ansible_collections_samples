@@ -8,13 +8,11 @@
 ###############################################################################
 
 - hosts: source_system
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Dump, pack, and transfer data sets
-      include_role:
+      ansible.builtin.include_role:
         name: dump-pack-ftp-data-sets
         public: true

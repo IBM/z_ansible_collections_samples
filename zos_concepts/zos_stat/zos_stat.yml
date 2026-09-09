@@ -35,8 +35,6 @@
 
 - name: Sample zos_stat playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -75,11 +73,11 @@
       tags: data_set
       block:
         - name: Create a temporary data set name.
-          command: "mvstmp {{ ansible_user | upper }}"
+          ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
 
         - name: Setting fact `seq_data_set_name` for use by this sample.
-          set_fact:
+          ansible.builtin.set_fact:
             seq_data_set_name: "{{ tmp_ds.stdout }}"
 
         - name: Allocate temporary sequential data set.
@@ -105,11 +103,11 @@
             msg: "{{ seq_data_set_stat }}"
 
         - name: Create a temporary data set name for a multi-volume data set.
-          command: "mvstmp {{ ansible_user | upper }}"
+          ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
 
         - name: Setting fact `multi_vol_data_set_name` for use by this sample.
-          set_fact:
+          ansible.builtin.set_fact:
             multi_vol_data_set_name: "{{ tmp_ds.stdout }}"
 
         - name: Allocate temporary sequential data set on multiple volumes.
@@ -154,6 +152,7 @@
     # +-------------------------------------------------------------------------
     - name: Query a file.
       tags: file
+      when: uss_file_path != ""
       block:
         - name: "Query {{ uss_file_path }} attributes with zos_stat."
           ibm.ibm_zos_core.zos_stat:
@@ -169,8 +168,6 @@
           ansible.builtin.debug:
             msg: "{{ file_stat }}"
 
-      when: uss_file_path != ""
-
     ##############################################################################
     # This third block shows how to query an aggregate.
     # If aggregate_name is empty, the block will be skipped.
@@ -183,6 +180,7 @@
     # +-------------------------------------------------------------------------
     - name: Query an aggregate.
       tags: aggregate
+      when: aggregate_name != ""
       block:
         - name: "Query {{ aggregate_name }} attributes with zos_stat."
           ibm.ibm_zos_core.zos_stat:
@@ -193,8 +191,6 @@
         - name: Inspect output from zos_stat.
           ansible.builtin.debug:
             msg: "{{ aggregate_stat }}"
-
-      when: aggregate_name != ""
 
     ##############################################################################
     # This fourth block shows examples of the output given by zos_stat when
@@ -220,11 +216,11 @@
       tags: gdg
       block:
         - name: Create a temporary data set name.
-          command: "mvstmp {{ ansible_user | upper }}"
+          ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
 
         - name: Setting fact `gdg_name` for use by this sample.
-          set_fact:
+          ansible.builtin.set_fact:
             gdg_name: "{{ tmp_ds.stdout }}"
 
         - name: Allocate temporary GDG.
@@ -307,11 +303,11 @@
       tags: automation-example
       block:
         - name: Create a temporary data set name.
-          command: "mvstmp {{ ansible_user | upper }}"
+          ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
 
         - name: Setting fact `jcl_data_set` for use by this sample.
-          set_fact:
+          ansible.builtin.set_fact:
             jcl_data_set: "{{ tmp_ds.stdout }}"
 
         # If you change the attributes here or in the conditionals in the task below,
@@ -374,11 +370,11 @@
             msg: "{{ job_result }}"
 
         - name: Create a temporary data set name for the aggregate.
-          command: "mvstmp {{ ansible_user | upper }}"
+          ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
 
         - name: Setting fact `zfs_data_set` for use by this sample.
-          set_fact:
+          ansible.builtin.set_fact:
             zfs_data_set: "{{ tmp_ds.stdout }}"
 
         - name: Create the zFS.

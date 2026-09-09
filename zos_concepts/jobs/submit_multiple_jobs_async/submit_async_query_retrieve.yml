@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2025, 2026
+# © Copyright IBM Corporation 2025, 2026
 ###############################################################################
 
 ###############################################################################
@@ -19,6 +20,7 @@
 #  `data_set_name`.
 #
 # Requirements:
+#   IBM z/OS core collection 2.0.0 or later
 #   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
@@ -55,8 +57,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -87,13 +87,22 @@
           //STDOUT DD SYSOUT=*
           //STDERR DD SYSOUT=*
           //
+          //ASYNC{{ item }}   JOB MSGLEVEL=1,MSGCLASS={{ job_class }},CLASS={{ job_class }}
+          //COMMAND  EXEC PGM=BPXBATCH
+          //STDPARM DD *
+          SH echo 'This is a {{ item }} job' && date && sleep 30 && date
+          //STDIN  DD DUMMY
+          //STDOUT DD SYSOUT=*
+          //STDERR DD SYSOUT=*
+          //
         dest: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
+        replace: true
         replace: true
       register: result
       with_sequence: count={{ job_count }}
 
     - name: Response for creating sample jobs on z/OS UNIX
-      debug:
+      ansible.builtin.debug:
         var: result
 
     # +-------------------------------------------------------------------------
@@ -102,11 +111,14 @@
     # | how multiple jobs could be submitted under a single task for members of
     # | a single PDS.
     # | See notes at the top for additional explanation on wait_time, async
+    # | See notes at the top for additional explanation on wait_time, async
     # | and poll times.
     # +-------------------------------------------------------------------------
     - name: Submit multiple batch jobs asynchronously.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
+        remote_src: true
+        wait_time: 45
         remote_src: true
         wait_time: 45
       with_sequence: count={{ job_count }}
@@ -115,7 +127,7 @@
       register: job_submit
 
     - name: Query status for asynchronous batch jobs captured in 'job_submit' and place results in 'job_outputs'.
-      async_status:
+      ansible.builtin.async_status:
         jid: "{{ item.ansible_job_id }}"
       until: job_outputs.finished
       retries: 10
@@ -124,7 +136,7 @@
       register: job_outputs
 
     - name: Separating job IDs from async status output for use by zos_job_query module later.
-      set_fact:
+      ansible.builtin.set_fact:
         job_ids: "{{ job_ids + [item.jobs[0].job_id] }}"
       with_items: "{{ job_outputs.results }}"
 
@@ -142,8 +154,9 @@
       loop: "{{ job_ids }}"
 
     - name: Check if any asynchronous batch job has a RC > 0 and fail if it does.
-      fail: msg="Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}  has a rc of = {{ item.jobs[0].ret_code.code}}, msg = {{ item.jobs[0].ret_code.msg }}"
+      ansible.builtin.fail: msg="Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}  has a rc of = {{ item.jobs[0].ret_code.code}}, msg = {{ item.jobs[0].ret_code.msg }}"
       failed_when: >
+        item.jobs[0].ret_code.code > 0
         item.jobs[0].ret_code.code > 0
       with_items: "{{ job_query.results }}"
 
@@ -154,7 +167,7 @@
       loop: "{{ job_ids }}"
 
     - name: Print out each job output
-      debug:
+      ansible.builtin.debug:
         var: job_output
 
     ############################################################################
@@ -164,7 +177,7 @@
     ############################################################################
 
     - name: Remove JCL files on USS target.
-      file:
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
         state: absent
       with_sequence: count={{ job_count }}

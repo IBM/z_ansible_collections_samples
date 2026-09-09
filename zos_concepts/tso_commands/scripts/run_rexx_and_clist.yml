@@ -24,8 +24,6 @@
 
 - name: Sample playbook for running REXX and CLISTs inside TSO.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 

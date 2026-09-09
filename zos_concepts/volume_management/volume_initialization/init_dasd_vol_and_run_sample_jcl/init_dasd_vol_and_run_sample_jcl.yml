@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023, 2026
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -20,6 +21,7 @@
 #
 # Requirements:
 #   IBM z/OS core collection 2.0.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
 #   vol_unit - this is the unit address (device number) of the target device.
@@ -30,12 +32,13 @@
 
 - name: Sample zos_volume_init playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
+  environment: "{{ environment_vars }}"
   environment: "{{ environment_vars }}"
 
   vars:
+    vol_unit: "volume_unit_address"
+    new_volser: "volume_serial_name"
     vol_unit: "volume_unit_address"
     new_volser: "volume_serial_name"
     mount_point: "/tmp/sample"
@@ -45,18 +48,18 @@
     # Generate a temporary data set name
     # ##########################################################################
     - name: Create temp data set name.
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
 
     # ##########################################################################
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Setting fact `zfs_dsname` for use by this sample.
-      set_fact:
+      ansible.builtin.set_fact:
         zfs_dsname: "{{ tmp_ds.stdout }}"
 
     - name: Fact `zfs_dsname` set with value.
-      debug:
+      ansible.builtin.debug:
         var: zfs_dsname
 
     ############################################################################
@@ -72,31 +75,33 @@
     ############################################################################
 
     - name: Take volume offline before initialization.
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "vary {{ vol_unit }},offline"
 
     - name: Initialize target volume - skip verify online check, verify no data
         sets currently exist on target volume, create an index, volume will
         not be SMS managed.
-      zos_volume_init:
+      ibm.ibm_zos_core.zos_volume_init:
         address: "{{ vol_unit }}"
+        verify_offline: false
         verify_offline: false
         volid: "{{ new_volser }}"
         index: true
         sms_managed: false
         verify_volume_empty: false
+        verify_volume_empty: false
       register: output
 
     - name: Response for intialize target volume.
-      debug:
+      ansible.builtin.debug:
         var: output
 
     - name: Bring volume back online after initialization.
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: "vary {{ vol_unit }},online"
 
     - name: Create ZFS data set.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ zfs_dsname }}"
         type: zfs
         space_primary: 50
@@ -105,42 +110,44 @@
         volumes: "{{ new_volser }}"
 
     - name: Ensure mount dir exists on Unix Systems Services side
-      file:
+      ansible.builtin.file:
         path: "{{ mount_point }}"
         state: directory
 
     - name: Mount ZFS data set.
-      zos_mount:
+      ibm.ibm_zos_core.zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
         fs_type: zfs
         state: mounted
 
     - name: Copy JCL to data set.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ mount_point }}/HELLO.jcl"
 
     - name: Submit the JCL at {{ mount_point}}/HELLO.jcl.
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ mount_point }}/HELLO.jcl"
+        remote_src: true
         remote_src: true
       register: result
 
     - name: Setting fact `job_id` for id of job submitted above.
-      set_fact:
+      ansible.builtin.set_fact:
         job_id: "{{ result.jobs[0].job_id }}"
 
     - name: Get job output for {{ job_id }}.
-      zos_job_output:
+      ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ job_id }}"
       register: result
 
     - name: Response for get job output for job "{{ job_id }}".
         member.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
+    # Un-comment the following line to pause playbook execution before artifacts
     # Un-comment the following line to pause playbook execution before artifacts
     # are cleaned up in the next tasks.
     # - pause:
@@ -152,13 +159,13 @@
     ############################################################################
 
     - name: Un-mount data set.
-      zos_mount:
+      ibm.ibm_zos_core.zos_mount:
         src: "{{ zfs_dsname }}"
         path: "{{ mount_point }}"
         fs_type: zfs
         state: absent
 
     - name: Delete ZFS data set {{ zfs_dsname }}.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ zfs_dsname }}"
         state: absent

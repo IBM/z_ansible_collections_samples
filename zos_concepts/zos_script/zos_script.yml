@@ -35,15 +35,13 @@
 
 - name: Sample zos_script playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   vars:
     python_script_dir: "/u/user_name"
 
-    use_custom_msg: True
+    use_custom_msg: true
     custom_msg: "This is a custom Hello World message!!"
     some_num: 3
     fav_programming_languages:

@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023, 2026
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -15,6 +16,7 @@
 #
 # Requirements:
 #   IBM z/OS core collection 2.0.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #   Ansible Community General Collection
 #
 # Configure (optional):
@@ -26,15 +28,14 @@
 ###############################################################################
 
 - hosts: destination
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
 
   vars:
     archive_data_set: "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.ARCHIVE"
-    remove_local_archive: True
-    replace: True
+    remove_local_archive: true
+    replace: true
 
+  environment: "{{ environment_vars }}"
   environment: "{{ environment_vars }}"
 
   tasks:
@@ -46,10 +47,10 @@
             format:
               type: terse
               options:
-                adrdssu: True
+                adrdssu: true
           register: unarchive_result
 
-        - debug:
+        - ansible.builtin.debug:
             msg: "{{ unarchive_result }}"
 
       always:
