@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2025
+# © Copyright IBM Corporation 2025, 2026
 ###############################################################################
 
 ###############################################################################
@@ -20,7 +20,7 @@
 #  ansible-playbook -i inventories zos_stat.yml --tags data_set
 #
 # Requirements:
-#   IBM z/OS core collection 1.14.0 or later.
+#   IBM z/OS core collection 2.0.0 or later.
 #
 # Optional:
 #   available_volumes - Names of the volumes where the sample will allocate
@@ -50,7 +50,6 @@
     mount_point: "/tmp/aggr"
 
   tasks:
-
     ##############################################################################
     # This first block shows examples of the output given by zos_stat when
     # querying data sets.
@@ -317,8 +316,9 @@
 
         # If you change the attributes here or in the conditionals in the task below,
         # the playbook will skip reallocating the data set when it is not needed.
-        - name: Allocate temporary data set to hold some JCL code. These attributes
-                are not the correct ones and will be changed later.          
+        - name:
+            Allocate temporary data set to hold some JCL code. These attributes
+            are not the correct ones and will be changed later.
           ibm.ibm_zos_core.zos_data_set:
             name: "{{ jcl_data_set }}"
             type: seq
@@ -336,13 +336,13 @@
           register: jcl_data_set_stat
 
         - name: Removing the allocated data set if the record format isn't FB
-                and it doesn't have the record length needed.
+            and it doesn't have the record length needed.
           ibm.ibm_zos_core.zos_data_set:
             name: "{{ jcl_data_set }}"
             state: absent
           when: jcl_data_set_stat.stat.attributes.type != 'seq' or
-                jcl_data_set_stat.stat.attributes.record_format != 'fb' or
-                jcl_data_set_stat.stat.attributes.record_length < 80
+            jcl_data_set_stat.stat.attributes.record_format != 'fb' or
+            jcl_data_set_stat.stat.attributes.record_length < 80
           register: check_result
 
         - name: Reallocating the data set in case it is necessary.
@@ -366,7 +366,7 @@
         - name: "Submit JCL contained in {{ jcl_data_set }}."
           ibm.ibm_zos_core.zos_job_submit:
             src: "{{ jcl_data_set }}"
-            location: data_set
+            remote_src: true
           register: job_result
 
         - name: Check the output from zos_job_submit.
@@ -429,7 +429,7 @@
             state: unmounted
 
         - name: Remove the mount point of the aggregate. Please make sure
-                this is allowed before running the playbook.
+            this is allowed before running the playbook.
           ansible.builtin.file:
             path: "{{ mount_point }}"
             state: absent

@@ -87,38 +87,30 @@
   args:
     executable: python3
 
-- name: Get security group
-  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f value | grep "secgroups"  | awk -F ' ' '{print$2}'
-  register:
-    security_group
-  failed_when: security_group.stdout == ""
+- name: Get current project ID
+  ansible.builtin.command: openstack token issue -f value -c project_id
+  register: current_project_id
+  changed_when: false
 
-- name: Check security group
+- name: Get project quota
+  openstack.cloud.quota:
+    name: "{{ current_project_id.stdout }}"
+  register: project_quota
+
+- name: Check security group quota
   ansible.builtin.fail:
-    msg: "Security group number is not enough, current: {{ security_group.stdout_lines[0] }}, minimum required: 3"
-  failed_when: "security_group.stdout_lines[0]|int < 3"
+    msg: "Security group number is not enough, current: {{ project_quota.quotas.network.security_groups }}, minimum required: 3"
+  when: project_quota.quotas.network.security_groups | int < 3
 
-- name: Get security group rule
-  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f value | grep "secgroup-rules" | awk -F ' ' '{print$2}'
-  register:
-    security_group_rule
-  failed_when: security_group_rule.stdout == ""
-
-- name: Check security group rule
+- name: Check security group rules quota
   ansible.builtin.fail:
-    msg: "Security group rules number is not enough, current: {{ security_group_rule.stdout_lines[0] }}, required: 60"
-  failed_when: "security_group_rule.stdout_lines[0]|int < 60"
-
-- name: Get server group quota
-  ansible.builtin.shell: openstack --os-volume-api-version=3 quota show -f value | grep "server-groups" | awk -F ' ' '{print$2}'
-  register:
-    server_group
-  failed_when: server_group.stdout == ""
+    msg: "Security group rules number is not enough, current: {{ project_quota.quotas.network.security_group_rules }}, required: 60"
+  when: project_quota.quotas.network.security_group_rules | int < 60
 
 - name: Check server group quota
   ansible.builtin.fail:
-    msg: "Server group number is not enough, current: {{ server_group.stdout_lines[0] }}, required: 1"
-  failed_when: "server_group.stdout_lines[0]|int < 1"
+    msg: "Server group number is not enough, current: {{ project_quota.quotas.compute.server_groups }}, required: 1"
+  when: project_quota.quotas.compute.server_groups | int < 1
 
 - name: Get storage provider
   ansible.builtin.shell: openstack --os-volume-api-version=3 volume service list -f csv | grep cinder-volume | wc -l

@@ -18,16 +18,15 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: false
-  environment:
-    "{{ environment_vars }}"
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Copy definition file over to target host
       zos_copy:
         src: "{{ playbook_dir }}/files/{{ ZOSMF_DEFINITION_FILE }}"
         dest: "{{ ZOSMF_DEST_FOLDER }}"
-        force: true
-        is_binary: true
+        replace: true
+        binary: true
 
     - name: Query list of available ZOSMF workflows
       uri:
@@ -47,7 +46,7 @@
 
     - name: Initialize existing_workflow_key variable
       set_fact:
-        existing_workflow_key: ''
+        existing_workflow_key: ""
 
     - name: Assign existing_workflow_key variable if the 'sample_uri_workflow' has already been created
       set_fact:
@@ -78,7 +77,7 @@
 
     - name: Initialize sample_workflow_key variable for workflow created in previous step (used for starting and cancelling workflow)
       set_fact:
-        sample_workflow_key: ''
+        sample_workflow_key: ""
 
     - name: Set variable for sample workflow
       set_fact:

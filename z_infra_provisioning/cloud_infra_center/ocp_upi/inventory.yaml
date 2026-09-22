@@ -50,13 +50,21 @@ all:
       os_flavor_bootstrap: 'medium'
       os_flavor_master: 'medium'
       os_flavor_worker: 'medium'
+      os_flavor_storage: 'medium'
+      os_flavor_infra: 'medium'
 
-      create_server_zone: ''
+      create_server_zone: 'Default_Group'
       os_control_nodes_number: 3
       os_compute_nodes_number: 3
+      os_storage_nodes_number: 0
+      os_infra_nodes_number: 0
 
+      # add_secgroups: security_group1,security_group2
+      # add_bootstrap_secgroups: bootstrap_group1,security_group1,security_group2
       # os_bootstrap_ip: '<bootstrap ip addr>'
       # os_master_ip: ['<master0 ip addr>', '<master1 ip addr>', '<master2 ip addr>']
+      # os_worker_ip: ['<worker0 ip addr>', '<worker1 ip addr>', '<worker2 ip addr>']
+      # os_storage_ip: ['<storage0 ip addr>', '<storage1 ip addr>', '<storage2 ip addr>']
       # os_infra_ip: ['<infra0 ip addr>', '<infra1 ip addr>', '<infra2 ip addr>']
 
       use_proxy: false
@@ -90,5 +98,7 @@ all:
     # bootstrap_name_prefix: '<bootstrap-node-name>'
     # master_name_prefix: '<master-node-name>'
     # worker_name_prefix: '<worker-node-name>'
+    # storage_name_prefix: '<storage-node-name>'
+    # infra_name_prefix: '<infra-node-name>'
     pullsecret: '<pull-secret>'
     sshkey: '<ssh-key>'

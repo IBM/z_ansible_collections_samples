@@ -1,0 +1,392 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *|   - Initial release                                                    |
+# *|   - Comprehensive log gathering playbook for ACC-admin and owner       |
+# *+------------------------------------------------------------------------+
+
+- name: ACC playbook to gather comprehensive logs (admin/owner)
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - owner_vars.yaml
+
+  vars_prompt:
+    - name: "acc_username"
+      prompt: "Enter ACC username (ACC-admin or appliance-owner)"
+      private: false
+    - name: "acc_password"
+      prompt: "Enter ACC password"
+      private: true
+    - name: "tasks_count"
+      prompt: "Enter number of recent tasks to retrieve (default 100)"
+      private: false
+      default: "100"
+    - name: "history_count"
+      prompt: "Enter number of recent history operations to retrieve (default 100)"
+      private: false
+      default: "100"
+
+  vars:
+    log_base_dir: "./acc_logs"
+
+  tasks:
+    - name: Display playbook execution information
+      ansible.builtin.include_tasks:
+        file: common_display_execution_info.yaml
+
+    - name: 00a - Set timestamp for this run
+      ansible.builtin.set_fact:
+        timestamp: "{{ ansible_facts['date_time']['iso8601_basic_short'] }}"
+
+    - name: 00b - Set log directory path
+      ansible.builtin.set_fact:
+        log_dir: "{{ log_base_dir }}/acc_logs_{{ timestamp }}"
+
+    - name: 00c - Create log directory structure
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ log_dir }}"
+        - "{{ log_dir }}/audit_logs"
+        - "{{ log_dir }}/app_logs"
+
+    - name: 01 - Check if MFA is enabled
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no):"
+      register: mfa_enabled_input
+
+    - name: 02 - Set MFA enabled flag
+      ansible.builtin.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 03 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA OTP:"
+      register: mfa_otp_input
+
+    - name: 04 - Get authentication token from ACC
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/user/token"
+        method: POST
+        body:
+          username: "{{ acc_username }}"
+          password: "{{ acc_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+      failed_when: false
+
+    - name: 05 - Check authentication success
+      ansible.builtin.fail:
+        msg: "Authentication failed. Please check your credentials."
+      when: auth_response.status != 200
+
+    - name: 06 - Extract the token and user role
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+        user_role: "{{ auth_response.json.role }}"
+
+    - name: 07 - Set user role flags
+      ansible.builtin.set_fact:
+        is_admin: "{{ user_role == 'admin' }}"
+        is_owner: "{{ user_role == 'owner' }}"
+
+    - name: 08 - Display detected user role
+      ansible.builtin.debug:
+        msg: "Detected user role: {{ user_role }}"
+
+    - name: 09 - Gather ACC about information
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/about"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+        return_content: true
+      register: about_response
+      failed_when: false
+
+    - name: 10 - Save about API output to file
+      ansible.builtin.copy:
+        content: "{{ about_response.json | to_nice_json }}"
+        dest: "{{ log_dir }}/about.log"
+        mode: "0755"
+      when: about_response.status == 200
+
+    - name: 11 - Display about API status
+      ansible.builtin.debug:
+        msg: "{{ 'About API gathered successfully' if about_response.status == 200 else 'Failed to gather about API info' }}"
+
+    - name: 12 - Gather last n tasks
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/cluster/tasks?n={{ tasks_count }}"
+        method: POST
+        body: {}
+        body_format: json
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+        return_content: true
+      register: tasks_response
+      failed_when: false
+
+    - name: 13 - Save tasks to file
+      ansible.builtin.copy:
+        content: "{{ tasks_response.json | to_nice_json }}"
+        dest: "{{ log_dir }}/tasks.log"
+        mode: "0755"
+      when: tasks_response.status == 200
+
+    - name: 14 - Display tasks gathering status
+      ansible.builtin.debug:
+        msg:
+          - "Tasks API Status: {{ tasks_response.status | default('No response') }}"
+          - "{{ 'Tasks gathered successfully' if tasks_response.status == 200 else 'Failed to gather tasks' }}"
+          - >-
+            {% if tasks_response.status != 200
+              and tasks_response.json is defined %}
+            API Response: {{ tasks_response.json | to_nice_json }}
+            {% elif tasks_response.status != 200 %}
+            Error: {{ tasks_response.msg | default('Unknown error') }}
+            {% endif %}
+
+    - name: 15 - Gather last n history operations
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/cluster/history?n={{ history_count }}"
+        method: POST
+        body: {}
+        body_format: json
+        headers:
+          Accept: "application/json"
+          Authorization: "Bearer {{ access_token }}"
+        validate_certs: false
+        return_content: true
+      register: history_response
+      failed_when: false
+
+    - name: 16 - Save history to file
+      ansible.builtin.copy:
+        content: "{{ history_response.json | to_nice_json }}"
+        dest: "{{ log_dir }}/history.log"
+        mode: "0755"
+      when: history_response.status == 200
+
+    - name: 17 - Display history gathering status
+      ansible.builtin.debug:
+        msg:
+          - "History API Status: {{ history_response.status | default('No response') }}"
+          - "{{ 'History gathered successfully' if history_response.status == 200 else 'Failed to gather history' }}"
+          - >-
+            {% if history_response.status != 200
+              and history_response.json is defined %}
+            API Response: {{ history_response.json | to_nice_json }}
+            {% elif history_response.status != 200 %}
+            Error: {{ history_response.msg | default('Unknown error') }}
+            {% endif %}
+
+    - name: 18 - Gather audit logs (ACC-admin only)
+      when: is_admin
+      block:
+        - name: 18a - Fetch audit logs and save directly to file
+          ansible.builtin.uri:
+            url: "{{ acc_url }}/audit"
+            method: GET
+            headers:
+              Authorization: "Bearer {{ access_token }}"
+              Content-Type: "application/json"
+            validate_certs: false
+            dest: "{{ log_dir }}/audit_logs/audit_logs_{{ timestamp }}.zip"
+            status_code: 200
+          register: audit_response
+          failed_when: false
+
+        - name: 18b - Display audit logs gathering status
+          ansible.builtin.debug:
+            msg: >-
+              {{
+                'Audit logs gathered successfully'
+                if audit_response.status == 200
+                else 'Failed to gather audit logs: '
+                    + (audit_response.msg | default('Unknown error'))
+              }}
+
+    - name: 19 - Skip audit logs for appliance-owner
+      when: is_owner
+      ansible.builtin.debug:
+        msg: "Skipping audit logs - only available for ACC-admin users"
+
+    - name: 20 - Gather appliance logs (ACC-admin only)
+      when: is_admin
+      block:
+        - name: 20a - Prompt for appliance credentials
+          ansible.builtin.pause:
+            prompt: "Do you want to gather appliance logs? This requires appliance credentials. (yes/no):"
+          register: gather_app_logs_input
+
+        - name: 20b - Set gather appliance logs flag
+          ansible.builtin.set_fact:
+            gather_app_logs: "{{ gather_app_logs_input.user_input | lower == 'yes' }}"
+
+        - name: 20c - Prompt for appliance IP
+          when: gather_app_logs
+          ansible.builtin.pause:
+            prompt: "Enter appliance (SSC) LPAR IP address:"
+          register: ssc_ip_input
+
+        - name: 20d - Prompt for appliance username
+          when: gather_app_logs
+          ansible.builtin.pause:
+            prompt: "Enter appliance (SSC) LPAR username:"
+          register: ssc_username_input
+
+        - name: 20e - Prompt for appliance password
+          when: gather_app_logs
+          ansible.builtin.pause:
+            prompt: "Enter appliance (SSC) LPAR password:"
+            echo: false
+          register: ssc_password_input
+
+        - name: 20f - Prompt for reason
+          when: gather_app_logs
+          ansible.builtin.pause:
+            prompt: "Enter reason for creating logs:"
+          register: reason_input
+
+        - name: 20g - Set appliance variables
+          when: gather_app_logs
+          ansible.builtin.set_fact:
+            ssc_ip: "{{ ssc_ip_input.user_input }}"
+            lpar_username: "{{ ssc_username_input.user_input }}"
+            lpar_password: "{{ ssc_password_input.user_input }}"
+            reason: "{{ reason_input.user_input }}"
+            log_destination: "{{ log_dir }}/app_logs/ssc_{{ timestamp }}.gz"
+
+        - name: 20h - Include SSC log pulling tasks (reuses 03_pull_ssc_logs.yaml logic)
+          when: gather_app_logs
+          block:
+            - name: Include SSC log tasks
+              ansible.builtin.include_tasks:
+                file: 17_tasks_pull_ssc_logs.yaml
+          rescue:
+            - name: Handle SSC log gathering failure
+              ansible.builtin.set_fact:
+                ssc_download_result:
+                  status: 500
+                  msg: "Failed to gather appliance logs"
+
+        - name: 20i - Display appliance logs gathering status
+          when: gather_app_logs
+          ansible.builtin.debug:
+            msg: >-
+              {{
+                'Appliance logs gathered successfully'
+                if (
+                  ssc_download_result is defined and
+                  ssc_download_result.status == 200
+                )
+                else 'Failed to gather appliance logs'
+              }}
+
+    - name: 21 - Skip appliance logs for appliance-owner
+      when: is_owner
+      ansible.builtin.debug:
+        msg: "Skipping appliance logs - only available for ACC-admin users"
+
+    - name: 22 - Create summary file
+      ansible.builtin.copy:
+        content: |
+          ACC Log Collection Summary
+          ==========================
+          Collection Time: {{ timestamp }}
+          ACC URL: {{ acc_url }}
+          User: {{ acc_username }}
+          User Role: {{ user_role }}
+
+          Files Collected:
+          ----------------
+          - about.log: ACC about information ({{ 'Success' if about_response.status == 200
+          else 'Failed - Status: ' + (about_response.status | string) }})
+          - tasks.log: Last {{ tasks_count }} tasks ({{ 'Success' if tasks_response.status == 200
+          else 'Failed - Status: ' + (tasks_response.status | string) }})
+          {% if tasks_response.status != 200 and tasks_response.json is defined %}
+            API Response: {{ tasks_response.json | to_nice_json }}
+          {% elif tasks_response.status != 200 %}
+            Error: {{ tasks_response.msg | default('Unknown error') }}
+          {% endif %}
+          - history.log: Last {{ history_count }} history operations ({{ 'Success' if history_response.status == 200
+          else 'Failed - Status: ' + (history_response.status | string) }})
+          {% if history_response.status != 200 and history_response.json is defined %}
+            API Response: {{ history_response.json | to_nice_json }}
+          {% elif history_response.status != 200 %}
+            Error: {{ history_response.msg | default('Unknown error') }}
+          {% endif %}
+          {% if is_admin %}
+          - audit_logs/audit_logs_{{ timestamp }}.zip: Audit logs ({{ 'Success' if audit_response.status == 200
+          else 'Failed - Status: ' + (audit_response.status | string) }})
+          {% if gather_app_logs | default(false) %}
+          - app_logs/ssc_{{ timestamp }}.gz: Appliance diagnostic logs ({{ 'Success' if ssc_download_result is defined
+          and ssc_download_result.status == 200 else 'Failed' }})
+          {% endif %}
+          {% else %}
+          - Audit logs: Skipped (requires ACC-admin role)
+          - Appliance logs: Skipped (requires ACC-admin role)
+          {% endif %}
+
+          Log Directory: {{ log_dir }}
+
+          Note: Appliance logs are gathered using reusable tasks from 17_tasks_pull_ssc_logs.yaml
+        dest: "{{ log_dir }}/SUMMARY.txt"
+        mode: "0755"
+
+    - name: 23 - Display completion message header
+      ansible.builtin.debug:
+        msg:
+          - "========================================"
+          - "Log collection completed successfully!"
+          - "========================================"
+          - ""
+          - "All logs have been saved to: {{ log_dir }}"
+          - ""
+          - "Files collected:"
+
+    - name: 24 - Display collected files
+      ansible.builtin.debug:
+        msg: "{{ collected_files }}"
+      vars:
+        collected_files: >-
+          {%- set files = [] -%}
+          {%- if about_response.status == 200 -%}
+            {%- set files = files + ['✓ about.log'] -%}
+          {%- endif -%}
+          {%- if tasks_response.status == 200 -%}
+            {%- set files = files + ['✓ tasks.log (' + tasks_count | string + ' tasks)'] -%}
+          {%- endif -%}
+          {%- if history_response.status == 200 -%}
+            {%- set files = files + ['✓ history.log (' + history_count | string + ' operations)'] -%}
+          {%- endif -%}
+          {%- if is_admin -%}
+            {%- if audit_response.status == 200 -%}
+              {%- set files = files + ['✓ audit_logs/audit_logs_' + timestamp + '.zip'] -%}
+            {%- endif -%}
+            {%- if gather_app_logs | default(false) and ssc_download_result is defined and ssc_download_result.status == 200 -%}
+              {%- set files = files + ['✓ app_logs/ssc_' + timestamp + '.gz'] -%}
+            {%- endif -%}
+          {%- else -%}
+            {%- set files = files + ['⊘ Audit logs (requires ACC-admin)', '⊘ Appliance logs (requires ACC-admin)'] -%}
+          {%- endif -%}
+          {{ files }}
+
+    - name: 25 - Display summary location
+      ansible.builtin.debug:
+        msg:
+          - ""
+          - "See SUMMARY.txt for details."

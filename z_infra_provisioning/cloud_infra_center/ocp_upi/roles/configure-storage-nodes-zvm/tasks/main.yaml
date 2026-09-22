@@ -1,0 +1,139 @@
+# =================================================================
+# Copyright 2022 https://github.com/openshift/installer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =================================================================
+
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+#
+# Change Summary:
+# - Move port creation to network.yaml
+# - Delete unnecessary Ansible tasks
+# - Use random strings to name storage nodes
+
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- name: 'Import common yaml'
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
+
+- name: Export infra ID
+  ansible.builtin.shell:
+    cmd: "jq -r .infraID metadata.json"
+  register: infra_id
+
+- name: Get icic project name
+  ansible.builtin.shell:
+    cmd: openstack configuration show -c auth.project_name -f value
+  register: icic_proj
+  
+- name: 'Get image name for ZVM'
+  ansible.builtin.set_fact:
+    image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}"
+  when:
+    - vm_type == "zvm"
+
+- name: 'Create the storage servers'
+  openstack.cloud.server:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_storage }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item.0 }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+  with_indexed_items: "{{ [os_storage_server_name] * os_storage_nodes_number }}"
+  when:
+    - disk_type == "dasd"
+    - vm_type == "zvm"
+
+- name: 'Convert storage node flavor from value into number'
+  ansible.builtin.command:
+    cmd: "openstack flavor show {{ os_flavor_storage }} -c disk -f value"
+  register: storage_flavor_size
+  when:
+    - disk_type == "scsi"
+
+- name: 'Create the storage servers with default boot volume'
+  openstack.cloud.server:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    image: "{{ image_name }}"
+    flavor: "{{ os_flavor_storage }}"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item.0 }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+    boot_from_volume: true
+    volume_size: "{{ storage_flavor_size.stdout_lines[0]}}"
+    terminate_volume: true
+  with_indexed_items: "{{ [os_storage_server_name] * os_storage_nodes_number }}"
+  when:
+    - disk_type == "scsi"
+    - vm_type == "zvm"
+    - volume_type_id is not defined
+
+- name: 'Create storage boot volume'
+  openstack.cloud.volume:
+    state: present
+    name: "{{ item.1 }}-{{ item.0 }}-boot"
+    image: "{{ image_name }}"
+    size: "{{ storage_flavor_size.stdout_lines[0]}}"
+    volume_type: "{{ volume_type_id }}"
+    metadata: "{{ cluster_id_tag }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+  with_indexed_items: "{{ [os_storage_server_name] * os_storage_nodes_number }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+
+- name: 'Set storage volume bootable'
+  ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item.1 }}-{{ item.0 }}-boot"
+  with_indexed_items: "{{ [os_storage_server_name] * os_storage_nodes_number }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined
+
+- name: 'Create the storage server with boot volume'
+  openstack.cloud.server:
+    name: "{{ item.1 }}-{{ item.0 }}"
+    flavor: "{{ os_flavor_storage }}"
+    boot_volume: "{{ item.1 }}-{{ item.0 }}-boot"
+    auto_ip: false
+    availability_zone: "{{ create_server_zone }}"
+    timeout: "{{ create_server_timeout|int * 60 }}"
+    userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
+    nics:
+      - port-name: "{{ os_port_storage }}-{{ item.0 }}"
+    meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
+    terminate_volume: true
+  with_indexed_items: "{{ [os_storage_server_name] * os_storage_nodes_number }}"
+  when:
+    - disk_type == "scsi"
+    - volume_type_id is defined

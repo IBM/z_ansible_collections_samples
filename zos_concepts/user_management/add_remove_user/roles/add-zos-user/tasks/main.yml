@@ -1,5 +1,5 @@
 ---
-# Copyright (c) IBM Corporation 2020
+# Copyright (c) IBM Corporation 2020, 2026
 
 # tasks file for add-zos-user
 
@@ -17,7 +17,7 @@
 - name: Assert desired userid is not in use
   ansible.builtin.fail:
     msg: "User ID {{ userid | upper }} is in use."
-  when: '"UNABLE TO LOCATE USER" not in listuser_response.get("output", [{}])[0].get("content", [""])[0]'
+  when: listuser_response.output | length > 0 and "UNABLE TO LOCATE USER" not in (listuser_response.output[0].stdout | default([]))
 
 - name: Generate password
   ansible.builtin.set_fact:
@@ -48,13 +48,13 @@
   ibm.ibm_zos_core.zos_tso_command:
     commands: "{{ lookup('template', '../templates/update-resource-access.j2') }}"
   with_items: "{{ resources_to_permit }}"
-  when: resources_to_permit is defined and resources_to_permit and resources_to_permit | length > 0
+  when: resources_to_permit is defined and resources_to_permit | length > 0
 
 - name: Add to groups
   ibm.ibm_zos_core.zos_tso_command:
     commands: "{{ lookup('template', '../templates/connect-user-to-group.j2') }}"
   with_items: "{{ groups_to_connect }}"
-  when: groups_to_connect is defined and groups_to_connect and groups_to_connect | length > 0
+  when: groups_to_connect is defined and groups_to_connect | length > 0
 
 - name: Define alias for user ID
   ibm.ibm_zos_core.zos_tso_command:
@@ -119,7 +119,7 @@
   when: templates_to_copy is defined and templates_to_copy | length > 0
 
 - name: Make mount persistent
-  when: bpxprm_member is defined and bpxprm_member
+  when: bpxprm_member is defined and bpxprm_member | length > 0
   block:
     - name: Generate tempfile to hold BPXPRMxx
       ansible.builtin.tempfile:

@@ -8,12 +8,14 @@
 # *|   - Renamed 13_unlock_each_appliances.yaml to 11_unlock_eachappliance.yaml |
 # *| [02.13.2026]                                                               |
 # *|   - Tested with ACC 1.2.12                                                 |
-# *| [04.02.2026]                                                           |
-# *|   - Tested with ACC 1.2.13                                             |
+# *| [04.02.2026]                                                               |
+# *|   - Tested with ACC 1.2.13                                                 |
+# *| [06.26.2026]                                                               |
+# *|   - Tested with ACC 1.2.14                                                 |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+----------------------------------------------------------------------------+
 
-
-# This playbook is not meant to be executed directly. It is automatically called 
+# This playbook is not meant to be executed directly. It is automatically called
 # by the other_usecases_ansible/12_unlock_appliances.yaml.
 # and ssa_deploy_ansible/04_unlock_ssa_after_hmc_install.yaml playbooks when run as
 # the appliance owner.

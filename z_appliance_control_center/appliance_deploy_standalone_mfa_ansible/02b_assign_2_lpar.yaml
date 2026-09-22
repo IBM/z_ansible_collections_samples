@@ -13,6 +13,9 @@
 # *|   - Replaced acc_ip with acc_url                                       |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for assigning two resource.
@@ -83,6 +86,10 @@
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: ../other_usecases_ansible/common_display_info.yaml
+
     - name: 01 - Validate WWPN and LUN values
       vars:
         hex_pattern: "^[A-Fa-f0-9]{16}$"
@@ -111,7 +118,6 @@
             - item | length > 0
             - item is not match(hex_pattern)
           loop: "{{ lun_vars }}"
-
 
     - name: 02 - As ACC-admin, assign two LPARs to the owner
       block:
@@ -170,7 +176,6 @@
               Select the correct disk type based on the system configuration.
                 - For FCP disk, ensure that valid values for 'wwpn*' and 'lun*' are provided
                 - For DASD disk, the 'wwpn' and 'lun' values are not required
-
 
         - name: Enter boot disk type for 1st LPAR [DASD/FCP]
           ansible.builtin.pause:

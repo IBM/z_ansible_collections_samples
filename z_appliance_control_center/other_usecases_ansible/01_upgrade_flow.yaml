@@ -12,6 +12,9 @@
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
 # *|   - Changed return code from 200 to 200,207                            |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for appliance upgrade
@@ -83,24 +86,67 @@
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: common_display_info.yaml
+
     - name: 04 - Upload upgrade appliance image to the ACC as owner
       tags: owner
       # The uri module cannot upload binary files.
       # One can use `src`, but both `src` and `body` can't be used together.
-      ansible.builtin.shell: 'curl -k -X "POST" \
+      ansible.builtin.shell: 'curl -v -k -X "POST" \
         "{{ acc_url }}/images" \
         -H "Authorization: Bearer {{ access_token }}" \
         -H "Content-Type: multipart/form-data" \
         -F "data=@{{ image_path }}" \
-        -F "image_name=awesome-img-2" -F "image_version=v1.0" -F "description=This image is an awesome image..." \
         -F "image_type={{ image_type }}" \
         -F "min_ifls={{ min_ifls }}" -F "min_memory={{ min_memory }}"'
-      register: response
+      register: upload_response
       changed_when: false
-      failed_when: >
-        response.rc != 0 or
-        (response.stdout is defined and 'exception' in response.stdout | lower)
+      failed_when: false
       # noqa command-instead-of-module command-instead-of-shell
+
+    - name: 04a - Display upload status
+      ansible.builtin.debug:
+        msg: "Image upload {{ 'successful' if upload_response.rc == 0 else 'failed with return code: ' + (upload_response.rc | string) }}"
+
+    - name: 04b - Check if image upload failed due to duplicate name
+      ansible.builtin.set_fact:
+        image_exists: "{{ ('Image name already exists' in upload_response.stdout) or ('E00402' in upload_response.stdout) }}"
+
+    - name: 04c - Display warning that the image upload failed due to a duplicate image already in ACC.
+      when: image_exists
+      ansible.builtin.debug:
+        msg:
+          - "⚠️  WARNING: Image with this name and version already exists for current user"
+          - ""
+          - "You can either:"
+          - "  1. Continue with an existing image (recommended)"
+          - "  2. Delete the existing image and re-run this playbook"
+
+    - name: 04d - Prompt user to continue with existing image
+      when: image_exists
+      ansible.builtin.pause:
+        prompt: |
+
+          Do you want to continue with an existing image? (yes/no)
+          Answering 'no' will stop the playbook.
+      register: continue_with_existing
+
+    - name: 04e - Fail if user chooses not to continue
+      when: image_exists and (continue_with_existing.user_input | lower != 'yes')
+      ansible.builtin.fail:
+        msg: "Playbook stopped by user. Please delete the existing image or change the image name in the playbook."
+
+    - name: 04f - Check for other upload errors
+      when: not image_exists and (upload_response.rc != 0 or 'exception' in upload_response.stdout | lower)
+      ansible.builtin.fail:
+        msg: "Image upload failed: {{ upload_response.stdout }}"
+
+    - name: 04g - Parse uploaded image ID from response
+      when: not image_exists
+      ansible.builtin.set_fact:
+        uploaded_image_id: "{{ (upload_response.stdout | from_json).image_id }}"
 
     - name: 05 - Get image information
       tags: owner, install
@@ -111,51 +157,93 @@
           Authorization: "Bearer {{ access_token }}"
           Content-Type: application/json
         validate_certs: false
-      register: response
-      failed_when: response.json.images | length == 0
+      register: get_images_response
+      failed_when: get_images_response.json.images | length == 0
 
-    - name: Printing the response of get image
-      tags: owner, install
+    - name: 05a - Display all available images
+      when: image_exists
       ansible.builtin.debug:
-        msg: "{{ response.json }}"
+        msg: "{{ get_images_response.json | to_nice_json }}"
 
-    - name: Extract the image ID from the DB
+    - name: 05b - Display available images header
+      when: image_exists
+      ansible.builtin.debug:
+        msg: "📋 Available Images:"
+
+    - name: 05c - Display each image for selection
+      when: image_exists
+      ansible.builtin.debug:
+        msg:
+          - "ID: {{ item.id }}"
+          - "Name: {{ item.name }}"
+          - "Version: {{ item.version | default('N/A') }}"
+          - "Type: {{ item.image_type | default('N/A') }}"
+          - "Description: {{ item.description | default('N/A') }}"
+      loop: "{{ get_images_response.json.images }}"
+      loop_control:
+        label: "Image ID: {{ item.id }}"
+
+    - name: 05d - Prompt user to select image ID
+      when: image_exists
+      ansible.builtin.pause:
+        prompt: |
+
+          Please enter the Image ID from the list above that you want to use for the upgrade:
+      register: selected_image_id_input
+
+    - name: 05e - Validate selected image ID exists
+      when: image_exists
+      ansible.builtin.set_fact:
+        selected_image_id: "{{ selected_image_id_input.user_input | int }}"
+        valid_image_ids: "{{ get_images_response.json.images | map(attribute='id') | list }}"
+
+    - name: 05f - Fail if selected image ID is invalid
+      when: image_exists and (selected_image_id | int not in valid_image_ids)
+      ansible.builtin.fail:
+        msg: "Invalid image ID '{{ selected_image_id }}'. Please run the playbook again and select a valid ID from the list."
+
+    - name: 06 - Set the image ID to use for upgrade
       tags: owner, install
       ansible.builtin.set_fact:
-        image_id: "{{ response.json.images[-1].id }}"
+        image_id: "{{ selected_image_id if image_exists else uploaded_image_id }}"
 
-    - name: Printing the image ID
+    - name: 07 - Printing the image ID
       tags: owner, install
       ansible.builtin.debug:
         msg: "{{ image_id }}"
 
-    - name: 06 - As owner, upgrade the image using image
+    - name: 08 - As owner, upgrade the image using image
       tags: owner, install
-      ansible.builtin.uri:
-        url: "{{ acc_url }}/cluster/upgrade"
-        method: POST
-        body: |
-          {
-            "{{ package_name }}": {
-            "lpars": ["{{ lpar_name }}"],
-            "image_id": {{ image_id | int }}
-            }
-          }
-        body_format: json
-        headers:
-          Authorization: "Bearer {{ access_token }}"
-          Content-Type: application/json
-        validate_certs: false
-        status_code: [200, 207]
-        dest: "{{ upgrade_appliance_data }}"
+      ansible.builtin.shell: |
+        http_code=$(curl -sS -k \
+          -D "{{ upgrade_appliance_data }}.headers" \
+          -o "{{ upgrade_appliance_data }}" \
+          -w "%{http_code}" \
+          -X POST "{{ acc_url }}/cluster/upgrade" \
+          -H "Authorization: Bearer {{ access_token }}" \
+          -H "Content-Type: application/json" \
+          --data '{"{{ package_name }}":{"lpars":["{{ lpar_name }}"],"image_id":{{ image_id | int }}}}')
+        printf '%s\n' "$http_code"
       changed_when: false
       register: upgrade_response
+      # noqa command-instead-of-module command-instead-of-shell
+
+    - name: Fail when upgrade request returns bad request (400)
+      tags: owner, install
+      ansible.builtin.fail:
+        msg: |
+          Upgrade request failed with HTTP 400.
+          Response ZIP saved at: {{ upgrade_appliance_data }}
+          Response headers saved at: {{ upgrade_appliance_data }}.headers
+
+          Inspect the ZIP contents to see the ACC validation error.
+      when: upgrade_response.stdout | trim == '400'
 
     - name: Debug message for partial failure (207)
       tags: owner, install
       ansible.builtin.debug:
         msg: "WARNING: Status code 207 received - one or more LPARs failed to perform the task"
-      when: upgrade_response.status == 207
+      when: upgrade_response.stdout | trim == '207'
 
     - name: Wait for 15 seconds
       ansible.builtin.pause:

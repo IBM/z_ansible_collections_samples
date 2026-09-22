@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2025
+# Copyright (c) IBM Corporation 2025, 2026
 ################################################################################
 
 ################################################################################
@@ -14,11 +14,13 @@
 # Note, PYZ and ZOAU environment variables must be configured.
 ################################################################################
 
-PYZ: "/allpython/3.11/usr/lpp/IBM/cyp/v3r11/pyz"
-ZOAU: "/zoau/v1.2.5"
+PYZ: "path_to_python_installation_on_zos_target"
+PYZ_VERSION: "3.xx"
+
+ZOAU: "path_to_zoau_installation_on_zos_target"
 
 ################################################################################
 # Do not configure, variable substituion will correctly set the
 # variable`ansible_python_interpreter`
 ################################################################################
-ansible_python_interpreter: "{{ PYZ }}/bin/python3.11"
+ansible_python_interpreter: "{{ PYZ }}/bin/python3"

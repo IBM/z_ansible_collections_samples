@@ -7,6 +7,8 @@
 # *|   - Tested with ACC 1.2.12                                             |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
 # *+------------------------------------------------------------------------+
 
 #####################################################################################################
@@ -30,7 +32,6 @@ mfa_enabled: false
 
 # IP of the ACC LPAR (e.g., "https://9.152.150.224:8081/api")
 acc_url: https://9.120.0.0:8081/api
-
 
 ####### HMC #######
 
@@ -92,13 +93,13 @@ image_type: "image"
 # specific set of logical partition (LPAR) and an appliance owner on an IBM Z system.
 # The resource package defines how many total number of Cores (GPs or IFLs),
 # how much total memory, and which LPARs within a CPC are assigned to the appliance owner.
-# The parameters below define the resource package to be created and assigned. When installing  
+# The parameters below define the resource package to be created and assigned. When installing
 # two SSAs, ensure that the resource package includes sufficient resources (ifls/gps and memory)
 # to accommodate both SSA LPARs. The allocations defined later in the Install section below
 # for the SSA appliances will be drawn from the total resources specified in the resource package.
 # ------------------------------------------------------------------------------
 #
-# The SSA appliance requires at least 2 IFLs and a minimum of 51200 (in MB) per LPAR. 
+# The SSA appliance requires at least 2 IFLs and a minimum of 51200 (in MB) per LPAR.
 # For better performance, more resource can be assigned depending on the expected workload.
 #
 # Memory should always be a multiple of 1024 (1 GB).
@@ -148,7 +149,7 @@ chpid1: "xx"
 zport1: 0
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
-# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# Note: When using FCP this variable represents the LPAR's FCP device number used to
 # communicate with the boot volume on the storage controller
 disk1_id: "0.0.5abc"
 
@@ -179,7 +180,7 @@ gw1_ip: "9.102.0.1"
 # Secure Service Container graphical user interface (GUI). An administrator user ID can
 # be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
 # 0 - 9, letters A - Z (upper or lower case), and the following special
-# characters: period (.), underscore (_), and hyphen (-). 
+# characters: period (.), underscore (_), and hyphen (-).
 # SSA1_APP_PASSWORD: This is the Administrator password in the SSC user guide.
 # This password can have a minimum of 8 characters and a maximum of 256 characters.
 # An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
@@ -219,7 +220,7 @@ chpid2: "xx"
 zport2: 0
 
 # Disk identifier (e.g., "5f20" start with 0.0) for installing image on lpar disk
-# Note: When using FCP this variable represents the LPAR's FCP device number used to 
+# Note: When using FCP this variable represents the LPAR's FCP device number used to
 # communicate with the boot volume on the storage controller
 disk2_id: "0.0.5abc"
 
@@ -250,7 +251,7 @@ gw2_ip: "9.102.0.1"
 # Secure Service Container graphical user interface (GUI). An administrator user ID can
 # be 1 - 32 characters long. It cannot contain blanks. Valid characters are numbers
 # 0 - 9, letters A - Z (upper or lower case), and the following special
-# characters: period (.), underscore (_), and hyphen (-). 
+# characters: period (.), underscore (_), and hyphen (-).
 # SSA2_APP_PASSWORD: This is the Administrator password in the SSC user guide.
 # This password can have a minimum of 8 characters and a maximum of 256 characters.
 # An administrator password is case-sensitive and can contain numbers 0 - 9, letters A - Z
@@ -267,7 +268,7 @@ lpar2_admin_user: "{{ lookup('env', 'SSA2_APP_USERNAME') }}"
 lpar2_admin_password: "{{ lookup('env', 'SSA2_APP_PASSWORD') }}"
 
 ################################################################################
-# From the HMC, select the LPAR you’re working with. In the Tasks panel, 
+# From the HMC, select the LPAR you’re working with. In the Tasks panel,
 # open the Operational Customization drop-down, choose Customize/Delete Activation Profiles,
 # and navigate to the Processor section, check the processor type and value:
 # - Dedicated central processors
@@ -281,7 +282,7 @@ lpar2_admin_password: "{{ lookup('env', 'SSA2_APP_PASSWORD') }}"
 # otherwise set it to "general-purpose" for central processors
 # Set processor_type for the LPAR (used during image installation)
 # Keep in mind, the processor type defined here correlates to the min_ifl value defined below.
-#   - For example, if min_ifls is set to 2 and processor_type is "ifl", then 2 IFLs will be assigned as the minimum for the appliance. 
+#   - For example, if min_ifls is set to 2 and processor_type is "ifl", then 2 IFLs will be assigned as the minimum for the appliance.
 #     If min_ifls is set to 2 and processor_type is "general-purpose", then 2 gps will be assigned as the minimum for the appliance.
 
 processor_type: "general-purpose"
@@ -306,8 +307,8 @@ install: true
 
 # **********************************************************************************************
 # Keep in mind when two SSA appliances are being installed, the cores and memory defined here
-# will be applied to each appliance LPAR individually. 
-# 
+# will be applied to each appliance LPAR individually.
+#
 # Always ensure that the resource package defined earlier above provides sufficient capacity
 # to support the appliances being installed.
 # **********************************************************************************************

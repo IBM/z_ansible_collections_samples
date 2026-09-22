@@ -20,15 +20,20 @@
     - name: 'Import common yaml'
       ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
+    - name: Get icic project name
+      ansible.builtin.shell:
+        cmd: openstack configuration show -c auth.project_name -f value
+      register: icic_proj
+
     - name: 'Get image name for kvm'
       ansible.builtin.set_fact:
-        image_name: icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}
+        image_name: icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}
       when:
         - vm_type == "kvm"
 
     - name: 'Get image name for ZVM'
       ansible.builtin.set_fact:
-        image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
+        image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}"
       when:
         - vm_type == "zvm"
 
@@ -93,8 +98,7 @@
       openstack.cloud.port:
         name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         network: "{{ use_network_name }}"
-        security_groups:
-          - "{{ os_sg_worker }}"
+        security_groups: "{{ os_sg_worker + ',' + add_secgroups if add_secgroups is defined else os_sg_worker }}"
         fixed_ips:
           - subnet: "{{ use_network_subnet }}"
             ip_address: "{{ item.split(' ')[1] }}"
@@ -106,8 +110,7 @@
       openstack.cloud.port:
         name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         network: "{{ use_network_name }}"
-        security_groups:
-          - "{{ os_sg_worker }}"
+        security_groups: "{{ os_sg_worker + ',' + add_secgroups if add_secgroups is defined else os_sg_worker }}"
       register: ports
       with_items: "{{ new_worker_list.stdout_lines }}"
       when: add_worker_ip == "random"

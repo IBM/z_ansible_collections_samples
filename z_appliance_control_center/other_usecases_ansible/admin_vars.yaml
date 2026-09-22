@@ -8,6 +8,8 @@
 # *|   - Replaced hmc_url with hmc_ip                                       |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
 # *+------------------------------------------------------------------------+
 
 ##### ACC variables #######
@@ -21,7 +23,7 @@ acc_port: 8081
 ##### HMC #######
 
 # hmc host ip (e.g., 9.0.0.0)
-hmc_ip: "9.152.150.166"
+hmc_ip: "9.152.150.67"
 
 # ACC-admin's user name on the HMC (e.g., export HMC_USER=xyz.ibm.com)
 hmc_user: "{{ lookup('env', 'HMC_USER') }}"

@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2025
+# © Copyright IBM Corporation 2025, 2026
 ###############################################################################
 
 ###############################################################################
@@ -18,7 +18,7 @@
 #  permissions such as writing the the target directories or creating data sets.
 #
 # Requirements:
-#     - IBM z/OS core collection 1.13.0 or later
+#     - IBM z/OS core collection 2.0.0 or later
 #
 ###############################################################################
 
@@ -131,4 +131,3 @@
       zos_data_set:
         name: "{{ zfs_data_set }}"
         state: absent
-

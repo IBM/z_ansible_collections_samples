@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021, 2024
+# Copyright (c) IBM Corporation 2021, 2026
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -26,24 +26,31 @@
 ################################################################################
 
 releases:
-    2020.09.01:
-        date: 2020-09-01
-        changes:
-            added:
-                - Released initial version
-    2021.08.06:
-        date: 2021-08-06
-        changes:
-            added:
-                - Site playbook for consistency with playbook design
-                - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
-                - Updated host_vars, group_vars and inventory
-            removed:
-                - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
-    2024.04.09:
-        date: 2024-04-09
-        changes:
-            fixed:
-                - Replace deprecated zos_data_set module option 'size' with new module options 'space_primary' and 'space_type'.
-            removed:
-                - Remove playbook task creating members to avoid using 'force' module option in the zos_copy playbook task.
+  2020.09.01:
+    date: 2020-09-01
+    changes:
+      added:
+        - Released initial version
+  2021.08.06:
+    date: 2021-08-06
+    changes:
+      added:
+        - Site playbook for consistency with playbook design
+        - Added requirements-check role that can evaluate the playbooks requirements and pass or fail playbook execution
+        - Updated host_vars, group_vars and inventory
+      removed:
+        - Removed the zos_ssh connection plugin, it is no longer included in the ibm_zos_core collection.
+  2024.04.09:
+    date: 2024-04-09
+    changes:
+      fixed:
+        - Replace deprecated zos_data_set module option 'size' with new module options 'space_primary' and 'space_type'.
+      removed:
+        - Remove playbook task creating members to avoid using 'force' module option in the zos_copy playbook task.
+  2026.06.09:
+    date: 2026-06-09
+    changes:
+      fixed:
+        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 zos_job_submit breaking changes.
+      minor:
+        - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.
