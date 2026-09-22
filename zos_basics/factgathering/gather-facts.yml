@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2023
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 # This sample playbook demonstrates the zos fact gathering module included in
 # the Red Hat Ansible Certified  Content for IBM Z core collection.
@@ -12,7 +12,7 @@
 #  ansible-playbook -i inventories gather-facts.yml -v
 #
 # Requirements:
-#   IBM z/OS core collection 1.4.0 or later. # TODO update this version!
+#   IBM z/OS core collection 2.0.0 or later.
 #
 ###############################################################################
 
@@ -26,7 +26,6 @@
   gather_facts: false
 
   tasks:
-
     # ##########################################################################
     # Call z/OS fact gathering with the 'ipl' subset and filter down to
     # master_catalog facts.
@@ -34,9 +33,9 @@
     - name: Collect z/OS facts on master_catalog.
       zos_gather_facts:
         gather_subset:
-          - 'ipl'
+          - "ipl"
         filter:
-          - 'master*'
+          - "master*"
 
     # ##########################################################################
     # Collected facts can be accessed via the ansible_facts dict (dictionary).
@@ -54,8 +53,8 @@
     - name: Gather additional z/OS facts.
       zos_gather_facts:
         gather_subset:
-          - 'cpu'
-          - 'iodf'
+          - "cpu"
+          - "iodf"
 
     # ##########################################################################
     # Collected facts are stored in ansible_facts dict but ansible_dict does

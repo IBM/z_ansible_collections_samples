@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2023, 2024
+# Copyright (c) IBM Corporation 2023, 2026
 #
 # All notable changes to this project will be documented in this file. Following
 # releases is a decimal based date since playbooks have no version in this
@@ -26,13 +26,21 @@
 ################################################################################
 
 releases:
-    2023.10.24:
-        date: 2023-10-24
-        changes:
-            added:
-                - Released initial version
-    2024.04.09:
-        date: 2024-04-09
-        changes:
-            fixed:
-                - Prefix paths with 'playbook_dir' Ansible global variable.
+  2023.10.24:
+    date: 2023-10-24
+    changes:
+      added:
+        - Released initial version
+  2024.04.09:
+    date: 2024-04-09
+    changes:
+      fixed:
+        - Prefix paths with 'playbook_dir' Ansible global variable.
+  2026.06.15:
+    date: 2026-06-15
+    changes:
+      fixed:
+        - Add encoding options to zos_script for local file to z/OS transfer.
+        - Rename option 'location' to 'remote_src' and change parameter from string to boolean per ibm.ibm_zos_core:2.0.0 zos_script breaking changes.
+      minor:
+        - Updated documentation and requirements for ibm.ibm_zos_core:2.0.0 compatibility.

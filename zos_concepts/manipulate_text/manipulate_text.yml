@@ -1,24 +1,23 @@
 ###############################################################################
-# © Copyright IBM Corporation 2025
+# © Copyright IBM Corporation 2025, 2026
 ###############################################################################
 
 ###############################################################################
-# This sample playbook demonstrates how to create a zFS aggregate, mount it,
-# shrink it with different size options,
-# and use the module's verbose mode to get the full trace back.
+# This sample playbook demonstrates how to manipulate text in z/OS data sets
+# and USS files using copy and replace operations.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
-#  ansible-playbook -i inventories copy_edit_submit.yml
+#  ansible-playbook -i inventories manipulate_text.yml
 #
 #  When running this playbook, review the comments on how ths sample will
 #  interact with your target, ensure you have the required authority and
 #  permissions such as writing the the target directories or creating data sets.
 #
 # Requirements:
-#     - IBM z/OS core collection 1.15.0 or later
+#     - IBM z/OS core collection 2.0.0 or later
 #
 ###############################################################################
 
@@ -101,25 +100,25 @@
       zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ seq_dataset }}"
-        remote_src: True
+        remote_src: true
 
     - name: "Generate a new member of {{ pdse_dataset }} with copy of content"
       zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ pdse_dataset }}(MEM1)"
-        remote_src: True
+        remote_src: true
 
     - name: "Execute copy of files_no_utf_8 to the tmp file {{ tmp_file }}"
       zos_copy:
         src: "{{playbook_dir}}/files/files_no_utf_8.txt"
         dest: "{{ tmp_file }}"
-        force: True
+        replace: true
 
     - name: "Copy {{ tmp_file }} to the last SEQ dataset {{ seq_n_dataset }}"
       zos_copy:
         src: "{{ tmp_file }}"
         dest: "{{ seq_n_dataset }}"
-        remote_src: True
+        remote_src: true
 
     # ##########################################################################
     # Manipulate text on the files with different options.
@@ -142,7 +141,7 @@
         regexp: ^(IE[A-Z0-9]{3}I|IEF[0-9]{3}I)\s.*
         after: ^\$DA *
         before: ^\s*NODE\d *
-        backup: True
+        backup: true
         backup_name: "{{ backup_name }}"
       register: multiple_lines_results
 
@@ -164,7 +163,7 @@
         target: "{{ pdse_dataset }}(MEM)"
         regexp: //*SMPTLIB  DD UNIT=SYSALLDA,SPACE=(TRK,(1,1)),VOL=SER=vvvvvv
         after: $TRACE OFF
-        disable_regex:
+        literal:
           - regexp
           - after
       register: disable_regex_output
@@ -187,10 +186,10 @@
     - name: "Replace words between lines on USS file {{ tmp_file }} with no utf-8"
       zos_replace:
         target: "{{ tmp_file }}"
-        regexp: 'ZOAU_ROOT'
-        replace: 'NEW_ZOAU_ROOT'
-        after: '^PATH*'
-        before: 'TYPE*'
+        regexp: "ZOAU_ROOT"
+        replace: "NEW_ZOAU_ROOT"
+        after: "^PATH*"
+        before: "TYPE*"
       register: replace_words
 
     - name: See the result of replace words

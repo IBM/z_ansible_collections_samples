@@ -1,0 +1,38 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| Common tasks for displaying playbook execution information and         |
+# *| ACC about information. Requires access_token and acc_url variables.    |
+# *+------------------------------------------------------------------------+
+
+- name: Display playbook execution information
+  ansible.builtin.include_tasks:
+    file: common_display_execution_info.yaml
+
+- name: Get ACC about information
+  ansible.builtin.uri:
+    url: "{{ acc_url }}/about"
+    method: GET
+    headers:
+      Accept: "application/json"
+      Authorization: "Bearer {{ access_token }}"
+    validate_certs: false
+    return_content: true
+  register: about_response
+  failed_when: false
+
+- name: Display ACC about information
+  ansible.builtin.debug:
+    var: about_response.json
+  when: about_response.status == 200
+
+- name: Display about API failure message
+  ansible.builtin.debug:
+    msg: >-
+      Failed to retrieve ACC about information - Status: {{ about_response.status }}.
+      This endpoint may not be available in your ACC version. Available in ACC versions >= 1.2.14.
+      API Response: {{
+        (about_response.content | from_json).message
+        if about_response.content is defined
+        else 'No response received'
+      }}
+  when: about_response.status != 200

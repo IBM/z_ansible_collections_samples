@@ -117,6 +117,7 @@ often repeated and in need of automation.
     - [Enable IMS catalog and managed ACBs](zos_subsystems/ims/enable_catalog_macb)
 - Software Installation
   - [SMP/E Playbooks](https://github.com/IBM/z_ansible_collections_samples/tree/master/zos_concepts/software_management)
+  - [z/OS Debugger Installation and Configuration Automation](z_system_automation/zos_debugger_install_config_automation)
 - Security
   - [Security validation](zos_management/zosmf_security_configuration_assistant)
   - [Security audit](zos_management/zosmf_security_configuration_assistant)
@@ -160,7 +161,7 @@ Licensed under
 [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0).
 
 ## Support
-This project is supported by the community though
+This project is supported by the community through
 [Git issues](https://github.com/IBM/z_ansible_collections_samples/issues).
 
 The repository admins and content owners will engage directly with users on

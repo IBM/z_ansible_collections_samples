@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) IBM Corporation 2021
+# Copyright (c) IBM Corporation 2021, 2026
 ################################################################################
 
 ################################################################################
@@ -17,12 +17,11 @@
 
 - name: DEBUG(-v) List of supported Ansible versions for this playbook
   ansible.builtin.set_fact:
-    runtime_ansible_req: "{{ runtime_ansible_req | default([]) }} +[ '{{ item }}.n' ]"
+    runtime_ansible_req: "{{ (runtime_ansible_req | default([])) + [item + '.n'] }}"
   loop: "{{requires_ansible_version}}"
 
 - name: Ansible requirement check ensuring the Ansible runtime version meets the playbook requirement
-  ansible.builtin.include_tasks:
-    ansible_check.yml
+  ansible.builtin.include_tasks: ansible_check.yml
   with_items: "{{requires_ansible_version}}"
   loop_control:
     loop_var: tmp
@@ -38,13 +37,11 @@
     verbosity: 1
 
 - name: Collection requirement check ensuring if the collection version meets the playbook requirement
-  ansible.builtin.include_tasks:
-    collection_check.yml
+  ansible.builtin.include_tasks: collection_check.yml
 
 - name: Ansible engine version for this playbook requirement check completed
   ansible.builtin.assert:
-    that:
-      ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', False)|list|length > 0
+    that: ansible_version_checks|dict2items|selectattr('value.failed', 'equalto', False)|list|length > 0
     success_msg: "[SUCCESS] This playbook has the required dependency Ansible version {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }} installed."
     fail_msg: "[FAIL] This playbook requires Ansible versions {{runtime_ansible_req}} and has detected {{ ansible_version.major|int }}.{{ ansible_version.minor|int }}.{{ ansible_version.revision|int }}. Please review the playbook documentation for the required Ansible version."
     quiet: true
@@ -70,16 +67,17 @@
   loop: "{{result_collection_status.results}}"
   loop_control:
     label: "{{ item.msg }}"
-  when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
+  when: result_collection_status.results | selectattr('msg', 'contains', 'FAIL') | list | length > 0
 
-- ansible.builtin.fail:
+- name: Fail if collection requirement not met
+  ansible.builtin.fail:
     msg: "{{result_collection_status_msg}}"
   when: result_collection_status_failed is defined and result_collection_status_failed
 
-- ansible.builtin.fail:
+- name: Fail if Ansible version requirement not met
+  ansible.builtin.fail:
     msg: "{{result_ansible_check.msg}}"
   when: result_ansible_check.msg is regex("FAIL")
-
 # - name: DEBUG(-v) Display if Ansible collection version for this playbook requirement passed
 #   fail:
 #     msg: "{{item.msg}}"
@@ -96,7 +94,6 @@
 #     label: "{{ item.msg }}"
 #  # when: result_collection_status.results |selectattr('msg', 'contains', 'FAIL')
 
-
 # - fail:
 #     msg: "{{result_ansible_check.msg}}"
 #   when: result_ansible_check.msg is regex("FAIL")
@@ -105,7 +102,6 @@
 #     msg: "{{foo}}"
 #   when: foo is regex("FAIL")
 
-
 # - name: DEBUG(-v) Display collection version check
 #   fail:
 #     msg: "{{item.msg}}"
@@ -113,7 +109,6 @@
 #   loop_control:
 #     label: "{{ item.msg }}"
 #   when: item.msg is regex("FAIL")
-
 
 #############################################
 # - name: Ansible requirement check completed

@@ -15,5 +15,35 @@ jobs:
         with:
           requirements: collections/requirements.yml
 
+      - name: Install ansible-lint
+        run: pip install ansible-lint
+
+      # Equivalent local one-liner (for reference / local testing):
+      # for dir in /Users/ddimatos/git/z_ansible_collections_samples/*/; do echo "=== Entering: $dir ===" && (cd "$dir" && ansible-lint *); done
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v6.22.2
+        env:
+          ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
+        run: |
+          failed=()
+          for dir in ${{ github.workspace }}/*/; do
+            echo ""
+            echo "==============================================="
+            echo "  Entering: $dir"
+            echo "==============================================="
+            echo ""
+            if (cd "$dir" && ansible-lint *); then
+              echo "[PASS] $dir"
+            else
+              echo "[FAIL] $dir"
+              failed+=("$dir")
+            fi
+          done
+
+          if [[ ${#failed[@]} -gt 0 ]]; then
+            echo ""
+            echo "The following directories failed:"
+            for d in "${failed[@]}"; do
+              echo "  - $d"
+            done
+            exit 1
+          fi

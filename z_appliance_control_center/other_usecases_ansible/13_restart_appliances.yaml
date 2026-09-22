@@ -8,6 +8,9 @@
 # *|   - Replaced acc_ip with acc_url                                       |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by appliance-owner, for restarting an appliance.
@@ -74,6 +77,10 @@
       tags: owner, install
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: common_display_info.yaml
 
     - name: 04 - Get list of running appliance
       ansible.builtin.uri:

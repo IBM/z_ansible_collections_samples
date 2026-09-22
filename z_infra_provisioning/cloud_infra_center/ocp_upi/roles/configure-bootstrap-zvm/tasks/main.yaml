@@ -38,9 +38,14 @@
 - name: 'Import common yaml'
   ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
+- name: Get icic project name
+  ansible.builtin.shell:
+    cmd: openstack configuration show -c auth.project_name -f value
+  register: icic_proj
+
 - name: 'Get image name for ZVM'
   ansible.builtin.set_fact:
-    image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
+    image_name: "icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}"
   when:
     - vm_type == "zvm"
 

@@ -22,32 +22,35 @@
 
 - hosts: localhost
   gather_facts: false
-
   tasks:
+    - name: Get icic project name
+      ansible.builtin.shell:
+        cmd: openstack configuration show -c auth.project_name -f value
+      register: icic_proj
 
     - name: Get existing rhcos image from ICIC glance
-      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}'| wc -l"
+      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'| wc -l"
       register: icic_rhcos_count
       when:
         - vm_type == "kvm"
 
     - name: 'Remove the rhcos image'
       ansible.builtin.shell:
-        cmd: "openstack image delete icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
+        cmd: "openstack image delete icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}"
       when:
         - vm_type == "kvm"
         - icic_rhcos_count is defined
         - icic_rhcos_count.stdout | int == 1
 
     - name: Get existing rhcos image from ICIC glance
-      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}'| wc -l"
+      ansible.builtin.shell: "openstack image list --format value| grep -w 'icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}'| wc -l"
       register: icic_rhcos_count
       when:
         - vm_type == "zvm"
 
     - name: 'Remove the rhcos image'
       ansible.builtin.shell:
-        cmd: "openstack image delete icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}"
+        cmd: "openstack image delete icic_rhcos_{{ vm_type }}_{{ disk_type }}_{{ openshift_version }}_{{ openshift_minor_version }}_{{ icic_proj.stdout }}"
       when:
         - vm_type == "zvm"
         - icic_rhcos_count is defined

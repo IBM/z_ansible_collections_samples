@@ -1,0 +1,173 @@
+# *+------------------------------------------------------------------------+
+# *| © Copyright IBM Corp. 2026                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Initial release                                                    |
+# *+------------------------------------------------------------------------+
+
+- name: ACC playbook, run as appliance-owner, to get preserved information for inactive appliance
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - owner_vars.yaml
+
+  vars_prompt:
+    - name: "resource_package_name"
+      prompt: "Enter the name of the resource package, or use 'all' to get information about all the resource packages (default: all)"
+      private: false
+      default: "all"
+
+  pre_tasks:
+    - name: Reminder - Export appliance-owner credentials
+      ansible.builtin.pause:
+        prompt: |
+          Before running this playbook, please export appliance-owner credentials:
+
+          export ACC_OWNER_PASSWORD=<owner_password>
+
+          Press Ctrl+C now to cancel if you haven't done this.
+          The playbook will continue shortly.
+        seconds: 5
+
+    - name: Check required environment variables
+      vars:
+        required_env_vars:
+          - ACC_OWNER_PASSWORD
+
+      ansible.builtin.fail:
+        msg: "Missing required environment variable: {{ item }}"
+      when: lookup('env', item) == ""
+      loop: "{{ required_env_vars }}"
+
+  tasks:
+    - name: 00 - Check MFA is enabled or not
+      ansible.builtin.pause:
+        prompt: "Do you have MFA enabled? (yes/no):"
+      register: mfa_enabled_input
+
+    - name: 01 - Set MFA enabled
+      ansible.builtin.set_fact:
+        mfa_enabled: "{{ mfa_enabled_input.user_input | lower == 'yes' }}"
+
+    - name: 02 - Prompt for OTP if MFA is enabled
+      when: mfa_enabled
+      ansible.builtin.pause:
+        prompt: "Enter MFA OTP generated for owner:"
+      register: mfa_otp_input
+
+    - name: 03 - Get authentication token from the ACC as owner
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/user/token"
+        method: POST
+        body:
+          username: "{{ cc_owner_user }}"
+          password: "{{ cc_owner_password }}"
+          otp: "{{ (mfa_otp_input.user_input if mfa_enabled else omit) }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+      register: auth_response
+
+    - name: 04 - Extract the token
+      tags: owner
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.access_token }}"
+
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: common_display_info.yaml
+
+    - name: 05 - Check if 'all' resource packages requested
+      ansible.builtin.set_fact:
+        fetch_all_packages: "{{ resource_package_name | lower == 'all' }}"
+
+    - name: 06 - Get all resource packages (if 'all' specified)
+      when: fetch_all_packages
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/resource/pkgs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Accept: application/json
+        return_content: true
+        validate_certs: false
+      register: resource_packages_response
+
+    - name: 07 - Extract resource package names (if 'all' specified)
+      when: fetch_all_packages
+      tags: owner
+      ansible.builtin.set_fact:
+        package_names: "{{ resource_packages_response.json | map(attribute='name') | list }}"
+
+    - name: 08 - Display resource packages found (if 'all' specified)
+      when: fetch_all_packages
+      ansible.builtin.debug:
+        msg: "Found {{ package_names | length }} resource package(s): {{ package_names | join(', ') }}"
+
+    - name: 09 - Prompt for LPAR specification preference
+      ansible.builtin.pause:
+        prompt: "Do you want to specify specific LPARs to get the preserved information? (yes/no - 'no' will fetch for all LPARs in the resource package)"
+      register: specify_lpars_input
+
+    - name: 10 - Set specify LPARs flag
+      ansible.builtin.set_fact:
+        specify_lpars: "{{ specify_lpars_input.user_input | lower == 'yes' }}"
+
+    - name: 11 - Prompt for LPAR names if specified
+      when: specify_lpars
+      ansible.builtin.pause:
+        prompt: "Enter LPAR names (comma-separated, e.g., SSC12,SSC09):"
+      register: lpar_names_input
+
+    - name: 12 - Build LPAR list
+      when: specify_lpars
+      ansible.builtin.set_fact:
+        lpar_list: "{{ lpar_names_input.user_input.split(',') | map('trim') | reject('equalto', '') | list }}"
+
+    - name: 13 - Build request body for all resource packages
+      when: fetch_all_packages and not specify_lpars
+      tags: owner
+      ansible.builtin.set_fact:
+        request_body: "{{ dict(package_names | zip_longest([], fillvalue={})) }}"
+
+    - name: 14 - Build request body for all resource packages with specific LPARs
+      when: fetch_all_packages and specify_lpars
+      tags: owner
+      ansible.builtin.set_fact:
+        request_body: "{{ dict(package_names | zip_longest([], fillvalue={'lpars': lpar_list})) }}"
+
+    - name: 15 - Build request body for single package with specific LPARs
+      when: not fetch_all_packages and specify_lpars
+      ansible.builtin.set_fact:
+        request_body: "{{ {} | combine({resource_package_name: {'lpars': lpar_list}}) }}"
+
+    - name: 16 - Build request body for single package with all LPARs
+      when: not fetch_all_packages and not specify_lpars
+      ansible.builtin.set_fact:
+        request_body: "{{ {} | combine({resource_package_name: {}}) }}"
+
+    - name: 17 - Display request body
+      ansible.builtin.debug:
+        var: request_body
+
+    - name: 18 - Get preserved information for inactive appliance
+      tags: owner
+      ansible.builtin.uri:
+        url: "{{ acc_url }}/cluster/inactive-appliance/preserved-info"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        body: "{{ request_body }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+        status_code: [200, 207]
+      register: preserved_info_response
+
+    - name: 19 - Display preserved appliance information response
+      tags: owner
+      ansible.builtin.debug:
+        var: preserved_info_response.json

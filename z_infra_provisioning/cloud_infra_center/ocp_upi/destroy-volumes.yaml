@@ -79,3 +79,35 @@
         - vm_type == "kvm"
         - volume_type_id is defined
         - compute_vols.stdout != ""
+
+    - name: 'Get storage volumes from ICIC command line'
+      ansible.builtin.shell: |
+        openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep storage | cut -d '-' -f 1-3
+      register: storage_vols
+      ignore_errors: true
+
+    - name: 'Delete storage boot volumes in KVM'
+      openstack.cloud.volume:
+        state: absent
+        name: "{{ item.1 }}-{{ item.0 }}-boot"
+      with_indexed_items: "{{ storage_vols.stdout_lines }}"
+      when:
+        - vm_type == "kvm"
+        - volume_type_id is defined
+        - storage_vols.stdout != ""
+
+    - name: 'Get infra volumes from ICIC command line'
+      ansible.builtin.shell: |
+        openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep infra | cut -d '-' -f 1-3
+      register: infra_vols
+      ignore_errors: true
+
+    - name: 'Delete infra boot volumes in KVM'
+      openstack.cloud.volume:
+        state: absent
+        name: "{{ item.1 }}-{{ item.0 }}-boot"
+      with_indexed_items: "{{ infra_vols.stdout_lines }}"
+      when:
+        - vm_type == "kvm"
+        - volume_type_id is defined
+        - infra_vols.stdout != ""

@@ -44,6 +44,23 @@
   ansible.builtin.command:
     cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_worker }} "
 
+
+- name: 'Create the storage security group'
+  openstack.cloud.security_group:
+    name: "{{ os_sg_storage }}"
+
+- name: 'Set storage security group tag'
+  ansible.builtin.command:
+    cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_storage }} "
+
+- name: 'Create the infra security group'
+  openstack.cloud.security_group:
+    name: "{{ os_sg_infra }}"
+
+- name: 'Set infra security group tag'
+  ansible.builtin.command:
+    cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_infra }} "
+
 - name: 'Create master-sg rule "ICMP"'
   openstack.cloud.security_group_rule:
     security_group: "{{ os_sg_master }}"
@@ -308,3 +325,239 @@
     security_group: "{{ os_sg_worker }}"
     protocol: '112'
     remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+
+- name: 'Create storage-sg rule "ICMP"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: icmp
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "SSH"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "mDNS"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 5353
+    port_range_max: 5353
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "Ingress HTTP"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "Ingress HTTPS"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    port_range_min: 443
+    port_range_max: 443
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "router"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 1936
+    port_range_max: 1936
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "VXLAN"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 4789
+    port_range_max: 4789
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "Geneve"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 6081
+    port_range_max: 6081
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "storage ingress internal (TCP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 9000
+    port_range_max: 9999
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "storage ingress internal (UDP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 9000
+    port_range_max: 9999
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "storage ingress kubelet insecure"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 10250
+    port_range_max: 10250
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "storage ingress services (TCP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 30000
+    port_range_max: 32767
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "storage ingress services (UDP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 30000
+    port_range_max: 32767
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create storage-sg rule "VRRP"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_storage }}"
+    protocol: '112'
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+  when: os_storage_nodes_number > 0 
+  
+- name: 'Create infra-sg rule "ICMP"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: icmp
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "SSH"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "mDNS"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 5353
+    port_range_max: 5353
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "Ingress HTTP"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "Ingress HTTPS"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    port_range_min: 443
+    port_range_max: 443
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "router"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 1936
+    port_range_max: 1936
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "VXLAN"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 4789
+    port_range_max: 4789
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "Geneve"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 6081
+    port_range_max: 6081
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "infra ingress internal (TCP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 9000
+    port_range_max: 9999
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "infra ingress internal (UDP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 9000
+    port_range_max: 9999
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "infra ingress kubelet insecure"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 10250
+    port_range_max: 10250
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "infra ingress services (TCP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: tcp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 30000
+    port_range_max: 32767
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "infra ingress services (UDP)"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: udp
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+    port_range_min: 30000
+    port_range_max: 32767
+  when: os_infra_nodes_number > 0 
+
+- name: 'Create infra-sg rule "VRRP"'
+  openstack.cloud.security_group_rule:
+    security_group: "{{ os_sg_infra }}"
+    protocol: '112'
+    remote_ip_prefix: "{{ sunbet_range.stdout_lines[0] }}"
+  when: os_infra_nodes_number > 0 

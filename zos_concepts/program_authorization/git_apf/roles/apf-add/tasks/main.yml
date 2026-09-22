@@ -1,6 +1,6 @@
 ---
 ################################################################################
-# © Copyright IBM Corporation 2020
+# © Copyright IBM Corporation 2020, 2026
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ################################################################################
 
@@ -8,4 +8,5 @@
   ibm.ibm_zos_core.zos_apf:
     batch: "{{ add_list }}"
     force_dynamic: true
-    persistent: "{{ persistent_ds }}"
+    persistent:
+      target: "{{ persistent_ds.target }}"

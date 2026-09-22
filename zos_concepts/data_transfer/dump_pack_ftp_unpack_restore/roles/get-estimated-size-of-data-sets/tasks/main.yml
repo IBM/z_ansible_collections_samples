@@ -5,7 +5,7 @@
 - name: Raise error is data_sets is not set
   ansible.builtin.fail:
     msg: Missing required variable 'data_sets'.
-  failed_when: data_sets is not defined
+  when: data_sets is not defined
 
 - name: Get attributes for data sets
   ansible.builtin.command: dls -s {{ data_sets | join(' ') }}

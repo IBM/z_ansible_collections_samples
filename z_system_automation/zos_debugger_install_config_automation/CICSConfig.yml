@@ -1,0 +1,78 @@
+---
+################################################################################
+# Copyright (c) IBM Corporation 2026
+################################################################################
+- name: CICS Configuration
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  vars_files: "variables.yml"
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+
+  tasks:
+    #######################################
+
+    # Update CSD
+
+    # Submit JCL to define debugger resources in CICS CSD
+    - name: Define and install Debugger resource in the CICS CSD
+      zos_job_submit:
+        src: JCLS/EQAWCCSD.jcl
+        location: local
+        use_template: true
+        max_rc: 4
+
+      register: response
+
+    # Show the job ID for CSD update
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for EQAWIVCT : {{ response.job_id }}"
+
+    #######################################
+
+    # Run COBOL V6x IVT EQAWIVCT
+
+    # Submit COBOL V6 IVP job
+    - name: EQAWIVCT
+      zos_job_submit:
+        src: JCLS/EQAWIVCT.jcl
+        location: local
+        use_template: true
+
+      register: response
+
+    # Show the job ID for IVP job
+    - name: Display job submission results
+      debug:
+        msg: "Job Submission Result for EQAWIVCT : {{ response.job_id }}"
+
+    # Display manual configuration steps for CICS
+    - name: Execution instructions
+      pause:
+        prompt: |
+          Ensure the following data sets are added to the DFHRPL DD in your CICS region:
+               {{ zosmf_user }}.EQAIVP.LOADPDSE
+               {{ eqa_hlq }}.SEQAMOD
+               SYS1.MIGLIB
+               SYS1.SIEAMIGE
+               {{ ivp_LIBPRFX }}.SCEECICS
+               {{ ivp_LIBPRFX }}.SCEERUN
+               {{ ivp_LIBPRFX }}.SCEERUN2
+
+          Add EQALIST to your CICS GRPLIST
+
+          Run the IVCT transaction to ensure it works
+
+          Run the DTCN transaction and press PF4 to save a profile and PF3 to exit DTCN
+
+          Run the IVCT transaction, you should see the z/OS Debugger screen appear
+
+          Debug the COBOL program. When done, enter QUIT DEBUG to end the debug session
+
+          Run the DTCN transactionb and press PF6 to delete the profile and PF3 to exit DTCN
+
+          Hit Enter key to continue
+    #######################################
+

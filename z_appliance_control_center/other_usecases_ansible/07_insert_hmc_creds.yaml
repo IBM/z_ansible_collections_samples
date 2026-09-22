@@ -13,6 +13,10 @@
 # *|   - Replaced hmc_url with hmc_ip                                       |
 # *| [04.02.2026]                                                           |
 # *|   - Tested with ACC 1.2.13                                             |
+# *| [06.26.2026]                                                           |
+# *|   - Tested with ACC 1.2.14                                             |
+# *|   - Added execution timestamp and ACC about info display               |
+# *|   - Added optional HMC credential expiry support                       |
 # *+------------------------------------------------------------------------+
 
 - name: ACC playbook, run by ACC-admin, for inserting HMC credentials
@@ -22,6 +26,10 @@
     - admin_vars.yaml
 
   pre_tasks:
+    - name: Prepare ACC URL
+      ansible.builtin.set_fact:
+        acc_url: "https://{{ acc_ip }}:{{ acc_port }}/api"
+
     - name: Reminder - Export credentials
       ansible.builtin.pause:
         prompt: |
@@ -54,6 +62,11 @@
       prompt: "Enter ACC-admin's Password"
       private: true
 
+    - name: days_to_clear_hmc_creds
+      prompt: "Enter HMC credential expiry in days (1-14, or leave empty to skip)"
+      private: false
+      default: ""
+
   tasks:
     - name: 00 - Check MFA is enabled or not
       ansible.builtin.pause:
@@ -70,7 +83,14 @@
         prompt: "Enter MFA OTP generated for admin:"
       register: mfa_otp_input
 
-    - name: 03 - Get authentication token from the ACC as admin
+    - name: 03 - Validate expiry days if provided
+      ansible.builtin.fail:
+        msg: "Invalid value for days_to_clear_hmc_creds. Enter an integer from 1 to 14, or leave empty to skip."
+      when:
+        - days_to_clear_hmc_creds != ""
+        - (days_to_clear_hmc_creds is not match('^[0-9]+$') or days_to_clear_hmc_creds | int < 1 or days_to_clear_hmc_creds | int > 14)
+
+    - name: 04 - Get authentication token from the ACC as admin
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}:{{ acc_port }}/api/user/token"
         body:
@@ -83,11 +103,15 @@
         validate_certs: false
       register: auth_response
 
-    - name: Extract the admin token
+    - name: 05 - Extract the admin token
       ansible.builtin.set_fact:
         access_token: "{{ auth_response.json.access_token }}"
 
-    - name: 04 - Set HMC configuration in the ACC (can take up to 10 mins)
+    - name: Display execution info and ACC about information
+      ansible.builtin.include_tasks:
+        file: common_display_info.yaml
+
+    - name: 06 - Set HMC configuration in the ACC (can take up to 10 mins)
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}:{{ acc_port }}/api/config/hmcconfig"
         timeout: 600
@@ -97,6 +121,7 @@
           userid: "{{ hmc_user }}"
           password: "{{ hmc_password }}"
           verify_cert: false
+          days_to_clear_hmc_creds: "{{ (days_to_clear_hmc_creds | int) if days_to_clear_hmc_creds != '' else omit }}"
         body_format: json
         headers:
           Authorization: "Bearer {{ access_token }}"
@@ -105,7 +130,37 @@
         status_code: 204
       register: response
 
-    - name: 05 - As a validation, get list of CPCs attached to the HMC
+    - name: 07 - Get HMC configuration from ACC
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/config/hmcconfig"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        return_content: true
+      register: hmc_config_response
+
+    - name: 07a - Print HMC configuration
+      ansible.builtin.debug:
+        msg: "{{ hmc_config_response.json }}"
+
+    - name: 08 - Check HMC credential expiry using about API
+      ansible.builtin.uri:
+        url: "https://{{ acc_ip }}:{{ acc_port }}/api/about"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ access_token }}"
+          Content-Type: application/json
+        validate_certs: false
+        return_content: true
+      register: about_response
+
+    - name: 08a - Print about API response
+      ansible.builtin.debug:
+        msg: "{{ about_response.json }}"
+
+    - name: 09 - As a validation, get list of CPCs attached to the HMC
       ansible.builtin.uri:
         url: "https://{{ acc_ip }}:{{ acc_port }}/api/cpcs"
         method: GET
@@ -115,6 +170,6 @@
         validate_certs: false
       register: response
 
-    - name: Printing the available CPCs
+    - name: 10 - Printing the available CPCs
       ansible.builtin.debug:
         msg: "{{ response.json }}"

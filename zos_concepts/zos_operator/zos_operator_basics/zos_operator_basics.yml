@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2020, 2021
+# © Copyright IBM Corporation 2020, 2026
 ###############################################################################
 
 ###############################################################################
@@ -23,7 +23,7 @@
 #  `system_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.1.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written

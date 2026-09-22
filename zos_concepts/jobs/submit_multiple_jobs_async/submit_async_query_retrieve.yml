@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2025
+# © Copyright IBM Corporation 2025, 2026
 ###############################################################################
 
 ###############################################################################
@@ -19,7 +19,7 @@
 #  `data_set_name`.
 #
 # Requirements:
-#   IBM z/OS core collection 1.13.0 or later
+#   IBM z/OS core collection 2.0.0 or later
 #
 # Configure:
 #   tgt_tmp_dir - this is the USS directory on the target which will be written
@@ -66,7 +66,6 @@
   environment: "{{ environment_vars }}"
 
   tasks:
-
     ############################################################################
     # Modules zos_copy, zos_job_submit, zos_job_query, zos_job_output
     #
@@ -80,36 +79,36 @@
     - name: Create simple batch jobs to use in this playbook.
       ibm.ibm_zos_core.zos_copy:
         content: |
-            //ASYNC{{ item }}   JOB MSGLEVEL=1,MSGCLASS={{ job_class }},CLASS={{ job_class }}
-            //COMMAND  EXEC PGM=BPXBATCH
-            //STDPARM DD *
-            SH echo 'This is a {{ item }} job' && date && sleep 30 && date
-            //STDIN  DD DUMMY
-            //STDOUT DD SYSOUT=*
-            //STDERR DD SYSOUT=*
-            //
+          //ASYNC{{ item }}   JOB MSGLEVEL=1,MSGCLASS={{ job_class }},CLASS={{ job_class }}
+          //COMMAND  EXEC PGM=BPXBATCH
+          //STDPARM DD *
+          SH echo 'This is a {{ item }} job' && date && sleep 30 && date
+          //STDIN  DD DUMMY
+          //STDOUT DD SYSOUT=*
+          //STDERR DD SYSOUT=*
+          //
         dest: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
-        force: true
+        replace: true
       register: result
       with_sequence: count={{ job_count }}
 
     - name: Response for creating sample jobs on z/OS UNIX
       debug:
-          var: result
+        var: result
 
     # +-------------------------------------------------------------------------
     # | "with_sequence" is a type of conditional Ansible loop. The loop here
     # | only runs for a single iteration and is included solely to demonstrate
     # | how multiple jobs could be submitted under a single task for members of
     # | a single PDS.
-    # | See notes at the top for additional explanation on wait_time_s, async
+    # | See notes at the top for additional explanation on wait_time, async
     # | and poll times.
     # +-------------------------------------------------------------------------
     - name: Submit multiple batch jobs asynchronously.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/{{ item }}.jcl"
-        location: uss
-        wait_time_s: 45
+        remote_src: true
+        wait_time: 45
       with_sequence: count={{ job_count }}
       async: 60
       poll: 0
@@ -126,8 +125,8 @@
 
     - name: Separating job IDs from async status output for use by zos_job_query module later.
       set_fact:
-        job_ids: "{{ job_ids + [item] }}"
-      with_items: "{{ job_outputs.results | map(attribute='job_id')|list}}"
+        job_ids: "{{ job_ids + [item.jobs[0].job_id] }}"
+      with_items: "{{ job_outputs.results }}"
 
     # +-------------------------------------------------------------------------
     # | There is a list of results returned by the zos_job_submit module. Each
@@ -145,7 +144,7 @@
     - name: Check if any asynchronous batch job has a RC > 0 and fail if it does.
       fail: msg="Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}  has a rc of = {{ item.jobs[0].ret_code.code}}, msg = {{ item.jobs[0].ret_code.msg }}"
       failed_when: >
-         item.jobs[0].ret_code.code > 0
+        item.jobs[0].ret_code.code > 0
       with_items: "{{ job_query.results }}"
 
     - name: Query asynchronous batch jobs using z/OS module and register the output into list 'job_output'.
@@ -156,7 +155,7 @@
 
     - name: Print out each job output
       debug:
-          var: job_output
+        var: job_output
 
     ############################################################################
     # +-------------------------------------------------------------------------
@@ -170,4 +169,3 @@
         state: absent
       with_sequence: count={{ job_count }}
       register: remove_files
-

@@ -13,6 +13,17 @@
 - import_playbook: configure-compute-nodes-zvm.yaml
   when: vm_type == "zvm"
 
+- import_playbook: configure-storage-nodes-kvm.yaml
+  when: vm_type == "kvm" and os_storage_nodes_number > 0
+- import_playbook: configure-storage-nodes-zvm.yaml
+  when: vm_type == "zvm" and os_storage_nodes_number > 0
+
+- import_playbook: configure-infra-nodes-kvm.yaml
+  when: vm_type == "kvm" and os_infra_nodes_number > 0 
+- import_playbook: configure-infra-nodes-zvm.yaml
+  when: vm_type == "zvm" and os_infra_nodes_number > 0 
+
 - import_playbook: approve.yaml
 - import_playbook: wait-for-install-complete.yaml
 
+- import_playbook: label-workers.yaml
