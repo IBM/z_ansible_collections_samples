@@ -1,46 +1,36 @@
-apf-list
-===============
+# apf-list
 
 Get APF current list in JSON format.
 
-Requirements
-------------
+## Requirements
 
 - Ansible Collection `ibm.ibm_zos_core`
 
-Role Variables
---------------
+## Role Variables
 
-
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Get APF current list
-      include_role:
+      ansible.builtin.include_role:
         name: apf-list
 ```
 
-License
--------
+## License
 
 Copyright (c) IBM Corporation 2020
 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-Author Information
-------------------
+## Author Information
 
 - Behnam Al Kajbaf behnam@ibm.com, [@balkajbaf](https://github.com/balkajbaf)
 
-Support
--------
+## Support
 
 All IBM certified sample playbooks, roles and filters are supported as part of
 the Red Hat® Ansible Certified Content for IBM Z offering. Support for samples

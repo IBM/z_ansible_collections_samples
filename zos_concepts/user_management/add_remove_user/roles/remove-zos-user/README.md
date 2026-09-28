@@ -71,14 +71,12 @@ Update the role variables in the `zos_concepts/user_management/add_remove_user/r
 
 ```yaml
 - hosts: all
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Remove a user from z/OS system
-      include_role:
+      ansible.builtin.include_role:
         name: remove-zos-user
 ```
 

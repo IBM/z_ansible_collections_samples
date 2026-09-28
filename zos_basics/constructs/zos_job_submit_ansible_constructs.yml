@@ -77,8 +77,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -114,6 +112,15 @@
                 - " 16.29.01 JOB00260  $HASP373 HELLO    STARTED - INIT 8    - CLASS A        - SYS STL1"
                 - " 16.29.01 JOB00260  SMF000I  HELLO       STEP0001    IEBGENER    0000"
                 - " 16.29.01 JOB00260  $HASP395 HELLO    ENDED - RC=0000"
+                - "0 "
+                - " 16.29.01 JOB00260 ---- THURSDAY,  13 MAY 2021 ----"
+                - " 16.29.01 JOB00260  IRR010I  USERID OMVSADM  IS ASSIGNED TO THIS JOB."
+                - " 16.29.01 JOB00260  $HASP375 JES2     ESTIMATED  LINES EXCEEDED"
+                - " 16.29.01 JOB00260  ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021"
+                - " 16.29.01 JOB00260  $HASP375 HELLO    ESTIMATED  LINES EXCEEDED"
+                - " 16.29.01 JOB00260  $HASP373 HELLO    STARTED - INIT 8    - CLASS A        - SYS STL1"
+                - " 16.29.01 JOB00260  SMF000I  HELLO       STEP0001    IEBGENER    0000"
+                - " 16.29.01 JOB00260  $HASP395 HELLO    ENDED - RC=0000"
                 - 0------ JES2 JOB STATISTICS ------
                 - "-  13 MAY 2021 JOB EXECUTION DATE"
                 - "-           16 CARDS READ"
@@ -128,6 +135,9 @@
               stepname: JES2
             - byte_count: "696"
               content:
+                - "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260"
+                - "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             "
+                - "           //*                                                                             "
                 - "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260"
                 - "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             "
                 - "           //*                                                                             "
@@ -385,7 +395,7 @@
     # Submit a job when --tags "mode_production"
     ############################################################################
     - name: Convert a local JCL file to IBM-037 and submit the job
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{playbook_dir}}/files/HELLO.jcl"
         remote_src: false
         encoding:
@@ -404,22 +414,22 @@
     ############################################################################
 
     - name: Set fact `job_sub_result` with live production content
-      set_fact:
+      ansible.builtin.set_fact:
         job_sub_result: "{{job_sub_result_production}}"
       tags: mode_production
 
     - name: Set fact `job_sub_result` with static YAML content used in development mode
-      set_fact:
+      ansible.builtin.set_fact:
         job_sub_result: "{{job_sub_result_yaml}}"
       tags: mode_development_yaml
 
     - name: Set fact `job_sub_result` with static JSON content used in development mode
-      set_fact:
+      ansible.builtin.set_fact:
         job_sub_result: "{{job_sub_result_json}}"
       tags: mode_development_json
 
     - name: Set facts used in this playbook
-      set_fact:
+      ansible.builtin.set_fact:
         submit_job_name: "{{ job_sub_result.jobs[0].job_name }}"
         submit_job_id: "{{ job_sub_result.jobs[0].job_id }}"
         submit_jobs_ddnames_length: "{{ job_sub_result.jobs[0].dds |length }}"
@@ -428,7 +438,7 @@
       tags: always
 
     - name: Fact values used in this playbook
-      debug:
+      ansible.builtin.debug:
         msg:
           - Job name={{submit_job_name}}
           - Job ID={{submit_job_id}}
@@ -442,14 +452,14 @@
     # --tags "mode_production"
     ############################################################################
     - name: Get job output for job ID {{submit_job_id}}
-      zos_job_output:
+      ibm.ibm_zos_core.zos_job_output:
         job_id: "{{submit_job_id}}"
       register: job_output_result
       when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
     - name: Result for get job output for job ID {{submit_job_id}}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ job_output_result }}"
       when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
@@ -459,14 +469,14 @@
     # --tags "mode_production"
     ############################################################################
     - name: Query the submitted job ID {{submit_job_id}}
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{submit_job_id}}"
       register: job_query_result
       when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
     - name: Result for query job ID {{submit_job_id}}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ job_query_result }}"
       when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
@@ -476,20 +486,20 @@
     # construct `with_sequence`
     ############################################################################
     - name: Traverse all DDs from submitted job {{submit_job_name}} using hard coded count with registered variable `job_sub_result`
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ job_sub_result.jobs[0].dds[item |int].dd_name }}"
       with_sequence: count=4
       tags: always
 
     - name: Traverse all DDs from submitted job {{submit_job_name}} using hard coded start and dynamic end `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list`
-      debug:
+      ansible.builtin.debug:
         msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
       with_sequence: start=0 end="{{ submit_jobs_ddnames_length |int -1 }}"
       tags: always
 
     - name: Traverse all DDs from submitted job {{submit_job_name}} using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list`
-      debug:
+      ansible.builtin.debug:
         msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
       with_sequence: count="{{ submit_jobs_ddnames_length |int -1 }}"
       tags: always
@@ -500,7 +510,7 @@
     # DD values dd_name, id, record_count, stepname, byte_count.
     ############################################################################
     - name: Traverse all DDs from submitted job {{submit_job_name}} using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` and print the DD stats (ddname, id, record_count, stepname, byte_count)
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ submit_job_ddnames_list[item |int].dd_name }}"
           - "{{ submit_job_ddnames_list[item |int].id }}"
@@ -515,13 +525,13 @@
     # Ansible construct `loop`
     ############################################################################
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` with  fact `submit_job_ddnames_list`
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item.dd_name }}"
       loop: "{{submit_job_ddnames_list}}"
       tags: always
 
     - name: Traverse all DDs stepname(s) from submitted job {{submit_job_name}} using ansible `loop` with set fact `submit_job_ddnames_list`
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item.stepname }}"
       loop: "{{submit_job_ddnames_list}}"
       tags: always
@@ -538,14 +548,14 @@
     ############################################################################
 
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `submit_job_list`
-      debug:
+      ansible.builtin.debug:
         msg: "{{item}}"
       # with_items: "{{ job_sub_result | community.general.json_query('jobs[*].dds[*].id') }}"
       loop: "{{ submit_job_list | community.general.json_query('dds[*].dd_name') }}"
       tags: always
 
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `job_sub_result`
-      debug:
+      ansible.builtin.debug:
         msg: "{{item}}"
       # with_items: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
       loop: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
@@ -563,13 +573,13 @@
     ############################################################################
 
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `with_items` and `json_query` with fact `submit_job_list`
-      debug:
+      ansible.builtin.debug:
         msg: "{{item}}"
       with_items: "{{ submit_job_list | community.general.json_query('dds[*].dd_name') }}"
       tags: always
 
     - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `with_items` and `json_query` with fact `job_sub_result`
-      debug:
+      ansible.builtin.debug:
         msg: "{{item}}"
       with_items: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
       tags: always
@@ -584,7 +594,7 @@
     #   },
     ############################################################################
     - name: Access the submitted job return code values
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ submit_job_list.ret_code.code}}"
           - "{{ submit_job_list.ret_code.msg}}"

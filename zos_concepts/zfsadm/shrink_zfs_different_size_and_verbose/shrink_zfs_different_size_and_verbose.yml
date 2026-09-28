@@ -24,8 +24,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -38,10 +36,10 @@
     # Generate a temporary data set name
     # ##########################################################################
     - name: Create temp data set name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
 
     # ##########################################################################
@@ -59,7 +57,7 @@
     # ##########################################################################
 
     - name: "Create zFS."
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ zfs_data_set }}"
         type: zfs
         space_primary: 2
@@ -67,23 +65,23 @@
         replace: true
 
     - name: "Create mount dir on z/OS USS."
-      file:
+      ansible.builtin.file:
         path: "{{ mount_point }}"
         state: directory
 
     - name: "Mount zFS data set."
-      zos_mount:
+      ibm.ibm_zos_core.zos_mount:
         src: "{{ zfs_data_set | upper }}"
         path: "{{ mount_point }}"
         fs_type: zfs
         state: mounted
 
     - name: "Confirm mount point."
-      command: "df /{{ mount_point }}"
+      ansible.builtin.command: "df /{{ mount_point }}"
       register: df_output
 
     - name: "Echo df output."
-      debug:
+      ansible.builtin.debug:
         msg: "{{ df_output.stdout_lines }}"
 
     # ##########################################################################
@@ -91,7 +89,7 @@
     # ##########################################################################
 
     - name: "Write 1 million bytes to zFS."
-      shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+      ansible.builtin.shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
 
     # ##########################################################################
     # Shrink zFS aggregate by changing its number of tracks.
@@ -99,25 +97,25 @@
     # ##########################################################################
 
     - name: "Shrink zFS aggregate data set {{ zfs_data_set }} on track size."
-      zos_zfs_resize:
+      ibm.ibm_zos_core.zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size_on_m }}"
         space_type: m
       register: shrink_output
 
     - name: Echo shrink_output.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ shrink_output }}"
 
     - name: "Shrink zFS aggregate data set {{ zfs_data_set }} and enable verbose mode."
-      zos_zfs_resize:
+      ibm.ibm_zos_core.zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size }}"
-        verbose: True
+        verbose: true
       register: shrink_output
 
     - name: Echo shrink_output.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ shrink_output }}"
 
     # ##########################################################################
@@ -125,9 +123,9 @@
     # ##########################################################################
 
     - name: Unmount zFS data set.
-      command: "/usr/sbin/unmount {{ mount_point }}"
+      ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}"
 
     - name: Delete zFS data set.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ zfs_data_set }}"
         state: absent

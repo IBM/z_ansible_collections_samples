@@ -8,12 +8,10 @@
 ###############################################################################
 
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Remove user from z/OS system
-      include_role:
+      ansible.builtin.include_role:
         name: remove-zos-user

@@ -1,5 +1,6 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023, 2026
+# © Copyright IBM Corporation 2023, 2026
 ###############################################################################
 
 ###############################################################################
@@ -26,8 +27,6 @@
 ###############################################################################
 
 - hosts: source
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
 
   vars:
@@ -38,10 +37,11 @@
     remove_data_sets: true
 
   environment: "{{ environment_vars }}"
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Create and copy content into data sets to archive.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         content: "HELLO WORLD - {{ item }}"
         dest: "{{ item }}"
         dest_data_set:
@@ -72,6 +72,9 @@
     # - The format option contains a number of sub-options including 'type' to
     # specify the format type, 'options' which contains two sub-options
     # spack to specify SPACK or PACK and 'adrdssu' to specify whether
+    # - The format option contains a number of sub-options including 'type' to
+    # specify the format type, 'options' which contains two sub-options
+    # spack to specify SPACK or PACK and 'adrdssu' to specify whether
     # to execute a previous step to create and archive a dump data set.
     # - The 'remove' option which removes data sets from the systems upon a
     # successful archive operation.
@@ -82,12 +85,12 @@
       ibm.ibm_zos_core.zos_archive:
         src: "{{ data_sets_to_archive }}"
         dest: "{{ archive_data_set }}"
-        force: True
+        force: true
         format:
           type: terse
           options:
-            spack: True
-            adrdssu: True
+            spack: true
+            adrdssu: true
         remove: "{{ remove_data_sets }}"
         dest_data_set:
           space_primary: "{{ size_in_cyls.primary }}"
@@ -95,33 +98,34 @@
           space_type: cyl
       register: archive_result
 
-    - debug:
+    - ansible.builtin.debug:
         msg: "{{ archive_result }}"
 
     #########################################################################
     # This section fetches the data set from the source host to our controller
     # node.
-    # To avoid encoding/decoding the archive file, binary is set to True
+    # To avoid encoding/decoding the archive file, binary is set to true
     # when dealing with data set archives.
-    # The 'binary' option should always be set to 'True' when dealing with
+    # The 'binary' option should always be set to 'true' when dealing with
     # z/OS archives.
     #########################################################################
     - name: Fetch the data set into the controller
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ archive_data_set }}"
         dest: "{{ playbook_dir }}/"
-        binary: True
-        flat: True
+        binary: true
+        flat: true
       register: result
 
     - name: "Result of fetching {{ archive_data_set }} to controller node"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     #########################################################################
     # Remove archive data set from remote system.
     #########################################################################
     - name: Delete archive data set from remote system.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
+
