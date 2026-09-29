@@ -1,6 +1,9 @@
 name: ansible-lint
 on: [push, pull_request] # noqa: yaml[truthy]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Ansible Lint
@@ -8,7 +11,7 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies from Ansible Galaxy
         uses: ./.github/actions/install-requirements
