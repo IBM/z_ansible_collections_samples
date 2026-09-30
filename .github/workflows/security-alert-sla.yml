@@ -40,7 +40,7 @@
 
 name: Security Alert SLA Monitor
 
-on:
+on: # noqa: yaml[truthy]
   # Run every day at 09:00 UTC so breaches are surfaced each morning.
   schedule:
     - cron: '0 9 * * *'
@@ -135,7 +135,7 @@ jobs:
       - name: Calculate SLA breaches and open issues
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO:     ${{ github.repository }}
+          REPO: ${{ github.repository }}
           SECURITY_TEAM: ${{ env.SECURITY_TEAM }}
         run: |
           # ── Shared SLA lookup ───────────────────────────────────────────────
