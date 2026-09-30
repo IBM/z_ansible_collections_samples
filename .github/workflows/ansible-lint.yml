@@ -12,16 +12,24 @@ permissions:
 # HOW PR-SCOPED LINTING WORKS
 # ----------------------------
 # On pull_request events: we diff the PR branch against its base to find
-# which top-level project directories contain changed files, then lint
-# only those directories. Projects with no changes are skipped entirely,
-# keeping the log focused on what the PR actually touched.
+# which Ansible project directories contain changed files, then lint only
+# those projects. Projects with no changes are skipped entirely.
 #
 # On push events: we diff HEAD against the previous commit (event.before).
 # If event.before is the zero SHA (first push to a new branch), we fall
-# back to linting all projects.
+# back to linting all discovered projects.
 #
-# To revert to linting all projects on every run, replace the
-# "Get changed projects" step output with: echo "projects=$(ls -d */ | sed 's|/||g' | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+# PROJECT DISCOVERY HEURISTIC
+# ----------------------------
+# A directory is treated as an Ansible project root if it contains at least
+# one *.yml or *.yaml file directly inside it (not only subdirectories).
+# The tree is walked depth-first; the shallowest matching directory wins,
+# so grouping directories (zos_concepts/, zos_subsystems/ims/, etc.) are
+# never linted directly — only the real project leaves are.
+# Maximum supported nesting depth: 5 levels (covers all current projects).
+#
+# NON-ANSIBLE DIRS (never linted regardless of changes):
+# .github  collections  docs  meta  roles  scripts
 
 jobs:
   build:
@@ -37,55 +45,92 @@ jobs:
       - name: Get changed projects
         id: changed
         run: |
-          # Determine the base SHA to diff against
+          # Directories that are never Ansible projects — skip unconditionally.
+          # Mirrors exclude_paths in the root .ansible-lint.
+          SKIP_DIRS=".github collections docs meta roles scripts"
+
+          # ── find_project_root ─────────────────────────────────────
+          # Given a file path, walk its directory upward until a directory
+          # that contains at least one *.yml or *.yaml file directly inside
+          # it is found. That directory is the Ansible project root.
+          # Prints nothing if the path is under a SKIP_DIR or no project
+          # root is found before reaching the repo root.
+          find_project_root() {
+            local file="$1"
+            local dir
+            dir=$(dirname "$file")
+
+            while [[ "$dir" != "." && "$dir" != "/" ]]; do
+              # Bail out if the top-level component is a non-Ansible dir
+              local top="${dir%%/*}"
+              if echo "$SKIP_DIRS" | grep -qw "$top"; then
+                return
+              fi
+
+              # This dir has at least one playbook/vars/task file directly
+              # inside it — treat it as the project root
+              if compgen -G "${dir}/*.yml" > /dev/null 2>&1 || \
+                 compgen -G "${dir}/*.yaml" > /dev/null 2>&1; then
+                echo "$dir"
+                return
+              fi
+
+              dir=$(dirname "$dir")
+            done
+          }
+
+          # ── all_projects ─────────────────────────────────────────
+          # Walk the entire repo tree and collect every Ansible project root.
+          # Used for the new-branch fallback (lint everything).
+          all_projects() {
+            find . -type f \( -name "*.yml" -o -name "*.yaml" \) \
+              | sed 's|^\./||' \
+              | while IFS= read -r file; do
+                  find_project_root "$file"
+                done \
+              | sort -u
+          }
+
+          # ── Determine base SHA ──────────────────────────────────────
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             base="origin/${{ github.event.pull_request.base.ref }}"
-          elif [[ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
-            # First push to a new branch — fall back to all projects
+          elif [[ "${{ github.event.before }}" \
+                  == "0000000000000000000000000000000000000000" ]]; then
             base=""
           else
             base="${{ github.event.before }}"
           fi
 
+          # ── Build project list ──────────────────────────────────────
           if [[ -z "$base" ]]; then
-            # New branch — lint everything except non-Ansible dirs
-            skip_dirs=".github collections docs meta roles scripts"
-            projects=$(ls -d */ | sed 's|/||g' \
-              | tr ' ' '\n' \
-              | while read -r entry; do
-                  echo "$skip_dirs" | grep -qw "$entry" && continue
-                  echo "$entry"
-                done \
-              | tr '\n' ' ')
+            # New branch — discover and lint every project in the repo
+            projects=$(all_projects | tr '\n' ' ')
           else
-            # Lint only top-level dirs that contain changed files.
-            # Filter with -d to exclude root-level files (e.g. .ansible-lint).
-            # Also skip non-Ansible dirs that would fail if linted: .github,
-            # collections, docs, meta, roles, scripts — these mirror the
-            # exclude_paths in the root .ansible-lint.
-            skip_dirs=".github collections docs meta roles scripts"
-            projects=$(git diff --name-only "$base"...HEAD \
-              | cut -d/ -f1 \
-              | sort -u \
-              | while read -r entry; do
-                  [ -d "$entry" ] || continue
-                  echo "$skip_dirs" | grep -qw "$entry" && continue
-                  echo "$entry"
-                done \
-              | tr '\n' ' ')
+            # PR/push — lint only projects that contain changed files
+            declare -A seen
+            while IFS= read -r file; do
+              project=$(find_project_root "$file")
+              [[ -n "$project" ]] && seen["$project"]=1
+            done < <(git diff --name-only "$base"...HEAD)
+            projects="${!seen[*]}"
           fi
 
           echo "Projects to lint: $projects"
           echo "projects=$projects" >> "$GITHUB_OUTPUT"
 
       - name: Install ansible-lint
-        run: pip install "ansible-lint==25.6.0" "ansible-core==2.16.19" "ansible-compat==25.1.5"
+        run: |
+          pip install \
+            "ansible-lint==25.6.0" \
+            "ansible-core==2.16.19" \
+            "ansible-compat==25.1.5"
 
       - name: Install dependencies from Ansible Galaxy
         run: |
           for attempt in 1 2 3; do
             echo "Galaxy install attempt $attempt of 3..."
-            ansible-galaxy collection install -r collections/requirements.yml --timeout 60 && break
+            ansible-galaxy collection install \
+              -r collections/requirements.yml --timeout 60 && break
             if [[ $attempt -lt 3 ]]; then
               echo "Attempt $attempt failed, retrying in 30s..."
               sleep 30
@@ -97,17 +142,12 @@ jobs:
 
       - name: Run ansible-lint
         env:
-          ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
+          ANSIBLE_LIBRARY: >-
+            ${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library
         run: |
           failed=()
 
-          # Iterate only over projects that had changes in this PR/push.
-          # The list is produced by the "Get changed projects" step above.
-          # Non-project dirs (collections, docs, etc.) are naturally excluded
-          # because they contain no changed Ansible files in typical PRs;
-          # .ansible-lint exclude_paths handles them if they do appear.
           for name in ${{ steps.changed.outputs.projects }}; do
-            # Strip any trailing slash just in case
             name="${name%/}"
 
             echo ""
