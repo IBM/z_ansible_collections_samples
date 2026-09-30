@@ -1,0 +1,409 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+# SECURITY ALERT SLA MONITOR
+# ===========================
+# This workflow runs every day at 09:00 UTC (and can be triggered manually) to
+# check whether any open Dependabot or CodeQL security alerts have exceeded
+# their severity-based SLA deadline.
+#
+# SLA RULES
+# ----------
+#   critical  →   7 days
+#   high      →  30 days
+#   medium    →  90 days
+#   low       → 180 days
+#
+# WHAT THIS WORKFLOW DOES (4 active steps)
+# -----------------------------------------
+#   Step 1 — Query open Dependabot alerts via the GitHub REST API.
+#   Step 2 — Query open CodeQL alerts via the GitHub REST API.
+#   Step 3 — For each alert past its SLA, open a GitHub Issue (deduplicated)
+#             tagging the resolved file owner (CODEOWNERS → git log → fallback).
+#   Step 4 — Log SLA check complete.
+#
+# FUTURE STEPS (currently commented out — see bottom of this file)
+# -----------------------------------------------------------------
+#   Step A — For each alert past SLA + grace period, open a PR that removes
+#             or disables the affected file. To enable: uncomment the
+#             "- name: Open remediation PR" step near the bottom of this file.
+#   Step B — Require 1 human approval before any remediation PR can merge.
+#             To enable: configure branch protection in GitHub repository
+#             Settings → Branches → Branch protection rules → "Require approvals: 1"
+#             Do NOT add --auto-merge to the gh pr create call.
+#
+# REQUIRED PERMISSIONS
+# --------------------
+# The default GITHUB_TOKEN is sufficient — no additional secrets are needed.
+# The job-level `permissions` block below grants the minimum required scopes.
+
+name: Security Alert SLA Monitor
+
+on: # noqa: yaml[truthy]
+  # Run every day at 09:00 UTC so breaches are surfaced each morning.
+  schedule:
+    - cron: '0 9 * * *'
+
+  # Allow maintainers to trigger a check at any time without waiting for the
+  # daily schedule (useful after deploying a batch of fixes).
+  workflow_dispatch:
+
+# Workflow-level environment variables
+# -------------------------------------
+# SECURITY_TEAM  – GitHub team handle tagged in every SLA-breach issue.
+#                  Override this variable if ownership moves to a different team.
+env:
+  SECURITY_TEAM: "@IBM/z-ansible-collections"
+
+permissions:
+  # Read repository contents (needed by actions/checkout and the gh CLI).
+  contents: read
+  # Create and search issues when an SLA breach is detected.
+  issues: write
+  # Query Dependabot and CodeQL alert APIs.
+  security-events: read
+
+jobs:
+  sla-check:
+    name: Check Security Alert SLAs
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------------------------------------------------------
+      # Check out the repository so the gh CLI has a local git context and can
+      # resolve the owner/repo values automatically from the remote URL.
+      # -----------------------------------------------------------------------
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # STEP 1 — QUERY DEPENDABOT ALERTS
+      # Retrieve all open Dependabot alerts via the GitHub REST API.
+      # The response is written to dependabot_alerts.json for later processing.
+      # -----------------------------------------------------------------------
+      - name: Query open Dependabot alerts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching open Dependabot alerts..."
+          gh api \
+            --paginate \
+            "/repos/${{ github.repository }}/dependabot/alerts?state=open" \
+            > dependabot_alerts.json
+
+          alert_count=$(jq length dependabot_alerts.json)
+          echo "Found ${alert_count} open Dependabot alert(s)."
+
+      # -----------------------------------------------------------------------
+      # STEP 2 — QUERY CODEQL ALERTS
+      # Retrieve all open CodeQL alerts via the GitHub REST API.
+      # Only CodeQL results are fetched (tool_name=CodeQL) to avoid mixing in
+      # alerts from other SAST tools that may have different SLA policies.
+      # -----------------------------------------------------------------------
+      - name: Query open CodeQL alerts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching open CodeQL alerts..."
+          gh api \
+            --paginate \
+            "/repos/${{ github.repository }}/code-scanning/alerts?state=open&tool_name=CodeQL" \
+            > codeql_alerts.json
+
+          alert_count=$(jq length codeql_alerts.json)
+          echo "Found ${alert_count} open CodeQL alert(s)."
+
+      # -----------------------------------------------------------------------
+      # STEP 3 — CALCULATE SLA BREACHES AND OPEN ISSUES
+      #
+      # For each alert the script:
+      #   a) Determines the severity (critical / high / medium / low).
+      #   b) Calculates the age in days from the alert's created_at timestamp.
+      #   c) Looks up the SLA deadline (days) for that severity.
+      #   d) If age > SLA deadline, searches for an existing issue whose title
+      #      contains the alert's unique identifier to avoid duplicates.
+      #   e) If no matching issue exists, creates one with:
+      #        - Title:  [SECURITY SLA BREACH] <summary> - <SEVERITY>
+      #        - Body:   alert details, affected file, days overdue, deadline,
+      #                  direct link to the alert, and the security team tag.
+      #        - Labels: security, sla-breach  (created automatically if absent)
+      #
+      # The script processes both Dependabot and CodeQL alerts using a shared
+      # function so the SLA logic lives in exactly one place.
+      # -----------------------------------------------------------------------
+      - name: Calculate SLA breaches and open issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SECURITY_TEAM: ${{ env.SECURITY_TEAM }}
+        run: |
+          # ── Shared SLA lookup ───────────────────────────────────────────────
+          # Returns the SLA deadline in days for a given severity string.
+          # Unrecognised severities fall back to the most lenient bucket (low).
+          sla_days() {
+            case "${1,,}" in          # lowercase the input for safety
+              critical) echo 7   ;;
+              high)     echo 30  ;;
+              medium)   echo 90  ;;
+              *)        echo 180 ;;  # low and anything unrecognised
+            esac
+          }
+
+          # ── Hybrid owner resolution ─────────────────────────────────────────
+          # Resolves the GitHub owner(s) for a given file path using a three-tier
+          # fallback chain:
+          #
+          #   1. CODEOWNERS  — parse .github/CODEOWNERS, match path against
+          #                    patterns top-to-bottom (last match wins, per GitHub
+          #                    spec). Returns the owner handle(s) on that line.
+          #   2. git log     — if no CODEOWNERS match, use the GitHub username of
+          #                    the last person who committed to the file/directory.
+          #                    Extracted from the noreply address when available.
+          #   3. SECURITY_TEAM fallback — if neither resolves, use $SECURITY_TEAM.
+          #
+          # Usage: resolve_owner "zos_concepts/encoding/convert_encoding.yml"
+          # Returns: "@hmillersarah" or "@IBM/z-ansible-collections" etc.
+          resolve_owner() {
+            local file_path="$1"
+            local owner=""
+
+            # ── Tier 1: CODEOWNERS ──────────────────────────────────────────
+            if [[ -f ".github/CODEOWNERS" ]]; then
+              # Read every non-comment, non-empty line; last match wins
+              while IFS= read -r line; do
+                [[ "$line" =~ ^[[:space:]]*# ]] && continue  # skip comments
+                [[ -z "${line// }" ]] && continue             # skip blank lines
+                pattern=$(echo "$line" | awk '{print $1}')
+                handles=$(echo "$line" | awk '{$1=""; print $0}' | xargs)
+                # Convert glob pattern to a simple prefix/suffix match
+                # Strip trailing slash for directory patterns
+                clean_pattern="${pattern%/}"
+                if [[ "$file_path" == $clean_pattern* ]] || \
+                   [[ "$file_path" == *$clean_pattern ]]; then
+                  owner="$handles"   # keep overwriting — last match wins
+                fi
+              done < ".github/CODEOWNERS"
+            fi
+
+            # ── Tier 2: git log ─────────────────────────────────────────────
+            if [[ -z "$owner" ]] && [[ "$file_path" != "N/A" ]]; then
+              local email
+              email=$(git log -1 --format="%ae" -- "${file_path}" 2>/dev/null)
+              if [[ -n "$email" ]]; then
+                # Extract GitHub username from noreply address if present
+                # e.g. 70414986+hmillersarah@users.noreply.github.com → @hmillersarah
+                local gh_user
+                gh_user=$(echo "$email" | grep -o '[^+]*@users\.noreply\.github\.com' \
+                          | cut -d'+' -f2 | cut -d'@' -f1)
+                if [[ -n "$gh_user" ]]; then
+                  owner="@${gh_user}"
+                else
+                  # Use the committer name as best-effort handle
+                  local committer_name
+                  committer_name=$(git log -1 --format="%an" -- "${file_path}" 2>/dev/null)
+                  owner="(last committer: ${committer_name} <${email}>)"
+                fi
+              fi
+            fi
+
+            # ── Tier 3: fallback ────────────────────────────────────────────
+            if [[ -z "$owner" ]]; then
+              owner="${SECURITY_TEAM}"
+            fi
+
+            echo "$owner"
+          }
+
+          # ── Ensure required labels exist ────────────────────────────────────
+          # The gh CLI will error if a label referenced in --label does not
+          # exist, so we create them idempotently (ignore 422 "already exists").
+          for label in security sla-breach; do
+            gh api --method POST "/repos/${REPO}/labels" \
+              -f name="${label}" -f color="B60205" 2>/dev/null || true
+          done
+
+          # ── Helper: process a single alert ──────────────────────────────────
+          # Arguments:
+          #   $1  alert_id      – numeric or alphanumeric alert identifier
+          #   $2  summary       – short human-readable description
+          #   $3  severity      – critical | high | medium | low
+          #   $4  created_at    – ISO-8601 timestamp (e.g. 2024-11-01T12:00:00Z)
+          #   $5  file_path     – affected file or "N/A" for ecosystem alerts
+          #   $6  alert_url     – direct link to the alert in the GitHub UI
+          #   $7  alert_type    – "Dependabot" or "CodeQL"
+          process_alert() {
+            local alert_id="$1"
+            local summary="$2"
+            local severity="$3"
+            local created_at="$4"
+            local file_path="$5"
+            local alert_url="$6"
+            local alert_type="$7"
+
+            local sla
+            sla=$(sla_days "${severity}")
+
+            # Age in whole days since the alert was created
+            local created_epoch now_epoch age_days
+            created_epoch=$(date -d "${created_at}" +%s 2>/dev/null \
+                            || date -j -f "%Y-%m-%dT%H:%M:%SZ" "${created_at}" +%s)
+            now_epoch=$(date +%s)
+            age_days=$(( (now_epoch - created_epoch) / 86400 ))
+
+            if (( age_days <= sla )); then
+              echo "  [OK]   ${alert_type} #${alert_id} — ${severity} — ${age_days}d / ${sla}d SLA"
+              return
+            fi
+
+            local days_overdue=$(( age_days - sla ))
+            local deadline
+            deadline=$(date -d "${created_at} + ${sla} days" "+%Y-%m-%d" 2>/dev/null \
+                       || date -j -v+"${sla}"d -f "%Y-%m-%dT%H:%M:%SZ" "${created_at}" "+%Y-%m-%d")
+
+            echo "  [BREACH] ${alert_type} #${alert_id} — ${severity} — ${age_days}d / ${sla}d SLA (${days_overdue}d overdue)"
+
+            # ── Deduplication check ────────────────────────────────────────
+            # Search for an open issue whose title already references this
+            # specific alert ID so we do not open duplicate issues on
+            # consecutive daily runs.
+            local issue_title="[SECURITY SLA BREACH] ${summary} - ${severity^^}"
+            local search_query="repo:${REPO} is:issue is:open \"${alert_type} #${alert_id}\" in:body"
+            local existing_issue
+            existing_issue=$(gh api \
+              "/search/issues?q=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "${search_query}")" \
+              --jq '.total_count')
+
+            if (( existing_issue > 0 )); then
+              echo "  → Issue already exists for ${alert_type} #${alert_id}, skipping."
+              return
+            fi
+
+            # ── Resolve owner for this file ────────────────────────────────
+            # Use CODEOWNERS → git log → $SECURITY_TEAM fallback chain.
+            local file_owner
+            file_owner=$(resolve_owner "${file_path}")
+
+            # ── Build issue body ───────────────────────────────────────────
+            # printf is used instead of a heredoc so the YAML block scalar is
+            # never broken by an unindented delimiter on its own line.
+            local body
+            body=$(printf '%s\n' \
+              '## :warning: Security SLA Breach Detected' \
+              '' \
+              '| Field            | Value |' \
+              '|------------------|-------|' \
+              "| **Alert type**   | ${alert_type} |" \
+              "| **Alert ID**     | #${alert_id} |" \
+              "| **Severity**     | ${severity^^} |" \
+              "| **SLA**          | ${sla} days |" \
+              "| **Age**          | ${age_days} days |" \
+              "| **Days overdue** | ${days_overdue} days |" \
+              "| **SLA deadline** | ${deadline} |" \
+              "| **Affected file**| \`${file_path}\` |" \
+              "| **Owner**        | ${file_owner} |" \
+              '' \
+              '### Summary' \
+              '' \
+              "${summary}" \
+              '' \
+              '### Alert link' \
+              '' \
+              "${alert_url}" \
+              '' \
+              '---' \
+              '' \
+              "cc ${file_owner}" \
+              '' \
+              '> This issue was opened automatically by the Security Alert SLA Monitor workflow.' \
+              '> Please remediate the alert and close this issue once resolved.' \
+            )
+
+            # ── Create the issue ───────────────────────────────────────────
+            gh issue create \
+              --repo "${REPO}" \
+              --title "${issue_title}" \
+              --body  "${body}" \
+              --label "security" \
+              --label "sla-breach"
+
+            echo "  → Opened issue: ${issue_title}"
+          }
+
+          # ── Process Dependabot alerts ────────────────────────────────────────
+          echo ""
+          echo "=== Dependabot alerts ==="
+          jq -c '.[]' dependabot_alerts.json | while IFS= read -r alert; do
+            alert_id=$(jq -r '.number'                              <<<"${alert}")
+            severity=$(jq -r '.security_advisory.severity // "low"' <<<"${alert}")
+            summary=$(jq -r  '.security_advisory.summary  // .dependency.package.name' <<<"${alert}")
+            created_at=$(jq -r '.created_at'                        <<<"${alert}")
+            file_path=$(jq -r  '.dependency.manifest_path // "N/A"' <<<"${alert}")
+            alert_url=$(jq -r  '.html_url'                          <<<"${alert}")
+
+            process_alert \
+              "${alert_id}" "${summary}" "${severity}" \
+              "${created_at}" "${file_path}" "${alert_url}" "Dependabot"
+          done
+
+          # ── Process CodeQL alerts ────────────────────────────────────────────
+          echo ""
+          echo "=== CodeQL alerts ==="
+          jq -c '.[]' codeql_alerts.json | while IFS= read -r alert; do
+            alert_id=$(jq -r  '.number'                               <<<"${alert}")
+            severity=$(jq -r  '.rule.severity // "low"'               <<<"${alert}")
+            summary=$(jq -r   '.rule.description // .rule.id'         <<<"${alert}")
+            created_at=$(jq -r '.created_at'                          <<<"${alert}")
+            file_path=$(jq -r  '.most_recent_instance.location.path // "N/A"' <<<"${alert}")
+            alert_url=$(jq -r  '.html_url'                            <<<"${alert}")
+
+            process_alert \
+              "${alert_id}" "${summary}" "${severity}" \
+              "${created_at}" "${file_path}" "${alert_url}" "CodeQL"
+          done
+
+          echo ""
+          echo "SLA check complete."
+
+      # -----------------------------------------------------------------------
+      # FUTURE STEPS — AUTO-REMEDIATION VIA PULL REQUEST
+      # -----------------------------------------------------------------------
+      #
+      # STEP A — Open a PR removing / disabling the affected file
+      # ----------------------------------------------------------
+      # To enable Step A: remove the leading `#` from every line in the
+      # "- name: Open remediation PR" block directly below this comment.
+      #
+      # What it does: for each alert that has exceeded (SLA + GRACE_PERIOD_DAYS),
+      # creates a branch, removes the offending file, and opens a PR referencing
+      # the SLA-breach issue opened in Step 3 above.
+      #
+      # - name: Open remediation PR for overdue alerts
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     # GRACE_PERIOD_DAYS — additional days beyond the SLA before a PR is
+      #     # opened. Set to 0 to open a PR immediately when SLA is breached.
+      #     GRACE_PERIOD_DAYS=7
+      #     # <iterate over breached alerts passed from the previous step>
+      #     # git checkout -b "security/sla-remove-${alert_id}"
+      #     # git rm <affected_file>
+      #     # git commit -m "security: remove file flagged by ${alert_type} #${alert_id}"
+      #     # git push origin "security/sla-remove-${alert_id}"
+      #     # gh pr create \
+      #     #   --title  "[SECURITY] Remove ${file_path} (${alert_type} #${alert_id})" \
+      #     #   --body   "Automated remediation — see linked SLA-breach issue." \
+      #     #   --label  "security" \
+      #     #   --label  "sla-breach"
+      #     #   NOTE: do NOT add --auto-merge here — see Step B below.
+      #
+      # STEP B — Require 1 human approval before any remediation PR can merge
+      # -----------------------------------------------------------------------
+      # Step B is NOT a code change — it is a GitHub repository settings change.
+      # To enable Step B:
+      #   1. Go to Settings → Branches → Branch protection rules
+      #   2. Add a rule for the pattern: security/sla-remove-*
+      #   3. Enable "Require a pull request before merging"
+      #   4. Set "Required approvals" to 1
+      # This ensures no automated file-removal PR can land without human review.
+      # -----------------------------------------------------------------------
