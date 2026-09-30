@@ -100,16 +100,16 @@ jobs:
           GH_TOKEN: ${{ secrets.SECURITY_PAT || secrets.GITHUB_TOKEN }}
         run: |
           echo "Fetching open Dependabot alerts..."
-          if ! gh api \
+          gh api \
             --paginate \
             "/repos/${{ github.repository }}/dependabot/alerts?state=open" \
-            > dependabot_alerts.json 2>/dev/null; then
+            > dependabot_alerts.json 2>/dev/null || {
             echo "WARNING: Could not fetch Dependabot alerts."
             echo "GITHUB_TOKEN cannot access Dependabot alerts on org-owned repos."
             echo "Create a PAT with security_events scope and store it as"
             echo "secrets.SECURITY_PAT to enable Dependabot alert scanning."
             echo "[]" > dependabot_alerts.json
-          fi
+          }
 
           alert_count=$(jq length dependabot_alerts.json)
           echo "Found ${alert_count} open Dependabot alert(s)."
