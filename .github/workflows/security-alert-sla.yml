@@ -358,7 +358,7 @@ jobs:
           # ── Process Dependabot alerts ────────────────────────────────────────
           echo ""
           echo "=== Dependabot alerts ==="
-          jq -c '.[]' dependabot_alerts.json | while IFS= read -r alert; do
+          while IFS= read -r alert; do
             alert_id=$(jq -r '.number'                              <<<"${alert}")
             severity=$(jq -r '.security_advisory.severity // "low"' <<<"${alert}")
             summary=$(jq -r  '.security_advisory.summary  // .dependency.package.name' <<<"${alert}")
@@ -369,12 +369,12 @@ jobs:
             process_alert \
               "${alert_id}" "${summary}" "${severity}" \
               "${created_at}" "${file_path}" "${alert_url}" "Dependabot"
-          done
+          done < <(jq -c '.[]' dependabot_alerts.json)
 
           # ── Process CodeQL alerts ────────────────────────────────────────────
           echo ""
           echo "=== CodeQL alerts ==="
-          jq -c '.[]' codeql_alerts.json | while IFS= read -r alert; do
+          while IFS= read -r alert; do
             alert_id=$(jq -r  '.number'                               <<<"${alert}")
             severity=$(jq -r  '.rule.severity // "low"'               <<<"${alert}")
             summary=$(jq -r   '.rule.description // .rule.id'         <<<"${alert}")
@@ -385,7 +385,7 @@ jobs:
             process_alert \
               "${alert_id}" "${summary}" "${severity}" \
               "${created_at}" "${file_path}" "${alert_url}" "CodeQL"
-          done
+          done < <(jq -c '.[]' codeql_alerts.json)
 
           echo ""
           echo "SLA check complete."
