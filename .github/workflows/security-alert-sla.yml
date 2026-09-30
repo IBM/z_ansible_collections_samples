@@ -25,13 +25,17 @@
 #          → Opens a PR that deletes the entire directory containing the
 #            offending file. Does NOT auto-merge — requires 1 human approval.
 #
+#   Alert resolved (Dependabot/CodeQL closes the alert)
+#          → Automatically closes the tracking issue with a comment
+#            explaining why it was closed.
+#
 # SLA RULES
 # ----------
-#   Dependabot severities        CodeQL severities
-#   critical  →   7 days         error   →   7 days
-#   high      →  30 days         warning →  90 days
-#   medium    →  90 days         note    → 180 days
-#   low       → 180 days         (none)  → 180 days
+#   Dependabot and CodeQL severities (via .rule.security_severity_level):
+#   critical  →   7 days
+#   high      →  30 days
+#   medium    →  90 days
+#   low       →  no deadline (tracking issue opened, no reminders)
 #
 # REQUIRED SECRETS
 # ----------------
@@ -507,7 +511,108 @@ jobs:
           echo "SLA tracking complete."
 
       # -----------------------------------------------------------------------
-      # STEP 4 — LOG SUMMARY
+      # STEP 4 — AUTO-CLOSE RESOLVED TRACKING ISSUES
+      #
+      # Cross-references every open GitHub Issue labelled "sla-breach-tracking"
+      # against the live Dependabot and CodeQL alert lists fetched in Steps 1-2.
+      #
+      # For each open tracking issue the script:
+      #   a) Extracts the alert type (Dependabot or CodeQL) and alert ID from
+      #      the issue body using the "alert-N" sentinel written when the issue
+      #      was opened.
+      #   b) Checks whether that alert ID still appears in dependabot_alerts.json
+      #      or codeql_alerts.json (state=open was already applied at fetch time).
+      #   c) If the alert is STILL open  → issue stays open, logs a message.
+      #   d) If the alert is NO LONGER open (fixed, dismissed, or auto-closed by
+      #      GitHub) → closes the issue and posts a comment explaining why.
+      # -----------------------------------------------------------------------
+      - name: Close tracking issues for resolved alerts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo ""
+          echo "=== Checking tracking issues for resolved alerts ==="
+          echo ""
+
+          # Fetch all open issues with the sla-breach-tracking label.
+          # --paginate ensures we get every issue even in large repos.
+          gh api \
+            --paginate \
+            "/repos/${REPO}/issues?state=open&labels=sla-breach-tracking" \
+            > tracking_issues.json
+
+          total=$(jq length tracking_issues.json)
+          echo "Found ${total} open tracking issue(s) to check."
+          echo ""
+
+          closed_count=0
+          kept_count=0
+
+          while IFS= read -r issue; do
+            issue_number=$(jq -r '.number' <<<"$issue")
+            issue_title=$(jq -r  '.title'  <<<"$issue")
+            body=$(jq -r         '.body'   <<<"$issue")
+
+            # Extract "Dependabot alert-N" or "CodeQL alert-N" from the body.
+            # This sentinel is written by process_alert when the issue is opened.
+            sentinel=$(echo "$body" \
+              | grep -oP '(Dependabot|CodeQL) alert-[0-9]+' \
+              | head -1)
+
+            if [[ -z "$sentinel" ]]; then
+              echo "  [SKIP]  Issue #${issue_number} \"${issue_title}\""
+              echo "          Could not find alert sentinel in body — skipping."
+              (( kept_count++ )) || true
+              continue
+            fi
+
+            alert_type=$(echo "$sentinel" | awk '{print $1}')
+            alert_id=$(echo "$sentinel"   | grep -oP '[0-9]+')
+
+            # Check if this alert is still in the open alerts list
+            if [[ "$alert_type" == "Dependabot" ]]; then
+              still_open=$(jq \
+                "[.[] | select(.number == ${alert_id})] | length" \
+                dependabot_alerts.json)
+            else
+              still_open=$(jq \
+                "[.[] | select(.number == ${alert_id})] | length" \
+                codeql_alerts.json)
+            fi
+
+            if (( still_open > 0 )); then
+              echo "  [OPEN]  Issue #${issue_number} — ${sentinel}"
+              echo "          Alert is still open in GitHub Security. Issue remains open."
+              (( kept_count++ )) || true
+            else
+              echo "  [CLOSE] Issue #${issue_number} — ${sentinel}"
+              echo "          Alert is no longer open (fixed or dismissed). Closing issue."
+              gh issue close "${issue_number}" \
+                --repo "${REPO}" \
+                --comment "$(printf '%s\n' \
+                  ":white_check_mark: **Auto-closed by Security Alert SLA Monitor**" \
+                  "" \
+                  "The associated **${sentinel}** is no longer open in GitHub Security." \
+                  "This means the vulnerability was either:" \
+                  "- Patched (dependency updated or code fix merged), or" \
+                  "- Manually dismissed by a maintainer." \
+                  "" \
+                  "This tracking issue has been closed automatically." \
+                  "If you believe this was closed in error, reopen this issue" \
+                  "and investigate the alert status in the Security tab.")"
+              (( closed_count++ )) || true
+            fi
+          done < <(jq -c '.[]' tracking_issues.json)
+
+          echo ""
+          echo "Auto-close summary:"
+          echo "  Checked : ${total}"
+          echo "  Closed  : ${closed_count}  (alert resolved in GitHub Security)"
+          echo "  Kept    : ${kept_count}  (alert still open)"
+
+      # -----------------------------------------------------------------------
+      # STEP 5 — LOG SUMMARY
       # -----------------------------------------------------------------------
       - name: Log SLA check complete
         run: echo "Security alert SLA tracking run complete."
