@@ -186,13 +186,28 @@ jobs:
             # Tier 3: fallback
             [[ -z "$OWNER_TAG" ]] && OWNER_TAG="${SECURITY_TEAM}"
 
-            # Determine assignee: only set for a single bare @username (not a team)
-            # GitHub API only accepts individual collaborator logins as assignees.
-            local raw="${OWNER_TAG}"
-            # A single @username looks like: @word  (no slash, no spaces, one token)
-            if [[ "$raw" =~ ^@([A-Za-z0-9_-]+)$ ]]; then
-              OWNER_ASSIGN="${BASH_REMATCH[1]}"
-            fi
+            # ── Determine assignees ─────────────────────────────────────────
+            # GitHub API only accepts individual collaborator logins — not team
+            # slugs (e.g. @IBM/z-ansible-collections). Strategy:
+            #
+            #   - Split OWNER_TAG on whitespace to get individual tokens.
+            #   - Keep tokens that match @username (no slash = individual).
+            #   - Drop tokens that contain a slash (org/team handles).
+            #   - Also handles "# Last committer: @username" style values from
+            #     git log: the @username token is picked up naturally.
+            #   - OWNER_ASSIGN becomes a space-separated list of bare logins
+            #     (no @ prefix) ready for repeated --assignee flags.
+            #   - If no individual usernames are found, OWNER_ASSIGN stays "".
+            OWNER_ASSIGN=""
+            local token
+            for token in ${OWNER_TAG}; do
+              # Skip team handles (contain a slash, e.g. @IBM/z-ansible-collections)
+              [[ "$token" == */* ]] && continue
+              # Match bare @username tokens
+              if [[ "$token" =~ ^@([A-Za-z0-9_-]+)$ ]]; then
+                OWNER_ASSIGN="${OWNER_ASSIGN:+${OWNER_ASSIGN} }${BASH_REMATCH[1]}"
+              fi
+            done
           }
 
           # ── Ensure required labels exist ────────────────────────────────────
@@ -276,15 +291,21 @@ jobs:
                 '> Reminder comments will be posted at 50% and 75% of the SLA window.' \
               )
 
-              # Build the gh issue create command; add --assignee only for individuals
+              # Build the gh issue create command.
+              # OWNER_ASSIGN is a space-separated list of individual logins.
+              # Each login gets its own --assignee flag (GitHub API requirement).
+              # Team handles (@org/team) were already filtered out in resolve_owner.
               local create_cmd=(gh issue create
                 --repo "${REPO}"
-                --title "[SECURITY] ${summary} — ${severity^^} (${alert_type} alert-${alert_id})"
+                --title "[SECURITY] ${summary} -- ${severity^^} (${alert_type} alert-${alert_id})"
                 --body  "${body}"
                 --label "security"
                 --label "sla-breach-tracking"
               )
-              [[ -n "$OWNER_ASSIGN" ]] && create_cmd+=(--assignee "${OWNER_ASSIGN}")
+              local login
+              for login in ${OWNER_ASSIGN}; do
+                create_cmd+=(--assignee "${login}")
+              done
 
               "${create_cmd[@]}"
               echo "  → Opened issue for ${alert_type} alert-${alert_id}"
