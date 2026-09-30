@@ -15,8 +15,8 @@ skip_list:
   # but adding names to import_playbook is not supported by Ansible
   - name[play]
 
-exclude_paths:
-  # TODO: The OCP UPI playbooks and roles below were excluded to silence
+# exclude_paths:
+# TODO: The OCP UPI playbooks and roles below were excluded to silence
   # lint failures rather than fixing them. This is not the right approach —
   # exclusions should only be used for files that genuinely cannot be linted
   # (e.g. files requiring secrets or a live environment).
