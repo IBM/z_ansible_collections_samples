@@ -162,10 +162,16 @@ jobs:
           # Unrecognised severities fall back to the most lenient bucket (low).
           sla_days() {
             case "${1,,}" in          # lowercase the input for safety
+              # Dependabot severities
               critical) echo 7   ;;
               high)     echo 30  ;;
               medium)   echo 90  ;;
-              *)        echo 180 ;;  # low and anything unrecognised
+              low)      echo 180 ;;
+              # CodeQL severities (error/warning/note/none)
+              # mapped to equivalent Dependabot buckets
+              error)    echo 7   ;;
+              warning)  echo 90  ;;
+              *)        echo 180 ;;  # note, none, and anything unrecognised
             esac
           }
 
@@ -287,7 +293,7 @@ jobs:
             # specific alert ID so we do not open duplicate issues on
             # consecutive daily runs.
             local issue_title="[SECURITY SLA BREACH] ${summary} - ${severity^^}"
-            local search_query="repo:${REPO} is:issue is:open \"${alert_type} #${alert_id}\" in:body"
+            local search_query="repo:${REPO} is:issue is:open \"${alert_type} alert-${alert_id}\" in:body"
             local existing_issue
             existing_issue=$(gh api \
               "/search/issues?q=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "${search_query}")" \
@@ -313,7 +319,7 @@ jobs:
               '| Field            | Value |' \
               '|------------------|-------|' \
               "| **Alert type**   | ${alert_type} |" \
-              "| **Alert ID**     | #${alert_id} |" \
+              "| **Alert ID**     | alert-${alert_id} |" \
               "| **Severity**     | ${severity^^} |" \
               "| **SLA**          | ${sla} days |" \
               "| **Age**          | ${age_days} days |" \
