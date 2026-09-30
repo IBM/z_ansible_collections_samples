@@ -54,7 +54,7 @@ jobs:
             echo "==============================================="
             echo ""
 
-            if ansible-lint "$name"; then
+            if (cd "$name" && ansible-lint); then
               echo "[PASS] $name"
             else
               echo "[FAIL] $name"
