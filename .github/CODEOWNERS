@@ -51,50 +51,52 @@ collections/                    @ketankelkar @ddimatos
 # Owner = last committer per `git log -1 --format="%an|%ae" -- <dir>/`
 # Update these entries when project ownership changes.
 
-# Last committer: thomas.hsu (thomas.hsu@ibm.com)
-# Subdirectory owners override this line due to last-match-wins rule below.
+# Last committer: @adn1107
 ibm_concert/                    @adn1107
+# Last committer: @jacobemery
 ibm_concert/z_apars/            @jacobemery
 
-# Last committer: M. Usman K. Khan (@mukk10)
+# Last committer: @mukk10
 z_appliance_control_center/     @mukk10 @frankmit11
 
-# Last committer: dibya2804 (dibya.raj@ibm.com)
+# Last committer: @dibya2804
 z_infra_provisioning/cloud_infra_center/ocp_upi/   @dibya2804 @ibmpstefos
 
-# Last committer: Sindhu-Prakash (Sindhu.Prakash@ibm.com)
 # z_system_automation/ falls back to catch-all @IBM/z-ansible-collections.
-# Someone from System Automation (SA) needs to own `dynamic_resources`!!!
+# Someone from System Automation (SA) needs to own `dynamic_resources`
+# Last committer: @IBM/z-ansible-collections
 z_system_automation/dynamic_resources/                        @IBM/z-ansible-collections
+
+# Last committer: @Sindhu-Prakash
 z_system_automation/zos_debugger_install_config_automation/   @Sindhu-Prakash
 
-# Last committer: andy-maier
+# Last committer: @andy-maier
 z_systems_administration/zhmc/   @andy-maier
 
-# Last committer: ddimatos (dimatos@gmail.com)
+# Last committer: @ddimatos
 zos_administration/host_setup/   @ddimatos
 
-# Last committer: Sarah Miller (@hmillersarah)
+# Last committer: @hmillersarah
 zos_basics/                     @hmillersarah @ketankelkar @yrana17 @surendrababuravella @Rohitcodes28
 
-# Last committer: Sarah Miller (@hmillersarah)
+# Last committer: @hmillersarah
 zos_concepts/                   @hmillersarah @ketankelkar @yrana17 @surendrababuravella @Rohitcodes28
 
-# Last committer: TaylorDigilio (@TaylorDigilio)
+# Last committer: @TaylorDigilio
 zos_management/                 @TaylorDigilio @AKippins
 
 # Subdirectory owners override the catch-all for their specific paths.
-# Last committer: ddimatos (dimatos@gmail.com)
+# Last committer: @ddimatos
 zos_subsystems/                 @ddimatos
-# Last committer: andrewhughes101
+# Last committer: @andrewhughes101
 zos_subsystems/cics/            @andrewhughes101
-# Last committer: jthyssenrocket — TODO: a second owner needs to be identified
+# Last committer: @jthyssenrocket — TODO: a second owner needs to be identified
 zos_subsystems/db2/             @jthyssenrocket
-# Last committer: ddgandhi — TODO: a second owner needs to be identified
+# Last committer: @ddgandhi — TODO: a second owner needs to be identified
 zos_subsystems/ims/             @ddgandhi
-# Last committer: mamwl1
+# Last committer: @mamwl1
 zos_subsystems/mq/mqsc/         @mamwl1
-# Last committer: steph-lieu — TODO: a second owner needs to be identified
+# Last committer: @steph-lieu — TODO: a second owner needs to be identified
 zos_subsystems/wlp/             @steph-lieu
-# Last committer: ddgandhi
+# Last committer: @ddgandhi
 zos_subsystems/zcee/            @ddgandhi
