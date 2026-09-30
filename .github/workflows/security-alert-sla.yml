@@ -123,7 +123,7 @@ jobs:
           REPO: ${{ github.repository }}
           SECURITY_TEAM: ${{ env.SECURITY_TEAM }}
         run: |
-          # ── SLA lookup ──────────────────────────────────────────────────────
+          # ── SLA lookup ─────────────────────────────────────────
           sla_days() {
             case "${1,,}" in
               critical) echo 7   ;;
@@ -136,7 +136,7 @@ jobs:
             esac
           }
 
-          # ── Owner resolution ────────────────────────────────────────────────
+          # ── Owner resolution ────────────────────────────────────────
           # Returns two values via globals: OWNER_ASSIGN (individual login or "")
           # and OWNER_TAG (handle suitable for cc in body).
           #
@@ -186,7 +186,7 @@ jobs:
             # Tier 3: fallback
             [[ -z "$OWNER_TAG" ]] && OWNER_TAG="${SECURITY_TEAM}"
 
-            # ── Determine assignees ─────────────────────────────────────────
+            # ── Determine assignees ─────────────────────────────────
             # GitHub API only accepts individual collaborator logins — not team
             # slugs (e.g. @IBM/z-ansible-collections). Strategy:
             #
@@ -216,7 +216,7 @@ jobs:
               -f name="${label}" -f color="B60205" 2>/dev/null || true
           done
 
-          # ── Process a single alert ──────────────────────────────────────────
+          # ── Process a single alert ──────────────────────────────────
           # Args: alert_id summary severity created_at file_path alert_url alert_type
           process_alert() {
             local alert_id="$1"
@@ -380,7 +380,9 @@ jobs:
             #       gh pr create \
             #         --repo  "${REPO}" \
             #         --title "[SECURITY] Remove ${affected_dir} (${alert_type} alert-${alert_id})" \
-            #         --body  "Automated remediation: removes \`${affected_dir}\` which contains a ${severity^^} ${alert_type} alert past its SLA deadline. Linked issue: #${existing_issue_number}. Requires 1 human approval before merge." \
+            #         --body  "Automated remediation: removes \`${affected_dir}\` which contains" \
+            #                 " a ${severity^^} ${alert_type} alert past its SLA deadline." \
+            #                 " Linked issue: #${existing_issue_number}. Requires 1 human approval before merge." \
             #         --label "security" \
             #         --label "sla-breach-tracking" \
             #         --base  main
@@ -392,7 +394,7 @@ jobs:
             # fi
           }
 
-          # ── Process Dependabot alerts ────────────────────────────────────────
+          # ── Process Dependabot alerts ────────────────────────────────
           echo ""
           echo "=== Dependabot alerts ==="
           while IFS= read -r alert; do
@@ -408,7 +410,7 @@ jobs:
               "${created_at}" "${file_path}" "${alert_url}" "Dependabot"
           done < <(jq -c '.[]' dependabot_alerts.json)
 
-          # ── Process CodeQL alerts ────────────────────────────────────────────
+          # ── Process CodeQL alerts ────────────────────────────────────
           echo ""
           echo "=== CodeQL alerts ==="
           while IFS= read -r alert; do

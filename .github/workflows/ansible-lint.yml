@@ -48,16 +48,30 @@ jobs:
           fi
 
           if [[ -z "$base" ]]; then
-            # New branch — lint everything
-            projects=$(ls -d */ | sed 's|/||g' | tr '\n' ' ')
+            # New branch — lint everything except non-Ansible dirs
+            skip_dirs=".github collections docs meta roles scripts"
+            projects=$(ls -d */ | sed 's|/||g' \
+              | tr ' ' '\n' \
+              | while read -r entry; do
+                  echo "$skip_dirs" | grep -qw "$entry" && continue
+                  echo "$entry"
+                done \
+              | tr '\n' ' ')
           else
             # Lint only top-level dirs that contain changed files.
-            # Filter with -d to exclude root-level files (e.g. .ansible-lint)
-            # that are not directories.
+            # Filter with -d to exclude root-level files (e.g. .ansible-lint).
+            # Also skip non-Ansible dirs that would fail if linted: .github,
+            # collections, docs, meta, roles, scripts — these mirror the
+            # exclude_paths in the root .ansible-lint.
+            skip_dirs=".github collections docs meta roles scripts"
             projects=$(git diff --name-only "$base"...HEAD \
               | cut -d/ -f1 \
               | sort -u \
-              | while read -r entry; do [ -d "$entry" ] && echo "$entry"; done \
+              | while read -r entry; do
+                  [ -d "$entry" ] || continue
+                  echo "$skip_dirs" | grep -qw "$entry" && continue
+                  echo "$entry"
+                done \
               | tr '\n' ' ')
           fi
 
