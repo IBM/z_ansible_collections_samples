@@ -34,17 +34,19 @@ jobs:
         env:
           ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
         run: |
-          skip_dirs="collections docs scripts"
+          # skip_dirs is commented out - directory skipping is handled via
+          # exclude_paths in .ansible-lint to keep it config-driven
+          # skip_dirs="collections docs meta roles scripts"
           failed=()
 
           for dir in */; do
             name="${dir%/}"
 
             # Skip dirs with no Ansible content
-            if echo "$skip_dirs" | grep -qw "$name"; then
-              echo "Skipping: $name"
-              continue
-            fi
+            # if echo "$skip_dirs" | grep -qw "$name"; then
+            #   echo "Skipping: $name"
+            #   continue
+            # fi
 
             echo ""
             echo "==============================================="
