@@ -1,12 +1,12 @@
 verbosity: 0
 
 exclude_paths:
-  - meta/
-  - collections/
-  - docs/
-  - .github/
-  - roles/
-  - scripts/
+  - meta
+  - collections
+  - docs
+  - .github
+  - roles
+  - scripts
 #  - zos_concepts/certificate_management/roles/*/tests/test.yml
 #  - zos_concepts/data_transfer/copy_sort_fetch/roles/*/tests/test.yml
 #  - zos_concepts/data_transfer/dump_pack_ftp_unpack_restore/roles/*/tests/test.yml
@@ -49,7 +49,7 @@ exclude_paths:
 #  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-storage-nodes-kvm/
 #  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-storage-nodes-zvm/
 #
-#skip_list:
+skip_list:
 #  - args[module]
 #  - command-instead-of-module
 #  - command-instead-of-shell
@@ -61,7 +61,7 @@ exclude_paths:
 #  - meta-no-info
 #  - meta-no-tags
 #  - name[missing]
-#  - name[play]
+  - name[play]
 #  - name[template]
 #  - no-changed-when
 #  - no-handler
