@@ -1,4 +1,8 @@
 ################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+################################################################################
 # ansible-lint configuration for z_infra_provisioning/
 #
 # This file overrides the root .ansible-lint for this project only.
