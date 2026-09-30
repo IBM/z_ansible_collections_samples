@@ -20,7 +20,9 @@ jobs:
         run: |
           for attempt in 1 2 3; do
             echo "Galaxy install attempt $attempt of 3..."
-            ansible-galaxy collection install -r collections/requirements.yml --timeout 60 && break
+            ansible-galaxy collection install -r collections/requirements.yml \
+              --timeout 60 \
+              -p "${{ github.workspace }}/.collections" && break
             if [[ $attempt -lt 3 ]]; then
               echo "Attempt $attempt failed, retrying in 30s..."
               sleep 30
@@ -35,6 +37,7 @@ jobs:
       - name: Run ansible-lint
         env:
           ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
+          ANSIBLE_COLLECTIONS_PATHS: "${{ github.workspace }}/.collections"
         run: |
           failed=()
           for dir in ${{ github.workspace }}/*/; do
