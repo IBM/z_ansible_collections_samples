@@ -63,6 +63,13 @@ permissions:
   issues: write
   # Query Dependabot and CodeQL alert APIs.
   security-events: read
+  # NOTE: Reading Dependabot alerts also requires the organisation to grant
+  # Actions tokens access to security events. If the Dependabot query returns
+  # HTTP 403, an org admin must enable this under:
+  #   Org Settings → Actions → General → Workflow permissions → Allow read
+  #   access to security events.
+  # Alternatively, replace secrets.GITHUB_TOKEN with a PAT that has the
+  # security_events scope stored as a repo secret (e.g. secrets.SECURITY_PAT).
 
 jobs:
   sla-check:
@@ -84,13 +91,25 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Query open Dependabot alerts
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN cannot access Dependabot alerts on org-owned repos due
+          # to a GitHub platform restriction — it always returns HTTP 403.
+          # A PAT with security_events scope is required. Store it as a repo
+          # secret named SECURITY_PAT.
+          # If SECURITY_PAT is not set, this step skips gracefully and logs a
+          # warning rather than failing the entire workflow.
+          GH_TOKEN: ${{ secrets.SECURITY_PAT || secrets.GITHUB_TOKEN }}
         run: |
           echo "Fetching open Dependabot alerts..."
           gh api \
             --paginate \
             "/repos/${{ github.repository }}/dependabot/alerts?state=open" \
-            > dependabot_alerts.json
+            > dependabot_alerts.json 2>/dev/null || {
+            echo "WARNING: Could not fetch Dependabot alerts."
+            echo "GITHUB_TOKEN cannot access Dependabot alerts on org-owned repos."
+            echo "Create a PAT with security_events scope and store it as"
+            echo "secrets.SECURITY_PAT to enable Dependabot alert scanning."
+            echo "[]" > dependabot_alerts.json
+          }
 
           alert_count=$(jq length dependabot_alerts.json)
           echo "Found ${alert_count} open Dependabot alert(s)."
