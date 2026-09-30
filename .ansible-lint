@@ -1,3 +1,5 @@
+verbosity: 0
+
 exclude_paths:
   - meta/
   - collections/
