@@ -1,0 +1,100 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+#
+# CODEOWNERS — GitHub Code Ownership
+# ====================================
+# This file maps repository paths to the GitHub users or teams responsible
+# for reviewing pull requests that touch those paths. GitHub automatically
+# requests reviews from the matching owner(s) when a PR is opened.
+#
+# HOW THIS FILE WAS GENERATED
+# ----------------------------
+# Initial owners were derived from `git log -1 --format="%ae" -- <dir>/`
+# (the last person who committed to each top-level directory) and then
+# mapped to GitHub usernames. Update entries as ownership changes — git
+# history is a starting point, not a permanent source of truth.
+#
+# FORMAT
+# ------
+# <path pattern>    @owner1 @owner2 ...
+#
+# Patterns are matched top-to-bottom; the LAST matching rule wins.
+# A catch-all `*` at the top ensures nothing is ever unowned.
+# More specific rules below override it for their paths.
+#
+# TEAMS vs INDIVIDUALS
+# ---------------------
+# Prefer team handles (@IBM/team-name) over individuals where possible so
+# that ownership survives people changing roles or leaving the project.
+# Individual handles are used here as a bootstrap — migrate to teams over time.
+#
+# REFERENCE
+# ----------
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Catch-all fallback ────────────────────────────────────────────────────────
+# Any path not matched by a more specific rule below is owned by the core team.
+# This ensures every file always has at least one owner.
+*                               @IBM/z-ansible-collections
+
+# ── Workflow and repository configuration ─────────────────────────────────────
+# Changes to CI, lint config, and repo metadata are reviewed by the designated
+# infrastructure maintainer. Only one reviewer is assigned to avoid spamming
+# the entire team for workflow/config changes.
+.github/                        @ketankelkar @ddimatos
+.ansible-lint                   @ketankelkar @ddimatos
+.ansible-lint-ignore            @ketankelkar @ddimatos
+collections/                    @ketankelkar @ddimatos
+
+# ── Top-level project directories ─────────────────────────────────────────────
+# Owner = last committer per `git log -1 --format="%an|%ae" -- <dir>/`
+# Update these entries when project ownership changes.
+
+# Last committer: thomas.hsu (thomas.hsu@ibm.com)
+# Subdirectory owners override this line due to last-match-wins rule below.
+ibm_concert/                    @adn1107
+ibm_concert/z_apars/            @jacobemery
+
+# Last committer: M. Usman K. Khan (@mukk10)
+z_appliance_control_center/     @mukk10 @frankmit11
+
+# Last committer: dibya2804 (dibya.raj@ibm.com)
+z_infra_provisioning/cloud_infra_center/ocp_upi/   @dibya2804 @ibmpstefos
+
+# Last committer: Sindhu-Prakash (Sindhu.Prakash@ibm.com)
+# z_system_automation/ falls back to catch-all @IBM/z-ansible-collections.
+# Someone from System Automation (SA) needs to own `dynamic_resources`!!!
+z_system_automation/dynamic_resources/                        @IBM/z-ansible-collections
+z_system_automation/zos_debugger_install_config_automation/   @Sindhu-Prakash
+
+# Last committer: andy-maier
+z_systems_administration/zhmc/   @andy-maier
+
+# Last committer: ddimatos (dimatos@gmail.com)
+zos_administration/host_setup/   @ddimatos
+
+# Last committer: Sarah Miller (@hmillersarah)
+zos_basics/                     @hmillersarah @ketankelkar @yrana17 @surendrababuravella @Rohitcodes28
+
+# Last committer: Sarah Miller (@hmillersarah)
+zos_concepts/                   @hmillersarah @ketankelkar @yrana17 @surendrababuravella @Rohitcodes28
+
+# Last committer: TaylorDigilio (@TaylorDigilio)
+zos_management/                 @TaylorDigilio @AKippins
+
+# Subdirectory owners override the catch-all for their specific paths.
+# Last committer: ddimatos (dimatos@gmail.com)
+zos_subsystems/                 @ddimatos
+# Last committer: andrewhughes101
+zos_subsystems/cics/            @andrewhughes101
+# Last committer: jthyssenrocket — TODO: a second owner needs to be identified
+zos_subsystems/db2/             @jthyssenrocket
+# Last committer: ddgandhi — TODO: a second owner needs to be identified
+zos_subsystems/ims/             @ddgandhi
+# Last committer: mamwl1
+zos_subsystems/mq/mqsc/         @mamwl1
+# Last committer: steph-lieu — TODO: a second owner needs to be identified
+zos_subsystems/wlp/             @steph-lieu
+# Last committer: ddgandhi
+zos_subsystems/zcee/            @ddgandhi
