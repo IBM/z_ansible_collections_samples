@@ -1,6 +1,9 @@
 name: ansible-lint
 on: [push, pull_request] # noqa: yaml[truthy]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Ansible Lint
@@ -8,40 +11,60 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies from Ansible Galaxy
-        uses: ./.github/actions/install-requirements
-        with:
-          requirements: collections/requirements.yml
+        uses: actions/checkout@v4
 
       - name: Install ansible-lint
-        run: pip install ansible-lint
+        run: pip install "ansible-lint==25.6.0" "ansible-core==2.16.19" "ansible-compat==25.1.5"
 
-      # Equivalent local one-liner (for reference / local testing):
-      # for dir in /Users/ddimatos/git/z_ansible_collections_samples/*/; do echo "=== Entering: $dir ===" && (cd "$dir" && ansible-lint *); done
+      - name: Install dependencies from Ansible Galaxy
+        run: |
+          for attempt in 1 2 3; do
+            echo "Galaxy install attempt $attempt of 3..."
+            ansible-galaxy collection install -r collections/requirements.yml --timeout 60 && break
+            if [[ $attempt -lt 3 ]]; then
+              echo "Attempt $attempt failed, retrying in 30s..."
+              sleep 30
+            else
+              echo "All 3 attempts failed."
+              exit 1
+            fi
+          done
+
       - name: Run ansible-lint
         env:
           ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
         run: |
+          # skip_dirs is commented out - directory skipping is handled via
+          # exclude_paths in .ansible-lint to keep it config-driven
+          # skip_dirs="collections docs meta roles scripts"
           failed=()
-          for dir in ${{ github.workspace }}/*/; do
+
+          for dir in */; do
+            name="${dir%/}"
+
+            # Skip dirs with no Ansible content
+            # if echo "$skip_dirs" | grep -qw "$name"; then
+            #   echo "Skipping: $name"
+            #   continue
+            # fi
+
             echo ""
             echo "==============================================="
-            echo "  Entering: $dir"
+            echo "  Linting: $name"
             echo "==============================================="
             echo ""
-            if (cd "$dir" && ansible-lint *); then
-              echo "[PASS] $dir"
+
+            if (cd "$name" && ansible-lint -q); then
+              echo "[PASS] $name"
             else
-              echo "[FAIL] $dir"
-              failed+=("$dir")
+              echo "[FAIL] $name"
+              failed+=("$name")
             fi
           done
 
           if [[ ${#failed[@]} -gt 0 ]]; then
             echo ""
-            echo "The following directories failed:"
+            echo "The following projects failed:"
             for d in "${failed[@]}"; do
               echo "  - $d"
             done
