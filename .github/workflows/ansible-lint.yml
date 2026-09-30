@@ -19,7 +19,7 @@ jobs:
           requirements: collections/requirements.yml
 
       - name: Install ansible-lint
-        run: pip install "ansible-lint==6.9.1" "ansible-core==2.20.9"
+        run: pip install "ansible-lint==6.9.1" "ansible-core==2.20.9" "ansible-compat==2.2.7"
 
       # Equivalent local one-liner (for reference / local testing):
       # for dir in /Users/ddimatos/git/z_ansible_collections_samples/*/; do echo "=== Entering: $dir ===" && (cd "$dir" && ansible-lint *); done
