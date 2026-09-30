@@ -1,5 +1,27 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+
 name: ansible-lint
 on: [push, pull_request] # noqa: yaml[truthy]
+
+permissions:
+  contents: read
+
+# HOW PR-SCOPED LINTING WORKS
+# ----------------------------
+# On pull_request events: we diff the PR branch against its base to find
+# which top-level project directories contain changed files, then lint
+# only those directories. Projects with no changes are skipped entirely,
+# keeping the log focused on what the PR actually touched.
+#
+# On push events: we diff HEAD against the previous commit (event.before).
+# If event.before is the zero SHA (first push to a new branch), we fall
+# back to linting all projects.
+#
+# To revert to linting all projects on every run, replace the
+# "Get changed projects" step output with: echo "projects=$(ls -d */ | sed 's|/||g' | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
 
 jobs:
   build:
@@ -8,40 +30,89 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies from Ansible Galaxy
-        uses: ./.github/actions/install-requirements
+        uses: actions/checkout@v4
         with:
-          requirements: collections/requirements.yml
+          fetch-depth: 0
+
+      - name: Get changed projects
+        id: changed
+        run: |
+          # Determine the base SHA to diff against
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="origin/${{ github.event.pull_request.base.ref }}"
+          elif [[ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
+            # First push to a new branch — fall back to all projects
+            base=""
+          else
+            base="${{ github.event.before }}"
+          fi
+
+          if [[ -z "$base" ]]; then
+            # New branch — lint everything
+            projects=$(ls -d */ | sed 's|/||g' | tr '\n' ' ')
+          else
+            # Lint only top-level dirs that contain changed files.
+            # Filter with -d to exclude root-level files (e.g. .ansible-lint)
+            # that are not directories.
+            projects=$(git diff --name-only "$base"...HEAD \
+              | cut -d/ -f1 \
+              | sort -u \
+              | while read -r entry; do [ -d "$entry" ] && echo "$entry"; done \
+              | tr '\n' ' ')
+          fi
+
+          echo "Projects to lint: $projects"
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
 
       - name: Install ansible-lint
-        run: pip install ansible-lint
+        run: pip install "ansible-lint==25.6.0" "ansible-core==2.16.19" "ansible-compat==25.1.5"
 
-      # Equivalent local one-liner (for reference / local testing):
-      # for dir in /Users/ddimatos/git/z_ansible_collections_samples/*/; do echo "=== Entering: $dir ===" && (cd "$dir" && ansible-lint *); done
+      - name: Install dependencies from Ansible Galaxy
+        run: |
+          for attempt in 1 2 3; do
+            echo "Galaxy install attempt $attempt of 3..."
+            ansible-galaxy collection install -r collections/requirements.yml --timeout 60 && break
+            if [[ $attempt -lt 3 ]]; then
+              echo "Attempt $attempt failed, retrying in 30s..."
+              sleep 30
+            else
+              echo "All 3 attempts failed."
+              exit 1
+            fi
+          done
+
       - name: Run ansible-lint
         env:
           ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
         run: |
           failed=()
-          for dir in ${{ github.workspace }}/*/; do
+
+          # Iterate only over projects that had changes in this PR/push.
+          # The list is produced by the "Get changed projects" step above.
+          # Non-project dirs (collections, docs, etc.) are naturally excluded
+          # because they contain no changed Ansible files in typical PRs;
+          # .ansible-lint exclude_paths handles them if they do appear.
+          for name in ${{ steps.changed.outputs.projects }}; do
+            # Strip any trailing slash just in case
+            name="${name%/}"
+
             echo ""
             echo "==============================================="
-            echo "  Entering: $dir"
+            echo "  Linting: $name"
             echo "==============================================="
             echo ""
-            if (cd "$dir" && ansible-lint *); then
-              echo "[PASS] $dir"
+
+            if (cd "$name" && ansible-lint -q); then
+              echo "[PASS] $name"
             else
-              echo "[FAIL] $dir"
-              failed+=("$dir")
+              echo "[FAIL] $name"
+              failed+=("$name")
             fi
           done
 
           if [[ ${#failed[@]} -gt 0 ]]; then
             echo ""
-            echo "The following directories failed:"
+            echo "The following projects failed:"
             for d in "${failed[@]}"; do
               echo "  - $d"
             done

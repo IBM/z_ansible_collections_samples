@@ -1,84 +1,51 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+################################################################################
+# Root ansible-lint configuration
+#
+# This file applies GLOBALLY to every project in this repository.
+# It is the LAST RESORT override — only put rules here that must apply
+# everywhere with no exceptions.
+#
+# Per-project overrides
+# ---------------------
+# Each top-level project directory (zos_concepts/, zos_subsystems/, etc.)
+# may contain its own .ansible-lint file for project-specific exclusions
+# or rule tuning. ansible-lint walks UP from the directory it is invoked
+# on, so a project-level .ansible-lint is found first and takes precedence
+# over this file for anything it defines.
+#
+# When to add something HERE vs a project .ansible-lint
+# ------------------------------------------------------
+#   Root (this file) : non-project dirs to skip (meta, docs, etc.),
+#                      verbosity, and rules that must apply repo-wide
+#   Project file     : exclude_paths for test fixtures, generated files,
+#                      or playbooks that cannot be linted in CI (e.g.
+#                      files that reference vaults or missing includes)
+#
+# Reverting per-project configs
+# -----------------------------
+# To revert to a single root config, delete the project-level .ansible-lint
+# files and move their exclude_paths back into this file using full paths
+# relative to the repo root (e.g. zos_concepts/certificate_management/...).
+################################################################################
+
+verbosity: 0
+
+# Directories that are not Ansible projects — skip them entirely.
+# ansible-lint will still be invoked on them by the CI loop but will
+# find nothing to lint and exit cleanly (Passed: 0 files).
 exclude_paths:
-  - zos_concepts/certificate_management/roles/*/tests/test.yml
-  - zos_concepts/data_transfer/copy_sort_fetch/roles/*/tests/test.yml
-  - zos_concepts/data_transfer/dump_pack_ftp_unpack_restore/roles/*/tests/test.yml
-  - zos_concepts/program_authorization/git_apf/roles/*/tests/test.yml
-  - zos_concepts/user_management/add_remove_user/roles/*/tests/test.yml
-  - zos_subsystems/ims/ims_cobol_deploy/roles/*/tests/test.yml
-  - zos_subsystems/ims/ims_provisioning/roles/*/tests/test.yml
-  - zos_subsystems/wlp/roles/*/tests/test.yml
-  - zos_subsystems/zcee/provisioning/roles/*/tests/test.yml
+  - meta
+  - collections
+  - docs
+  - .github
+  - roles
+  - scripts
 
-  - z_systems_administration/zhmc/playbooks/vault_example.yml
-  - z_systems_administration/zhmc/playbooks/inventory_example.yml
-
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-bootstrap.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-compute-nodes.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-control-plane.yaml
-
-  # OCP UPI playbooks/roles that use openstack.cloud (not installed offline)
-  # or reference common.yaml files that do not exist in the repository
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/add-new-compute-node.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-bootstrap.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-controls.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-network.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/destroy-volumes.yaml
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-bootstrap-kvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-bootstrap-zvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-compute-nodes-kvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-compute-nodes-zvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-control-plane-kvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-control-plane-zvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-infra-nodes-kvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-infra-nodes-zvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-installer-rhcos/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-installer-rhcos-local/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-install-ignition/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-network/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-node-labels/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-pre-check/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-security-groups/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-storage-nodes-kvm/
-  - z_infra_provisioning/cloud_infra_center/ocp_upi/roles/configure-storage-nodes-zvm/
-
-skip_list:
-  - args[module]
-  - command-instead-of-module
-  - command-instead-of-shell
-  - deprecated-command-syntax
-  - deprecated-local-action
-  - ignore-errors
-  - jinja[spacing]
-  - meta-incorrect
-  - meta-no-info
-  - meta-no-tags
-  - name[missing]
-  - name[play]
-  - name[template]
-  - no-changed-when
-  - no-handler
-  - no-relative-paths
-  - package-latest
-  - risky-file-permissions
-  - risky-shell-pipe
-  - role-name
-  - schema[vars]
-  - var-naming
-  - yaml[line-length]
-  - fqcn[keyword]
-  - fqcn[action-core]
-  - key-order[task]
-  - latest[git]
-  - literal-compare
-  - name[casing]
-  - schema[execution-environment]
-  - yaml[comments]
-  - yaml[empty-lines]
-  - yaml[hyphens]
-  - yaml[indentation]
-  - yaml[key-duplicates]
-  - yaml[new-line-at-end-of-file]
-  - yaml[octal-values]
-  - yaml[too-many-spaces]
-  - yaml[trailing-spaces]
-  - yaml[truthy]
+# Global skip list — rules disabled for the entire repository.
+# To disable a rule for a single project only, add it to that
+# project's .ansible-lint skip_list instead.
+# skip_list:

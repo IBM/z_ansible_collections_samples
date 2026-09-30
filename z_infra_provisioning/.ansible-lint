@@ -1,0 +1,57 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+################################################################################
+# ansible-lint configuration for z_infra_provisioning/
+#
+# This file overrides the root .ansible-lint for this project only.
+# Settings here are MERGED with the root config — they do not replace it.
+# The root .ansible-lint at the repo root remains the global fallback.
+#
+# To revert: delete this file. All exclusions below would need to be moved
+# back to the root .ansible-lint using their full paths, e.g.:
+#   - z_infra_provisioning/cloud_infra_center/ocp_upi/configure-bootstrap.yaml
+################################################################################
+
+skip_list:
+  # import_playbook entries without a name: field are flagged by name[play]
+  # but adding names to import_playbook is not supported by Ansible
+  - name[play]
+
+# exclude_paths:
+# TODO: The OCP UPI playbooks and roles below were excluded to silence
+  # lint failures rather than fixing them. This is not the right approach —
+  # exclusions should only be used for files that genuinely cannot be linted
+  # (e.g. files requiring secrets or a live environment).
+  #
+  # Investigation showed these files have real, fixable violations including:
+  #   - command-instead-of-shell  (use command: where shell is not needed)
+  #   - no-changed-when           (shell tasks must declare changed_when)
+  #   - jinja[spacing]            (Jinja2 template spacing issues)
+  #
+  # These exclusions are commented out so that ansible-lint reports the
+  # violations and the files can be properly fixed.
+  #
+  # - cloud_infra_center/ocp_upi/add-new-compute-node.yaml
+  # - cloud_infra_center/ocp_upi/destroy-bootstrap.yaml
+  # - cloud_infra_center/ocp_upi/destroy-controls.yaml
+  # - cloud_infra_center/ocp_upi/destroy-network.yaml
+  # - cloud_infra_center/ocp_upi/destroy-volumes.yaml
+  # - cloud_infra_center/ocp_upi/roles/configure-bootstrap-kvm
+  # - cloud_infra_center/ocp_upi/roles/configure-bootstrap-zvm
+  # - cloud_infra_center/ocp_upi/roles/configure-compute-nodes-kvm
+  # - cloud_infra_center/ocp_upi/roles/configure-compute-nodes-zvm
+  # - cloud_infra_center/ocp_upi/roles/configure-control-plane-kvm
+  # - cloud_infra_center/ocp_upi/roles/configure-control-plane-zvm
+  # - cloud_infra_center/ocp_upi/roles/configure-infra-nodes-kvm
+  # - cloud_infra_center/ocp_upi/roles/configure-infra-nodes-zvm
+  # - cloud_infra_center/ocp_upi/roles/configure-installer-rhcos
+  # - cloud_infra_center/ocp_upi/roles/configure-installer-rhcos-local
+  # - cloud_infra_center/ocp_upi/roles/configure-install-ignition
+  # - cloud_infra_center/ocp_upi/roles/configure-network
+  # - cloud_infra_center/ocp_upi/roles/configure-node-labels
+  # - cloud_infra_center/ocp_upi/roles/configure-pre-check
+  # - cloud_infra_center/ocp_upi/roles/configure-security-groups
+  # - cloud_infra_center/ocp_upi/roles/configure-storage-nodes-kvm
+  # - cloud_infra_center/ocp_upi/roles/configure-storage-nodes-zvm

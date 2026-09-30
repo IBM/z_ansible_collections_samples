@@ -1,0 +1,413 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+# SECURITY ALERT SLA MONITOR
+# ===========================
+# This workflow runs every day at 09:00 UTC (and can be triggered manually).
+#
+# BEHAVIOUR
+# ----------
+# For every open Dependabot and CodeQL alert the workflow:
+#
+#   Day 0  (alert appears)
+#          → Opens a GitHub Issue immediately.
+#            Individual owners are assigned via the GitHub assignees API.
+#            Team handles are tagged in the issue body with cc @handle.
+#
+#   50% of SLA elapsed
+#          → Posts a reminder comment on the existing issue.
+#
+#   75% of SLA elapsed
+#          → Posts an urgent reminder comment on the existing issue.
+#
+#   SLA - 2 days  [COMMENTED OUT — enable after steps above are stable]
+#          → Opens a PR that deletes the entire directory containing the
+#            offending file. Does NOT auto-merge — requires 1 human approval.
+#
+# SLA RULES
+# ----------
+#   Dependabot severities        CodeQL severities
+#   critical  →   7 days         error   →   7 days
+#   high      →  30 days         warning →  90 days
+#   medium    →  90 days         note    → 180 days
+#   low       → 180 days         (none)  → 180 days
+#
+# REQUIRED SECRETS
+# ----------------
+#   SECURITY_PAT  — Classic PAT with security_events scope.
+#                   Required to read Dependabot alerts on org-owned repos
+#                   (GITHUB_TOKEN always returns 403 for Dependabot on orgs).
+#                   Store as a repo secret named SECURITY_PAT.
+#                   CodeQL alerts use the default GITHUB_TOKEN.
+
+name: Security Alert SLA Monitor
+
+on: # noqa: yaml[truthy]
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+env:
+  SECURITY_TEAM: "@IBM/z-ansible-collections"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  security-events: read
+
+jobs:
+  sla-check:
+    name: Check Security Alert SLAs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed for git log owner resolution
+
+      # -----------------------------------------------------------------------
+      # STEP 1 — QUERY DEPENDABOT ALERTS
+      # -----------------------------------------------------------------------
+      - name: Query open Dependabot alerts
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching open Dependabot alerts..."
+          gh api \
+            --paginate \
+            "/repos/${{ github.repository }}/dependabot/alerts?state=open" \
+            > dependabot_alerts.json 2>/dev/null || {
+            echo "WARNING: Could not fetch Dependabot alerts."
+            echo "Create a PAT with security_events scope stored as secrets.SECURITY_PAT."
+            echo "[]" > dependabot_alerts.json
+          }
+          echo "Found $(jq length dependabot_alerts.json) open Dependabot alert(s)."
+
+      # -----------------------------------------------------------------------
+      # STEP 2 — QUERY CODEQL ALERTS
+      # -----------------------------------------------------------------------
+      - name: Query open CodeQL alerts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching open CodeQL alerts..."
+          gh api \
+            --paginate \
+            "/repos/${{ github.repository }}/code-scanning/alerts?state=open&tool_name=CodeQL" \
+            > codeql_alerts.json
+          echo "Found $(jq length codeql_alerts.json) open CodeQL alert(s)."
+
+      # -----------------------------------------------------------------------
+      # STEP 3 — OPEN ISSUES IMMEDIATELY AND POST REMINDER COMMENTS
+      #
+      # For each alert this script:
+      #   a) Maps severity → SLA deadline in days.
+      #   b) Calculates age in days from created_at.
+      #   c) Resolves owner: CODEOWNERS → git log → $SECURITY_TEAM fallback.
+      #      Individual usernames are added as GitHub assignees.
+      #      Team handles are tagged in the issue body only (GitHub API limitation).
+      #   d) If no open issue exists for this alert ID → creates one immediately
+      #      (day 0 behaviour — issues open as soon as an alert appears).
+      #   e) If an issue already exists:
+      #        • At 50 % of SLA elapsed → posts a reminder comment.
+      #        • At 75 % of SLA elapsed → posts an urgent reminder comment.
+      #        Reminder comments are deduplicated via a search for a sentinel
+      #        string in existing comments before posting.
+      # -----------------------------------------------------------------------
+      - name: Open issues and post SLA reminders
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SECURITY_TEAM: ${{ env.SECURITY_TEAM }}
+        run: |
+          # ── SLA lookup ──────────────────────────────────────────────────────
+          sla_days() {
+            case "${1,,}" in
+              critical) echo 7   ;;
+              high)     echo 30  ;;
+              medium)   echo 90  ;;
+              low)      echo 180 ;;
+              error)    echo 7   ;;
+              warning)  echo 90  ;;
+              *)        echo 180 ;;   # note, none, unrecognised
+            esac
+          }
+
+          # ── Owner resolution ────────────────────────────────────────────────
+          # Returns two values via globals: OWNER_ASSIGN (individual login or "")
+          # and OWNER_TAG (handle suitable for cc in body).
+          #
+          # Tier 1: CODEOWNERS — last matching pattern wins (GitHub spec).
+          # Tier 2: git log    — extract GitHub username from noreply address.
+          # Tier 3: $SECURITY_TEAM fallback.
+          resolve_owner() {
+            local file_path="$1"
+            OWNER_ASSIGN=""
+            OWNER_TAG=""
+
+            # Tier 1: CODEOWNERS
+            if [[ -f ".github/CODEOWNERS" ]]; then
+              while IFS= read -r line; do
+                [[ "$line" =~ ^[[:space:]]*# ]] && continue
+                [[ -z "${line// }" ]] && continue
+                local pattern handles
+                pattern=$(echo "$line" | awk '{print $1}')
+                handles=$(echo "$line" | awk '{$1=""; print $0}' | xargs)
+                local clean_pattern="${pattern%/}"
+                if [[ "$file_path" == $clean_pattern* ]] || \
+                   [[ "$file_path" == *$clean_pattern ]]; then
+                  OWNER_TAG="$handles"
+                fi
+              done < ".github/CODEOWNERS"
+            fi
+
+            # Tier 2: git log
+            if [[ -z "$OWNER_TAG" ]] && [[ "$file_path" != "N/A" ]]; then
+              local email
+              email=$(git log -1 --format="%ae" -- "${file_path}" 2>/dev/null)
+              if [[ -n "$email" ]]; then
+                local gh_user
+                gh_user=$(echo "$email" \
+                  | grep -o '[^+]*@users\.noreply\.github\.com' \
+                  | cut -d'+' -f2 | cut -d'@' -f1)
+                if [[ -n "$gh_user" ]]; then
+                  OWNER_TAG="@${gh_user}"
+                else
+                  local committer_name
+                  committer_name=$(git log -1 --format="%an" -- "${file_path}" 2>/dev/null)
+                  OWNER_TAG="(last committer: ${committer_name} <${email}>)"
+                fi
+              fi
+            fi
+
+            # Tier 3: fallback
+            [[ -z "$OWNER_TAG" ]] && OWNER_TAG="${SECURITY_TEAM}"
+
+            # Determine assignee: only set for a single bare @username (not a team)
+            # GitHub API only accepts individual collaborator logins as assignees.
+            local raw="${OWNER_TAG}"
+            # A single @username looks like: @word  (no slash, no spaces, one token)
+            if [[ "$raw" =~ ^@([A-Za-z0-9_-]+)$ ]]; then
+              OWNER_ASSIGN="${BASH_REMATCH[1]}"
+            fi
+          }
+
+          # ── Ensure required labels exist ────────────────────────────────────
+          for label in security sla-breach-tracking; do
+            gh api --method POST "/repos/${REPO}/labels" \
+              -f name="${label}" -f color="B60205" 2>/dev/null || true
+          done
+
+          # ── Process a single alert ──────────────────────────────────────────
+          # Args: alert_id summary severity created_at file_path alert_url alert_type
+          process_alert() {
+            local alert_id="$1"
+            local summary="$2"
+            local severity="$3"
+            local created_at="$4"
+            local file_path="$5"
+            local alert_url="$6"
+            local alert_type="$7"
+
+            local sla
+            sla=$(sla_days "${severity}")
+
+            local created_epoch now_epoch age_days
+            created_epoch=$(date -d "${created_at}" +%s 2>/dev/null \
+                            || date -j -f "%Y-%m-%dT%H:%M:%SZ" "${created_at}" +%s)
+            now_epoch=$(date +%s)
+            age_days=$(( (now_epoch - created_epoch) / 86400 ))
+
+            local days_remaining=$(( sla - age_days ))
+            local pct_elapsed=$(( age_days * 100 / sla ))
+
+            echo "  ${alert_type} alert-${alert_id} — ${severity} — ${age_days}d / ${sla}d SLA (${pct_elapsed}% elapsed, ${days_remaining}d remaining)"
+
+            # Resolve owner (sets OWNER_ASSIGN and OWNER_TAG globals)
+            resolve_owner "${file_path}"
+
+            # ── Deduplication: find existing open issue for this alert ────────
+            local search_query="repo:${REPO} is:issue is:open \"${alert_type} alert-${alert_id}\" in:body"
+            local existing_issue_number=""
+            existing_issue_number=$(gh api \
+              "/search/issues?q=$(python3 -c \
+                "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" \
+                "${search_query}")" \
+              --jq '.items[0].number // ""')
+
+            # ── No issue yet → open one immediately ──────────────────────────
+            if [[ -z "$existing_issue_number" ]]; then
+              local deadline
+              deadline=$(date -d "${created_at} + ${sla} days" "+%Y-%m-%d" 2>/dev/null \
+                         || date -j -v+"${sla}"d -f "%Y-%m-%dT%H:%M:%SZ" "${created_at}" "+%Y-%m-%d")
+
+              local body
+              body=$(printf '%s\n' \
+                '## :warning: Security Alert — SLA Tracking Issue' \
+                '' \
+                '| Field              | Value |' \
+                '|--------------------|-------|' \
+                "| **Alert type**     | ${alert_type} |" \
+                "| **Alert ID**       | alert-${alert_id} |" \
+                "| **Severity**       | ${severity^^} |" \
+                "| **SLA**            | ${sla} days |" \
+                "| **Age at opening** | ${age_days} days |" \
+                "| **SLA deadline**   | ${deadline} |" \
+                "| **Affected file**  | \`${file_path}\` |" \
+                "| **Owner**          | ${OWNER_TAG} |" \
+                '' \
+                '### Summary' \
+                '' \
+                "${summary}" \
+                '' \
+                '### Alert link' \
+                '' \
+                "${alert_url}" \
+                '' \
+                '---' \
+                '' \
+                "cc ${OWNER_TAG}" \
+                '' \
+                '> This issue was opened automatically by the Security Alert SLA Monitor.' \
+                '> Please remediate the alert and close this issue once resolved.' \
+                '> Reminder comments will be posted at 50% and 75% of the SLA window.' \
+              )
+
+              # Build the gh issue create command; add --assignee only for individuals
+              local create_cmd=(gh issue create
+                --repo "${REPO}"
+                --title "[SECURITY] ${summary} — ${severity^^} (${alert_type} alert-${alert_id})"
+                --body  "${body}"
+                --label "security"
+                --label "sla-breach-tracking"
+              )
+              [[ -n "$OWNER_ASSIGN" ]] && create_cmd+=(--assignee "${OWNER_ASSIGN}")
+
+              "${create_cmd[@]}"
+              echo "  → Opened issue for ${alert_type} alert-${alert_id}"
+              return
+            fi
+
+            echo "  → Issue #${existing_issue_number} exists for ${alert_type} alert-${alert_id}"
+
+            # ── Reminder comments (deduplicated by sentinel string) ───────────
+            # 50% reminder
+            if (( pct_elapsed >= 50 && pct_elapsed < 75 )); then
+              local sentinel_50="SLA-REMINDER-50PCT-${alert_type}-${alert_id}"
+              local already_50
+              already_50=$(gh api "/repos/${REPO}/issues/${existing_issue_number}/comments" \
+                --jq "[.[] | select(.body | contains(\"${sentinel_50}\"))] | length")
+              if (( already_50 == 0 )); then
+                local body_50
+                body_50=$(printf '%s\n' \
+                  "<!-- ${sentinel_50} -->" \
+                  ":alarm_clock: **50% SLA reminder** -- ${age_days} of ${sla} days elapsed for ${alert_type} alert-${alert_id} (${severity^^})." \
+                  "${days_remaining} day(s) remain before the SLA deadline. Please prioritise remediation." \
+                  "cc ${OWNER_TAG}")
+                gh issue comment "${existing_issue_number}" --repo "${REPO}" --body "${body_50}"
+                echo "  -> Posted 50% reminder on issue #${existing_issue_number}"
+              fi
+
+            # 75% reminder
+            elif (( pct_elapsed >= 75 )); then
+              local sentinel_75="SLA-REMINDER-75PCT-${alert_type}-${alert_id}"
+              local already_75
+              already_75=$(gh api "/repos/${REPO}/issues/${existing_issue_number}/comments" \
+                --jq "[.[] | select(.body | contains(\"${sentinel_75}\"))] | length")
+              if (( already_75 == 0 )); then
+                local body_75
+                body_75=$(printf '%s\n' \
+                  "<!-- ${sentinel_75} -->" \
+                  ":rotating_light: **URGENT -- 75% SLA elapsed** -- ${age_days} of ${sla} days elapsed for ${alert_type} alert-${alert_id} (${severity^^})." \
+                  "Only ${days_remaining} day(s) remain. Immediate action required." \
+                  "cc ${OWNER_TAG}")
+                gh issue comment "${existing_issue_number}" --repo "${REPO}" --body "${body_75}"
+                echo "  -> Posted 75% urgent reminder on issue #${existing_issue_number}"
+              fi
+            fi
+
+            # ── SLA-2 day auto-PR (COMMENTED OUT — enable after above is stable)
+            # ----------------------------------------------------------------
+            # What this block does when enabled:
+            #   When age_days >= (sla - 2), opens a PR that deletes the entire
+            #   directory containing the offending file. The PR requires 1 human
+            #   approval before it can merge (configure branch protection for
+            #   pattern  security/sla-remove-*  with "Required approvals: 1").
+            #
+            # To enable: remove the leading `#` from every line below, then
+            # configure branch protection as described above.
+            #
+            # if (( age_days >= sla - 2 )) && [[ "$file_path" != "N/A" ]]; then
+            #   local pr_branch="security/sla-remove-${alert_type,,}-${alert_id}"
+            #   local affected_dir
+            #   affected_dir=$(dirname "${file_path}")
+            #   # Only delete the immediate directory — not parent directories.
+            #   if [[ "$affected_dir" == "." ]]; then
+            #     echo "  → File is at repo root, skipping auto-PR (manual review required)"
+            #   else
+            #     # Check if PR branch already exists
+            #     if ! git ls-remote --exit-code --heads origin "${pr_branch}" >/dev/null 2>&1; then
+            #       git config user.email "github-actions[bot]@users.noreply.github.com"
+            #       git config user.name  "github-actions[bot]"
+            #       git checkout -b "${pr_branch}"
+            #       git rm -r "${affected_dir}"
+            #       git commit -m "security: remove ${affected_dir} flagged by ${alert_type} alert-${alert_id}"
+            #       git push origin "${pr_branch}"
+            #       gh pr create \
+            #         --repo  "${REPO}" \
+            #         --title "[SECURITY] Remove ${affected_dir} (${alert_type} alert-${alert_id})" \
+            #         --body  "Automated remediation: removes \`${affected_dir}\` which contains a ${severity^^} ${alert_type} alert past its SLA deadline. Linked issue: #${existing_issue_number}. Requires 1 human approval before merge." \
+            #         --label "security" \
+            #         --label "sla-breach-tracking" \
+            #         --base  main
+            #       echo "  → Opened remediation PR for ${affected_dir}"
+            #     else
+            #       echo "  → Remediation PR branch ${pr_branch} already exists, skipping"
+            #     fi
+            #   fi
+            # fi
+          }
+
+          # ── Process Dependabot alerts ────────────────────────────────────────
+          echo ""
+          echo "=== Dependabot alerts ==="
+          while IFS= read -r alert; do
+            alert_id=$(jq -r '.number'                                         <<<"${alert}")
+            severity=$(jq -r '.security_advisory.severity // "low"'            <<<"${alert}")
+            summary=$(jq -r  '.security_advisory.summary // .dependency.package.name' <<<"${alert}")
+            created_at=$(jq -r '.created_at'                                   <<<"${alert}")
+            file_path=$(jq -r  '.dependency.manifest_path // "N/A"'            <<<"${alert}")
+            alert_url=$(jq -r  '.html_url'                                     <<<"${alert}")
+
+            process_alert \
+              "${alert_id}" "${summary}" "${severity}" \
+              "${created_at}" "${file_path}" "${alert_url}" "Dependabot"
+          done < <(jq -c '.[]' dependabot_alerts.json)
+
+          # ── Process CodeQL alerts ────────────────────────────────────────────
+          echo ""
+          echo "=== CodeQL alerts ==="
+          while IFS= read -r alert; do
+            alert_id=$(jq -r  '.number'                                        <<<"${alert}")
+            severity=$(jq -r  '.rule.severity // "low"'                        <<<"${alert}")
+            summary=$(jq -r   '.rule.description // .rule.id'                  <<<"${alert}")
+            created_at=$(jq -r '.created_at'                                   <<<"${alert}")
+            file_path=$(jq -r  '.most_recent_instance.location.path // "N/A"'  <<<"${alert}")
+            alert_url=$(jq -r  '.html_url'                                     <<<"${alert}")
+
+            process_alert \
+              "${alert_id}" "${summary}" "${severity}" \
+              "${created_at}" "${file_path}" "${alert_url}" "CodeQL"
+          done < <(jq -c '.[]' codeql_alerts.json)
+
+          echo ""
+          echo "SLA tracking complete."
+
+      # -----------------------------------------------------------------------
+      # STEP 4 — LOG SUMMARY
+      # -----------------------------------------------------------------------
+      - name: Log SLA check complete
+        run: echo "Security alert SLA tracking run complete."
