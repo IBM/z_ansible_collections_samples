@@ -7,7 +7,6 @@
 ---
 collections:
   - name: ibm.ibm_zhmc
-    version: 1.2.1
   - name: ibm.ibm_zos_cics
     version: 2.1.0
   - name: ibm.ibm_zos_core
