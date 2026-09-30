@@ -1,4 +1,10 @@
-#exclude_paths:
+exclude_paths:
+  - meta/
+  - collections/
+  - docs/
+  - .github/
+  - roles/
+  - scripts/
 #  - zos_concepts/certificate_management/roles/*/tests/test.yml
 #  - zos_concepts/data_transfer/copy_sort_fetch/roles/*/tests/test.yml
 #  - zos_concepts/data_transfer/dump_pack_ftp_unpack_restore/roles/*/tests/test.yml
