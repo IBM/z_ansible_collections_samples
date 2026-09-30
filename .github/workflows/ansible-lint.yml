@@ -51,10 +51,13 @@ jobs:
             # New branch — lint everything
             projects=$(ls -d */ | sed 's|/||g' | tr '\n' ' ')
           else
-            # Lint only top-level dirs that contain changed files
+            # Lint only top-level dirs that contain changed files.
+            # Filter with -d to exclude root-level files (e.g. .ansible-lint)
+            # that are not directories.
             projects=$(git diff --name-only "$base"...HEAD \
               | cut -d/ -f1 \
               | sort -u \
+              | while read -r entry; do [ -d "$entry" ] && echo "$entry"; done \
               | tr '\n' ' ')
           fi
 
