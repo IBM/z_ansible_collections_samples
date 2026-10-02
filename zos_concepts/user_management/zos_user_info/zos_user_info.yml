@@ -60,22 +60,20 @@
 
 - name: Sample zos_user_info playbook for RACF profile information retrieval
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   vars:
     test_user_id: "{{ ansible_user | upper }}"
     test_group_name: "SYS1"
-    
+
   tasks:
     ###########################################################################
     # USER PROFILE INFORMATION RETRIEVAL
     ###########################################################################
 
     - name: Display test configuration
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Testing with user: {{ test_user_id }}"
           - "Testing with group: {{ test_group_name }}"
@@ -198,7 +196,7 @@
       ibm.ibm_zos_core.zos_user_info:
         name: "NONEXIST"
         profile_type: user
-      ignore_errors: yes
+      ignore_errors: true
       register: nonexistent_user
 
     # Demonstrate handling of invalid group profile name.
@@ -206,5 +204,5 @@
       ibm.ibm_zos_core.zos_user_info:
         name: "INVALID_NAME"
         profile_type: group
-      ignore_errors: yes
+      ignore_errors: true
       register: nonexistent_group
