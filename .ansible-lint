@@ -44,6 +44,7 @@ exclude_paths:
   - .github
   - roles
   - scripts
+  - "**/host_vars"
 
 # Global skip list — rules disabled for the entire repository.
 # To disable a rule for a single project only, add it to that
