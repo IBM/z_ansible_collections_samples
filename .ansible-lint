@@ -44,6 +44,12 @@ exclude_paths:
   - .github
   - roles
   - scripts
+  - "**/zos_host.yml"
+  - "**/zos_host.yaml"
+  - "**/source.yml"
+  - "**/destination.yml"
+  - "**/zvm.yml"
+  - "**/zosendpoint.yml"
 
 # Global skip list — rules disabled for the entire repository.
 # To disable a rule for a single project only, add it to that
