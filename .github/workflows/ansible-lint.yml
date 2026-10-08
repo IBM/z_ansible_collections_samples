@@ -67,6 +67,13 @@ jobs:
                 return
               fi
 
+              # host_vars dirs contain only variable files excluded from linting;
+              # skip this level and keep walking up to the real project root.
+              if [[ "${dir##*/}" == "host_vars" ]]; then
+                dir=$(dirname "$dir")
+                continue
+              fi
+
               # This dir has at least one playbook/vars/task file directly
               # inside it — treat it as the project root
               if compgen -G "${dir}/*.yml" > /dev/null 2>&1 || \
