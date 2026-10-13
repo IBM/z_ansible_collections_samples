@@ -112,15 +112,6 @@
                 - " 16.29.01 JOB00260  $HASP373 HELLO    STARTED - INIT 8    - CLASS A        - SYS STL1"
                 - " 16.29.01 JOB00260  SMF000I  HELLO       STEP0001    IEBGENER    0000"
                 - " 16.29.01 JOB00260  $HASP395 HELLO    ENDED - RC=0000"
-                - "0 "
-                - " 16.29.01 JOB00260 ---- THURSDAY,  13 MAY 2021 ----"
-                - " 16.29.01 JOB00260  IRR010I  USERID OMVSADM  IS ASSIGNED TO THIS JOB."
-                - " 16.29.01 JOB00260  $HASP375 JES2     ESTIMATED  LINES EXCEEDED"
-                - " 16.29.01 JOB00260  ICH70001I OMVSADM  LAST ACCESS AT 16:28:55 ON THURSDAY, MAY 13, 2021"
-                - " 16.29.01 JOB00260  $HASP375 HELLO    ESTIMATED  LINES EXCEEDED"
-                - " 16.29.01 JOB00260  $HASP373 HELLO    STARTED - INIT 8    - CLASS A        - SYS STL1"
-                - " 16.29.01 JOB00260  SMF000I  HELLO       STEP0001    IEBGENER    0000"
-                - " 16.29.01 JOB00260  $HASP395 HELLO    ENDED - RC=0000"
                 - 0------ JES2 JOB STATISTICS ------
                 - "-  13 MAY 2021 JOB EXECUTION DATE"
                 - "-           16 CARDS READ"
@@ -135,9 +126,6 @@
               stepname: JES2
             - byte_count: "696"
               content:
-                - "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260"
-                - "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             "
-                - "           //*                                                                             "
                 - "         1 //HELLO    JOB (T043JM,JM00,1,0,0,0),'HELLO WORLD - JRM',               JOB00260"
                 - "           //             MSGCLASS=X,MSGLEVEL=1,NOTIFY=&SYSUID                             "
                 - "           //*                                                                             "

@@ -1,6 +1,5 @@
 ###############################################################################
 # © Copyright IBM Corporation 2024, 2026
-# © Copyright IBM Corporation 2024, 2026
 ###############################################################################
 
 ###############################################################################
@@ -9,7 +8,6 @@
 # in Ansible facts with a static file using Red Hat Ansible Certified Content
 # for IBM Z.
 # Try running the 'gather_and_print_facts' playbook before and after running
-# this one to see the effect updating the static file 'zoau.fact' has on the
 # this one to see the effect updating the static file 'zoau.fact' has on the
 # facts Ansible gathers.
 #
@@ -20,7 +18,6 @@
 #  ansible-playbook -i inventories unarchive_pax_and_set_custom_facts.yml
 #
 # Requirements:
-#   IBM z/OS core collection 2.0.0 or later.
 #   IBM z/OS core collection 2.0.0 or later.
 #
 # Configure:
@@ -34,7 +31,6 @@
 - name: Sample zoau pax installation playbook.
   hosts: zos_host
 
-  environment: "{{ environment_vars }}"
   environment: "{{ environment_vars }}"
 
   vars:
@@ -90,18 +86,6 @@
         format:
           type: pax
 
-    ##############################################################################
-    # Once the files are in place, the environemnt needs to be configured. For
-    # ZOAU the two configs which changed are the path where the target ZOAU is and
-    # the path to the ZOAU Python libraries. The next task sets those two as facts
-    # and prints them out. Note, setting facts with the ansible.builtin.set_fact
-    # module creates variables with playbook scope, meaning once this playbook
-    # completes, the values are lost.
-    ##############################################################################
-    - name: Set facts, so the next step can leverage updated values.
-      ansible.builtin.set_fact:
-        ZOAU: "{{ new_zoau_target_dir }}"
-        ZOAU_PYTHONPATH: "{{ new_zoau_target_dir }}lib/3.11"
     ##############################################################################
     # Once the files are in place, the environemnt needs to be configured. For
     # ZOAU the two configs which changed are the path where the target ZOAU is and
@@ -194,19 +178,11 @@
           # pull this from previous task output, then parse it for the verison.
           zoaversion: "{{ zoaversion_str.stdout }}"
           version: "{{ zoaversion_str.stdout.split(' v')[1].split()[0] }}"
-          # pull this from previous task output, then parse it for the verison.
-          zoaversion: "{{ zoaversion_str.stdout }}"
-          version: "{{ zoaversion_str.stdout.split(' v')[1].split()[0] }}"
 
           # the next two were configured in a previous task and can be reused here.
           executable: "{{ ZOAU }}"
           zoau_pythonpath: "{{ ZOAU_PYTHONPATH }}"
-          # the next two were configured in a previous task and can be reused here.
-          executable: "{{ ZOAU }}"
-          zoau_pythonpath: "{{ ZOAU_PYTHONPATH }}"
 
-          # take advantage of the now() command built in to jinja.
-          date_last_updated: "{{ now(utc=true,fmt='%Y-%m-%d') }}"
           # take advantage of the now() command built in to jinja.
           date_last_updated: "{{ now(utc=true,fmt='%Y-%m-%d') }}"
 
