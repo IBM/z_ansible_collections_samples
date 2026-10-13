@@ -40,8 +40,6 @@
 
 - name: Sample zos_job_submit template playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -80,7 +78,7 @@
       register: job_output
 
     - name: Extracting ddnames from job output.
-      set_fact:
+      ansible.builtin.set_fact:
         job_ddnames: "{{ job_output.jobs[0].dds }}"
 
     # By looking at the submitted JCL, we'll see how Jinja rendered
@@ -111,7 +109,7 @@
       register: job_output
 
     - name: Extracting ddnames from job output.
-      set_fact:
+      ansible.builtin.set_fact:
         job_ddnames: "{{ job_output.jobs[0].dds }}"
 
     - name: See job's submitted JCL.
