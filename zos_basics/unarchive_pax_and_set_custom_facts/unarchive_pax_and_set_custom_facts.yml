@@ -124,43 +124,11 @@
         PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
       ansible.builtin.command: zoaversion
       register: zoaversion_str
-    ##############################################################################
-    # As a validation step that the files and config are set up correctly, the
-    # next task calls the 'zoaversion' command with a task-level environment
-    # configuration. Notice the environment defined here is not the complete
-    # environment defined in the inventories directory. This is because the task
-    # level environment inherits from the playbook and then makes any required
-    # modifications. Running this playbook with verbosity level 3 or higher
-    # ('ansible-playbook -vvv ...') will print the environment to the playbook
-    # output, where the new ZOAU values can be verified visually.
-    ##############################################################################
-    - name: Run zoaversion at new zoau location using a task-level environment
-        config to update the environemnt vars related to zoau, the rest remain
-        in place, inherited from the host_vars/group_vars.
-      environment:
-        PYTHONPATH: "{{ ZOAU_PYTHONPATH }}"
-        LIBPATH: "{{ ZOAU_PYTHONPATH }}:{{ ZOAU }}/lib/:{{ PYZ }}/lib:/lib:/usr/lib:."
-        PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
-      ansible.builtin.command: zoaversion
-      register: zoaversion_str
 
     - name: Print the results of the call to zoaversion.
       ansible.builtin.debug:
         var: zoaversion_str.stdout
 
-    ##############################################################################
-    # Now that the 'new' ZOAU files have been set up, the next tasks update the
-    # custom facts by setting a local variable with the ansible.builtin.set_fact
-    # module, printing the facts, and finally writing the changes to the static
-    # file so that updated facts persist beyond this playbook.
-    ##############################################################################
-    - name:
-        Create a dict with updates. Remember, this dict in its current form is
-        not persistent and changes will be lost once the playbook completes.
-      ansible.builtin.set_fact:
-        new_zoau_facts:
-          # can use existing value since it won't change with an update.
-          product_name: "{{ ansible_local.zoau.product_name }}"
     ##############################################################################
     # Now that the 'new' ZOAU files have been set up, the next tasks update the
     # custom facts by setting a local variable with the ansible.builtin.set_fact
