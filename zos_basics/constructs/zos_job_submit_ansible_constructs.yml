@@ -76,7 +76,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Submit jobs, and query and retrieve job output using various Ansible constructs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:

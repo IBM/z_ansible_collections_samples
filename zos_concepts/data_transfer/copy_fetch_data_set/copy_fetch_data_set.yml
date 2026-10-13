@@ -35,7 +35,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Copy data to and from a z/OS system
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"

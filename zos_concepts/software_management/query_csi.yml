@@ -14,7 +14,8 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
+- name: Query the SMP/E CSI
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 

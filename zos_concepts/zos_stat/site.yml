@@ -18,7 +18,8 @@
 ###############################################################################
 
 ---
-- hosts: localhost
+- name: Check the playbook requirements
+  hosts: localhost
 
   tasks:
     - name: Parse the registry for collection entries

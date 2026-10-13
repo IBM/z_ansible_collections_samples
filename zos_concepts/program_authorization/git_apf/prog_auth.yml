@@ -47,7 +47,8 @@
 #     are used as examples. The user of this playbook is responsible for providing valid information.
 ###############################################################################
 
-- hosts: zos_host
+- name: Clone a Git repository and manage APF authorized libraries
+  hosts: zos_host
   gather_facts: false
   vars:
     git_repo: "git@github.com:IBM/z_ansible_collections_samples.git"

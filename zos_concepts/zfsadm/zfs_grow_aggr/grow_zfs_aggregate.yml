@@ -24,7 +24,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Grow a zFS aggregate
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:

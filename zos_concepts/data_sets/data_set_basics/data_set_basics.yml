@@ -32,7 +32,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Perform basic data set operations
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"

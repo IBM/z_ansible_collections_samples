@@ -22,7 +22,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Manipulate text in data sets and USS files
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 

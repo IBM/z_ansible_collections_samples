@@ -54,7 +54,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Submit batch jobs asynchronously, query them and retrieve output
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"

@@ -23,7 +23,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Shrink a zFS aggregate using different size options
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:

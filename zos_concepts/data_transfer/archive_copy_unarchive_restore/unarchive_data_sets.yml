@@ -25,7 +25,8 @@
 #
 ###############################################################################
 
-- hosts: destination
+- name: Restore data sets from an archive
+  hosts: destination
   gather_facts: false
 
   vars:

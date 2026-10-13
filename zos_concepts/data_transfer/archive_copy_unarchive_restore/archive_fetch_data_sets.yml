@@ -25,7 +25,8 @@
 #
 ###############################################################################
 
-- hosts: source
+- name: Archive data sets and fetch the archive to the controller
+  hosts: source
   gather_facts: false
 
   vars:

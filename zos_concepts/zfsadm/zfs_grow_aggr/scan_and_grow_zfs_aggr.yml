@@ -30,7 +30,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Scan and grow selected zFS aggregates
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:

@@ -22,7 +22,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Create generation data sets, copy JCL and submit it
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 

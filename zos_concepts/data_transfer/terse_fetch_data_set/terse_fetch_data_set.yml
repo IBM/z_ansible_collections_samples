@@ -25,7 +25,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Terse a data set and fetch it to the controller
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:

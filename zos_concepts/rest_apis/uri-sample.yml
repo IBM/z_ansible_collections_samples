@@ -14,7 +14,8 @@
 #
 ###############################################################################
 ---
-- hosts: zos_host
+- name: Invoke z/OSMF REST API services
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 

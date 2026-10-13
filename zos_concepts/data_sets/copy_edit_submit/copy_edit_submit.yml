@@ -22,7 +22,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Copy a directory to a PDS, edit a member and submit it
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 

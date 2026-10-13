@@ -36,7 +36,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Execute z/OS operator commands and retrieve their output
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
