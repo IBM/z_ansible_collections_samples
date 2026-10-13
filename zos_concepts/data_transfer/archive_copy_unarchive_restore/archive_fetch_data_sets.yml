@@ -123,4 +123,3 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
-

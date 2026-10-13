@@ -107,7 +107,7 @@
         verbose: true
       register: start_out
 
-    - name: Print start_out
+    - name: Print start_out for the JCL member started task
       ansible.builtin.debug:
         msg:
           - "{{ start_out }}"
@@ -228,7 +228,7 @@
         verbose: true
       register: start_out
 
-    - name: Print start_out
+    - name: Print start_out for 'ICSF'
       ansible.builtin.debug:
         msg:
           - "{{ start_out }}"
@@ -244,7 +244,7 @@
         system_logs: true
       register: start_out
 
-    - name: Print start_out
+    - name: Print start_out for 'VLF'
       ansible.builtin.debug:
         msg:
           - "{{ start_out }}"
