@@ -1,0 +1,31 @@
+# Copyright (c) IBM Corporation 2024
+# This playbook demonstrates using roles:
+# 'zmf_swmgmt_zos_system_uuid', and 'zmf_swmgmt_csi_query'
+# to query the global zone CSI data set associated with
+# the z/OS system's UUID.
+
+#####################################################################################
+# PLAY #1: Retrieve the z/OS system's UUID.                                         #
+#####################################################################################
+- name: Retrieve the z/OS system UUID
+  hosts: swmgmt
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Retrieve the z/OS system UUID
+      include_role:
+        name: zmf_swmgmt_zos_system_uuid
+
+#######################################################################################
+# PLAY #2: Query the global zone CSI data set associated with the z/OS system's UUID. #
+#######################################################################################
+- name: Query a CSI data set
+  hosts: swmgmt
+  gather_facts: false
+  collections:
+    - ibm.ibm_zosmf
+  tasks:
+    - name: Query a CSI data set
+      include_role:
+        name: zmf_swmgmt_csi_query

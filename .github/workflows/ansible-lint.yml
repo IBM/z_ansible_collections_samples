@@ -1,5 +1,35 @@
+################################################################################
+# Copyright IBM Corporation 2026
+################################################################################
+
+
 name: ansible-lint
 on: [push, pull_request] # noqa: yaml[truthy]
+
+permissions:
+  contents: read
+
+# HOW PR-SCOPED LINTING WORKS
+# ----------------------------
+# On pull_request events: we diff the PR branch against its base to find
+# which Ansible project directories contain changed files, then lint only
+# those projects. Projects with no changes are skipped entirely.
+#
+# On push events: we diff HEAD against the previous commit (event.before).
+# If event.before is the zero SHA (first push to a new branch), we fall
+# back to linting all discovered projects.
+#
+# PROJECT DISCOVERY HEURISTIC
+# ----------------------------
+# A directory is treated as an Ansible project root if it contains at least
+# one *.yml or *.yaml file directly inside it (not only subdirectories).
+# The tree is walked depth-first; the shallowest matching directory wins,
+# so grouping directories (zos_concepts/, zos_subsystems/ims/, etc.) are
+# never linted directly — only the real project leaves are.
+# Maximum supported nesting depth: 5 levels (covers all current projects).
+#
+# NON-ANSIBLE DIRS (never linted regardless of changes):
+# .github  collections  docs  meta  roles  scripts
 
 jobs:
   build:
@@ -8,40 +38,142 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies from Ansible Galaxy
-        uses: ./.github/actions/install-requirements
+        uses: actions/checkout@v4
         with:
-          requirements: collections/requirements.yml
+          fetch-depth: 0
+
+      - name: Get changed projects
+        id: changed
+        run: |
+          # Directories that are never Ansible projects — skip unconditionally.
+          # Mirrors exclude_paths in the root .ansible-lint.
+          SKIP_DIRS=".github collections docs meta roles scripts"
+
+          # ── find_project_root ─────────────────────────────────────
+          # Given a file path, walk its directory upward until a directory
+          # that contains at least one *.yml or *.yaml file directly inside
+          # it is found. That directory is the Ansible project root.
+          # Prints nothing if the path is under a SKIP_DIR or no project
+          # root is found before reaching the repo root.
+          find_project_root() {
+            local file="$1"
+            local dir
+            dir=$(dirname "$file")
+
+            while [[ "$dir" != "." && "$dir" != "/" ]]; do
+              # Bail out if the top-level component is a non-Ansible dir
+              local top="${dir%%/*}"
+              if echo "$SKIP_DIRS" | grep -qw "$top"; then
+                return
+              fi
+
+              # host_vars dirs contain only variable files excluded from linting;
+              # skip this level and keep walking up to the real project root.
+              if [[ "${dir##*/}" == "host_vars" ]]; then
+                dir=$(dirname "$dir")
+                continue
+              fi
+
+              # This dir has at least one playbook/vars/task file directly
+              # inside it — treat it as the project root
+              if compgen -G "${dir}/*.yml" > /dev/null 2>&1 || \
+                 compgen -G "${dir}/*.yaml" > /dev/null 2>&1; then
+                echo "$dir"
+                return
+              fi
+
+              dir=$(dirname "$dir")
+            done
+          }
+
+          # ── all_projects ─────────────────────────────────────────
+          # Walk the entire repo tree and collect every Ansible project root.
+          # Used for the new-branch fallback (lint everything).
+          all_projects() {
+            find . -type f \( -name "*.yml" -o -name "*.yaml" \) \
+              | sed 's|^\./||' \
+              | while IFS= read -r file; do
+                  find_project_root "$file"
+                done \
+              | sort -u
+          }
+
+          # ── Determine base SHA ──────────────────────────────────────
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="origin/${{ github.event.pull_request.base.ref }}"
+          elif [[ "${{ github.event.before }}" \
+                  == "0000000000000000000000000000000000000000" ]]; then
+            base=""
+          else
+            base="${{ github.event.before }}"
+          fi
+
+          # ── Build project list ──────────────────────────────────────
+          if [[ -z "$base" ]]; then
+            # New branch — discover and lint every project in the repo
+            projects=$(all_projects | tr '\n' ' ')
+          else
+            # PR/push — lint only projects that contain changed files
+            declare -A seen
+            while IFS= read -r file; do
+              project=$(find_project_root "$file")
+              [[ -n "$project" ]] && seen["$project"]=1
+            done < <(git diff --name-only "$base"...HEAD)
+            projects="${!seen[*]}"
+          fi
+
+          echo "Projects to lint: $projects"
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
 
       - name: Install ansible-lint
-        run: pip install ansible-lint
+        run: |
+          pip install \
+            "ansible-lint==25.6.0" \
+            "ansible-core==2.16.19" \
+            "ansible-compat==25.1.5"
 
-      # Equivalent local one-liner (for reference / local testing):
-      # for dir in /Users/ddimatos/git/z_ansible_collections_samples/*/; do echo "=== Entering: $dir ===" && (cd "$dir" && ansible-lint *); done
+      - name: Install dependencies from Ansible Galaxy
+        run: |
+          for attempt in 1 2 3; do
+            echo "Galaxy install attempt $attempt of 3..."
+            ansible-galaxy collection install \
+              -r collections/requirements.yml --timeout 60 && break
+            if [[ $attempt -lt 3 ]]; then
+              echo "Attempt $attempt failed, retrying in 30s..."
+              sleep 30
+            else
+              echo "All 3 attempts failed."
+              exit 1
+            fi
+          done
+
       - name: Run ansible-lint
         env:
-          ANSIBLE_LIBRARY: "${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library"
+          ANSIBLE_LIBRARY: >-
+            ${{ github.workspace }}/zos_subsystems/ims/ims_provisioning/library
         run: |
           failed=()
-          for dir in ${{ github.workspace }}/*/; do
+
+          for name in ${{ steps.changed.outputs.projects }}; do
+            name="${name%/}"
+
             echo ""
             echo "==============================================="
-            echo "  Entering: $dir"
+            echo "  Linting: $name"
             echo "==============================================="
             echo ""
-            if (cd "$dir" && ansible-lint *); then
-              echo "[PASS] $dir"
+
+            if (cd "$name" && ansible-lint -q); then
+              echo "[PASS] $name"
             else
-              echo "[FAIL] $dir"
-              failed+=("$dir")
+              echo "[FAIL] $name"
+              failed+=("$name")
             fi
           done
 
           if [[ ${#failed[@]} -gt 0 ]]; then
             echo ""
-            echo "The following directories failed:"
+            echo "The following projects failed:"
             for d in "${failed[@]}"; do
               echo "  - $d"
             done

@@ -174,6 +174,10 @@
       ansible.builtin.debug:
         msg: "ACC appliance is operational after configuration restore"
 
+    - name: Wait for API to finish initialising after reboot
+      ansible.builtin.wait_for:
+        timeout: 30
+
     # ---------------------------------------------------------------------
     # Re-authenticate after restart
     # ---------------------------------------------------------------------
@@ -193,7 +197,12 @@
         body_format: json
         return_content: true
         validate_certs: false
+        status_code: 200
       register: post_reboot_auth
+      retries: 10
+      delay: 15
+      until: post_reboot_auth.status == 200
+      failed_when: false
 
     - name: Update access token after reboot
       ansible.builtin.set_fact:

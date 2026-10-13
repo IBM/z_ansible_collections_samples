@@ -33,9 +33,6 @@
       prompt: "Enter reason to create logs"
       private: false
 
-  vars:
-    log_destination: "/tmp/ssc_{{ '%Y-%m-%d_%H:%M:%S' | strftime }}.gz"
-
   tasks:
     - name: Display playbook execution information
       ansible.builtin.include_tasks:

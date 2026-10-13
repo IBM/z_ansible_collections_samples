@@ -171,12 +171,12 @@
                   {
                     "name": "{{ lpar1_name }}",
                     "execution_action": "{{ execution_action }}",
-                    "install": {{ install }}
+                    "install": {{ install | lower }}
                   },
                   {
                     "name": "{{ lpar2_name }}",
                     "execution_action": "{{ execution_action }}",
-                    "install": {{ install }}
+                    "install": {{ install | lower }}
                   }
                 ]
               }

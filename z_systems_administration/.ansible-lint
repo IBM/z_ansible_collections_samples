@@ -1,0 +1,19 @@
+################################################################################
+# ansible-lint configuration for z_systems_administration/
+#
+# This file overrides the root .ansible-lint for this project only.
+# Settings here are MERGED with the root config — they do not replace it.
+# The root .ansible-lint at the repo root remains the global fallback.
+#
+# To revert: delete this file. All exclusions below would need to be moved
+# back to the root .ansible-lint using their full paths, e.g.:
+#   - z_systems_administration/zhmc/playbooks/vault_example.yml
+################################################################################
+
+exclude_paths:
+  # These are documentation template files shown to users as examples of how
+  # to structure their vault and inventory files. They contain placeholder
+  # values (myuserid, mypassword, HMC_HOST) and are not playbooks — linting
+  # them produces false positives and serves no purpose.
+  - zhmc/playbooks/vault_example.yml
+  - zhmc/playbooks/inventory_example.yml

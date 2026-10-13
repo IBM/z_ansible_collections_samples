@@ -180,9 +180,37 @@
           - 204
       register: is_operational_response
       until: is_operational_response.status in [202, 204]
+
+    - name: Wait for API to finish initialising after reboot
+      ansible.builtin.wait_for:
+        timeout: 30
+
+    - name: Fetch authentication token from the ACC after reboot
+      ansible.builtin.uri:
+        url: "{{ api_base_url }}/api-tokens"
+        method: POST
+        headers:
+          zACI-API: "com.ibm.zaci.system/1.0"
+          Accept: "application/vnd.ibm.zaci.payload+json"
+          Content-Type: "application/vnd.ibm.zaci.payload+json;version=1.0"
+        body:
+          kind: "request"
+          parameters:
+            user: "{{ lpar_username }}"
+            password: "{{ lpar_password }}"
+        body_format: json
+        return_content: true
+        validate_certs: false
+        status_code: 200
+      register: auth_response
       retries: 10
-      delay: 5
+      delay: 15
+      until: auth_response.status == 200
       failed_when: false
+
+    - name: Extract the token from response after reboot
+      ansible.builtin.set_fact:
+        access_token: "{{ auth_response.json.parameters.token }}"
 
     - name: Display appliance status
       ansible.builtin.debug:
