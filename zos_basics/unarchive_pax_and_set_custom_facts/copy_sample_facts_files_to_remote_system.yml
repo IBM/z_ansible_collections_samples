@@ -38,6 +38,7 @@
       ansible.builtin.file:
         path: "{{ remote_facts_dir }}"
         state: directory
+        mode: "0755"
 
     - name: Copy local *.fact files to remote z/OS system.
       ibm.ibm_zos_core.zos_copy:

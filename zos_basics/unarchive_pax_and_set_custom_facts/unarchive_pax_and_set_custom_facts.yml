@@ -72,6 +72,7 @@
       ansible.builtin.file:
         name: "{{ new_zoau_target_dir }}"
         state: directory
+        mode: "0755"
 
     ##############################################################################
     # The next task unpackages the ZOAU pax file. Notice 'remote_src' is set to

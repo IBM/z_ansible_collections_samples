@@ -89,6 +89,7 @@
       ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl"
         state: directory
+        mode: "0755"
 
     - name: Response for ensure JCL folder exists in USS to manage JCL
       ansible.builtin.debug:

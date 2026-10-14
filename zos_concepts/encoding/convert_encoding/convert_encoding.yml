@@ -165,11 +165,13 @@
       ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/encode/"
         state: directory
+        mode: "0755"
 
     - name: "{{ 'Create a series of USS files in %s/encode' | format(tgt_tmp_dir) }}"
       ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/encode/{{ item }}.txt"
         state: touch
+        mode: "0644"
       with_sequence: count=4
       register: result
 

@@ -145,6 +145,7 @@
       ansible.builtin.file:
         path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
         state: touch
+        mode: "0644"
       with_sequence: count=4
       delegate_to: localhost
       register: result

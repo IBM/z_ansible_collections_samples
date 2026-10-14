@@ -80,6 +80,7 @@
       ansible.builtin.file:
         path: "{{ mount_point }}"
         state: directory
+        mode: "0755"
 
     - name: "Mount zFS data set."
       ibm.ibm_zos_core.zos_mount:

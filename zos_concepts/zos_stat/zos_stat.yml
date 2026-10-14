@@ -394,6 +394,7 @@
           ansible.builtin.file:
             path: "{{ mount_point }}"
             state: directory
+            mode: "0755"
 
         - name: Mount the aggregate.
           ibm.ibm_zos_core.zos_mount:
