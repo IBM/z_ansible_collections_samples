@@ -30,8 +30,10 @@
     var: result
     verbosity: 1
 
-- ansible.builtin.set_fact:
+- name: Build the version string from the parsed version
+  ansible.builtin.set_fact:
     temp_version: "{{ tmp.split('.')[0]}}.{{tmp.split('.')[1]}}.{{tmp.split('.')[2]| default (0)}}"
 
-- ansible.builtin.set_fact:
+- name: Record the version check result
+  ansible.builtin.set_fact:
     ansible_version_checks: "{{ ansible_version_checks |combine({temp_version:{'version':temp_version,'failed':result.failed}}) }}"

@@ -55,7 +55,8 @@
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds3
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set, backup and file name facts
+      ansible.builtin.set_fact:
         seq_dataset: "{{ tmp_ds1.stdout }}"
         pdse_dataset: "{{ tmp_ds2.stdout }}"
         seq_n_dataset: "{{ tmp_ds3.stdout }}"

@@ -37,7 +37,8 @@
   environment: "{{ environment_vars }}"
 
   tasks:
-    - block:
+    - name: Unarchive and restore the data sets
+      block:
         - name: Unarchive the dump using terse and restore the data sets.
           ibm.ibm_zos_core.zos_unarchive:
             src: "{{ playbook_dir }}/{{ archive_data_set }}"
@@ -48,7 +49,8 @@
                 adrdssu: true
           register: unarchive_result
 
-        - ansible.builtin.debug:
+        - name: Display the unarchive result
+          ansible.builtin.debug:
             msg: "{{ unarchive_result }}"
 
       always:

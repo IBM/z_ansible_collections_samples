@@ -46,7 +46,8 @@
     # ##########################################################################
     # Generate a temporary data set name
     # ##########################################################################
-    - block:
+    - name: Generate a temporary data set name
+      block:
         - name: Create a temporary data set
           ibm.ibm_zos_core.zos_data_set:
             type: seq
@@ -61,7 +62,8 @@
       ansible.builtin.debug:
         var: tmp_ds
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set name
+      ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.get('data_sets')[0].name }}"
 
     # ##################################################################################################

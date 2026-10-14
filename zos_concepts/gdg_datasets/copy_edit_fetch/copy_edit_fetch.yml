@@ -60,7 +60,8 @@
       ansible.builtin.command: "pcon -r"
       register: log_output
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set, date, time and system name facts
+      ansible.builtin.set_fact:
         tmp_data_set1: "{{ tmp_ds1.stdout }}"
         tmp_data_set2: "{{ tmp_ds2.stdout }}"
         date: "{{ date_time.stdout[0:10] }}"

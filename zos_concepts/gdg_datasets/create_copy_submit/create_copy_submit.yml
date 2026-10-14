@@ -35,7 +35,8 @@
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set name
+      ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.stdout }}"
     # ##########################################################################
     # Modules: zos_data_set, zos_copy, zos_job_submit

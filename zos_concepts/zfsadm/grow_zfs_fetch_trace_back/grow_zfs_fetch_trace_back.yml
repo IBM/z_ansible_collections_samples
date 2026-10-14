@@ -44,7 +44,8 @@
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
 
-    - ansible.builtin.set_fact:
+    - name: Set the zFS and trace back data set name facts
+      ansible.builtin.set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
         trace_back_data_set: "{{ tmp_ds2.stdout }}"
         trace_back_data_set_mem: "{{ tmp_ds2.stdout }}(MEM)"

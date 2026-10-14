@@ -36,7 +36,8 @@
   environment: "{{ environment_vars }}"
 
   tasks:
-    - block:
+    - name: Copy, sort and fetch the data
+      block:
         - name: Copy local file containing data
           ansible.builtin.include_role:
             name: copy-local-data

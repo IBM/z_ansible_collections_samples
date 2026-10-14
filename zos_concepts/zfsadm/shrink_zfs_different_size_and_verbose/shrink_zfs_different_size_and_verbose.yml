@@ -40,7 +40,8 @@
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
 
-    - ansible.builtin.set_fact:
+    - name: Set the zFS data set name
+      ansible.builtin.set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
 
     # ##########################################################################
