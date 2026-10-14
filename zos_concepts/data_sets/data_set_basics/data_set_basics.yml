@@ -91,7 +91,7 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Remove old {{ tgt_tmp_dir }}/HELLO if it exists, for idempotency
+    - name: "{{ 'Remove old %s/HELLO if it exists, for idempotency' | format(tgt_tmp_dir) }}"
       ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
@@ -107,8 +107,7 @@
         dest: "{{ tgt_tmp_dir }}/HELLO"
       register: result
 
-    - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
-        on target {{ inventory_hostname }}
+    - name: "{{ 'Response for populating USS file %s/HELLO on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
@@ -155,7 +154,7 @@
         remote_src: true
       register: result
 
-    - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
+    - name: "{{ 'Response for copying %s to %s(HELLO)' | format(data_set_name, pds_name) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 

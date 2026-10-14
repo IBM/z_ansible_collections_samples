@@ -146,7 +146,7 @@
         msg: "{{ result_zos_operator_end }}"
       when: bool_zos_operator_action_continue and result_zos_operator_end is defined and reply_num is defined
 
-    - name: Verify actionable message on system {{ system_name }} is canceled
+    - name: Verify actionable message is canceled on system {{ system_name }}
       ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: results_zos_operator_action_query_verify
@@ -157,7 +157,7 @@
         filtered_zos_operator_action_query_verify: "{{ results_zos_operator_action_query_verify | ibm.ibm_zos_core.filter_wtor_messages('IEE094D SPECIFY OPERAND') }}"
       when: bool_zos_operator_action_continue and results_zos_operator_action_query_verify is defined and not results_zos_operator_action_query_verify.failed
 
-    - name: Response for verifying actionable messages on system {{ system_name }} are canceled
+    - name: Response for verifying actionable messages are canceled on system {{ system_name }}
       ansible.builtin.assert:
         that:
           - bool_zos_operator_action_continue

@@ -93,29 +93,24 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Write HELLO JCL to USS in {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
-        on target {{ inventory_hostname }}
+    - name: "{{ 'Write HELLO JCL to USS in %s/ansible/jcl/HELLO on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
       register: result
 
-    - name: Response for write HELLO JCL to USS
-        in {{ tgt_tmp_dir }}/ansible/jcl/HELLO" on
-        target {{ inventory_hostname }}
+    - name: "{{ 'Response for write HELLO JCL to USS in %s/ansible/jcl/HELLO on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Populate {{ data_set_name }} member with data from USS file
-        in {{ tgt_tmp_dir }}/ansible/jcl
+    - name: "{{ 'Populate %s member with data from USS file in %s/ansible/jcl' | format(data_set_name, tgt_tmp_dir) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         remote_src: true
         dest: "{{ data_set_name }}(MEM1)"
       register: result
 
-    - name: Response for populate {{ data_set_name }} member with data from
-        USS file in {{ tgt_tmp_dir }}/ansible/jcl
+    - name: "{{ 'Response for populate %s member with data from USS file in %s/ansible/jcl' | format(data_set_name, tgt_tmp_dir) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
@@ -126,14 +121,14 @@
     # | a single PDS.
     # +-------------------------------------------------------------------------
 
-    - name: Submit the JCL {{ data_set_name }}(MEM1)
+    - name: "{{ 'Submit the JCL %s(MEM1)' | format(data_set_name) }}"
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
         remote_src: true
       register: result
       with_sequence: count=1
 
-    - name: Response for submit the JCL {{ data_set_name }}.(MEM1)
+    - name: "{{ 'Response for submit the JCL %s.(MEM1)' | format(data_set_name) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
@@ -160,13 +155,12 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Get job output for job {{ job_id_pds }} from PDS member
+    - name: Get job output from PDS member for job {{ job_id_pds }}
       ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ job_id_pds }}"
       register: result
 
-    - name: Response for get job output for job "{{ job_id_pds }}" from PDS
-        member
+    - name: Response for get job output from PDS member for job "{{ job_id_pds }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
@@ -175,15 +169,13 @@
     # | zos_job_submit module.
     # +-------------------------------------------------------------------------
 
-    - name: Submit {{ job_name }} JCL located on target
-        in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
+    - name: "{{ 'Submit %s JCL located on target in %s/ansible/jcl/%s' | format(job_name, tgt_tmp_dir, job_name) }}"
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
         remote_src: true
       register: result
 
-    - name: Response for submit {{ job_name }} JCL located on target
-        in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
+    - name: "{{ 'Response for submit %s JCL located on target in %s/ansible/jcl/%s' | format(job_name, tgt_tmp_dir, job_name) }}"
       ansible.builtin.debug:
         msg:
           - "{{ result }}"
@@ -196,13 +188,12 @@
       ansible.builtin.debug:
         msg: "{{ job_id_uss }}"
 
-    - name: Query the submitted job {{ job_name }} on USS target
+    - name: "{{ 'Query the submitted job %s on USS target' | format(job_name) }}"
       ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ job_id_uss }}"
       register: result
 
-    - name: Response for Query the submitted job {{ job_name }}
-        on USS target
+    - name: "{{ 'Response for Query the submitted job %s on USS target' | format(job_name) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
@@ -228,14 +219,13 @@
     # +-------------------------------------------------------------------------
     ############################################################################
 
-    - name: Remove {{ job_name }} JCL and folder on USS target
+    - name: Remove JCL and folder on USS target for {{ job_name }}
       ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/ansible"
         state: absent
       register: result
 
-    - name: Response for remove {{ job_name }} JCL and folder on
-        USS target
+    - name: Response for remove JCL and folder on USS target for {{ job_name }}
       ansible.builtin.debug:
         msg: "{{ result }}"
 

@@ -92,7 +92,7 @@
             record_length: 60
             volume: "{{ available_volumes[0] }}"
 
-        - name: "Query {{ seq_data_set_name }} attributes with zos_stat."
+        - name: "Query attributes with zos_stat for {{ seq_data_set_name }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ seq_data_set_name }}"
             type: data_set
@@ -122,7 +122,7 @@
             record_length: 60
             volumes: "{{ available_volumes }}"
 
-        - name: "Query {{ multi_vol_data_set_name }} attributes with zos_stat."
+        - name: "Query attributes with zos_stat for {{ multi_vol_data_set_name }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ multi_vol_data_set_name }}"
             type: data_set
@@ -154,7 +154,7 @@
       tags: file
       when: uss_file_path != ""
       block:
-        - name: "Query {{ uss_file_path }} attributes with zos_stat."
+        - name: "Query attributes with zos_stat for {{ uss_file_path }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ uss_file_path }}"
             type: file
@@ -182,7 +182,7 @@
       tags: aggregate
       when: aggregate_name != ""
       block:
-        - name: "Query {{ aggregate_name }} attributes with zos_stat."
+        - name: "Query attributes with zos_stat for {{ aggregate_name }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ aggregate_name }}"
             type: aggregate
@@ -231,7 +231,7 @@
             limit: 5
             empty: true
 
-        - name: "Query {{ gdg_name }} attributes with zos_stat."
+        - name: "Query attributes with zos_stat for {{ gdg_name }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ gdg_name }}"
             type: gdg
@@ -252,7 +252,7 @@
             record_format: fba
             record_length: 60
 
-        - name: "Query {{ gdg_name }}(0) attributes with zos_stat."
+        - name: "{{ 'Query %s(0) attributes with zos_stat.' | format(gdg_name) }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ gdg_name }}(0)"
             type: data_set
@@ -325,7 +325,7 @@
             record_format: fba
             record_length: 40
 
-        - name: "Query {{ jcl_data_set }} attributes with zos_stat."
+        - name: "Query attributes with zos_stat for {{ jcl_data_set }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ jcl_data_set }}"
             type: data_set
@@ -409,7 +409,7 @@
           delegate_to: localhost
           register: file_stat
 
-        - name: "Copy the local file {{ jcl_file }} only when there is enough space."
+        - name: "{{ 'Copy the local file %s only when there is enough space.' | format(jcl_file) }}"
           ibm.ibm_zos_core.zos_copy:
             src: "{{ jcl_file }}"
             dest: "{{ mount_point }}/text_file.txt"

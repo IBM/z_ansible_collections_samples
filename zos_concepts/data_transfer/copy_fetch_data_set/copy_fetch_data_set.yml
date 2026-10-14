@@ -66,13 +66,11 @@
       ansible.builtin.command: locale -c charmap
       register: result
 
-    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
-        target {{ inventory_hostname }}
+    - name: "{{ 'Response for create shell script %s/date.sh on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Set variable `target_charset` with target {{ inventory_hostname }}
-        charset
+    - name: Set variable `target_charset` with the target charset of {{ inventory_hostname }}
       ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 

@@ -95,13 +95,13 @@
         src: "{{playbook_dir}}/files/log_file.txt"
         dest: "{{ pdse_dataset }}(MEM)"
 
-    - name: "Copy {{ pdse_dataset }} to the {{ seq_dataset }} dataset"
+    - name: "{{ 'Copy %s to the %s dataset' | format(pdse_dataset, seq_dataset) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ seq_dataset }}"
         remote_src: true
 
-    - name: "Generate a new member of {{ pdse_dataset }} with copy of content"
+    - name: "Generate a new member with copy of content in {{ pdse_dataset }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ pdse_dataset }}(MEM1)"
@@ -113,7 +113,7 @@
         dest: "{{ tmp_file }}"
         replace: true
 
-    - name: "Copy {{ tmp_file }} to the last SEQ dataset {{ seq_n_dataset }}"
+    - name: "{{ 'Copy %s to the last SEQ dataset %s' | format(tmp_file, seq_n_dataset) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_file }}"
         dest: "{{ seq_n_dataset }}"
@@ -134,7 +134,7 @@
     # manipulate the text on files
     # ##########################################################################
 
-    - name: "Replace multiple lines on {{ seq_dataset }} dataset and backup result"
+    - name: "Replace multiple lines and backup result on dataset {{ seq_dataset }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ seq_dataset }}"
         regexp: ^(IE[A-Z0-9]{3}I|IEF[0-9]{3}I)\s.*
@@ -157,7 +157,7 @@
       ansible.builtin.debug:
         msg: "{{ content_of_backup }}"
 
-    - name: "Replace a line using disable_regex option for after on {{ pdse_dataset }}(MEM)"
+    - name: "{{ 'Replace a line using disable_regex option for after on %s(MEM)' | format(pdse_dataset) }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ pdse_dataset }}(MEM)"
         regexp: //*SMPTLIB  DD UNIT=SYSALLDA,SPACE=(TRK,(1,1)),VOL=SER=vvvvvv
@@ -171,7 +171,7 @@
       ansible.builtin.debug:
         msg: "{{ disable_regex_output }}"
 
-    - name: "Replace using backref on {{ pdse_dataset }}(MEM1)"
+    - name: "{{ 'Replace using backref on %s(MEM1)' | format(pdse_dataset) }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ pdse_dataset }}(MEM)"
         regexp: '^(IEF403I|IEF404I|IEF456I) (\S+) - '
@@ -182,7 +182,7 @@
       ansible.builtin.debug:
         msg: "{{ backref_output }}"
 
-    - name: "Replace words between lines on USS file {{ tmp_file }} with no utf-8"
+    - name: "Replace words between lines with no utf-8 on USS file {{ tmp_file }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ tmp_file }}"
         regexp: "ZOAU_ROOT"
@@ -195,7 +195,7 @@
       ansible.builtin.debug:
         msg: "{{ replace_words }}"
 
-    - name: "Replace on SEQ dataset {{ seq_n_dataset }} with no utf-8 characters"
+    - name: "Replace with no utf-8 characters on SEQ dataset {{ seq_n_dataset }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ seq_n_dataset }}"
         regexp: lpp

@@ -474,20 +474,20 @@
     # Traverse the submitted job to extract ddnames by using the Ansible
     # construct `with_sequence`
     ############################################################################
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using hard coded count with registered variable `job_sub_result`
+    - name: Traverse all DDs using hard coded count with registered variable `job_sub_result` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg:
           - "{{ job_sub_result.jobs[0].dds[item |int].dd_name }}"
       with_sequence: count=4
       tags: always
 
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using hard coded start and dynamic end `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list`
+    - name: Traverse all DDs using hard coded start and dynamic end `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
       with_sequence: start=0 end="{{ submit_jobs_ddnames_length |int -1 }}"
       tags: always
 
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list`
+    - name: Traverse all DDs using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
       with_sequence: count="{{ submit_jobs_ddnames_length |int -1 }}"
@@ -498,7 +498,7 @@
     # construct `with_sequence` and print the
     # DD values dd_name, id, record_count, stepname, byte_count.
     ############################################################################
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` and print the DD stats (ddname, id, record_count, stepname, byte_count)
+    - name: Traverse all DDs using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` and print the DD stats (ddname, id, record_count, stepname, byte_count) from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg:
           - "{{ submit_job_ddnames_list[item |int].dd_name }}"
@@ -513,13 +513,13 @@
     # Traverse the submitted job to extract ddname and stepname by using the
     # Ansible construct `loop`
     ############################################################################
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` with  fact `submit_job_ddnames_list`
+    - name: Traverse all DDs ddname(s) using ansible `loop` with fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ item.dd_name }}"
       loop: "{{submit_job_ddnames_list}}"
       tags: always
 
-    - name: Traverse all DDs stepname(s) from submitted job {{submit_job_name}} using ansible `loop` with set fact `submit_job_ddnames_list`
+    - name: Traverse all DDs stepname(s) using ansible `loop` with set fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ item.stepname }}"
       loop: "{{submit_job_ddnames_list}}"
@@ -536,14 +536,14 @@
     #    * `ansible-galaxy collection install community.general`
     ############################################################################
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `submit_job_list`
+    - name: Traverse all DDs ddname(s) using ansible `loop` and `json_query` with fact `submit_job_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{item}}"
       # with_items: "{{ job_sub_result | community.general.json_query('jobs[*].dds[*].id') }}"
       loop: "{{ submit_job_list | community.general.json_query('dds[*].dd_name') }}"
       tags: always
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `job_sub_result`
+    - name: Traverse all DDs ddname(s) using ansible `loop` and `json_query` with fact `job_sub_result` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{item}}"
       # with_items: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
@@ -561,13 +561,13 @@
     #    * `ansible-galaxy collection install community.general`
     ############################################################################
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `with_items` and `json_query` with fact `submit_job_list`
+    - name: Traverse all DDs ddname(s) using ansible `with_items` and `json_query` with fact `submit_job_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{item}}"
       with_items: "{{ submit_job_list | community.general.json_query('dds[*].dd_name') }}"
       tags: always
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `with_items` and `json_query` with fact `job_sub_result`
+    - name: Traverse all DDs ddname(s) using ansible `with_items` and `json_query` with fact `job_sub_result` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{item}}"
       with_items: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"

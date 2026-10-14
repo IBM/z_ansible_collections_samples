@@ -113,7 +113,7 @@
         flat: true
       register: result
 
-    - name: "Result of fetching {{ archive_data_set }} to controller node"
+    - name: "{{ 'Result of fetching %s to controller node' | format(archive_data_set) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 

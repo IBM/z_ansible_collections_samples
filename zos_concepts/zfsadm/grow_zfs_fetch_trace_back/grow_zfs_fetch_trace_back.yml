@@ -135,13 +135,13 @@
       ansible.builtin.debug:
         msg: "{{ grow_output }}"
 
-    - name: "Fetch {{ trace_back_data_set }} to the local controller."
+    - name: "{{ 'Fetch %s to the local controller.' | format(trace_back_data_set) }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ trace_back_data_set_mem }}"
         dest: "{{ output_path }}"
       register: fetch_result
 
-    - name: "Result of Fetch {{ trace_back_data_set_mem }} to the local machine."
+    - name: "{{ 'Result of Fetch %s to the local machine.' | format(trace_back_data_set_mem) }}"
       ansible.builtin.debug:
         msg: "{{ fetch_result }}"
 
