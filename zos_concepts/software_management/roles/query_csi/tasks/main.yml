@@ -4,14 +4,14 @@
 # tasks file for query_csi
 
 # LIST HOLDDATA
-- name: "LIST {{ list_operands }} FROM ZONE {{ zone }}"
+- name: "LIST {{ query_csi_list_operands }} FROM ZONE {{ query_csi_zone }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ query_csi_global_csi }}"
 
       - dd_output:
           dd_name: "SMPOUT"
@@ -24,5 +24,5 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY({{ zone }}) .'
-            - 'LIST {{ list_operands }}'
+            - 'SET  BOUNDARY({{ query_csi_zone }}) .'
+            - 'LIST {{ query_csi_list_operands }}'
