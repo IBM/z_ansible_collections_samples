@@ -21,6 +21,6 @@
 
   roles:
     - role: order_ptf
-      ptf: "UI74491"
-      global_csi: "IMSTESTL.ZOAU110.CSI"
-      smpe_root: "/var/zoau110"
+      order_ptf_ptf: "UI74491"
+      order_ptf_global_csi: "IMSTESTL.ZOAU110.CSI"
+      order_ptf_smpe_root: "/var/zoau110"

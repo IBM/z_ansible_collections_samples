@@ -21,4 +21,4 @@
 
   roles:
     - role: restore_ptf
-      reject_sysmod: false
+      restore_ptf_reject_sysmod: false
