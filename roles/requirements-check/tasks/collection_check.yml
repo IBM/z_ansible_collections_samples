@@ -41,9 +41,9 @@
 
 - name: Populate temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
   ansible.builtin.set_fact:
-    temp_collection_paths_dict: "{{temp_collection_paths_dict | default([]) + [{'collection_path':item.stat.path,'installed_version':None}  ]}}"
+    temp_collection_paths_dict: "{{ temp_collection_paths_dict | default([]) + [{'collection_path': item.stat.path, 'installed_version': None}] }}"
   when: item.stat.exists
-  with_items: "{{collection_paths_status.results}}"
+  with_items: "{{ collection_paths_status.results }}"
 
 - name: DEBUG(-v) Display temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
   ansible.builtin.debug:
@@ -53,8 +53,8 @@
 
 - name: Combine dictionary `temp_collection_paths_dict` with `requires_collection` dictionary
   ansible.builtin.set_fact:
-    requires_collection: "{{ requires_collection | combine({ item.key : {'installed': (temp_collection_paths_dict | default([]))} }, recursive=true) }}"
-  with_dict: "{{requires_collection}}"
+    requires_collection: "{{ requires_collection | combine({item.key: {'installed': (temp_collection_paths_dict | default([]))}}, recursive=true) }}"
+  with_dict: "{{ requires_collection }}"
 
 - name: DEBUG(-v) Display dictionary `requires_collection`
   ansible.builtin.debug:
@@ -85,7 +85,7 @@
 
 - name: Invoke Ansible version filter to update _collection_status_dict with additional facts
   ansible_version:
-    data: "{{_collection_status_dict}}"
+    data: "{{ _collection_status_dict }}"
   register: result_ansible_version_filter
 
 - name: DEBUG(-v) Display Ansible version filter result
@@ -108,15 +108,15 @@
       item.installed_collection_version is version(item.required_collection_version,'>=')
       )
     success_msg: >-
-      [SUCCESS] Ansible collection {{item.required_collection_name}} version
-      {{item.installed_collection_version}} is installed.
+      [SUCCESS] Ansible collection {{ item.required_collection_name }} version
+      {{ item.installed_collection_version }} is installed.
     fail_msg: >-
       [FAIL] This playbook requires Ansible collection
-      {{item.required_collection_name}} version
-      {{item.required_collection_version}} and
-      {{item.installed_collection_version if item.installed_collection_version != None else 'no version'}}
+      {{ item.required_collection_name }} version
+      {{ item.required_collection_version }} and
+      {{ item.installed_collection_version if item.installed_collection_version != None else 'no version' }}
       is installed.
     quiet: true
   register: result_collection_status
   ignore_errors: true
-  loop: "{{ result_ansible_version_filter.results}}"
+  loop: "{{ result_ansible_version_filter.results }}"
