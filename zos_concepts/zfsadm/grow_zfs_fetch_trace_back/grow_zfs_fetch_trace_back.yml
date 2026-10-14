@@ -39,10 +39,12 @@
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
+      changed_when: false
 
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
+      changed_when: false
 
     - name: Set the zFS and trace back data set name facts
       ansible.builtin.set_fact:
@@ -89,6 +91,7 @@
     - name: "Confirm mount point."
       ansible.builtin.command: "df /{{ mount_point }}"
       register: df_output
+      changed_when: false
 
     - name: "Echo df output."
       ansible.builtin.debug:
@@ -118,6 +121,7 @@
 
     - name: "Write 1 million bytes to zFS."
       ansible.builtin.shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+      changed_when: true
 
     # ##########################################################################
     # Grow zFS aggregate.
@@ -152,6 +156,7 @@
 
     - name: Unmount zFS data set.
       ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}"
+      changed_when: true
 
     - name: Delete zFS data set.
       ibm.ibm_zos_core.zos_data_set:

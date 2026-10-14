@@ -39,6 +39,7 @@
     - name: Create temp ZFS data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_zfs_dsn
+      changed_when: false
 
     - name: Setting fact `zfs_dsn` for use by this sample
       ansible.builtin.set_fact:
@@ -75,6 +76,7 @@
     - name: Confirm mount point.
       ansible.builtin.command: "df /{{ mount_point }}"
       register: df_output
+      changed_when: false
 
     - name: Echo df output.
       ansible.builtin.debug:
@@ -89,18 +91,22 @@
 
     - name: Write 1 million bytes to ZFS.
       ansible.builtin.shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+      changed_when: true
 
     - name: Get aggregate info BEFORE growth.
       ansible.builtin.command: zfsadm aggrinfo {{ zfs_dsn | upper }}
       register: aggrinfo_output_before
+      changed_when: false
 
     - name: Get percentage use BEFORE growth.
       ansible.builtin.command: "df -kP {{ mount_point }}"
       register: df_output_before
+      changed_when: false
 
     - name: Grow ZFS aggregate.
       ansible.builtin.command: zfsadm grow -aggregate {{ zfs_dsn }} -size "{{ aggr_growth_size }}"
       register: grow_output
+      changed_when: true
 
     - name: Echo grow_output.
       ansible.builtin.debug:
@@ -109,10 +115,12 @@
     - name: Get aggregate info AFTER growth.
       ansible.builtin.command: zfsadm aggrinfo {{ zfs_dsn | upper }}
       register: aggrinfo_output_after
+      changed_when: false
 
     - name: Get percentage use AFTER growth.
       ansible.builtin.command: "df -kP {{ mount_point }}"
       register: df_output_after
+      changed_when: false
 
     - name: Echo aggrinfo_output and percent-use AFTER growth.
       ansible.builtin.debug:
@@ -130,6 +138,7 @@
 
     - name: Unmount ZFS data set.
       ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}"
+      changed_when: true
 
     - name: Delete ZFS data set.
       ibm.ibm_zos_core.zos_data_set:

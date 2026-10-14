@@ -50,6 +50,7 @@
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
+      changed_when: false
 
     # ##########################################################################
     # Fact setting for use by this playbook
@@ -65,6 +66,7 @@
     - name: Detect character set for locale on target {{ inventory_hostname }}
       ansible.builtin.command: locale -c charmap
       register: result
+      changed_when: false
 
     - name: "{{ 'Response for create shell script %s/date.sh on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ansible.builtin.debug:
@@ -78,6 +80,7 @@
       # ansible.builtin.shell: "uname -a |awk '{print $2}'"
       ansible.builtin.command: uname -n
       register: result
+      changed_when: false
 
     - name: Setting fact `system_name` for use by this sample
       ansible.builtin.set_fact:

@@ -75,6 +75,7 @@
         - name: Create a temporary data set name.
           ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
+          changed_when: false
 
         - name: Setting fact `seq_data_set_name` for use by this sample.
           ansible.builtin.set_fact:
@@ -105,6 +106,7 @@
         - name: Create a temporary data set name for a multi-volume data set.
           ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
+          changed_when: false
 
         - name: Setting fact `multi_vol_data_set_name` for use by this sample.
           ansible.builtin.set_fact:
@@ -218,6 +220,7 @@
         - name: Create a temporary data set name.
           ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
+          changed_when: false
 
         - name: Setting fact `gdg_name` for use by this sample.
           ansible.builtin.set_fact:
@@ -305,6 +308,7 @@
         - name: Create a temporary data set name.
           ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
+          changed_when: false
 
         - name: Setting fact `jcl_data_set` for use by this sample.
           ansible.builtin.set_fact:
@@ -373,6 +377,7 @@
         - name: Create a temporary data set name for the aggregate.
           ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
           register: tmp_ds
+          changed_when: false
 
         - name: Setting fact `zfs_data_set` for use by this sample.
           ansible.builtin.set_fact:

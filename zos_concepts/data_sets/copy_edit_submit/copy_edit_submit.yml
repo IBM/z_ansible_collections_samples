@@ -34,6 +34,7 @@
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
+      changed_when: false
 
     - name: Set the temporary data set name
       ansible.builtin.set_fact:

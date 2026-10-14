@@ -52,6 +52,7 @@
       # ansible.builtin.shell: "uname -a |awk '{print $2}'"
       ansible.builtin.command: uname -n
       register: result
+      changed_when: false
 
     - name: Setting fact `system_name` for use by this sample
       ansible.builtin.set_fact:

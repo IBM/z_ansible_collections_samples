@@ -46,10 +46,12 @@
     - name: Create temp sequential data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_seq
+      changed_when: false
 
     - name: Create temp PDS name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds_pds
+      changed_when: false
 
     - name: Set names for sequential data set and pds for use by this sample
       ansible.builtin.set_fact:

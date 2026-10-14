@@ -124,6 +124,7 @@
         PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
       ansible.builtin.command: zoaversion
       register: zoaversion_str
+      changed_when: false
 
     - name: Print the results of the call to zoaversion.
       ansible.builtin.debug:

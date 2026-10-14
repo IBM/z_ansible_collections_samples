@@ -35,14 +35,17 @@
     - name: Create temp data set name for SEQ dataset
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
+      changed_when: false
 
     - name: Create temp data set name for PDSE dataset
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
+      changed_when: false
 
     - name: Create temp data set name for backup name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: backup_tmp
+      changed_when: false
 
     - name: Create USS file to copy the text
       ansible.builtin.tempfile:
@@ -54,6 +57,7 @@
     - name: Create temp data set name for SEQ dataset
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds3
+      changed_when: false
 
     - name: Set the temporary data set, backup and file name facts
       ansible.builtin.set_fact:
@@ -153,6 +157,7 @@
       ansible.builtin.command:
         cmd: dcat "{{ multiple_lines_results.backup_name }}"
       register: content_of_backup
+      changed_when: false
 
     - name: See the backup of the original text
       ansible.builtin.debug:

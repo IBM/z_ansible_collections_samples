@@ -49,6 +49,7 @@
     - name: Detecting system name
       ansible.builtin.command: uname -n
       register: result
+      changed_when: false
 
     - name: Setting fact `system_name` for use by this sample
       ansible.builtin.set_fact:
@@ -77,6 +78,7 @@
     - name: Detect character set for locale on target {{ inventory_hostname }}
       ansible.builtin.command: locale -c charmap
       register: result
+      changed_when: false
 
     - name: "{{ 'Response for create shell script %s/date.sh on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ansible.builtin.debug:
@@ -106,6 +108,7 @@
     - name: Display script contents after changing encoding to "{{ target_charset }}"
       ansible.builtin.command: cat {{ tgt_tmp_dir }}/date.sh
       register: result
+      changed_when: false
 
     - name: Response for display script contents after changing encoding
         to "{{ target_charset }}"
@@ -116,6 +119,7 @@
       ansible.builtin.command: "{{ tgt_tmp_dir }}/date.sh"
       register: result
       when: script_sh_mode == "0755"
+      changed_when: false
 
     - name: "{{ 'Response for executing %s/date.sh on target if permission is 0755' | format(tgt_tmp_dir) }}"
       ansible.builtin.debug:
@@ -146,6 +150,7 @@
     - name: Detecting the character set for the locale on the target
       ansible.builtin.command: locale -c charmap
       register: result
+      changed_when: false
 
     - name: Response for detecting the character set for the locale on the
         target
@@ -176,6 +181,7 @@
       ansible.builtin.shell: 'echo "hello world" >{{ tgt_tmp_dir }}/encode/{{ item }}.txt'
       with_sequence: count=4
       register: result
+      changed_when: true
 
     - name: '{{ "Response for populate a series of USS files in %s/encode with ''hello world''" | format(tgt_tmp_dir) }}'
       ansible.builtin.debug:

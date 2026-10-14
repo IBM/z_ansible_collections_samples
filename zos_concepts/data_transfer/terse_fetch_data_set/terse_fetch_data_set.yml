@@ -72,6 +72,7 @@
     - name: Create a temporary archive data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: archive_data_set
+      changed_when: false
 
     - name: Save temporary archive data set name
       ansible.builtin.set_fact:

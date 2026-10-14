@@ -81,6 +81,7 @@
       ansible.builtin.command: "df /{{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output
+      changed_when: false
 
     - name: Echo df output to confirm mount points
       ansible.builtin.debug:
@@ -97,16 +98,19 @@
       loop: "{{ mount_points }}"
       loop_control:
         index_var: index
+      changed_when: true
 
     - name: Get aggrinfo report
       ansible.builtin.command: zfsadm aggrinfo {{ item | upper }}
       loop: "{{ zfs_data_sets }}"
       register: aggrinfo_output_before
+      changed_when: false
 
     - name: Get percentage use BEFORE growth
       ansible.builtin.command: "df -kP {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output_before
+      changed_when: false
 
     - name: Echo aggrinfo and percent-use BEFORE growth
       ansible.builtin.debug:
@@ -132,11 +136,13 @@
       ansible.builtin.command: "zfsadm grow -aggregate {{ item }} -size {{ aggr_growth_size }}"
       loop: "{{ grow_list }}"
       register: grow_output
+      changed_when: true
 
     - name: Get percentage use AFTER growth
       ansible.builtin.command: "df -kP {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output_after
+      changed_when: false
 
     - name: Echo 'zfsadm grow' output and percent-use AFTER growth.
       ansible.builtin.debug:
@@ -151,6 +157,7 @@
     - name: Unmount ZFS data sets
       ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
+      changed_when: true
 
     - name: Delete ZFS data sets
       ibm.ibm_zos_core.zos_data_set:

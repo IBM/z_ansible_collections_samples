@@ -60,6 +60,7 @@
     - name: Get attributes for data sets
       ansible.builtin.command: dls -s {{ data_sets_to_archive | join(' ') }}
       register: response
+      changed_when: false
 
     - name: Set the size of the data sets in cylinders
       ansible.builtin.set_fact:
