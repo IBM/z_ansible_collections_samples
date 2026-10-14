@@ -51,6 +51,7 @@ exclude_paths:
   - "**/zvm.yml"
   - "**/zosendpoint.yml"
   - "group_vars/all.yml"
+  - "**/requirements-check/meta/main.yml"
 
 # Global skip list — rules disabled for the entire repository.
 # To disable a rule for a single project only, add it to that
