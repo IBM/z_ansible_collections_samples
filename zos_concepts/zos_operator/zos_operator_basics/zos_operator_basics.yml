@@ -93,6 +93,7 @@
           - bool_zos_operator_action_continue
         success_msg: "Operator demo will continue, no matching 'IEE094D SPECIFY OPERAND' actions were discovered."
         fail_msg: "There are more than one actionable messages that matches 'IEE094D SPECIFY OPERAND' , skipping operator demo. "
+      register: result_assert_no_existing_dump_messages
       ignore_errors: true
 
     - name: Create an operator action (WTOR) "DUMP COMM=('test dump')" for
@@ -163,4 +164,5 @@
           - filtered_zos_operator_action_query_verify is defined and  (filtered_zos_operator_action_query_verify | length == 0)
         success_msg: "All actionable messages that match 'IEE094D SPECIFY OPERAND' have been cancelled"
         fail_msg: "There are more than one remaining actionable messages that match 'IEE094D SPECIFY OPERAND' , unable to reply to more than one action. "
+      register: result_assert_dump_messages_cancelled
       ignore_errors: true

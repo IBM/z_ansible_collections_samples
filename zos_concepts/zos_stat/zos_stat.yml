@@ -339,7 +339,6 @@
           when: jcl_data_set_stat.stat.attributes.type != 'seq' or
             jcl_data_set_stat.stat.attributes.record_format != 'fb' or
             jcl_data_set_stat.stat.attributes.record_length < 80
-          register: check_result
 
         - name: Reallocating the data set in case it is necessary.
           ibm.ibm_zos_core.zos_data_set:
@@ -351,7 +350,9 @@
             space_type: trk
             record_format: fb
             record_length: 80
-          when: check_result is changed
+          when: jcl_data_set_stat.stat.attributes.type != 'seq' or
+            jcl_data_set_stat.stat.attributes.record_format != 'fb' or
+            jcl_data_set_stat.stat.attributes.record_length < 80
 
         - name: "Copy JCL to {{ jcl_data_set }}."
           ibm.ibm_zos_core.zos_copy:

@@ -70,7 +70,11 @@
       loop: "{{ mount_points }}"
 
     - name: Mount ZFS data sets
-      ansible.builtin.command: /usr/sbin/mount -t zfs -f {{ item.0 | upper }} {{ mount_point }}/{{ item.1 }}
+      ibm.ibm_zos_core.zos_mount:
+        src: "{{ item.0 | upper }}"
+        path: "{{ mount_point }}/{{ item.1 }}"
+        fs_type: zfs
+        state: mounted
       loop: "{{ zfs_data_sets | zip( mount_points ) | list }}"
 
     - name: Confirm mount points
@@ -100,7 +104,7 @@
       register: aggrinfo_output_before
 
     - name: Get percentage use BEFORE growth
-      ansible.builtin.shell: "df -kP {{ mount_point }}/{{ item }}"
+      ansible.builtin.command: "df -kP {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output_before
 
@@ -130,7 +134,7 @@
       register: grow_output
 
     - name: Get percentage use AFTER growth
-      ansible.builtin.shell: "df -kP {{ mount_point }}/{{ item }}"
+      ansible.builtin.command: "df -kP {{ mount_point }}/{{ item }}"
       loop: "{{ mount_points }}"
       register: df_output_after
 

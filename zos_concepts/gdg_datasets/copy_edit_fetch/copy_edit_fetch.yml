@@ -44,7 +44,7 @@
       register: tmp_ds2
 
     - name: Get date time
-      ansible.builtin.shell: "date +%Y-%m-%d%H:%M:%S"
+      ansible.builtin.command: "date +%Y-%m-%d%H:%M:%S"
       register: date_time
 
     - name: Get system name
@@ -53,6 +53,7 @@
 
     - name: Ensure console log.
       ansible.builtin.command: "pcon -l"
+      register: console_log_result
       ignore_errors: true
 
     - name: Check content of last ten minutes of console log

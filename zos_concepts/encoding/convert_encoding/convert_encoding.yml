@@ -117,7 +117,7 @@
         msg: "{{ result.stdout }}"
 
     - name: Executing {{ tgt_tmp_dir }}/date.sh on target if permission is 0755
-      ansible.builtin.shell: "{{ tgt_tmp_dir }}/date.sh"
+      ansible.builtin.command: "{{ tgt_tmp_dir }}/date.sh"
       register: result
       when: script_sh_mode == "0755"
 
@@ -131,6 +131,7 @@
       ansible.builtin.fail:
         msg: "File {{ tgt_tmp_dir }}/date.sh permissions were not equal to 0755"
       when: result.stdout_lines is not defined
+      register: permissions_check
       ignore_errors: true
 
     - name: Remove {{ tgt_tmp_dir }}/date.sh on target {{ inventory_hostname }}

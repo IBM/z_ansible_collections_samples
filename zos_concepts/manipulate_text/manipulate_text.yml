@@ -149,7 +149,7 @@
         msg: "{{ multiple_lines_results }}"
 
     - name: Cat backup with original text
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: dcat "{{ multiple_lines_results.backup_name }}"
       register: content_of_backup
 

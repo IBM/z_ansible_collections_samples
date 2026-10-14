@@ -66,7 +66,11 @@
         state: directory
 
     - name: Mount ZFS data set.
-      ansible.builtin.command: /usr/sbin/mount -t zfs -f {{ zfs_dsn | upper }} {{ mount_point }}
+      ibm.ibm_zos_core.zos_mount:
+        src: "{{ zfs_dsn | upper }}"
+        path: "{{ mount_point }}"
+        fs_type: zfs
+        state: mounted
 
     - name: Confirm mount point.
       ansible.builtin.command: "df /{{ mount_point }}"
@@ -91,7 +95,7 @@
       register: aggrinfo_output_before
 
     - name: Get percentage use BEFORE growth.
-      ansible.builtin.shell: "df -kP {{ mount_point }}"
+      ansible.builtin.command: "df -kP {{ mount_point }}"
       register: df_output_before
 
     - name: Grow ZFS aggregate.
@@ -107,7 +111,7 @@
       register: aggrinfo_output_after
 
     - name: Get percentage use AFTER growth.
-      ansible.builtin.shell: "df -kP {{ mount_point }}"
+      ansible.builtin.command: "df -kP {{ mount_point }}"
       register: df_output_after
 
     - name: Echo aggrinfo_output and percent-use AFTER growth.
