@@ -157,7 +157,7 @@
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Set variable `target_charset` with the target charset of {{ inventory_hostname }}
+    - name: Set variable `target_charset` from the detected locale charset on {{ inventory_hostname }}
       ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 

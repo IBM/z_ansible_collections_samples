@@ -4,7 +4,7 @@
 # tasks file for order_ptf
 
 # Order PTF from IBM
-- name: "ORDER PTF {{order_ptf_ptf}} from IBM server"
+- name: "{{ 'ORDER PTF %s from IBM server' | format(order_ptf_ptf) }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"

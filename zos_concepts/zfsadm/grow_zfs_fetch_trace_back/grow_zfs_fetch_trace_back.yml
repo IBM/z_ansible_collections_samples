@@ -36,12 +36,12 @@
     # ##########################################################################
     # Generate temporary data set names
     # ##########################################################################
-    - name: Create temp data set name
+    - name: Create temp data set name for the zFS
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
       changed_when: false
 
-    - name: Create temp data set name
+    - name: Create temp data set name for the trace back
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
       changed_when: false

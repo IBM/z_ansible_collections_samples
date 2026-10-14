@@ -109,7 +109,7 @@
         space_type: m
       register: shrink_output
 
-    - name: Echo shrink_output.
+    - name: Echo shrink_output for the size shrink.
       ansible.builtin.debug:
         msg: "{{ shrink_output }}"
 
@@ -120,7 +120,7 @@
         verbose: true
       register: shrink_output
 
-    - name: Echo shrink_output.
+    - name: Echo shrink_output for the verbose shrink.
       ansible.builtin.debug:
         msg: "{{ shrink_output }}"
 

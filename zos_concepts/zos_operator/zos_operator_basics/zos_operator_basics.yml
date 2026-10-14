@@ -112,13 +112,13 @@
         msg: "{{ result_zos_operator }}"
       when: bool_zos_operator_action_continue
 
-    - name: Query actionable messages on system {{ system_name }}
+    - name: Query actionable messages after creating the operator action on system {{ system_name }}
       ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: result_zos_operator_action_query
       when: bool_zos_operator_action_continue
 
-    - name: Response for query actionable messages on system {{ system_name }}
+    - name: Response for query actionable messages after creating the operator action on system {{ system_name }}
       ansible.builtin.debug:
         msg: "{{ result_zos_operator_action_query }}"
       when: bool_zos_operator_action_continue and result_zos_operator_action_query is defined and not result_zos_operator_action_query.failed
