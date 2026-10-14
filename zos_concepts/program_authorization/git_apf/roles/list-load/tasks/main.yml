@@ -7,6 +7,7 @@
 - name: Cat file_name
   ansible.builtin.command: "cat {{ file_name }}"
   register: content
+  changed_when: false
 
 - name: Load the list from the file in the git repo
   ansible.builtin.set_fact:
