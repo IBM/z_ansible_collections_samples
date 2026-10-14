@@ -2,4 +2,4 @@
 # Copyright (c) IBM Corporation 2021
 
 # defaults file for restore-ptf
-target_zone: TGT
+restore_ptf_target_zone: TGT
