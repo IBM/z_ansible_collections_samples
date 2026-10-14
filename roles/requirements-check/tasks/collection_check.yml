@@ -12,7 +12,7 @@
 ---
 - name: Extracting Ansible enviroment variable COLLECTIONS_PATHS from localhost
   ansible.builtin.shell:
-    cmd: ansible-config dump|grep -i COLLECTIONS_PATHS|awk -F" = " '{print $2}'
+    cmd: set -o pipefail && ansible-config dump | grep -i COLLECTIONS_PATHS | awk -F" = " '{print $2}'
   register: ansible_collections_paths
   changed_when: false
 
@@ -107,8 +107,15 @@
       item.required_collection_version != None and
       item.installed_collection_version is version(item.required_collection_version,'>=')
       )
-    success_msg: "[SUCCESS] Ansible collection {{item.required_collection_name}} version {{item.installed_collection_version}} is installed."
-    fail_msg: "[FAIL] This playbook requires Ansible collection {{item.required_collection_name}} version {{item.required_collection_version}} and {{item.installed_collection_version if item.installed_collection_version != None else 'no version' }} is installed."
+    success_msg: >-
+      [SUCCESS] Ansible collection {{item.required_collection_name}} version
+      {{item.installed_collection_version}} is installed.
+    fail_msg: >-
+      [FAIL] This playbook requires Ansible collection
+      {{item.required_collection_name}} version
+      {{item.required_collection_version}} and
+      {{item.installed_collection_version if item.installed_collection_version != None else 'no version'}}
+      is installed.
     quiet: true
   register: result_collection_status
   ignore_errors: true

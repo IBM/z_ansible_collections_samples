@@ -61,7 +61,7 @@
 
   tasks:
     - name: Get home directory
-      ansible.builtin.shell: "echo $HOME | sed 's:/*$::'"
+      ansible.builtin.shell: "set -o pipefail && echo $HOME | sed 's:/*$::'"
       register: result
       changed_when: false
     - name: Set home_dir path
@@ -78,6 +78,7 @@
         name: list-load
     - name: Create persistent dataset if not exist
       ansible.builtin.shell: |
+        set -o pipefail
         dls `echo "{{ persistent_ds.target }}" | sed s'/(.*)$//'` > /dev/null 2>&1 ||
           { dtouch `echo "{{ persistent_ds.target }}" | sed s'/(.*)$//'` && echo CREATED; }
       register: persistent_ds_result
