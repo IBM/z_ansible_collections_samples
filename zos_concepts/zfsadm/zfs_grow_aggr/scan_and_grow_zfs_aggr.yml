@@ -67,6 +67,7 @@
       ansible.builtin.file:
         path: "{{ mount_point }}/{{ item }}"
         state: directory
+        mode: "0755"
       loop: "{{ mount_points }}"
 
     - name: Mount ZFS data sets
@@ -120,7 +121,9 @@
 
     - name: Scan df_output to build list of data set names and utilization percentages
       ansible.builtin.set_fact:
-        dsn_per_util_list: "{{ df_output_before.results | map(attribute='stdout') | map('regex_search', '\\n([a-zA-Z0-9\\.]+).*(\\b[0-9]+)%', ('\\1'), ('\\2'))  | list }}"
+        dsn_per_util_list: >-
+          {{ df_output_before.results | map(attribute='stdout') |
+          map('regex_search', '\\n([a-zA-Z0-9\\.]+).*(\\b[0-9]+)%', ('\\1'), ('\\2')) | list }}
 
     - name: Build grow_list
       ansible.builtin.set_fact:

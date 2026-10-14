@@ -481,7 +481,7 @@
       with_sequence: count=4
       tags: always
 
-    - name: Traverse all DDs using hard coded start and dynamic end `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
+    - name: Traverse all DDs using hard coded start and dynamic end with fact `submit_job_ddnames_list` from {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
       with_sequence: start=0 end="{{ submit_jobs_ddnames_length |int -1 }}"
@@ -498,7 +498,7 @@
     # construct `with_sequence` and print the
     # DD values dd_name, id, record_count, stepname, byte_count.
     ############################################################################
-    - name: Traverse all DDs using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` and print the DD stats (ddname, id, record_count, stepname, byte_count) from submitted job {{ submit_job_name }}
+    - name: Traverse all DDs using dynamic length with `submit_job_ddnames_list` and print DD stats from {{ submit_job_name }}
       ansible.builtin.debug:
         msg:
           - "{{ submit_job_ddnames_list[item |int].dd_name }}"

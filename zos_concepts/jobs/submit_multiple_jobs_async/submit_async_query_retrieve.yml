@@ -142,7 +142,9 @@
 
     - name: Check if any asynchronous batch job has a RC > 0 and fail if it does.
       ansible.builtin.fail:
-        msg: "Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}  has a rc of = {{ item.jobs[0].ret_code.code }}, msg = {{ item.jobs[0].ret_code.msg }}"
+        msg: >-
+          Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}
+          has a rc of = {{ item.jobs[0].ret_code.code }}, msg = {{ item.jobs[0].ret_code.msg }}
       failed_when: >
         item.jobs[0].ret_code.code > 0
       with_items: "{{ job_query.results }}"
