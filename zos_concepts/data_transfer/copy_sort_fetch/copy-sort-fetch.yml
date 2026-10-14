@@ -27,7 +27,8 @@
 #
 ###############################################################################
 
-- hosts: source_system
+- name: Copy a local file to a data set, sort it and fetch the result
+  hosts: source_system
   vars:
     column_headers: "{{ lookup('file', 'roles/copy-local-data/files/SalaryData.txt').splitlines()[0] }}"
     output_path: "{{ playbook_dir }}"
@@ -35,7 +36,8 @@
   environment: "{{ environment_vars }}"
 
   tasks:
-    - block:
+    - name: Copy, sort and fetch the data
+      block:
         - name: Copy local file containing data
           ansible.builtin.include_role:
             name: copy-local-data

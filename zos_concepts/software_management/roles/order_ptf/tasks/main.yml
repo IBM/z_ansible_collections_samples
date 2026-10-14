@@ -4,14 +4,14 @@
 # tasks file for order_ptf
 
 # Order PTF from IBM
-- name: "ORDER PTF {{ptf}} from IBM server"
+- name: "{{ 'ORDER PTF %s from IBM server' | format(order_ptf_ptf) }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ order_ptf_global_csi }}"
           disposition: old
       - dd_output:
           dd_name: "SMPOUT"
@@ -19,23 +19,23 @@
             type: text
       - dd_unix:
           dd_name: "SMPNTS"
-          path: "{{smpe_root}}/smpnts/"
+          path: "{{order_ptf_smpe_root}}/smpnts/"
       - dd_input:
           dd_name: "SMPCNTL"
           content:
             - 'SET  BOUNDARY(GLOBAL) .'
             - 'RECEIVE ORDER('
-            - '           CONTENT(PTFS({{ ptf }}))'
+            - '           CONTENT(PTFS({{ order_ptf_ptf }}))'
             - '           ORDERSERVER(SERVINFO)'
             - '           CLIENT(CLNTINFO)'
             - '              )'
             - DELETEPKG.
       - dd_input:
           dd_name: "SERVINFO"
-          content: "{{ server_info }}"
+          content: "{{ order_ptf_server_info }}"
       - dd_input:
           dd_name: "CLNTINFO"
-          content: "{{ client_info }}"
+          content: "{{ order_ptf_client_info }}"
   register: order_result
 
 - name: "LIST HOLDDATA"
@@ -45,7 +45,7 @@
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ order_ptf_global_csi }}"
           disposition: old
 
       - dd_output:
@@ -60,5 +60,5 @@
           dd_name: "SMPCNTL"
           content:
             - 'SET  BOUNDARY(GLOBAL) .'
-            - 'LIST SYSMOD({{ ptf }}) HOLDDATA .'
+            - 'LIST SYSMOD({{ order_ptf_ptf }}) HOLDDATA .'
   when: order_result.ret_code.code <= 4

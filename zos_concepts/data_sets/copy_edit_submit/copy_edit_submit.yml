@@ -22,7 +22,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Copy a directory to a PDS, edit a member and submit it
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -33,8 +34,10 @@
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
+      changed_when: false
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set name
+      ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.stdout }}"
     # ##########################################################################
     # Modules: zos_copy, zos_lineinfile, zos_mvs_raw, zos_job_submit
@@ -48,7 +51,7 @@
     # | - Using zos_job_submit, submit both JCLs, UPTIME and PSA
     # | - Using zos_data_set, delete the copied data set on z/OS host
     # +-------------------------------------------------------------------------
-    - name: "Copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}"
+    - name: "{{ 'Copy local directory %s/files to %s' | format(playbook_dir, tmp_data_set) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files"
         dest: "{{ tmp_data_set }}"
@@ -57,11 +60,11 @@
           to: IBM-1047
       register: result_copy_dir
 
-    - name: "Response for copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}."
+    - name: "{{ 'Response for copy local directory %s/files to %s.' | format(playbook_dir, tmp_data_set) }}"
       ansible.builtin.debug:
         var: result_copy_dir
 
-    - name: "Copy PDS member {{ tmp_data_set }}(UPTIME) to a new PDS member {{ tmp_data_set }}(PSA)"
+    - name: "{{ 'Copy PDS member %s(UPTIME) to a new PDS member %s(PSA)' | format(tmp_data_set, tmp_data_set) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_data_set }}(UPTIME)"
         dest: "{{ tmp_data_set }}(PSA)"
@@ -88,23 +91,23 @@
         regexp: "SH uptime"
         line: "SH ps -A"
 
-    - name: "Submit the JCL {{ tmp_data_set }}(PSA)"
+    - name: "{{ 'Submit the JCL %s(PSA)' | format(tmp_data_set) }}"
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(PSA)"
         remote_src: true
       register: result_submit_psa
 
-    - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
+    - name: "{{ 'Response for submitting JCL %s(PSA)' | format(tmp_data_set) }}"
       ansible.builtin.debug:
         var: result_submit_psa
 
-    - name: "Submit the JCL {{ tmp_data_set }}(UPTIME)"
+    - name: "{{ 'Submit the JCL %s(UPTIME)' | format(tmp_data_set) }}"
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(UPTIME)"
         remote_src: true
       register: result_submit_uptime
 
-    - name: "Response for submitting JCL {{ tmp_data_set }}(UPTIME)"
+    - name: "{{ 'Response for submitting JCL %s(UPTIME)' | format(tmp_data_set) }}"
       ansible.builtin.debug:
         var: result_submit_uptime
 

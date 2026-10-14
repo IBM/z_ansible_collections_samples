@@ -22,7 +22,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Manipulate text in data sets and USS files
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -34,14 +35,17 @@
     - name: Create temp data set name for SEQ dataset
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
+      changed_when: false
 
     - name: Create temp data set name for PDSE dataset
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
+      changed_when: false
 
     - name: Create temp data set name for backup name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: backup_tmp
+      changed_when: false
 
     - name: Create USS file to copy the text
       ansible.builtin.tempfile:
@@ -50,11 +54,13 @@
         suffix: temp
       register: tmp_file
 
-    - name: Create temp data set name for SEQ dataset
+    - name: Create temp data set name for second SEQ dataset
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds3
+      changed_when: false
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set, backup and file name facts
+      ansible.builtin.set_fact:
         seq_dataset: "{{ tmp_ds1.stdout }}"
         pdse_dataset: "{{ tmp_ds2.stdout }}"
         seq_n_dataset: "{{ tmp_ds3.stdout }}"
@@ -91,16 +97,16 @@
 
     - name: "Copy the file log_file of the folder to the MEM of {{ pdse_dataset }}"
       ibm.ibm_zos_core.zos_copy:
-        src: "{{playbook_dir}}/files/log_file.txt"
+        src: "{{ playbook_dir }}/files/log_file.txt"
         dest: "{{ pdse_dataset }}(MEM)"
 
-    - name: "Copy {{ pdse_dataset }} to the {{ seq_dataset }} dataset"
+    - name: "{{ 'Copy %s to the %s dataset' | format(pdse_dataset, seq_dataset) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ seq_dataset }}"
         remote_src: true
 
-    - name: "Generate a new member of {{ pdse_dataset }} with copy of content"
+    - name: "Generate a new member with copy of content in {{ pdse_dataset }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ pdse_dataset }}(MEM1)"
@@ -108,11 +114,11 @@
 
     - name: "Execute copy of files_no_utf_8 to the tmp file {{ tmp_file }}"
       ibm.ibm_zos_core.zos_copy:
-        src: "{{playbook_dir}}/files/files_no_utf_8.txt"
+        src: "{{ playbook_dir }}/files/files_no_utf_8.txt"
         dest: "{{ tmp_file }}"
         replace: true
 
-    - name: "Copy {{ tmp_file }} to the last SEQ dataset {{ seq_n_dataset }}"
+    - name: "{{ 'Copy %s to the last SEQ dataset %s' | format(tmp_file, seq_n_dataset) }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_file }}"
         dest: "{{ seq_n_dataset }}"
@@ -133,7 +139,7 @@
     # manipulate the text on files
     # ##########################################################################
 
-    - name: "Replace multiple lines on {{ seq_dataset }} dataset and backup result"
+    - name: "Replace multiple lines and backup result on dataset {{ seq_dataset }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ seq_dataset }}"
         regexp: ^(IE[A-Z0-9]{3}I|IEF[0-9]{3}I)\s.*
@@ -148,15 +154,16 @@
         msg: "{{ multiple_lines_results }}"
 
     - name: Cat backup with original text
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: dcat "{{ multiple_lines_results.backup_name }}"
       register: content_of_backup
+      changed_when: false
 
     - name: See the backup of the original text
       ansible.builtin.debug:
         msg: "{{ content_of_backup }}"
 
-    - name: "Replace a line using disable_regex option for after on {{ pdse_dataset }}(MEM)"
+    - name: "{{ 'Replace a line using disable_regex option for after on %s(MEM)' | format(pdse_dataset) }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ pdse_dataset }}(MEM)"
         regexp: //*SMPTLIB  DD UNIT=SYSALLDA,SPACE=(TRK,(1,1)),VOL=SER=vvvvvv
@@ -170,18 +177,18 @@
       ansible.builtin.debug:
         msg: "{{ disable_regex_output }}"
 
-    - name: "Replace using backref on {{ pdse_dataset }}(MEM1)"
+    - name: "{{ 'Replace using backref on %s(MEM1)' | format(pdse_dataset) }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ pdse_dataset }}(MEM)"
         regexp: '^(IEF403I|IEF404I|IEF456I) (\S+) - '
         replace: '\1 PROCESSING_JOB - '
       register: backref_output
 
-    - name: See the result of replace a specif line
+    - name: See the result of replace using backref
       ansible.builtin.debug:
         msg: "{{ backref_output }}"
 
-    - name: "Replace words between lines on USS file {{ tmp_file }} with no utf-8"
+    - name: "Replace words between lines with no utf-8 on USS file {{ tmp_file }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ tmp_file }}"
         regexp: "ZOAU_ROOT"
@@ -194,7 +201,7 @@
       ansible.builtin.debug:
         msg: "{{ replace_words }}"
 
-    - name: "Replace on SEQ dataset {{ seq_n_dataset }} with no utf-8 characters"
+    - name: "Replace with no utf-8 characters on SEQ dataset {{ seq_n_dataset }}"
       ibm.ibm_zos_core.zos_replace:
         target: "{{ seq_n_dataset }}"
         regexp: lpp
@@ -209,17 +216,17 @@
     # clean up - delete datasets
     # ##########################################################################
 
-    - name: Delete dataset
+    - name: "{{ 'Delete data set %s' | format(seq_n_dataset) }}"
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ seq_n_dataset }}"
         state: absent
 
-    - name: Delete dataset
+    - name: "{{ 'Delete data set %s' | format(pdse_dataset) }}"
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ pdse_dataset }}"
         state: absent
 
-    - name: Delete dataset
+    - name: "{{ 'Delete data set %s' | format(seq_dataset) }}"
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ seq_dataset }}"
         state: absent

@@ -11,7 +11,7 @@
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ apply_ptf_global_csi }}"
           disposition: old
       - dd_output:
           dd_name: "SMPOUT"
@@ -19,7 +19,7 @@
             type: text
       - dd_unix:
           dd_name: "SMPNTS"
-          path: "{{smpe_root}}/smpnts/"
+          path: "{{ apply_ptf_smpe_root }}/smpnts/"
 
       - dd_input:
           dd_name: "SMPCNTL"
@@ -27,7 +27,7 @@
             - " SET  BOUNDARY(GLOBAL) ."
             - "RECEIVE SYSMODS HOLDDATA"
             - "ORDER("
-            - "PENDING({{order_number}})"
+            - "PENDING({{ apply_ptf_order_number }})"
             - "CLIENT(CLNTINFO)"
             - ")."
       - dd_input:
@@ -39,18 +39,18 @@
             - 'javahome="/usr/lpp/java/java180/J8.0_64"'
             - ">"
             - "</CLIENT>"
-  when: package_location == 'pending_order'
+  when: apply_ptf_package_location == 'pending_order'
   register: receive_result
 
 # APPLY CHECK
-- name: "Perform APPLY CHECK for {{ ptf }}"
+- name: "Perform APPLY CHECK for {{ apply_ptf_ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ apply_ptf_global_csi }}"
           disposition: old
 
       - dd_output:
@@ -60,9 +60,9 @@
 
       - dd_input:
           dd_name: "SMPCNTL"
-          content: " SET BOUNDARY({{target_zone}}) .
+          content: " SET BOUNDARY({{ apply_ptf_target_zone }}) .
             \nAPPLY SELECT(
-            \n{{ptf}}
+            \n{{ apply_ptf_ptf }}
             \n)
             \nCHECK
             \nBYPASS(HOLDSYS,HOLDERROR)
@@ -71,14 +71,14 @@
   register: apply_check_result
 
 # APPLY
-- name: "Perform APPLY for {{ ptf }}"
+- name: "Perform APPLY for {{ apply_ptf_ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ apply_ptf_global_csi }}"
           disposition: old
 
       - dd_output:
@@ -88,9 +88,9 @@
 
       - dd_input:
           dd_name: "SMPCNTL"
-          content: " SET BOUNDARY({{target_zone}}) .
+          content: " SET BOUNDARY({{ apply_ptf_target_zone }}) .
             \nAPPLY SELECT(
-            \n{{ptf}}
+            \n{{ apply_ptf_ptf }}
             \n)
             \nBYPASS(HOLDSYS,HOLDERROR)
             \nCOMPRESS(ALL) ."

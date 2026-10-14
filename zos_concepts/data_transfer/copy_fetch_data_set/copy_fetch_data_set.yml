@@ -35,7 +35,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Copy data to and from a z/OS system
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -49,6 +50,7 @@
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
+      changed_when: false
 
     # ##########################################################################
     # Fact setting for use by this playbook
@@ -64,14 +66,13 @@
     - name: Detect character set for locale on target {{ inventory_hostname }}
       ansible.builtin.command: locale -c charmap
       register: result
+      changed_when: false
 
-    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
-        target {{ inventory_hostname }}
+    - name: "{{ 'Response for create shell script %s/date.sh on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Set variable `target_charset` with target {{ inventory_hostname }}
-        charset
+    - name: Set variable `target_charset` with the target charset of {{ inventory_hostname }}
       ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
@@ -79,6 +80,7 @@
       # ansible.builtin.shell: "uname -a |awk '{print $2}'"
       ansible.builtin.command: uname -n
       register: result
+      changed_when: false
 
     - name: Setting fact `system_name` for use by this sample
       ansible.builtin.set_fact:
@@ -143,6 +145,7 @@
       ansible.builtin.file:
         path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
         state: touch
+        mode: "0644"
       with_sequence: count=4
       delegate_to: localhost
       register: result

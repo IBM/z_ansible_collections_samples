@@ -1,7 +1,7 @@
 ---
 # vars file for apply_ptf
-ptf: 'UI70435'
-global_csi: 'IMSTESTL.ZOAU100.CSI'
-smpe_root: '/var/zoau100'
-package_location: "" # pending_order or '' if already in GLOBAL zone
-order_number: "ORD00002"
+apply_ptf_ptf: 'UI70435'
+apply_ptf_global_csi: 'IMSTESTL.ZOAU100.CSI'
+apply_ptf_smpe_root: '/var/zoau100'
+apply_ptf_package_location: "" # pending_order or '' if already in GLOBAL zone
+apply_ptf_order_number: "ORD00002"
