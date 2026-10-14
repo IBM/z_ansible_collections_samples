@@ -21,9 +21,6 @@
 - name: Unpack and restore data sets
   hosts: destination_system
   gather_facts: false
-  vars:
-    PYZ: "{{ hostvars.destination.PYZ }}"
-    ZOAU: "{{ hostvars.destination.ZOAU }}"
   environment: "{{ environment_vars }}"
 
   tasks:
