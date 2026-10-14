@@ -2,7 +2,8 @@
 # © Copyright IBM Corporation 2020
 ###############################################################################
 
-- hosts: localhost
+- name: Send rejection email
+  hosts: localhost
   gather_facts: false
 
   tasks:

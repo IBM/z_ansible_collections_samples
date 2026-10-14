@@ -40,7 +40,7 @@
       register: tmp_ds1
       changed_when: false
 
-    - name: Create temp data set name
+    - name: Create second temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
       changed_when: false

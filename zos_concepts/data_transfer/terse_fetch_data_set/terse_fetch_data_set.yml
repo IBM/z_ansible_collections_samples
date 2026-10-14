@@ -92,7 +92,7 @@
           type: terse
       register: terse_response
 
-    - name: Get the result of temp data set creation
+    - name: Show the temp data set facts
       ansible.builtin.debug:
         var: temp_data_set
 
