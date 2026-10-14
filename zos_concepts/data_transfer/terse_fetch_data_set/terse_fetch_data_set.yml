@@ -56,7 +56,7 @@
             space_type: cyl
             record_length: 1024
           register: tmp_ds
-          failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', [])|length == 0
+          failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', []) | length == 0
 
     - name: Get the result of temp data set creation
       ansible.builtin.debug:
@@ -116,7 +116,7 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
-      when: temp_data_set is defined and temp_data_set.data_sets|length > 0
+      when: temp_data_set is defined and temp_data_set.data_sets | length > 0
 
     - name: "{{ 'Fetch %s to local machine' | format(tmp_data_set) }}"
       ibm.ibm_zos_core.zos_fetch:

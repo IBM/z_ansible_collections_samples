@@ -49,7 +49,7 @@
 
     - name: Assign existing_workflow_key variable if the 'sample_uri_workflow' has already been created
       ansible.builtin.set_fact:
-        existing_workflow_key: "{{ item.workflowKey if 'sample_uri_workflow' in item.workflowName else existing_workflow_key}}"
+        existing_workflow_key: "{{ item.workflowKey if 'sample_uri_workflow' in item.workflowName else existing_workflow_key }}"
       loop: "{{ zosmf_result.json.workflows }}"
 
     - name: Create workflow if not already created

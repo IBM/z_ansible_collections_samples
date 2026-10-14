@@ -154,7 +154,7 @@
           zoau_pythonpath: "{{ ZOAU_PYTHONPATH }}"
 
           # take advantage of the now() command built in to jinja.
-          date_last_updated: "{{ now(utc=true,fmt='%Y-%m-%d') }}"
+          date_last_updated: "{{ now(utc=true, fmt='%Y-%m-%d') }}"
 
     - name: Print the updated zoau dict before writing to file.
       ansible.builtin.debug:

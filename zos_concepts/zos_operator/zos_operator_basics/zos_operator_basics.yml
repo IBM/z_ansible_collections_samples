@@ -136,11 +136,11 @@
     - name: Set reply value if there is one matching actionable message
       ansible.builtin.set_fact:
         reply_num: "{{ result_zos_operator_action_query.actions[0].number }}"
-      when: bool_zos_operator_action_continue and filtered_zos_operator_action_query is defined and  (filtered_zos_operator_action_query | length == 1)
+      when: bool_zos_operator_action_continue and filtered_zos_operator_action_query is defined and (filtered_zos_operator_action_query | length == 1)
 
     - name: Reply to operator action with "end"
       ibm.ibm_zos_core.zos_operator:
-        cmd: "{{ reply_num}}end"
+        cmd: "{{ reply_num }}end"
       register: result_zos_operator_end
       when: bool_zos_operator_action_continue and reply_num is defined
 
@@ -166,7 +166,7 @@
       ansible.builtin.assert:
         that:
           - bool_zos_operator_action_continue
-          - filtered_zos_operator_action_query_verify is defined and  (filtered_zos_operator_action_query_verify | length == 0)
+          - filtered_zos_operator_action_query_verify is defined and (filtered_zos_operator_action_query_verify | length == 0)
         success_msg: "All actionable messages that match 'IEE094D SPECIFY OPERAND' have been cancelled"
         fail_msg: "There are more than one remaining actionable messages that match 'IEE094D SPECIFY OPERAND' , unable to reply to more than one action. "
       register: result_assert_dump_messages_cancelled

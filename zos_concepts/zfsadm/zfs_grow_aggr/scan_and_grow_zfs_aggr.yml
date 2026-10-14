@@ -76,7 +76,7 @@
         path: "{{ mount_point }}/{{ item.1 }}"
         fs_type: zfs
         state: mounted
-      loop: "{{ zfs_data_sets | zip( mount_points ) | list }}"
+      loop: "{{ zfs_data_sets | zip(mount_points) | list }}"
 
     - name: Confirm mount points
       ansible.builtin.command: "df /{{ mount_point }}/{{ item }}"
@@ -95,7 +95,7 @@
     # ##########################################################################
 
     - name: Write random bytes to ZFS aggregates
-      ansible.builtin.shell: head -c "{{250000*(1+index) }}" /dev/urandom > {{ mount_point }}/{{item}}/test.txt
+      ansible.builtin.shell: head -c "{{ 250000 * (1 + index) }}" /dev/urandom > {{ mount_point }}/{{ item }}/test.txt
       loop: "{{ mount_points }}"
       loop_control:
         index_var: index
@@ -116,7 +116,7 @@
     - name: Echo aggrinfo and percent-use BEFORE growth
       ansible.builtin.debug:
         msg:
-          - "{{ aggrinfo_output_before.results |  map(attribute='stdout_lines') | flatten }}"
+          - "{{ aggrinfo_output_before.results | map(attribute='stdout_lines') | flatten }}"
           - "{{ df_output_before.results | map(attribute='stdout_lines') | flatten }}"
 
     - name: Scan df_output to build list of data set names and utilization percentages
@@ -150,7 +150,7 @@
     - name: Echo 'zfsadm grow' output and percent-use AFTER growth.
       ansible.builtin.debug:
         msg:
-          - "{{ grow_output.results |  map(attribute='stdout_lines') | flatten }}"
+          - "{{ grow_output.results | map(attribute='stdout_lines') | flatten }}"
           - "{{ df_output_after.results | map(attribute='stdout_lines') | flatten }}"
 
     # ##########################################################################

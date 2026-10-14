@@ -403,7 +403,7 @@
             fs_type: zfs
             state: mounted
 
-        - name: "Query the free size of {{ zfs_data_set}}"
+        - name: "Query the free size of {{ zfs_data_set }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ zfs_data_set }}"
             type: aggregate

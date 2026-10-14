@@ -71,7 +71,7 @@
         tmp_data_set2: "{{ tmp_ds2.stdout }}"
         date: "{{ date_time.stdout[0:10] }}"
         time: "{{ date_time.stdout[10:] }}"
-        sys_name: "{{ sys_info.ansible_facts.sys_name}}"
+        sys_name: "{{ sys_info.ansible_facts.sys_name }}"
         log_output: "{{ log_output.stdout }}"
 
     # ##########################################################################
@@ -137,7 +137,7 @@
         marker_end: " End of log time {{ time }} "
         insertbefore: BOF
         state: present
-        block: "{{ log_output | default('No log output available', true) | regex_replace('[^\\x20-\\x7E\\n]', '') }}"
+        block: "{{ log_output | default('No log output available', true) | regex_replace('[^\\x20-\\x7e\\n]', '') }}"
 
     - name: "{{ 'Copy from the current generation of %s to the last Generation of %s' | format(tmp_data_set1, tmp_data_set2) }}"
       ibm.ibm_zos_core.zos_copy:

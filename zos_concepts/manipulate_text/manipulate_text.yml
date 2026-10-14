@@ -97,7 +97,7 @@
 
     - name: "Copy the file log_file of the folder to the MEM of {{ pdse_dataset }}"
       ibm.ibm_zos_core.zos_copy:
-        src: "{{playbook_dir}}/files/log_file.txt"
+        src: "{{ playbook_dir }}/files/log_file.txt"
         dest: "{{ pdse_dataset }}(MEM)"
 
     - name: "{{ 'Copy %s to the %s dataset' | format(pdse_dataset, seq_dataset) }}"
@@ -114,7 +114,7 @@
 
     - name: "Execute copy of files_no_utf_8 to the tmp file {{ tmp_file }}"
       ibm.ibm_zos_core.zos_copy:
-        src: "{{playbook_dir}}/files/files_no_utf_8.txt"
+        src: "{{ playbook_dir }}/files/files_no_utf_8.txt"
         dest: "{{ tmp_file }}"
         replace: true
 
