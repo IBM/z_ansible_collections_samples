@@ -25,7 +25,8 @@
 #
 ###############################################################################
 
-- hosts: source
+- name: Archive data sets and fetch the archive to the controller
+  hosts: source
   gather_facts: false
 
   vars:
@@ -59,8 +60,10 @@
     - name: Get attributes for data sets
       ansible.builtin.command: dls -s {{ data_sets_to_archive | join(' ') }}
       register: response
+      changed_when: false
 
-    - ansible.builtin.set_fact:
+    - name: Set the size of the data sets in cylinders
+      ansible.builtin.set_fact:
         size_in_cyls: "{{ response | total_size }}"
 
     #########################################################################
@@ -93,7 +96,8 @@
           space_type: cyl
       register: archive_result
 
-    - ansible.builtin.debug:
+    - name: Display the archive result
+      ansible.builtin.debug:
         msg: "{{ archive_result }}"
 
     #########################################################################
@@ -112,7 +116,7 @@
         flat: true
       register: result
 
-    - name: "Result of fetching {{ archive_data_set }} to controller node"
+    - name: "Result of fetching to controller node from {{ archive_data_set }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 
@@ -123,4 +127,3 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
-

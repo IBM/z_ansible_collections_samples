@@ -7,7 +7,8 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: source_system
+- name: Dump, pack, and transfer data sets
+  hosts: source_system
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -17,11 +18,9 @@
         name: dump-pack-ftp-data-sets
         public: true
 
-- hosts: destination_system
+- name: Unpack and restore data sets
+  hosts: destination_system
   gather_facts: false
-  vars:
-    PYZ: "{{ hostvars.destination.PYZ }}"
-    ZOAU: "{{ hostvars.destination.ZOAU }}"
   environment: "{{ environment_vars }}"
 
   tasks:

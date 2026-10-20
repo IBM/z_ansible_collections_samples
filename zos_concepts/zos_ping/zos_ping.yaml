@@ -21,7 +21,8 @@
 #  ansible-playbook -i "mysystem.to.connect.com," zos_ping.yml
 
 ---
-- hosts: all
+- name: Verify connectivity to the target systems
+  hosts: all
   gather_facts: false
 
   environment: "{{ environment_vars }}"

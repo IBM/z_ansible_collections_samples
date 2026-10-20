@@ -76,7 +76,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Submit jobs, and query and retrieve job output using various Ansible constructs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -384,7 +385,7 @@
     ############################################################################
     - name: Convert a local JCL file to IBM-037 and submit the job
       ibm.ibm_zos_core.zos_job_submit:
-        src: "{{playbook_dir}}/files/HELLO.jcl"
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
         remote_src: false
         encoding:
           from: ISO8859-1
@@ -403,24 +404,24 @@
 
     - name: Set fact `job_sub_result` with live production content
       ansible.builtin.set_fact:
-        job_sub_result: "{{job_sub_result_production}}"
+        job_sub_result: "{{ job_sub_result_production }}"
       tags: mode_production
 
     - name: Set fact `job_sub_result` with static YAML content used in development mode
       ansible.builtin.set_fact:
-        job_sub_result: "{{job_sub_result_yaml}}"
+        job_sub_result: "{{ job_sub_result_yaml }}"
       tags: mode_development_yaml
 
     - name: Set fact `job_sub_result` with static JSON content used in development mode
       ansible.builtin.set_fact:
-        job_sub_result: "{{job_sub_result_json}}"
+        job_sub_result: "{{ job_sub_result_json }}"
       tags: mode_development_json
 
     - name: Set facts used in this playbook
       ansible.builtin.set_fact:
         submit_job_name: "{{ job_sub_result.jobs[0].job_name }}"
         submit_job_id: "{{ job_sub_result.jobs[0].job_id }}"
-        submit_jobs_ddnames_length: "{{ job_sub_result.jobs[0].dds |length }}"
+        submit_jobs_ddnames_length: "{{ job_sub_result.jobs[0].dds | length }}"
         submit_job_ddnames_list: "{{ job_sub_result.jobs[0].dds }}"
         submit_job_list: "{{ job_sub_result.jobs[0] }}"
       tags: always
@@ -428,25 +429,25 @@
     - name: Fact values used in this playbook
       ansible.builtin.debug:
         msg:
-          - Job name={{submit_job_name}}
-          - Job ID={{submit_job_id}}
-          - DD Count={{submit_jobs_ddnames_length}}
-          - "{{submit_job_ddnames_list}}"
-          - "{{submit_job_list}}"
+          - Job name={{ submit_job_name }}
+          - Job ID={{ submit_job_id }}
+          - DD Count={{ submit_jobs_ddnames_length }}
+          - "{{ submit_job_ddnames_list }}"
+          - "{{ submit_job_list }}"
       tags: mode_verbose
 
     ############################################################################
     # Get job output by job id when a job is submitted to z/OS when
     # --tags "mode_production"
     ############################################################################
-    - name: Get job output for job ID {{submit_job_id}}
+    - name: Get job output for job ID {{ submit_job_id }}
       ibm.ibm_zos_core.zos_job_output:
-        job_id: "{{submit_job_id}}"
+        job_id: "{{ submit_job_id }}"
       register: job_output_result
       when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
-    - name: Result for get job output for job ID {{submit_job_id}}
+    - name: Result for get job output for job ID {{ submit_job_id }}
       ansible.builtin.debug:
         msg: "{{ job_output_result }}"
       when: job_sub_result_production is defined and not job_sub_result_production.failed
@@ -456,14 +457,14 @@
     # Query job by job id when when a job is submitted to z/OS when
     # --tags "mode_production"
     ############################################################################
-    - name: Query the submitted job ID {{submit_job_id}}
+    - name: Query the submitted job ID {{ submit_job_id }}
       ibm.ibm_zos_core.zos_job_query:
-        job_id: "{{submit_job_id}}"
+        job_id: "{{ submit_job_id }}"
       register: job_query_result
       when: job_sub_result_production is defined and not job_sub_result_production.failed
       tags: always
 
-    - name: Result for query job ID {{submit_job_id}}
+    - name: Result for query job ID {{ submit_job_id }}
       ansible.builtin.debug:
         msg: "{{ job_query_result }}"
       when: job_sub_result_production is defined and not job_sub_result_production.failed
@@ -473,23 +474,23 @@
     # Traverse the submitted job to extract ddnames by using the Ansible
     # construct `with_sequence`
     ############################################################################
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using hard coded count with registered variable `job_sub_result`
+    - name: Traverse all DDs using hard coded count with registered variable `job_sub_result` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg:
-          - "{{ job_sub_result.jobs[0].dds[item |int].dd_name }}"
+          - "{{ job_sub_result.jobs[0].dds[item | int].dd_name }}"
       with_sequence: count=4
       tags: always
 
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using hard coded start and dynamic end `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list`
+    - name: Traverse all DDs using hard coded start and dynamic end with fact `submit_job_ddnames_list` from {{ submit_job_name }}
       ansible.builtin.debug:
-        msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
-      with_sequence: start=0 end="{{ submit_jobs_ddnames_length |int -1 }}"
+        msg: "{{ submit_job_ddnames_list[item | int].dd_name }}"
+      with_sequence: start=0 end="{{ submit_jobs_ddnames_length | int - 1 }}"
       tags: always
 
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list`
+    - name: Traverse all DDs using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
-        msg: "{{ submit_job_ddnames_list[item |int].dd_name }}"
-      with_sequence: count="{{ submit_jobs_ddnames_length |int -1 }}"
+        msg: "{{ submit_job_ddnames_list[item | int].dd_name }}"
+      with_sequence: count="{{ submit_jobs_ddnames_length | int - 1 }}"
       tags: always
 
     ############################################################################
@@ -497,31 +498,31 @@
     # construct `with_sequence` and print the
     # DD values dd_name, id, record_count, stepname, byte_count.
     ############################################################################
-    - name: Traverse all DDs from submitted job {{submit_job_name}} using dynamic `submit_jobs_ddnames_length` with fact `submit_job_ddnames_list` and print the DD stats (ddname, id, record_count, stepname, byte_count)
+    - name: Traverse all DDs using dynamic length with `submit_job_ddnames_list` and print DD stats from {{ submit_job_name }}
       ansible.builtin.debug:
         msg:
-          - "{{ submit_job_ddnames_list[item |int].dd_name }}"
-          - "{{ submit_job_ddnames_list[item |int].id }}"
-          - "{{ submit_job_ddnames_list[item |int].record_count }}"
-          - "{{ submit_job_ddnames_list[item |int].stepname }}"
-          - "{{ submit_job_ddnames_list[item |int].byte_count }}"
-      with_sequence: count="{{ submit_jobs_ddnames_length |int -1 }}"
+          - "{{ submit_job_ddnames_list[item | int].dd_name }}"
+          - "{{ submit_job_ddnames_list[item | int].id }}"
+          - "{{ submit_job_ddnames_list[item | int].record_count }}"
+          - "{{ submit_job_ddnames_list[item | int].stepname }}"
+          - "{{ submit_job_ddnames_list[item | int].byte_count }}"
+      with_sequence: count="{{ submit_jobs_ddnames_length | int - 1 }}"
       tags: always
 
     ############################################################################
     # Traverse the submitted job to extract ddname and stepname by using the
     # Ansible construct `loop`
     ############################################################################
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` with  fact `submit_job_ddnames_list`
+    - name: Traverse all DDs ddname(s) using ansible `loop` with fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ item.dd_name }}"
-      loop: "{{submit_job_ddnames_list}}"
+      loop: "{{ submit_job_ddnames_list }}"
       tags: always
 
-    - name: Traverse all DDs stepname(s) from submitted job {{submit_job_name}} using ansible `loop` with set fact `submit_job_ddnames_list`
+    - name: Traverse all DDs stepname(s) using ansible `loop` with set fact `submit_job_ddnames_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
         msg: "{{ item.stepname }}"
-      loop: "{{submit_job_ddnames_list}}"
+      loop: "{{ submit_job_ddnames_list }}"
       tags: always
 
     ############################################################################
@@ -535,16 +536,16 @@
     #    * `ansible-galaxy collection install community.general`
     ############################################################################
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `submit_job_list`
+    - name: Traverse all DDs ddname(s) using ansible `loop` and `json_query` with fact `submit_job_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
-        msg: "{{item}}"
+        msg: "{{ item }}"
       # with_items: "{{ job_sub_result | community.general.json_query('jobs[*].dds[*].id') }}"
       loop: "{{ submit_job_list | community.general.json_query('dds[*].dd_name') }}"
       tags: always
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `loop` and `json_query` with fact `job_sub_result`
+    - name: Traverse all DDs ddname(s) using ansible `loop` and `json_query` with fact `job_sub_result` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
-        msg: "{{item}}"
+        msg: "{{ item }}"
       # with_items: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
       loop: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
       tags: always
@@ -560,15 +561,15 @@
     #    * `ansible-galaxy collection install community.general`
     ############################################################################
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `with_items` and `json_query` with fact `submit_job_list`
+    - name: Traverse all DDs ddname(s) using ansible `with_items` and `json_query` with fact `submit_job_list` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
-        msg: "{{item}}"
+        msg: "{{ item }}"
       with_items: "{{ submit_job_list | community.general.json_query('dds[*].dd_name') }}"
       tags: always
 
-    - name: Traverse all DDs ddname(s) from submitted job {{submit_job_name}} using ansible `with_items` and `json_query` with fact `job_sub_result`
+    - name: Traverse all DDs ddname(s) using ansible `with_items` and `json_query` with fact `job_sub_result` from submitted job {{ submit_job_name }}
       ansible.builtin.debug:
-        msg: "{{item}}"
+        msg: "{{ item }}"
       with_items: "{{ job_sub_result | community.general.json_query('jobs[0].dds[*].dd_name') }}"
       tags: always
 
@@ -584,8 +585,8 @@
     - name: Access the submitted job return code values
       ansible.builtin.debug:
         msg:
-          - "{{ submit_job_list.ret_code.code}}"
-          - "{{ submit_job_list.ret_code.msg}}"
-          - "{{ submit_job_list.ret_code.msg_code}}"
-          - "{{ submit_job_list.ret_code.msg_txt}}"
+          - "{{ submit_job_list.ret_code.code }}"
+          - "{{ submit_job_list.ret_code.msg }}"
+          - "{{ submit_job_list.ret_code.msg_code }}"
+          - "{{ submit_job_list.ret_code.msg_txt }}"
       tags: always
