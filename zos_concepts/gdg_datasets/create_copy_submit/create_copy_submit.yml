@@ -65,18 +65,18 @@
       ansible.builtin.debug:
         msg: "{{ result_create_gdg }}"
 
-    - name: "{{ 'Create the GDS with relative notation %s(+1)' | format(tmp_data_set) }}"
+    - name: Create the GDS with relative notation {{ tmp_data_set ~ '(+1)' }}
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}(+1)"
         type: seq
         state: "present"
       register: result_create_gds_relative
 
-    - name: "{{ 'Response of the creation of the GDS %s(+1)' | format(tmp_data_set) }}"
+    - name: Response of the creation of the GDS {{ tmp_data_set ~ '(+1)' }}
       ansible.builtin.debug:
         msg: "{{ result_create_gds_relative }}"
 
-    - name: "{{ 'Copy local file %s/UPTIME to latest creation of GDG %s' | format(playbook_dir, tmp_data_set) }}"
+    - name: "Copy local file {{ playbook_dir ~ '/UPTIME to latest creation of GDG ' ~ tmp_data_set }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/UPTIME"
         dest: "{{ tmp_data_set }}(0)"
@@ -85,28 +85,28 @@
           to: IBM-1047
       register: result_copy_dir
 
-    - name: "{{ 'Response from copying local file %s/UPTIME to latest creation of GDS %s.' | format(playbook_dir, tmp_data_set) }}"
+    - name: "Response from copying local file {{ playbook_dir ~ '/UPTIME to latest creation of GDS ' ~ tmp_data_set ~ '.' }}"
       ansible.builtin.debug:
         var: result_copy_dir
 
-    - name: "{{ 'Copy SEQ gds %s(0) to a new GDS creation %s(+1)' | format(tmp_data_set, tmp_data_set) }}"
+    - name: "Copy SEQ gds {{ tmp_data_set ~ '(0) to a new GDS creation ' ~ tmp_data_set ~ '(+1)' }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_data_set }}(0)"
         dest: "{{ tmp_data_set }}(+1)"
         remote_src: true
 
-    - name: "{{ 'Delete previous data set %s(-1)' | format(tmp_data_set) }}"
+    - name: Delete previous data set {{ tmp_data_set ~ '(-1)' }}
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}(-1)"
         state: absent
 
-    - name: "{{ 'Submit the JCL from the last generation %s(0)' | format(tmp_data_set) }}"
+    - name: Submit the JCL from the last generation {{ tmp_data_set ~ '(0)' }}
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(0)"
         remote_src: true
       register: result_submit
 
-    - name: "{{ 'Response from submitting JCL %s(0)' | format(tmp_data_set) }}"
+    - name: Response from submitting JCL {{ tmp_data_set ~ '(0)' }}
       ansible.builtin.debug:
         var: result_submit
 

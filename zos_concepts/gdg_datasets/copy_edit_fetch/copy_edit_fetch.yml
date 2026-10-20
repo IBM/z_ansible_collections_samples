@@ -90,14 +90,14 @@
     # |   using relative notation notation {{ tmp_data_set2 }}(0).
     # | - Using zos_fetch, to fetch the latest generation of the GDG {{ tmp_data_set2 }}.
     # +-------------------------------------------------------------------------
-    - name: "{{ 'Create the Generation Data Group(GDG) %s with a limit of 2 generations' | format(tmp_data_set1) }}"
+    - name: "Create the Generation Data Group(GDG) with a limit of 2 generations named {{ tmp_data_set1 }}"
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set1 }}"
         type: gdg
         limit: 2
       register: result_create_gdg
 
-    - name: "{{ 'Create the Generation Data Group(GDG) %s with a limit of 2 generations to backup %s' | format(tmp_data_set2, tmp_data_set1) }}"
+    - name: "Create the Generation Data Group(GDG) with a limit of 2 generations named {{ tmp_data_set2 ~ ' to backup ' ~ tmp_data_set1 }}"
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set2 }}"
         type: gdg
@@ -124,7 +124,7 @@
         state: "present"
       register: result_create_gds
 
-    - name: "{{ 'Response of the GDS %s(+1) creation' | format(tmp_data_set2) }}"
+    - name: "Response of the GDS {{ tmp_data_set2 ~ '(+1) creation' }}"
       ansible.builtin.debug:
         msg:
           - "{{ result_create_gds }}"
@@ -139,7 +139,7 @@
         state: present
         block: "{{ log_output | default('No log output available', true) | regex_replace('[^\\x20-\\x7e\\n]', '') }}"
 
-    - name: "{{ 'Copy from the current generation of %s to the last Generation of %s' | format(tmp_data_set1, tmp_data_set2) }}"
+    - name: "Copy from the current generation of {{ tmp_data_set1 ~ ' to the last generation of ' ~ tmp_data_set2 }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_data_set1 }}(0)"
         dest: "{{ tmp_data_set2 }}(0)"
@@ -152,13 +152,13 @@
         state: present
         line: "#### Console log from system {{ sys_name }} ####"
 
-    - name: "{{ 'Fetch %s(0) to the local controller' | format(tmp_data_set2) }}"
+    - name: "Fetch to the local controller from {{ tmp_data_set2 ~ '(0)' }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ tmp_data_set2 }}(0)"
         dest: "{{ output_path }}"
       register: fetch_result
 
-    - name: "{{ 'Result of Fetch %s(0) to the local machine' | format(tmp_data_set2) }}"
+    - name: "Result of Fetch to the local machine from {{ tmp_data_set2 ~ '(0)' }}"
       ansible.builtin.debug:
         msg:
           - "{{ fetch_result }}"

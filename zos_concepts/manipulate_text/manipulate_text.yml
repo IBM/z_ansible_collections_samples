@@ -100,7 +100,7 @@
         src: "{{ playbook_dir }}/files/log_file.txt"
         dest: "{{ pdse_dataset }}(MEM)"
 
-    - name: "{{ 'Copy %s to the %s dataset' | format(pdse_dataset, seq_dataset) }}"
+    - name: "Copy {{ pdse_dataset ~ ' to the SEQ dataset ' ~ seq_dataset }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ pdse_dataset }}(MEM)"
         dest: "{{ seq_dataset }}"
@@ -118,7 +118,7 @@
         dest: "{{ tmp_file }}"
         replace: true
 
-    - name: "{{ 'Copy %s to the last SEQ dataset %s' | format(tmp_file, seq_n_dataset) }}"
+    - name: "Copy {{ tmp_file ~ ' to the last SEQ dataset ' ~ seq_n_dataset }}"
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_file }}"
         dest: "{{ seq_n_dataset }}"
@@ -163,7 +163,7 @@
       ansible.builtin.debug:
         msg: "{{ content_of_backup }}"
 
-    - name: "{{ 'Replace a line using disable_regex option for after on %s(MEM)' | format(pdse_dataset) }}"
+    - name: Replace a line using disable_regex option for after on {{ pdse_dataset ~ '(MEM)' }}
       ibm.ibm_zos_core.zos_replace:
         target: "{{ pdse_dataset }}(MEM)"
         regexp: //*SMPTLIB  DD UNIT=SYSALLDA,SPACE=(TRK,(1,1)),VOL=SER=vvvvvv
@@ -177,7 +177,7 @@
       ansible.builtin.debug:
         msg: "{{ disable_regex_output }}"
 
-    - name: "{{ 'Replace using backref on %s(MEM1)' | format(pdse_dataset) }}"
+    - name: Replace using backref on {{ pdse_dataset ~ '(MEM1)' }}
       ibm.ibm_zos_core.zos_replace:
         target: "{{ pdse_dataset }}(MEM)"
         regexp: '^(IEF403I|IEF404I|IEF456I) (\S+) - '
@@ -216,17 +216,17 @@
     # clean up - delete datasets
     # ##########################################################################
 
-    - name: "{{ 'Delete data set %s' | format(seq_n_dataset) }}"
+    - name: Delete data set {{ seq_n_dataset }}
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ seq_n_dataset }}"
         state: absent
 
-    - name: "{{ 'Delete data set %s' | format(pdse_dataset) }}"
+    - name: Delete data set {{ pdse_dataset }}
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ pdse_dataset }}"
         state: absent
 
-    - name: "{{ 'Delete data set %s' | format(seq_dataset) }}"
+    - name: Delete data set {{ seq_dataset }}
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ seq_dataset }}"
         state: absent

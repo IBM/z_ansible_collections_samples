@@ -255,7 +255,7 @@
             record_format: fba
             record_length: 60
 
-        - name: "{{ 'Query %s(0) attributes with zos_stat.' | format(gdg_name) }}"
+        - name: "Query attributes with zos_stat for {{ gdg_name ~ '(0)' }}"
           ibm.ibm_zos_core.zos_stat:
             name: "{{ gdg_name }}(0)"
             type: data_set
@@ -415,7 +415,7 @@
           delegate_to: localhost
           register: file_stat
 
-        - name: "{{ 'Copy the local file %s only when there is enough space.' | format(jcl_file) }}"
+        - name: "Copy only when there is enough space, local file {{ jcl_file }}"
           ibm.ibm_zos_core.zos_copy:
             src: "{{ jcl_file }}"
             dest: "{{ mount_point }}/text_file.txt"

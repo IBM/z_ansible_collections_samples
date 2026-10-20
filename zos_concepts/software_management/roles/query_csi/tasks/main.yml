@@ -4,7 +4,7 @@
 # tasks file for query_csi
 
 # LIST HOLDDATA
-- name: "{{ 'LIST %s FROM ZONE %s' | format(query_csi_list_operands, query_csi_zone) }}"
+- name: LIST {{ query_csi_list_operands ~ ' FROM ZONE ' ~ query_csi_zone }}
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"

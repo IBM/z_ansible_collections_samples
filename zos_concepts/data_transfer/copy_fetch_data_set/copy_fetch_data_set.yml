@@ -68,7 +68,7 @@
       register: result
       changed_when: false
 
-    - name: "{{ 'Response for create shell script %s/date.sh on target %s' | format(tgt_tmp_dir, inventory_hostname) }}"
+    - name: "Response for create shell script {{ tgt_tmp_dir ~ '/date.sh on target ' ~ inventory_hostname }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 

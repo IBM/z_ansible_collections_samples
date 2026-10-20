@@ -121,7 +121,7 @@
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ mount_point }}/HELLO.jcl"
 
-    - name: "{{ 'Submit the JCL at %s/HELLO.jcl.' | format(mount_point) }}"
+    - name: Submit the JCL at {{ mount_point ~ '/HELLO.jcl.' }}
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ mount_point }}/HELLO.jcl"
         remote_src: true
@@ -136,7 +136,7 @@
         job_id: "{{ job_id }}"
       register: result
 
-    - name: "{{ 'Response for get job output for job \"%s\". member.' | format(job_id) }}"
+    - name: "Response for get job output for job {{ job_id }}"
       ansible.builtin.debug:
         msg: "{{ result }}"
 

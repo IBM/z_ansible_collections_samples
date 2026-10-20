@@ -125,7 +125,7 @@
         sleep_jcl_task_id: "{{ filtered_task.task_id }}"
         sleep_jcl_asidx: "{{ filtered_task.asidx }}"
 
-    - name: '{{ "Display the status of started task ''%s'' using task ID ''%s''" | format(member_name, sleep_jcl_task_id) }}'
+    - name: "Display the status of the started task using task ID {{ sleep_jcl_task_id }}"
       ibm.ibm_zos_core.zos_started_task:
         state: displayed
         task_id: "{{ sleep_jcl_task_id }}"
@@ -141,7 +141,7 @@
     # #######################################################################################
     # Cancel a running started task using a started task name and other params.
     # #######################################################################################
-    - name: '{{ "Cancel the started task ''%s'' using its address space identifier %s" | format(member_name, sleep_jcl_asidx) }}'
+    - name: "Cancel the started task using its address space identifier {{ sleep_jcl_asidx }}"
       ibm.ibm_zos_core.zos_started_task:
         state: cancelled
         job_name: "{{ member_name }}"

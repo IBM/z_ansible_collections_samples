@@ -100,7 +100,7 @@
       ansible.builtin.debug:
         var: terse_response
 
-    - name: "{{ 'Fetch the tersed data set %s to the local machine' | format(archive_data_set) }}"
+    - name: "Fetch the tersed data set to the local machine from {{ archive_data_set }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ archive_data_set }}"
         dest: "{{ output_path }}/"
@@ -118,7 +118,7 @@
         state: absent
       when: temp_data_set is defined and temp_data_set.data_sets | length > 0
 
-    - name: "{{ 'Fetch %s to local machine' | format(tmp_data_set) }}"
+    - name: "Fetch to local machine from {{ tmp_data_set }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ tmp_data_set }}"
         dest: "{{ output_path }}/"
@@ -128,7 +128,7 @@
           to: ISO8859-1
       register: result
 
-    - name: "{{ 'Result of fetching %s to local machine' | format(tmp_data_set) }}"
+    - name: "Result of fetching to local machine from {{ tmp_data_set }}"
       ansible.builtin.debug:
         var: result
 
