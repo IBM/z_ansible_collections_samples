@@ -17,10 +17,14 @@
           environment:
             KUBECONFIG: "./auth/kubeconfig"
           ansible.builtin.shell: |
+            set -o pipefail
             ./oc get csr -o name | xargs ./oc adm certificate approve &> /dev/null
-            echo $(./oc get nodes |grep -E 'worker-|storage-|infra-'|wc -l)
+            echo $(./oc get nodes | grep -E 'worker-|storage-|infra-' | wc -l)
+          args:
+            executable: /bin/bash
           register: csr_worker
-          until: csr_worker.stdout | int == {{ os_compute_nodes_number|int + os_storage_nodes_number|int + os_infra_nodes_number|int }}
+          changed_when: false
+          until: csr_worker.stdout | int == (os_compute_nodes_number | int + os_storage_nodes_number | int + os_infra_nodes_number | int)
           retries: 60
           delay: 10
       rescue:

@@ -1,0 +1,114 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-install-config
+
+- name: 'Remove the install_config.yaml'
+  ansible.builtin.file:
+    state: absent
+    path: install-config.yaml
+
+- name: 'Get the subnet range'
+  ansible.builtin.command:
+    cmd: "openstack subnet show {{ use_network_subnet }} -c cidr -f value"
+  register: sunbet_range
+  changed_when: false
+
+- name: Create install-config.yaml
+  ansible.builtin.template:
+    src: templates/install-config-yaml.j2
+    dest: "install-config.yaml"
+    mode: '0644'
+
+- name: Configure machine network in install configuration
+  ansible.builtin.script: tools/config-machine-network.py {{ sunbet_range.stdout_lines[0] }}
+  args:
+    executable: python3
+
+- name: Add proxy section after baseDomain in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'baseDomain'
+    line: 'proxy:'
+  when: use_proxy
+
+- name: Add httpProxy in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'proxy:'
+    line: "  httpProxy: {{ http_proxy }}"
+  when: use_proxy
+
+- name: Add httpsProxy in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'httpProxy:'
+    line: "  httpsProxy: {{ https_proxy }}"
+  when: use_proxy
+
+- name: Add noProxy in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'httpsProxy:'
+    line: "  noProxy: {{ no_proxy }}"
+  when: use_proxy
+
+- name: Add imageContentSources header in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'baseDomain'
+    line: 'imageContentSources:'
+  when: use_localreg
+
+- name: Add ocp-release mirror in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'imageContentSources:'
+    line: "- mirrors:\n  - {{ localreg_mirror }}\n  source: quay.io/openshift-release-dev/ocp-release"
+  when: use_localreg
+
+- name: Add ocp-v4.0-art-dev mirror in install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    insertafter: 'imageContentSources:'
+    line: "- mirrors:\n  - {{ localreg_mirror }}\n  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+  when: use_localreg
+
+- name: Remove networkType line from install-config.yaml
+  ansible.builtin.lineinfile:
+    path: install-config.yaml
+    regexp: 'networkType'
+    state: absent
+  when:
+    - openshift_version is version('4.12', '>=')
+
+- name: Update cluster base domain in install-config.yaml
+  ansible.builtin.replace:
+    path: install-config.yaml
+    regexp: 'cluster_basedomain'
+    replace: "{{ base_domain }}"
+
+- name: Update cluster name in install-config.yaml
+  ansible.builtin.replace:
+    path: install-config.yaml
+    regexp: 'cluster_name'
+    replace: "{{ cluster_name }}"
+
+- name: Backup install-config.yaml
+  ansible.builtin.copy:
+    src: install-config.yaml
+    dest: .install-config.yaml
+    mode: '0644'
+    remote_src: true
+
+- name: Empty compute server pools
+  ansible.builtin.script: tools/empty-compute-node.py
+  args:
+    executable: python3

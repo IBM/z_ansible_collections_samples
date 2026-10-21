@@ -12,4 +12,4 @@
 - name: Create the storage nodes in zvm
   hosts: localhost
   roles:
-    - configure-storage-nodes-zvm
+    - configure_storage_nodes_zvm

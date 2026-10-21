@@ -1,0 +1,50 @@
+---
+- name: Update node label
+  block:
+    - name: Apply node label
+      environment:
+        KUBECONFIG: "./auth/kubeconfig"
+      ansible.builtin.shell: |
+        set -o pipefail
+        ./kubectl label node {{ workerid }} \
+          node-role.kubernetes.io/{{ worker_type | default('worker') }}='' \
+          --kubeconfig auth/kubeconfig &> /dev/null
+        echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
+      register: result
+      until: result.stdout.find(workerid) != -1
+      retries: 30
+      delay: 10
+      changed_when: false
+  rescue:
+    - name: Update node label manually
+      ansible.builtin.debug:
+        msg: >-
+          Please update {{ worker_type | default('worker') }} node label manually via:
+          ./kubectl label node {{ workerid }}
+          node-role.kubernetes.io/{{ worker_type | default('worker') }}=''
+          --kubeconfig auth/kubeconfig
+
+- name: Update node taint to NoSchedule
+  block:
+    - name: Apply NoSchedule taint
+      environment:
+        KUBECONFIG: "./auth/kubeconfig"
+      ansible.builtin.shell: |
+        set -o pipefail
+        ./kubectl taint node {{ workerid }} \
+          node-role.kubernetes.io/{{ worker_type | default('worker') }}:NoSchedule \
+          --kubeconfig auth/kubeconfig &> /dev/null
+        echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
+      register: result
+      until: result.stdout.find(workerid) != -1
+      retries: 30
+      delay: 10
+      changed_when: false
+  rescue:
+    - name: Apply NoSchedule taint manually
+      ansible.builtin.debug:
+        msg: >-
+          Please update {{ worker_type | default('worker') }} node label manually via:
+          ./kubectl taint node {{ workerid }}
+          node-role.kubernetes.io/{{ worker_type | default('worker') }}='':NoSchedule
+          --kubeconfig auth/kubeconfig

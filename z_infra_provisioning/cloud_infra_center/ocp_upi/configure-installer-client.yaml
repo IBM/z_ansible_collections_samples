@@ -11,4 +11,4 @@
 - name: Download openshift installer client
   hosts: localhost
   roles:
-    - configure-installer-client
+    - configure_installer_client

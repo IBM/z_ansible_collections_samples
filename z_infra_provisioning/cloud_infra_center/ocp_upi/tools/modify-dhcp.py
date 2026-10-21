@@ -72,5 +72,10 @@ for line in result.split("\n"):
             template_line = f"  {role}-{index}:\n    mac: \"{mac_address}\"\n    ip: \"{ip_address}\""    
         template += "\n" + template_line
 
-with open("dhcp_template.yaml", "w") as file:
-    file.write(template)
+old_umask = os.umask(0o177)
+    file.write(template)	try:
+    with open("dhcp_template.yaml", "w") as file:
+        file.write(template)
+    os.chmod("dhcp_template.yaml", 0o600)
+finally:
+    os.umask(old_umask)

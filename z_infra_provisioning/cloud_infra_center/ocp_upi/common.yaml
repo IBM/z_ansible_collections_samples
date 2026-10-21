@@ -15,9 +15,10 @@
 # =================================================================
 
 - name: 'Export infra ID'
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: "jq -r .infraID metadata.json"
   register: infra_id
+  changed_when: false
 
 - name: 'Compute resource names'
   ansible.builtin.set_fact:
@@ -31,7 +32,7 @@
     os_port_ingress: "{{ infra_id.stdout_lines[0] }}-ingress-port"
     os_port_bootstrap: "{{ infra_id.stdout_lines[0] }}-bootstrap-port"
     os_port_master: "{{ infra_id.stdout_lines[0] }}-master-port"
-    os_port_worker: "{{ infra_id.stdout_lines[0] }}-{{comp_name_suffix | default('worker')}}-port"
+    os_port_worker: "{{ infra_id.stdout_lines[0] }}-{{ comp_name_suffix | default('worker') }}-port"
     os_port_storage: "{{ infra_id.stdout_lines[0] }}-storage-port"
     os_port_infra: "{{ infra_id.stdout_lines[0] }}-infra-port"
     # Security groups names
@@ -70,7 +71,7 @@
 
 - name: 'Worker server names without prefix'
   ansible.builtin.set_fact:
-    os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-{{comp_name_suffix | default('worker')}}"
+    os_compute_server_name: "{{ infra_id.stdout_lines[0] }}-{{ comp_name_suffix | default('worker') }}"
   when:
     - worker_name_prefix is not defined
 

@@ -15,9 +15,10 @@
   hosts: localhost
   tasks:
     - name: 'Get Network physical_network'
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "openstack network show -c provider:physical_network -f value {{ use_network_name }}"
       register: physical_network_out
+      changed_when: false
     - name: Set fact physical_network
       ansible.builtin.set_fact:
         physical_network: "{{ physical_network_out.stdout }}"
@@ -25,7 +26,7 @@
 - name: 'Configure DHCP on bastion'
   hosts: bastion
   tasks:
-    - name: 'Get Network physical_network'
-      include_role:
-        name: configure-dhcp
+    - name: 'Configure DHCP role'
+      ansible.builtin.include_role:
+        name: configure_dhcp
       when: hostvars['localhost']['physical_network'] == "macvtap0"

@@ -50,9 +50,13 @@
 
     - name: 'Get controller volumes from ICIC command line'
       ansible.builtin.shell: |
+        set -o pipefail
         openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep master | cut -d '-' -f 1-3
+      args:
+        executable: /bin/bash
       register: controller_vols
-      ignore_errors: true
+      failed_when: false
+      changed_when: false
 
     - name: 'Delete controller boot volumes in KVM'
       openstack.cloud.volume:
@@ -66,9 +70,13 @@
 
     - name: 'Get compute volumes from ICIC command line'
       ansible.builtin.shell: |
+        set -o pipefail
         openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep worker | cut -d '-' -f 1-3
+      args:
+        executable: /bin/bash
       register: compute_vols
-      ignore_errors: true
+      failed_when: false
+      changed_when: false
 
     - name: 'Delete compute boot volumes in KVM'
       openstack.cloud.volume:
@@ -82,9 +90,13 @@
 
     - name: 'Get storage volumes from ICIC command line'
       ansible.builtin.shell: |
+        set -o pipefail
         openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep storage | cut -d '-' -f 1-3
+      args:
+        executable: /bin/bash
       register: storage_vols
-      ignore_errors: true
+      failed_when: false
+      changed_when: false
 
     - name: 'Delete storage boot volumes in KVM'
       openstack.cloud.volume:
@@ -98,9 +110,13 @@
 
     - name: 'Get infra volumes from ICIC command line'
       ansible.builtin.shell: |
+        set -o pipefail
         openstack --os-volume-api-version=3 volume list -c Name -f value | grep {{ infra_id.stdout_lines[0] }} | grep infra | cut -d '-' -f 1-3
+      args:
+        executable: /bin/bash
       register: infra_vols
-      ignore_errors: true
+      failed_when: false
+      changed_when: false
 
     - name: 'Delete infra boot volumes in KVM'
       openstack.cloud.volume:
