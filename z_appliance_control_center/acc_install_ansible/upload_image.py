@@ -69,9 +69,9 @@ def upload_zfab_image(api_token: str, disk: str, image_file: str) -> tuple[int, 
         print(f"UPLOAD URL for FCP disk:: {url}")
 
     # Regenerate the token to avoid token expiration
-    rc, latest_token, _ = get_api_token()
-    if rc != HTTPStatus.OK:
-        print(f"Bad rc from get_api_token: {rc}")
+    httpStatus, latest_token, _ = get_api_token()
+    if httpStatus != HTTPStatus.OK:
+        print(f"Bad httpStatus from get_api_token: {httpStatus}")
         sys.exit(1)
     print("Successfully regenerated API token before install")
 
