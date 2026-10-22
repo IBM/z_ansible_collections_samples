@@ -241,10 +241,10 @@ def image_task():
             print(f"{param_image_file} is not a valid file")
             sys.exit(1)
 
-        rc, token, _ = get_api_token()
+        httpStatus, token, _ = get_api_token()
         #print(token)
-        if rc != HTTPStatus.OK:
-            print(f"Bad rc from get_api_token: {rc}")
+        if httpStatus != HTTPStatus.OK:
+            print(f"Bad httpStatus from get_api_token: {httpStatus}")
             sys.exit(1)
         
         print("Successfully received API token")
