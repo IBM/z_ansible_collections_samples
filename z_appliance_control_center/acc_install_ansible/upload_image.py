@@ -71,7 +71,7 @@ def upload_zfab_image(api_token: str, disk: str, image_file: str) -> tuple[int, 
     # Regenerate the token to avoid token expiration
     rc, latest_token, _ = get_api_token()
     if rc != HTTPStatus.OK:
-        print(f"Bad rc from get_api_token: {rc}")
+        print("Failed to regenerate API token")
         sys.exit(1)
     print("Successfully regenerated API token before install")
 
@@ -135,7 +135,7 @@ def select(api_token: str, disk: str, lun: str=None, wwpn: str=None) -> tuple[in
     rc, latest_token, _ = get_api_token()
         #print(token)
     if rc != HTTPStatus.OK:
-        print(f"Bad rc from get_api_token: {rc}")
+        print("Failed to regenerate API token")
         sys.exit(1)
     print("Successfully regenerated API token")
 
