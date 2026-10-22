@@ -71,4 +71,4 @@ def get_api_token() -> tuple[int, str, str]:
 
 if __name__ == "__main__":
     rc, token, text = get_api_token()
-    print(f"rc={rc}, text={text}")
+    print(f"rc={rc}")
