@@ -26,14 +26,12 @@
 ###############################################################################
 
 - hosts: destination
-  collections:
-    - "ibm.ibm_zos_core"
   gather_facts: false
 
   vars:
     archive_data_set: "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.ARCHIVE"
-    remove_local_archive: True
-    replace: True
+    remove_local_archive: true
+    replace: true
 
   environment: "{{ environment_vars }}"
 
@@ -46,10 +44,10 @@
             format:
               type: terse
               options:
-                adrdssu: True
+                adrdssu: true
           register: unarchive_result
 
-        - debug:
+        - ansible.builtin.debug:
             msg: "{{ unarchive_result }}"
 
       always:

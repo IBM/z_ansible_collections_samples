@@ -7,7 +7,7 @@
 
   tasks:
     - name: Send a rejection email to the user who requested a new UserID
-      mail:
+      community.general.mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"

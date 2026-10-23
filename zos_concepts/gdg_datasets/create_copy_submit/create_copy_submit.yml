@@ -23,8 +23,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
 
@@ -33,10 +31,10 @@
     # Generate a temporary data set name
     # ##########################################################################
     - name: Create temp data set name
-      command: "mvstmp {{ ansible_user | upper }}"
+      ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.stdout }}"
     # ##########################################################################
     # Modules: zos_data_set, zos_copy, zos_job_submit
@@ -54,29 +52,29 @@
     # |   notation {{ tmp_data_set }}(0).
     # +-------------------------------------------------------------------------
     - name: "Create the GDG {{tmp_data_set}} with limit of 3"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}"
         type: gdg
         limit: 3
       register: result_create_gdg
 
     - name: "Response from creating GDG {{ tmp_data_set }} with limit of 3"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result_create_gdg }}"
 
     - name: "Create the GDS with relative notation {{ tmp_data_set }}(+1)"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}(+1)"
         type: seq
         state: "present"
       register: result_create_gds_relative
 
     - name: "Response of the creation of the GDS {{ tmp_data_set }}(+1)"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result_create_gds_relative }}"
 
     - name: "Copy local file {{ playbook_dir }}/UPTIME to latest creation of GDG {{ tmp_data_set }}"
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/UPTIME"
         dest: "{{ tmp_data_set }}(0)"
         encoding:
@@ -85,32 +83,32 @@
       register: result_copy_dir
 
     - name: "Response from copying local file {{ playbook_dir }}/UPTIME to latest creation of GDS {{ tmp_data_set }}."
-      debug:
+      ansible.builtin.debug:
         var: result_copy_dir
 
     - name: "Copy SEQ gds {{ tmp_data_set }}(0) to a new GDS creation {{ tmp_data_set }}(+1)"
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tmp_data_set }}(0)"
         dest: "{{ tmp_data_set }}(+1)"
         remote_src: true
 
     - name: "Delete previous data set {{ tmp_data_set }}(-1)"
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ tmp_data_set }}(-1)"
         state: absent
 
     - name: "Submit the JCL from the last generation {{ tmp_data_set }}(0)"
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(0)"
         remote_src: true
       register: result_submit
 
     - name: "Response from submitting JCL {{ tmp_data_set }}(0)"
-      debug:
+      ansible.builtin.debug:
         var: result_submit
 
     - name: Delete the data sets
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         batch:
           - name: "{{ tmp_data_set }}(0)"
             state: absent

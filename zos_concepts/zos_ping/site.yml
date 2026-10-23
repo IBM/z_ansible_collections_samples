@@ -1,5 +1,5 @@
 ###############################################################################
-# © Copyright IBM Corporation 2021
+# © Copyright IBM Corporation 2021, 2026
 ###############################################################################
 
 ###############################################################################
@@ -15,7 +15,6 @@
 #
 # Example:
 #  ansible-playbook -i inventories site.yml
-#  ansible-playbook -i inventories site.yml -v
 ###############################################################################
 
 ---
@@ -23,10 +22,10 @@
 
   tasks:
     - name: Parse the registry for collection entries
-      include_vars: runtime-requirements.yml
+      ansible.builtin.include_vars: runtime-requirements.yml
 
     - name: Display the registered collections and properites in `registry.yml`.
-      include_role:
+      ansible.builtin.include_role:
         name: requirements-check
 
 - name: Executing the z/OS Ansible playbook
