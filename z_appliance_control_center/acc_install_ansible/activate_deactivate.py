@@ -199,7 +199,12 @@ def set_image_activation_profile(cpc, profile_name: str):
             properties['initial-processing-weight'] = 10
     
     print("Using the following activation profile properties for the LPAR:")
-    print(properties)
+
+    safe_properties_for_log = {
+        k: ('***REDACTED***' if k == 'ssc-master-pw' else v)
+        for k, v in properties.items()
+    }
+    print(safe_properties_for_log)
 
     profile.update_properties(properties)
     
