@@ -34,9 +34,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Convert file encodings on USS
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -48,15 +47,16 @@
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Detecting system name
-      command: uname -n
+      ansible.builtin.command: uname -n
       register: result
+      changed_when: false
 
     - name: Setting fact `system_name` for use by this sample
-      set_fact:
+      ansible.builtin.set_fact:
         system_name: "{{ result.stdout }}"
 
     - name: Fact `system_name` set with value
-      debug:
+      ansible.builtin.debug:
         msg: "{{ system_name }}"
 
     # ##########################################################################
@@ -66,9 +66,8 @@
     # | Create shell script on target, encode with the targets charset, execute
     # | script if mode == 755, else fail
     # +-------------------------------------------------------------------------
-    - name: Create shell script {{ tgt_tmp_dir }}/date.sh
-        on target {{ inventory_hostname }}
-      copy:
+    - name: "Create shell script {{ tgt_tmp_dir ~ '/date.sh on target ' ~ inventory_hostname }}"
+      ansible.builtin.copy:
         dest: "{{ tgt_tmp_dir }}/date.sh"
         content: |
           date
@@ -77,22 +76,20 @@
         force: true
 
     - name: Detect character set for locale on target {{ inventory_hostname }}
-      command: locale -c charmap
+      ansible.builtin.command: locale -c charmap
       register: result
+      changed_when: false
 
-    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
-        target {{ inventory_hostname }}
-      debug:
+    - name: "Response for create shell script {{ tgt_tmp_dir ~ '/date.sh on target ' ~ inventory_hostname }}"
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Set variable `target_charset` with target {{ inventory_hostname }}
-        charset
-      set_fact:
+    - name: Set variable `target_charset` with the target charset of {{ inventory_hostname }}
+      ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
-    - name: Encode script {{ tgt_tmp_dir }}/date.sh encoding
-        from ISO8859-1 to "{{ target_charset }}"
-      zos_encode:
+    - name: "Encode script {{ tgt_tmp_dir ~ '/date.sh encoding from ISO8859-1 to ' ~ target_charset }}"
+      ibm.ibm_zos_core.zos_encode:
         src: "{{ tgt_tmp_dir }}/date.sh"
         dest: "{{ tgt_tmp_dir }}/date.sh"
         encoding:
@@ -101,48 +98,49 @@
         backup: false
       register: result
 
-    - name: Response for encode script {{ tgt_tmp_dir }}/date.sh encoding from ISO8859-1 to {{ target_charset }}
-      debug:
+    - name: "Response for encode script {{ tgt_tmp_dir ~ '/date.sh encoding from ISO8859-1 to ' ~ target_charset }}"
+      ansible.builtin.debug:
         msg: "{{ result }}"
     - name: Setting fact `script_sh_mode` with script file permissions
-      set_fact:
+      ansible.builtin.set_fact:
         script_sh_mode: "{{ result.mode }}"
 
     - name: Display script contents after changing encoding to "{{ target_charset }}"
-      command: cat {{ tgt_tmp_dir }}/date.sh
+      ansible.builtin.command: cat {{ tgt_tmp_dir }}/date.sh
       register: result
+      changed_when: false
 
     - name: Response for display script contents after changing encoding
         to "{{ target_charset }}"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result.stdout }}"
 
-    - name: Executing {{ tgt_tmp_dir }}/date.sh on target if permission is 0755
-      shell: "{{ tgt_tmp_dir }}/date.sh"
+    - name: "Executing {{ tgt_tmp_dir ~ '/date.sh on target if permission is 0755' }}"
+      ansible.builtin.command: "{{ tgt_tmp_dir }}/date.sh"
       register: result
       when: script_sh_mode == "0755"
+      changed_when: false
 
-    - name: Response for executing {{ tgt_tmp_dir }}/date.sh on target if
-        permission is 0755
-      debug:
+    - name: "Response for executing {{ tgt_tmp_dir ~ '/date.sh on target if permission is 0755' }}"
+      ansible.builtin.debug:
         msg: "{{ result.stdout_lines }}"
       when: result.stdout_lines is defined
 
     - name: File permissions check
-      fail:
+      ansible.builtin.fail:
         msg: "File {{ tgt_tmp_dir }}/date.sh permissions were not equal to 0755"
       when: result.stdout_lines is not defined
+      register: permissions_check
       ignore_errors: true
 
-    - name: Remove {{ tgt_tmp_dir }}/date.sh on target {{ inventory_hostname }}
-      file:
+    - name: "Remove {{ tgt_tmp_dir ~ '/date.sh on target ' ~ inventory_hostname }}"
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/date.sh"
         state: absent
       register: result
 
-    - name: Response for remove {{ tgt_tmp_dir }}/date.sh on
-        target {{ inventory_hostname }}
-      debug:
+    - name: "Response for remove {{ tgt_tmp_dir ~ '/date.sh on target ' ~ inventory_hostname }}"
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
@@ -150,50 +148,49 @@
     # +-------------------------------------------------------------------------
 
     - name: Detecting the character set for the locale on the target
-      command: locale -c charmap
+      ansible.builtin.command: locale -c charmap
       register: result
+      changed_when: false
 
     - name: Response for detecting the character set for the locale on the
         target
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Set variable `target_charset` with target {{ inventory_hostname }}
-        charset
-      set_fact:
+    - name: Set variable `target_charset` from the detected locale charset on {{ inventory_hostname }}
+      ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
-    - name: Create directory {{ tgt_tmp_dir }}/encode/
-      file:
+    - name: Create directory {{ tgt_tmp_dir ~ '/encode/' }}
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/encode/"
         state: directory
+        mode: "0755"
 
-    - name: Create a series of USS files in {{ tgt_tmp_dir }}/encode
-      file:
+    - name: Create a series of USS files in {{ tgt_tmp_dir ~ '/encode' }}
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/encode/{{ item }}.txt"
         state: touch
+        mode: "0644"
       with_sequence: count=4
       register: result
 
-    - name: Response for create a series of USS files
-        in {{ tgt_tmp_dir }}/encode
-      debug:
+    - name: Response for create a series of USS files in {{ tgt_tmp_dir ~ '/encode' }}
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Populate a series of USS files in {{ tgt_tmp_dir }}/encode
-        with 'hello world'
-      shell: 'echo "hello world" >{{ tgt_tmp_dir }}/encode/{{ item }}.txt'
+    - name: "Populate a series of USS files with 'hello world' in {{ tgt_tmp_dir ~ '/encode' }}"
+      ansible.builtin.shell: 'echo "hello world" >{{ tgt_tmp_dir }}/encode/{{ item }}.txt'
       with_sequence: count=4
       register: result
+      changed_when: true
 
-    - name: Response for populate a series of USS files
-        in {{ tgt_tmp_dir }}/encode with 'hello world'
-      debug:
+    - name: "Response for populate a series of USS files with 'hello world' in {{ tgt_tmp_dir ~ '/encode' }}"
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Encode files in {{ tgt_tmp_dir }}/encode/` from
-        charset ISO8859-1 to {{ target_charset }}
-      zos_encode:
+    - name: "Encode files in {{ tgt_tmp_dir ~ '/encode/ from charset ISO8859-1 to ' ~ target_charset }}"
+      ibm.ibm_zos_core.zos_encode:
         src: "{{ tgt_tmp_dir }}/encode/"
         dest: "{{ tgt_tmp_dir }}/encode/"
         encoding:
@@ -201,31 +198,29 @@
           to: "{{ target_charset }}"
       register: result
 
-    - name: Response for encode files in {{ tgt_tmp_dir }}/encode/` from
-        charset ISO8859-1 to {{ target_charset }}
-      debug:
+    - name: "Response for encode files in {{ tgt_tmp_dir ~ '/encode/ from charset ISO8859-1 to ' ~ target_charset }}"
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     # +----------------------------------------------------------------------------------------------------------
     # | The display method below requires the Ansible controller to be able to process EBCDIC data.
     # | You should comment out the display and response tasks if your controller is unable to process EBCDIC.
     # +----------------------------------------------------------------------------------------------------------
-    - name: Display a series of USS files contents in {{ tgt_tmp_dir }}/encode
-      command: "cat {{ tgt_tmp_dir }}/encode/{{ item }}.txt"
-      with_sequence: count=4
-      register: result
+    # - name: Display a series of USS files contents in {{ tgt_tmp_dir }}/encode
+    #   ansible.builtin.command: "cat {{ tgt_tmp_dir }}/encode/{{ item }}.txt"
+    #   with_sequence: count=4
+    #   register: result
 
-    - name: Response for display a series of USS files contents
-        in {{ tgt_tmp_dir }}/encode
-      debug:
+    - name: Response for display a series of USS files contents in {{ tgt_tmp_dir ~ '/encode' }}
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Remove files on target in {{ tgt_tmp_dir }}/encode
-      file:
+    - name: Remove files on target in {{ tgt_tmp_dir ~ '/encode' }}
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/encode"
         state: absent
       register: result
 
-    - name: Response for remove files on target in {{ tgt_tmp_dir }}/encode
-      debug:
+    - name: Response for remove files on target in {{ tgt_tmp_dir ~ '/encode' }}
+      ansible.builtin.debug:
         msg: "{{ result }}"

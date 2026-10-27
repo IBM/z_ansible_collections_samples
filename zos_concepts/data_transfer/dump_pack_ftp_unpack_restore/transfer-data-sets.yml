@@ -7,30 +7,25 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: source_system
-  collections:
-    - ibm.ibm_zos_core
+- name: Dump, pack, and transfer data sets
+  hosts: source_system
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Dump, pack, and transfer data sets
-      include_role:
+      ansible.builtin.include_role:
         name: dump-pack-ftp-data-sets
         public: true
 
-- hosts: destination_system
-  collections:
-    - ibm.ibm_zos_core
+- name: Unpack and restore data sets
+  hosts: destination_system
   gather_facts: false
-  vars:
-    PYZ: "{{ hostvars.destination.PYZ }}"
-    ZOAU: "{{ hostvars.destination.ZOAU }}"
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Unpack and restore data sets
-      include_role:
+      ansible.builtin.include_role:
         name: unpack-restore-data-sets
       vars:
         # target_data_set and size_in_cyls will always be defined for all hosts

@@ -14,15 +14,14 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Query the SMP/E CSI
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
     - role: query_csi
-      ptf: "UI70435"
-      global_csi: "IMSTESTL.ZOAU100.CSI"
-      zone: GLOBAL
-      list_operands: "SYSMOD({{ ptf }}) HOLDDATA ."
+      query_csi_ptf: "UI70435"
+      query_csi_global_csi: "IMSTESTL.ZOAU100.CSI"
+      query_csi_zone: GLOBAL
+      query_csi_list_operands: "SYSMOD({{ query_csi_ptf }}) HOLDDATA ."

@@ -7,13 +7,12 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Add a user to the z/OS system
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Add user to z/OS system
-      include_role:
+      ansible.builtin.include_role:
         name: add-zos-user

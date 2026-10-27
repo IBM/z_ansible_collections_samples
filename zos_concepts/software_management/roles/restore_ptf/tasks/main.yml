@@ -4,14 +4,14 @@
 # tasks file for restore_ptf
 
 # RESTORE CHECK a SYSMOD
-- name: "RESTORE CHECK SYSMOD {{ ptf }} "
+- name: "RESTORE CHECK SYSMOD {{ restore_ptf_ptf }} "
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ restore_ptf_global_csi }}"
           disposition: old
 
       - dd_output:
@@ -21,21 +21,21 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY({{ target_zone }}) .'
-            - 'RESTORE S({{ ptf }})'
+            - 'SET  BOUNDARY({{ restore_ptf_target_zone }}) .'
+            - 'RESTORE S({{ restore_ptf_ptf }})'
             - 'CHECK'
             - 'COMPRESS(ALL).'
   register: restore_check_result
 
 # RESTORE a SYSMOD
-- name: "RESTORE SYSMOD {{ ptf }} "
+- name: "RESTORE SYSMOD {{ restore_ptf_ptf }} "
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ restore_ptf_global_csi }}"
           disposition: old
 
       - dd_output:
@@ -45,21 +45,21 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content:
-            - 'SET  BOUNDARY({{ target_zone }}) .'
-            - 'RESTORE S({{ ptf }})'
+            - 'SET  BOUNDARY({{ restore_ptf_target_zone }}) .'
+            - 'RESTORE S({{ restore_ptf_ptf }})'
             - 'COMPRESS(ALL).'
   when: restore_check_result.ret_code.code <= 4
   register: restore_result
 
 # REJECT a SYSMOD
-- name: "REJECT SYSMOD {{ ptf }}"
+- name: "REJECT SYSMOD {{ restore_ptf_ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "{{ restore_ptf_global_csi }}"
           disposition: old
 
       - dd_output:
@@ -69,6 +69,6 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY(GLOBAL) .
-                    \nREJECT S({{ ptf }}) ."
+                    \nREJECT S({{ restore_ptf_ptf }}) ."
   tags: reject sysmod
-  when: reject_sysmod | bool and restore_result.ret_code.code <= 4
+  when: restore_ptf_reject_sysmod | bool and restore_result.ret_code.code <= 4

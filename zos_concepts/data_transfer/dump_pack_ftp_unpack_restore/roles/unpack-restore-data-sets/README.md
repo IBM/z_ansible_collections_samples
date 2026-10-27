@@ -1,16 +1,13 @@
-unpack-restore-data-sets
-=========
+# unpack-restore-data-sets
 
 Unpack and restore data sets from a tersed data set dump.
 
-Requirements
-------------
+## Requirements
 
 - Ansible Collection `ibm.ibm_zos_core`
 - Role `get-estimated-size-of-data-sets`
 
-Role Variables
---------------
+## Role Variables
 
 | Variable Name        | Description                                                                                                                      |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -22,31 +19,25 @@ Role Variables
 | delete               | should terse and archive data sets be deleted upon successful restore?                                                           |
 | replace              | should existing data sets be overwritten during restore?                                                                         |
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - hosts: destination_system
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: no
   environment: "{{ environment_vars }}"
 
   tasks:
     - name: Unpack and restore data sets
-      include_role:
+      ansible.builtin.include_role:
         name: unpack-restore-data-sets
 ```
 
-License
--------
+## License
 
 Copyright (c) IBM Corporation 2020
 Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-
-Author Information
-------------------
+## Author Information
 
 - Blake Becker blake.becker@ibm.com, [@blakeinate](https://github.com/blakeinate)
 

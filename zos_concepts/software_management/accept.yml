@@ -14,12 +14,10 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Accept SMP/E PTFs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
-  vars:
 
   roles:
     - role: accept_ptf

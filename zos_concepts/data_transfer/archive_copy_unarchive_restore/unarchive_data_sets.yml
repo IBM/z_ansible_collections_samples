@@ -25,20 +25,20 @@
 #
 ###############################################################################
 
-- hosts: destination
-  collections:
-    - "ibm.ibm_zos_core"
+- name: Restore data sets from an archive
+  hosts: destination
   gather_facts: false
 
   vars:
     archive_data_set: "{{ ansible_user | upper }}.ANSIBLE.SAMPLE.ARCHIVE"
-    remove_local_archive: True
-    replace: True
+    remove_local_archive: true
+    replace: true
 
   environment: "{{ environment_vars }}"
 
   tasks:
-    - block:
+    - name: Unarchive and restore the data sets
+      block:
         - name: Unarchive the dump using terse and restore the data sets.
           ibm.ibm_zos_core.zos_unarchive:
             src: "{{ playbook_dir }}/{{ archive_data_set }}"
@@ -46,10 +46,11 @@
             format:
               type: terse
               options:
-                adrdssu: True
+                adrdssu: true
           register: unarchive_result
 
-        - debug:
+        - name: Display the unarchive result
+          ansible.builtin.debug:
             msg: "{{ unarchive_result }}"
 
       always:

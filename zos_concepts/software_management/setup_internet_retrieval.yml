@@ -14,14 +14,13 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Set up internet retrieval of PTFs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
     - role: add_certificate
-      user_certificate_dataset: "IMSTESTL.ZOAU100.SMPE.USER.CERT"
-      ca_certificate_dataset: "IMSTESTL.ZOAU100.SMPE.CA.CERT"
-      user_cert_pwd: "smpeansible"
+      add_certificate_user_certificate_dataset: "IMSTESTL.ZOAU100.SMPE.USER.CERT"
+      add_certificate_ca_certificate_dataset: "IMSTESTL.ZOAU100.SMPE.CA.CERT"
+      add_certificate_user_cert_pwd: "smpeansible"

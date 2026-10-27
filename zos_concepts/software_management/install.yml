@@ -14,13 +14,12 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Apply SMP/E PTFs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
     - role: apply_ptf
-      ptf: "UI74491"
-      global_csi: "IMSTESTL.ZOAU110.CSI"
+      apply_ptf_ptf: "UI74491"
+      apply_ptf_global_csi: "IMSTESTL.ZOAU110.CSI"

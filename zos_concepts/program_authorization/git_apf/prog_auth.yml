@@ -47,9 +47,8 @@
 #     are used as examples. The user of this playbook is responsible for providing valid information.
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Clone a Git repository and manage APF authorized libraries
+  hosts: zos_host
   gather_facts: false
   vars:
     git_repo: "git@github.com:IBM/z_ansible_collections_samples.git"
@@ -62,25 +61,31 @@
 
   tasks:
     - name: Get home directory
-      shell: "echo $HOME | sed 's:/*$::'"
+      ansible.builtin.shell: "set -o pipefail && echo $HOME | sed 's:/*$::'"
       register: result
+      changed_when: false
     - name: Set home_dir path
-      set_fact:
+      ansible.builtin.set_fact:
         home_dir: "{{ result.stdout }}"
     - name: Git clone repository
-      include_role:
+      ansible.builtin.include_role:
         name: git-pull
     - name: Get current APF list
-      include_role:
+      ansible.builtin.include_role:
         name: apf-list
     - name: Load the list from the file in git repo and find out the delta from current APF list
-      include_role:
+      ansible.builtin.include_role:
         name: list-load
     - name: Create persistent dataset if not exist
-      shell: 'dls `echo "{{ persistent_ds.target }}" | sed s''/(.*)$//''` > /dev/null 2>&1 || dtouch `echo "{{ persistent_ds.target }}" | sed s''/(.*)$//''`'
+      ansible.builtin.shell: |
+        set -o pipefail
+        dls `echo "{{ persistent_ds.target }}" | sed s'/(.*)$//'` > /dev/null 2>&1 ||
+          { dtouch `echo "{{ persistent_ds.target }}" | sed s'/(.*)$//'` && echo CREATED; }
+      register: persistent_ds_result
+      changed_when: "'CREATED' in persistent_ds_result.stdout"
     - name: APF add delta list
-      include_role:
+      ansible.builtin.include_role:
         name: apf-add
     - name: APF list to be added
-      debug:
+      ansible.builtin.debug:
         msg: "{{ add_list }}"

@@ -30,8 +30,6 @@
 
 - name: Sample zoau pax installation playbook.
   hosts: zos_host
-  collections:
-    - "ibm.ibm_zos_core"
 
   environment: "{{ environment_vars }}"
 
@@ -55,7 +53,7 @@
   # '/etc/ansible/facts.d/'. The 'fact_path' keyword is used to specify a
   # different directory.
   ##############################################################################
-  gather_facts: True
+  gather_facts: true
   fact_path: "{{ remote_facts_dir }}"
 
   tasks:
@@ -66,14 +64,15 @@
     # unecessarily repeat copy operations and at worst delete important files.
     ##############################################################################
     - name: Remove target directory for new-zoau to ensure clean build.
-      file:
+      ansible.builtin.file:
         name: "{{ new_zoau_target_dir }}"
         state: absent
 
     - name: Create target directory for new-zoau.
-      file:
+      ansible.builtin.file:
         name: "{{ new_zoau_target_dir }}"
         state: directory
+        mode: "0755"
 
     ##############################################################################
     # The next task unpackages the ZOAU pax file. Notice 'remote_src' is set to
@@ -81,7 +80,7 @@
     # remote system. The 'zos_unarchive' module can unpackage local archives too.
     ##############################################################################
     - name: Unpackage zoau pax file.
-      zos_unarchive:
+      ibm.ibm_zos_core.zos_unarchive:
         src: "{{ path_to_new_zoau_pax }}"
         dest: "{{ new_zoau_target_dir }}"
         remote_src: true
@@ -98,14 +97,14 @@
     ##############################################################################
     - name: Set facts, so the next step can leverage updated values.
       ansible.builtin.set_fact:
-        ZOAU: "{{ new_zoau_target_dir }}"
-        ZOAU_PYTHONPATH: "{{ new_zoau_target_dir }}lib/3.11"
+        new_zoau_home: "{{ new_zoau_target_dir }}"
+        new_zoau_pythonpath: "{{ new_zoau_target_dir }}lib/3.11"
 
     - name: Print the facts set in the previous task.
-      debug:
+      ansible.builtin.debug:
         msg:
-          - "{{ ZOAU }}"
-          - "{{ ZOAU_PYTHONPATH }}"
+          - "{{ new_zoau_home }}"
+          - "{{ new_zoau_pythonpath }}"
 
     ##############################################################################
     # As a validation step that the files and config are set up correctly, the
@@ -121,14 +120,15 @@
         config to update the environemnt vars related to zoau, the rest remain
         in place, inherited from the host_vars/group_vars.
       environment:
-        PYTHONPATH: "{{ ZOAU_PYTHONPATH }}"
-        LIBPATH: "{{ ZOAU_PYTHONPATH }}:{{ ZOAU }}/lib/:{{ PYZ }}/lib:/lib:/usr/lib:."
-        PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+        PYTHONPATH: "{{ new_zoau_pythonpath }}"
+        LIBPATH: "{{ new_zoau_pythonpath }}:{{ new_zoau_home }}/lib/:{{ PYZ }}/lib:/lib:/usr/lib:."
+        PATH: "{{ new_zoau_home }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
       ansible.builtin.command: zoaversion
       register: zoaversion_str
+      changed_when: false
 
     - name: Print the results of the call to zoaversion.
-      debug:
+      ansible.builtin.debug:
         var: zoaversion_str.stdout
 
     ##############################################################################
@@ -150,18 +150,18 @@
           version: "{{ zoaversion_str.stdout.split(' v')[1].split()[0] }}"
 
           # the next two were configured in a previous task and can be reused here.
-          executable: "{{ ZOAU }}"
-          zoau_pythonpath: "{{ ZOAU_PYTHONPATH }}"
+          executable: "{{ new_zoau_home }}"
+          zoau_pythonpath: "{{ new_zoau_pythonpath }}"
 
           # take advantage of the now() command built in to jinja.
-          date_last_updated: "{{ now(utc=true,fmt='%Y-%m-%d') }}"
+          date_last_updated: "{{ now(utc=true, fmt='%Y-%m-%d') }}"
 
     - name: Print the updated zoau dict before writing to file.
-      debug:
+      ansible.builtin.debug:
         var: new_zoau_facts
 
     - name: Update the 'zoau.fact' file to persist the updates for future users.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         content: "{{ new_zoau_facts | to_nice_json }}"
         dest: "{{ remote_facts_dir }}/zoau.fact"
         replace: true

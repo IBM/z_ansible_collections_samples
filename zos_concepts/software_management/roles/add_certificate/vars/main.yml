@@ -1,5 +1,5 @@
 ---
 # vars file for add_certificate
-user_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.USER.CERT'
-ca_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.CA.CERT'
-user_cert_pwd: ''
+add_certificate_user_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.USER.CERT'
+add_certificate_ca_certificate_dataset: 'IMSTESTL.ZOAU100.SMPE.CA.CERT'
+add_certificate_user_cert_pwd: ''

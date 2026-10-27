@@ -21,9 +21,8 @@
 #  ansible-playbook -i "mysystem.to.connect.com," zos_ping.yml
 
 ---
-- hosts: all
-  collections:
-    - ibm.ibm_zos_core
+- name: Verify connectivity to the target systems
+  hosts: all
   gather_facts: false
 
   environment: "{{ environment_vars }}"
@@ -33,12 +32,12 @@
     # Ping the host with Ansible ping module to see if the target is available
     # ##########################################################################
     - name: Ping host - {{ inventory_hostname }}
-      zos_ping:
+      ibm.ibm_zos_core.zos_ping:
       register: result
 
     # ##########################################################################
     # Display the response from the pin module
     # ##########################################################################
     - name: Response
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result.ping }}"
