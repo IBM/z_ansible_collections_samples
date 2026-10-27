@@ -12,4 +12,4 @@
 - name: Create the infra nodes in zvm
   hosts: localhost
   roles:
-    - configure-infra-nodes-zvm
+    - configure_infra_nodes_zvm

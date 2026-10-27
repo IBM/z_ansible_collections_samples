@@ -1,0 +1,21 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2021 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-bastion-properties
+
+- name: Get nodes IP and store into yaml file
+  ansible.builtin.script: tools/modify-bastion.py
+  args:
+    executable: python3
+
+- name: 'Get Nodes IP, MAC address and store into yaml file'
+  ansible.builtin.script: tools/modify-dhcp.py
+  args:
+    executable: python3

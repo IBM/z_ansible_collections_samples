@@ -31,8 +31,10 @@
       ansible.builtin.command:
         cmd: "openstack security group list --tags {{ cluster_id_tag }} -f value -c ID"
       register: security_groups
+      changed_when: false
 
     - name: 'Remove the cluster security groups'
       ansible.builtin.command:
         cmd: "openstack security group delete {{ item.1 }}"
       with_indexed_items: "{{ security_groups.stdout_lines }}"
+      changed_when: false

@@ -12,4 +12,4 @@
 - name: Create the infra nodes in kvm
   hosts: localhost
   roles:
-    - configure-infra-nodes-kvm
+    - configure_infra_nodes_kvm

@@ -10,4 +10,4 @@
 - hosts: localhost
   gather_facts: false
   roles:
-    - configure-node-labels
+    - configure_node_labels

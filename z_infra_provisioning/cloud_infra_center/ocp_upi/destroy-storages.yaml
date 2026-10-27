@@ -40,24 +40,31 @@
       ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
     - name: 'Export infra ID'
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "jq -r .infraID metadata.json"
       register: infra_id
+      changed_when: false
 
     - name: 'Get storage nodes from ICIC command line'
       ansible.builtin.shell: |
+        set -o pipefail
         openstack server list -c Name -f value | awk '/{{ os_storage_server_name }}/'
+      args:
+        executable: /bin/bash
       register: computes
-      ignore_errors: true
+      failed_when: false
+      changed_when: false
 
     - name: 'Remove all storage nodes'
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "openstack server delete {{ item.1 }}"
       with_indexed_items: "{{ computes.stdout_lines }}"
+      changed_when: false
       when: compute_index is not defined
 
     - name: 'Remove specific storage nodes'
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "openstack server delete {{ os_storage_server_name }}-{{ item }}"
-      loop: "{{compute_index}}"
+      loop: "{{ compute_index }}"
+      changed_when: false
       when: compute_index is defined

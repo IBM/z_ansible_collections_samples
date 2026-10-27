@@ -29,6 +29,7 @@
       async: 3600
       poll: 0
       register: bootstrap_complete_sleeper
+      changed_when: false
 
     - name: 'Waiting for bootstrap-complete'
       ansible.builtin.async_status:
@@ -39,8 +40,13 @@
       delay: 30
 
     - name: Check bootstrap log
-      ansible.builtin.shell: 'cat .openshift_install.log  | grep -A7 "bootstrapping to complete"'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -A7 "bootstrapping to complete" .openshift_install.log
+      args:
+        executable: /bin/bash
       register: bootstrap_log
+      changed_when: false
 
     - name: Show bootstrapping log
       ansible.builtin.debug:

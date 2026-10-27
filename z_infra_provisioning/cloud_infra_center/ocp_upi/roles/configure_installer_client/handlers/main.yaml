@@ -1,0 +1,12 @@
+---
+- name: Unzip openshift installer
+  ansible.builtin.unarchive:
+    src: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
+    dest: "{{ openshift_install_dir }}"
+    remote_src: true
+
+- name: Unzip openshift client
+  ansible.builtin.unarchive:
+    src: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+    dest: "{{ openshift_install_dir }}"
+    remote_src: true

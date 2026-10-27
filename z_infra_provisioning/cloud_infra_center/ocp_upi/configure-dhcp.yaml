@@ -28,4 +28,4 @@
 - name: Configure dns on bastion
   hosts: bastion
   roles:
-    - configure-dhcp
+    - configure_dhcp

@@ -21,9 +21,10 @@
       ansible.builtin.include_tasks: "{{ playbook_dir }}/common.yaml"
 
     - name: Get icic project name
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: openstack configuration show -c auth.project_name -f value
       register: icic_proj
+      changed_when: false
 
     - name: 'Get image name for kvm'
       ansible.builtin.set_fact:
@@ -38,9 +39,10 @@
         - vm_type == "zvm"
 
     - name: 'Export infra ID'
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "jq -r .infraID metadata.json"
       register: infra_id
+      changed_when: false
 
     - name: 'Set new worker properties'
       ansible.builtin.set_fact:
@@ -57,18 +59,18 @@
 
     - name: Find existing compute nodes
       openstack.cloud.server_info:
-        name: '{{os_compute_server_name}}-*'
-        timeout: "{{ create_server_timeout|int * 60 }}"
+        name: '{{ os_compute_server_name }}-*'
+        timeout: "{{ create_server_timeout | int * 60 }}"
         filters:
           vm_state: active
       register: existing_compute
 
     - name: Create lists
       ansible.builtin.set_fact:
-        worker_sequence: "{{ range(count_of_ex_cmpt|int, count_of_ex_cmpt|int + add_worker_number|int) | list }}"
-        add_worker_ips: "{{add_worker_ip.split(',')}}"
+        worker_sequence: "{{ range(count_of_ex_cmpt | int, count_of_ex_cmpt | int + add_worker_number | int) | list }}"
+        add_worker_ips: "{{ add_worker_ip.split(',') }}"
       vars:
-        count_of_ex_cmpt: "{{ existing_compute.servers|count }}"
+        count_of_ex_cmpt: "{{ existing_compute.servers | count }}"
 
     - name: Remove existing worker file
       ansible.builtin.file:
@@ -79,16 +81,21 @@
       ansible.builtin.lineinfile:
         path: "{{ new_worker_file }}"
         create: true
+        mode: '0644'
         insertafter: EOF
         line: "{{ name_list_ip if add_worker_ip != 'random' else name_list_random }}"
       vars:
-        name_list_ip: "{% set zipped_lists = worker_sequence | zip(add_worker_ips|list) %}{% for item in zipped_lists|list %}{{ item.0 }} {{ item.1 }}\n{% endfor %}"
+        name_list_ip: >-
+          {% set zipped_lists = worker_sequence | zip(add_worker_ips | list) %}
+          {% for item in zipped_lists | list %}{{ item.0 }} {{ item.1 }}
+          {% endfor %}
         name_list_random: "{% for item in worker_sequence %}{{ item }} random\n{% endfor %}"
 
     - name: 'Get new worker list'
       ansible.builtin.command:
         cmd: cat {{ new_worker_file }}
       register: new_worker_list
+      changed_when: false
 
     - name: 'Generate worker node json file'
       ansible.builtin.script: tools/generate-new-worker-ignition.sh "{{ os_compute_server_name }}-{{ item.split(' ')[0] }}"
@@ -119,6 +126,7 @@
       ansible.builtin.command:
         cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_port_worker }}-{{ item.split(' ')[0] }}"
       with_items: "{{ new_worker_list.stdout_lines }}"
+      changed_when: false
 
     - name: 'Create the compute servers'
       openstack.cloud.server:
@@ -126,8 +134,8 @@
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
         auto_ip: false
-        timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0] , 'ignition.json'] | join('-'))  | string }}"
+        timeout: "{{ create_server_timeout | int * 60 }}"
+        userdata: "{{ lookup('file', [os_compute_server_name, item.split(' ')[0], 'ignition.json'] | join('-')) | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
           - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
@@ -143,8 +151,8 @@
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
         auto_ip: false
-        timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0], 'ignition.json'] | join('-'))  | string }}"
+        timeout: "{{ create_server_timeout | int * 60 }}"
+        userdata: "{{ lookup('file', [os_compute_server_name, item.split(' ')[0], 'ignition.json'] | join('-')) | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
           - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
@@ -159,6 +167,7 @@
       ansible.builtin.command:
         cmd: "openstack flavor show {{ os_flavor_worker }} -c disk -f value"
       register: compute_flavor_size
+      changed_when: false
       when:
         - disk_type == "scsi"
 
@@ -168,13 +177,13 @@
         image: "{{ image_name }}"
         flavor: "{{ os_flavor_worker }}"
         auto_ip: false
-        timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0] , 'ignition.json'] | join('-'))  | string }}"
+        timeout: "{{ create_server_timeout | int * 60 }}"
+        userdata: "{{ lookup('file', [os_compute_server_name, item.split(' ')[0], 'ignition.json'] | join('-')) | string }}"
         availability_zone: "{{ create_server_zone }}"
         nics:
           - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         boot_from_volume: true
-        volume_size: "{{ compute_flavor_size.stdout_lines[0]}}"
+        volume_size: "{{ compute_flavor_size.stdout_lines[0] }}"
         terminate_volume: true
         meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
       with_items: "{{ new_worker_list.stdout_lines }}"
@@ -188,18 +197,20 @@
         state: present
         name: "{{ item }}-boot"
         image: "{{ image_name }}"
-        size: "{{ compute_flavor_size.stdout_lines[0]}}"
+        size: "{{ compute_flavor_size.stdout_lines[0] }}"
         volume_type: "{{ volume_type_id }}"
         metadata: "{{ cluster_id_tag }}"
-        timeout: "{{ create_server_timeout|int * 60 }}"
+        timeout: "{{ create_server_timeout | int * 60 }}"
       with_items: "{{ new_worker_list.stdout_lines }}"
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
 
     - name: 'Set compute volume bootable'
-      ansible.builtin.shell: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
+      ansible.builtin.command:
+        cmd: openstack --os-volume-api-version=3 volume set --bootable "{{ item }}-boot"
       with_items: "{{ new_worker_list.stdout_lines }}"
+      changed_when: false
       when:
         - disk_type == "scsi"
         - volume_type_id is defined
@@ -211,8 +222,8 @@
         boot_volume: "{{ item }}-boot"
         auto_ip: false
         availability_zone: "{{ create_server_zone }}"
-        timeout: "{{ create_server_timeout|int * 60 }}"
-        userdata: "{{ lookup('file', [ os_compute_server_name, item.split(' ')[0] , 'ignition.json'] | join('-'))  | string }}"
+        timeout: "{{ create_server_timeout | int * 60 }}"
+        userdata: "{{ lookup('file', [os_compute_server_name, item.split(' ')[0], 'ignition.json'] | join('-')) | string }}"
         nics:
           - port-name: "{{ os_port_worker }}-{{ item.split(' ')[0] }}"
         meta: "{{ cluster_id_tag }},custom_dns={{ os_dns_domain }}"
@@ -234,7 +245,7 @@
 - hosts: localhost
   tasks:
     - name: 'Get new worker name list'
-      command: /usr/bin/python3
+      ansible.builtin.command: /usr/bin/python3
       args:
         stdin: |
           import yaml
@@ -243,20 +254,21 @@
           workers = cluster["cluster_nodes"]["infra"]
           print(workers)
       register: works_list_results
+      changed_when: false
 
-    - set_fact:
+    - name: Set workers list
+      ansible.builtin.set_fact:
         workers_list: "{{ item.split(',') }}"
       with_items: "{{ works_list_results.stdout_lines }}"
-  
+
 - hosts: bastion
   tasks:
     - name: Modify dns & haproxy on bastion
-      include_tasks: modify-bastion.yaml
+      ansible.builtin.include_tasks: modify-bastion.yaml
       vars:
         worker_name: "{{ item.split(':')[0] }}"
         worker_ip: "{{ item.split(':')[-1] }}"
         cluster_domain_name: "{{ hostvars['localhost']['cluster_name'] }}.{{ hostvars['localhost']['base_domain'] }}"
-      with_items: "{{ hostvars['localhost']['workers_list'] }}" 
+      with_items: "{{ hostvars['localhost']['workers_list'] }}"
       when:
-        - use_internal_bastion == true
-
+        - use_internal_bastion is true

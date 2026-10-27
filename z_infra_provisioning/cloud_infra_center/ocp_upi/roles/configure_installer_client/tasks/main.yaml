@@ -1,0 +1,98 @@
+# =================================================================
+# Licensed Materials - Property of IBM
+#
+# (c) Copyright IBM Corp. 2022 All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+# =================================================================
+
+---
+# tasks file for configure-installer-and-image
+
+- name: Verify openshift minor version
+  ansible.builtin.shell: |
+    set -o pipefail
+    ocp_base="https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/clients/ocp"
+    version=$(wget -q -O - \
+      "${ocp_base}/{{ openshift_version }}.{{ openshift_minor_version }}/release.txt" | \
+      grep 'Name:' | awk -F: '{print $2}' | xargs)
+    if [ -z $version ]; then
+      echo $(wget -q -O - \
+        "${ocp_base}/latest-{{ openshift_version }}/release.txt" | \
+        grep 'Name:' | awk -F: '{print $2}' | xargs)
+    else
+      echo $version
+    fi
+  register: icic_ocp_version
+  changed_when: false
+
+- name: 'Set fact for openshift client'
+  ansible.builtin.set_fact:
+    openshift_client_url: >-
+      https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/{{ icic_ocp_version.stdout }}/{{
+      'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}
+    openshift_install_dir: "."
+
+- name: Get checksum for local openshift-install-linux.tar.gz
+  ansible.builtin.stat:
+    path: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: openshift_local_tar_results
+
+- name: Get checksum for local openshift-client-linux.tar.gz
+  ansible.builtin.stat:
+    path: >-
+      {{ openshift_install_dir }}/openshift-client-linux-{{
+      'amd64' if ansible_architecture == 'x86_64' else ansible_architecture
+      }}-rhel{{ ansible_distribution_major_version }}.tar.gz
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: openshift_client_local_tar_results
+
+- name: Download checksum for the latest openshift-install-linux.tar.gz
+  ansible.builtin.get_url:
+    url: "{{ openshift_client_url }}/sha256sum.txt"
+    dest: "{{ openshift_install_dir }}/sha256sum.txt"
+    mode: '0644'
+
+- name: Get checksum for the latest openshift-install-linux.tar.gz
+  ansible.builtin.slurp:
+    src: "{{ openshift_install_dir }}/sha256sum.txt"
+  register: openshift_install_checksum_results
+
+- name: Download openshift installer
+  ansible.builtin.get_url:
+    url: "{{ openshift_client_url }}/openshift-install-linux.tar.gz"
+    dest: "{{ openshift_install_dir }}/openshift-install-linux.tar.gz"
+    mode: '0755'
+  notify: Unzip openshift installer
+  when:
+    - not openshift_local_tar_results.stat.exists or
+      (openshift_local_tar_results.stat.checksum is defined and
+      openshift_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
+
+- name: Download openshift client
+  ansible.builtin.get_url:
+    url: >-
+      {{ openshift_client_url }}/openshift-client-linux-{{
+      'amd64' if ansible_architecture == 'x86_64' else ansible_architecture
+      }}-rhel{{ ansible_distribution_major_version }}.tar.gz
+    dest: "{{ openshift_install_dir }}/openshift-client-linux.tar.gz"
+    mode: '0755'
+  notify: Unzip openshift client
+  when:
+    - not openshift_client_local_tar_results.stat.exists or
+      (openshift_client_local_tar_results.stat.checksum is defined and
+      openshift_client_local_tar_results.stat.checksum not in openshift_install_checksum_results.content | b64decode)
+
+- name: Remove openshift install archive
+  ansible.builtin.file:
+    state: absent
+    path: openshift-install-linux.tar.gz
+
+- name: Remove openshift client archive
+  ansible.builtin.file:
+    state: absent
+    path: openshift-client-linux.tar.gz

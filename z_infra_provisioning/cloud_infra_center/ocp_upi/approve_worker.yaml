@@ -13,9 +13,13 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
+        set -o pipefail
         ./oc get csr -o name | xargs ./oc adm certificate approve &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
+      args:
+        executable: /bin/bash
       register: result
+      changed_when: false
       until: result.stdout.find(workerid) != -1
       retries: 60
       delay: 10
@@ -30,9 +34,11 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
-        ./kubectl label node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}='' --kubeconfig auth/kubeconfig &> /dev/null
+        ./kubectl label node {{ workerid }} node-role.kubernetes.io/{{ comp_name_suffix | default('worker') }}='' \
+          --kubeconfig auth/kubeconfig &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
+      changed_when: false
       until: result.stdout.find(workerid) != -1
       retries: 60
       delay: 10
@@ -40,7 +46,9 @@
   rescue:
     - name: Update Compute node label manually
       ansible.builtin.debug:
-        msg: "Please update compute node label manually via: ./kubectl label node <node name> node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}='' --kubeconfig auth/kubeconfig"
+        msg: >-
+          Please update compute node label manually via: ./kubectl label node <node name>
+          node-role.kubernetes.io/{{ comp_name_suffix | default('worker') }}='' --kubeconfig auth/kubeconfig
       when: comp_name_suffix | default('worker') != 'worker'
 
 - name: Update the compute node taint to NoSchedule
@@ -49,9 +57,11 @@
       environment:
         KUBECONFIG: "./auth/kubeconfig"
       ansible.builtin.shell: |
-        ./kubectl taint node {{workerid}} node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}='':NoSchedule --kubeconfig auth/kubeconfig &> /dev/null
+        ./kubectl taint node {{ workerid }} node-role.kubernetes.io/{{ comp_name_suffix | default('worker') }}='':NoSchedule \
+          --kubeconfig auth/kubeconfig &> /dev/null
         echo $(./oc get nodes -o custom-columns=NAME:.metadata.name)
       register: result
+      changed_when: false
       until: result.stdout.find(workerid) != -1
       retries: 60
       delay: 10
@@ -59,5 +69,7 @@
   rescue:
     - name: Apply NoSchedule taint manually
       ansible.builtin.debug:
-        msg: "Please update compute node label manually via: ./kubectl taint node <node name> node-role.kubernetes.io/{{comp_name_suffix | default('worker')}}='':NoSchedule --kubeconfig auth/kubeconfig"
+        msg: >-
+          Please update compute node label manually via: ./kubectl taint node <node name>
+          node-role.kubernetes.io/{{ comp_name_suffix | default('worker') }}='':NoSchedule --kubeconfig auth/kubeconfig
       when: comp_name_suffix | default('worker') != 'worker'

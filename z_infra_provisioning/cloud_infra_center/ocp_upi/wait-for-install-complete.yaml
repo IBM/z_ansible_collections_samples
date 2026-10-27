@@ -32,12 +32,14 @@
       delay: 10
       register: result
       until: result is not failed
+      changed_when: false
 
     - name: Wait-for install-complete
       ansible.builtin.command: "./openshift-install wait-for install-complete"
       async: 3600
       poll: 0
       register: install_complete_sleeper
+      changed_when: false
 
     - name: 'Waiting for install-complete'
       ansible.builtin.async_status:
@@ -48,8 +50,13 @@
       delay: 30
 
     - name: Check openshift web-console and kubeadmin-password
-      ansible.builtin.shell: 'cat .openshift_install.log  | grep -A10 "Install complete"'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -A10 "Install complete" .openshift_install.log
+      args:
+        executable: /bin/bash
       register: webconsole
+      changed_when: false
 
     - name: Show openshift web-console and kubeadmin-password
       ansible.builtin.debug:
