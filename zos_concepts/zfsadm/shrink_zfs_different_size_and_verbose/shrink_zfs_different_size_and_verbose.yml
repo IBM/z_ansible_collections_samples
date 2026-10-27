@@ -23,7 +23,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Shrink a zFS aggregate using different size options
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -38,8 +39,10 @@
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
+      changed_when: false
 
-    - ansible.builtin.set_fact:
+    - name: Set the zFS data set name
+      ansible.builtin.set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
 
     # ##########################################################################
@@ -68,6 +71,7 @@
       ansible.builtin.file:
         path: "{{ mount_point }}"
         state: directory
+        mode: "0755"
 
     - name: "Mount zFS data set."
       ibm.ibm_zos_core.zos_mount:
@@ -79,6 +83,7 @@
     - name: "Confirm mount point."
       ansible.builtin.command: "df /{{ mount_point }}"
       register: df_output
+      changed_when: false
 
     - name: "Echo df output."
       ansible.builtin.debug:
@@ -90,31 +95,32 @@
 
     - name: "Write 1 million bytes to zFS."
       ansible.builtin.shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+      changed_when: true
 
     # ##########################################################################
     # Shrink zFS aggregate by changing its number of tracks.
     # Shrink zFS aggregate with verbose mode enabled.
     # ##########################################################################
 
-    - name: "Shrink zFS aggregate data set {{ zfs_data_set }} on track size."
+    - name: "Shrink zFS aggregate data set on track size for {{ zfs_data_set }}"
       ibm.ibm_zos_core.zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size_on_m }}"
         space_type: m
       register: shrink_output
 
-    - name: Echo shrink_output.
+    - name: Echo shrink_output for the size shrink.
       ansible.builtin.debug:
         msg: "{{ shrink_output }}"
 
-    - name: "Shrink zFS aggregate data set {{ zfs_data_set }} and enable verbose mode."
+    - name: "Shrink zFS aggregate data set and enable verbose mode for {{ zfs_data_set }}"
       ibm.ibm_zos_core.zos_zfs_resize:
         target: "{{ zfs_data_set }}"
         size: "{{ aggr_shrink_size }}"
         verbose: true
       register: shrink_output
 
-    - name: Echo shrink_output.
+    - name: Echo shrink_output for the verbose shrink.
       ansible.builtin.debug:
         msg: "{{ shrink_output }}"
 
@@ -124,6 +130,7 @@
 
     - name: Unmount zFS data set.
       ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}"
+      changed_when: true
 
     - name: Delete zFS data set.
       ibm.ibm_zos_core.zos_data_set:

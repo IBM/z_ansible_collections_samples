@@ -72,6 +72,7 @@
       ansible.builtin.file:
         name: "{{ new_zoau_target_dir }}"
         state: directory
+        mode: "0755"
 
     ##############################################################################
     # The next task unpackages the ZOAU pax file. Notice 'remote_src' is set to
@@ -96,14 +97,14 @@
     ##############################################################################
     - name: Set facts, so the next step can leverage updated values.
       ansible.builtin.set_fact:
-        ZOAU: "{{ new_zoau_target_dir }}"
-        ZOAU_PYTHONPATH: "{{ new_zoau_target_dir }}lib/3.11"
+        new_zoau_home: "{{ new_zoau_target_dir }}"
+        new_zoau_pythonpath: "{{ new_zoau_target_dir }}lib/3.11"
 
     - name: Print the facts set in the previous task.
       ansible.builtin.debug:
         msg:
-          - "{{ ZOAU }}"
-          - "{{ ZOAU_PYTHONPATH }}"
+          - "{{ new_zoau_home }}"
+          - "{{ new_zoau_pythonpath }}"
 
     ##############################################################################
     # As a validation step that the files and config are set up correctly, the
@@ -119,11 +120,12 @@
         config to update the environemnt vars related to zoau, the rest remain
         in place, inherited from the host_vars/group_vars.
       environment:
-        PYTHONPATH: "{{ ZOAU_PYTHONPATH }}"
-        LIBPATH: "{{ ZOAU_PYTHONPATH }}:{{ ZOAU }}/lib/:{{ PYZ }}/lib:/lib:/usr/lib:."
-        PATH: "{{ ZOAU }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
+        PYTHONPATH: "{{ new_zoau_pythonpath }}"
+        LIBPATH: "{{ new_zoau_pythonpath }}:{{ new_zoau_home }}/lib/:{{ PYZ }}/lib:/lib:/usr/lib:."
+        PATH: "{{ new_zoau_home }}/bin:{{ PYZ }}/bin:/bin:/var/bin"
       ansible.builtin.command: zoaversion
       register: zoaversion_str
+      changed_when: false
 
     - name: Print the results of the call to zoaversion.
       ansible.builtin.debug:
@@ -148,11 +150,11 @@
           version: "{{ zoaversion_str.stdout.split(' v')[1].split()[0] }}"
 
           # the next two were configured in a previous task and can be reused here.
-          executable: "{{ ZOAU }}"
-          zoau_pythonpath: "{{ ZOAU_PYTHONPATH }}"
+          executable: "{{ new_zoau_home }}"
+          zoau_pythonpath: "{{ new_zoau_pythonpath }}"
 
           # take advantage of the now() command built in to jinja.
-          date_last_updated: "{{ now(utc=true,fmt='%Y-%m-%d') }}"
+          date_last_updated: "{{ now(utc=true, fmt='%Y-%m-%d') }}"
 
     - name: Print the updated zoau dict before writing to file.
       ansible.builtin.debug:

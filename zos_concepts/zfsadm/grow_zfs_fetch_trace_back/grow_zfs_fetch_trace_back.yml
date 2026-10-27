@@ -23,7 +23,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Create, mount and grow a zFS aggregate, then fetch the trace back
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -35,15 +36,18 @@
     # ##########################################################################
     # Generate temporary data set names
     # ##########################################################################
-    - name: Create temp data set name
+    - name: Create temp data set name for the zFS
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds1
+      changed_when: false
 
-    - name: Create temp data set name
+    - name: Create temp data set name for the trace back
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: tmp_ds2
+      changed_when: false
 
-    - ansible.builtin.set_fact:
+    - name: Set the zFS and trace back data set name facts
+      ansible.builtin.set_fact:
         zfs_data_set: "{{ tmp_ds1.stdout }}"
         trace_back_data_set: "{{ tmp_ds2.stdout }}"
         trace_back_data_set_mem: "{{ tmp_ds2.stdout }}(MEM)"
@@ -76,6 +80,7 @@
       ansible.builtin.file:
         path: "{{ mount_point }}"
         state: directory
+        mode: "0755"
 
     - name: "Mount zFS data set."
       ibm.ibm_zos_core.zos_mount:
@@ -87,6 +92,7 @@
     - name: "Confirm mount point."
       ansible.builtin.command: "df /{{ mount_point }}"
       register: df_output
+      changed_when: false
 
     - name: "Echo df output."
       ansible.builtin.debug:
@@ -116,6 +122,7 @@
 
     - name: "Write 1 million bytes to zFS."
       ansible.builtin.shell: head -c 1000000 /dev/urandom > {{ mount_point }}/test.txt
+      changed_when: true
 
     # ##########################################################################
     # Grow zFS aggregate.
@@ -134,13 +141,13 @@
       ansible.builtin.debug:
         msg: "{{ grow_output }}"
 
-    - name: "Fetch {{ trace_back_data_set }} to the local controller."
+    - name: "Fetch to the local controller from {{ trace_back_data_set }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ trace_back_data_set_mem }}"
         dest: "{{ output_path }}"
       register: fetch_result
 
-    - name: "Result of Fetch {{ trace_back_data_set_mem }} to the local machine."
+    - name: "Result of Fetch to the local machine from {{ trace_back_data_set_mem }}"
       ansible.builtin.debug:
         msg: "{{ fetch_result }}"
 
@@ -150,6 +157,7 @@
 
     - name: Unmount zFS data set.
       ansible.builtin.command: "/usr/sbin/unmount {{ mount_point }}"
+      changed_when: true
 
     - name: Delete zFS data set.
       ibm.ibm_zos_core.zos_data_set:

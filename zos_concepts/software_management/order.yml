@@ -14,12 +14,13 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
+- name: Order SMP/E PTFs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
     - role: order_ptf
-      ptf: "UI74491"
-      global_csi: "IMSTESTL.ZOAU110.CSI"
-      smpe_root: "/var/zoau110"
+      order_ptf_ptf: "UI74491"
+      order_ptf_global_csi: "IMSTESTL.ZOAU110.CSI"
+      order_ptf_smpe_root: "/var/zoau110"

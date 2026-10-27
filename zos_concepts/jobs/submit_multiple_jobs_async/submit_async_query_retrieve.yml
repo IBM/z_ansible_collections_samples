@@ -54,7 +54,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Submit batch jobs asynchronously, query them and retrieve output
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -140,7 +141,10 @@
       loop: "{{ job_ids }}"
 
     - name: Check if any asynchronous batch job has a RC > 0 and fail if it does.
-      ansible.builtin.fail: msg="Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}  has a rc of = {{ item.jobs[0].ret_code.code}}, msg = {{ item.jobs[0].ret_code.msg }}"
+      ansible.builtin.fail:
+        msg: >-
+          Asynchronous job ID = {{ item.item }}, job name = {{ item.jobs[0].job_name }}
+          has a rc of = {{ item.jobs[0].ret_code.code }}, msg = {{ item.jobs[0].ret_code.msg }}
       failed_when: >
         item.jobs[0].ret_code.code > 0
       with_items: "{{ job_query.results }}"

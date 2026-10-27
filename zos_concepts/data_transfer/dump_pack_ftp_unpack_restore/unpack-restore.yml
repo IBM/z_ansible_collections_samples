@@ -7,7 +7,8 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: destination_system
+- name: Unpack and restore data sets
+  hosts: destination_system
   gather_facts: false
   environment: "{{ environment_vars }}"
 

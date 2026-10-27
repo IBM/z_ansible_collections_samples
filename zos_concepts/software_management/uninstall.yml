@@ -14,10 +14,11 @@
 #     - IBM z/OS core collection 2.0.0 or later
 ###############################################################################
 
-- hosts: zos_host
+- name: Restore SMP/E PTFs
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   roles:
     - role: restore_ptf
-      reject_sysmod: false
+      restore_ptf_reject_sysmod: false

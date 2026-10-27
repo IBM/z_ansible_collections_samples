@@ -47,7 +47,8 @@
 #     are used as examples. The user of this playbook is responsible for providing valid information.
 ###############################################################################
 
-- hosts: zos_host
+- name: Clone a Git repository and manage APF authorized libraries
+  hosts: zos_host
   gather_facts: false
   vars:
     git_repo: "git@github.com:IBM/z_ansible_collections_samples.git"
@@ -60,8 +61,9 @@
 
   tasks:
     - name: Get home directory
-      ansible.builtin.shell: "echo $HOME | sed 's:/*$::'"
+      ansible.builtin.shell: "set -o pipefail && echo $HOME | sed 's:/*$::'"
       register: result
+      changed_when: false
     - name: Set home_dir path
       ansible.builtin.set_fact:
         home_dir: "{{ result.stdout }}"
@@ -75,7 +77,12 @@
       ansible.builtin.include_role:
         name: list-load
     - name: Create persistent dataset if not exist
-      ansible.builtin.shell: 'dls `echo "{{ persistent_ds.target }}" | sed s''/(.*)$//''` > /dev/null 2>&1 || dtouch `echo "{{ persistent_ds.target }}" | sed s''/(.*)$//''`'
+      ansible.builtin.shell: |
+        set -o pipefail
+        dls `echo "{{ persistent_ds.target }}" | sed s'/(.*)$//'` > /dev/null 2>&1 ||
+          { dtouch `echo "{{ persistent_ds.target }}" | sed s'/(.*)$//'` && echo CREATED; }
+      register: persistent_ds_result
+      changed_when: "'CREATED' in persistent_ds_result.stdout"
     - name: APF add delta list
       ansible.builtin.include_role:
         name: apf-add

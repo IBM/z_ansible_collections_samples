@@ -25,7 +25,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
+- name: Terse a data set and fetch it to the controller
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -45,7 +46,8 @@
     # ##########################################################################
     # Generate a temporary data set name
     # ##########################################################################
-    - block:
+    - name: Generate a temporary data set name
+      block:
         - name: Create a temporary data set
           ibm.ibm_zos_core.zos_data_set:
             type: seq
@@ -54,13 +56,14 @@
             space_type: cyl
             record_length: 1024
           register: tmp_ds
-          failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', [])|length == 0
+          failed_when: tmp_ds is not defined or tmp_ds.get('data_sets', []) | length == 0
 
     - name: Get the result of temp data set creation
       ansible.builtin.debug:
         var: tmp_ds
 
-    - ansible.builtin.set_fact:
+    - name: Set the temporary data set name
+      ansible.builtin.set_fact:
         tmp_data_set: "{{ tmp_ds.get('data_sets')[0].name }}"
 
     # ##################################################################################################
@@ -69,6 +72,7 @@
     - name: Create a temporary archive data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
       register: archive_data_set
+      changed_when: false
 
     - name: Save temporary archive data set name
       ansible.builtin.set_fact:
@@ -88,7 +92,7 @@
           type: terse
       register: terse_response
 
-    - name: Get the result of temp data set creation
+    - name: Show the temp data set facts
       ansible.builtin.debug:
         var: temp_data_set
 
@@ -96,7 +100,7 @@
       ansible.builtin.debug:
         var: terse_response
 
-    - name: "Fetch the tersed data set {{ archive_data_set }} to the local machine"
+    - name: "Fetch the tersed data set to the local machine from {{ archive_data_set }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ archive_data_set }}"
         dest: "{{ output_path }}/"
@@ -112,9 +116,9 @@
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ archive_data_set }}"
         state: absent
-      when: temp_data_set is defined and temp_data_set.data_sets|length > 0
+      when: temp_data_set is defined and temp_data_set.data_sets | length > 0
 
-    - name: "Fetch {{ tmp_data_set }} to local machine"
+    - name: "Fetch to local machine from {{ tmp_data_set }}"
       ibm.ibm_zos_core.zos_fetch:
         src: "{{ tmp_data_set }}"
         dest: "{{ output_path }}/"
@@ -124,7 +128,7 @@
           to: ISO8859-1
       register: result
 
-    - name: "Result of fetching {{ tmp_data_set }} to local machine"
+    - name: "Result of fetching to local machine from {{ tmp_data_set }}"
       ansible.builtin.debug:
         var: result
 
