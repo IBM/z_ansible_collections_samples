@@ -72,10 +72,8 @@ for line in result.split("\n"):
             template_line = f"  {role}-{index}:\n    mac: \"{mac_address}\"\n    ip: \"{ip_address}\""    
         template += "\n" + template_line
 
-old_umask = os.umask(0o177)
-    file.write(template)	try:
-    with open("dhcp_template.yaml", "w") as file:
-        file.write(template)
-    os.chmod("dhcp_template.yaml", 0o600)
-finally:
-    os.umask(old_umask)
+# Create the file with owner-only permissions (0600) from the start
+fd = os.open("dhcp_template.yaml", os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+with os.fdopen(fd, "w") as file:
+    file.write(template)
+os.chmod("dhcp_template.yaml", 0o600)
