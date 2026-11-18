@@ -1,0 +1,336 @@
+###############################################################################
+# © Copyright IBM Corporation 2026
+###############################################################################
+
+###############################################################################
+# This playbook demonstrates how to use zos_started_task_info to retrieve status
+# information for started tasks on z/OS using Red Hat Ansible Certified
+# Content for IBM Z.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories zos_started_task_info.yml
+#
+# Requirements:
+#   IBM z/OS core collection 2.3.0 or later.
+#
+###############################################################################
+
+###############################################################################
+# Playbook Overview:
+# This playbook demonstrates comprehensive started task information retrieval by
+# performing the following operations:
+#
+# 1. It copies a sample JCL containing a sleep command to a PDS member and starts
+#    it as a task.
+#
+# 2. It displays detailed status information for the newly started task.
+#
+# 3. It sets a PER trap for the started task.
+#
+# 4. It displays started task information after a change has been made to the
+#    started task address space.
+#
+# 5. It cancels the started task and displays the results from attempting to get
+#    information from a cancelled started task.
+#
+# 6. It uses an asterisk wildcard pattern to filter for multiple started tasks.
+#
+# 7. It queries all active started tasks on the z/OS system.
+#
+# 8. It uses a task ID to retrieve started task information.
+#
+#
+# Configurable Variables:
+#   jcl_file: Path to the source JCL file on the controller
+#             Default: "{{ playbook_dir }}/files/sample.jcl"
+#             Description: Local JCL file containing the sleep command to be
+#                         copied to z/OS for testing started task operations
+#
+#   usr_proclib: Target PDS (Partitioned Data Set) on z/OS
+#                Default: "USER.PRIVATE.PROCLIB"
+#                Description: A standard z/OS procedure library that is
+#                            accessible by the system when starting tasks.
+#                            This is a default dataset in the JES2 PROCLIB
+#                            concatenation, allowing started tasks to be
+#                            initiated from members stored within it
+#
+#   member_name: Name of the PDS member
+#                Default: "SLEEPJCL"
+#                Description: The member name (up to 8 characters) used to
+#                            store the JCL and identify the started task.
+#                            This name will be used throughout the playbook
+#                            for task operations
+#
+#   started_task_name: Name of the started task
+#                Default: "SLEEP"
+#                Description: The name (up to 8 characters) used to
+#                            identify the started task. This name
+#                            will be used throughout the playbook
+#                            for task operations.
+#
+# Prerequisites:
+#   - The USER.PRIVATE.PROCLIB dataset must exist or user must have authority to create it
+#   - User must have appropriate permissions to start and cancel tasks and set and delete
+#     a SLIP trap
+#   - IBM z/OS core collection 2.3.0 or later must be installed
+#   - The target z/OS system must have the ICSF started task available to run the tasks
+#     relating to wildcards and task_id
+#
+# Note: This playbook modifies system-level started tasks. Ensure you have
+#       proper authorization and understand the impact before running
+#       in a production environment.
+#
+# Tags:
+#   Specify one of the following tags to run a specific scenario.
+#
+#   user_started_task: Use this tag to start a started task from a local JCL template,
+#                      display detailed task information, and cancel the task.
+#
+#   set_slip_trap:     Use this tag with the user_started_task to set a PER SLIP trap
+#                      in the started task address space to view how changes to a
+#                      started task are reflected in the zos_started_task_info display.
+#
+#   wildcards:         Use this tag to view examples of how to use wildcard patterns
+#                      to filter started tasks.
+#
+#   task_id:          Use this tag to view an example of how to retrieve started
+#                     task information using a task ID.
+#
+#   Example:
+#     ansible-playbook -i inventories zos_started_task_info.yml --tags "user_started_task,set_slip_trap"
+#
+###############################################################################
+
+- name: Sample zos_started_task_info playbook
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    jcl_file: "{{ playbook_dir }}/files/sample.jcl"
+    usr_proclib: "USER.PRIVATE.PROCLIB"
+    member_name: "SLEEPJCL"
+    started_task_name: "SLEEP"
+
+  tasks:
+    # #######################################################################################
+    # This task copies a sample JCL file to a z/OS dataset member (member_name). The JCL contains
+    # a simple script that executes a sleep command, which is used for demonstration purposes
+    # in this playbook.
+    # #######################################################################################
+    - name: "Copy sample JCL containing sleep command to member '{{ member_name }}'"
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ jcl_file }}"
+        dest: "{{ usr_proclib }}({{ member_name }})"
+        replace: true
+      register: copy_out
+      tags: user_started_task
+
+    - name: Print zos_copy output
+      ansible.builtin.debug:
+        var: copy_out
+      tags: user_started_task
+
+    # #######################################################################################
+    # Start a started task using PDS Member name which contains JCL to run as a started task.
+    # #######################################################################################
+    - name: "Start a started task with JCL stored in {{ member_name }}, ensuring to wait the full 30 seconds"
+      ibm.ibm_zos_core.zos_started_task:
+        state: started
+        member: "{{ member_name }}"
+        job_name: "{{ started_task_name }}"
+        wait_time: 30
+        wait_full_time: true
+      register: start_out
+      tags: user_started_task
+
+    - name: Print start output for the JCL member started task
+      ansible.builtin.debug:
+        var: start_out
+      tags: user_started_task
+
+    # #######################################################################################
+    # Display details of a running started task using started task name.
+    # #######################################################################################
+    - name: Display the status of the started task using task name {{ started_task_name }}
+      ibm.ibm_zos_core.zos_started_task_info:
+        job_name: "{{ started_task_name }}"
+        verbose: true
+      register: display_out
+      tags: user_started_task
+
+    # Print the complete module output for the running started task. This includes every field
+    # in the tasks list and, because verbose is true, the system logs in verbose_output.
+    # The per_trap and address_space_flag values are compared with the values returned after
+    # the PER SLIP trap is set.
+    - name: Print display output for started task {{ started_task_name }}
+      ansible.builtin.debug:
+        var: display_out
+      tags: user_started_task
+
+    # #######################################################################################
+    # Set PER SLIP TRAP for started task in order to view a sample address_space_flag return value
+    # when displaying the started task.
+    #
+    # The following summarizes the contents of the command passed to the zos_operator module:
+    #   SLIP SET  - activates a new Serviceability Level Indication Processing (SLIP) trap
+    #   IF        - Instruction Fetch (PER trap type) - directs hardware program event recording (PER)
+    #               to monitor instruction execution and fire whenever an instruction is executed within
+    #               the specified storage range
+    #   ID=PER1   - A 1-4 character alphanumeric identifier assigned to this trap
+    #   JOBNAME   - restricts trap monitoring to the address space running the specified started task
+    #   RANGE     - The virtual storage address range to monitor
+    #   ACTION    - Action taken upon matching trap criteria - SVCD requests z/OS to capture an SVC DUMP
+    #   MATCHLIM  - Limits the number of times the trap can match and perform its action (prevent flooding of system storage)
+    #   END       - Required terminator keyword signaling to the z/OS SLIP command processor that parameter specifications are complete
+    # #######################################################################################
+
+    - name: Set a PER SLIP trap for the started task
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "SLIP SET,IF,ID=PER1,JOBNAME={{ started_task_name }},RANGE=1B0000,ACTION=SVCD,MATCHLIM=5,END"
+        verbose: true
+      tags: set_slip_trap
+
+    - name: Display the active SLIP trap
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "DISPLAY SLIP=PER1"
+      tags: set_slip_trap
+
+    - name: Display started task {{ started_task_name }}
+      ibm.ibm_zos_core.zos_started_task_info:
+        job_name: "{{ started_task_name }}"
+      register: display_2_out
+      tags: set_slip_trap
+
+    # Compare the values returned before and after the PER SLIP trap was set. The per_trap
+    # value changes from false to true and the address_space_flag changes to PR.
+    - name: Print per_trap and address_space_flag before and after setting the SLIP trap
+      ansible.builtin.debug:
+        msg:
+          - "Before SLIP trap - per_trap: {{ display_out.tasks[0].per_trap }}, address_space_flag: '{{ display_out.tasks[0].address_space_flag }}'"
+          - "After SLIP trap  - per_trap: {{ display_2_out.tasks[0].per_trap }}, address_space_flag: '{{ display_2_out.tasks[0].address_space_flag }}'"
+      tags: set_slip_trap
+
+    # #######################################################################################
+    # Delete the SLIP trap and cancel the running started task.
+    # #######################################################################################
+    - name: Delete the SLIP trap
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "SLIP DEL,ID=PER1"
+      tags: set_slip_trap
+
+    - name: Cancel started task {{ started_task_name }}
+      ibm.ibm_zos_core.zos_started_task:
+        state: cancelled
+        job_name: "{{ started_task_name }}"
+      register: cancel_out
+      tags: user_started_task
+
+    - name: Print cancel_out
+      ansible.builtin.debug:
+        var: cancel_out
+      tags: user_started_task
+
+    # A failure is expected when attempting to display a started task that is not active on the system
+    - name: Attempt to display cancelled started task {{ started_task_name }}
+      ibm.ibm_zos_core.zos_started_task_info:
+        job_name: "{{ started_task_name }}"
+      register: display_cancelled_out
+      ignore_errors: true
+      tags: user_started_task
+
+    - name: Print the message and return code for cancelled task {{ started_task_name }}
+      ansible.builtin.debug:
+        msg:
+          - "msg: {{ display_cancelled_out.msg }}"
+          - "rc: {{ display_cancelled_out.rc }}"
+      tags: user_started_task
+
+    # #######################################################################################
+    # Delete PDS member 'SLEEPJCL' which got created for testing purposes.
+    # #######################################################################################
+    - name: "Remove PDS Member {{ member_name }}"
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ usr_proclib }}({{ member_name }})"
+        state: absent
+        type: member
+      tags: user_started_task
+
+    # #######################################################################################
+    # Display details of a running started task using wildcards.
+    # #######################################################################################
+    # Combining a wildcard started task name with an identifier will filter all names matching
+    # the wildcard pattern by the identifier name.
+    - name: Display started tasks already running on system matching name and identifier
+      ibm.ibm_zos_core.zos_started_task_info:
+        job_name: "I*"
+        identifier_name: "ICSF"
+      register: display_identifier_out
+      tags: wildcards
+
+    - name: Print matched started tasks for I*.ICSF
+      ansible.builtin.debug:
+        var: display_identifier_out
+      tags: wildcards
+
+    # This task will retrieve all jobs match the "J*" wildcard pattern. It will match JES2 on most
+    # systems, but a system without a matching started task will return a "NOT FOUND" error.
+    - name: Display started tasks already running on system matching J*
+      ibm.ibm_zos_core.zos_started_task_info:
+        job_name: "J*"
+      register: display_wildcard_out
+      tags: wildcards
+
+    - name: Print matched started tasks for J*
+      ansible.builtin.debug:
+        var: display_wildcard_out
+      tags: wildcards
+
+    # #######################################################################################
+    # Display all started tasks on the LPAR.
+    #
+    # Specifying "*" returns every active address space (batch jobs, started tasks, system
+    # address spaces, TSO/E users, initiators, etc.), so the full output can be very large.
+    # Rather than printing the entire result, a summary of the number of tasks returned and
+    # their names is printed.
+    # #######################################################################################
+    - name: Display all started tasks
+      ibm.ibm_zos_core.zos_started_task_info:
+        job_name: "*"
+      register: display_all_out
+      tags: wildcards
+
+    - name: Print a summary of all started tasks
+      ansible.builtin.debug:
+        msg:
+          - "Total number of address spaces returned: {{ display_all_out.tasks | length }}"
+          - "Task names: {{ display_all_out.tasks | map(attribute='task_name') | list }}"
+      tags: wildcards
+
+    # #######################################################################################
+    # Display details of a running started task using the task ID.
+    # #######################################################################################
+    - name: Query started task ICSF
+      ibm.ibm_zos_core.zos_job_query:
+        job_name: "ICSF"
+      register: icsf_query_out
+      tags: task_id
+
+    - name: Set fact task_id from the queried job output
+      ansible.builtin.set_fact:
+        task_id: "{{ icsf_query_out.jobs[0].job_id }}"
+      tags: task_id
+
+    - name: Display started task matching task ID
+      ibm.ibm_zos_core.zos_started_task_info:
+        task_id: "{{ task_id }}"
+      register: display_id_out
+      tags: task_id
+
+    - name: Print status fields for started task with ID {{ task_id }}
+      ansible.builtin.debug:
+        var: display_id_out
+      tags: task_id
