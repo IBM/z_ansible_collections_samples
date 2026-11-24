@@ -11,7 +11,14 @@
 #
 # Run pytest
 # ------------
+# ALL PLAYBOOOKS:
 # pytest zos_concepts/tests/test_run_playbook.py
+#
+# ONE PLAYBOOK, VERBOSE:
+# pytest zos_concepts/tests/test_run_playbook.py -v -k "started_task_management/zos_started_task_info"
+#
+# LIST TEST CASES WITHOUT RUNNING TESTS:
+# pytest zos_concepts/tests/test_run_playbook.py --collect-only -q
 ###############################################################################
 
 from pathlib import Path
@@ -86,7 +93,8 @@ _SITE_PLAYBOOKS: set[Path] = {
     _ZOS_CONCEPTS_DIR / "zos_operator" / "zos_operator_basics" / "site.yml",
     _ZOS_CONCEPTS_DIR / "zos_ping" / "site.yml",
     _ZOS_CONCEPTS_DIR / "zos_script" / "site.yml",
-    _ZOS_CONCEPTS_DIR / "zos_started_task" / "site.yml",
+    _ZOS_CONCEPTS_DIR / "started_task_management" / "zos_started_task_info" / "site.yml",
+    _ZOS_CONCEPTS_DIR / "started_task_management" / "zos_started_task" / "site.yml",
     _ZOS_CONCEPTS_DIR / "zos_stat" / "site.yml",
 }
 
