@@ -8,8 +8,15 @@
 ################################################################################
 
 releases:
-    2025.10.02:
-        date: 2025-10-02
-        changes:
-            added:
-                - Released initial version
+  2025.10.02:
+    date: 2025-10-02
+    changes:
+      added:
+        - Released initial version
+  2026.11.16:
+    date: 2026.11.16
+    changes:
+      fixed:
+        - Update README with correct description of playbook capabilities.
+      minor:
+        - Create subfolder for zos_started_task playbook under started_task_management.

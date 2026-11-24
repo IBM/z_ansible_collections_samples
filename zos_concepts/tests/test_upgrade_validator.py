@@ -4,6 +4,17 @@
 # Tests that run the ibm.ibm_zos_core.playbook_upgrade_validator role against
 # every zos_concepts playbook and assert the resulting JSON migration report
 # contains no [MUST_FIX] violations.
+#
+# Run pytest
+# ------------
+# ALL PLAYBOOKS:
+# pytest zos_concepts/tests/test_upgrade_validator.py
+#
+# ONE PLAYBOOK, VERBOSE:
+# pytest zos_concepts/tests/test_upgrade_validator.py -v -k zos_started_task_info
+#
+# LIST TEST CASES WITHOUT RUNNING TESTS:
+# pytest zos_concepts/tests/test_upgrade_validator.py --collect-only -q
 ###############################################################################
 
 from pathlib import Path

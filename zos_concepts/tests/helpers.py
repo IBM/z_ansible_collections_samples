@@ -156,7 +156,11 @@ PLAYBOOKS_BY_SUBFOLDER: dict[str, list[str]] = {
         "site.yml",
         "zos_script.yml",
     ],
-    "zos_started_task": [
+    "started_task_management/zos_started_task_info": [
+        "site.yml",
+        "zos_started_task_info.yml",
+    ],
+    "started_task_management/zos_started_task": [
         "site.yml",
         "zos_started_task.yml",
     ],
