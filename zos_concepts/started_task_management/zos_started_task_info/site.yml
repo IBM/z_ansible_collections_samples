@@ -29,5 +29,5 @@
       ansible.builtin.include_role:
         name: requirements-check
 
-- name: Execute the z/OS Ansible playbook, querying a variety of resources in z/OS
+- name: Execute the z/OS Ansible playbook for retrieving started task information
   import_playbook: zos_started_task_info.yml

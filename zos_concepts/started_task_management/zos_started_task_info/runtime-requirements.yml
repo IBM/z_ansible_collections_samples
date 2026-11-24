@@ -4,7 +4,7 @@
 
 ################################################################################
 # List `requires_ansible_version` contains Ansible version entries that this
-# playbook requires. It can be one more then one Ansible version
+# playbook requires. It can be more than one Ansible version
 # e.g, `- 2.9` would be interpreted as 2.9 - 2.9.n where n is >= 0. Where `- 2.9.0`
 # would be require an exact match, just like 2.9.12 would be an exact match.
 #

@@ -79,7 +79,7 @@
 #   - The target z/OS system must have the ICSF started task available to run the tasks
 #     relating to wildcards and task_id
 #
-# Note: This playbook modifies system-level started tasks. Ensure you have
+# Note: This playbook set hardware-level event monitoring. Ensure you have
 #       proper authorization and understand the impact before running
 #       in a production environment.
 #
@@ -210,8 +210,8 @@
     - name: Print per_trap and address_space_flag before and after setting the SLIP trap
       ansible.builtin.debug:
         msg:
-          - "Before SLIP trap - per_trap: {{ display_out.tasks[0].per_trap }}, address_space_flag: '{{ display_out.tasks[0].address_space_flag }}'"
-          - "After SLIP trap  - per_trap: {{ display_2_out.tasks[0].per_trap }}, address_space_flag: '{{ display_2_out.tasks[0].address_space_flag }}'"
+          - "Before SLIP trap - per_trap: {{ display_out.tasks[0].per_trap }}, address_space_flag: '{{ display_out.tasks[0].address_space_flag | default('') }}'"
+          - "After SLIP trap  - per_trap: {{ display_2_out.tasks[0].per_trap }}, address_space_flag: '{{ display_2_out.tasks[0].address_space_flag | default('') }}'"
       tags: set_slip_trap
 
     # #######################################################################################
@@ -276,7 +276,7 @@
         var: display_identifier_out
       tags: wildcards
 
-    # This task will retrieve all jobs match the "J*" wildcard pattern. It will match JES2 on most
+    # This task will retrieve all jobs matching the "J*" wildcard pattern. It will match JES2 on most
     # systems, but a system without a matching started task will return a "NOT FOUND" error.
     - name: Display started tasks already running on system matching J*
       ibm.ibm_zos_core.zos_started_task_info:
